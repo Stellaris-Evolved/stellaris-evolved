@@ -1,0 +1,202 @@
+# o v e r w r i t e 
+
+offworld_trading_company = {
+	icon = "GFX_starbase_offworld_trading_company"
+	construction_days = 360
+
+	
+	potential = {
+		exists = owner
+		owner = {
+			has_technology = tech_space_trading
+			OR = {
+				is_gestalt = no
+				tec_is_trade_gestalt = yes
+			}
+		}
+		is_orbital_ring = no
+	}
+	
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_starport"
+			has_starbase_size >= starbase_starport
+		}
+		OR = {
+			has_starbase_module = trading_hub
+			starbase_buildable_is_in_queue_before = {
+				first = trading_hub
+				second = offworld_trading_company
+			}
+			and = {
+				owner = {
+					OR = {
+						has_valid_civic = civic_tec_corporate_navaltraders
+						has_valid_civic = civic_tec_machine_traders
+					}
+				}
+				OR = {
+					has_starbase_module = anchorage
+					starbase_buildable_is_in_queue_before = {
+						first = anchorage
+						second = offworld_trading_company
+					}
+				}
+			}
+		}
+	}
+
+	resources = {
+		category = starbase_buildings
+		cost = {
+			alloys = 100
+		}
+	}
+	
+	triggered_station_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_valid_civic = civic_corporate_dominion
+			}
+		}
+		trade_value_add = 5
+	}
+	
+	triggered_station_modifier = {
+		potential = {
+			hidden_trigger = { exists = this }
+			has_starbase_module = trading_hub
+		}
+		trade_value_add = 2
+		mult = value:num_starbase_modules_of_type|TYPE|trading_hub|
+	}
+
+	#money from anchorages
+	triggered_station_modifier = {
+		potential = {
+			hidden_trigger = { exists = this }
+			hidden_trigger = {
+				exists = owner
+				owner = {
+					OR = {
+						has_valid_civic = civic_tec_corporate_navaltraders
+						has_valid_civic = civic_tec_machine_traders
+					}
+				}
+			}
+			has_starbase_module = anchorage
+		}
+		trade_value_add = 2
+		mult = value:num_starbase_modules_of_type|TYPE|anchorage|
+	}
+	
+	custom_tooltip = sm_offworld_trading_company_desc_modifier
+
+	show_in_tech = "tech_space_trading"
+	
+	ai_weight = {
+		weight = 200
+		modifier = {
+			factor = 0
+			count_starbase_modules = {
+				type = trading_hub
+				count < 3
+			}
+		}
+		modifier = {
+			factor = 100
+			owner = {
+				OR = {
+					has_valid_civic = civic_tec_corporate_navaltraders
+					has_valid_civic = civic_tec_machine_traders
+				}
+			}
+			count_starbase_modules = {
+				type = anchorage
+				count > 3
+			}
+		}
+	}
+}
+
+# Balance reasons
+hydroponics_bay = {
+	icon = "GFX_spaceport_module_hydroponic_farms"
+	construction_days = 360
+
+	potential = {
+		exists = owner
+		owner = { has_technology = "tech_food_processing_1" }
+	}
+
+	resources = {
+		category = starbase_buildings
+		cost = {
+			alloys = 200
+		}
+
+		upkeep = {
+			energy = 5
+		}
+	}
+
+	triggered_system_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_ascension_perk = ap_grasp_the_void
+			}
+		}
+		planet_farmers_food_produces_add = 1
+	}
+
+	show_in_tech = tech_food_processing_1
+
+	ai_weight = {
+		weight = 100 #use same weight here - ai weighting is done in starbase_types.txt
+	}
+}
+
+# Might 1
+crew_quarters = {
+	icon = "GFX_spaceport_module_crew_quarters"
+	construction_days = 180
+
+	initial = yes
+
+	resources = {
+		category = starbase_buildings
+		cost = {
+			alloys = 50
+		}
+
+		upkeep = {
+			energy = 1
+		}
+	}
+
+	orbit_modifier = {
+		ship_orbit_upkeep_mult = -0.25
+	}
+
+	triggered_station_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				OR = {
+					has_active_tradition = tr_tec_might_1
+					has_active_tradition = tr_tec_might_1_hive
+					has_active_tradition = tr_tec_might_1_machine
+				}
+			}
+		}
+		starbase_shipyard_build_speed_mult = 0.10
+		ship_orbit_upkeep_mult = -0.05
+		#starbase_shipyard_capacity_add = 1
+	}
+
+	ai_weight = {
+		weight = 100 #use same weight here - ai weighting is done in starbase_types.txt
+	}
+}

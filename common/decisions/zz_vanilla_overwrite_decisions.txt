@@ -1,0 +1,860 @@
+# - - - - - - - - - - - - - - - - - - - - - 
+# Centralized Overwrites
+# - - - - - - - - - - - - - - - - - - - - - 
+
+# - - - - - - - - - - - - - - - - - - - - - 
+# O V E R W R I T E			02_special_decisions.txt
+# - - - - - - - - - - - - - - - - - - - - - 
+# Market Candidate Nomination
+decision_market_nomination = {
+	icon = decision_market_nomination
+	owned_planets_only = yes
+
+	# instant
+
+	resources = {
+		category = decisions
+	
+		cost = {
+				trigger = {
+				owner = {
+					nor = {
+						has_valid_civic = civic_tec_globalism 
+						has_valid_civic = civic_tec_corporate_globalism
+					}
+				}
+			}
+			energy = 1000
+			influence = 150			
+		}
+		cost = {
+				trigger = {
+				owner = {
+					OR = {
+						has_valid_civic = civic_tec_globalism 
+						has_valid_civic = civic_tec_corporate_globalism
+					}
+				}
+			}
+			energy = 1000
+			influence = 50			
+		}
+	}
+	
+	potential = {
+		OR = {
+			has_global_flag = ongoing_market_nomination
+			has_global_flag = ongoing_market_relocation_nomination
+		}
+		#from = { has_communications = event_target:50percentcomms } # should include self
+		from = { has_country_flag = market_nomination_eligible }
+	}
+
+	allow = {
+		num_pops > 20
+		custom_tooltip = {
+			fail_text = already_market_nominated
+			from = {
+				NOT = {
+					any_owned_planet = {
+						OR = {
+							has_modifier = market_nominee_level_1
+							has_modifier = market_nominee_level_2
+							has_modifier = market_nominee_level_3
+							has_modifier = market_nominee_level_4 # boosted once
+							has_modifier = market_nominee_level_5 # boosted twice
+						}
+					}
+				}
+			}
+		}
+	}
+
+	effect = {
+		custom_tooltip = decision_market_nomination_effects
+		hidden_effect = {
+			from = {
+				set_variable = {
+					which = market_rating
+					value = 0
+				}
+			}
+			random_list = {
+				9 = {
+					add_modifier = {
+						modifier = market_nominee_level_1
+						days = -1
+					}
+					from = {
+						change_variable = {
+							which = market_rating
+							value = 1
+						}
+					}
+					modifier = {
+						factor = 0.33
+						from = {
+							OR = {
+								is_megacorp = yes 
+								tec_is_trade_gestalt = yes
+							}
+						}
+					}
+					modifier = {
+						factor = 0.33
+						from = {
+							OR = {
+								has_valid_civic = civic_tec_globalism 
+								has_valid_civic = civic_tec_corporate_globalism
+							}
+						}
+					}
+					modifier = {
+						factor = 0.33
+						from = { trade_income >= 100 }
+					}
+					modifier = {
+						factor = 2
+						from = { trade_income <= 50 }
+					}
+					modifier = {
+						factor = 1.5
+						from = {
+							is_gestalt = yes
+							tec_is_trade_gestalt = no
+						}
+					}
+				}
+				6 = {
+					add_modifier = {
+						modifier = market_nominee_level_2
+						days = -1
+					}
+					from = {
+						change_variable = {
+							which = market_rating
+							value = 2
+						}
+					}
+				}
+				1 = {
+					modifier = {
+						factor = 200
+						uses_district_set = city_world
+					}
+					modifier = {
+						factor = 9
+						from = {
+							OR = {
+								is_megacorp = yes 
+								tec_is_trade_gestalt = yes
+							}
+						}
+					}
+					modifier = {
+						factor = 9
+						from = {
+							OR = {
+								has_valid_civic = civic_tec_globalism 
+								has_valid_civic = civic_tec_corporate_globalism
+							}
+						}
+					}
+					add_modifier = {
+						modifier = market_nominee_level_3
+						days = -1
+					}
+					from = {
+						change_variable = {
+							which = market_rating
+							value = 3
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 10
+		modifier = {
+			factor = 0
+			num_pops < 20
+		}
+		modifier = {
+			factor = 1.5
+			from = {
+				resource_stockpile_compare = {
+					resource = energy
+					value > 12000
+				}
+				resource_stockpile_compare = {
+					resource = influence
+					value > 400
+				}
+			}
+		}
+		modifier = {
+			factor = 0.8
+			from = { is_xenophobe = yes }
+		}
+		modifier = {
+			factor = 2
+			from = {
+				OR = {
+					is_megacorp = yes 
+					tec_is_trade_gestalt = yes
+				}
+			}
+		}
+		modifier = {
+			factor = 2
+			from = {
+				OR = {
+					has_valid_civic = civic_tec_globalism 
+					has_valid_civic = civic_tec_corporate_globalism
+				}
+			}
+		}
+	}
+}
+
+decision_boost_market_nomination = {
+	icon = decision_market_nomination
+	owned_planets_only = yes
+	resources = {
+		category = decisions
+	
+		cost = {
+				trigger = {
+				owner = {
+					NOR = {
+						has_valid_civic = civic_tec_globalism 
+						has_valid_civic = civic_tec_corporate_globalism
+					}
+				}
+			}
+			energy = 2000
+			influence = 300			
+		}
+		cost = {
+				trigger = {
+				owner = {
+					OR = {
+						has_valid_civic = civic_tec_globalism 
+						has_valid_civic = civic_tec_corporate_globalism
+					}
+				}
+			}
+			energy = 2000
+			influence = 100			
+		}
+	}
+	
+	potential = {
+		OR = {
+			has_global_flag = ongoing_market_nomination
+			has_global_flag = ongoing_market_relocation_nomination
+		}
+		#from = { has_communications = event_target:50percentcomms } # should include self
+		from = { has_country_flag = market_nomination_eligible }
+		OR = {
+			has_modifier = market_nominee_level_1
+			has_modifier = market_nominee_level_2
+			has_modifier = market_nominee_level_3
+			has_modifier = market_nominee_level_4 # maxed out and boosted once
+			has_modifier = market_nominee_level_5 # maxed out and boosted twice
+		}
+	}
+
+	allow = {
+		custom_tooltip = {
+			fail_text = max_boosted
+			NOT = { has_planet_flag = boosted_twice }
+		}
+	}
+
+	effect = {
+		custom_tooltip = decision_boost_market_nomination_effects
+		hidden_effect = {
+			# boost counter
+			if = {
+				limit = { has_planet_flag = boosted_once }
+				set_planet_flag = boosted_twice
+			}
+			else = {
+				set_planet_flag = boosted_once
+			}
+			# boost rating
+			if = {
+				limit = { has_modifier = market_nominee_level_1 }
+				remove_modifier = market_nominee_level_1
+				add_modifier = {
+					modifier = market_nominee_level_2
+					days = -1
+				}
+			}
+			if = {
+				limit = { has_modifier = market_nominee_level_2 }
+				remove_modifier = market_nominee_level_2
+				add_modifier = {
+					modifier = market_nominee_level_3
+					days = -1
+				}
+			}
+			if = {
+				limit = { has_modifier = market_nominee_level_3 }
+				remove_modifier = market_nominee_level_3
+				add_modifier = {
+					modifier = market_nominee_level_4
+					days = -1
+				}
+			}
+			if = {
+				limit = { has_modifier = market_nominee_level_4 }
+				remove_modifier = market_nominee_level_4
+				add_modifier = {
+					modifier = market_nominee_level_5
+					days = -1
+				}
+			}
+			from = {
+				change_variable = {
+					which = market_rating
+					value = 1
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 10
+		modifier = {
+			factor = 0
+			num_pops < 20
+		}
+		modifier = {
+			factor = 1.5
+			from = {
+				resource_stockpile_compare = {
+					resource = energy
+					value > 11000
+				}
+				resource_stockpile_compare = {
+					resource = influence
+					value > 350
+				}
+			}
+		}
+		modifier = {
+			factor = 0.8
+			from = { is_xenophobe = yes }
+		}
+		modifier = {
+			factor = 2
+			from = {
+				OR = {
+					is_megacorp = yes
+					tec_is_trade_gestalt = yes
+				}
+			}
+		}
+		modifier = {
+			factor = 2
+			from = {
+				OR = {
+					has_valid_civic = civic_tec_globalism 
+					has_valid_civic = civic_tec_corporate_globalism
+				}
+			}
+		}
+	}
+}
+
+# - - - - - - - - - - - - - - - - - - - - - 
+# O V E R W R I T E :		03_crime_decisions.txt
+# - - - - - - - - - - - - - - - - - - - - - 
+# Negotiate with Crime Lords
+decision_negotiate_with_crime_lords = {
+	owned_planets_only = yes
+	sound = event_administrative_work
+	icon = decision_deal
+
+	resources = {
+		category = decisions
+		cost = {
+			#influence = 25		# UNITYPATCH
+			unity = 250
+		}
+	}
+	
+	potential = {
+		owner = { is_regular_empire = yes }
+		planet_crime >= 10
+		NOR = {
+			has_modifier = crime_lord_deal
+			has_modifier = anticrime_campaign
+		}
+	}
+	
+	effect = {
+		add_modifier = { modifier = "crime_lord_deal" days = -1 }
+	}
+	
+	ai_weight = {
+		weight = 50
+		modifier = {
+			weight = 2
+			planet_crime > 50
+			has_branch_office = yes
+			branch_office_owner = {
+				is_criminal_syndicate = yes
+			}
+		}
+	}
+}
+
+decision_end_crime_lord_deal = {
+	owned_planets_only = yes
+	sound = event_administrative_work
+	icon = decision_deal
+
+	resources = {
+		category = decisions
+	}
+	
+	potential = {
+		has_modifier = crime_lord_deal
+	}
+	
+	effect = {
+		remove_modifier = crime_lord_deal
+		add_modifier = { modifier = "crime_lord_deal_broken" days = 1800 }
+	}
+	
+	ai_weight = {
+		weight = 0
+		# LET IT WITHER AWAY!!
+	}
+}
+
+# - - - - - - - - - - - - - - - - - - - - - 
+# O V E R W R I T E			02_special_decisions.txt
+# - - - - - - - - - - - - - - - - - - - - - 
+# Lithoid terravore special decision
+decision_lithoid_swarm_consume_world = {
+	icon = decision_burning_settlement
+	sound = event_structural_collapse
+
+	enactment_time = 360
+	resources = {
+		category = decisions
+	}
+	owned_planets_only = yes
+
+	potential = {
+		owner = {
+			is_lithoid_devouring_swarm = yes
+		}
+		OR = {
+			can_have_habitable_deposits = yes
+			uses_district_set = tec_protoworld
+		}
+		is_capital = no
+	}
+
+	allow = {
+		num_free_districts = { type = any value > 0 }
+	}
+
+	effect = {
+		custom_tooltip = decision_lithoid_swarm_consume_world_effect_desc
+
+		if = {
+			limit = { num_districts = { type = any value > 0 } }
+			custom_tooltip = decision_lithoid_swarm_consume_world_destroy_district_desc
+
+			hidden_effect = {
+				random_list = {
+					1 = {
+						modifier = {
+							factor = 0
+							num_districts = { type = district_hive value = 0 }
+						}
+						remove_district = district_hive
+					}
+					1 = {
+						modifier = {
+							factor = 0
+							num_districts = { type = district_generator value = 0 }
+						}
+						remove_district = district_generator
+					}
+					1 = {
+						modifier = {
+							factor = 0
+							num_districts = { type = district_mining value = 0 }
+						}
+						remove_district = district_mining
+					}
+					3 = {
+						modifier = {
+							factor = 0
+							num_districts = { type = district_farming value = 0 }
+						}
+						remove_district = district_farming
+					}
+				}
+			}
+		}
+
+		hidden_effect = {
+			random_list = {
+				10 = {
+					modifier = {
+						factor = 0
+						num_free_districts = { type = any value < 2 }
+					}
+					add_deposit = d_lithoid_devastation
+					add_deposit = d_lithoid_devastation
+					create_pop = {
+						species = owner_main_species
+					}
+					add_planet_devastation = 20
+
+					if = {
+						limit = { owner = { is_ai = yes } }
+						random_owned_pop = {
+							resettle_pop = {
+								pop = this
+								planet = owner.capital_scope
+							}
+						}
+					}
+
+					create_message = {
+						type = MESSAGE_TERRAVORE_CONSUME_WORLD
+						localization = MESSAGE_TERRAVORE_CONSUME_WORLD_POP_TEXT
+						days = 30
+						target = this
+
+						variable = {
+							type = name
+							localization = PLANET
+							scope = this
+						}
+					}
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						num_free_districts = { type = any value < 2 }
+					}
+					add_deposit = d_lithoid_devastation
+					add_deposit = d_lithoid_devastation
+					owner = {
+						add_monthly_resource_mult = {
+							resource = minerals
+							value = 5
+							min = @tier1materialmin
+							max = @tier1materialmax
+						}
+					}
+					add_planet_devastation = 20
+
+					create_message = {
+						type = MESSAGE_TERRAVORE_CONSUME_WORLD
+						localization = MESSAGE_TERRAVORE_CONSUME_WORLD_MINERALS_TEXT
+						days = 30
+						target = this
+
+						variable = {
+							type = name
+							localization = PLANET
+							scope = this
+						}
+					}
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						num_free_districts = { type = any value < 2 }
+					}
+					add_deposit = d_lithoid_devastation
+					add_deposit = d_lithoid_devastation
+					owner = {
+						add_monthly_resource_mult = {
+							resource = alloys
+							value = 3
+							min = @tier1materialmin
+							max = @tier1materialmax
+						}
+					}
+					add_planet_devastation = 20
+
+					create_message = {
+						type = MESSAGE_TERRAVORE_CONSUME_WORLD
+						localization = MESSAGE_TERRAVORE_CONSUME_WORLD_ALLOYS_TEXT
+						days = 30
+						target = this
+
+						variable = {
+							type = name
+							localization = PLANET
+							scope = this
+						}
+					}
+				}
+				10 = {
+					# There's only one district slot left on the planet
+					modifier = {
+						factor = 0
+						num_free_districts = { type = any value >= 2 }
+					}
+					add_deposit = d_lithoid_devastation
+					owner = {
+						add_monthly_resource_mult = {
+							resource = minerals
+							value = 3
+							min = @tier1materialmin
+							max = @tier1materialmax
+						}
+					}
+					add_planet_devastation = 10
+
+					create_message = {
+						type = MESSAGE_TERRAVORE_CONSUME_WORLD
+						localization = MESSAGE_TERRAVORE_CONSUME_WORLD_MINERALS_TEXT
+						days = 30
+						target = this
+
+						variable = {
+							type = name
+							localization = PLANET
+							scope = this
+						}
+					}
+				}
+			}
+
+			# Abandon the planet if we've finished consuming the planet
+			if = {
+				limit = {
+					OR = {
+						num_free_districts = { type = any value <= 0 }
+						num_free_districts = { type = district_hive value <= 0 }
+						num_free_districts = { type = any value <= 1 }
+						num_free_districts = { type = district_hive value <= 1 }
+					}
+				}
+				owner = {
+					country_event = {
+						id = tec_rebalance.185
+						#colony.185 
+						days = 1 
+					}
+				}
+				# traditions
+				if = {
+					limit = {
+						owner = {
+							has_active_tradition = tr_tec_outreach_finish_terravore
+						}
+					}
+					owner = {
+						capital_scope = {
+							if = {
+								limit = {
+									root = {
+										planet_size < 10
+									}
+								}
+								while = {
+									count = 2
+									create_pop = {
+										species = root.owner.owner_main_species
+									}
+								}
+							}
+							else_if = {
+								limit = {
+									root = {
+										planet_size > 9
+										planet_size < 15
+									}
+								}
+								while = {
+									count = 3
+									create_pop = {
+										species = root.owner.owner_main_species
+									}
+								}
+							}
+							else_if = {
+								limit = {
+									root = {
+										planet_size > 14
+										planet_size < 21
+									}
+								}
+								while = {
+									count = 4
+									create_pop = {
+										species = root.owner.owner_main_species
+									}
+								}
+							}
+							else_if = {
+								limit = {
+									root = {
+										planet_size > 19
+									}
+								}
+								while = {
+									count = 5
+									create_pop = {
+										species = root.owner.owner_main_species
+									}
+								}
+							}
+						}
+					}
+				}
+				if = {
+					limit = {
+						owner = {
+							has_active_tradition = tr_tec_artifice_finish_terravore
+						}
+						NOR = {
+							HAS_planet_flag = has_megastructure
+							has_planet_flag = megastructure
+						}
+					}
+					solar_system = {
+						spawn_planet = {
+							class = "pc_habitat"
+							location = root
+							orbit_location = yes
+							orbit_angle_offset = 45
+							orbit_distance_offset = 9.899
+							size = 4
+							has_ring = no
+				
+							init_effect = {
+								set_name = "HABITAT_PLANET_NAME"
+								set_planet_entity = {
+									entity = "habitat_phase_01_entity"
+									graphical_culture = root.owner
+								}
+								set_surveyed = {
+									surveyed = yes
+									surveyor = root.owner
+								}
+								every_country = {
+									limit = {
+										has_communications = root.owner
+									}
+									prev = {
+										set_surveyed = {
+											surveyed = yes
+											surveyor = Prev
+										}
+									}
+								}
+								clear_blockers = yes
+				
+								set_planet_flag = megastructure
+								set_planet_flag = habitat
+				
+								# It will always be a mining habitat
+									set_planet_flag = mining_habitat
+								#
+												
+								if = {
+									limit = {
+										root.owner = {
+											OR = {
+												has_origin = origin_void_dwellers
+												is_ai = yes
+											}
+										}
+									}
+									create_colony = {
+										owner = root.owner
+									}
+									if = {
+										limit = {
+											root.owner = {
+												has_active_tradition = tr_tec_outreach_1_vd
+											}
+										}
+										create_pop = {
+											species = root.owner.owner_main_species
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				#
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 5
+
+		# don't wreck worlds you want to keep
+		modifier = {
+			factor = 0
+			is_lithoid_devouring_swarm_consumption_world = no
+		}
+	}
+}
+
+# - - - - - - - - - - - - - - - - - - - - - 
+# O V E R W R I T E			05_ancient_relics_decisions.txt
+# - - - - - - - - - - - - - - - - - - - - - 
+@minor_artifact_decision_cost = 2
+@minor_artifact_decision_duration = 3600
+
+decision_museum_exhibits = {
+	owned_planets_only = yes
+	sound = event_administrative_work
+	icon = decision_museum
+
+	potential = {
+		owner = {
+			is_gestalt = no
+			is_megacorp = no
+		}
+	}
+
+	allow = {
+		NOT = {
+			has_modifier = "planet_museum_exhibits"
+		}
+	}
+
+	resources = {
+		category = decisions
+		cost = {
+			minor_artifacts = @minor_artifact_decision_cost
+		}
+	}
+
+	effect = {
+		#custom_tooltip = decision_museum_exhibits_effect
+		add_modifier = { modifier = "planet_museum_exhibits" days = @minor_artifact_decision_duration }
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}
+
+
+# - - - - - - - - - - - - - - - - - - - - - 
+# O V E R W R I T E	02_special_decisions.txt
+# - - - - - - - - - - - - - - - - - - - - - 

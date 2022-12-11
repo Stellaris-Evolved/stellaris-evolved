@@ -1,0 +1,2264 @@
+# Vars
+# ------------------------------------------------------------
+# Chance of events - b=base, h=high, m=medium, l=low, vl=verylow
+#@tec_s_c_b		200 =
+#@tec_s_c_h		10 =
+#@tec_s_c_m		5 =
+#@tec_s_c_l		2 =
+#@tec_s_c_vl	1 =
+
+@tec_situation_cost_low = 25
+@tec_situation_cost_high = 50
+@tec_path_cost_low = 50
+@tec_path_cost_high = 100
+
+# --------------------------- Biological A --------------------------------
+# --------------- T1
+#situation_tec_gene_path_t1
+# --------------- Gating A
+situation_tec_gene_path_gate = {
+	desc = {
+		text = situation_tec_gene_path_gate_desc
+		trigger = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+	}
+	picture = GFX_evt_society_research
+	category = positive
+	complete_icon_frame = GFX_situation_outcome_frame_green
+	complete_icon = GFX_situation_outcome_unknown
+	fail_icon_frame = GFX_situation_outcome_frame_red
+	fail_icon = GFX_situation_outcome_negative
+	start_value = 0
+	progress_direction = monodirectional
+
+	on_start = {
+		set_situation_locked = yes
+	}
+
+	on_fail = {
+		# This should never happen, but if it does...
+		owner = {
+			start_situation = {
+				type = situation_tec_gene_path_gate
+				target = capital_scope
+				effect = {
+					save_event_target_as = new_situation
+				}
+			}
+		}
+		event_target:new_situation = {
+			set_situation_locked = no
+		}
+	}
+
+	on_monthly = {
+		random_events = {
+			# Nothing
+			200 = 0
+			# Negative random outcomes
+			2 = tec_gene_path.20011
+			2 = tec_gene_path.20012
+			#1 = tec_gene_path.20013
+			# Positive random outcomes
+			2 = tec_gene_path.20021
+			2 = tec_gene_path.20022
+			1 = tec_gene_path.20023
+		}
+	}
+	
+	on_progress_complete = {
+		hidden_effect = {
+			if = {
+				limit = {
+					current_situation_approach = situation_approach_tec_gene_path_gate_slow
+				}
+				owner = {
+					set_timed_country_flag = {
+						flag = tec_gene_good_temp
+						years = 5
+					}
+				}
+			}
+			if = {
+				limit = {
+					current_situation_approach = situation_approach_tec_gene_path_gate_fast
+				}
+				owner = {
+					set_timed_country_flag = {
+						flag = tec_gene_bad_temp
+						years = 5
+					}
+				}
+			}
+			owner = {
+				country_event = {
+					id = tec_gene_path.205
+				}
+			}
+			destroy_situation = this
+		}
+		custom_tooltip = situation_tec_gene_path_gate_end_tooltip
+		destroy_situation = this
+	}
+
+	stages = {
+		situation_tec_gene_path_gate_stage_1 = { #25% - After unlocks approaches
+			icon = GFX_situation_stage_1
+			icon_background = GFX_situation_stage_frame_tec_orange
+			end = 25
+		}
+
+		situation_tec_gene_path_gate_stage_2 = { #50%
+			icon = GFX_situation_stage_2
+			icon_background = GFX_situation_stage_frame_tec_yellow
+			end = 50
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_gene_path.20025
+					}
+				}
+			}
+		}
+
+		situation_tec_gene_path_gate_stage_3 = { #75%
+			icon = GFX_situation_stage_3
+			icon_background = GFX_situation_stage_frame_green
+			end = 75
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_gene_path.20050
+					}
+				}
+			}
+		}
+
+		situation_tec_gene_path_gate_stage_4 = { #100%
+			icon = GFX_situation_stage_4
+			icon_background = GFX_situation_stage_frame_blue
+			end = 100
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_gene_path.20075
+					}
+				}
+			}
+		}
+	}
+
+	# Approaches
+	approach = { # Basic
+		name = situation_approach_tec_gene_path_gate_neutral
+		icon = GFX_situation_approach_research
+		icon_background = GFX_situation_approach_bg_yellow
+		potential = {
+			NOT = {
+				has_situation_flag = situation_tec_gene_path_gate_unlock_approachs
+			}
+		}
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = @tec_situation_cost_low
+				#mult = owner.trigger:num_pops
+			}
+		}
+	}
+
+	approach = { # Slow but good
+		name = situation_approach_tec_gene_path_gate_slow
+		icon = GFX_situation_approach_genetics
+		icon_background = GFX_situation_approach_bg_green
+		potential = {
+			has_situation_flag = situation_tec_gene_path_gate_unlock_approachs
+		}
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = @tec_situation_cost_low
+			}
+		}
+	}
+
+	approach = { # Fast but bad
+		name = situation_approach_tec_gene_path_gate_fast
+		icon = GFX_situation_approach_tec_genecrank
+		icon_background = GFX_situation_approach_bg_red
+		potential = {
+			has_situation_flag = situation_tec_gene_path_gate_unlock_approachs
+		}
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = @tec_situation_cost_high
+			}
+		}
+	}
+
+	monthly_progress = {
+		base = 0
+		# Debug
+		modifier = {
+			add = 10
+			desc = EXCELLENT
+			has_situation_flag = situation_tec_debug
+		}
+		# Passive
+		modifier = {
+			add = 1
+			desc = situation_string_tec_gene_path_gate_base
+			OR = {
+				current_situation_approach = situation_approach_tec_gene_path_gate_neutral
+				has_situation_flag = situation_tec_gene_path_gate_end
+			}
+		}
+		# Approaches
+		modifier = {
+			add = 2
+			desc = situation_string_tec_gene_path_gate_bad
+			current_situation_approach = situation_approach_tec_gene_path_gate_fast
+		}
+		modifier = {
+			add = 1
+			desc = situation_string_tec_gene_path_gate_good
+			current_situation_approach = situation_approach_tec_gene_path_gate_slow
+		}
+	}
+
+	abort_trigger = {
+		NOT = { exists = owner }
+	}
+}
+# --------------- T2A
+situation_tec_gene_path_t2 = {
+	desc = {
+		text = situation_tec_gene_path_t2_desc
+		trigger = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+	}
+	picture = GFX_evt_society_research
+	category = positive
+	complete_icon_frame = GFX_situation_outcome_frame_green
+	complete_icon = GFX_situation_outcome_unknown
+	fail_icon_frame = GFX_situation_outcome_frame_red
+	fail_icon = GFX_situation_outcome_negative
+	start_value = 0
+	progress_direction = monodirectional
+
+	on_start = {
+		set_situation_locked = yes
+	}
+
+	on_fail = {
+		# This should never happen, but if it does...
+		owner = {
+			start_situation = {
+				type = situation_tec_gene_path_t2
+				target = capital_scope
+				effect = {
+					save_event_target_as = new_situation
+				}
+			}
+		}
+		event_target:new_situation = {
+			set_situation_locked = no
+		}
+	}
+
+	on_monthly = {
+		random_events = {
+			# Nothing
+			200 = 0
+			## Negative random outcomes
+			#2 = tec_gene_path.30011
+			#2 = tec_gene_path.30012
+			##5 = tec_gene_path.20013
+			## Positive random outcomes
+			#2 = tec_gene_path.30021
+			#2 = tec_gene_path.30022
+			#1 = tec_gene_path.30023
+		}
+	}
+	
+	on_progress_complete = {
+		hidden_effect = {
+			owner = {
+				country_event = {
+					id = tec_gene_path.305
+				}
+			}
+			destroy_situation = this
+		}
+		custom_tooltip = situation_tec_gene_path_t2_end_tooltip
+		destroy_situation = this
+	}
+
+	stages = {
+		situation_tec_gene_path_t2_stage_1 = { #25% - After unlocks approaches
+			icon = GFX_situation_stage_1
+			icon_background = GFX_situation_stage_frame_tec_orange
+			end = 25
+		}
+
+		situation_tec_gene_path_t2_stage_2 = { #50%
+			icon = GFX_situation_stage_2
+			icon_background = GFX_situation_stage_frame_tec_yellow
+			end = 50
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_gene_path.30025
+					}
+				}
+			}
+		}
+
+		situation_tec_gene_path_t2_stage_3 = { #75%
+			icon = GFX_situation_stage_3
+			icon_background = GFX_situation_stage_frame_green
+			end = 75
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_gene_path.30050
+					}
+				}
+			}
+		}
+
+		situation_tec_gene_path_t2_stage_4 = { #100%
+			icon = GFX_situation_stage_4
+			icon_background = GFX_situation_stage_frame_blue
+			end = 100
+			on_first_enter = {
+				hidden_effect = {
+					set_situation_flag = situation_tec_gene_path_t2_end
+					#situation_event = {
+					#	id = tec_gene_path.30075
+					#}
+				}
+			}
+		}
+	}
+
+	# Approaches
+	approach = { # Slow but good
+		name = situation_approach_tec_gene_path_t2_slow
+		icon = GFX_situation_approach_genetics
+		icon_background = GFX_situation_approach_bg_green
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = @tec_path_cost_low
+			}
+		}
+	}
+
+	approach = { # Fast but bad
+		name = situation_approach_tec_gene_path_t2_fast
+		icon = GFX_situation_approach_tec_genecrank
+		icon_background = GFX_situation_approach_bg_red
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = @tec_path_cost_high
+			}
+		}
+	}
+
+	monthly_progress = {
+		base = 0
+		# Debug
+		modifier = {
+			add = 10
+			desc = EXCELLENT
+			has_situation_flag = situation_tec_debug
+		}
+		# Passive
+		modifier = {
+			add = 1
+			desc = situation_string_tec_gene_path_t2_ending
+			has_situation_flag = situation_tec_gene_path_t2_end
+		}
+		# Approaches
+		modifier = {
+			add = 1
+			desc = situation_string_tec_gene_path_t2_slow
+			current_situation_approach = situation_approach_tec_gene_path_t2_slow
+		}
+		modifier = {
+			add = 2
+			desc = situation_string_tec_gene_path_t2_fast
+			current_situation_approach = situation_approach_tec_gene_path_t2_fast
+		}
+	}
+
+	abort_trigger = {
+		NOT = { exists = owner }
+	}
+}
+
+# --------------- Gating B
+#situation_tec_bio_path_gate
+# --------------- T2B
+#situation_tec_bio_path_t2
+
+# --------------------------- Cybernetics --------------------------------
+# --------------- T1
+#situation_tec_cybernetic_path_t1
+# --------------- Gating A
+situation_tec_cybernetic_path_gate = {
+	desc = {
+		text = situation_tec_cybernetic_path_gate_desc
+		trigger = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+	}
+	picture = GFX_evt_cybernetics
+	category = positive
+	complete_icon_frame = GFX_situation_outcome_frame_green
+	complete_icon = GFX_situation_outcome_unknown
+	fail_icon_frame = GFX_situation_outcome_frame_red
+	fail_icon = GFX_situation_outcome_negative
+	start_value = 0
+	progress_direction = monodirectional
+
+	on_start = {
+		set_situation_locked = yes
+	}
+
+	on_fail = {
+		# This should never happen, but if it does...
+		owner = {
+			start_situation = {
+				type = situation_tec_cybernetic_path_gate
+				target = capital_scope
+				effect = {
+					save_event_target_as = new_situation
+				}
+			}
+		}
+		event_target:new_situation = {
+			set_situation_locked = no
+		}
+	}
+
+	on_monthly = {
+		random_events = {
+			# Nothing
+			200 = 0
+			# Negative random outcomes
+			2 = tec_cybernetic_path.20011
+			2 = tec_cybernetic_path.20012
+			1 = tec_cybernetic_path.20013
+			# Positive random outcomes
+			2 = tec_cybernetic_path.20021
+			2 = tec_cybernetic_path.20022
+			1 = tec_cybernetic_path.20023
+		}
+	}
+	
+	on_progress_complete = {
+		hidden_effect = {
+			owner = {
+				country_event = {
+					id = tec_cybernetic_path.205
+				}
+			}
+			destroy_situation = this
+		}
+		custom_tooltip = situation_tec_cybernetic_path_gate_finish_tooltip
+		destroy_situation = this
+	}
+
+	stages = {
+		situation_tec_cybernetic_path_gate_stage_1 = { #25% - After unlocks approaches
+			icon = GFX_situation_stage_1
+			icon_background = GFX_situation_stage_frame_tec_orange
+			end = 25
+		}
+
+		situation_tec_cybernetic_path_gate_stage_2 = { #50%
+			icon = GFX_situation_stage_2
+			icon_background = GFX_situation_stage_frame_tec_yellow
+			end = 50
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_cybernetic_path.20025
+					}
+				}
+			}
+		}
+
+		situation_tec_cybernetic_path_gate_stage_3 = { #75%
+			icon = GFX_situation_stage_3
+			icon_background = GFX_situation_stage_frame_green
+			end = 75
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_cybernetic_path.20050
+					}
+				}
+			}
+		}
+
+		situation_tec_cybernetic_path_gate_stage_4 = { #100%
+			icon = GFX_situation_stage_4
+			icon_background = GFX_situation_stage_frame_blue
+			end = 100
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_cybernetic_path.20075
+					}
+				}
+			}
+		}
+	}
+
+	# Approaches
+	approach = { # Standard
+		name = situation_approach_tec_cybernetic_path_gate_standard
+		icon = GFX_situation_approach_tec_gear
+		icon_background = GFX_situation_approach_bg_yellow
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				engineering_research = @tec_situation_cost_low
+			}
+		}
+	}
+
+	approach = { # Slow but good
+		name = situation_approach_tec_cybernetic_path_gate_slow
+		icon = GFX_situation_approach_tec_gear
+		icon_background = GFX_situation_approach_bg_green
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				engineering_research = @tec_situation_cost_low
+			}
+		}
+	}
+
+	approach = { # Fast but bad
+		name = situation_approach_tec_cybernetic_path_gate_fast
+		icon = GFX_situation_approach_tec_gear
+		icon_background = GFX_situation_approach_bg_red
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				engineering_research = @tec_situation_cost_high
+			}
+		}
+	}
+
+	monthly_progress = {
+		base = 0
+		# Debug
+		modifier = {
+			add = 10
+			desc = EXCELLENT
+			has_situation_flag = situation_tec_debug
+		}
+		# Passive
+		modifier = {
+			add = 1
+			desc = situation_string_tec_cybernetic_path_gate_standard
+			current_situation_approach = situation_approach_tec_cybernetic_path_gate_standard
+		}
+		# Approaches
+		modifier = {
+			add = 2
+			desc = situation_string_tec_cybernetic_path_gate_fast
+			current_situation_approach = situation_approach_tec_cybernetic_path_gate_fast
+		}
+		modifier = {
+			add = 1
+			desc = situation_string_tec_cybernetic_path_gate_slow
+			current_situation_approach = situation_approach_tec_cybernetic_path_gate_slow
+		}
+	}
+
+	abort_trigger = {
+		NOT = { exists = owner }
+	}
+}
+# --------------- T2 A
+situation_tec_cybernetic_path_t2 = {
+	desc = {
+		text = situation_tec_cybernetic_path_t2_desc
+		trigger = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+	}
+	picture = GFX_evt_cybernetics
+	category = positive
+	complete_icon_frame = GFX_situation_outcome_frame_green
+	complete_icon = GFX_situation_outcome_unknown
+	fail_icon_frame = GFX_situation_outcome_frame_red
+	fail_icon = GFX_situation_outcome_negative
+	start_value = 0
+	progress_direction = monodirectional
+
+	on_start = {
+		set_situation_locked = yes
+	}
+
+	on_fail = {
+		# This should never happen, but if it does...
+		owner = {
+			start_situation = {
+				type = situation_tec_cybernetic_path_t2
+				target = capital_scope
+				effect = {
+					save_event_target_as = new_situation
+				}
+			}
+		}
+		event_target:new_situation = {
+			set_situation_locked = no
+		}
+	}
+
+	on_monthly = {
+		random_events = {
+			# Nothing
+			200 = 0
+			# Negative random outcomes
+			2 = tec_cybernetic_path.30011
+			2 = tec_cybernetic_path.30012
+			#1 = tec_cybernetic_path.30013
+			# Positive random outcomes
+			2 = tec_cybernetic_path.30021
+			2 = tec_cybernetic_path.30022
+			#1 = tec_cybernetic_path.30023
+		}
+	}
+	
+	on_progress_complete = {
+		hidden_effect = {
+			destroy_situation = this
+			owner = {
+				country_event = {
+					id = tec_cybernetic_path.305
+				}
+			}
+		}
+		custom_tooltip = situation_tec_cybernetic_path_t2_finish_tooltip
+		destroy_situation = this
+	}
+
+	stages = {
+		situation_tec_cybernetic_path_t2_stage_1 = { #25% - After unlocks approaches
+			icon = GFX_situation_stage_1
+			icon_background = GFX_situation_stage_frame_tec_orange
+			end = 25
+		}
+
+		situation_tec_cybernetic_path_t2_stage_2 = { #50%
+			icon = GFX_situation_stage_2
+			icon_background = GFX_situation_stage_frame_tec_yellow
+			end = 50
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_cybernetic_path.30025
+					}
+				}
+			}
+		}
+
+		situation_tec_cybernetic_path_t2_stage_3 = { #75%
+			icon = GFX_situation_stage_3
+			icon_background = GFX_situation_stage_frame_green
+			end = 75
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_cybernetic_path.30050
+					}
+				}
+			}
+		}
+
+		situation_tec_cybernetic_path_t2_stage_4 = { #100%
+			icon = GFX_situation_stage_4
+			icon_background = GFX_situation_stage_frame_blue
+			end = 100
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_cybernetic_path.30075
+					}
+				}
+			}
+		}
+	}
+
+	# Approaches
+	approach = { # Slow but good
+		name = situation_approach_tec_cybernetic_path_t2_slow
+		icon = GFX_situation_approach_tec_gear
+		icon_background = GFX_situation_approach_bg_green
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				engineering_research = @tec_path_cost_low
+			}
+		}
+	}
+
+	approach = { # Fast but bad
+		name = situation_approach_tec_cybernetic_path_t2_fast
+		icon = GFX_situation_approach_tec_genecrank
+		icon_background = GFX_situation_approach_bg_red
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				engineering_research = @tec_path_cost_high
+			}
+		}
+	}
+
+	monthly_progress = {
+		base = 0
+		# Debug
+		modifier = {
+			add = 10
+			desc = EXCELLENT
+			has_situation_flag = situation_tec_debug
+		}
+		# Approaches
+		modifier = {
+			add = 1
+			desc = situation_string_tec_cybernetic_path_t2_slow
+			NOR = {
+				current_situation_approach = situation_approach_tec_cybernetic_path_t2_fast
+				current_situation_approach = situation_approach_tec_cybernetic_path_t2_slow
+			}
+		}
+		modifier = {
+			add = 2
+			desc = situation_string_tec_cybernetic_path_t2_fast
+			current_situation_approach = situation_approach_tec_cybernetic_path_t2_fast
+		}
+		modifier = {
+			add = 1
+			desc = situation_string_tec_cybernetic_path_t2_slow
+			current_situation_approach = situation_approach_tec_cybernetic_path_t2_slow
+		}
+	}
+
+	abort_trigger = {
+		NOT = { exists = owner }
+	}
+}
+
+# --------------- Gating B
+#situation_tec_cyberslave_path_gating
+# --------------- T2 B
+#situation_tec_cyberslave_path_t2
+
+# --------------------------- Synthetics --------------------------------
+# --------------- T1
+situation_tec_synth_path_t1 = {
+	desc = {
+		text = situation_tec_synth_path_t1_desc
+		trigger = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+	}
+	picture = GFX_evt_tec_synthetic_first
+	category = positive
+	complete_icon_frame = GFX_situation_outcome_frame_green
+	complete_icon = GFX_situation_outcome_unknown
+	fail_icon_frame = GFX_situation_outcome_frame_red
+	fail_icon = GFX_situation_outcome_negative
+	start_value = 0
+	progress_direction = monodirectional
+
+	on_start = {
+		set_situation_locked = yes
+	}
+
+	on_fail = {
+		# This should never happen, but if it does...
+		owner = {
+			start_situation = {
+				type = situation_tec_synth_path_t1
+				target = capital_scope
+				effect = {
+					save_event_target_as = new_situation
+				}
+			}
+		}
+		event_target:new_situation = {
+			set_situation_locked = no
+		}
+	}
+
+	on_monthly = {
+		random_events = {
+			# Nothing
+			200 = 0
+			# Negative random outcomes
+			2 = tec_synth_path.10011
+			2 = tec_synth_path.10012
+			#5 = tec_synth_path.10013
+			# Positive random outcomes
+			2 = tec_synth_path.10021
+			2 = tec_synth_path.10022
+			#1 = tec_synth_path.10023
+		}
+	}
+	
+	on_progress_complete = {
+		hidden_effect = {
+			owner = {
+				country_event = {
+					id = tec_synth_path.105
+				}
+			}
+			destroy_situation = this
+		}
+		custom_tooltip = situation_tec_synth_path_t1_finish_tooltip
+		destroy_situation = this
+	}
+
+	stages = {
+		situation_tec_synth_path_t1_stage_1 = { #10% - After unlocks approaches
+			icon = GFX_situation_stage_tec_0
+			icon_background = GFX_situation_stage_frame_red
+			end = 10
+		}
+
+		situation_tec_synth_path_t1_stage_2 = { #20% - After unlocks approaches
+			icon = GFX_situation_stage_1
+			icon_background = GFX_situation_stage_frame_tec_orange
+			end = 20
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_synth_path.10010
+					}
+				}
+			}
+		}
+
+		situation_tec_synth_path_t1_stage_3 = { #30% - After unlocks approaches
+			icon = GFX_situation_stage_2
+			icon_background = GFX_situation_stage_frame_tec_yellow
+			end = 30
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_synth_path.10020
+					}
+				}
+			}
+		}
+
+		situation_tec_synth_path_t1_stage_4 = { #50%
+			icon = GFX_situation_stage_3
+			icon_background = GFX_situation_stage_frame_tec_yellow
+			end = 50
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_synth_path.10030
+					}
+				}
+			}
+		}
+
+		situation_tec_synth_path_t1_stage_5 = { #75%
+			icon = GFX_situation_stage_4
+			icon_background = GFX_situation_stage_frame_green
+			end = 75
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_synth_path.10050
+					}
+				}
+			}
+		}
+
+		situation_tec_synth_path_t1_stage_6 = { #100%
+			icon = GFX_situation_stage_5
+			icon_background = GFX_situation_stage_frame_blue
+			end = 100
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_synth_path.10075
+					}
+				}
+			}
+		}
+	}
+
+	# Approaches
+	approach = { # Basic
+		name = situation_approach_tec_synth_path_t1_standard
+		icon = GFX_situation_approach_research
+		icon_background = GFX_situation_approach_bg_yellow
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				engineering_research = @tec_path_cost_low
+			}
+		}
+	}
+
+	monthly_progress = {
+		base = 0
+		# Debug
+		modifier = {
+			add = 5
+			desc = EXCELLENT
+			has_situation_flag = situation_tec_debug
+		}
+		# Passive
+		modifier = {
+			add = 1
+			desc = situation_string_tec_synth_path_t1_base
+			current_situation_approach = situation_approach_tec_synth_path_t1_standard
+			owner = {
+				has_technology = tech_synthetic_workers
+				has_technology = tech_synthetic_leaders
+			}
+		}
+		# Subevents
+		modifier = {	# Used robots as base
+			add = 0.5
+			desc = situation_string_tec_synth_path_t1_use_robots
+			owner = {
+				has_country_flag = tec_synth_use_robots
+				has_technology = tech_synthetic_workers
+				has_technology = tech_synthetic_leaders
+			}
+		}
+		modifier = {	# Forced volunteers
+			add = 0.5
+			desc = situation_string_tec_synth_path_t1_forced_subject
+			owner = {
+				has_country_flag = tec_synth_forced_subject
+				has_technology = tech_synthetic_workers
+				has_technology = tech_synthetic_leaders
+			}
+		}
+		modifier = {	# No theseus
+			add = 0.5
+			desc = situation_string_tec_synth_path_t1_no_theseus
+			owner = {
+				has_country_flag = tec_synth_fast_transition
+				has_technology = tech_synthetic_workers
+				has_technology = tech_synthetic_leaders
+			}
+		}
+	}
+
+	abort_trigger = {
+		NOT = { exists = owner }
+	}
+}
+# --------------- Gating
+situation_tec_synth_path_gate = {
+	desc = {
+		text = situation_tec_synth_path_gate_desc
+		trigger = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+	}
+	picture = GFX_evt_cybernetics
+	category = positive
+	complete_icon_frame = GFX_situation_outcome_frame_green
+	complete_icon = GFX_situation_outcome_unknown
+	fail_icon_frame = GFX_situation_outcome_frame_red
+	fail_icon = GFX_situation_outcome_negative
+	start_value = 0
+	progress_direction = monodirectional
+
+	on_start = {
+		set_situation_locked = yes
+	}
+
+	on_fail = {
+		# This should never happen, but if it does...
+		owner = {
+			start_situation = {
+				type = situation_tec_synth_path_gate
+				target = capital_scope
+				effect = {
+					save_event_target_as = new_situation
+				}
+			}
+		}
+		event_target:new_situation = {
+			set_situation_locked = no
+		}
+	}
+
+	on_monthly = {
+		random_events = {
+			# Nothing
+			200 = 0
+			# Negative random outcomes
+			15 = tec_synth_path.10011
+			10 = tec_synth_path.10012
+			#5 = tec_synth_path.10013
+			# Positive random outcomes
+			15 = tec_synth_path.10021
+			10 = tec_synth_path.10022
+			#5 = tec_synth_path.10023
+		}
+	}
+	
+	on_progress_complete = {
+		hidden_effect = {
+			destroy_situation = this
+			owner = {
+				country_event = {
+					id = tec_synth_path.205
+				}
+			}
+		}
+		custom_tooltip = situation_tec_synth_path_gate_finish_tooltip
+		destroy_situation = this
+	}
+
+	stages = {
+		situation_tec_synth_path_gate_stage_1 = { #25% - After unlocks approaches
+			icon = GFX_situation_stage_1
+			icon_background = GFX_situation_stage_frame_tec_orange
+			end = 25
+		}
+
+		situation_tec_synth_path_gate_stage_2 = { #50%
+			icon = GFX_situation_stage_2
+			icon_background = GFX_situation_stage_frame_tec_yellow
+			end = 50
+			on_first_enter = {
+				hidden_effect = {
+					set_situation_flag = situation_tec_gene_path_t2_approachs
+				}
+			}
+		}
+
+		situation_tec_synth_path_gate_stage_3 = { #75%
+			icon = GFX_situation_stage_3
+			icon_background = GFX_situation_stage_frame_green
+			end = 75
+		}
+
+		situation_tec_synth_path_gate_stage_4 = { #100%
+			icon = GFX_situation_stage_4
+			icon_background = GFX_situation_stage_frame_blue
+			end = 100
+			on_first_enter = {
+				hidden_effect = {
+					
+				}
+			}
+		}
+	}
+
+	# Approaches
+	approach = { # Basic
+		name = situation_approach_tec_synth_path_gate_basic
+		icon = GFX_situation_approach_research
+		icon_background = GFX_situation_approach_bg_yellow
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = 10
+			}
+		}
+	}
+
+	approach = { # Slow but good
+		name = situation_approach_tec_synth_path_gate_good
+		icon = GFX_situation_approach_tec_gear
+		icon_background = GFX_situation_approach_bg_green
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = 10
+			}
+		}
+	}
+
+	approach = { # Fast but bad
+		name = situation_approach_tec_synth_path_gate_bad
+		icon = GFX_situation_approach_tec_genecrank
+		icon_background = GFX_situation_approach_bg_red
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = 10
+			}
+		}
+	}
+
+	monthly_progress = {
+		base = 0
+		# Debug
+		modifier = {
+			add = 10
+			desc = EXCELLENT
+			has_situation_flag = situation_tec_debug
+		}
+		# Passive
+		modifier = {
+			add = 1
+			desc = situation_string_tec_synth_path_gate_base
+			current_situation_approach = situation_approach_tec_synth_path_gate_basic
+		}
+		# Approaches
+		modifier = {
+			add = 2
+			desc = situation_string_tec_synth_path_gate_bad
+			current_situation_approach = situation_approach_tec_synth_path_gate_bad
+		}
+		modifier = {
+			add = 1
+			desc = situation_string_tec_synth_path_gate_good
+			current_situation_approach = situation_approach_tec_synth_path_gate_good
+		}
+	}
+
+	abort_trigger = {
+		NOT = { exists = owner }
+	}
+}
+# --------------- t2
+#situation_tec_synth_path_t2
+
+# --------------------------- Psionic A Regular --------------------------------
+# --------------- T1
+situation_tec_psionic_path_t1 = {
+	desc = {
+		text = situation_tec_psionic_path_t1_desc
+		trigger = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+	}
+	picture = GFX_evt_society_research
+	category = positive
+	complete_icon_frame = GFX_situation_outcome_frame_green
+	complete_icon = GFX_situation_outcome_unknown
+	fail_icon_frame = GFX_situation_outcome_frame_red
+	fail_icon = GFX_situation_outcome_negative
+	start_value = 100
+	progress_direction = bidirectional
+
+	on_start = {
+		set_situation_locked = yes
+	}
+
+	on_fail = {
+		# This should never happen, but if it does...
+		owner = {
+			start_situation = {
+				type = situation_tec_psionic_path_t1
+				target = capital_scope
+				effect = {
+					save_event_target_as = new_situation
+				}
+			}
+		}
+		event_target:new_situation = {
+			set_situation_locked = no
+		}
+	}
+
+	on_monthly = {
+		random_events = {
+			# Nothing
+			200 = 0
+			## Negative random outcomes
+			#2 = tec_psionic_path.20011
+			#2 = tec_psionic_path.20012
+			##1 = tec_psionic_path.20013
+			## Positive random outcomes
+			#2 = tec_psionic_path.20021
+			#2 = tec_psionic_path.20022
+			##1 = tec_psionic_path.20023
+		}
+	}
+	
+	on_progress_complete = {
+		hidden_effect = {
+			owner = {
+				country_event = {
+					id = tec_psionic_path.205
+				}
+			}
+			destroy_situation = this
+		}
+		custom_tooltip = situation_tec_psionic_path_t1_end_tooltip
+		destroy_situation = this
+	}
+
+	stages = {
+		situation_tec_psionic_path_t1_stage_1 = { #25% - After unlocks approaches
+			icon = GFX_situation_stage_1
+			icon_background = GFX_situation_stage_frame_tec_orange
+			end = 25
+		}
+
+		situation_tec_psionic_path_t1_stage_2 = { #50%
+			icon = GFX_situation_stage_2
+			icon_background = GFX_situation_stage_frame_tec_yellow
+			end = 50
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_psionic_path.20025
+					}
+				}
+			}
+		}
+
+		situation_tec_psionic_path_t1_stage_3 = { #75%
+			icon = GFX_situation_stage_3
+			icon_background = GFX_situation_stage_frame_green
+			end = 75
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_psionic_path.20050
+					}
+				}
+			}
+		}
+
+		situation_tec_psionic_path_t1_stage_4 = { #100%
+			icon = GFX_situation_stage_4
+			icon_background = GFX_situation_stage_frame_blue
+			end = 100
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_psionic_path.20075
+					}
+				}
+			}
+		}
+	}
+
+	# Approaches
+	approach = { # Basic
+		name = situation_approach_tec_psionic_path_t1_neutral
+		icon = GFX_situation_approach_research
+		icon_background = GFX_situation_approach_bg_yellow
+		potential = {
+			NOT = {
+				has_situation_flag = situation_tec_psionic_path_t1_unlock_approachs
+			}
+		}
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = @tec_situation_cost_low
+				#mult = owner.trigger:num_pops
+			}
+		}
+	}
+
+	approach = { # Slow but good
+		name = situation_approach_tec_psionic_path_t1_slow
+		icon = GFX_situation_approach_genetics
+		icon_background = GFX_situation_approach_bg_green
+		potential = {
+			has_situation_flag = situation_tec_psionic_path_t1_unlock_approachs
+		}
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = @tec_situation_cost_low
+			}
+		}
+	}
+
+	approach = { # Fast but bad
+		name = situation_approach_tec_psionic_path_t1_fast
+		icon = GFX_situation_approach_tec_genecrank
+		icon_background = GFX_situation_approach_bg_red
+		potential = {
+			has_situation_flag = situation_tec_psionic_path_t1_unlock_approachs
+		}
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = @tec_situation_cost_high
+			}
+		}
+	}
+
+	monthly_progress = {
+		base = 0
+		# Debug
+		modifier = {
+			add = 10
+			desc = EXCELLENT
+			has_situation_flag = situation_tec_debug
+		}
+		# Passive
+		
+		# Approaches
+		modifier = {
+			add = 1
+			desc = situation_string_tec_psionic_path_t1_neutral
+			current_situation_approach = situation_approach_tec_psionic_path_t1_neutral
+		}
+		modifier = {
+			add = 2
+			desc = situation_string_tec_psionic_path_t1_fast
+			current_situation_approach = situation_approach_tec_psionic_path_t1_fast
+		}
+		modifier = {
+			add = 1
+			desc = situation_string_tec_psionic_path_t1_slow
+			current_situation_approach = situation_approach_tec_psionic_path_t1_slow
+		}
+	}
+
+	abort_trigger = {
+		NOT = { exists = owner }
+	}
+}
+# --------------- Gating A
+situation_tec_psionic_path_gate = {
+	desc = {
+		text = situation_tec_psionic_path_gate_desc
+		trigger = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+	}
+	picture = GFX_evt_society_research
+	category = positive
+	complete_icon_frame = GFX_situation_outcome_frame_green
+	complete_icon = GFX_situation_outcome_unknown
+	fail_icon_frame = GFX_situation_outcome_frame_red
+	fail_icon = GFX_situation_outcome_negative
+	start_value = 0
+	progress_direction = monodirectional
+
+	on_start = {
+		set_situation_locked = yes
+	}
+
+	on_fail = {
+		# This should never happen, but if it does...
+		owner = {
+			start_situation = {
+				type = situation_tec_psionic_path_gate
+				target = capital_scope
+				effect = {
+					save_event_target_as = new_situation
+				}
+			}
+		}
+		event_target:new_situation = {
+			set_situation_locked = no
+		}
+	}
+
+	on_monthly = {
+		random_events = {
+			# Nothing
+			200 = 0
+			## Negative random outcomes
+			#2 = tec_psionic_path.20011
+			#2 = tec_psionic_path.20012
+			##1 = tec_psionic_path.20013
+			## Positive random outcomes
+			#2 = tec_psionic_path.20021
+			#2 = tec_psionic_path.20022
+			##1 = tec_psionic_path.20023
+		}
+	}
+	
+	on_progress_complete = {
+		hidden_effect = {
+			if = {
+				limit = {
+					current_situation_approach = situation_approach_tec_psionic_path_gate_slow
+				}
+				owner = {
+					set_timed_country_flag = {
+						flag = tec_psi_good_temp
+						years = 5
+					}
+				}
+			}
+			if = {
+				limit = {
+					current_situation_approach = situation_approach_tec_psionic_path_gate_fast
+				}
+				owner = {
+					set_timed_country_flag = {
+						flag = tec_psi_bad_temp
+						years = 5
+					}
+				}
+			}
+			owner = {
+				country_event = {
+					id = tec_psionic_path.205
+				}
+			}
+			destroy_situation = this
+		}
+		custom_tooltip = situation_tec_psionic_path_gate_end_tooltip
+		destroy_situation = this
+	}
+
+	stages = {
+		situation_tec_psionic_path_gate_stage_1 = { #25% - After unlocks approaches
+			icon = GFX_situation_stage_1
+			icon_background = GFX_situation_stage_frame_tec_orange
+			end = 25
+		}
+
+		situation_tec_psionic_path_gate_stage_2 = { #50%
+			icon = GFX_situation_stage_2
+			icon_background = GFX_situation_stage_frame_tec_yellow
+			end = 50
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_psionic_path.20025
+					}
+				}
+			}
+		}
+
+		situation_tec_psionic_path_gate_stage_3 = { #75%
+			icon = GFX_situation_stage_3
+			icon_background = GFX_situation_stage_frame_green
+			end = 75
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_psionic_path.20050
+					}
+				}
+			}
+		}
+
+		situation_tec_psionic_path_gate_stage_4 = { #100%
+			icon = GFX_situation_stage_4
+			icon_background = GFX_situation_stage_frame_blue
+			end = 100
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_psionic_path.20075
+					}
+				}
+			}
+		}
+	}
+
+	# Approaches
+	approach = { # Basic
+		name = situation_approach_tec_psionic_path_gate_neutral
+		icon = GFX_situation_approach_research
+		icon_background = GFX_situation_approach_bg_yellow
+		potential = {
+			NOT = {
+				has_situation_flag = situation_tec_psionic_path_gate_unlock_approachs
+			}
+		}
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = @tec_situation_cost_low
+				#mult = owner.trigger:num_pops
+			}
+		}
+	}
+
+	approach = { # Slow but good
+		name = situation_approach_tec_psionic_path_gate_slow
+		icon = GFX_situation_approach_genetics
+		icon_background = GFX_situation_approach_bg_green
+		potential = {
+			has_situation_flag = situation_tec_psionic_path_gate_unlock_approachs
+		}
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = @tec_situation_cost_low
+			}
+		}
+	}
+
+	approach = { # Fast but bad
+		name = situation_approach_tec_psionic_path_gate_fast
+		icon = GFX_situation_approach_tec_genecrank
+		icon_background = GFX_situation_approach_bg_red
+		potential = {
+			has_situation_flag = situation_tec_psionic_path_gate_unlock_approachs
+		}
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = @tec_situation_cost_high
+			}
+		}
+	}
+
+	monthly_progress = {
+		base = 0
+		# Debug
+		modifier = {
+			add = 10
+			desc = EXCELLENT
+			has_situation_flag = situation_tec_debug
+		}
+		# Passive
+		
+		# Approaches
+		modifier = {
+			add = 1
+			desc = situation_string_tec_psionic_path_gate_neutral
+			current_situation_approach = situation_approach_tec_psionic_path_gate_neutral
+		}
+		modifier = {
+			add = 2
+			desc = situation_string_tec_psionic_path_gate_fast
+			current_situation_approach = situation_approach_tec_psionic_path_gate_fast
+		}
+		modifier = {
+			add = 1
+			desc = situation_string_tec_psionic_path_gate_slow
+			current_situation_approach = situation_approach_tec_psionic_path_gate_slow
+		}
+	}
+
+	abort_trigger = {
+		NOT = { exists = owner }
+	}
+}
+# --------------- T2 A
+situation_tec_psionic_path_t2 = {
+	desc = {
+		text = situation_tec_psionic_path_t2_desc
+		trigger = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+	}
+	picture = GFX_evt_zro_3
+	category = positive
+	complete_icon_frame = GFX_situation_outcome_frame_green
+	complete_icon = GFX_situation_outcome_unknown
+	fail_icon_frame = GFX_situation_outcome_frame_red
+	fail_icon = GFX_situation_outcome_negative
+	start_value = 0
+	progress_direction = monodirectional
+
+	on_start = {
+		set_situation_locked = yes
+	}
+
+	on_fail = {
+		# This should never happen, but if it does...
+		owner = {
+			start_situation = {
+				type = situation_tec_psionic_path_t2
+				target = capital_scope
+				effect = {
+					save_event_target_as = new_situation
+				}
+			}
+		}
+		event_target:new_situation = {
+			set_situation_locked = no
+		}
+	}
+
+	on_monthly = {
+		random_events = {
+			# Nothing
+			200 = 0
+			## Negative random outcomes
+			#2 = tec_psionic_path.30011
+			#2 = tec_psionic_path.30012
+			##1 = tec_psionic_path.30013
+			## Positive random outcomes
+			#2 = tec_psionic_path.30021
+			#2 = tec_psionic_path.30022
+			##1 = tec_psionic_path.30023
+		}
+	}
+	
+	on_progress_complete = {
+		hidden_effect = {
+			if = {
+				limit = {
+					current_situation_approach = situation_approach_tec_psionic_path_t2_slow
+				}
+				owner = {
+					set_timed_country_flag = {
+						flag = tec_psi_t2_slow_temp
+						years = 5
+					}
+				}
+			}
+			if = {
+				limit = {
+					current_situation_approach = situation_approach_tec_psionic_path_t2_fast
+				}
+				owner = {
+					set_timed_country_flag = {
+						flag = tec_psi_t2_fast_temp
+						years = 5
+					}
+				}
+			}
+			owner = {
+				country_event = {
+					id = tec_psionic_path.305
+				}
+			}
+			destroy_situation = this
+		}
+		custom_tooltip = situation_tec_psionic_path_t2_end_tooltip
+		destroy_situation = this
+	}
+
+	stages = {
+		situation_tec_psionic_path_t2_stage_1 = { #10
+			icon = GFX_situation_stage_1
+			icon_background = GFX_situation_stage_frame_tec_orange
+			end = 10
+			
+		}
+
+		situation_tec_psionic_path_t2_stage_2 = { #20
+			icon = GFX_situation_stage_2
+			icon_background = GFX_situation_stage_frame_tec_yellow
+			end = 20
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_psionic_path.30010
+					}
+				}
+			}
+		}
+
+		situation_tec_psionic_path_t2_stage_3 = { #60%
+			icon = GFX_situation_stage_3
+			icon_background = GFX_situation_stage_frame_green
+			end = 60
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_psionic_path.30020
+					}
+				}
+			}
+		}
+
+		situation_tec_psionic_path_t2_stage_4 = { #100%
+			icon = GFX_situation_stage_4
+			icon_background = GFX_situation_stage_frame_blue
+			end = 80
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_psionic_path.30060
+					}
+				}
+			}
+		}
+
+		situation_tec_psionic_path_t2_stage_5 = { #100%
+			icon = GFX_situation_stage_5
+			icon_background = GFX_situation_stage_frame_blue
+			end = 100
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_psionic_path.30080
+					}
+				}
+			}
+		}
+	}
+
+	# Approaches
+	approach = { # Basic
+		name = situation_approach_tec_psionic_path_t2_neutral
+		icon = GFX_situation_approach_research
+		icon_background = GFX_situation_approach_bg_yellow
+		potential = {
+			NOT = {
+				has_situation_flag = situation_tec_psionic_path_t2_unlock_approachs
+			}
+		}
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = @tec_path_cost_low
+				#mult = owner.trigger:num_pops
+			}
+		}
+	}
+
+	approach = { # Slow but good
+		name = situation_approach_tec_psionic_path_t2_slow
+		icon = GFX_situation_approach_genetics
+		icon_background = GFX_situation_approach_bg_green
+		potential = {
+			has_situation_flag = situation_tec_psionic_path_t2_unlock_approachs
+		}
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = @tec_path_cost_low
+			}
+		}
+	}
+
+	approach = { # Fast but bad
+		name = situation_approach_tec_psionic_path_t2_fast
+		icon = GFX_situation_approach_tec_genecrank
+		icon_background = GFX_situation_approach_bg_red
+		potential = {
+			has_situation_flag = situation_tec_psionic_path_t2_unlock_approachs
+		}
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = @tec_path_cost_high
+			}
+		}
+	}
+
+	monthly_progress = {
+		base = 0
+		# Debug
+		modifier = {
+			add = 10
+			desc = EXCELLENT
+			has_situation_flag = situation_tec_debug
+		}
+		# Passive
+		
+		# Approaches
+		modifier = {
+			add = 1
+			desc = situation_string_tec_psionic_path_t2_neutral
+			current_situation_approach = situation_approach_tec_psionic_path_t2_neutral
+		}
+		modifier = {
+			add = 2
+			desc = situation_string_tec_psionic_path_t2_fast
+			current_situation_approach = situation_approach_tec_psionic_path_t2_fast
+		}
+		modifier = {
+			add = 1
+			desc = situation_string_tec_psionic_path_t2_slow
+			current_situation_approach = situation_approach_tec_psionic_path_t2_slow
+		}
+	}
+
+	abort_trigger = {
+		NOT = { exists = owner }
+	}
+}
+
+# --------------- Gating B
+#situation_tec_ethereal_path_gate
+# --------------- T2 B
+#situation_tec_ethereal_path_t2
+
+# --------------------------- Psionic Hives --------------------------------
+# --------------- T1
+#situation_tec_psi_hive_t1
+# --------------- Gating
+#situation_tec_psi_hive_gating
+# --------------- T2
+#situation_tec_psi_hive_t2
+
+# Psi hive - #1A - Shroud Analysis
+# ------------------------------------------------------------
+# Todo
+
+
+# Psi hive - #2A - Shroud Connection
+# ------------------------------------------------------------
+# To do
+
+
+# Psi hive - #3AA - Shroud Pathway
+# ------------------------------------------------------------
+# To do
+
+
+# Psi hive - #3AB - Shadow In The Shroud
+# ------------------------------------------------------------
+# To do
+
+
+# Psi hive - #1B - Immateria presence
+# ------------------------------------------------------------
+# Todo
+
+
+# Psi hive - #2B - Immateria Connection
+# ------------------------------------------------------------
+# To do
+
+
+# Psi hive - #3BA - Reality Harmonization
+# ------------------------------------------------------------
+# To do
+
+
+# Psi hive - #3BA - Reality Twisting
+# ------------------------------------------------------------
+# To do
+
+# Psi hive - #1C - Entropic Manifestation
+# ------------------------------------------------------------
+# Todo
+
+# Psi hive - #2C - Reality Harmonization
+# ------------------------------------------------------------
+# To do
+
+# Psi hive - #3CA - Reality Twisting
+# ------------------------------------------------------------
+# To do
+
+# Psi hive - #3CB - Shadow In The Shroud
+# ------------------------------------------------------------
+# To do
+
+# Test
+# ------------------------------------------------------------
+situation_tec_test = {
+	desc = {
+		text = situation_tec_test_desc
+		trigger = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+	}
+	picture = GFX_evt_cybernetics
+	category = positive
+	complete_icon_frame = GFX_situation_outcome_frame_green
+	complete_icon = GFX_situation_outcome_unknown
+	fail_icon_frame = GFX_situation_outcome_frame_red
+	fail_icon = GFX_situation_outcome_negative
+	start_value = 0
+	progress_direction = monodirectional
+
+	on_start = {
+		set_situation_locked = no
+	}
+
+	on_fail = {
+
+	}
+
+	on_monthly = {
+		random_events = {
+			# Nothing
+			200 = 0
+		}
+	}
+	
+	on_progress_complete = {
+		if = {
+			limit = {
+				owner = {
+					has_country_flag = tec_situation_test
+				}
+			}
+			owner = {
+				set_country_flag = tec_situation_test			
+			}
+			owner = {
+				start_situation = {
+					type = situation_tec_test
+					target = capital_scope
+					effect = {
+						save_event_target_as = new_situation
+					}
+				}
+				event_target:new_situation = {
+					set_situation_locked = no
+					set_situation_approach = situation_approach_tec_test_neutral
+				}
+			}
+		}
+	}
+
+	stages = {
+		situation_tec_test_stage_1 = { #25% - After unlocks approaches
+			icon = GFX_situation_stage_1
+			icon_background = GFX_situation_stage_frame_tec_orange
+			end = 25
+		}
+
+		situation_tec_test_stage_2 = { #50%
+			icon = GFX_situation_stage_2
+			icon_background = GFX_situation_stage_frame_tec_yellow
+			end = 50
+			on_first_enter = {
+				hidden_effect = {
+					set_situation_flag = situation_tec_psionic_path_t2_approachs
+				}
+			}
+		}
+
+		situation_tec_test_stage_3 = { #75%
+			icon = GFX_situation_stage_3
+			icon_background = GFX_situation_stage_frame_green
+			end = 75
+		}
+
+		situation_tec_test_stage_4 = { #100%
+			icon = GFX_situation_stage_4
+			icon_background = GFX_situation_stage_frame_blue
+			end = 100
+			on_first_enter = {
+				hidden_effect = {
+					
+				}
+			}
+		}
+	}
+
+	# Approaches
+	approach = { # Slow but good
+		name = situation_approach_tec_test_slow
+		icon = GFX_situation_approach_tec_gear
+		icon_background = GFX_situation_approach_bg_green
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = 10
+			}
+		}
+	}
+
+	approach = { # Basic
+		name = situation_approach_tec_test_neutral
+		icon = GFX_situation_approach_research
+		icon_background = GFX_situation_approach_bg_yellow
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = 10
+			}
+		}
+	}
+
+	approach = { # Fast but bad
+		name = situation_approach_tec_test_fast
+		icon = GFX_situation_approach_tec_genecrank
+		icon_background = GFX_situation_approach_bg_red
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = 10
+			}
+		}
+	}
+
+	monthly_progress = {
+		base = 0
+		# Debug
+		modifier = {
+			add = 10
+			desc = EXCELLENT
+			has_situation_flag = situation_tec_debug
+		}
+		# Passive
+		
+		# Approaches
+		modifier = {
+			add = 1
+			desc = situation_string_tec_test_slow
+			current_situation_approach = situation_approach_tec_test_slow
+		}
+		modifier = {
+			add = 1
+			desc = situation_string_tec_test_neutral
+			current_situation_approach = situation_approach_tec_test_neutral
+		}
+		modifier = {
+			add = 2
+			desc = situation_string_tec_test_fast
+			current_situation_approach = situation_approach_tec_test_fast
+		}
+	}
+
+	abort_trigger = {
+		NOT = { exists = owner }
+	}
+}
+
+situation_tec_test_bidirectional = {
+	desc = {
+		text = situation_tec_test_bidirectional_desc
+		trigger = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+	}
+	picture = GFX_evt_cybernetics
+	category = positive
+	complete_icon_frame = GFX_situation_outcome_frame_green
+	complete_icon = GFX_situation_outcome_unknown
+	fail_icon_frame = GFX_situation_outcome_frame_red
+	fail_icon = GFX_situation_outcome_negative
+	start_value = 0
+	progress_direction = bidirectional
+
+	on_start = {
+		set_situation_locked = no
+	}
+
+	on_fail = {
+
+	}
+
+	on_monthly = {
+		random_events = {
+			# Nothing
+			200 = 0
+		}
+	}
+	
+	on_progress_complete = {
+		
+	}
+
+	stages = {
+		situation_tec_test_bidirectional_stage_1 = { #25% - After unlocks approaches
+			icon = GFX_situation_stage_1
+			icon_background = GFX_situation_stage_frame_tec_orange
+			end = 25
+		}
+
+		situation_tec_test_bidirectional_stage_2 = { #50%
+			icon = GFX_situation_stage_2
+			icon_background = GFX_situation_stage_frame_tec_yellow
+			end = 50
+			on_first_enter = {
+				hidden_effect = {
+					set_situation_flag = situation_tec_psionic_path_t2_approachs
+				}
+			}
+		}
+
+		situation_tec_test_bidirectional_stage_3 = { #75%
+			icon = GFX_situation_stage_3
+			icon_background = GFX_situation_stage_frame_green
+			end = 75
+		}
+
+		situation_tec_test_bidirectional_stage_4 = { #100%
+			icon = GFX_situation_stage_4
+			icon_background = GFX_situation_stage_frame_blue
+			end = 100
+			on_first_enter = {
+				hidden_effect = {
+					
+				}
+			}
+		}
+	}
+
+	# Approaches
+	approach = { # Slow but good
+		name = situation_approach_tec_test_bidirectional_slow
+		icon = GFX_situation_approach_tec_gear
+		icon_background = GFX_situation_approach_bg_green
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = 10
+			}
+		}
+	}
+
+	approach = { # Basic
+		name = situation_approach_tec_test_bidirectional_neutral
+		icon = GFX_situation_approach_research
+		icon_background = GFX_situation_approach_bg_yellow
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = 10
+			}
+		}
+	}
+
+	approach = { # Fast but bad
+		name = situation_approach_tec_test_bidirectional_fast
+		icon = GFX_situation_approach_tec_genecrank
+		icon_background = GFX_situation_approach_bg_red
+		on_select = {
+			custom_tooltip = approach_outcome_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				society_research = 10
+			}
+		}
+	}
+
+	monthly_progress = {
+		base = 0
+		# Debug
+		modifier = {
+			add = 10
+			desc = EXCELLENT
+			has_situation_flag = situation_tec_debug
+		}
+
+		# Approaches
+		modifier = {
+			add = 1
+			desc = situation_string_tec_test_bidirectional_slow
+			current_situation_approach = situation_approach_tec_test_bidirectional_slow
+		}
+		modifier = {
+			add = 1
+			desc = situation_string_tec_test_bidirectional_neutral
+			current_situation_approach = situation_approach_tec_test_bidirectional_neutral
+		}
+		modifier = {
+			add = 5
+			desc = situation_string_tec_test_bidirectional_fast
+			current_situation_approach = situation_approach_tec_test_bidirectional_fast
+		}
+	}
+
+	abort_trigger = {
+		NOT = { exists = owner }
+	}
+}

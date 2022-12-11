@@ -1,0 +1,924 @@
+# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
+# Traditionalist Faction
+# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
+
+traditionalist = {
+	election_header = "GFX_faction_header_yellow"
+	guiding_ethic = ethic_spiritualist
+	
+	unique = yes
+	support_multiplier = 1
+	
+	resources = {
+		category = pop_factions
+		produces = {
+			unity = @tec_fac_infl_produce
+		}
+		produces = {	# Political virtue
+			trigger = {
+				owner = {
+					has_valid_civic = civic_tec_political_virtue
+				}
+				faction_approval >= 0.5
+			}
+			unity = 0.25
+		}
+		produces = {	# Political virtue
+			trigger = {
+				owner = {
+					has_valid_civic = civic_tec_political_virtue
+					is_spiritualist = yes
+				}
+				faction_approval >= 0.5
+			}
+			unity = 0.05
+		}
+		produces = {	# Idealistic foundation
+			trigger = {
+				owner = {
+					has_valid_civic = civic_idealistic_foundation
+				}
+			}
+			influence = 0.005
+		}
+	}
+
+	#Note: number of potential or actual members is checked by POP_FACTION_MIN_POTENTIAL_MEMBERS define
+	is_potential = {
+		is_faction_allowed = yes
+	}
+
+	parameters = {
+		empire = {
+			type = country
+			valid_objects = {
+				is_same_value = root
+			}
+		}
+	}
+	
+	can_join_pre_triggers = {
+		is_enslaved = no
+		is_being_purged = no
+		# robots can join, under certain circunstances
+	}
+
+	can_join_faction = {
+		is_shackled_robot = no
+		is_shackled_bioservant = no
+		tec_has_stapled_trait = no
+		OR = {
+			is_robot_pop = no
+			AND = {
+				owner = {
+					tec_is_robot_lover_spiritualist = yes
+				}
+				is_robot_pop = yes
+			}
+		}
+	}
+	
+	attraction = {
+		base = 150
+		
+		modifier = {
+			factor = 1.25
+			exists = from
+			from = {
+				exists = leader
+				leader = { leader_class = ruler }
+			}
+		}
+		
+		modifier = {
+			factor = 0.75
+			exists = from
+			from = {
+				NOT = { exists = leader }
+			}
+		}
+	}
+	
+	leader = {
+		base = 100
+		modifier = {
+			factor = 0
+			owner = {
+				tec_is_robot_lover_spiritualist = no
+			}
+			species = {
+				has_trait = "trait_mechanical"		
+			}
+		}
+
+		modifier = {
+			factor = 0.0
+			is_event_leader = yes
+		}
+	}
+
+	demand = {
+		title = "FACTION_OUTRAGED_GC"
+		unfulfilled_title = "FACTION_OUTRAGED_GC"
+		desc = "FACTION_OUTRAGED_GC_DESC"
+
+		fulfilled_effect = -20
+		unfulfilled_effect = 0
+
+		potential = {
+			exists = owner
+			owner = {
+				has_country_flag = faction_spiritualist_outraged_gc
+			}
+		}
+
+		trigger = {
+			owner = {
+				has_country_flag = faction_spiritualist_outraged_gc
+			}
+		}
+	}
+	
+	# Evolved: List of demands
+		# Positives (only pos)
+			# Gaia worlds
+			# Psionic pursuit
+			# 25% spi pops
+			# Shroud boon
+			# Religious finds
+		# Neutral (pos and negs)
+			# Spiritual government
+			# Cybernetics (robot lover spi)
+		# Negatives (only negs)
+			# No robots (exp robot lover spi)
+			# No robots rights (excp robot lover spi)
+			# No full robots rights (exp robot lover spi)
+			# No tomb worlds
+			# No cybernetics (excp robot lover spi)
+			# 25% spi pops
+			# Shroud curse
+	# /
+	# ----------------------- D E M A N D S -----------------------
+		# Pos scaling
+			# Spiritualist pops
+			demand = { # "TRADITIONALIST_SPIRITUALIST_POPS 1"
+				title = "TEC_FAC_SPI_SPIRITUALIST_POPS1"
+				unfulfilled_title = "TEC_FAC_SPI_FEW_SPIRITUALIST_POPS1"
+				desc = "TEC_FAC_SPI_SPIRITUALIST_POPS1_DESC"	
+				fulfilled_effect = 5
+				unfulfilled_effect = 0
+				potential = {
+					support < 0.25
+				}
+				trigger = {
+					support >= 0.15
+				}
+			}
+			demand = { # "TRADITIONALIST_SPIRITUALIST_POPS 2"
+				title = "TEC_FAC_SPI_SPIRITUALIST_POPS3"
+				unfulfilled_title = "TEC_FAC_SPI_FEW_SPIRITUALIST_POPS3"
+				desc = "TEC_FAC_SPI_SPIRITUALIST_POPS3_DESC"	
+				fulfilled_effect = 10
+				unfulfilled_effect = 0
+				potential = {
+					support > 0.15
+					support < 0.5			
+				}
+				trigger = {
+					support >= 0.25
+				}
+			}
+			demand = { # "TRADITIONALIST_SPIRITUALIST_POPS 3"
+				title = "TEC_FAC_SPI_SPIRITUALIST_POPS2"
+				unfulfilled_title = "TEC_FAC_SPI_FEW_SPIRITUALIST_POPS2"
+				desc = "TEC_FAC_SPI_SPIRITUALIST_POPS2_DESC"	
+				fulfilled_effect = 10
+				unfulfilled_effect = 0
+				potential = {
+					support > 0.25		
+				}
+				trigger = {
+					support >= 0.5
+				}
+			}
+		# /
+		# Pos
+			# Recent sacriffice (death cults)
+			demand = { # POS - RECENT SACRIFFICE
+				title = "TEC_FAC_SPI_RECENT_SACRIFFICE"
+				unfulfilled_title = "TEC_FAC_SPI_NO_RECENT_SACRIFFICE"
+				desc = "TEC_FAC_SPI_RECENT_SACRIFFICE_DESC"
+				fulfilled_effect = 10
+				unfulfilled_effect = 0
+				potential = {
+					host_has_dlc = "Utopia"
+					exists = owner
+					owner = {
+						tec_is_death_cult = yes
+					}
+				}
+				trigger = {
+					owner = {
+						OR = {
+							has_edict = sacrifice_bounty
+							has_edict = sacrifice_harmony
+							has_edict = sacrifice_togetherness
+						}
+					}
+				}
+			}
+			# Mind and soul (psionics)
+			demand = { # "TRADITIONALIST_PSIONIC_PURSUIT"
+				title = "TEC_FAC_SPI_PSIONIC_PURSUIT"
+				unfulfilled_title = "TEC_FAC_SPI_NO_PSIONIC_PURSUIT"
+				desc = "TEC_FAC_SPI_PSIONIC_PURSUIT_DESC"
+				fulfilled_effect = 10
+				unfulfilled_effect = 0
+				potential = {
+					host_has_dlc = "Utopia"
+					exists = owner
+					owner = {
+						NOR = {
+							has_origin = origin_shroudwalker_apprentice
+							has_ascension_perk = ap_tec_cybernetic_revolution
+							has_ascension_perk = ap_synthetic_evolution
+							has_ascension_perk = ap_tec_genetic_perfection
+						}
+						has_technology = tech_psionic_theory
+						OR = {
+							num_ascension_perks > 0
+							num_ascension_perk_slots > 0
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						tec_has_psionic_ascension_path = yes
+					}
+				}
+			}
+			# Purity assembly
+			demand = { # POS - PURITY ASSEMBLY
+				title = "TEC_FAC_SPI_PURITY_ASSEMBLY"
+				unfulfilled_title = "TEC_FAC_SPI_NO_PURITY_ASSEMBLY"
+				desc = "TEC_FAC_SPI_PURITY_ASSEMBLY_DESC"
+				fulfilled_effect = 20
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+					owner = {
+						is_ai = no # Needed, for now
+						NOR = {
+							tec_is_robot_lover_spiritualist = yes
+							has_origin = origin_tec_bioservant
+						}
+						can_set_policy = {
+							policy = tec_assembly_policy
+							option = tec_main_species_assembly
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						has_policy_flag = tec_purity_assembly
+					}
+				}
+			}
+			# Full cybernetics (machine cult)
+			demand = {
+				title = "TEC_FAC_SPI_CYBERFORM"
+				unfulfilled_title = "TEC_FAC_SPI_NO_CYBERFORM"
+				desc = "TEC_FAC_SPI_CYBERFORM_DESC"
+				fulfilled_effect = 10	
+				unfulfilled_effect = 0	
+				potential = {
+					exists = owner
+					owner = {
+						tec_is_robot_lover_spiritualist = yes
+						NOT = {
+							has_civic = civic_tec_occultist
+						}
+						num_ascension_perks > 1
+						has_technology = tech_droid_workers
+					}
+				}
+				trigger = {
+					owner = {
+						OR = {
+							AND = {
+								has_ascension_perk = ap_synthetic_evolution
+								has_trait = trait_mechanical
+							}
+							has_ascension_perk = ap_tec_cybernetic_revolution
+						}
+					}
+				}
+			}
+			# Focused cult
+			demand = { # POS - FOCUS CULT
+				title = "TEC_FAC_SPI_FOCUSCULT"
+				unfulfilled_title = "TEC_FAC_SPI_NO_FOCUSCULT"
+				desc = "TEC_FAC_SPI_FOCUSCULT_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+					owner = {
+						is_spiritualist = yes
+						can_set_policy = {
+							policy = religious_cult_policy
+							option = free_religious_cult
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						NOR = {
+							has_policy_flag = free_religious_cult
+						}
+					}
+				}
+			}
+			# Theocracy government
+			demand = { # NEUT - THEOCRACY
+				title = "TEC_FAC_SPI_THEOCRACY"
+				unfulfilled_title = "TEC_FAC_SPI_NO_THEOCRACY"
+				desc = "TEC_FAC_SPI_THEOCRACY_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+				}
+				trigger = {
+					owner = {
+						OR = {
+							has_authority = auth_tec_theocracy
+							AND = {
+								has_authority = auth_oligarchic
+								has_valid_civic = civic_tec_divine_circle
+							}
+							has_civic = civic_imperial_cult
+						}
+					}
+				}
+			}
+			# Shroud boon
+			demand = { # "TRADITIONALIST_SHROUD_BOON"
+				title = "TEC_FAC_SPI_SHROUD_BOON"
+				unfulfilled_title = "TEC_FAC_SPI_NO_SHROUD_BOON"
+				desc = "TEC_FAC_SPI_SHROUD_BOON_DESC"			
+				fulfilled_effect = 5
+				unfulfilled_effect = 0	
+				potential = {
+					exists = owner
+					owner = {
+						has_country_flag = positive_shroud_outcome
+					}
+				}
+				trigger = {
+					owner = {
+						has_country_flag = positive_shroud_outcome
+					}
+				}
+			}
+			# Religious findings
+			demand = {
+				title = "TEC_FAC_SPI_RELIGIOUS_FINDING"
+				unfulfilled_title = "TEC_FAC_SPI_NO_RELIGIOUS_FINDING"
+				desc = "TEC_FAC_SPI_RELIGIOUS_FINDING_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = 0		
+				potential = {
+					exists = owner
+					owner = {
+						has_modifier = proclaim_religious_finding
+					}
+				}
+				trigger = {
+					owner = {
+						has_modifier = proclaim_religious_finding
+					}
+				}
+			}
+			# Repose nuked memorial (memorialists)
+			demand = {
+				title = "TEC_FAC_SPI_MEMORIAL"
+				unfulfilled_title = "TEC_FAC_SPI_MEMORIAL"
+				desc = "TEC_FAC_SPI_MEMORIAL_DESC"
+				fulfilled_effect = 5	
+				unfulfilled_effect = 0	
+				potential = {
+					exists = owner
+					owner = {
+						OR = {
+							has_valid_civic = civic_memorialist
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						any_owned_planet = {
+							OR = {
+								is_planet_class = pc_relic
+								is_planet_class = pc_nuked
+								AND = {
+									uses_district_set = city_world
+									has_deposit = d_central_spire
+								}
+							}
+							OR = {
+								has_active_building = building_galactic_memorial_1
+								has_active_building = building_galactic_memorial_2
+								has_active_building = building_galactic_memorial_3
+							}
+						}
+					}
+				}
+			}
+		# /
+
+		# Neut
+			# Cybernetic, psionics, flesh is weak and etc
+			demand = { # NEUT - THE FLESH IS STRONG
+				title = "TEC_FAC_SPI_FLESH_IS_STRONG"
+				unfulfilled_title = "TEC_FAC_SPI_FLESH_IS_WEAK"
+				desc = "TEC_FAC_SPI_FLESH_IS_STRONG_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = -20
+				potential = {
+					exists = owner
+					owner = {
+						is_spiritualist = yes
+						tec_is_robot_lover_spiritualist = no
+						NOT = {
+							has_civic = civic_tec_occultist
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						tec_has_cybernetic_ascension_path = no
+					}
+				}
+			}
+			demand = { # NEUT - THE FLESH IS WEAK
+				title = "TEC_FAC_SPI_FLESH_IS_WEAK"
+				unfulfilled_title = "TEC_FAC_SPI_DISGUSTING_FLESH"
+				desc = "TEC_FAC_SPI_FLESH_IS_WEAK_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = -5
+				potential = {
+					exists = owner
+					owner = {
+						is_spiritualist = yes
+						tec_is_robot_lover_spiritualist = yes
+						NOT = {
+							has_civic = civic_tec_occultist
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						tec_has_cybernetic_ascension_path = yes
+					}
+				}
+			}
+			# Spiritualist government
+			demand = { # "TRADITIONALIST_SPIRITUALIST_GOVERNMENT"
+				title = "TEC_FAC_SPI_GOVERNMENT"
+				unfulfilled_title = "TEC_FAC_SPI_SECULAR_GOVERNMENT"
+				desc = "TEC_FAC_SPI_GOVERNMENT_DESC"	
+				fulfilled_effect = 5
+				unfulfilled_effect = -5
+				potential = {
+					exists = owner
+				}
+				trigger = {
+					owner = {
+						OR = {
+							has_ethic = ethic_fanatic_spiritualist
+							has_ethic = ethic_spiritualist
+						}
+					}
+				}
+			}
+		# /
+
+		# Bad
+			# No robot rights
+			demand = { # "TRADITIONALIST_NO_ROBOT_RIGHTS"
+				title = "TEC_FAC_SPI_NO_ROBOT_RIGHTS"
+				unfulfilled_title = "TEC_FAC_SPI_ROBOT_RIGHTS_BAD"
+				desc = "TEC_FAC_SPI_NO_ROBOTS_DESC"
+				fulfilled_effect = 0
+				unfulfilled_effect = -10
+				potential = {
+					exists = owner
+					owner = {
+						can_set_ai_policy = yes
+						has_technology = tech_droid_workers
+						NOR = {
+							has_policy_flag = ai_full_rights 
+							tec_is_robot_lover_spiritualist = yes
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						NOT = {
+							has_policy_flag = ai_servitude 
+						}
+					}
+				}
+			}
+			# Shroud curse
+			demand = { # "TRADITIONALIST_SHROUD_CURSE"
+				title = "TEC_FAC_SPI_SHROUD_CURSE"
+				unfulfilled_title = "TEC_FAC_SPI_NO_SHROUD_CURSE"
+				desc = "TEC_FAC_SPI_SHROUD_CURSE_DESC"
+				fulfilled_effect = -5
+				potential = {
+					exists = owner
+					owner = {
+						has_country_flag = negative_shroud_outcome
+					}
+				}
+				trigger = {
+					owner = {
+						has_country_flag = negative_shroud_outcome
+					}
+				}
+			}
+			# Fanatic no crafted species
+			demand = {	# NEG - FANSPI NO ROBOTS
+				title = "TEC_FAC_SPI_NO_CRAFTED_SPECIES"
+				unfulfilled_title = "TEC_FAC_SPI_CRAFTED_SPECIES_ARE_BAD"
+				desc = "TEC_FAC_SPI_NO_CRAFTED_SPECIES_DESC"
+				
+				fulfilled_effect = 0
+				unfulfilled_effect = -20
+				potential = {
+					exists = owner
+					owner = {
+						is_ai = no # Needed, for now
+						NOR = {
+							tec_is_robot_lover_spiritualist = yes
+							has_origin = origin_tec_bioservant
+						}
+						has_ethic = ethic_fanatic_spiritualist
+					}
+				}
+				trigger = {
+					owner = {
+						NOT = {
+							any_owned_species = {
+								OR = {
+									has_trait = trait_mechanical
+									has_trait = trait_tec_bioservant
+								}
+							}
+						}
+					}
+				}
+			}
+			# No full robot rights
+			demand = { # "TRADITIONALIST_NO_FULL_ROBOT_RIGHTS"
+				title = "TEC_FAC_SPI_NO_FULL_ROBOT_RIGHTS"
+				unfulfilled_title = "TEC_FAC_SPI_FULL_ROBOT_RIGHTS_BAD"
+				desc = "TEC_FAC_SPI_NO_FULL_ROBOT_RIGHTS_DESC"
+				fulfilled_effect = 0
+				unfulfilled_effect = -20
+				potential = {
+					exists = owner
+					owner = {
+						can_set_ai_policy = yes
+						has_policy_flag = ai_full_rights
+						has_technology = tech_synthetic_workers
+						tec_is_robot_lover_spiritualist = no
+					}
+				}
+				trigger = {
+					owner = {
+						NOT = {
+							has_policy_flag = ai_full_rights 
+						}
+					}
+				}
+			}
+			# Low spiritualist pops
+			demand = { # NEG - LOW SPI POPS
+				title = "TEC_FAC_SPI_LOW_POPS"
+				unfulfilled_title = "TEC_FAC_SPI_LOW_POPS_IS_BAD"
+				desc = "TEC_FAC_SPI_LOW_POPS_DESC"
+				fulfilled_effect = 0
+				unfulfilled_effect = -10
+				potential = {
+					support < 0.25
+				}
+				trigger = {
+					support >= 0.1
+				}
+			}
+		# /
+		
+		# MISC - Auth/Factions
+			demand = {	# MISC - Spi fed
+				title = TRADITIONALIST_FEDERATION
+				unfulfilled_title = TRADITIONALIST_FEDERATION_NOT_SPIRITUALIST
+				desc = TRADITIONALIST_FEDERATION_DESC
+
+				fulfilled_effect = 5
+				unfulfilled_effect = -0.001
+
+				potential = {
+					exists = owner.federation
+					has_federations_dlc = yes
+				}
+
+				trigger = {
+					owner.federation = { has_federation_type = spiritualist_federation }
+				}
+			}
+			demand = {	# MISC - Mat fed
+				title = TRADITIONALIST_FEDERATION_ANTI
+				unfulfilled_title = TRADITIONALIST_FEDERATION_ANTI_NOT_RESEARCH
+				desc = TRADITIONALIST_FEDERATION_ANTI_DESC
+
+				unfulfilled_effect = -10
+				fulfilled_effect = 0.001
+
+				potential = {
+					exists = owner.federation
+					owner.federation = { has_federation_type = research_federation }
+				}
+
+				trigger = {
+					OR = {
+						NOT = { exists = owner.federation }
+						owner.federation = {
+							NOT = { has_federation_type = research_federation }
+						}
+					}
+				}
+			}
+		# /
+
+		demand = {	# NEG - FACTION NEGATIVE ECONOMY
+			title = "TEC_FACTION_NO_NEGATIVE_ECONOMY"
+			unfulfilled_title = "TEC_FACTION_BAD_ECONOMY"
+			desc = "TEC_FACTION_NO_NEGATIVE_ECONOMY_DESC"
+			fulfilled_effect = 0
+			unfulfilled_effect = -10
+			potential = {
+				exists = owner
+			}
+			trigger = {
+				owner = {
+					NOR = {
+						has_modifier = energy_deficit
+						has_modifier = minerals_deficit
+						has_modifier = food_deficit
+						has_modifier = alloys_deficit
+						has_modifier = minerals_deficit
+						#has_modifier = unity_deficit
+						has_modifier = consumer_goods_deficit
+						has_modifier = volatile_motes_deficit
+						has_modifier = exotic_gases_deficit
+						has_modifier = rare_crystals_deficit
+						has_modifier = nanites_deficit
+						#has_modifier = living_metal_deficit
+						#has_modifier = sr_zro_deficit
+					}
+				}
+			}
+		}
+	# /
+	
+	on_create = {
+		pop_faction_event = { id = factions.1 }
+	}
+
+	on_destroy = {
+		if = {
+			limit = {
+				has_modifier = promoted_spiritualist
+			}
+			remove_modifier = promoted_spiritualist
+		}
+		if = {
+			limit = {
+				has_modifier = suppressed_spiritualist
+			}
+			remove_modifier = suppressed_spiritualist
+		}
+	}
+	
+	actions = {
+		embrace_faction = {
+			title = "EMBRACE_FACTION"
+			description = "EMBRACE_FACTION_DESC"
+			
+			cost = {
+				influence = @tec_fac_embrace_cost
+			}
+			
+			potential = {
+				exists = owner
+				owner = {
+					OR = {
+						is_subject = no
+						NOT = { any_agreement = { agreement_preset = preset_dominion } }
+					}
+				}
+			}
+			
+			valid = {
+				custom_tooltip = {
+					fail_text = EMBRACE_FACTION_COOLDOWN
+					parameter:empire = {
+						NOT = { has_modifier = embraced_faction_timer }
+					}
+				}
+				support > @tec_fac_embrace_min_support
+				parameter:empire = {
+					NOT = { has_ethic = "ethic_fanatic_spiritualist" }
+				}
+			}
+
+			effect = {
+				add_modifier = { modifier = embraced_faction days = @tec_fac_embrace_cd}
+				parameter:empire = {
+					shift_ethic = ethic_spiritualist
+					hidden_effect = {
+						add_modifier = { modifier = embraced_faction_timer days = @tec_fac_embrace_cd}
+						every_pop_faction = {
+							limit = { NOT = { is_same_value = root } }
+							add_modifier = { modifier = embraced_another_faction days = @tec_fac_embrace_cd}
+						}
+					}
+				}
+				hidden_effect = {
+					save_event_target_as = TargetFaction
+					parameter:empire = {
+						every_relation = {
+							limit = {
+								is_ai = no
+								tec_is_default_country = yes
+								has_communications = prev
+								has_intel_level = {
+									who = prev
+									category = government
+									level >= 1
+								}
+							}
+							country_event = { id = factions.2000 }
+						}
+					}
+				}
+			}
+			
+			ai_weight = {
+				base = 1
+				modifier = {
+					factor = 0
+					support < 0.50
+					owner = {
+						has_ethic = ethic_spiritualist
+					}
+				}
+				modifier = {
+					factor = 0
+					owner = { has_valid_civic = civic_fanatic_purifiers }
+				}
+				modifier = {
+					factor = 0
+					NOT = {
+						owner = {
+							exists = ruler
+							ruler = {
+								leader_of_faction = traditionalist
+							}
+						}
+					}
+				}
+				modifier = {
+					factor = 0
+					owner = {
+						count_pop_faction = {
+							count < 4
+						}
+					}
+				}
+			}
+		}
+		promote_faction = {
+			title = "PROMOTE_FACTION"
+			description = "PROMOTE_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					NOR = {
+						has_modifier = suppressed_spiritualist
+						has_modifier = promoted_spiritualist
+					}
+				}
+			}
+
+			effect = {
+				parameter:empire = {
+					add_modifier = { modifier = promoted_spiritualist days = -1 }
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		cancel_promote_faction = {
+			title = "CANCEL_PROMOTE_FACTION"
+			description = "CANCEL_PROMOTE_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					has_modifier = promoted_spiritualist
+				}
+			}
+
+			effect = {
+				parameter:empire = {
+					remove_modifier = promoted_spiritualist
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		suppress_faction = {
+			title = "SUPPRESS_FACTION"
+			description = "SUPPRESS_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					NOR = {
+						has_modifier = suppressed_spiritualist
+						has_modifier = promoted_spiritualist
+					}
+				}
+			}
+
+			effect = {
+				add_modifier = { modifier = suppressed_faction days = -1 }
+				parameter:empire = {
+					add_modifier = { modifier = suppressed_spiritualist days = -1 }
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		cancel_suppress_faction = {
+			title = "CANCEL_SUPPRESS_FACTION"
+			description = "CANCEL_SUPPRESS_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					has_modifier = suppressed_spiritualist
+				}
+			}
+
+			effect = {
+				remove_modifier = suppressed_faction
+				parameter:empire = {
+					remove_modifier = suppressed_spiritualist
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		# Evolved
+			# Note: For ALL - Bribe takes a 25% of your total tv to keep the faction happy
+			#tec_faction_action_bribe
+			#tec_faction_action_bribe_cancel
+			# Note: For ALL - Concedes a planet to the faction, giving massive eth act/restrictions
+			#tec_faction_action_concesion
+			#tec_faction_action_concesion_cancel
+			# Note: For OLI - Boosts faction leader with a trait/xp gain
+			#tec_faction_action_boostleader
+			#tec_faction_action_boostleader_cancel
+			# Note: For OLI - Consumes a % of the empire tv and makes the fact produces more
+			#tec_faction_action_incentivize
+			#tec_faction_action_incentivize_cancel
+			# Note: For OLI - to do
+			#tec_faction_action_incentivize
+			#tec_faction_action_incentivize_cancel
+		# /
+	}
+}

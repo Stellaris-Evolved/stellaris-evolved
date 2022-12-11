@@ -1,0 +1,147 @@
+
+#To use one of them, refer to them elsewhere in script via "value:<value>" e.g. value:example_value
+#IMPORTANT NOTE: Be mindful of performance when using these in triggers that are checked often!
+
+# example_value = {
+# 	base = 10 #default: 0
+
+# 	# List of valid mathematical operations:
+# 	# 	Numerical (modifying by a number):
+# 	# 	- set/weight (both do the same, replaces the current result with this value)
+# 	# 	- add
+# 	# 	- subtract
+# 	# 	- factor/mult/multiply ("multiply" fits the name scheme of the rest better, but the other two were kept for historical reasons)
+# 	# 	- divide
+# 	# 	- modulo
+# 	# 	- round_to (rounds to nearest of that value, e.g. 10.7 round_to 5 gives you 10)
+# 	# 	- max (sets to specified value if currently above it)
+# 	# 	- min (sets to specified value if currently below it)
+# 	# 	Simple (do not need a number, but just "yes", e.g. "round = yes")
+# 	# 	- round (sets to nearest full number)
+# 	# 	- ceiling (rounds up)
+# 	# 	- floor (rounds down)
+# 	# 	- abs (multiply by -1 if negative)
+
+# 	#All mathematical operations except weight and factor can be used inline e.g.
+# 	add = 100
+# 	multiply = value:some_other_script_value
+# 	round = yes
+# 	#(Note: weight and factor will instead overwrite the base value - use set, mult or multiply instead)
+
+# 	#They can also be used in modifier = {} fields, which lets you only apply them if triggers are true
+# 	modifier = {
+# 		max = owner.max_example_variable 					#Variable set by set_variable
+# 		owner = { is_variable_set = max_example_variable }	#Only applied if this trigger is true
+# 	}
+# 	# What works for right hand side values of mathematical operations? See events/00_how_to_use_variables for full list.
+
+# 	complex_trigger_modifier = { 	#This lets you get the value of a trigger that you can't use in one-liners because it uses {}
+# 		trigger = count_owned_planet
+# 		trigger_scope = owner 		#Lets you get the result of the trigger on a different scope. Default is "this"
+# 		parameters = { 				#Stick any further information necessary in here, like you'd do within the {} of the trigger normally
+# 			limit = { num_pops > 10 }
+# 		}
+# 		mode = add 					#Allows all numerical operations
+# 		mult = 5 					#Multiplies the outcome by this. In this example, this means adding 5 for each planet with more than 10 pops
+# 	}
+# }
+
+# Final note: script_values use the same metascript system as scripted_triggers and scripted_effects
+# This means that you can input parameters into them, in a similar fashion as described in scripted_effects/99_advanced_documentation.txt
+# For format for doing so is value:my_value|PARAM1|value1|PARAM2|value2|.
+# Then you can use $PARAM1$ in the script value and it will replace it with value1
+
+
+tech_weight_likelihood = {
+	base = 1.25
+	modifier = {
+		add = 1.25
+		OR = {
+			has_valid_civic = civic_tec_science_directorate
+			has_valid_civic = civic_tec_corporate_innovative
+			has_valid_civic = civic_tec_hive_anaxiomatic
+		}
+	}
+}
+
+
+conclave_election_value = {
+	complex_trigger_modifier = {
+		trigger = pop_percentage
+		parameters = {
+			limit = {
+				OR = {
+					has_job = priest
+					has_job = high_priest
+					has_job = death_priest
+					has_job = mortal_initiate
+					has_job = preacher
+					#Evolved jobs
+					has_job = tec_ai_high_ordinator
+					has_job = tec_ai_ordinator
+					has_job = tec_grand_occultist
+					has_job = tec_minor_occultist
+					has_job = tec_mecha_priest
+					has_job = tec_techno_priest
+					has_job = druid
+					has_Job = templar
+					has_job = transcend
+				}
+			}
+		}
+		mode = add
+		mult = 200 #normalising percentage, then x2
+	}
+
+	mult = value:conclave_election_robots_value
+	mult = value:conclave_election_ascension_value
+
+	modifier = {
+		factor = 1.1
+		has_ethic = ethic_spiritualist
+	}
+	modifier = {
+		factor = 1.25
+		has_ethic = ethic_fanatic_spiritualist
+	}
+	modifier = {
+		factor = 1.25
+		has_tradition = tr_psionics_finish
+	}
+	modifier = {
+		factor = 5
+		exists = ruler
+		ruler = { has_trait = leader_trait_ruler_chosen }
+	}
+	modifier = {
+		factor = 1.25
+		has_relic = r_severed_head
+	}
+	modifier = {
+		factor = 1.25
+		any_owned_planet = { has_modifier = holy_planet }
+	}
+	modifier = {
+		factor = 1.25
+		check_variable = {
+			which = num_consecrated_worlds
+			value > 2
+		}
+	}
+	modifier = {
+		factor = conclave_election_random_factor
+		is_variable_set = conclave_election_random_factor
+	}
+	modifier = {
+		factor = value:conclave_election_bribes_value
+		is_variable_set = conclave_election_bribes
+	}
+	modifier = {
+		subtract = 100
+		is_gestalt = yes
+	}
+	modifier = {
+		subtract = 1000
+		is_subject = yes
+	}
+}

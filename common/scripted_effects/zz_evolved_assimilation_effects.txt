@@ -1,0 +1,3051 @@
+# ------------------------------------------------------------
+# ASSIMILATIONS
+# ------------------------------------------------------------
+
+# Modules
+# ------------------------------------------------------------
+
+
+
+# Effects & Cleanups
+# ------------------------------------------------------------
+# root/this = planet
+tec_assimilation_effect = {
+	random_owned_pop = {
+		limit = {
+			has_citizenship_type = {
+				type = citizenship_assimilation
+				country = root.owner
+			}
+		}
+		species = {
+			save_event_target_as = tec_old_species
+		}
+		if = { # ascended synths & bioassimilators & evil replicants
+			limit = {
+				root.owner = {
+					OR = {
+						OR = {
+							has_country_flag = synthetic_empire
+							has_country_flag = synth_assimilation
+						}
+						has_country_flag = tec_biological_assimilation
+						AND = {
+							has_country_flag = tec_replicant_assimilation
+							has_policy_flag = tec_replicant_full_assimilation
+						}
+					}
+				}
+			}
+			kill_pop = yes
+			root = {
+				create_pop = {
+					species = root.owner
+					ethos = root.owner
+				}
+				owner = {
+					if = {
+						limit = { has_ascension_perk = ap_become_the_crisis }
+						complete_crisis_objective = crisobj_purge_pops
+					}
+				}
+			}
+		}
+		else_if = { # Replicant assimilation
+			limit = {
+				root.owner = {
+					has_country_flag = tec_replicant_assimilation
+					NOT = {
+						has_policy_flag = tec_replicant_full_assimilation
+					}
+				}
+			}
+			# Checks if a replicant version of that species exists in the empire
+			if = {
+				limit = {
+					root.owner = {
+						any_owned_species = {
+							OR = {
+								is_exact_same_species = event_target:tec_old_species
+								is_same_species = event_target:tec_old_species
+							}
+							has_trait = trait_tec_replicant_standard
+						}
+					}
+				}
+				root.owner = {
+					random_owned_species = {
+						limit = {
+							OR = {
+								is_exact_same_species = event_target:tec_old_species
+								is_same_species = event_target:tec_old_species
+							}
+							has_trait = trait_tec_replicant_standard
+						}
+						save_event_target_as = tec_convert_into_this
+					}
+				}
+				change_species = event_target:tec_convert_into_this
+			}
+			# Creates another replicant species
+			else = {
+				# Remove traits
+				if = {	# if its lithoid
+					limit = {
+						species = {
+							has_trait = trait_lithoid
+						}
+					}
+					modify_species = {
+						species = this
+						ideal_planet_class = pc_nuked
+						change_scoped_species = no
+						effect = {
+							modify_species = {
+								species = this
+								remove_trait = trait_pc_nuked_preference
+								change_scoped_species = no
+								effect = {
+									modify_species = {
+										species = this
+										remove_trait = trait_lithoid
+										effect = {
+											create_species = {
+												is_mod = yes
+												name = prevprevprev.species #event_target:tec_old_species
+												#namelist = prevprevprev.species #event_target:tec_old_species
+												name_list = event_target:tec_old_species
+												plural = prevprevprev.species #event_target:tec_old_species
+												class = "REPLICANT"
+												portrait = prevprevprev.species #event_target:tec_old_species
+												can_be_modified = prevprevprev.species #event_target:tec_old_species
+												gender = prevprevprev.species #event_target:tec_old_species
+												homeworld = owner.capital_scope
+												traits = {
+													trait = "trait_tec_replicant_standard"
+												}
+												traits = this
+									
+												effect = {
+													#rename_species = {
+													#	prompt_country = root
+													#	name_list = ascension_list
+													#}
+													save_event_target_as = tec_convert_into_this
+													set_species_flag = tec_replicant_species_of_@prev.species
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+					last_created_species = {
+						set_species_flag = tec_replicant_species_of_@prev.species
+					}
+				}
+				else = {
+					if = {
+						limit = {
+							species = {
+								NOT = {
+									has_trait = trait_lithoid
+								}
+							}
+						}
+						modify_species = {
+							species = this
+							ideal_planet_class = pc_nuked
+							change_scoped_species = no
+							effect = {
+								modify_species = {
+									species = this
+									remove_trait = trait_pc_nuked_preference
+									change_scoped_species = no
+									effect = {
+										create_species = {
+											is_mod = yes
+											name = prevprev.species #event_target:tec_old_species
+											#namelist = prevprev.species #event_target:tec_old_species
+											name_list = event_target:tec_old_species
+											plural = prevprev.species #event_target:tec_old_species
+											class = "REPLICANT"
+											portrait = prevprev.species #event_target:tec_old_species
+											can_be_modified = prevprev.species #event_target:tec_old_species
+											gender = prevprev.species #event_target:tec_old_species
+											homeworld = owner.capital_scope
+											traits = {
+												trait = "trait_tec_replicant_standard"
+											}
+											traits = this
+											effect = {
+												#rename_species = {
+												#	prompt_country = root
+												#	name_list = ascension_list
+												#}
+												save_event_target_as = tec_convert_into_this
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+					last_created_species = {
+						set_species_flag = tec_replicant_species_of_@prev.species
+					}
+				}
+				#Species cleanup
+				event_target:tec_convert_into_this = {
+					if = {
+						limit = {
+							has_trait = trait_hive_mind
+						}
+						modify_species = {
+							species = this
+							remove_trait = trait_hive_mind
+							change_scoped_species = no
+						}
+					}
+					if = {
+						limit = {
+							has_trait = trait_cybernetic
+						}
+						modify_species = {
+							species = this
+							remove_trait = trait_cybernetic
+							change_scoped_species = no
+						}
+					}
+					if = {
+						limit = {
+							has_trait = trait_tec_advanced_cyborg
+						}
+						modify_species = {
+							species = this
+							remove_trait = trait_tec_advanced_cyborg
+							change_scoped_species = no
+						}
+					}
+					#recheck
+
+					save_event_target_as = tec_convert_into_this	
+				}
+				event_target:tec_convert_into_this = {	#recheck, in case
+					set_species_flag = tec_replicant_species_of_@prevprev.species
+				}
+				change_species = event_target:tec_convert_into_this
+			}
+		
+			# Secondary bonuses and etc
+			root = {
+				owner = {
+					if = {
+						limit = { has_ascension_perk = ap_become_the_crisis }
+						complete_crisis_objective = crisobj_purge_pops
+					}
+				}
+			}
+		}
+		else = {
+			random_galaxy_species = {
+				limit = {
+					has_species_flag = assimilation_species_of_species@prev.species
+					has_species_flag = assimilation_species_of_empire@root.owner
+				}
+				save_event_target_as = convert_to_species
+			}
+			species = {
+				save_event_target_as = old_species
+			}
+			if = {
+				limit = {
+					exists = event_target:convert_to_species #should always exist
+				}
+				change_species = event_target:convert_to_species
+				owner = {
+					if = {
+						limit = { has_ascension_perk = ap_become_the_crisis }
+						complete_crisis_objective = crisobj_purge_pops
+					}
+				}
+				root = {
+					change_variable = {
+						which = assimilation_counter
+						value = -1
+					}
+					while = { #to avoid doing the random_galaxy_species thing too many times
+						limit = {
+							exists = event_target:old_species
+							check_variable = {
+								which = assimilation_counter
+								value > 0
+							}
+							any_owned_pop = {
+								is_same_value = event_target:old_species
+							}
+						}
+						random_owned_pop = {
+							limit = {
+								is_exact_same_species = event_target:old_species
+							}
+							change_species = event_target:convert_to_species
+							apply_post_assimilation_effects = yes
+						}
+						change_variable = {
+							which = assimilation_counter
+							value = -1
+						}
+						owner = {
+							if = {
+								limit = { has_ascension_perk = ap_become_the_crisis }
+								complete_crisis_objective = crisobj_purge_pops
+							}
+						}
+					}
+				}
+				apply_post_assimilation_effects = yes
+			}
+			else = {
+				log_error = "No species found for \\[This.Species.GetName] pop owned by \\[This.Owner.GetName] on \\[This.Planet.GetName] to assimilate to"
+			}
+		}
+	}
+}
+
+# pop scope, root = planet
+apply_post_assimilation_effects = {
+	if = { # assimilator empire
+		limit = {
+			root.owner = {
+				OR = {
+					AND = {
+						is_machine_empire = yes
+						has_civic = civic_machine_assimilator
+					}
+					AND = {	# Evolved
+						is_hive_empire = yes
+						tec_is_cyberhive = yes
+					}
+				}
+				NOT = { has_tradition = tr_cybernetics_assimilator_adopt }
+			}
+		}
+		root.owner = { generate_cyborg_treats = yes } # scripted effect
+	}
+	else_if = {
+		limit = {
+			root.owner = {
+				OR = {
+					AND = {
+						is_machine_empire = yes
+						has_civic = civic_machine_assimilator
+					}
+					AND = {	# Evolved
+						is_hive_empire = yes
+						tec_is_cyberhive = yes
+					}
+				}
+				has_tradition = tr_cybernetics_assimilator_adopt
+			}
+		}
+		root.owner = { generate_cyborg_extra_treats = yes } # scripted effect
+	}
+	if = {
+		limit = {
+			NOT = {
+				owner = {
+					any_owned_pop = {
+						is_exact_same_species = event_target:convert_to_species
+						NOT = { is_same_value = prevprev }
+					}
+				}
+			}
+		}
+		if = { # set citizenship
+			limit = { root.owner = { is_machine_empire = yes } }
+			set_citizenship_type = {
+				type = citizenship_full_machine
+				country = root.owner
+			}
+		}
+		else = {
+			set_citizenship_type = {
+				type = citizenship_full
+				country = root.owner
+			}
+		}
+
+		if = { # set citizenship
+			limit = { root.owner = { has_ethic = ethic_gestalt_consciousness } }
+			set_living_standard = {
+				type = living_standard_hive_mind
+				country = root.owner
+			}
+		}
+	}
+}
+
+# Specific
+# ------------------------------------------------------------
+tec_replicant_trait_cleanup_effect = {
+	if = {
+		limit = {
+			has_trait = trait_lithoid
+		}
+		modify_species = {
+			species = this
+			remove_trait = trait_lithoid
+			change_scoped_species = no
+		}
+	}
+	if = {
+		limit = {
+			has_trait = trait_hive_mind
+		}
+		modify_species = {
+			species = this
+			remove_trait = trait_hive_mind
+			change_scoped_species = no
+		}
+	}
+	if = {
+		limit = {
+			has_trait = trait_cybernetic
+		}
+		modify_species = {
+			species = this
+			remove_trait = trait_cybernetic
+			change_scoped_species = no
+		}
+	}
+	if = {
+		limit = {
+			has_trait = trait_tec_advanced_cyborg
+		}
+		modify_species = {
+			species = this
+			remove_trait = trait_tec_advanced_cyborg
+			change_scoped_species = no
+		}
+	}
+}
+
+# Scripts
+# ------------------------------------------------------------
+tec_robot_into_machines_assimilation_script = {				# RM A
+	# Also considers robots into same patent
+	if = {
+		limit = {
+			OR = {
+				has_trait = trait_mechanical
+				has_trait = trait_machine_unit
+				NOT = {
+					has_species_flag = mechanical_species@prev
+				}
+			}
+			prev = {
+				has_technology = tech_tec_machine_assimilation
+			}
+		}
+		set_timed_species_flag = {
+			flag = tec_rm_a
+			days = 10
+		}
+	}
+}
+
+tec_machines_into_robots_assimilation_script = {			# MR A
+	# Also considers machines into same patent
+	if = {
+		limit = {
+			OR = {
+				has_trait = trait_mechanical
+				has_trait = trait_machine_unit
+			}
+			prev = {
+				has_technology = tech_tec_robot_assimilation
+			}
+		}
+		set_timed_species_flag = {
+			flag = tec_mr_a
+			days = 10
+		}
+	}
+}
+
+# -------------- Hivemind block
+	# Regular
+tec_hivemind_trait_assimilation_script = {	# Adds hive
+	# Note* Psi, lpsi will be replaced later
+	# Ignores cybernetic for convenience
+	if = {	# If any species already is patent
+		limit = {
+			prev = {
+				any_owned_species = {
+					has_species_flag = tec_target_assim_spe_of_@prevprev
+					has_trait = trait_hive_mind
+				}
+			}
+		}
+		prev = {
+			random_owned_species = {
+				limit = {
+					has_species_flag = tec_target_assim_spe_of_@prevprev
+					has_trait = trait_hive_mind
+				}
+				set_timed_species_flag = { # renews
+					flag = tec_target_assim_spe_of_@prevprev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+			}
+		}
+		set_timed_species_flag = {
+			flag = tec_hm_asim_@this
+			days = 30
+		}
+	}
+	else = {
+		modify_species = {
+			species = this
+			# Add traits
+			add_trait = trait_hive_mind
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_hm_asim_@prev
+					days = 30
+				}
+			}
+		}
+	}
+}
+	# Cyberhive
+tec_hivemind_cyberhive_t0_assimilation_script = {	# Deprecated as it worked with rudimentary cyborg
+	# deprecated
+}
+
+tec_hivemind_cyberhive_t1_assimilation_script = {	# Adds cybernetic trait, if the species is not a cyborg
+	# Note* Psi, lpsi will be replaced later if cyberpsi
+	# Purity of form is removed because you are no longer pure
+	if = {			# If any species already is patent
+		limit = {
+			prev = {
+				any_owned_species = {
+					OR = {
+						has_species_flag = tec_target_assim_spe_of_@prevprev
+						is_same_species = prevprev
+					}
+					has_trait = trait_hive_mind
+					tec_is_cyborg_species = yes
+				}
+			}
+		}
+		prev = {
+			random_owned_species = {
+				limit = {
+					OR = {
+						has_species_flag = tec_target_assim_spe_of_@prevprev
+						is_same_species = prevprev
+					}
+					has_trait = trait_hive_mind
+					tec_is_cyborg_species = yes
+				}
+				set_timed_species_flag = { # renews
+					flag = tec_target_assim_spe_of_@prevprev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+			}
+		}
+		set_timed_species_flag = {
+			flag = tec_hmcybt1_asim_@this
+			days = 30
+		}
+	}
+	else_if = {		# Species is already a cyborg of any type
+		limit = {
+			tec_is_cyborg_species = yes
+		}
+		modify_species = {
+			species = this
+			# Remove traits
+			#remove_trait = trait_tec_rudimentary_cyborg
+			remove_trait = trait_tec_pure_psionic
+			#remove_trait = trait_tec_pure_psionic_hive
+			# Add traits
+			add_trait = trait_hive_mind
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_hm_asim_@prev
+					days = 30
+				}
+			}
+		}
+	}
+	else = {
+		modify_species = {
+			species = this
+			# Remove traits
+			#remove_trait = trait_tec_rudimentary_cyborg
+			remove_trait = trait_tec_pure_psionic
+			#remove_trait = trait_tec_pure_psionic_hive
+			# Add traits
+			add_trait = trait_hive_mind
+			add_trait = trait_cybernetic
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_hm_asim_@prev
+					days = 30
+				}
+			}
+		}
+	}
+}
+
+tec_hivemind_cyberhive_t2_assimilation_script = {	# Adds advcyb trait
+	# Note* Psi, lpsi will be replaced later if cyberpsi
+	# Purity of form is removed because you are no longer pure
+	if = {			# If any species already is patent
+		limit = {
+			prev = {
+				any_owned_species = {
+					OR = {
+						has_species_flag = tec_target_assim_spe_of_@prevprev
+						is_same_species = prevprev
+					}
+					has_trait = trait_hive_mind
+					tec_is_advanced_cyborg_species = yes
+				}
+			}
+		}
+		prev = {
+			random_owned_species = {
+				limit = {
+					OR = {
+						has_species_flag = tec_target_assim_spe_of_@prevprev
+						is_same_species = prevprev
+					}
+					has_trait = trait_hive_mind
+					tec_is_advanced_cyborg_species = yes
+				}
+				set_timed_species_flag = { # renews
+					flag = tec_target_assim_spe_of_@prevprev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+			}
+		}
+		set_timed_species_flag = {
+			flag = tec_hmcybt2_asim_@this
+			days = 30
+		}
+	}
+	else_if = {		# Species is already advanced cyborg
+		limit = {
+			tec_is_advanced_cyborg_species = yes
+		}
+		modify_species = {
+			species = this
+			# Remove traits
+			#remove_trait = trait_tec_rudimentary_cyborg
+			remove_trait = trait_cybernetic
+			remove_trait = trait_tec_pure_psionic
+			#remove_trait = trait_tec_pure_psionic_hive
+			# Add traits
+			add_trait = trait_hive_mind
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_hm_asim_@prev
+					days = 30
+				}
+			}
+		}
+	}
+	else = {
+		modify_species = {
+			species = this
+			# Remove traits
+			#remove_trait = trait_tec_rudimentary_cyborg
+			remove_trait = trait_cybernetic
+			remove_trait = trait_tec_pure_psionic
+			#remove_trait = trait_tec_pure_psionic_hive
+			# Add traits
+			add_trait = trait_hive_mind
+			add_trait = trait_tec_advanced_cyborg
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_hm_asim_@prev
+					days = 30
+				}
+			}
+		}
+	}
+}
+	# Psionic 			# Not functional, yet
+tec_hivemind_psionic_assimilation_script = {
+	# Note* psi traits will be flipped
+
+}
+	# Biopsionic		# Not functional, yet
+tec_hivemind_biopsionic_assimilation_script = {
+	# Discarded - full species assimilation
+}
+	# Cyberpsionic		# Not functional, yet
+tec_hivemind_cyberpsionic_assimilation_script = {
+	# Note* psi traits will be flipped
+	
+}
+# -------------- Machine Block
+	# Biotrophy hives
+tec_machine_hive_into_biotrophy_assimilation_script = {
+	# Converts psionic hives into latent psionics
+	if = {			# If any species already is patent
+		limit = {
+			prev = {
+				any_owned_species = {
+					OR = {
+						has_species_flag = tec_target_assim_spe_of_@prevprev
+						is_same_species = prevprev
+					}
+					NOR = {
+						has_trait = trait_hive_mind
+						has_trait = trait_tec_hive_psionic_resonance
+					}
+				}
+			}
+		}
+		prev = {
+			random_owned_species = {
+				limit = {
+					OR = {
+						has_species_flag = tec_target_assim_spe_of_@prevprev
+						is_same_species = prevprev
+					}
+					NOR = {
+						has_trait = trait_hive_mind
+						has_trait = trait_tec_hive_psionic_resonance
+					}
+				}
+				set_timed_species_flag = { # renews
+					flag = tec_target_assim_spe_of_@prevprev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+			}
+		}
+		set_timed_species_flag = {
+			flag = tec_mhivbiotrophy_asim_@this
+			days = 30
+		}
+	}
+	else_if = {		# Psionic hive
+		limit = {
+			has_trait = trait_hive_mind
+			has_trait = trait_tec_hive_psionic_resonance
+		}
+		modify_species = {
+			species = this
+			# Remove
+			remove_trait = trait_tec_hive_psionic_resonance
+			remove_trait = trait_hive_mind
+			# add
+			add_trait = trait_latent_psionic
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_m_hm_desim_psi_@prev
+					days = 30
+				}
+			}
+		}
+	}
+	else = {		# ONLY HIVE
+		modify_species = {
+			species = this
+			# Remove
+			remove_trait = trait_hive_mind
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_m_hm_desim_@prev
+					days = 30
+				}
+			}
+		}
+	}
+}
+	# Cybernetics
+tec_machine_cybernetic_t1_assimilation_script = {
+	if = {			# If any species already is patent
+		limit = {
+			prev = {
+				any_owned_species = {
+					OR = {
+						has_species_flag = tec_target_assim_spe_of_@prevprev
+						is_same_species = prevprev
+					}
+					tec_is_cyborg_species = yes
+					NOR = {
+						has_trait = trait_hive_mind
+						has_trait = trait_tec_hive_psionic_resonance
+						has_trait = trait_tec_pure_psionic
+					}
+				}
+			}
+		}
+		prev = {
+			random_owned_species = {
+				limit = {
+					OR = {
+						has_species_flag = tec_target_assim_spe_of_@prevprev
+						is_same_species = prevprev
+					}
+					tec_is_cyborg_species = yes
+					NOR = {
+						has_trait = trait_hive_mind
+						has_trait = trait_tec_hive_psionic_resonance
+						has_trait = trait_tec_pure_psionic
+					}
+				}
+				set_timed_species_flag = { # renews
+					flag = tec_target_assim_spe_of_@prevprev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+			}
+		}
+		set_timed_species_flag = {
+			flag = tec_mcybt1_asim_@this
+			days = 30
+		}
+	}
+	else_if = {		# Species is already cyborg
+		limit = {
+			tec_is_cyborg_species = yes
+			OR = {
+				has_trait = trait_hive_mind
+				has_trait = trait_tec_hive_psionic_resonance
+				has_trait = trait_tec_pure_psionic
+				#has_trait = trait_tec_rudimentary_cyborg
+			}
+		}
+		modify_species = {
+			species = this
+			# Remove
+			remove_trait = trait_hive_mind
+			remove_trait = trait_tec_hive_psionic_resonance
+			remove_trait = trait_tec_pure_psionic
+			#remove_trait = trait_tec_rudimentary_cyborg
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_mcyb_t1_change_@prev
+					days = 30
+				}
+			}
+		}
+	}
+	else_if = {		# Purepsi/hive/hivepsi
+		limit = {
+			tec_is_cyborg_species = no
+			OR = {
+				has_trait = trait_hive_mind
+				has_trait = trait_tec_hive_psionic_resonance
+				has_trait = trait_tec_pure_psionic
+				#has_trait = trait_tec_rudimentary_cyborg
+			}
+		}
+		modify_species = {
+			species = this
+			# Add
+			add_trait = trait_cybernetic
+			# Remove
+			remove_trait = trait_hive_mind
+			remove_trait = trait_tec_hive_psionic_resonance
+			remove_trait = trait_tec_pure_psionic
+			#remove_trait = trait_tec_rudimentary_cyborg
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_mcyb_t1_change_@prev
+					days = 30
+				}
+			}
+		}
+	}
+	else = {		# Just cyborg
+		modify_species = {
+			species = this
+			add_trait = trait_cybernetic
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_mcyb_t1_else_@prev
+					days = 30
+				}
+			}
+		}
+	}
+}
+
+tec_machine_cybernetic_t2_assimilation_script = {
+	if = {			# If any species already is patent
+		limit = {
+			prev = {
+				any_owned_species = {
+					OR = {
+						has_species_flag = tec_target_assim_spe_of_@prevprev
+						is_same_species = prevprev
+					}
+					tec_is_advanced_cyborg_species = yes
+					NOR = {
+						has_trait = trait_hive_mind
+						has_trait = trait_tec_hive_psionic_resonance
+						has_trait = trait_tec_pure_psionic
+					}
+				}
+			}
+		}
+		prev = {
+			random_owned_species = {
+				limit = {
+					OR = {
+						has_species_flag = tec_target_assim_spe_of_@prevprev
+						is_same_species = prevprev
+					}
+					tec_is_advanced_cyborg_species = yes
+					NOR = {
+						has_trait = trait_hive_mind
+						has_trait = trait_tec_hive_psionic_resonance
+						has_trait = trait_tec_pure_psionic
+					}
+				}
+				set_timed_species_flag = { # renews
+					flag = tec_target_assim_spe_of_@prevprev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+			}
+		}
+		set_timed_species_flag = {
+			flag = tec_mcybt2_asim_@this
+			days = 30
+		}
+	}
+	else_if = {		# Species is already adv cyborg
+		limit = {
+			tec_is_advanced_cyborg_species = yes
+			OR = {
+				has_trait = trait_hive_mind
+				has_trait = trait_tec_hive_psionic_resonance
+				has_trait = trait_tec_pure_psionic
+				#has_trait = trait_tec_rudimentary_cyborg
+			}
+		}
+		modify_species = {
+			species = this
+			# Remove
+			remove_trait = trait_hive_mind
+			remove_trait = trait_tec_hive_psionic_resonance
+			remove_trait = trait_tec_pure_psionic
+			#remove_trait = trait_tec_rudimentary_cyborg
+			remove_trait = trait_cybernetic
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_mcyb_t2_cyb_@prev
+					days = 30
+				}
+			}
+		}
+	}
+	else_if = {		# Purepsi/hive/hivepsi/cyb
+		limit = {
+			tec_is_advanced_cyborg_species = no
+			OR = {
+				has_trait = trait_hive_mind
+				has_trait = trait_tec_hive_psionic_resonance
+				has_trait = trait_tec_pure_psionic
+				#has_trait = trait_tec_rudimentary_cyborg
+				has_trait = trait_cybernetic
+			}
+		}
+		modify_species = {
+			species = this
+			# Add
+			add_trait = trait_tec_advanced_cyborg
+			# Remove
+			remove_trait = trait_hive_mind
+			remove_trait = trait_tec_hive_psionic_resonance
+			remove_trait = trait_tec_pure_psionic
+			#remove_trait = trait_tec_rudimentary_cyborg
+			remove_trait = trait_cybernetic
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_mcyb_t2_change_@prev
+					days = 30
+				}
+			}
+		}
+	}
+	else = {		# Just cyborg
+		modify_species = {
+			species = this
+			add_trait = trait_tec_advanced_cyborg
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_mcyb_t2_else_@prev
+					days = 30
+				}
+			}
+		}
+	}
+}
+# -------------- Regular block
+	# Hive deassim
+tec_regular_hivedeassim_assimilation_script = {
+	# Intentionally preserving purity of form and cybernetics
+	if = {			# If any species already is patent
+		limit = {
+			prev = {
+				any_owned_species = {
+					OR = {
+						has_species_flag = tec_target_assim_spe_of_@prevprev
+						is_same_species = prevprev
+					}
+					NOR = {
+						has_trait = trait_hive_mind
+						has_trait = trait_tec_hive_psionic_resonance
+					}
+				}
+			}
+		}
+		prev = {
+			random_owned_species = {
+				limit = {
+					OR = {
+						has_species_flag = tec_target_assim_spe_of_@prevprev
+						is_same_species = prevprev
+					}
+					NOR = {
+						has_trait = trait_hive_mind
+						has_trait = trait_tec_hive_psionic_resonance
+					}
+				}
+				set_timed_species_flag = { # renews
+					flag = tec_target_assim_spe_of_@prevprev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+			}
+		}
+		set_timed_species_flag = {
+			flag = tec_dehiv_asim_@this
+			days = 30
+		}
+	}
+	else_if = {		# Psi hivemind
+		limit = {
+			has_trait = trait_hive_mind
+			has_trait = trait_tec_hive_psionic_resonance
+		}
+		modify_species = {
+			species = this
+			add_traits_at_start_of_list = yes
+			# Add
+			add_trait = trait_latent_psionic
+			# Remove
+			remove_trait = trait_hive_mind
+			remove_trait = trait_tec_hive_psionic_resonance
+			change_scoped_species = no
+			effect = {	#double
+				modify_species = {
+					species = this
+					remove_trait = trait_tec_hive_psionic_entanglement
+					change_scoped_species = no
+					effect = {
+						set_timed_species_flag = {
+							flag = tec_target_assim_spe_of_@prevprev
+							days = 480
+						}
+						set_timed_species_flag = {
+							flag = assim_spe_of_spe_@prevprev
+							days = 30
+						}
+						set_timed_species_flag = {
+							flag = assim_spe_of_emp_@prevprevprev
+							days = 30
+						}
+						set_timed_species_flag = {
+							flag = tec_deasim_hm_@prevprev
+							days = 30
+						}
+					}
+				}
+			}
+		}
+	}
+	else = {		# Remove hivemind
+		modify_species = {
+			species = this
+			add_traits_at_start_of_list = yes
+			remove_trait = trait_hive_mind
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_deasim_hm_@prev
+					days = 30
+				}
+			}
+		}
+	}
+}
+	# Cybernetics
+tec_regular_cybernetic_t1_assimilation_script = {
+	# Removes hivemind, pure psionic // Adds rudimentary cyborg // Replaces hive psi by latent psi
+	if = {			# If any species already is patent
+		limit = {
+			prev = {
+				any_owned_species = {
+					OR = {
+						has_species_flag = tec_target_assim_spe_of_@prevprev
+						is_same_species = prevprev
+					}
+					tec_is_cyborg_species = yes
+					NOR = {
+						has_trait = trait_hive_mind
+						has_trait = trait_tec_hive_psionic_resonance
+						has_trait = trait_tec_hive_psionic_entanglement
+						has_trait = trait_tec_pure_psionic
+					}
+				}
+			}
+		}
+		prev = {
+			random_owned_species = {
+				limit = {
+					OR = {
+						has_species_flag = tec_target_assim_spe_of_@prevprev
+						is_same_species = prevprev
+					}
+					tec_is_cyborg_species = yes
+					NOR = {
+						has_trait = trait_hive_mind
+						has_trait = trait_tec_hive_psionic_resonance
+						has_trait = trait_tec_hive_psionic_entanglement
+						has_trait = trait_tec_pure_psionic
+					}
+				}
+				set_timed_species_flag = { # renews
+					flag = tec_target_assim_spe_of_@prevprev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+			}
+		}
+		set_timed_species_flag = {
+			flag = tec_cybt1_asim_@this
+			days = 30
+		}
+	}
+	else_if = {		# Species is already cyborg
+		limit = {
+			tec_is_cyborg_species = yes
+			OR = {
+				has_trait = trait_hive_mind
+				has_trait = trait_tec_hive_psionic_resonance
+				has_trait = trait_tec_pure_psionic
+				#has_trait = trait_tec_rudimentary_cyborg
+			}
+		}
+		modify_species = {
+			species = this
+			# Remove
+			remove_trait = trait_hive_mind
+			remove_trait = trait_tec_hive_psionic_resonance
+			remove_trait = trait_tec_pure_psionic
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_mcyb_t1_cyb_@prev
+					days = 30
+				}
+			}
+		}
+	}
+	else_if = {		# hm /psi
+		limit = {
+			tec_is_cyborg_species = no
+			OR = {
+				has_trait = trait_hive_mind
+				has_trait = trait_tec_hive_psionic_resonance
+				has_trait = trait_tec_pure_psionic
+				#has_trait = trait_tec_rudimentary_cyborg
+			}
+		}
+		modify_species = {
+			species = this
+			# Add
+			add_trait = trait_cybernetic
+			# Remove
+			remove_trait = trait_hive_mind
+			remove_trait = trait_tec_hive_psionic_resonance
+			remove_trait = trait_tec_pure_psionic
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_mcyb_t1_nocyb_@prev
+					days = 30
+				}
+			}
+		}
+	}
+	else = {		# Adds cyb
+		modify_species = {
+			species = this
+			add_trait = trait_cybernetic
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_mcyb_t1_else_@prev
+					days = 30
+				}
+			}
+		}
+	}
+}
+
+tec_regular_cybernetic_t2_assimilation_script = {
+	if = {			# If any species already is patent
+		limit = {
+			prev = {
+				any_owned_species = {
+					OR = {
+						has_species_flag = tec_target_assim_spe_of_@prevprev
+						is_same_species = prevprev
+					}
+					tec_is_advanced_cyborg_species = yes
+					NOR = {
+						has_trait = trait_hive_mind
+						has_trait = trait_tec_hive_psionic_resonance
+						has_trait = trait_tec_pure_psionic
+					}
+				}
+			}
+		}
+		prev = {
+			random_owned_species = {
+				limit = {
+					OR = {
+						has_species_flag = tec_target_assim_spe_of_@prevprev
+						is_same_species = prevprev
+					}
+					tec_is_advanced_cyborg_species = yes
+					NOR = {
+						has_trait = trait_hive_mind
+						has_trait = trait_tec_hive_psionic_resonance
+						has_trait = trait_tec_pure_psionic
+					}
+				}
+				set_timed_species_flag = { # renews
+					flag = tec_target_assim_spe_of_@prevprev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+			}
+		}
+		set_timed_species_flag = {
+			flag = tec_cybt2_asim_@this
+			days = 30
+		}
+	}
+	else_if = {		# Species is already adv cyborg
+		limit = {
+			tec_is_advanced_cyborg_species = yes
+			OR = {
+				has_trait = trait_hive_mind
+				has_trait = trait_tec_hive_psionic_resonance
+				has_trait = trait_tec_pure_psionic
+				#has_trait = trait_tec_rudimentary_cyborg
+				has_trait = trait_cybernetic
+			}
+		}
+		modify_species = {
+			species = this
+			# Remove
+			remove_trait = trait_hive_mind
+			remove_trait = trait_tec_hive_psionic_resonance
+			remove_trait = trait_tec_pure_psionic
+			#remove_trait = trait_tec_rudimentary_cyborg
+			remove_trait = trait_cybernetic
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_mcyb_t2_cyb_@prev
+					days = 30
+				}
+			}
+		}
+	}
+	else_if = {		# hm / purepsi
+		limit = {
+			tec_is_advanced_cyborg_species = no
+			OR = {
+				has_trait = trait_hive_mind
+				has_trait = trait_tec_hive_psionic_resonance
+				has_trait = trait_tec_pure_psionic
+				#has_trait = trait_tec_rudimentary_cyborg
+				has_trait = trait_cybernetic
+			}
+		}
+		modify_species = {
+			species = this
+			# Add
+			add_trait = trait_tec_advanced_cyborg
+			# Remove
+			remove_trait = trait_hive_mind
+			remove_trait = trait_tec_hive_psionic_resonance
+			remove_trait = trait_tec_pure_psionic
+			#remove_trait = trait_tec_rudimentary_cyborg
+			remove_trait = trait_cybernetic
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_mcyb_t2_nocyb_@prev
+					days = 30
+				}
+			}
+		}
+	}
+	else = {		# adds adv cyb
+		modify_species = {
+			species = this
+			# Add
+			add_trait = trait_tec_advanced_cyborg
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_mcyb_t2_else_@prev
+					days = 30
+				}
+			}
+		}
+	}
+}
+	# Psionic
+tec_regular_psionic_assimilation_script = {
+	# Cyborg and etc are tolerated
+	if = {			# If any species already is patent
+		limit = {
+			prev = {
+				any_owned_species = {
+					OR = {
+						has_species_flag = tec_target_assim_spe_of_@prevprev
+						is_same_species = prevprev
+					}
+					OR = {
+						has_trait = trait_psionic
+						has_trait = trait_tec_cyberpsionic
+					}
+				}
+			}
+		}
+		prev = {
+			random_owned_species = {
+				limit = {
+					OR = {
+						has_species_flag = tec_target_assim_spe_of_@prevprev
+						is_same_species = prevprev
+					}
+					OR = {
+						has_trait = trait_psionic
+						has_trait = trait_tec_cyberpsionic
+					}
+				}
+				set_timed_species_flag = { # renews
+					flag = tec_target_assim_spe_of_@prevprev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+			}
+		}
+		set_timed_species_flag = {
+			flag = tec_psi_asim_@this
+			days = 30
+		}
+	}
+	else_if = {		# Species is already psionic
+		limit = {
+			OR = {
+				has_trait = trait_tec_pure_psionic
+				has_trait = trait_tec_cyberpsionic
+			}
+			OR = {
+				has_trait = trait_hive_mind
+				has_trait = trait_tec_hive_psionic_resonance
+				has_trait = trait_tec_pure_psionic
+			}
+		}
+		modify_species = {
+			species = this
+			# Remove
+			remove_trait = trait_hive_mind
+			remove_trait = trait_tec_hive_psionic_resonance
+			remove_trait = trait_tec_pure_psionic
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_psi_psi_@prev
+					days = 30
+				}
+			}
+		}
+	}
+	else_if = {		# hm / hivepsi / purepsi
+		limit = {
+			NOR = {
+				has_trait = trait_tec_pure_psionic
+				has_trait = trait_tec_cyberpsionic
+			}
+			OR = {
+				has_trait = trait_hive_mind
+				has_trait = trait_tec_hive_psionic_resonance
+				has_trait = trait_tec_pure_psionic
+			}
+		}
+		modify_species = {
+			species = this
+			# Add
+			add_trait = trait_psionic
+			# Remove
+			remove_trait = trait_hive_mind
+			remove_trait = trait_tec_hive_psionic_resonance
+			remove_trait = trait_tec_pure_psionic
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_psi_nopsi_@prev
+					days = 30
+				}
+			}
+		}
+	}
+	else = {		# Adds trait and thats it
+		modify_species = {
+			species = this
+			add_trait = trait_psionic
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_psi_else_@prev
+					days = 30
+				}
+			}
+		}
+	}
+}
+	# Cyberpsio
+tec_regular_cyberpsionic_assimilation_script = {
+	if = {			# If any species already is patent
+		limit = {
+			prev = {
+				any_owned_species = {
+					OR = {
+						has_species_flag = tec_target_assim_spe_of_@prevprev
+						is_same_species = prevprev
+					}
+					has_trait = trait_tec_cyberpsionic
+					NOR = {
+						has_trait = trait_hive_mind
+						has_trait = trait_tec_hive_psionic_resonance
+						has_trait = trait_latent_psionic
+						has_trait = trait_psionic
+						has_trait = trait_tec_pure_psionic
+					}
+				}
+			}
+		}
+		prev = {
+			random_owned_species = {
+				limit = {
+					OR = {
+						has_species_flag = tec_target_assim_spe_of_@prevprev
+						#is_same_species = prevprev
+					}
+					has_trait = trait_tec_cyberpsionic
+					NOR = {
+						has_trait = trait_hive_mind
+						has_trait = trait_tec_hive_psionic_resonance
+						has_trait = trait_latent_psionic
+						has_trait = trait_psionic
+						has_trait = trait_tec_pure_psionic
+					}
+				}
+				set_timed_species_flag = { # renews
+					flag = tec_target_assim_spe_of_@prevprev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+			}
+		}
+		set_timed_species_flag = {
+			flag = tec_cybpsi_asim_@this
+			days = 30
+		}
+	}
+	else_if = {		# Already cyberpsi
+		limit = {
+			has_trait = trait_tec_cyberpsionic
+			OR = {
+				has_trait = trait_hive_mind
+				has_trait = trait_tec_hive_psionic_resonance
+				has_trait = trait_latent_psionic
+				has_trait = trait_psionic
+				has_trait = trait_tec_pure_psionic
+				has_trait = trait_cybernetic
+				has_trait = trait_tec_advanced_cyborg
+			}
+		}
+		modify_species = {
+			species = this
+			# Remove
+			remove_trait = trait_hive_mind
+			remove_trait = trait_tec_hive_psionic_resonance
+			remove_trait = trait_latent_psionic
+			remove_trait = trait_psionic
+			remove_trait = trait_tec_pure_psionic
+			remove_trait = trait_cybernetic
+			remove_trait = trait_tec_advanced_cyborg
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_cybpsi_acyb_@prev
+					days = 30
+				}
+			}
+		}
+	}
+	else_if = {		# hive / hivepsi / psi / purepsi / cyb
+		limit = {
+			NOT = {
+				has_trait = trait_tec_cyberpsionic
+			}
+			OR = {
+				has_trait = trait_hive_mind
+				has_trait = trait_tec_hive_psionic_resonance
+				has_trait = trait_latent_psionic
+				has_trait = trait_psionic
+				has_trait = trait_tec_pure_psionic
+				has_trait = trait_cybernetic
+				has_trait = trait_tec_advanced_cyborg
+			}
+		}
+		modify_species = {
+			species = this
+			# Add
+			add_trait = trait_tec_cyberpsionic
+			# Remove
+			remove_trait = trait_hive_mind
+			remove_trait = trait_tec_hive_psionic_resonance
+			remove_trait = trait_latent_psionic
+			remove_trait = trait_psionic
+			remove_trait = trait_tec_pure_psionic
+			remove_trait = trait_cybernetic
+			remove_trait = trait_tec_advanced_cyborg
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_cybpsi_acyb_@prev
+					days = 30
+				}
+			}
+		}
+	}
+	else = {	# Adds trait and thats it
+		modify_species = {
+			species = this
+			add_trait = trait_tec_cyberpsionic
+			add_traits_at_start_of_list = yes
+			change_scoped_species = no
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_cybpsi_else_@prev
+					days = 30
+				}
+			}
+		}
+	}
+}
+	# Biopsio
+tec_regular_biopsionic_assimilation_script = {
+	# Its now a - to main species - assimilation
+}
+
+
+# T E S T
+# ------------------------------------------------------------
+tec_test_assim_regular_psi = {
+	add_building = tec_supertestbuilding
+	# Latent psionic
+		create_species = {
+			name = "LATENT PSI"
+			plural = RANDOM
+			class = random
+			namelist = this
+			portrait = mol1
+			traits = {
+				trait = trait_latent_psionic
+			}
+			effect = {
+				save_event_target_as = tec_new_species
+			}
+		}
+		while = {
+			count = 5
+			create_pop = {
+				species = event_target:tec_new_species
+			}
+		}
+	# /
+	# psionic
+		create_species = {
+			name = "PSI BASE"
+			plural = RANDOM
+			class = random
+			namelist = this
+			portrait = mol2
+			traits = {
+				trait = trait_psionic
+			}
+			effect = {
+				save_event_target_as = tec_new_species
+			}
+		}
+		while = {
+			count = 5
+			create_pop = {
+				species = event_target:tec_new_species
+			}
+		}
+	# /
+	# pure psionic
+		create_species = {
+			name = "PURE PSI"
+			plural = RANDOM
+			class = random
+			namelist = this
+			portrait = mol3
+			traits = {
+				trait = trait_tec_pure_psionic
+			}
+		}
+		while = {
+			count = 5
+			create_pop = {
+				species = event_target:tec_new_species
+			}
+		}
+	# /
+}
+
+tec_test_assim_regular_cyb = {
+	add_building = tec_supertestbuilding
+	# Cyb
+		create_species = {
+			name = RANDOM
+			plural = RANDOM
+			class = random
+			namelist = this
+			portrait = art12
+			traits = {
+				trait = trait_cybernetic
+			}
+			effect = {
+				save_event_target_as = tec_new_species
+			}
+		}
+		while = {
+			count = 5
+			create_pop = {
+				species = event_target:tec_new_species
+			}
+		}
+	# /
+	# adv cyb
+		create_species = {
+			name = RANDOM
+			plural = RANDOM
+			class = random
+			namelist = this
+			portrait = art13
+			traits = {
+				trait = trait_tec_advanced_cyborg
+			}
+		}
+		while = {
+			count = 5
+			create_pop = {
+				species = event_target:tec_new_species
+			}
+		}
+	# /
+}
+
+tec_test_assim_cyberpsionics = {
+	# Cyberlatent
+		create_species = {
+			name = "CYB LP"
+			plural = RANDOM
+			class = random
+			namelist = this
+			portrait = mol4
+			traits = {
+				trait = trait_cybernetic
+				trait = trait_latent_psionic
+			}
+			effect = {
+				save_event_target_as = tec_new_species
+			}
+		}
+		while = {
+			count = 5
+			create_pop = {
+				species = event_target:tec_new_species
+			}
+		}
+	# /
+	# Cyberpsi
+	create_species = {
+		name = "CYB P"
+		plural = RANDOM
+		class = random
+		namelist = this
+		portrait = mol4
+		traits = {
+			trait = trait_cybernetic
+			trait = trait_psionic
+		}
+		effect = {
+			save_event_target_as = tec_new_species
+		}
+	}
+	while = {
+		count = 5
+		create_pop = {
+			species = event_target:tec_new_species
+		}
+	}
+	# /
+	# Cyberpure
+	create_species = {
+		name = "CYB PF"
+		plural = RANDOM
+		class = random
+		namelist = this
+		portrait = mol4
+		traits = {
+			trait = trait_cybernetic
+			trait = trait_tec_pure_psionic
+		}
+		effect = {
+			save_event_target_as = tec_new_species
+		}
+	}
+	while = {
+		count = 5
+		create_pop = {
+			species = event_target:tec_new_species
+		}
+	}
+	# /
+	# Acyb lpsi
+		create_species = {
+			name = "ACYB LP"
+			plural = RANDOM
+			class = random
+			namelist = this
+			portrait = mol4
+			traits = {
+				trait = trait_tec_advanced_cyborg
+				trait = trait_latent_psionic
+			}
+			effect = {
+				save_event_target_as = tec_new_species
+			}
+		}
+		while = {
+			count = 5
+			create_pop = {
+				species = event_target:tec_new_species
+			}
+		}
+	# /
+	# Acyb psi
+		create_species = {
+			name = "ACYB PSI"
+			plural = RANDOM
+			class = random
+			namelist = this
+			portrait = mol4
+			traits = {
+				trait = trait_tec_advanced_cyborg
+				trait = trait_psionic
+			}
+			effect = {
+				save_event_target_as = tec_new_species
+			}
+		}
+		while = {
+			count = 5
+			create_pop = {
+				species = event_target:tec_new_species
+			}
+		}
+	# /
+	# Acyb Purepsi
+		create_species = {
+			name = "ACYB PF"
+			plural = RANDOM
+			class = random
+			namelist = this
+			portrait = mol4
+			traits = {
+				trait = trait_tec_advanced_cyborg
+				trait = trait_tec_pure_psionic
+			}
+			effect = {
+				save_event_target_as = tec_new_species
+			}
+		}
+		while = {
+			count = 5
+			create_pop = {
+				species = event_target:tec_new_species
+			}
+		}
+	# /
+	# Cyberadvpsionic
+		create_species = {
+			name = "CYBER PSI"
+			plural = RANDOM
+			class = random
+			namelist = this
+			portrait = mol4
+			traits = {
+				trait = trait_tec_cyberpsionic
+			}
+			effect = {
+				save_event_target_as = tec_new_species
+			}
+		}
+		while = {
+			count = 5
+			create_pop = {
+				species = event_target:tec_new_species
+			}
+		}
+	# /
+}
+
+tec_test_assim_replicant = {
+	add_building = tec_supertestbuilding
+	# Replicant
+		create_species = {
+			name = "REPLICANT"
+			plural = RANDOM
+			class = REPLICANT
+			namelist = this
+			portrait = art15
+			traits = {
+				trait = trait_tec_replicant_standard
+			}
+			effect = {
+				rename_species = {
+					name_list = ascension_list
+				}
+				save_event_target_as = tec_new_species
+			}
+		}
+		while = {
+			count = 5
+			create_pop = {
+				species = event_target:tec_new_species
+			}
+		}
+	# /
+	# Replicant latentpsi
+		create_species = {
+			name = "REPLICANT LP"
+			plural = RANDOM
+			class = REPLICANT
+			namelist = this
+			portrait = art15
+			traits = {
+				trait = trait_tec_replicant_standard
+				trait = trait_latent_psionic
+			}
+			effect = {
+				save_event_target_as = tec_new_species
+			}
+		}
+		while = {
+			count = 5
+			create_pop = {
+				species = event_target:tec_new_species
+			}
+		}
+	# /
+	# Replicant psi
+		create_species = {
+			name = "REPLICANT P"
+			plural = RANDOM
+			class = REPLICANT
+			namelist = this
+			portrait = art15
+			traits = {
+				trait = trait_tec_replicant_standard
+				trait = trait_psionic
+			}
+			effect = {
+				save_event_target_as = tec_new_species
+			}
+		}
+		while = {
+			count = 5
+			create_pop = {
+				species = event_target:tec_new_species
+			}
+		}
+	# /
+	# Replicant purepsi
+		create_species = {
+			name = "REPLICANT PS"
+			plural = RANDOM
+			class = REPLICANT
+			namelist = this
+			portrait = art15
+			traits = {
+				trait = trait_tec_replicant_standard
+				trait = trait_tec_pure_psionic
+			}
+			effect = {
+				save_event_target_as = tec_new_species
+			}
+		}
+		while = {
+			count = 5
+			create_pop = {
+				species = event_target:tec_new_species
+			}
+		}
+	# /	
+}
+
+tec_test_assim_hiv = {
+	add_building = tec_supertestbuilding
+	# Cyb hiv
+		create_species = {
+			name = "HIVE CYB"
+			plural = RANDOM
+			class = random
+			namelist = this
+			portrait = fun12
+			traits = {
+				trait = trait_hive_mind
+				trait = trait_cybernetic
+			}
+			effect = {
+				save_event_target_as = tec_new_species
+			}
+		}
+		while = {
+			count = 5
+			create_pop = {
+				species = event_target:tec_new_species
+			}
+		}
+	# /
+	# adv cyb hiv
+		create_species = {
+			name = "HIVE ACYB"
+			plural = RANDOM
+			class = random
+			namelist = this
+			portrait = fun13
+			traits = {
+				trait = trait_hive_mind
+				trait = trait_tec_advanced_cyborg
+			}
+		}
+		while = {
+			count = 5
+			create_pop = {
+				species = event_target:tec_new_species
+			}
+		}
+	# /
+	# Hiv
+		create_species = {
+			name = "HIVE NORMAL"
+			plural = RANDOM
+			class = random
+			namelist = this
+			portrait = fun14
+			traits = {
+				trait = trait_hive_mind
+			}
+			effect = {
+				save_event_target_as = tec_new_species
+			}
+		}
+		while = {
+			count = 5
+			create_pop = {
+				species = event_target:tec_new_species
+			}
+		}
+	# /
+	# LP HIV
+		create_species = {
+			name = "PSIVE A"
+			plural = RANDOM
+			class = random
+			namelist = this
+			portrait = fun15
+			traits = {
+				trait = trait_tec_hive_psionic_resonance
+				trait = trait_hive_mind
+			}
+			effect = {
+				save_event_target_as = tec_new_species
+			}
+		}
+		while = {
+			count = 5
+			create_pop = {
+				species = event_target:tec_new_species
+			}
+		}
+	# /
+	# ENTANGLED HIV
+		create_species = {
+			name = "APSIVE A"
+			plural = RANDOM
+			class = random
+			namelist = this
+			portrait = fun16
+			traits = {
+				trait = trait_tec_hive_psionic_entanglement
+				trait = trait_hive_mind
+			}
+			effect = {
+				save_event_target_as = tec_new_species
+			}
+		}
+		while = {
+			count = 5
+			create_pop = {
+				species = event_target:tec_new_species
+			}
+		}
+	# /
+}
+
+tec_test_assim_robots= {
+	create_species = {
+		name = "ROBOTS 1"
+		plural = RANDOM
+		class = ROBOT
+		namelist = this
+		portrait = robot1
+		traits = {
+			trait = trait_mechanical
+		}
+		effect = {
+			save_event_target_as = tec_new_species
+		}
+	}
+	while = {
+		count = 10
+		create_pop = {
+			species = event_target:tec_new_species
+		}
+	}
+}
+
+tec_test_assim_specimens = {
+	add_building = tec_supertestbuilding
+	create_species = {
+		name = "SPECIMENS 1"
+		plural = RANDOM
+		class = random
+		namelist = this
+		portrait = humanoid_02
+		traits = {
+
+		}
+		effect = {
+			save_event_target_as = tec_new_species
+		}
+	}
+	while = {
+		count = 10
+		create_pop = {
+			species = event_target:tec_new_species
+		}
+	}
+	create_species = {
+		name = "SPECIMENS 2"
+		plural = RANDOM
+		class = random
+		namelist = this
+		portrait = humanoid_03
+		traits = {
+
+		}
+		effect = {
+			save_event_target_as = tec_new_species
+		}
+	}
+	while = {
+		count = 10
+		create_pop = {
+			species = event_target:tec_new_species
+		}
+	}
+	create_species = {
+		name = "SPECIMENS 3"
+		plural = RANDOM
+		class = random
+		namelist = this
+		portrait = humanoid_04
+		traits = {
+
+		}
+		effect = {
+			save_event_target_as = tec_new_species
+		}
+	}
+	while = {
+		count = 10
+		create_pop = {
+			species = event_target:tec_new_species
+		}
+	}
+}
+
+
+tec_test_assim_specimens_2 = {
+	create_species = {
+		name = "SPECIMENS 1"
+		plural = RANDOM
+		class = random
+		namelist = this
+		portrait = fun16
+		traits = {
+			trait = trait_tec_hive_psionic_entanglement
+			trait = trait_hive_mind
+			trait = trait_tec_advanced_cyborg
+		}
+		effect = {
+			save_event_target_as = tec_new_species
+		}
+	}
+	while = {
+		count = 10
+		create_pop = {
+			species = event_target:tec_new_species
+		}
+	}
+	create_species = {
+		name = "SPECIMENS 2"
+		plural = RANDOM
+		class = random
+		namelist = this
+		portrait = fun13
+		traits = {
+			trait = trait_tec_hive_psionic_resonance
+			trait = trait_hive_mind
+			trait = trait_tec_cyberpsionic
+		}
+		effect = {
+			save_event_target_as = tec_new_species
+		}
+	}
+	while = {
+		count = 10
+		create_pop = {
+			species = event_target:tec_new_species
+		}
+	}
+	create_species = {
+		name = "SPECIMENS 2"
+		plural = RANDOM
+		class = random
+		namelist = this
+		portrait = fun11
+		traits = {
+			trait = trait_tec_pure_psionic
+			trait = trait_tec_replicant_standard
+			trait = trait_tec_psionic_body
+		}
+		effect = {
+			save_event_target_as = tec_new_species
+		}
+	}
+	while = {
+		count = 10
+		create_pop = {
+			species = event_target:tec_new_species
+		}
+	}
+}
+
+tec_test_assim_hypertest = {
+	every_owned_species = {	# Emulate the species is assimilated
+		limit = {
+			OR = {
+				has_trait = trait_tec_hive_psionic_entanglement
+				has_trait = trait_hive_mind
+				has_trait = trait_tec_advanced_cyborg
+
+				has_trait = trait_tec_hive_psionic_resonance
+				has_trait = trait_hive_mind
+				has_trait = trait_tec_cyberpsionic
+
+				has_trait = trait_tec_pure_psionic
+				has_trait = trait_tec_replicant_standard
+				has_trait = trait_tec_psionic_body
+			}
+		}
+		if = {
+			limit = {
+				has_trait = trait_tec_hive_psionic_entanglement
+			}
+			modify_species = {
+				species = this
+				remove_trait = trait_tec_hive_psionic_entanglement
+				add_traits_at_start_of_list = yes
+				change_scoped_species = no
+				effect = {
+					set_timed_species_flag = {
+						flag = tec_target_assim_spe_of_@prev
+						days = 480
+					}
+					set_timed_species_flag = {
+						flag = assim_spe_of_spe_@prev
+						days = 30
+					}
+					set_timed_species_flag = {
+						flag = assim_spe_of_emp_@prevprev
+						days = 30
+					}
+					set_timed_species_flag = {
+						flag = tec_cybpsi_cyb_@prev
+						days = 30
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_trait = trait_hive_mind
+			}
+			modify_species = {
+				species = this
+				remove_trait = trait_hive_mind
+				add_traits_at_start_of_list = yes
+				change_scoped_species = no
+				effect = {
+					set_timed_species_flag = {
+						flag = tec_target_assim_spe_of_@prev
+						days = 480
+					}
+					set_timed_species_flag = {
+						flag = assim_spe_of_spe_@prev
+						days = 30
+					}
+					set_timed_species_flag = {
+						flag = assim_spe_of_emp_@prevprev
+						days = 30
+					}
+					set_timed_species_flag = {
+						flag = tec_cybpsi_cyb_@prev
+						days = 30
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_trait = trait_tec_advanced_cyborg
+			}
+			modify_species = {
+				species = this
+				remove_trait = trait_tec_advanced_cyborg
+				add_traits_at_start_of_list = yes
+				change_scoped_species = no
+				effect = {
+					set_timed_species_flag = {
+						flag = tec_target_assim_spe_of_@prev
+						days = 480
+					}
+					set_timed_species_flag = {
+						flag = assim_spe_of_spe_@prev
+						days = 30
+					}
+					set_timed_species_flag = {
+						flag = assim_spe_of_emp_@prevprev
+						days = 30
+					}
+					set_timed_species_flag = {
+						flag = tec_cybpsi_cyb_@prev
+						days = 30
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_trait = trait_tec_hive_psionic_resonance
+			}
+			modify_species = {
+				species = this
+				remove_trait = trait_tec_hive_psionic_resonance
+				add_traits_at_start_of_list = yes
+				change_scoped_species = no
+				effect = {
+					set_timed_species_flag = {
+						flag = tec_target_assim_spe_of_@prev
+						days = 480
+					}
+					set_timed_species_flag = {
+						flag = assim_spe_of_spe_@prev
+						days = 30
+					}
+					set_timed_species_flag = {
+						flag = assim_spe_of_emp_@prevprev
+						days = 30
+					}
+					set_timed_species_flag = {
+						flag = tec_cybpsi_cyb_@prev
+						days = 30
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_trait = trait_tec_cyberpsionic
+			}
+			modify_species = {
+				species = this
+				remove_trait = trait_tec_cyberpsionic
+				add_traits_at_start_of_list = yes
+				change_scoped_species = no
+				effect = {
+					set_timed_species_flag = {
+						flag = tec_target_assim_spe_of_@prev
+						days = 480
+					}
+					set_timed_species_flag = {
+						flag = assim_spe_of_spe_@prev
+						days = 30
+					}
+					set_timed_species_flag = {
+						flag = assim_spe_of_emp_@prevprev
+						days = 30
+					}
+					set_timed_species_flag = {
+						flag = tec_cybpsi_cyb_@prev
+						days = 30
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_trait = trait_tec_pure_psionic
+			}
+			modify_species = {
+				species = this
+				remove_trait = trait_tec_pure_psionic
+				add_traits_at_start_of_list = yes
+				change_scoped_species = no
+				effect = {
+					set_timed_species_flag = {
+						flag = tec_target_assim_spe_of_@prev
+						days = 480
+					}
+					set_timed_species_flag = {
+						flag = assim_spe_of_spe_@prev
+						days = 30
+					}
+					set_timed_species_flag = {
+						flag = assim_spe_of_emp_@prevprev
+						days = 30
+					}
+					set_timed_species_flag = {
+						flag = tec_cybpsi_cyb_@prev
+						days = 30
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_trait = trait_tec_replicant_standard
+			}
+			modify_species = {
+				species = this
+				remove_trait = trait_tec_replicant_standard
+				add_traits_at_start_of_list = yes
+				change_scoped_species = no
+				effect = {
+					set_timed_species_flag = {
+						flag = tec_target_assim_spe_of_@prev
+						days = 480
+					}
+					set_timed_species_flag = {
+						flag = assim_spe_of_spe_@prev
+						days = 30
+					}
+					set_timed_species_flag = {
+						flag = assim_spe_of_emp_@prevprev
+						days = 30
+					}
+					set_timed_species_flag = {
+						flag = tec_cybpsi_cyb_@prev
+						days = 30
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_trait = trait_tec_psionic_body
+			}
+			modify_species = {
+				species = this
+				remove_trait = trait_tec_psionic_body
+				add_traits_at_start_of_list = yes
+				change_scoped_species = no
+				effect = {
+					set_timed_species_flag = {
+						flag = tec_target_assim_spe_of_@prev
+						days = 480
+					}
+					set_timed_species_flag = {
+						flag = assim_spe_of_spe_@prev
+						days = 30
+					}
+					set_timed_species_flag = {
+						flag = assim_spe_of_emp_@prevprev
+						days = 30
+					}
+					set_timed_species_flag = {
+						flag = tec_cybpsi_cyb_@prev
+						days = 30
+					}
+				}
+			}
+		}
+		modify_species = {
+			species = this
+			add_trait = trait_tec_rudimentary_cyborg
+			add_traits_at_start_of_list = yes
+			change_scoped_species = yes
+			effect = {
+				set_timed_species_flag = {
+					flag = tec_target_assim_spe_of_@prev
+					days = 480
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_spe_@prev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = assim_spe_of_emp_@prevprev
+					days = 30
+				}
+				set_timed_species_flag = {
+					flag = tec_cybpsi_cyb_@prev
+					days = 30
+				}
+			}
+		}
+		prevprev = {
+			capital_scope = {
+				random_owned_species = {
+					limit = {
+						has_species_flag = assim_spe_of_emp_@prevprev
+					}
+				}
+				break = yes
+			}
+		}
+		
+	}
+	
+}
+
+
+tec_test_assim_prevpocalipse = {
+	owner_main_species = {
+		modify_species = {
+			species = this
+			add_trait = trait_tec_advanced_cyborg
+			add_traits_at_start_of_list = yes
+			change_scoped_species = yes
+			effect = {
+				modify_species = {
+					species = this
+					add_trait = trait_psionic
+					add_traits_at_start_of_list = yes
+					change_scoped_species = yes
+					effect = {
+						set_timed_species_flag = {
+							flag = tec_target_assim_spe_of_@prevprev
+							days = 480
+						}
+						set_timed_species_flag = {
+							flag = assim_spe_of_spe_@prevprev
+							days = 30
+						}
+						set_timed_species_flag = {
+							flag = assim_spe_of_emp_@prevprevprev
+							days = 30
+						}
+						set_timed_species_flag = {
+							flag = tec_cybpsi_cyb_@prevprev
+							days = 30
+						}
+						save_event_target_as = tec_convert_into_this
+					}
+				}
+			}
+		}
+	}
+	capital_scope = {
+		every_owned_pop = {
+			change_species = event_target:tec_convert_into_this
+		}
+	}
+}
+
+
+tec_test_assim_prevpocalipse_2 = {
+	owner_main_species = {
+		modify_species = {
+			species = this
+			remove_trait = trait_tec_advanced_cyborg
+			add_traits_at_start_of_list = yes
+			change_scoped_species = yes
+			effect = {
+				modify_species = {
+					species = this
+					remove_trait = trait_psionic
+					add_traits_at_start_of_list = yes
+					change_scoped_species = yes
+					effect = {
+						set_timed_species_flag = {
+							flag = tec_target_assim_spe_of_@prevprev
+							days = 480
+						}
+						set_timed_species_flag = {
+							flag = assim_spe_of_spe_@prevprev
+							days = 30
+						}
+						set_timed_species_flag = {
+							flag = assim_spe_of_emp_@prevprevprev
+							days = 30
+						}
+						set_timed_species_flag = {
+							flag = tec_cybpsi_cyb_@prevprev
+							days = 30
+						}
+						save_event_target_as = tec_convert_into_this
+					}
+				}
+			}
+		}
+	}
+	capital_scope = {
+		every_owned_pop = {
+			change_species = event_target:tec_convert_into_this
+		}
+	}
+}
+
+# effect tec_test_assim_regular_psi tec_test_assim_regular_cyb tec_test_assim_hiv
+
+tec_test_special_trait = {
+	owner_main_species = {
+		modify_species = {
+			ideal_planet_class = pc_tec_gene
+			change_scoped_species = no
+			effect = {
+				save_event_target_as = tec_aa
+			}
+		}
+		every_species_pop = {
+			change_species = event_target:tec_aa
+		}
+	}
+	change_dominant_species = {
+		species = event_target:tec_aa
+	}
+}
+
+tec_test_ruler_exp = {
+	ruler = {
+		add_experience = 200
+	}
+}
+
+tec_test_leader_exp = {
+	every_owned_leader = {
+		add_experience = 2000
+	}
+}
+
+tec_test_new_species_mod = {
+	owner_main_species = {
+		modify_species = {
+			remove_trait = trait_agrarian
+			remove_trait = trait_industrious
+			remove_trait = trait_intelligent
+			remove_trait = trait_enduring
+			change_scoped_species = no
+			effect = {
+				save_event_target_as = tec_aa
+			}
+		}
+		every_species_pop = {
+			change_species = event_target:tec_aa
+		}
+	}
+	change_dominant_species = {
+		species = event_target:tec_aa
+	}
+}

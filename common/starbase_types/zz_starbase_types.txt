@@ -1,0 +1,382 @@
+# O V E R W R I TE 
+# 00_starbase_types
+
+#root = starbase
+#from = player
+
+# N o t e s 
+# Weights in the ai_design part are multiplied with the base weight of 00_starbase_buildings.txt and 00_starbase_modules.txt
+# Then, a random number between that value and and extra 50% of that it is ADDED to it
+# F.e. 100 base weight multiplies with 2.00 = 200. Then we take a random number between 0 and 100 (50% of 200) and ADD it to 200. 235 then, for example
+# This is done for ALL starbase modules and buildings in the list every time an evaluation is made
+# And the building or module with the highest value will be chosen to being built
+# The implication of that is that you can not balance the weights TOO FAR from each other - otherwise some modules will never be chosen, unless they are the only thing on the evaluation
+# Due to the progression of the game and the unlocking of tech, though, it is often the case that there will only be 1 item on the list at any given time anyway
+
+# How the AI/game selects which type to use:
+# First of all, it will try to find one which fulfils both the potential trigger and has a positive weight_modifier
+# If this succeeds, the starbase already has a type.
+# If it fails, it will go through each starbase type that fulfils the potential trigger. Then it will check the ratio it has built (total of this type / total upgraded starbases) compared to the desired ratio. If it is set to desire a minimum value and owns less than that, it multiplies its ratio desire by * 100. Then it build according to that type's template.
+
+
+# Fortress System
+sfortress = {
+	potential = {
+		has_starbase_size > starbase_outpost
+		exists = owner
+		OR = {
+			owner = { is_ai = no }
+			AND = {
+				solar_system = { is_bottleneck_system = yes }
+				closest_system = {
+					min_steps = 0
+					max_steps = 2
+					limit = {
+						exists = owner
+						owner = {
+							tec_is_default_country = yes
+							NOR = {
+								is_same_value = root.owner
+								is_in_federation_with = root.owner
+								has_association_status = root.owner
+								has_defensive_pact = root.owner
+								has_non_aggression_pact = root.owner
+								has_overlord = root.owner
+								AND = {
+									has_subject = root.owner
+									has_loyalty > 0
+								}
+							}
+						}
+					}
+					exists = this
+				}
+			}
+		}
+	}
+
+	ai_use_defense_platforms = yes #AI will not build defense platforms otherwise, except in the capital system
+
+	weight_modifier = {
+		base = 0
+		complex_trigger_modifier = { #+75 for each gun_battery
+			trigger = count_starbase_modules
+			parameters = {
+				type = gun_battery
+			}
+			mode = add
+			mult = 75
+		}
+		complex_trigger_modifier = { #+75 for each tec_starbase_m_xxl_cannons
+			trigger = count_starbase_modules
+			parameters = {
+				type = tec_starbase_m_xxl_cannons
+			}
+			mode = add
+			mult = 75
+		}
+		# - 
+		complex_trigger_modifier = { #+75 for each missile_battery
+			trigger = count_starbase_modules
+			parameters = {
+				type = missile_battery
+			}
+			mode = add
+			mult = 75
+		}
+		complex_trigger_modifier = { #+75 for each tec_starbase_m_xxl_missiles
+			trigger = count_starbase_modules
+			parameters = {
+				type = tec_starbase_m_xxl_missiles
+			}
+			mode = add
+			mult = 75
+		}
+		# - 
+		complex_trigger_modifier = { #+75 for each hangar_bay
+			trigger = count_starbase_modules
+			parameters = {
+				type = hangar_bay
+			}
+			mode = add
+			mult = 75
+		}
+		complex_trigger_modifier = { #+75 for each tec_starbase_m_xxl_hangars
+			trigger = count_starbase_modules
+			parameters = {
+				type = tec_starbase_m_xxl_hangars
+			}
+			mode = add
+			mult = 75
+		}
+		# - 
+		modifier = {
+			add = 50
+			solar_system = { is_bottleneck_system = yes }
+		}
+		modifier = {
+			add = 150
+			solar_system = { is_bottleneck_system = yes }
+			closest_system = {
+				max_steps = 2
+				limit = {
+					exists = owner
+					owner = {
+						OR = {
+							is_rival = root
+							is_hostile_to = root
+							is_hostile = root
+						}
+					}
+				}
+				exists = this
+			}
+		}
+	}
+
+	ai_design = {
+		min = {
+			base = 0
+		}
+
+		ratio = {
+			base = 0.10
+			modifier = {
+				add = 0.10
+				exists = owner
+				owner = {
+					has_ethic = ethic_pacifist
+				}
+			}
+			modifier = {
+				add = 0.10
+				exists = owner
+				owner = {
+					has_ethic = ethic_fanatic_pacifist
+				}
+			}
+		}
+
+		# token followed by priority
+		buildings = {
+			target_uplink_computer = {
+				base = 1.00
+			}
+
+			command_center = {
+				base = 1.00
+			}
+
+			defense_grid = {
+				base = 1.00
+			}
+
+			communications_jammer = {
+				base = 0.90
+			}
+
+			disruption_field = {
+				base = 0.90
+			}
+			
+			ice_mining_station = {
+				base = 3.00
+			}
+
+			dragon_hatchery = {
+				base = 3.00
+			}
+
+			hydroponics_bay = {
+				base = 0.25
+			}
+		}
+
+		modules = {
+			hangar_bay = {
+				base = 0.80
+			}
+
+			missile_battery = {
+				base = 1.00
+			}
+
+			gun_battery = {
+				base = 1.00
+			}
+
+			tec_starbase_m_xxl_hangars = {
+				base = 0.80
+			}
+
+			tec_starbase_m_xxl_missiles = {
+				base = 1.00
+			}
+
+			tec_starbase_m_xxl_cannons = {
+				base = 1.50
+			}
+		}
+	}
+}
+
+tec_sbd_production = {
+	potential = {
+		has_starbase_size > starbase_outpost
+	}
+
+	weight_modifier = {
+		base = 0
+		complex_trigger_modifier = { #+100 for each tec_starbase_m_mining
+			trigger = count_starbase_modules
+			parameters = {
+				type = tec_starbase_m_mining
+			}
+			mode = add
+			mult = 100
+		}
+		complex_trigger_modifier = { #+100 for each tec_starbase_m_generator
+			trigger = count_starbase_modules
+			parameters = {
+				type = tec_starbase_m_generator
+			}
+			mode = add
+			mult = 100
+		}
+		complex_trigger_modifier = { #+100 for each tec_starbase_m_food
+			trigger = count_starbase_modules
+			parameters = {
+				type = tec_starbase_m_food
+			}
+			mode = add
+			mult = 100
+		}
+		modifier = {
+			add = 100
+			OR = {
+				count_starbase_modules = {
+					type = tec_starbase_m_mining
+					count > 2
+				}
+				count_starbase_modules = {
+					type = tec_starbase_m_generator
+					count > 2
+				}
+				count_starbase_modules = {
+					type = tec_starbase_m_food
+					count > 2
+				}
+			}
+			OR = {
+				has_starbase_building = tec_starbase_b_energygrid
+				has_starbase_building = tec_starbase_b_mininggrid
+				has_starbase_building = hydroponics_bay
+			}
+		}
+	}
+
+	ai_design = {
+		min = {
+			base = 0
+			factor = 0
+		}
+
+		ratio = {
+			base = 0.33
+		}
+
+		# token followed by priority
+		buildings = {
+			target_uplink_computer = {
+				base = 1.00
+			}
+
+			tec_starbase_b_mininggrid = {
+				base = 3.00
+			}
+
+			tec_starbase_b_energygrid = {
+				base = 3.00
+			}
+
+			ice_mining_station = {
+				base = 3.00
+			}
+
+			dragon_hatchery = {
+				base = 3.00
+			}
+
+			hydroponics_bay = {
+				base = 0.25
+			}
+		}
+
+		modules = {
+			# Mining
+			tec_starbase_m_generator = {
+				base = 1.00
+			}
+
+			tec_starbase_m_mining = {
+				base = 1.00
+			}
+
+			tec_starbase_m_food = {
+				base = 1.00
+			}
+		}
+	}
+}
+
+tec_sbd_research = {
+	potential = {
+		has_starbase_size > starbase_outpost
+	}
+
+	weight_modifier = {
+		base = 0
+		complex_trigger_modifier = { #+100 for each tec_starbase_m_physics
+			trigger = count_starbase_modules
+			parameters = {
+				type = tec_starbase_m_physics
+			}
+			mode = add
+			mult = 100
+		}
+		complex_trigger_modifier = { #+100 for each tec_starbase_m_society
+			trigger = count_starbase_modules
+			parameters = {
+				type = tec_starbase_m_society
+			}
+			mode = add
+			mult = 100
+		}
+		complex_trigger_modifier = { #+100 for each tec_starbase_m_engineering
+			trigger = count_starbase_modules
+			parameters = {
+				type = tec_starbase_m_engineering
+			}
+			mode = add
+			mult = 100
+		}
+		modifier = {
+			add = 100
+			OR = {
+				count_starbase_modules = {
+					type = tec_starbase_m_physics
+					count > 2
+				}
+				count_starbase_modules = {
+					type = tec_starbase_m_society
+					count > 2
+				}
+				count_starbase_modules = {
+					type = tec_starbase_m_engineering
+					count > 2
+				}
+			}
+			has_starbase_building = tec_starbase_b_research
+		}
+	}
+}

@@ -1,0 +1,374 @@
+# - - - - - - - - - - - - - - - - - - - - - 
+# Planetary Decisions
+# - - - - - - - - - - - - - - - - - - - - - 
+
+# ----------------------------------------
+#	Protoworlds
+# ----------------------------------------
+decision_tec_force_terraform = {
+	icon = decision_drilling_for_gas
+	resources = {
+		category = decisions
+		cost = {
+			influence = 100
+			energy = 5000
+		}
+	}
+
+	potential = {
+		exists = owner
+		owner = {
+			has_tradition = tr_tec_outreach_finish
+			NOT = {
+				has_active_tradition = tr_tec_outreach_finish_terravore
+			}
+		}
+		uses_district_set = tec_protoworld
+		# The proto started changing
+		has_planet_flag = tec_protoworld_started_terraform
+		# The proto is valid for the decision
+		OR = {	# Either under the automatic timer, or locked
+			has_planet_flag = tec_protoworld_valid_forceform
+			has_planet_flag = tec_proto_locked_terraform
+		}
+		#has_planet_flag = tec_proto_locked_terraform
+		NOT = {
+			has_planet_flag = tec_forced_prototerraform
+		}
+	}
+	
+	effect = {
+		custom_tooltip = decision_tec_force_terraform_effects
+
+		#7200
+		hidden_effect = {
+			# Extracheck
+			remove_planet_flag = tec_proto_locked_terraform
+			#
+			set_planet_flag = tec_terraformed_by_@from
+			set_timed_planet_flag = {	# 1 day more just in case
+				flag = tec_forced_prototerraform
+				days = 1801
+			}
+			planet_event = {
+				id = tec_protoworld.20
+				days = 1800
+			}
+			if = {
+				limit = {
+					has_modifier = pm_tec_terra_proto_random
+				}
+				remove_modifier = pm_tec_terra_proto_random
+			}
+			add_modifier = { # 1 day more just in case
+				modifier = pm_tec_terra_proto_random
+				days = 1801
+			}
+			if = {	# remove basic modifier
+				limit = {
+					has_modifier = pm_tec_protoworld_modifier
+				}
+				while = {
+					limit = {
+						has_modifier = pm_tec_protoworld_modifier
+					}
+					remove_modifier = pm_tec_protoworld_modifier
+				}
+			}
+			if = {	# remove halted modifier
+				limit = {
+					has_modifier = pm_tec_terra_proto_halted
+				}
+				while = {
+					limit = {
+						has_modifier = pm_tec_terra_proto_halted
+					}
+					remove_modifier = pm_tec_terra_proto_halted
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 100
+		modifier = {
+			factor = 10
+		}
+	}
+}
+
+decision_tec_interrupt_terraform = {
+	icon = decision_planet_beam
+	resources = {
+		category = decisions
+		cost = {
+			influence = 100
+			energy = 5000
+		}
+	}
+	
+	potential = {
+		exists = owner
+		owner = {
+			has_tradition = tr_tec_outreach_finish
+			NOT = {
+				has_active_tradition = tr_tec_outreach_finish_terravore
+			}
+		}
+		uses_district_set = tec_protoworld
+		# The proto started changing
+		has_planet_flag = tec_protoworld_started_terraform
+		has_modifier = pm_tec_terra_proto_random
+		# The proto is not already locked
+		NOR = {
+			has_modifier = pm_tec_terra_proto_halted
+			has_planet_flag = tec_proto_locked_terraform
+			has_planet_flag = tec_forced_prototerraform
+		}
+	}
+	
+	effect = {
+		custom_tooltip = decision_tec_interrupt_terraform_effects
+		#7200
+		hidden_effect = {
+			set_planet_flag = tec_proto_locked_terraform
+			add_modifier = {
+				modifier = pm_tec_terra_proto_halted
+				days = -1
+			}
+			if = {	# remove basic modifier
+				limit = {
+					has_modifier = pm_tec_protoworld_modifier
+				}
+				while = {
+					limit = {
+						has_modifier = pm_tec_protoworld_modifier
+					}
+					remove_modifier = pm_tec_protoworld_modifier
+				}
+			}
+			if = {	# remove terraform modifier
+				limit = {
+					has_modifier = pm_tec_terra_proto_random
+				}
+				while = {
+					limit = {
+						has_modifier = pm_tec_terra_proto_random
+					}
+					remove_modifier = pm_tec_terra_proto_random
+				}
+			}
+			if = {	# remove forceform indicator
+				limit = {
+					has_planet_flag = tec_protoworld_valid_forceform
+				}
+				remove_planet_flag = tec_protoworld_valid_forceform
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}
+
+#-----------------------------------------------------
+#	Zroni Restauration
+#-----------------------------------------------------
+# Zrocursor_homeworld
+decision_tec_terraform_zroni_restore = {
+	icon = decision_cold_barren_planet
+	resources = {
+		category = decisions
+		cost = {
+			sr_zro = 500
+		}
+	}
+	
+	potential = {
+		always = no
+		is_planet_class = pc_shrouded
+		has_planet_flag = Zrocursor_homeworld
+		exists = space_owner
+		NOT = {
+			has_planet_flag = zron_homeworld_terraformed
+		}
+	}
+	
+	effect = {
+		custom_tooltip = decision_tec_terraform_zroni_restore
+		add_modifier = {
+			modifier = "pm_tec_terraform_madness_barren" 
+			days = 360	
+		}
+		hidden_effect = {
+			set_planet_flag = zron_homeworld_terraformed
+			set_planet_flag = tec_terraformed_by_@from
+					#7200
+			planet_event = { id = terraform_end.1999 days = 360 }
+			}
+	}
+	ai_weight = {
+		weight = 100
+		modifier = {
+			factor = 10
+			}
+		}
+}
+
+#-----------------------------------------------------
+#	Desiccators
+#-----------------------------------------------------
+decision_tec_desiccate_planet = {
+	icon = decision_burning_settlement
+	resources = {
+		category = decisions
+	}
+	enactment_time = 360
+	
+	potential = {
+		exists = owner
+		owner = {
+			is_machine_empire = yes
+			tec_is_aquatic_empire = yes
+		}
+		OR = {
+			# This makes it only possible on basic planet types
+			is_wet = yes
+			is_dry = yes
+			is_cold = yes
+			# Made it this way so modded oversighted planets are handled better
+			# So no, not extracting a barren colony or whatever
+		}
+		is_capital = no
+		habitable_structure = no
+		# The proto is not already locked
+		hidden_trigger = {
+			# Avoid cheese
+			NOT = {
+				has_planet_flag = tec_desicatted_in_the_past
+			}
+		}
+	}
+
+	allow = {
+		custom_tooltip = {
+			fail_text = decision_tec_desiccate_planet_nexus
+			owner = {
+				any_owned_planet = {
+					has_building = building_tec_machine_anglers_nexus_A
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = decision_tec_desiccate_planet_extractor
+			OR = {
+				has_building = building_tec_machine_anglers_extractor
+				has_building = building_tec_machine_anglers_extractor_on
+			}
+		}
+	}
+	
+	effect = {
+		custom_tooltip = decision_tec_desiccate_planet_effects
+		#7200
+		hidden_effect = {
+			# first time?
+			if = {
+				limit = {
+					NOR = {
+						has_modifier = pm_tec_desiccation_1
+						has_modifier = pm_tec_desiccation_2
+						has_modifier = pm_tec_desiccation_3
+					}
+				}
+				add_modifier = {
+					modifier = pm_tec_desiccation_1
+					days = -1
+				}
+				while = {
+					limit = {
+						has_building = building_tec_machine_anglers_extractor
+					}
+					add_building = building_tec_machine_anglers_extractor_on
+					remove_building = building_tec_machine_anglers_extractor
+				}
+				break = yes
+			}
+			# Second time?
+			else_if = {
+				limit = {
+					has_modifier = pm_tec_desiccation_1
+				}
+				remove_modifier = pm_tec_desiccation_1
+				add_modifier = {
+					modifier = pm_tec_desiccation_2
+					days = -1
+				}
+				break = yes
+			}
+			# 3th time?
+			else_if = {
+				limit = {
+					has_modifier = pm_tec_desiccation_2
+				}
+				remove_modifier = pm_tec_desiccation_2
+				add_modifier = {
+					modifier = pm_tec_desiccation_3
+					days = -1
+				}
+				break = yes
+			}
+			# 4th time? the charm!
+			else_if = {
+				limit = {
+					has_modifier = pm_tec_desiccation_3
+				}
+				remove_modifier = pm_tec_desiccation_3
+				set_planet_flag = tec_desicatted_in_the_past
+				owner = {
+					random_owned_planet = {
+						limit = {
+							has_building = building_tec_machine_anglers_nexus_A
+						}
+						save_event_target_as = tec_hydronexus_planet
+						add_deposit = d_tec_desiccators_deposit
+					}
+					change_variable = {
+						which = tec_desiccated_worlds
+						value = 1
+					}
+					create_message = {
+						type = MESSAGE_TEC_DESICCATED_WORLD
+						localization = MESSAGE_TEC_DESICCATED_WORLD
+						days = 30
+						target = PREV
+						variable = {
+							type = name
+							localization = PLANET
+							scope = prev
+						}
+					}
+				}
+				every_owned_pop = {
+					resettle_pop = {
+						pop = THIS
+						planet = event_target:tec_hydronexus_planet
+					}
+				}
+				remove_all_buildings = yes
+				# This should avoid desiccators remaining on the planet
+				change_pc = pc_barren
+				add_modifier = {
+					modifier = terraforming_candidate
+				}
+				destroy_colony = yes
+				break = yes
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}

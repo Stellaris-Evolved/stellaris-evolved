@@ -1,0 +1,785 @@
+# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - ##
+#
+# Origin Events
+# Written by Henrik Thyrwall
+#
+# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - #
+
+namespace = origin
+
+# Void Dweller Production Bonus (Pop Added)
+pop_event = {
+	id = origin.1
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		always = no
+	}
+}
+
+
+# MEMESIS REVIEW SCION
+
+# Scion Setup
+# origin.5
+
+# Bring Into Fold War Goal Successful (HIDDEN)
+# Necessary to bounce effects in this event from the war goal, or there is no truce period
+# origin.6
+
+# Intro Diplomatic Message
+# origin.10
+
+# Reward (HIDDEN)
+# origin.20
+
+# Reward - Engineering Tech
+# origin.21
+
+# Reward - Physics Tech
+# origin.22
+
+# Reward - Society Tech
+# origin.23
+
+# Reward - Resources
+# origin.24
+
+# Scion Tasks
+# origin.25
+
+# Task: Surrender Leader
+# origin.26
+
+# Reward: Receive Leader
+# origin.27
+
+# Reward: Receive Ships
+# origin.28
+
+# FE War Intervention
+# origin.50
+
+# Reward: Receive Temporary FE Fleet
+# origin.51
+
+# FE Fleet Lost
+# origin.52
+
+# FE Fleet Lost - FE Communication
+# origin.53
+
+# FE Fleet Reclaimed (War against Overlord)
+# origin.29
+
+# FE Fleet Reclaimed (War Over)
+# origin.30
+
+# FE Fleet Reclaimed
+# origin.54
+
+# Common Ground/Hegemon Setup
+
+# Common Ground/Hegemon Setup
+country_event = {
+	id = origin.55
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = first_contact_event
+		set_country_flag = Story2 # Already encountered spacefarers
+		add_tradition = tr_diplomacy_adopt
+		add_tradition = tr_diplomacy_the_federation
+
+		if = {
+			limit = { num_guaranteed_colonies >= 2 }
+			capital_scope = {
+				solar_system = {
+					closest_system = {
+						limit = { has_star_flag = neighbor_t1_first_colony }
+						random_system_planet = {
+							limit = { has_planet_flag = prescripted_ideal }
+							save_event_target_as = fed_planet_1
+							federation_origin_planet_setup = yes
+						}
+					}
+					closest_system = {
+						limit = { has_star_flag = neighbor_t2_second_colony }
+						random_system_planet = {
+							limit = { has_planet_flag = prescripted_ideal }
+							save_event_target_as = fed_planet_2
+							federation_origin_planet_setup = yes
+						}
+					}
+				}
+			}
+		}
+		if = {
+			limit = { num_guaranteed_colonies >= 1 }
+			capital_scope = {
+				solar_system = {
+					closest_system = {
+						limit = { has_star_flag = neighbor_t1_first_colony }
+						random_system_planet = {
+							limit = { has_planet_flag = prescripted_ideal }
+							save_event_target_as = fed_planet_1
+							federation_origin_planet_setup = yes
+						}
+					}
+					closest_system = {
+						limit = {
+							NOT = { has_star_flag = neighbor_t1_first_colony }
+							has_owner = no
+							any_system_planet = {
+								is_ringworld = no
+								is_asteroid = no
+								is_star = no
+								is_moon = no
+							}
+						}
+						if = {
+							limit = {
+								any_system_planet = { habitable_planet = yes }
+							}
+							random_system_planet = {
+								limit = { habitable_planet = yes }
+								save_event_target_as = fed_planet_2
+								set_planet_size = 16
+							}
+						}
+						else = {
+							random_system_planet = {
+								limit = {
+									is_ringworld = no
+									is_asteroid = no
+									is_star = no
+									is_moon = no
+								}
+								save_event_target_as = fed_planet_2
+								federation_origin_planet_setup = yes
+							}
+						}
+					}
+				}
+			}
+		}
+		if = {
+			limit = { num_guaranteed_colonies = 0 }
+			capital_scope = {
+				solar_system = {
+					closest_system = {
+						limit = { has_owner = no }
+						set_star_flag = fed_origin_system_1
+						if = {
+							limit = {
+								any_system_planet = { habitable_planet = yes }
+							}
+							random_system_planet = {
+								limit = { habitable_planet = yes }
+								save_event_target_as = fed_planet_1
+								set_planet_size = 16
+							}
+						}
+						else = {
+							random_system_planet = {
+								limit = {
+									is_ringworld = no
+									is_asteroid = no
+									is_star = no
+									is_moon = no
+								}
+								save_event_target_as = fed_planet_1
+								federation_origin_planet_setup = yes
+							}
+						}
+					}
+					closest_system = {
+						limit = {
+							NOT = { has_star_flag = fed_origin_system_1 }
+							has_owner = no
+							any_system_planet = {
+								is_ringworld = no
+								is_asteroid = no
+								is_star = no
+								is_moon = no
+							}
+						}
+						if = {
+							limit = {
+								any_system_planet = { habitable_planet = yes }
+							}
+							random_system_planet = {
+								limit = { habitable_planet = yes }
+								save_event_target_as = fed_planet_2
+								set_planet_size = 16
+							}
+						}
+						else = {
+							random_system_planet = {
+								limit = {
+									is_ringworld = no
+									is_asteroid = no
+									is_star = no
+									is_moon = no
+								}
+								save_event_target_as = fed_planet_2
+								federation_origin_planet_setup = yes
+							}
+						}
+					}
+				}
+			}
+		}
+
+
+
+		# First Member
+		event_target:fed_planet_1 = {
+			solar_system = { generate_home_system_resources = yes }
+			create_species = {
+				name = random
+				class = random_non_machine
+				portrait = random
+				traits = random
+				homeworld = this
+				can_be_modified = yes
+				gender = this
+				effect = {
+					save_event_target_as = fed_planet_1_species
+				}
+			}
+			if = {
+				limit = { root = { has_origin = origin_common_ground } }
+				create_common_ground_member_1 = yes
+			}
+			if = {
+				limit = { root = { has_origin = origin_hegemon } }
+				create_hegemon_member_1 = yes
+			}
+			create_colony = {
+				owner = event_target:fed_member_1
+			}
+			generate_start_deposits_and_blockers = yes
+			generate_start_buildings_and_districts = yes
+			generate_start_pops = yes
+			event_target:fed_member_1 = { give_starting_resources_effect = yes }
+			solar_system = {
+				create_starbase = {
+					size = starbase_starport
+					module = shipyard
+					building = crew_quarters
+					owner = event_target:fed_member_1
+					effect = {
+						set_starbase_module = {
+							slot = 1
+							module = trading_hub
+						}
+						set_starbase_module = {
+							slot = 2
+							module = shipyard
+						}
+					}
+				}
+			}
+		}
+
+		# Second Member
+		event_target:fed_planet_2 = {
+			solar_system = { generate_home_system_resources = yes }
+			create_species = {
+				name = random
+				class = random_non_machine
+				portrait = random
+				traits = random
+				homeworld = this
+				can_be_modified = yes
+				gender = this
+				effect = {
+					save_event_target_as = fed_planet_2_species
+				}
+			}
+			if = {
+				limit = { root = { has_origin = origin_common_ground } }
+				create_common_ground_member_2 = yes
+			}
+			if = {
+				limit = { root = { has_origin = origin_hegemon } }
+				create_hegemon_member_2 = yes
+			}
+			create_colony = {
+				owner = event_target:fed_member_2
+			}
+			generate_start_deposits_and_blockers = yes
+			generate_start_buildings_and_districts = yes
+			generate_start_pops = yes
+			event_target:fed_member_2 = { give_starting_resources_effect = yes }
+			solar_system = {
+				create_starbase = {
+					size = starbase_starport
+					module = shipyard
+					building = crew_quarters
+					owner = event_target:fed_member_2
+					effect = {
+						set_starbase_module = {
+							slot = 1
+							module = trading_hub
+						}
+						set_starbase_module = {
+							slot = 2
+							module = shipyard
+						}
+					}
+				}
+			}
+		}
+		event_target:fed_member_1 = {
+			create_starting_leaders = yes
+			country_event = { id = game_start.9 }
+			country_event = { id = game_start.33 days = 1 } # needs delay for system ownership to settle
+			join_alliance = { who = root override_requirements = yes }
+			set_name = random # Fixes some naming issues
+		}
+		event_target:fed_member_2 = {
+			create_starting_leaders = yes
+			country_event = { id = game_start.9 }
+			country_event = { id = game_start.33 days = 1 } # needs delay for system ownership to settle
+			join_alliance = { who = root override_requirements = yes }
+			set_name = random # Fixes some naming issues
+		}
+		if = {
+			limit = { has_origin = origin_common_ground }
+			event_target:fed_member_1 = {
+				add_opinion_modifier = {
+					who = root
+					modifier = opinion_common_ground
+				}
+				add_trust = {
+					amount = 50
+					who = root
+				}
+				add_trust = {
+					amount = 50
+					who = event_target:fed_member_2
+				}
+				add_intel = {
+					amount = 60
+					who = root
+				}
+				add_intel = {
+					amount = 60
+					who = event_target:fed_member_2
+				}
+			}
+			event_target:fed_member_2 = {
+				add_opinion_modifier = {
+					who = root
+					modifier = opinion_common_ground
+				}
+				add_trust = {
+					amount = 50
+					who = root
+				}
+				add_trust = {
+					amount = 50
+					who = event_target:fed_member_1
+				}
+				add_intel = {
+					amount = 60
+					who = root
+				}
+				add_intel = {
+					amount = 60
+					who = event_target:fed_member_1
+				}
+			}
+			add_opinion_modifier = {
+				who = event_target:fed_member_1
+				modifier = opinion_common_ground
+			}
+			add_opinion_modifier = {
+				who = event_target:fed_member_2
+				modifier = opinion_common_ground
+			}
+			add_trust = {
+				amount = 50
+				who = event_target:fed_member_1
+			}
+			add_trust = {
+				amount = 50
+				who = event_target:fed_member_2
+			}
+			add_intel = {
+				amount = 60
+				who = event_target:fed_member_1
+			}
+			add_intel = {
+				amount = 60
+				who = event_target:fed_member_2
+			}
+			# EVOLVED
+				if = {
+					limit = {
+						root = {
+							OR = {
+								is_machine_empire = yes
+								is_materialist = yes
+								AND = {
+									is_hive_empire = yes
+									has_ethic = ethic_gestalt_extrospective
+								}
+							}
+						}
+					}
+					federation = {
+						set_federation_type = research_federation
+						set_name = random
+						set_federation_law = succession_term_years_20
+					}
+				}
+				if = {	# Megas always spawn with trade leagues
+					limit = {
+						root = {
+							is_megacorp = yes
+						}
+					}
+					federation = {
+						set_federation_type = trade_federation
+						set_name = random
+						set_federation_law = succession_term_years_20
+					}
+				}
+			# /
+		}
+		if = {
+			limit = { has_origin = origin_hegemon }
+			federation = {
+				set_federation_type = hegemony_federation
+				set_name = random
+				set_federation_law = succession_term_years_20
+			}
+			event_target:fed_member_1 = {
+				add_intel = {
+					amount = 40
+					who = root
+				}
+				add_intel = {
+					amount = 40
+					who = event_target:fed_member_2
+				}
+			}
+			event_target:fed_member_2 = {
+				add_intel = {
+					amount = 40
+					who = root
+				}
+				add_intel = {
+					amount = 40
+					who = event_target:fed_member_1
+				}
+			}
+			add_intel = {
+				amount = 40
+				who = event_target:fed_member_1
+			}
+			add_intel = {
+				amount = 40
+				who = event_target:fed_member_2
+			}
+		}
+		set_federation_leader = root
+	}
+	after = {
+		event_target:fed_member_1 = {
+			if = {
+				limit = {
+					OR = {
+						has_valid_civic = civic_fanatic_purifiers
+						has_valid_civic = civic_tec_corporate_megakillers
+					}
+				}
+				if = {
+					limit = {
+						has_valid_civic = civic_fanatic_purifiers
+					}
+					force_remove_civic = civic_fanatic_purifiers
+					change_government = {
+						cooldown = no
+						civics = random
+					}
+				}
+				if = {
+					limit = {
+						has_valid_civic = civic_tec_corporate_megakillers
+					}
+					force_remove_civic = civic_tec_corporate_megakillers
+					change_government = {
+						cooldown = no
+						civics = random
+					}
+				}
+			}
+		}
+		
+	}
+}
+
+### Doomsday
+
+# Set Up
+# origin.60
+
+# Doomsday 2
+# origin.61
+
+# Doomsday 3
+# origin.65
+
+# Doomsday 4
+# origin.70
+
+# Doomsday 5
+# origin.75
+
+# Doomsday 5.5
+# origin.76
+
+# Doomsday 6 - THE END		# MEMESIS
+planet_event = {
+	id = origin.80
+	title = "origin.80.name"
+	desc = {
+		trigger = {
+			has_planet_flag = doomsday_lost_some_pops
+			has_planet_flag = doomsday_still_original_owner
+			event_target:doomsday_owner = {
+				NOT = { has_ethic = ethic_gestalt_consciousness }
+			}
+		}
+		text = "origin.80.1.desc"
+	}
+	desc = {
+		trigger = {
+			has_planet_flag = doomsday_lost_some_pops
+			has_planet_flag = doomsday_still_original_owner
+			event_target:doomsday_owner = {
+				has_ethic = ethic_gestalt_consciousness
+			}
+		}
+		text = "origin.80.1.gestalt.desc"
+	}
+	desc = {
+		trigger = {
+			has_planet_flag = doomsday_lost_many_pops
+			has_planet_flag = doomsday_still_original_owner
+			event_target:doomsday_owner = {
+				NOT = { has_ethic = ethic_gestalt_consciousness }
+			}
+		}
+		text = "origin.80.2.desc"
+	}
+	desc = {
+		trigger = {
+			has_planet_flag = doomsday_lost_many_pops
+			has_planet_flag = doomsday_still_original_owner
+			event_target:doomsday_owner = {
+				has_ethic = ethic_gestalt_consciousness
+			}
+		}
+		text = "origin.80.2.gestalt.desc"
+	}
+	desc = {
+		trigger = {
+			has_planet_flag = doomsday_lost_everything
+			has_planet_flag = doomsday_still_original_owner
+			event_target:doomsday_owner = {
+				NOT = { has_ethic = ethic_gestalt_consciousness }
+			}
+		}
+		text = "origin.80.4.desc"
+	}
+	desc = {
+		trigger = {
+			has_planet_flag = doomsday_lost_everything
+			has_planet_flag = doomsday_still_original_owner
+			event_target:doomsday_owner = {
+				has_ethic = ethic_gestalt_consciousness
+			}
+		}
+		text = "origin.80.4.gestalt.desc"
+	}
+	desc = {
+		trigger = {
+			NOT = { has_planet_flag = doomsday_still_original_owner }
+		}
+		text = "origin.80.5.desc"
+	}
+	picture = GFX_evt_exploding_planet
+	show_sound = event_super_explosion
+	location = root
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				has_owner = yes
+				owner = { is_same_value = event_target:doomsday_owner }
+			}
+			set_planet_flag = doomsday_still_original_owner
+			if = {
+				limit = {
+					owner = {
+						is_megacorp = yes
+					}
+				}
+				set_planet_flag = tec_doomsday_megacorp
+			}
+			if = {
+				limit = {
+					owner = { num_owned_planets = 1 }
+				}
+				set_planet_flag = doomsday_lost_everything
+			}
+			else_if = {
+				limit = {
+					owner = { num_owned_planets > 1 }
+					num_pops >= 20
+				}
+				set_planet_flag = doomsday_lost_many_pops
+			}
+			else_if = {
+				limit = {
+					owner = { num_owned_planets > 1 }
+					num_pops <= 19
+					num_pops > 0
+				}
+				set_planet_flag = doomsday_lost_some_pops
+			}
+			event_target:doomsday_owner = {
+				every_relation = {
+					limit = {
+						is_ai = no
+						has_communications = prev
+						OR = {
+							has_intel_level = {
+								who = prev
+								category = government
+								level >= 1
+							}
+							has_intel_level = {
+								who = prev
+								category = economy
+								level >= 1
+							}
+						}
+					}
+					country_event = { id = origin.90 }
+				}
+			}
+		}
+		else = {
+			event_target:doomsday_owner = {
+				country_event = { id = origin.81 }
+				every_relation = {
+					limit = {
+						is_ai = no
+						has_communications = prev
+						OR = {
+							has_intel_level = {
+								who = prev
+								category = government
+								level >= 1
+							}
+							has_intel_level = {
+								who = prev
+								category = economy
+								level >= 1
+							}
+						}
+					}
+					country_event = { id = origin.91 }
+				}
+			}
+		}
+		remove_modifier = doomsday_5
+		every_owned_pop = { kill_pop = yes }
+		destroy_colony = yes
+		change_pc = pc_shattered
+		clear_deposits = yes
+		random_list = {
+			1 = {
+				add_deposit = d_minerals_10
+				add_deposit = d_minerals_6
+			}
+			1 = {
+				add_deposit = d_minerals_10
+				add_deposit = d_minerals_2
+			}
+			1 = {
+				add_deposit = d_minerals_8
+			}
+			1 = {
+				add_deposit = d_minerals_4
+			}
+		}
+	}
+
+	option = {
+		name = origin_80.a
+		trigger = {
+			has_planet_flag = doomsday_lost_everything
+		}
+	}
+	option = {
+		name = origin_80.b
+		trigger = {
+			has_planet_flag = doomsday_lost_many_pops
+		}
+	}
+	option = {
+		name = origin_80.c
+		trigger = {
+			has_planet_flag = doomsday_lost_some_pops
+		}
+	}
+	option = {
+		name = UNFORTUNATE
+		trigger = {
+			NOR = {
+				has_planet_flag = doomsday_lost_everything
+				has_planet_flag = doomsday_lost_some_pops
+				has_planet_flag = doomsday_lost_many_pops
+				has_planet_flag = doomsday_lost_some_pops
+			}
+		}
+	}
+	option = {
+		name = tec_doomsday_economy
+		
+		trigger = {
+			has_planet_flag = tec_doomsday_megacorp
+		}
+	}
+}
+
+# Doomsday 6 - Planet Evacuated
+# origin.81
+
+# Doomsday Colonized Planet (HIDDEN)
+# origin.84
+
+# Doomsday Colonized Planet
+# origin.85
+
+# Doomsday - Neighbors Informed
+# origin.90
+
+# Doomsday - Neighbors Informed, Planet Completely Evacuated
+# origin.91
+
+# Lost Colony Setup
+# origin.100

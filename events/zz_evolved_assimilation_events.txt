@@ -1,0 +1,1967 @@
+# - - - - - - - - - - - - - - - - - - - - - 
+#
+# Based on Necroids Events
+#
+#
+# - - - - - - - - - - - - - - - - - - - - - 
+
+
+# Assimilator events
+
+
+namespace = tec_assimilation
+
+# Metamorphosis event for assimilator hives
+planet_event = {
+	id = tec_assimilation.100
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			has_building = building_tec_hive_metamorphochamber
+			has_building = building_tec_hive_metamorphochamber_2
+		}
+		exists = owner
+		owner = {
+			OR = {
+				has_valid_civic = civic_tec_hive_splicers
+				AND = {
+					is_hive_empire = yes
+					has_ascension_perk = ap_evolutionary_mastery # will be changed in the future	
+				}
+			}
+			tec_is_biohive = yes
+		}
+		num_assigned_jobs = {
+			job = tec_metamorphed
+			value >= 1
+		}
+	}
+
+	immediate = {
+		set_timed_planet_flag = {
+			flag = metamorph_alert_timer
+			days = 576
+		}
+		random_owned_pop = {
+			limit = {
+				is_same_species = owner_species
+			}
+			species = { save_event_target_as = metamorph_pop_species }
+		}
+		every_owned_pop = {
+			limit = { has_job = tec_metamorphed }
+			root = {
+				change_variable = {
+					which = var_metamorphed_pops
+					value = 1
+				}
+				change_variable = {
+					which = var_total_metamorphed_pops
+					value = 1
+				}
+				if = {
+					limit = {
+						exists = event_target:metamorph_pop_species
+					}
+					create_pop = {
+						species = event_target:metamorph_pop_species
+					}
+				}
+				else = {
+					create_pop = {
+						species = owner_species
+					}
+				}
+				if = {
+					limit = {
+						last_created_pop = {
+							NOT = { ideal_planet_class = root }
+						}
+						NOR = {
+							uses_habitat_capitals = yes
+							tec_is_ringworld = yes
+							tec_is_city_planet = yes
+							uses_district_set = hive_world
+							uses_district_set = machine_world
+							is_planet_class = pc_gaia
+							is_planet_class = pc_relic
+						}
+						owner = {
+							has_technology = tech_glandular_acclimation
+							NOT = { ideal_planet_class = root }
+						}
+					}
+					last_created_pop = {
+						modify_species = {
+							ideal_planet_class = root
+						}
+					}
+				}
+			}
+			every_country = {
+				limit = {
+					has_communications = root.owner
+					NOT = { is_country = root.owner }
+					NOT = { is_same_species = prev }
+					NOT = { has_ai_personality_behaviour = purger }
+					NOR = {
+						has_ethic = ethic_gestalt_consciousness
+						NOT = {
+							has_ethic = ethic_gestalt_empathy	
+						}
+					}
+					tec_is_death_cult = no
+					OR = {
+						tec_is_default_country = yes
+						has_ai_personality = awakened_fallen_empire_xenophile
+					}
+				}
+				add_opinion_modifier = { who = root.owner modifier = opinion_tec_genespliced_pop }
+			}
+			every_country = {
+				limit = {
+					has_communications = root.owner
+					NOT = { is_country = root.owner }
+					is_same_species = prev
+				}
+				add_opinion_modifier = { who = root.owner modifier = opinion_tec_genespliced_our_species }
+			}
+			kill_pop = yes
+		}
+		create_message = {
+			type = MESSAGE_TEC_METAMORPHED_EVENT
+			localization = MESSAGE_TEC_METAMORPHED_POPS
+			days = 30
+			target = this
+			variable = {
+				type = name
+				localization = PLANET
+				scope = this
+			}
+			variable = {
+				type = variable
+				varname = var_metamorphed_pops
+				localization = VALUE
+				scope = this
+			}
+		}
+		if = {
+			limit = {
+				owner = {
+					has_active_tradition = tr_harmony_unity_of_self
+				}
+			}
+			owner = {
+				add_monthly_resource_mult = {
+					resource = unity
+					value = 1.5
+					min = 5
+					max = 100
+				}
+			}
+		}
+		set_variable = {
+			which = var_metamorphed_pops
+			value = 0
+		}
+	}
+}
+
+# Metamorphosis event for organic bioascended hives
+# tec_assimilation 150
+
+
+# Splicing event for ascension perk regular empires and regular hives
+planet_event = {
+	id = tec_assimilation.200
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			has_building = building_tec_splicechamber
+			has_building = building_tec_splicechamber_2
+		}
+		exists = owner
+		owner = {
+			OR = {
+				has_valid_civic = civic_tec_hive_splicers
+				AND = {
+					has_country_flag = tec_can_genesplice
+					has_ascension_perk = ap_evolutionary_mastery # will be changed in the future	
+				}
+			}
+			tec_is_biohive = no
+		}
+		num_assigned_jobs = {
+			job = tec_spliced
+			value >= 1
+		}
+	}
+
+	immediate = {
+		set_timed_planet_flag = {
+			flag = spliced_alert_timer
+			days = 576
+		}
+		random_owned_pop = {
+			limit = {
+				is_same_species = owner_species
+			}
+			species = { save_event_target_as = spliced_pop_species }
+		}
+		every_owned_pop = {
+			limit = { has_job = tec_spliced }
+			root = {
+				change_variable = {
+					which = var_spliced_pops
+					value = 1
+				}
+				change_variable = {
+					which = var_total_spliced_pops
+					value = 1
+				}
+				if = {
+					limit = {
+						exists = event_target:spliced_pop_species
+					}
+					create_pop = {
+						species = event_target:spliced_pop_species
+					}
+				}
+				else = {
+					create_pop = {
+						species = owner_species
+					}
+				}
+				if = {
+					limit = {
+						last_created_pop = {
+							NOT = { ideal_planet_class = root }
+						}
+						NOR = {
+							uses_habitat_capitals = yes
+							tec_is_ringworld = yes
+							tec_is_city_planet = yes
+							uses_district_set = hive_world
+							uses_district_set = machine_world
+							is_planet_class = pc_gaia
+							is_planet_class = pc_relic
+						}
+						owner = {
+							has_technology = tech_glandular_acclimation
+							NOT = { ideal_planet_class = root }
+						}
+					}
+					last_created_pop = {
+						modify_species = {
+							ideal_planet_class = root
+						}
+					}
+				}
+			}
+			every_country = {
+				limit = {
+					has_communications = root.owner
+					NOT = { is_country = root.owner }
+					NOT = { is_same_species = prev }
+					NOT = { has_ai_personality_behaviour = purger }
+					NOR = {
+						has_ethic = ethic_gestalt_consciousness
+						NOT = {
+							has_ethic = ethic_gestalt_empathy	
+						}
+					}
+					tec_is_death_cult = no
+					OR = {
+						tec_is_default_country = yes
+						has_ai_personality = awakened_fallen_empire_xenophile
+					}
+				}
+				add_opinion_modifier = { who = root.owner modifier = opinion_tec_genespliced_pop }
+			}
+			every_country = {
+				limit = {
+					has_communications = root.owner
+					NOT = { is_country = root.owner }
+					is_same_species = prev
+				}
+				add_opinion_modifier = { who = root.owner modifier = opinion_tec_genespliced_our_species }
+			}
+			kill_pop = yes
+		}
+		create_message = {
+			type = MESSAGE_TEC_SPLICED_EVENT
+			localization = MESSAGE_TEC_SPLICED_POPS
+			days = 30
+			target = this
+			variable = {
+				type = name
+				localization = PLANET
+				scope = this
+			}
+			variable = {
+				type = variable
+				varname = var_spliced_pops
+				localization = VALUE
+				scope = this
+			}
+		}
+		if = {
+			limit = {
+				owner = {
+					has_active_tradition = tr_harmony_unity_of_self
+				}
+			}
+			owner = {
+				add_monthly_resource_mult = {
+					resource = unity
+					value = 1.5
+					min = 5
+					max = 100
+				}
+			}
+		}
+		set_variable = {
+			which = var_spliced_pops
+			value = 0
+		}
+	}
+}
+
+# Encaser event for machines and cyberhives
+planet_event = {
+	id = tec_assimilation.300
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			has_building = building_tec_organic_composer
+			has_building = building_tec_organic_composer_2
+		}
+		exists = owner
+		owner = {
+			NOT = {
+				has_valid_civic = civic_tec_machine_composer
+			}
+			OR = {
+			#	has_valid_civic = civic_tec_hive_splicers_cyborg
+				AND = {
+					is_machine_empire = yes
+					has_ascension_perk = ap_tec_machine_mechanic_3 # will be changed in the future
+				}
+				AND = {
+					is_hive_empire = yes
+					tec_has_cybernetic_ascension_path = yes # will be changed in the future	
+				}
+			}
+			has_country_flag = tec_can_encase
+		}
+		num_assigned_jobs = {
+			job = tec_encased
+			value >= 1
+		}
+	}
+
+	immediate = {
+		set_timed_planet_flag = {
+			flag = encased_alert_timer
+			days = 576
+		}
+		random_owned_pop = {
+			limit = {
+				is_same_species = owner_species
+			}
+			species = { save_event_target_as = encased_pop_species }
+		}
+		every_owned_pop = {
+			limit = { has_job = tec_encased}
+			root = {
+				change_variable = {
+					which = var_encased_pops
+					value = 1
+				}
+				change_variable = {
+					which = var_total_encased_pops
+					value = 1
+				}
+				if = {
+					limit = {
+						exists = event_target:encased_pop_species
+					}
+					create_pop = {
+						species = event_target:encased_pop_species
+					}
+				}
+				else = {
+					create_pop = {
+						species = owner_species
+					}
+				}
+				#Troublesome brains need practical sollutions
+				if = {
+					limit = {
+						event_target:encased_pop_species = {
+							is_robotic_species = yes
+						}
+						this = {
+							is_robotic_species = no
+						}
+					}
+					last_created_pop = {
+						modify_species = {
+							add_trait = trait_tec_machine_biobrain
+						}
+					}
+				}
+			}
+			every_country = {
+				limit = {
+					has_communications = root.owner
+					NOT = { is_country = root.owner }
+					NOT = { is_same_species = prev }
+					NOT = { has_ai_personality_behaviour = purger }
+					NOR = {
+						has_ethic = ethic_gestalt_consciousness
+						NOT = {
+							has_ethic = ethic_gestalt_empathy	
+						}
+					}
+					is_spiritualist = no
+					OR = {
+						tec_is_default_country = yes
+						has_ai_personality = awakened_fallen_empire_xenophile
+					}
+				}
+				add_opinion_modifier = { who = root.owner modifier = opinion_tec_encased_pop }
+			}
+			every_country = {
+				limit = {
+					has_communications = root.owner
+					NOT = { is_country = root.owner }
+					is_same_species = prev
+					is_spiritualist = no
+				}
+				add_opinion_modifier = { who = root.owner modifier = opinion_tec_encased_our_species }
+			}
+			every_country = {
+				limit = {
+					has_communications = root.owner
+					NOT = { is_country = root.owner }
+					NOT = { is_same_species = prev }
+					is_spiritualist = no
+					OR = {
+						tec_is_default_country = yes
+						has_ai_personality = awakened_fallen_empire_xenophile
+						has_ai_personality = awakened_fallen_empire_spiritualist
+					}
+				}
+				add_opinion_modifier = { who = root.owner modifier = opinion_tec_encased_pop_spiritualist }
+			}
+			every_country = {
+				limit = {
+					has_communications = root.owner
+					NOT = { is_country = root.owner }
+					is_same_species = prev
+					is_spiritualist = yes
+				}
+				add_opinion_modifier = { who = root.owner modifier = opinion_tec_encased_our_species_spiritualist }
+			}
+			kill_pop = yes
+		}
+		create_message = {
+			type = MESSAGE_TEC_ENCASED_EVENT
+			localization = MESSAGE_TEC_ENCASED_POPS
+			days = 30
+			target = this
+			variable = {
+				type = name
+				localization = PLANET
+				scope = this
+			}
+			variable = {
+				type = variable
+				varname = var_encased_pops
+				localization = VALUE
+				scope = this
+			}
+		}
+		if = {
+			limit = {
+				owner = {
+					has_active_tradition = tr_harmony_unity_of_self
+				}
+			}
+			owner = {
+				add_monthly_resource_mult = {
+					resource = unity
+					value = 1.5
+					min = 5
+					max = 100
+				}
+			}
+		}
+		set_variable = {
+			which = var_encased_pops
+			value = 0
+		}
+	}
+}
+
+# Composer event for composer machines
+planet_event = {
+	id = tec_assimilation.400
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			has_building = building_tec_organic_composer
+			has_building = building_tec_organic_composer_2
+		}
+		exists = owner
+		owner = {
+			OR = {
+				has_valid_civic = civic_tec_machine_composer
+			}
+		}
+		num_assigned_jobs = {
+			job = tec_composed
+			value >= 1
+		}
+	}
+
+	immediate = {
+		set_timed_planet_flag = {
+			flag = composed_alert_timer
+			days = 576
+		}
+		random_owned_pop = {
+			limit = {
+				is_same_species = owner_species
+			}
+			species = { save_event_target_as = composed_pop_species }
+		}
+		every_owned_pop = {
+			limit = { has_job = tec_composed}
+			root = {
+				change_variable = {
+					which = var_composed_pops
+					value = 1
+				}
+				change_variable = {
+					which = var_total_composed_pops
+					value = 1
+				}
+				if = {
+					limit = {
+						exists = event_target:composed_pop_species
+					}
+					create_pop = {
+						species = event_target:composed_pop_species
+					}
+				}
+				else = {
+					create_pop = {
+						species = owner_species
+					}
+				}
+			}
+			every_country = {
+				limit = {
+					has_communications = root.owner
+					NOT = { is_country = root.owner }
+					NOT = { is_same_species = prev }
+					NOT = { has_ai_personality_behaviour = purger }
+					NOR = {
+						has_ethic = ethic_gestalt_consciousness
+						NOT = {
+							has_ethic = ethic_gestalt_empathy	
+						}
+					}
+					is_spiritualist = no
+					OR = {
+						tec_is_default_country = yes
+						has_ai_personality = awakened_fallen_empire_xenophile
+					}
+				}
+				add_opinion_modifier = { who = root.owner modifier = opinion_tec_composed_pop }
+			}
+			every_country = {
+				limit = {
+					has_communications = root.owner
+					NOT = { is_country = root.owner }
+					is_same_species = prev
+					is_spiritualist = no
+				}
+				add_opinion_modifier = { who = root.owner modifier = opinion_tec_composed_our_species }
+			}
+			every_country = {
+				limit = {
+					has_communications = root.owner
+					NOT = { is_country = root.owner }
+					NOT = { is_same_species = prev }
+					is_spiritualist = no
+					OR = {
+						tec_is_default_country = yes
+						has_ai_personality = awakened_fallen_empire_xenophile
+						has_ai_personality = awakened_fallen_empire_spiritualist
+					}
+				}
+				add_opinion_modifier = { who = root.owner modifier = opinion_tec_composed_pop_spiritualist }
+			}
+			every_country = {
+				limit = {
+					has_communications = root.owner
+					NOT = { is_country = root.owner }
+					is_same_species = prev
+					is_spiritualist = yes
+				}
+				add_opinion_modifier = {
+					who = root.owner 
+					modifier = opinion_tec_composed_our_species_spiritualist 
+				}
+			}
+			kill_pop = yes
+		}
+		create_message = {
+			type = MESSAGE_TEC_COMPOSED_EVENT
+			localization = MESSAGE_TEC_COMPOSED_POPS
+			days = 30
+			target = this
+			variable = {
+				type = name
+				localization = PLANET
+				scope = this
+			}
+			variable = {
+				type = variable
+				varname = var_composed_pops
+				localization = VALUE
+				scope = this
+			}
+		}
+		if = {
+			limit = {
+				owner = {
+					has_active_tradition = tr_harmony_unity_of_self
+				}
+			}
+			owner = {
+				add_monthly_resource_mult = {
+					resource = unity
+					value = 1.5
+					min = 5
+					max = 100
+				}
+			}
+		}
+		set_variable = {
+			which = var_composed_pops
+			value = 0
+		}
+	}
+}
+
+#necroids.2 Tell player about necrophage mechanic 180 days before it happens
+country_event = {
+	id = tec_assimilation.2222
+	title = necroids.2.name
+	desc = necroids.2.desc
+	show_sound = event_necrophage
+	picture = GFX_evt_necrophage
+	is_triggered_only = yes
+
+	trigger = {
+		capital_scope = {
+			colony_age > 8
+			has_building = building_necrophage_elevation_chamber
+			num_assigned_jobs = {
+				job = necro_apprentice
+				value >= 1
+			}
+		}
+	}
+
+	immediate = {
+		capital_scope = {
+			random_owned_species = {
+				limit = { species_can_be_necrophaged = yes }
+				save_event_target_as = necrophage_species
+			}
+		}
+	}
+
+	option = {
+		name = necroids.2.A
+		custom_tooltip = necroids.2.A.tooltip
+	}
+}
+
+# AI help for getting secondary necrophage species on the planet
+planet_event = {
+	id = tec_assimilation.333
+	is_triggered_only = yes
+	hide_window = yes
+	
+	trigger = {
+		exists = owner
+		owner = {
+			is_ai = yes
+			has_origin = origin_necrophage
+			has_trait = trait_necrophage
+			any_owned_species = {
+				species_can_be_necrophaged = yes
+				NOT = {
+					has_citizenship_type = { type = citizenship_purge country = root.owner }
+				}
+			}
+		}
+		OR = {
+			AND = {
+				any_owned_species = {
+					is_same_species = root.owner_species
+				}
+				NOT = {
+					any_owned_species = {
+						species_can_be_necrophaged = yes
+					}
+				}
+			}
+			AND = {
+				NOT = {
+					any_owned_species = {
+						is_same_species = root.owner_species
+					}
+				}
+				any_owned_species = {
+					species_can_be_necrophaged = yes
+				}
+			}
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				any_owned_species = {
+					is_same_species = root.owner_species
+				}
+				NOT = {
+					any_owned_species = {
+						species_can_be_necrophaged = yes
+					}
+				}
+			}
+			owner = {
+				random_owned_planet = {
+					limit = {
+						any_owned_species = {
+							species_can_be_necrophaged = yes
+							NOT = {
+								has_citizenship_type = { type = citizenship_purge country = root.owner }
+							}
+						}
+						count_owned_pop = {
+							count > 1
+							limit = {
+								species = {
+									species_can_be_necrophaged = yes
+									NOT = {
+										has_citizenship_type = { type = citizenship_purge country = root.owner }
+									}
+								}
+							}
+						}
+					}
+					random_owned_pop = {
+						limit = {
+							species = {
+								species_can_be_necrophaged = yes
+								NOT = {
+									has_citizenship_type = { type = citizenship_purge country = root.owner }
+								}
+							}
+						}
+						resettle_pop = {
+							pop = this
+							planet = root
+						}
+					}
+				}
+			}
+		}
+		else = {
+			owner = {
+				random_owned_planet = {
+					limit = {
+						any_owned_species = {
+							is_same_species = root.owner_species
+						}
+						count_owned_pop = {
+							count > 1
+							limit = {
+								species = {
+									is_same_species = root.owner_species
+								}
+							}
+						}
+					}
+					random_owned_pop = {
+						limit = {
+							species = {
+								is_same_species = root.owner_species
+							}
+						}
+						resettle_pop = {
+							pop = this
+							planet = root
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# Necrophage Purge
+
+# on_pop_purged
+# This = Planet scope
+# From = Country
+# FromFrom = Pop
+planet_event = {
+	id = tec_assimilation.555
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		fromfrom = {
+			has_purge_type = {
+				type = purge_necrophage
+			}
+		}
+	}
+
+	immediate = {
+		random_owned_pop = {
+			limit = {
+				is_same_species = owner_species
+			}
+			species = { save_event_target_as = necrophage_pop_species }
+		}
+		if = {
+			limit = {
+				exists = event_target:necrophage_pop_species
+			}
+			create_pop = {
+				species = event_target:necrophage_pop_species
+			}
+		}
+		else = {
+			create_pop = {
+				species = owner_species
+			}
+		}
+		if = {
+			limit = {
+				last_created_pop = {
+					NOT = { ideal_planet_class = root }
+				}
+				NOR = {
+					tec_is_ringworld = yes
+					uses_habitat_capitals = yes
+					tec_is_city_planet = yes
+					uses_district_set = hive_world
+					uses_district_set = machine_world
+					is_planet_class = pc_gaia
+					is_planet_class = pc_relic
+				}
+				owner = {
+					has_technology = tech_glandular_acclimation
+					NOT = { ideal_planet_class = root }
+				}
+			}
+			last_created_pop = {
+				modify_species = {
+					ideal_planet_class = root
+				}
+			}
+		}
+		if = {
+			limit = {
+				from = {
+					has_active_tradition = tr_harmony_unity_of_self
+				}
+			}
+			from = {
+				add_monthly_resource_mult = {
+					resource = unity
+					value = 1.5
+					min = 5
+					max = 100
+				}
+			}
+		}
+		every_country = {
+			limit = {
+				has_communications = FROM
+				NOT = { is_country = FROM }
+				NOT = { is_same_species = FROMFROM }
+				NOT = { has_ai_personality_behaviour = purger }
+				NOT = { has_origin = origin_necrophage }
+				NOT = { has_ethic = ethic_gestalt_consciousness }
+				tec_is_death_cult = no
+				OR = {
+					tec_is_default_country = yes
+					has_ai_personality = awakened_fallen_empire_xenophile
+				}
+			}
+			add_opinion_modifier = { who = FROM modifier = opinion_necrophage }
+		}
+		every_country = {
+			limit = {
+				has_communications = FROM
+				NOT = { is_country = FROM }
+				is_same_species = FROMFROM
+			}
+			add_opinion_modifier = { who = FROM modifier = opinion_necrophage_our_species }
+		}
+	}
+}
+
+ # New assimilation system
+# Assimilate Pops on Yearly Pulse event = {	id = action.64 	OVERWRITE
+# Assimilate Pops planet_event = { 	id = action.65	OVERWRITE
+
+# How the new assimilation works
+# - Instead of all being done on year pulse, it distributes it arounds 30 days after monthly tick
+# - Assimilated pops are sorted, and 1 pop is assimilated each
+
+# Assimilate Pops on Yearly Pulse
+event = {
+	id = tec_assimilation.63
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		any_playable_country = {
+			num_unique_species > 1
+			any_owned_species = {
+				has_citizenship_type = {
+					type = citizenship_assimilation
+					country = prev
+				}
+			}
+		}
+	}
+
+	immediate = {
+		log = "action.64"
+		set_update_modifiers_batch = begin
+		every_playable_country = {
+			limit = {
+				num_unique_species > 1
+				any_owned_species = {
+					has_citizenship_type = {
+						type = citizenship_assimilation
+						country = prev
+					}
+				}
+			}
+			log = "action.64.epc"
+
+			if = { # Excluding assimilations that kill pops
+				limit = {
+					NOR = {
+						has_country_flag = tec_synthetic_assimilation			# Convert into robots
+						has_country_flag = tec_biological_assimilation			# Convert into themselves
+						has_country_flag = tec_hive_biological_assimilation
+						has_country_flag = tec_biopsionic_assimilation
+						has_country_flag = tec_replicant_assimilation
+						has_country_flag = tec_ethereal_assimilation
+						has_country_flag = tec_machine_encasing					# Convert organics into robots
+					}
+				}
+				# Launchs the assimilator conditions
+				every_owned_species = {
+					limit = {
+						has_citizenship_type = {
+							type = citizenship_assimilation
+							country = prev
+						}
+					}
+					# How new assimilation works
+						# Empire - Type - Checker for is_exact_same_species with appropiate traits, else create new effect
+						# Reduced load on late game by 50%, tests are still going
+					# /	
+					# Hivemind empires assimilation
+					if = {
+						limit = {
+							prev = {
+								is_hive_empire = yes
+							}
+						}
+						# Robots into robot main species
+						# Machines into robots
+						if = {		# RM A
+							limit = {
+								OR = {
+									has_trait = trait_mechanical
+									has_trait = trait_machine_unit
+									NOT = {
+										has_species_flag = mechanical_species@prev
+									}
+								}
+								prev = {
+									has_technology = tech_tec_machine_assimilation
+								}
+							}
+							set_timed_species_flag = {
+								flag = tec_rm_a
+								days = 10
+							}
+						}
+						# Hivemind
+						if = {		# HIV ONLY A 
+							limit = {
+								prev = {
+									tec_is_cyberhive = no
+									OR = {
+										has_technology = tech_tec_hive_assimilation
+										AND = {
+											OR = {
+												has_country_flag = can_add_advanced_traits
+												has_technology = tech_tec_hive_assimilation
+											}
+											NOR = {
+												has_country_flag = tec_biological_assimilation
+												has_country_flag = tec_hive_biological_assimilation
+											}
+										}
+									}
+									NOR = {
+										has_country_flag = tec_biological_assimilation
+										has_country_flag = tec_hive_replicant_assimilation
+										
+										has_country_flag = tec_hive_cybernetic_t1_assimilation
+										has_country_flag = tec_hive_cybernetic_t2_assimilation
+										
+										has_country_flag = tec_hive_psionic_assimilation
+										has_country_flag = tec_hive_cyberpsionic_assimilation
+										has_country_flag = tec_hive_biopsionic_assimilation
+									}
+								}
+							}
+							tec_hivemind_trait_assimilation_script = yes
+						}
+						# Cyberhive
+						if = {		# PSI A - 
+							limit = {
+								prev = {
+									tec_is_cyberhive = yes
+								}
+							}
+							if = {	# T1
+								limit = {
+									prev = {
+										NOT = {
+											has_country_flag = tec_hive_cybernetic_t2_assimilation
+										}
+									}
+								}
+								tec_hivemind_cyberhive_t1_assimilation_script = yes
+							}
+							else_if = {	# T2
+								limit = {
+									prev = {
+										has_country_flag = tec_hive_cybernetic_t2_assimilation
+									}
+								}
+								tec_hivemind_cyberhive_t2_assimilation_script = yes
+								
+							}
+						}
+						# Note: Biological and Pure of form removes the cybernetic trait and the civic
+						# Psi (nocyb)
+						if = {	# Not functional, yet
+							limit = {
+								prev = {
+									has_country_flag = tec_hive_psionic_assimilation
+								}
+							}
+							tec_hivemind_psionic_assimilation_script = yes
+						}
+						# Pure of form
+						if = {	# Not functional, yet
+							limit = {
+								prev = {
+									has_country_flag = tec_hive_biopsionic_assimilation
+								}
+							}
+							tec_hivemind_biopsionic_assimilation_script = yes
+						}
+						# Cyberpsi
+						if = { # Not functional, yet
+							limit = {
+								prev = {
+									has_country_flag = tec_hive_cyberpsionic_assimilation
+								}
+							}
+							tec_hivemind_cyberpsionic_assimilation_script = yes
+						}
+					}
+					# Machine empires assimilation
+					if = {
+						limit = {
+							prev = {
+								is_machine_empire = yes
+							}
+						}
+						# Robots into machines
+						if = {		# RM A
+							limit = {
+								has_trait = trait_mechanical
+								prev = {
+									has_technology = tech_tec_robot_assimilation
+								}
+							}
+							set_timed_species_flag = {
+								flag = tec_rm_a
+								days = 10
+							}
+						}
+						# Machines into main species
+						if = {		# MM A
+							limit = {
+								OR = {
+									has_trait = trait_machine_unit
+									has_trait = trait_tec_replicant_standard
+								}
+								NOT = {
+									is_same_value = prev.owner_main_species
+								}
+								prev = {
+									has_technology = tech_tec_robot_assimilation
+								}
+							}
+							set_timed_species_flag = {
+								flag = tec_mm_a
+								days = 10
+							}
+						}
+						# Hiveminds into biotrophies
+						if = {
+							limit = {
+								prev = {
+									has_valid_civic = civic_machine_servitor
+									NOT = {
+										has_ethic = ethic_gestalt_apathy
+									}
+								}
+								has_trait = trait_hive_mind
+							}
+							tec_machine_hive_into_biotrophy_assimilation_script = yes
+						}
+						# Cyborgs
+						if = {		# MCYB A - 
+							limit = {
+								prev = {
+									OR = {
+										has_valid_civic = civic_machine_assimilator
+										has_country_flag = tec_cybernetic_t1_assimilation
+										has_country_flag = tec_cybernetic_t2_assimilation
+									}
+								}
+							}
+							if = {		# CYB T1 - trait_cybernetic
+								limit = {
+									prev = {
+										OR = {
+											has_valid_civic = civic_machine_assimilator
+											has_country_flag = tec_cybernetic_t1_assimilation	
+										}
+										NOT = {
+											has_country_flag = tec_cybernetic_t2_assimilation
+										}
+									}
+								}
+								tec_machine_cybernetic_t1_assimilation_script = yes
+							}
+							else_if = {		# CYB T2 - trait_tec_advanced_cyborg
+								limit = {
+									prev = {
+										has_country_flag = tec_cybernetic_t2_assimilation						
+									}
+								}
+								tec_machine_cybernetic_t2_assimilation_script = yes
+							}
+						}
+					}
+					# Regular empires assimilation
+					if = {
+						limit = {
+							prev = {
+								is_regular_empire = yes
+							}
+						}
+						# Robots and machines into main robot
+						if = {		# RM A
+							limit = {
+								OR = {
+									has_trait = trait_mechanical
+									has_trait = trait_machine_unit
+									NOT = {
+										has_species_flag = mechanical_species@prev
+									}
+								}
+								prev = {
+									has_technology = tech_tec_machine_assimilation
+								}
+							}
+							set_timed_species_flag = {
+								flag = tec_rm_a
+								days = 10
+							}
+						}
+						# Hive deassimilation
+						if = {		# HM DA
+							limit = {
+								prev = {
+									NOR = {
+										has_country_flag = tec_biological_assimilation
+										has_country_flag = tec_replicant_assimilation
+										
+										has_country_flag = tec_synthetic_assimilation
+										has_country_flag = tec_cybernetic_t1_assimilation
+										has_country_flag = tec_cybernetic_t2_assimilation
+										
+										has_country_flag = tec_psionic_assimilation
+										has_country_flag = tec_biopsionic_assimilation
+										has_country_flag = tec_cyberpsionic_assimilation
+										has_country_flag = tec_psienergy_assimilation
+									}
+									has_technology = tech_tec_hive_deassimilation
+									
+								}
+								has_trait = trait_hive_mind
+							}
+							tec_regular_hivedeassim_assimilation_script = yes
+						}
+						# Cybernetic assimilation
+						if = {		# CYB A - 
+							limit = {
+								prev = {
+									OR = {
+										has_country_flag = tec_cybernetic_t1_assimilation
+										has_country_flag = tec_cybernetic_t2_assimilation
+									}
+								}
+							}
+							if = {		# CYB T1 - trait_cybernetic
+								limit = {
+									prev = {
+										has_country_flag = tec_cybernetic_t1_assimilation						
+									}
+								}
+								tec_regular_cybernetic_t1_assimilation_script = yes
+							}
+							else_if = {		# CYB T2 - trait_tec_advanced_cyborg
+								limit = {
+									prev = {
+										has_country_flag = tec_cybernetic_t2_assimilation						
+									}
+								}
+								tec_regular_cybernetic_t2_assimilation_script = yes
+							}
+						}
+						# Psionic Assimilation
+						if = {		# PSI A - 
+							limit = {
+								prev = {
+									has_country_flag = tec_psionic_assimilation
+								}
+							}
+							tec_regular_psionic_assimilation_script = yes
+						}
+						# Cyberpsionic assimilation
+						if = {		# CYBPSI A - 
+							limit = {
+								prev = {
+									has_country_flag = tec_cyberpsionic_assimilation
+								}
+							}
+							tec_regular_cyberpsionic_assimilation_script = yes
+						}
+						# Pure psio assimilation
+						if = {		# PSI A - 
+							limit = {
+								prev = {
+									has_country_flag = tec_biopsionic_assimilation
+								}
+							}
+							tec_regular_biopsionic_assimilation_script = yes
+						}
+						# Energy entity assimilation
+					}
+				}
+			}
+
+			every_owned_planet = {	# REGULAR QUEUE
+				planet_event = {
+					id = tec_assimilation.64 
+				}
+			}
+			every_owned_planet = {	# CRAFTED QUEUE
+				planet_event = {
+					id = tec_assimilation.65
+				}
+			}
+		}
+		set_update_modifiers_batch = end
+	}
+}
+
+# Assimilate Pops
+planet_event = {
+	id = tec_assimilation.64
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		any_owned_species = {
+			has_citizenship_type = {
+				type = citizenship_assimilation
+				country = root.owner
+			}
+			NOR = {	# Crafted species uses other event
+				has_trait = trait_mechanical
+				has_trait = trait_machine_unit
+				#	has_trait = trait_tec_bioservant
+			}
+		}
+	}
+
+	immediate = {
+		set_variable = {
+			which = assimilation_counter
+			value = 20
+		}
+		
+		while = {
+			count = 20
+			limit = {
+				any_owned_pop = {
+					has_citizenship_type = {
+						type = citizenship_assimilation
+						country = root.owner
+					}
+				}
+				check_variable = {
+					which = assimilation_counter
+					value > 0
+				}
+			}
+			random_owned_pop = {
+				limit = {
+					has_citizenship_type = {
+						type = citizenship_assimilation
+						country = root.owner
+					}
+					NOR = {	# Crafted species uses other event
+						has_trait = trait_mechanical
+						has_trait = trait_machine_unit
+						#	has_trait = trait_tec_bioservant
+					}
+				}
+				species = {
+					set_timed_species_flag = {
+						flag = tec_old_species_@this
+						days = 10
+					}
+					save_event_target_as = tec_old_species
+				}
+				if = {		# POP IS KILLED
+					limit = {
+						root.owner = {
+							OR = {
+								has_country_flag = tec_synthetic_assimilation				# Convert into robots
+								has_country_flag = tec_biological_assimilation				# Convert into themselves
+								has_country_flag = tec_hive_biological_assimilation
+								has_country_flag = tec_biopsionic_assimilation
+								has_country_flag = tec_ethereal_assimilation
+								#has_country_flag = tec_hive_cyberpsionic_assimilation		# Convert into robots or drones
+								AND = {
+									has_country_flag = tec_replicant_assimilation			# Convert into new replicants
+									has_policy_flag = tec_replicant_full_assimilation
+								}
+								has_country_flag = tec_machine_encasing						# Convert into drones
+							}
+						}
+					}
+					kill_pop = yes
+					root = {
+						create_pop = {
+							species = root.owner
+							ethos = root.owner
+						}
+						owner = {
+							if = {
+								limit = { has_ascension_perk = ap_become_the_crisis }
+								complete_crisis_objective = crisobj_purge_pops
+							}
+						}
+					}
+				}
+				else_if = {	# ANOTHER TEMPLATE ALREADY EXIST
+					limit = {
+						owner = {
+							any_owned_species = {
+								has_species_flag = tec_target_assim_spe_of_@event_target:tec_old_species
+							}
+						}
+					}
+					owner = {
+						random_owned_species = {
+							limit = {
+								has_species_flag = tec_target_assim_spe_of_@event_target:tec_old_species
+							}
+							save_event_target_as = tec_convert_into_this
+						}
+					}
+					change_species = event_target:tec_convert_into_this
+					
+				}
+				else_if = {	# POP IS TRANSFORMED - REPLICANTS
+					limit = {
+						root.owner = {
+							has_country_flag = tec_replicant_assimilation	# Convert into new replicants
+							NOT = {
+								has_policy_flag = tec_replicant_full_assimilation
+							}
+						}
+					}
+					# Check if a replicant version of the transforming species exists
+					if = {
+						limit = {
+							root.owner = {
+								any_owned_species = {
+									OR = { # was exact_same_species before !!
+										is_same_species = event_target:tec_old_species
+										has_species_flag = tec_replicant_species_of_@event_target:tec_old_species
+										has_species_flag = tec_temp_replicant_target_@event_target:tec_old_species
+									}
+									has_trait = trait_tec_replicant_standard
+								}
+							}
+						}
+						root.owner = {
+							# Targets the replicant template
+							random_owned_species = {
+								limit = {
+									OR = {	# was exact_same_species before !!
+										is_same_species = event_target:tec_old_species
+										has_species_flag = tec_replicant_species_of_@event_target:tec_old_species
+										has_species_flag = tec_temp_replicant_target_@event_target:tec_old_species
+									}
+									has_trait = trait_tec_replicant_standard
+								}
+								save_event_target_as = tec_convert_into_this
+							}
+						}
+						# changes the pop species into the new one
+						change_species = event_target:tec_convert_into_this
+					}
+					# Creates another replicant species
+					else = {
+							#limit = {
+							#	root.owner = {
+							#		any_owned_species = {
+							#			NOT = {
+							#				has_species_flag = tec_temp_replicant_target_@event_target:tec_old_species
+							#			}
+							#			NAND = {
+							#				OR = {
+							#					is_exact_same_species = event_target:tec_old_species
+							#					is_same_species = event_target:tec_old_species
+							#					has_species_flag = tec_replicant_species_of_@event_target:tec_old_species
+							#				}
+							#				has_trait = trait_tec_replicant_standard
+							#			}
+							#		}
+							#	}
+							#	root = {
+							#		NOT = {
+							#			has_planet_flag = tec_created_replicant_species@event_target:tec_old_species
+							#		}
+							#	}
+							#}
+						# Creates the new archetype
+						species = {
+							modify_species = {
+								species = this
+								ideal_planet_class = pc_nuked
+								change_scoped_species = no
+								effect = {
+									modify_species = {
+										species = this
+										remove_trait = trait_pc_nuked_preference
+										change_scoped_species = no
+										effect = {
+											create_species = {
+												is_mod = yes
+												name = event_target:tec_old_species
+												#namelist = event_target:tec_old_species
+												#name_list = event_target:tec_old_species
+												plural = this
+												class = "REPLICANT"
+												portrait = this
+												can_be_modified = this
+												gender = this
+												homeworld = root.owner.capital_scope
+												traits = {
+													trait = "trait_tec_replicant_standard"
+												}
+												traits = this
+												effect = {
+													#rename_species = {
+													#	name_list = ascension_list
+													#}
+													save_event_target_as = tec_convert_into_this
+													set_timed_species_flag = {
+														flag = tec_temp_replicant_target_@event_target:tec_old_species
+														days = 360
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+												
+						# Removes any possible non-compatible trait
+						event_target:tec_convert_into_this = {
+							tec_replicant_trait_cleanup_effect = yes
+							# recheck
+							last_created_species = {
+								save_event_target_as = tec_convert_into_this
+							}
+						}
+
+						# Recognises the original root species of the replicant
+						random_galaxy_species = {
+							limit = {
+								prev = {
+									is_subspecies = prev 
+								}
+							}
+							set_species_flag = tec_original_species_from_@event_target:tec_convert_into_this
+							save_event_target_as = tec_original_species
+						}
+
+						# Ensures the replicant species is taken as is_same_species_as the base one
+						event_target:tec_convert_into_this = {
+							set_species_identity = event_target:tec_original_species
+							set_species_flag = tec_replicant_species_of_@event_target:tec_old_species
+							set_timed_species_flag = {
+								flag = tec_temp_replicant_target_@event_target:tec_old_species
+								days = 5
+							}
+							save_event_target_as = tec_convert_into_this
+						}
+
+						# changes the pop
+						change_species = event_target:tec_convert_into_this
+						
+						# planet temporally blocker
+						root = {
+							set_timed_planet_flag = {
+								flag = tec_created_replicant_species@event_target:tec_old_species
+								days = 10
+							}
+						}
+					}
+				
+					# Secondary bonuses and etc
+					root = {
+						owner = {
+							if = {
+								limit = { has_ascension_perk = ap_become_the_crisis }
+								complete_crisis_objective = crisobj_purge_pops
+							}
+						}
+						change_variable = {
+							which = assimilation_counter
+							value = -1
+						}
+					}
+				}
+				else = {	# POP CHANGES SPECIES
+					random_galaxy_species = {
+						limit = {
+							has_species_flag = assim_spe_of_spe_@prev.species
+							has_species_flag = assim_spe_of_emp_@root.owner
+						}
+						save_event_target_as = convert_to_species
+					}
+					species = {
+						save_event_target_as = old_species
+					}
+					if = {
+						limit = {
+							exists = event_target:convert_to_species #should always exist
+						}
+						change_species = event_target:convert_to_species
+						owner = {
+							if = {
+								limit = { has_ascension_perk = ap_become_the_crisis }
+								complete_crisis_objective = crisobj_purge_pops
+							}
+						}
+						root = {
+							change_variable = {
+								which = assimilation_counter
+								value = -1
+							}
+							while = { #to avoid doing the random_galaxy_species thing too many times
+								limit = {
+									exists = event_target:old_species
+									check_variable = {
+										which = assimilation_counter
+										value > 0
+									}
+									any_owned_pop = {
+										is_same_value = event_target:old_species
+									}
+								}
+								random_owned_pop = {
+									limit = {
+										is_exact_same_species = event_target:old_species
+									}
+									change_species = event_target:convert_to_species
+									apply_post_assimilation_effects = yes
+								}
+								change_variable = {
+									which = assimilation_counter
+									value = -1
+								}
+								owner = {
+									if = {
+										limit = { has_ascension_perk = ap_become_the_crisis }
+										complete_crisis_objective = crisobj_purge_pops
+									}
+								}
+							}
+						}
+						apply_post_assimilation_effects = yes
+					}
+					else = {
+						log_error = "No species found for \\[This.Species.GetName] pop owned by \\[This.Owner.GetName] on \\[This.Planet.GetName] to assimilate to"
+					}
+				}
+			}
+		}
+		set_variable = {
+			which = assimilation_counter
+			value = 0
+		}
+	}
+}
+
+# Assimilate Pops - Crafted species
+planet_event = {
+	id = tec_assimilation.65
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			any_owned_species = {
+				has_trait = trait_machine_unit
+				has_citizenship_type = {
+					type = citizenship_assimilation
+					country = root.owner
+				}
+			}
+			any_owned_species = {
+				has_trait = trait_mechanical
+				has_citizenship_type = {
+					type = citizenship_assimilation
+					country = root.owner
+				}
+			}
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				has_major_upgraded_capital = yes
+			}
+			set_variable = {
+				which = assimilation_crafted_counter
+				value = 10
+			}
+		}
+		else = {
+			set_variable = {
+				which = assimilation_crafted_counter
+				value = 10
+			}
+		}
+
+		while = {
+			limit = {
+				any_owned_pop = {
+					has_citizenship_type = {
+						type = citizenship_assimilation
+						country = root.owner
+					}
+				}
+				check_variable = {
+					which = assimilation_crafted_counter
+					value > 0
+				}
+			}
+			#tec_assimilation_effect = yes
+			set_variable = {
+				which = assimilation_crafted_counter
+				value = -1
+			}
+			random_owned_pop = {
+				limit = {
+					has_citizenship_type = {
+						type = citizenship_assimilation
+						country = root.owner
+					}
+					OR = {
+						has_trait = trait_mechanical
+						has_trait = trait_machine_unit
+						#	has_trait = trait_tec_bioservant	# not yet space cowboy
+					}
+				}
+				species = {
+					set_timed_species_flag = {
+						flag = tec_old_crafted_species_@this
+						days = 30
+					}
+					save_event_target_as = tec_old_crafted_species
+				}
+				# Replicants consuming everything
+				if = {
+					limit = {
+						root.owner = {
+							has_country_flag = tec_replicant_assimilation							
+						}
+						OR = {
+							has_trait = trait_mechanical
+							has_trait = trait_machine_unit
+						}
+						has_citizenship_type = {
+							type = citizenship_assimilation
+							country = root.owner
+						}
+					}
+					kill_pop = yes
+					root = {
+						create_pop = {
+							species = root.owner
+						}
+						owner = {
+							if = {
+								limit = { has_ascension_perk = ap_become_the_crisis }
+								complete_crisis_objective = crisobj_purge_pops
+							}
+						}
+					}
+				}
+
+				# Robots into machines
+				else_if = {
+					limit = {
+						root.owner = {
+							is_machine_empire = yes
+							NOT = {
+								has_country_flag = tec_replicant_assimilation
+							}
+						}
+						has_trait = trait_mechanical
+						has_citizenship_type = {
+							type = citizenship_assimilation
+							country = root.owner
+						}
+					}
+					kill_pop = yes
+					root = {
+						create_pop = {
+							species = root.owner
+						}
+						owner = {
+							if = {
+								limit = { has_ascension_perk = ap_become_the_crisis }
+								complete_crisis_objective = crisobj_purge_pops
+							}
+						}
+					}
+				}
+
+				# Machines into machines
+				else_if = {
+					limit = {
+						root.owner = {
+							is_machine_empire = yes
+							NOT = {
+								has_country_flag = tec_replicant_assimilation
+							}
+						}
+						has_trait = trait_machine_unit
+						has_citizenship_type = {
+							type = citizenship_assimilation
+							country = root.owner
+						}
+						NOT = {
+							is_exact_same_species = root.owner
+						}
+					}
+					kill_pop = yes
+					root = {
+						create_pop = {
+							species = root.owner
+						}
+						owner = {
+							if = {
+								limit = { has_ascension_perk = ap_become_the_crisis }
+								complete_crisis_objective = crisobj_purge_pops
+							}
+						}
+					}
+				}
+
+				# Machines into synths
+				else_if = {
+					limit = {
+						root.owner = {
+							has_country_flag = synthetic_empire
+							has_ascension_perk = ap_synthetic_evolution
+						}
+						has_trait = trait_machine_unit
+						has_citizenship_type = {
+							type = citizenship_assimilation
+							country = root.owner
+						}
+					}
+					kill_pop = yes
+					root = {
+						create_pop = {
+							species = root.owner
+						}
+						owner = {
+							if = {
+								limit = { has_ascension_perk = ap_become_the_crisis }
+								complete_crisis_objective = crisobj_purge_pops
+							}
+						}
+					}
+				}
+
+				# Machines into robots - exist a template
+				else_if = {
+					limit = {
+						root.owner = {
+							is_machine_empire = no
+							has_technology = tech_tec_machine_assimilation
+							any_owned_species = {
+								has_trait = trait_mechanical
+								has_species_flag = mechanical_species@root.owner
+							}
+							NOT = {
+								has_country_flag = tec_replicant_assimilation
+							}
+						}
+					}
+					root.owner = {
+						random_owned_species = {
+							limit = {
+								has_trait = trait_mechanical
+								has_species_flag = mechanical_species@root.owner
+							}
+							save_event_target_as = tec_robot_template
+							set_timed_species_flag = {
+								flag = tec_temp_robot_target
+								days = 30
+							}
+						}
+					}
+					kill_pop = yes
+					root = {
+						create_pop = {
+							species = event_target:tec_robot_template
+							ethos = root.owner
+						}
+						owner = {
+							if = {
+								limit = { has_ascension_perk = ap_become_the_crisis }
+								complete_crisis_objective = crisobj_purge_pops
+							}
+						}
+					}
+				}
+
+				# Machines into robots - not exist a template
+				else_if = {
+					limit = {
+						root.owner = {
+							is_machine_empire = no
+							has_technology = tech_tec_machine_assimilation
+							NOT = {
+								has_country_flag = tec_replicant_assimilation
+							}
+							any_owned_species = {
+								NAND = {
+									has_trait = trait_mechanical
+									has_species_flag = mechanical_species@root.owner
+								}
+							}
+						}
+					}
+					root.owner = {
+						tec_create_built_robot_species = yes
+					}
+					last_created_species = {
+						save_event_target_as = tec_robot_template
+						set_timed_species_flag = {
+							flag = tec_temp_robot_target
+							days = 30
+						}
+					}
+					kill_pop = yes
+					root = {
+						create_pop = {
+							species = event_target:tec_robot_template
+							ethos = root.owner
+						}
+						owner = {
+							if = {
+								limit = { has_ascension_perk = ap_become_the_crisis }
+								complete_crisis_objective = crisobj_purge_pops
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	after = {
+		set_variable = {
+			which = assimilation_crafted_counter
+			value = 0
+		}
+		set_update_modifiers_batch = end
+	}
+}
+

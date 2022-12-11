@@ -1,0 +1,654 @@
+# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
+# Industrialist Manufacturers Faction
+# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
+
+manufacturers = {
+	election_header = "GFX_faction_header_yellow"
+	guiding_ethic = ethic_industrial
+	
+	unique = yes
+	support_multiplier = 1
+
+	resources = {
+		category = pop_factions
+		produces = {
+			unity = @tec_fac_infl_produce
+		}
+		produces = {	# Political virtue
+			trigger = {
+				exists = owner
+				owner = {
+					has_valid_civic = civic_tec_political_virtue
+				}
+				faction_approval >= 0.5
+			}
+			minerals = 1
+		}
+		produces = {	# Political virtue
+			trigger = {
+				exists = owner
+				owner = {
+					has_valid_civic = civic_tec_political_virtue
+					is_industrialist = yes
+				}
+				faction_approval >= 0.5
+			}
+			minerals = 0.2
+		}
+		produces = {	# Idealistic foundation
+			trigger = {
+				owner = {
+					has_valid_civic = civic_idealistic_foundation
+				}
+			}
+			influence = 0.005
+		}
+	}
+	
+	#Note: number of potential or actual members is checked by POP_FACTION_MIN_POTENTIAL_MEMBERS define
+	is_potential = {
+		is_faction_allowed = yes
+	}
+
+	parameters = {
+		empire = {
+			type = country
+			valid_objects = {
+				is_same_value = root
+			}
+		}
+	}
+
+	can_join_pre_triggers = {
+		is_enslaved = no
+		is_being_purged = no
+	}
+
+	can_join_faction = {
+		is_shackled_robot = no
+		is_shackled_bioservant = no
+		tec_has_stapled_trait = no
+	}
+	
+	attraction = {
+		base = 150
+		
+		modifier = {
+			factor = 1.25
+			exists = from
+			from = {
+				exists = leader
+				leader = { leader_class = ruler }
+			}
+		}
+		
+		modifier = {
+			factor = 0.75
+			exists = from
+			from = {
+				NOT = { exists = leader }
+			}
+		}
+
+		# Should really check for citizenship instead
+		modifier = {
+			factor = 0.25
+			NOT = { is_same_species = owner_species }
+		}
+	}
+	
+	leader = {
+		base = 100
+
+		modifier = {
+			factor = 0
+			leader_class = ruler
+			owner = { has_authority = auth_imperial }
+		}
+		
+		modifier = {
+			factor = 0.0
+			is_event_leader = yes
+		}
+	}
+
+	
+	demand = {
+		title = "FACTION_OUTRAGED_GC"
+		unfulfilled_title = "FACTION_OUTRAGED_GC"
+		desc = "FACTION_OUTRAGED_GC_DESC"
+
+		fulfilled_effect = -20
+		unfulfilled_effect = 0
+
+		potential = {
+			exists = owner
+			owner = {
+				has_country_flag = faction_industrial_outraged_gc
+			}
+		}
+
+		trigger = {
+			owner = {
+				has_country_flag = faction_industrial_outraged_gc
+			}
+		}
+	}
+	
+	# Evolved: List of demands
+		# Industrialists want a high influx of whatever, no matter the ecological cost
+		# Positive group
+			# Large bonuses
+				# Mineral income
+				# Industrial capital
+				# Created ecumenopolis
+			# /
+			# Small bonuses
+				# Created arcology (small)
+				# Artifice path taken
+			# /
+		# /
+
+		# Neutral
+			# Large bonuses
+				# Industrial trade focus
+			# /
+			# Small bonuses
+				# Industrial productivity
+				# Unregulated industrialization (efficiency)
+			# /
+		# /
+
+		# Bad group
+			# Small penalties
+				# Regulated industrialization (efficiency)
+			# /
+			# Large penalties
+				# Ecologic production
+			# /
+		# /
+	# /	
+
+	# ----------------------- D E M A N D S -----------------------
+		# Pos scaling
+			# Created ecumenopolis
+			demand = {	# POS - CREATED ECUS
+				title = "TEC_FAC_IND_CREATED_ECU1"
+				unfulfilled_title = "TEC_FAC_IND_NO_CREATED_ECU1"
+				desc = "TEC_FAC_IND_CREATED_ECU1_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+					owner = {
+						check_variable = {
+							which = tec_created_ecus
+							value < 2
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						check_variable = {
+							which = tec_created_ecus
+							value = 1
+						}
+					}
+				}
+			}
+			demand = {	# POS - CREATED ECUS
+				title = "TEC_FAC_IND_CREATED_ECU2"
+				unfulfilled_title = "TEC_FAC_IND_NO_CREATED_ECU2"
+				desc = "TEC_FAC_IND_CREATED_ECU2_DESC"
+				fulfilled_effect = 10
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+					owner = {
+						check_variable = {
+							which = tec_created_ecus
+							value > 0
+						}
+						check_variable = {
+							which = tec_created_ecus
+							value < 5
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						check_variable = {
+							which = tec_created_ecus
+							value = 2
+						}
+					}
+				}
+			}
+			demand = {	# POS - CREATED ECUS
+				title = "TEC_FAC_IND_CREATED_ECU3"
+				unfulfilled_title = "TEC_FAC_IND_NO_CREATED_ECU3"
+				desc = "TEC_FAC_IND_CREATED_ECU3_DESC"
+				fulfilled_effect = 15
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+					owner = {
+						check_variable = {
+							which = tec_created_ecus
+							value >= 2
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						check_variable = {
+							which = tec_created_ecus
+							value >= 5
+						}
+					}
+				}
+			}
+		# /
+		# Pos
+			# Recent ecumenopolis
+			demand = {	# NEUT - INDUSTRIAL POLICY
+				title = "TEC_FAC_IND_CREATED_ARCOLOGY"
+				unfulfilled_title = "TEC_FAC_IND_NO_CREATED_ARCOLOGY"
+				desc = "TEC_FAC_IND_CREATED_ARCOLOGY_DESC"
+				fulfilled_effect = 10
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+				}
+				trigger = {
+					owner = {
+						OR = {
+							has_country_flag = tec_recently_created_mega
+							has_country_flag = tec_recently_created_ecumenopolis
+						}
+					}
+				}
+			}
+			# Industrial capital
+			demand = {	# POS - INDUSTRIAL CAPITAL
+				title = "TEC_FAC_IND_CAPITAL"
+				unfulfilled_title = "TEC_FAC_IND_NO_CAPITAL"
+				desc = "TEC_FAC_IND_CAPITAL_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+				}
+				trigger = {
+					owner = {
+						capital_scope = {
+							OR = {
+								has_building = building_foundry_2
+								has_building = building_foundry_3
+								has_building = building_factory_2
+								has_building = building_factory_3
+							}
+						}
+					}
+				}
+			}
+			# Artifice path taken
+			demand = {	# NEUT - INDUSTRIAL POLICY
+				title = "TEC_FAC_IND_ARTIFICE"
+				unfulfilled_title = "TEC_FAC_IND_NO_ARTIFICE"
+				desc = "TEC_FAC_IND_ARTIFICE_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+				}
+				trigger = {
+					owner = {
+						tec_has_artifice_traditions = yes
+					}
+				}
+			}
+		# /
+		# Neut
+			# Industrial trade focus
+			demand = {	# NEUT - INDUSTRIAL POLICY
+				title = "TEC_FAC_IND_INDUTRADE"
+				unfulfilled_title = "TEC_FAC_IND_NO_INDUTRADE"
+				desc = "TEC_FAC_IND_INDUTRADE_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = -5
+				potential = {
+					exists = owner
+					owner = {
+						can_set_policy = {
+							policy = trade_policy
+							option = trade_policy_mining
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						OR = {
+							has_policy_flag = trade_conversion_mining
+							has_policy_flag = trade_conversion_consumer_goods
+							has_policy_flag = trade_conversion_infrastructure
+							has_policy_flag = trade_conversion_innovation
+							has_policy_flag = trade_conversion_trade_league
+						}
+					}
+				}
+			}
+			# Industrial productivity
+			demand = {	# NEUT - INDUSTRIAL POLICY
+				title = "TEC_FAC_IND_INDUGROWTH"
+				unfulfilled_title = "TEC_FAC_IND_NO_INDUGROWTH"
+				desc = "TEC_FAC_IND_INDUGROWTH_DESC"
+				fulfilled_effect = 10
+				unfulfilled_effect = -10
+				potential = {
+					exists = owner
+					owner = {
+						can_set_policy = {
+							policy = industrial
+							option = industrial_efficiency
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						has_policy_flag = industrial_growth
+					}
+				}
+			}
+		# /
+		# Bad
+			# Regulated industrialization (efficiency)
+			demand = {	# NEG - REGULATED
+				title = "TEC_FAC_IND_INDUREGULATION"
+				unfulfilled_title = "TEC_FAC_IND_INDUREGULATION_BAD"
+				desc = "TEC_FAC_IND_INDUREGULATION_DESC"
+				fulfilled_effect = 0
+				unfulfilled_effect = -10
+				potential = {
+					exists = owner
+					owner = {
+						can_set_policy = {
+							policy = industrial
+							option = industrial_growth
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						OR = {
+							has_policy_flag = industrial_growth
+							has_policy_flag = mixed_industrial
+						}
+					}
+				}
+			}
+			# Ecologic production
+			demand = {	# NEG - REGULAR CGS
+				title = "TEC_FAC_IND_NO_ECOLOGIC_CGS"
+				unfulfilled_title = "TEC_FAC_IND_ECOLOGIC_CGS_IS_BAD"
+				desc = "TEC_FAC_IND_NO_ECOLOGIC_CGS_DESC"
+				fulfilled_effect = 0
+				unfulfilled_effect = -10
+				potential = {
+					exists = owner
+					owner = {
+						can_set_policy = {
+							policy = goods_policy
+							option = consumer_goods_minerals
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						has_policy_flag = consumer_goods_minerals
+					}
+				}
+			}
+		# /
+		demand = {	# NEG - FACTION NEGATIVE ECONOMY
+			title = "TEC_FACTION_NO_NEGATIVE_ECONOMY"
+			unfulfilled_title = "TEC_FACTION_BAD_ECONOMY"
+			desc = "TEC_FACTION_NO_NEGATIVE_ECONOMY_DESC"
+			fulfilled_effect = 0
+			unfulfilled_effect = -10
+			potential = {
+				exists = owner
+			}
+			trigger = {
+				owner = {
+					NOR = {
+						has_modifier = energy_deficit
+						has_modifier = minerals_deficit
+						has_modifier = food_deficit
+						has_modifier = alloys_deficit
+						has_modifier = minerals_deficit
+						#has_modifier = unity_deficit
+						has_modifier = consumer_goods_deficit
+						has_modifier = volatile_motes_deficit
+						has_modifier = exotic_gases_deficit
+						has_modifier = rare_crystals_deficit
+						has_modifier = nanites_deficit
+						#has_modifier = living_metal_deficit
+						#has_modifier = sr_zro_deficit
+					}
+				}
+			}
+		}
+	# /
+	
+	on_create = {
+		pop_faction_event = { id = factions.1 }
+	}
+
+	on_destroy = {
+		if = {
+			limit = {
+				has_modifier = promoted_industrial
+			}
+			remove_modifier = promoted_industrial
+		}
+		if = {
+			limit = {
+				has_modifier = suppressed_industrial
+			}
+			remove_modifier = suppressed_industrial
+		}
+	}
+	
+	actions = {
+		embrace_faction = {
+			title = "EMBRACE_FACTION"
+			description = "EMBRACE_FACTION_DESC"
+			
+			cost = {
+				influence = @tec_fac_embrace_cost
+			}
+			
+			potential = {
+				exists = owner
+				owner = {
+					OR = {
+						is_subject = no
+						NOT = { any_agreement = { agreement_preset = preset_dominion } }
+					}
+				}
+			}
+			
+			valid = {
+				custom_tooltip = {
+					fail_text = EMBRACE_FACTION_COOLDOWN
+					parameter:empire = {
+						NOT = { has_modifier = embraced_faction_timer }
+					}
+				}
+				support > @tec_fac_embrace_min_support
+				parameter:empire = {
+					NOT = { has_ethic = "ethic_fanatic_industrial" }
+				}
+			}
+
+			effect = {
+				add_modifier = { modifier = embraced_faction days = @tec_fac_embrace_cd}
+				parameter:empire = {
+					shift_ethic = ethic_industrial
+					hidden_effect = {
+						add_modifier = { modifier = embraced_faction_timer days = @tec_fac_embrace_cd}
+						every_pop_faction = {
+							limit = { NOT = { is_same_value = root } }
+							add_modifier = { modifier = embraced_another_faction days = @tec_fac_embrace_cd}
+						}
+					}
+				}
+				hidden_effect = {
+					save_event_target_as = TargetFaction
+					parameter:empire = {
+						every_relation = {
+							limit = {
+								is_ai = no
+								tec_is_default_country = yes
+								has_communications = prev
+								has_intel_level = {
+									who = prev
+									category = government
+									level >= 1
+								}
+							}
+							country_event = { id = factions.2000 }
+						}
+					}
+				}
+			}
+			
+			ai_weight = {
+				base = 1
+				modifier = {
+					factor = 0
+					support < 0.50
+					owner = {
+						has_ethic = ethic_industrial
+					}
+				}
+				modifier = {
+					factor = 0
+					owner = { has_valid_civic = civic_fanatic_purifiers }
+				}
+				modifier = {
+					factor = 0
+					NOT = {
+						owner = {
+							exists = ruler
+							ruler = {
+								leader_of_faction = manufacturers
+							}
+						}
+					}
+				}
+				modifier = {
+					factor = 0
+					owner = {
+						count_pop_faction = {
+							count < 4
+						}
+					}
+				}
+			}
+		}
+		promote_faction = {
+			title = "PROMOTE_FACTION"
+			description = "PROMOTE_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					NOR = {
+						has_modifier = suppressed_industrial
+						has_modifier = promoted_industrial 
+					}
+				}
+			}
+
+			effect = {
+				parameter:empire = {
+					add_modifier = { modifier = promoted_industrial days = -1 }
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		cancel_promote_faction = {
+			title = "CANCEL_PROMOTE_FACTION"
+			description = "CANCEL_PROMOTE_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					has_modifier = promoted_industrial
+				}
+			}
+
+			effect = {
+				parameter:empire = {
+					remove_modifier = promoted_industrial
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		suppress_faction = {
+			title = "SUPPRESS_FACTION"
+			description = "SUPPRESS_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					NOR = {
+						has_modifier = suppressed_industrial
+						has_modifier = promoted_industrial 
+					}
+				}
+			}
+
+			effect = {
+				add_modifier = { modifier = suppressed_faction days = -1 }
+				parameter:empire = {
+					add_modifier = { modifier = suppressed_industrial days = -1 }
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		cancel_suppress_faction = {
+			title = "CANCEL_SUPPRESS_FACTION"
+			description = "CANCEL_SUPPRESS_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					has_modifier = suppressed_industrial
+				}
+			}
+
+			effect = {
+				remove_modifier = suppressed_faction
+				parameter:empire = {
+					remove_modifier = suppressed_industrial
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+	}
+}

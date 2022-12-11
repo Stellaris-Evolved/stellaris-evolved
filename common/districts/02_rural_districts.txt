@@ -1,0 +1,2509 @@
+# NOTE: District sorting
+	# qualities
+	# potential/possible
+	# allow
+	# destroy/convert to, etc
+	# resource
+	# Modifiers
+		# Standard
+		# /
+		# Technologies
+		# /
+		# Traditions
+		# /
+		# Origins
+		# /
+		# Civics
+		# /
+	# /
+	# Jobs
+		# Regular
+		# /
+		# Hive
+		# /
+		# Machine
+		# /
+		# FE
+		# /
+	# /
+# /
+
+@base_cost = 300
+@city_cost = 500
+
+# --------------- Energy
+district_generator = {
+	base_buildtime = 240
+
+	min_for_deposits_on_planet = 3	
+	max_for_deposits_on_planet = 15
+	
+	prerequisites = {
+		tech_power_plant_1
+	}
+
+	show_on_uncolonized = {
+		exists = from
+		from = {
+			tec_district_organic_swap = no
+			tec_generator_aqua_district_swap = no
+		}
+		tec_district_ecoworld_swap = no
+		uses_district_set = standard
+	}
+	
+	potential = {
+		exists = owner
+		owner = {
+			tec_district_organic_swap = no
+			tec_generator_aqua_district_swap = no
+		}
+		tec_district_ecoworld_swap = no
+		uses_district_set = standard
+	}
+	
+	allow = {
+		NOR = {
+			has_modifier = resort_colony
+			AND = {
+				exists = owner
+				owner = {
+					is_ai = yes
+				}
+				has_planet_flag = tec_chosen_ai_ecu
+			}
+			tec_has_machine_production_capital = yes
+		}
+	}
+	
+	conversion_ratio = 1
+	convert_to = {
+		district_generator_uncapped
+		district_tec_eco_generator
+		district_tec_eco_aqua_generator
+		district_tec_aqua_generator
+		district_tec_decadent_generator
+	}
+
+	resources = {
+		category = planet_districts
+		cost = {
+			minerals = @base_cost
+		}
+		upkeep = {
+			energy = 1
+		}
+
+		upkeep = {
+			trigger = {
+				owner = {
+					has_valid_civic = civic_tec_syndical
+				}
+			}
+			energy = 0.25
+		}
+		# Automated production
+			produces = {	# BASE
+				trigger = {
+					exists = owner
+					owner = { tec_is_automated_empire = yes }
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				energy = 1
+				multiplier = value:tec_automated_district_production|BASE|6|ECO_CAT|planet_technician|RESOURCE|energy|REQUISITON|has_energy_requisitorium|REQUISITION_AMOUNT|@requisitorium_energy_reduction|
+			}
+		# /
+		# Resource production civic
+			produces = {
+				trigger = {
+					exists = owner
+					owner = {
+						tec_district_generate_basic_resources = yes
+					}
+				}
+				energy = 2
+			}
+		# /
+	}
+
+	# Overlord production for automated empires
+	overlord_resources = {
+		category = planet_requisitioned_energy
+		produces = {
+			trigger = {
+				planet = {
+					exist = owner
+					owner = { tec_is_automated_empire = yes }
+					has_planet_flag = has_energy_requisitorium
+					tec_planet_allows_automation = yes
+				}
+			}
+			energy = @requisitorium_energy_overlord
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { tec_is_automated_empire = yes }
+			planet = {
+				tec_planet_allows_automation = yes
+			}
+		}
+		text = tec_district_is_automated
+	}
+
+	# Modifiers
+		# Standard
+			planet_modifier = {
+				planet_housing_add = 2
+			}
+		# /
+		# Civics
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_agrarian_idyll
+					}
+				}
+				modifier = {
+					planet_housing_add = 1
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_tec_tribalism
+					}
+				}
+				modifier = {
+					planet_housing_add = 2
+					planet_amenities_add = 1
+				}
+			}
+		# /
+	# /
+
+	# Jobs
+		# Regular
+			triggered_planet_modifier = { 	# regular
+				potential = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+						is_fallen_empire_spiritualist = no
+					}
+				}
+				modifier = {
+					job_technician_add = 2
+				}
+			}
+			triggered_planet_modifier = { 	# Automated
+				potential = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+						is_fallen_empire_spiritualist = no
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_technician_add = -1
+					planet_amenities_add = -2
+				}
+			}
+			triggered_desc = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+						is_fallen_empire_spiritualist = no
+					}
+				}
+				text = job_technician_effect_desc
+			}
+
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_tec_syndical
+					}
+				}
+				modifier = {
+					job_technician_add = 1
+				}
+			}
+		# /
+		# Hive
+			triggered_planet_modifier = {	# Hive
+				potential = {
+					exists = owner
+					owner = { is_hive_empire = yes }
+				}
+				modifier = {
+					job_technician_drone_add = 3
+				}
+			}
+			triggered_planet_modifier = { 	# Automated
+				potential = {
+					exists = owner
+					owner = {
+						is_hive_empire = yes
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_technician_drone_add = -1
+					planet_amenities_no_happiness_add = -2
+				}
+			}
+			triggered_desc = {
+				trigger = {
+					exists = owner
+					owner = { is_gestalt = yes }
+				}
+				text = job_technician_drone_effect_desc
+			}
+		# /
+		# Machine
+			triggered_planet_modifier = {	# Machine
+				potential = {
+					exists = owner
+					owner = { is_machine_empire = yes }
+				}
+				modifier = {
+					job_technician_drone_add = 2
+					planet_housing_add = 1
+				}
+			}
+			triggered_planet_modifier = { 	# Automated
+				potential = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_technician_drone_add = -1
+					planet_amenities_no_happiness_add = -2
+				}
+			}
+			# desc declared above
+		# /
+		# FE
+			triggered_planet_modifier = { #fe
+				potential = {
+					exists = owner
+					owner = { is_fallen_empire_spiritualist = yes }
+				}
+				modifier = {
+					job_fe_acolyte_generator_add = 2
+				}
+			}
+			triggered_planet_modifier = { 	# Automated
+				potential = {
+					exists = owner
+					owner = {
+						is_fallen_empire_spiritualist = yes
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_fe_acolyte_generator_add = -1
+					planet_amenities_add = -2
+				}
+			}
+			triggered_desc = {
+				trigger = {
+					exists = owner
+					owner = { is_fallen_empire_spiritualist = yes }
+				}
+				text = job_fe_acolyte_generator_effect_desc
+			}
+		# /
+	# /
+}
+district_generator_uncapped = {
+	base_buildtime = 240
+	icon = district_generator
+	is_capped_by_modifier = no
+	
+	show_on_uncolonized = {
+		exists = from
+		from = {
+			tec_district_organic_swap = no
+			tec_generator_aqua_district_swap = no
+			tec_has_infinite_generator_district = yes
+		}
+		tec_district_ecoworld_swap = no
+	}
+	
+	potential = {
+		exists = owner
+		owner = {
+			tec_district_organic_swap = no
+			tec_generator_aqua_district_swap = no
+			tec_has_infinite_generator_district = yes
+		}
+		tec_district_ecoworld_swap = no
+	}
+	
+	allow = {
+		NOR = {
+			has_modifier = resort_colony
+			tec_has_machine_production_capital = yes
+		}
+	}
+	
+	conversion_ratio = 1
+	convert_to = {
+		district_generator
+		district_tec_eco_generator
+		district_tec_eco_aqua_generator
+		district_tec_aqua_generator
+		district_tec_decadent_generator
+	}
+	
+
+	resources = {
+		category = planet_districts
+		cost = {
+			minerals = @base_cost
+		}
+		upkeep = {
+			energy = 1
+		}
+
+		upkeep = {
+			trigger = {
+				owner = {
+					has_valid_civic = civic_tec_syndical
+				}
+			}
+			energy = 0.25
+		}
+		# Automated production
+			produces = {	# BASE
+				trigger = {
+					exists = owner
+					owner = { tec_is_automated_empire = yes }
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				energy = 1
+				multiplier = value:tec_automated_district_production|BASE|6|ECO_CAT|planet_technician|RESOURCE|energy|REQUISITON|has_energy_requisitorium|REQUISITION_AMOUNT|@requisitorium_energy_reduction|
+			}
+		# /
+		# Resource production civic
+			produces = {
+				trigger = {
+					exists = owner
+					owner = {
+						tec_district_generate_basic_resources = yes
+					}
+				}
+				energy = 2
+			}
+		# /	
+	}
+	# Overlord production for automated empires
+	overlord_resources = {
+		category = planet_requisitioned_energy
+		produces = {
+			trigger = {
+				planet = {
+					exist = owner
+					owner = { tec_is_automated_empire = yes }
+					has_planet_flag = has_energy_requisitorium
+					tec_planet_allows_automation = yes
+				}
+			}
+			energy = @requisitorium_energy_overlord
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { tec_is_automated_empire = yes }
+			planet = {
+				tec_planet_allows_automation = yes
+			}
+		}
+		text = tec_district_is_automated
+	}
+
+	# Modifiers
+		# Standard
+			planet_modifier = {
+				planet_housing_add = 2
+			}
+		# /
+		# Technologies
+
+		# /
+		# Traditions
+		# /
+		# Civics
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_agrarian_idyll
+					}
+				}
+				modifier = {
+					planet_housing_add = 1
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_tec_tribalism
+					}
+				}
+				modifier = {
+					planet_housing_add = 2
+					planet_amenities_add = 1
+				}
+			}
+		# /
+	# /
+
+	# Jobs
+		# Regular
+			triggered_planet_modifier = { 	# regular
+				potential = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+						is_fallen_empire_spiritualist = no
+					}
+				}
+				modifier = {
+					job_technician_add = 2
+				}
+			}
+			triggered_planet_modifier = { 	# Automated
+				potential = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+						is_fallen_empire_spiritualist = no
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_technician_add = -1
+					planet_amenities_add = -2
+				}
+			}
+			triggered_desc = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+						is_fallen_empire_spiritualist = no
+					}
+				}
+				text = job_technician_effect_desc
+			}
+
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_tec_syndical
+					}
+				}
+				modifier = {
+					job_technician_add = 1
+				}
+			}
+		# /
+		# Hive
+			triggered_planet_modifier = {	# Hive
+				potential = {
+					exists = owner
+					owner = { is_hive_empire = yes }
+				}
+				modifier = {
+					job_technician_drone_add = 3
+				}
+			}
+			triggered_planet_modifier = { 	# Automated
+				potential = {
+					exists = owner
+					owner = {
+						is_hive_empire = yes
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_technician_drone_add = -1
+					planet_amenities_no_happiness_add = -2
+				}
+			}
+			triggered_desc = {
+				trigger = {
+					exists = owner
+					owner = { is_gestalt = yes }
+				}
+				text = job_technician_drone_effect_desc
+			}
+		# /
+		# Machine
+			triggered_planet_modifier = {	# Machine
+				potential = {
+					exists = owner
+					owner = { is_machine_empire = yes }
+				}
+				modifier = {
+					job_technician_drone_add = 2
+					planet_housing_add = 1
+				}
+			}
+			triggered_planet_modifier = { 	# Automated
+				potential = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_technician_drone_add = -1
+					planet_amenities_no_happiness_add = -2
+				}
+			}
+			# desc declared above
+		# /
+		# FE
+			triggered_planet_modifier = { #fe
+				potential = {
+					exists = owner
+					owner = { is_fallen_empire_spiritualist = yes }
+				}
+				modifier = {
+					job_fe_acolyte_generator_add = 2
+				}
+			}
+			triggered_planet_modifier = { 	# Automated
+				potential = {
+					exists = owner
+					owner = {
+						is_fallen_empire_spiritualist = yes
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_fe_acolyte_generator_add = -1
+					planet_amenities_add = -2
+				}
+			}
+			triggered_desc = {
+				trigger = {
+					exists = owner
+					owner = { is_fallen_empire_spiritualist = yes }
+				}
+				text = job_fe_acolyte_generator_effect_desc
+			}
+		# /
+	# /
+}
+# Energy group
+	district_tec_aqua_generator = {
+		show_on_uncolonized = {	always = no}
+		potential = { always = no }
+		base_buildtime = 1
+		resources = {
+			category = planet_districts
+			cost = {
+				minerals = 1
+			}
+		}
+	}
+	district_tec_decadent_generator = {
+		show_on_uncolonized = {	always = no}
+		potential = { always = no }
+		base_buildtime = 1
+		resources = {
+			category = planet_districts
+			cost = {
+				minerals = 1
+			}
+		}
+	}
+#
+
+# --------------- Minerals
+district_mining = {
+	base_buildtime = 240
+	
+	min_for_deposits_on_planet = 1
+	max_for_deposits_on_planet = 15
+			
+	prerequisites = {
+		tech_mechanized_mining
+	}
+
+	show_on_uncolonized = {
+		exists = from
+		from = {
+			tec_district_organic_swap = no
+			tec_mining_aqua_district_swap = no
+			tec_mining_subterranean_district_swap = no
+		}
+		tec_district_ecoworld_swap = no
+		uses_district_set = standard
+	}
+	
+	potential = {
+		exists = owner
+		owner = {
+			tec_district_organic_swap = no
+			tec_mining_aqua_district_swap = no
+			tec_mining_subterranean_district_swap = no
+		}
+		tec_district_ecoworld_swap = no
+		uses_district_set = standard
+	}
+	
+	allow = {
+		NOR = {
+			has_modifier = resort_colony 
+			AND = {
+				exists = owner
+				owner = {
+					is_ai = yes
+				}
+				has_planet_flag = tec_chosen_ai_ecu
+			}
+			tec_has_machine_production_capital = yes
+		}
+	}
+	
+	conversion_ratio = 1
+	convert_to = {
+		district_mining_uncapped
+		district_tec_eco_mining
+		district_tec_eco_aqua_mining
+		district_tec_aqua_mining
+		district_tec_decadent_mining
+	}
+	
+	resources = {
+		category = planet_districts
+		cost = {
+			minerals = @base_cost
+		}
+		upkeep = {
+			energy = 1
+		}
+		
+		upkeep = {
+			trigger = {
+				owner = {
+					has_valid_civic = civic_tec_syndical 
+				}
+			}
+			energy = 0.25
+		}
+		upkeep = {
+			trigger = {
+				owner = { has_valid_civic = civic_mining_guilds }
+			}
+			energy = 0.2
+		}
+		# Automated production
+			produces = {	# BASE
+				trigger = {
+					exists = owner
+					owner = { tec_is_automated_empire = yes }
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				minerals = 1
+				multiplier = value:tec_automated_district_production|BASE|4|ECO_CAT|planet_miners|RESOURCE|minerals|REQUISITON|has_material_requisitorium|REQUISITION_AMOUNT|@requisitorium_minerals_reduction|
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = { tec_is_automated_empire = yes }
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				energy = 2
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						tec_is_automated_empire = yes
+						is_gestalt = no
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				consumer_goods = 1
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						tec_is_automated_empire = yes
+						is_gestalt = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				unity = 1
+			}
+		# /	
+		# Resource production civic
+			produces = {
+				trigger = {
+					exists = owner
+					owner = {
+						tec_district_generate_basic_resources = yes
+					}
+				}
+				minerals = 2
+			}
+		# /	
+	}
+
+	# Overlord production for automated empires
+	overlord_resources = {
+		category = planet_requisitioned_minerals
+		produces = {
+			trigger = {
+				planet = {
+					exist = owner
+					owner = { tec_is_automated_empire = yes }
+					has_planet_flag = has_material_requisitorium
+					tec_planet_allows_automation = yes
+				}
+			}
+			minerals = @requisitorium_minerals_overlord
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { tec_is_automated_empire = yes }
+			planet = {
+				tec_planet_allows_automation = yes
+			}
+		}
+		text = tec_district_is_automated
+	}
+	
+	# Modifiers
+		# Standard
+			planet_modifier = {
+				planet_housing_add = 2
+			}
+		# /
+		# Technologies
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_technology = tech_tec_housing_lithoid_idyll
+						has_valid_civic = civic_agrarian_idyll
+						is_lithoid_empire = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = 1
+				}
+			}
+		# /
+		# Traditions
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_agrarian_idyll
+						is_lithoid_empire = yes
+						has_tradition = tr_tec_artifice_final_1
+					}
+				}
+				planet_amenities_add = 2
+			}
+		# /
+		# Civics
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_agrarian_idyll
+					}
+				}
+				modifier = {
+					planet_housing_add = 1
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_agrarian_idyll
+						is_lithoid_empire = yes
+					}
+				}
+				modifier = {
+					planet_max_buildings_add = 0.35
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_tec_tribalism
+					}
+				}
+				modifier = {
+					planet_housing_add = 2
+					planet_amenities_add = 1
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_tec_eco_keepers
+					}
+				}
+				modifier = {
+					planet_amenities_add = -1
+				}
+			}
+		# /
+	# /
+
+	# Jobs
+		# Regular
+			triggered_planet_modifier = {	# Regular
+				potential = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+						is_fallen_empire_spiritualist = no
+					}
+				}
+				modifier = {
+					job_miner_add = 2
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+						is_fallen_empire_spiritualist = no
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_miner_add = -1
+					planet_amenities_add = -2
+				}
+			}
+			triggered_desc = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+						is_fallen_empire_spiritualist = no
+					}
+				}
+				text = job_miner_effect_desc
+			}
+
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_mining_guilds
+					}
+				}
+				modifier = {
+					planet_housing_add = 1
+					job_miner_add = 1
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_tec_syndical
+					}
+				}
+				modifier = {
+					job_miner_add = 1
+				}
+			}
+		# /
+		# Hive
+			triggered_planet_modifier = {	#Hive
+				potential = {
+					exists = owner
+					owner = { is_hive_empire = yes }
+				}
+				modifier = {
+					job_mining_drone_add = 3
+				}
+			}
+			triggered_planet_modifier = {	#Hive
+				potential = {
+					exists = owner
+					owner = {
+						is_hive_empire = yes 
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_mining_drone_add = -1
+					planet_amenities_no_happiness_add = -2
+				}
+			}
+			triggered_desc = {
+				trigger = {
+					exists = owner
+					owner = { is_gestalt = yes }
+				}
+				text = job_mining_drone_effect_desc
+			}
+		# /
+		# Machine
+			triggered_planet_modifier = {	#Machine
+				potential = {
+					exists = owner
+					owner = { is_machine_empire = yes }
+				}
+				modifier = {
+					job_mining_drone_add = 2
+					planet_housing_add = 1
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes 
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_mining_drone_add = -1
+					planet_amenities_no_happiness_add = -2
+				}
+			}
+			# Declared above
+		# /
+		# FE
+			triggered_planet_modifier = {	#Fe
+				potential = {
+					exists = owner
+					owner = { is_fallen_empire_spiritualist = yes }
+				}
+				modifier = {
+					job_fe_acolyte_mine_add = 2
+				}
+			}
+			triggered_planet_modifier = {	#Fe
+				potential = {
+					exists = owner
+					owner = {
+						is_fallen_empire_spiritualist = yes 
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_fe_acolyte_mine_add = -1
+					planet_amenities_add = -2
+				}
+			}
+			triggered_desc = {
+				trigger = {
+					exists = owner
+					owner = { is_fallen_empire_spiritualist = yes }
+				}
+				text = job_fe_acolyte_mine_effect_desc
+			}
+		# /
+	# /
+}
+district_mining_uncapped = {
+	base_buildtime = 240
+	icon = district_mining
+	is_capped_by_modifier = no
+	
+	desc = {
+		trigger = {
+			NOT = { uses_district_set = shattered_ring_world }
+		}
+		text = district_mining_uncapped_desc
+	}
+
+	desc = {
+		trigger = { uses_district_set = shattered_ring_world }
+		text = district_srw_mining_desc
+	}
+
+	show_on_uncolonized = {
+		exists = from
+		from = {
+			tec_district_organic_swap = no
+			tec_mining_aqua_district_swap = no
+			tec_has_infinite_mining_district = yes
+		}
+		tec_district_ecoworld_swap = no
+	}
+	
+	potential = {
+		exists = owner
+		owner = {
+			tec_district_organic_swap = no
+			tec_mining_aqua_district_swap = no
+			tec_has_infinite_mining_district = yes
+		}
+		tec_district_ecoworld_swap = no
+	}
+
+	allow = {
+		NOR = {
+			has_modifier = resort_colony
+			tec_has_machine_production_capital = yes
+		}
+	}
+	
+	conversion_ratio = 1
+	convert_to = {
+		district_mining
+		district_tec_eco_mining
+		district_tec_eco_aqua_mining
+		district_tec_aqua_mining
+		district_tec_decadent_mining
+	}
+	
+	resources = {
+		category = planet_districts
+		cost = {
+			minerals = @base_cost
+		}
+		upkeep = {
+			energy = 1
+		}
+		
+		upkeep = {
+			trigger = {
+				owner = {
+					has_valid_civic = civic_tec_syndical 
+				}
+			}
+			energy = 0.25
+		}
+		upkeep = {
+			trigger = {
+				owner = { has_valid_civic = civic_mining_guilds }
+			}
+			energy = 0.2
+		}
+		# Automated production
+			produces = {	# BASE
+				trigger = {
+					exists = owner
+					owner = { tec_is_automated_empire = yes }
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				minerals = 1
+				multiplier = value:tec_automated_district_production|BASE|4|ECO_CAT|planet_miners|RESOURCE|minerals|REQUISITON|has_material_requisitorium|REQUISITION_AMOUNT|@requisitorium_minerals_reduction|
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = { tec_is_automated_empire = yes }
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				energy = 2
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						tec_is_automated_empire = yes
+						is_gestalt = no
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				consumer_goods = 1
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						tec_is_automated_empire = yes
+						is_gestalt = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				unity = 1
+			}
+		# /
+		# Resource production civic
+			produces = {
+				trigger = {
+					exists = owner
+					owner = {
+						tec_district_generate_basic_resources = yes
+					}
+				}
+				minerals = 2
+			}
+		# /	
+	}
+
+	# Overlord production for automated empires
+	overlord_resources = {
+		category = planet_requisitioned_minerals
+		produces = {
+			trigger = {
+				planet = {
+					exist = owner
+					owner = { tec_is_automated_empire = yes }
+					has_planet_flag = has_material_requisitorium
+					tec_planet_allows_automation = yes
+				}
+			}
+			minerals = @requisitorium_minerals_overlord
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { tec_is_automated_empire = yes }
+			planet = {
+				tec_planet_allows_automation = yes
+			}
+		}
+		text = tec_district_is_automated
+	}
+	
+	# Modifiers
+		# Standard
+			planet_modifier = {
+				planet_housing_add = 2
+			}
+		# /
+		# Technologies
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_technology = tech_tec_housing_lithoid_idyll
+						has_valid_civic = civic_agrarian_idyll
+						is_lithoid_empire = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = 1
+				}
+			}
+		# /
+		# Traditions
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_agrarian_idyll
+						is_lithoid_empire = yes
+						has_tradition = tr_tec_artifice_final_1
+					}
+				}
+				planet_amenities_add = 2
+			}
+		# /
+		# Origins
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = { is_subterranean_empire = yes}
+				}
+				modifier = {
+					planet_housing_add = 2
+					planet_max_buildings_add = 0.34
+				}
+			}
+		# /
+		# Civics
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_agrarian_idyll
+					}
+				}
+				modifier = {
+					planet_housing_add = 1
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_agrarian_idyll
+						is_lithoid_empire = yes
+					}
+				}
+				modifier = {
+					planet_max_buildings_add = 0.35
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_tec_tribalism
+					}
+				}
+				modifier = {
+					planet_housing_add = 2
+					planet_amenities_add = 1
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_tec_eco_keepers
+					}
+				}
+				modifier = {
+					planet_amenities_add = -1
+				}
+			}
+		# /
+	# /
+
+	# Jobs
+		# Regular
+			triggered_planet_modifier = {	# Regular
+				potential = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+						is_fallen_empire_spiritualist = no
+					}
+					NOT = {
+						uses_district_set = shattered_ring_world
+					}
+				}
+				modifier = {
+					job_miner_add = 2
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+						is_fallen_empire_spiritualist = no
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+					NOT = {
+						uses_district_set = shattered_ring_world
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_miner_add = -1
+					planet_amenities_add = -2
+				}
+			}
+			triggered_desc = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+						is_fallen_empire_spiritualist = no
+					}
+					NOT = {
+						uses_district_set = shattered_ring_world
+					}
+				}
+				text = job_miner_effect_desc
+			}
+
+			triggered_planet_modifier = {	# Shattered ring
+				potential = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+						is_fallen_empire_spiritualist = no
+					}
+					uses_district_set = shattered_ring_world
+				}
+				modifier = {
+					job_scrap_miner_add = 2
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+						is_fallen_empire_spiritualist = no
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+					uses_district_set = shattered_ring_world
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_scrap_miner_add = -1
+					planet_amenities_add = -2
+				}
+			}
+			triggered_desc = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+					}
+					uses_district_set = shattered_ring_world
+				}
+				text = job_scrap_miner_effect_desc
+			}
+
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_mining_guilds
+					}
+					NOT = {
+						uses_district_set = shattered_ring_world
+					}
+				}
+				modifier = {
+					planet_housing_add = 1
+					job_miner_add = 1
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_mining_guilds
+					}
+					uses_district_set = shattered_ring_world
+				}
+				modifier = {
+					planet_housing_add = 1
+					job_scrap_miner_add = 1
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_tec_syndical
+					}
+					NOT = {
+						uses_district_set = shattered_ring_world
+					}
+				}
+				modifier = {
+					job_miner_add = 1
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_tec_syndical
+					}
+					uses_district_set = shattered_ring_world
+				}
+				modifier = {
+					job_scrap_miner_add = 1
+				}
+			}
+		# /
+		# Hive
+			triggered_planet_modifier = {	#Hive
+				potential = {
+					exists = owner
+					owner = {
+						is_hive_empire = yes 
+					}
+					NOT = {
+						uses_district_set = shattered_ring_world
+					}
+				}
+				modifier = {
+					job_mining_drone_add = 3
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						is_hive_empire = yes 
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						NOT = {
+							uses_district_set = shattered_ring_world
+						}
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_mining_drone_add = -1
+					planet_amenities_no_happiness_add = -2
+				}
+			}
+			triggered_desc = {
+				trigger = {
+					exists = owner
+					owner = { is_gestalt = yes }
+					NOT = {
+						uses_district_set = shattered_ring_world
+					}
+				}
+				text = job_mining_drone_effect_desc
+			}
+
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						is_hive_empire = yes 
+					}
+					uses_district_set = shattered_ring_world
+				}
+				modifier = {
+					job_scrap_miner_drone_add = 3
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						is_hive_empire = yes 
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						uses_district_set = shattered_ring_world
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_scrap_miner_drone_add = -1
+					planet_amenities_no_happiness_add = -2
+				}
+			}
+			triggered_desc = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+					}
+					uses_district_set = shattered_ring_world
+				}
+				text = job_scrap_miner_effect_desc
+			}
+		# /
+		# Machine
+			triggered_planet_modifier = {	#Machine
+				potential = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes 
+					}
+					NOT = {
+						uses_district_set = shattered_ring_world
+					}
+				}
+				modifier = {
+					job_mining_drone_add = 2
+					planet_housing_add = 1
+				}
+			}		
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes 
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						NOT = {
+							uses_district_set = shattered_ring_world
+						}
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_mining_drone_add = -1
+					planet_amenities_no_happiness_add = -2
+				}
+			}
+			# Declared above
+
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes 
+					}
+					uses_district_set = shattered_ring_world
+				}
+				modifier = {
+					job_scrap_miner_drone_add = 2
+					planet_housing_add = 1
+				}
+			}
+			# Declared above
+		# /
+		# FE
+			triggered_planet_modifier = {	#Fe
+				potential = {
+					exists = owner
+					owner = { is_fallen_empire_spiritualist = yes }
+				}
+				modifier = {
+					job_fe_acolyte_mine_add = 2
+				}
+			}
+			triggered_planet_modifier = {	#Fe
+				potential = {
+					exists = owner
+					owner = {
+						is_fallen_empire_spiritualist = yes 
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_fe_acolyte_mine_add = -1
+					planet_amenities_add = -2
+				}
+			}
+			triggered_desc = {
+				trigger = {
+					exists = owner
+					owner = { is_fallen_empire_spiritualist = yes }
+				}
+				text = job_fe_acolyte_mine_effect_desc
+			}
+		# /
+	# /
+}
+# Minerals group
+	district_tec_aqua_mining = {
+		show_on_uncolonized = {	always = no}
+		potential = { always = no }
+		base_buildtime = 1
+		resources = {
+			category = planet_districts
+			cost = {
+				minerals = 1
+			}
+		}
+	}
+	district_tec_decadent_mining = {
+		show_on_uncolonized = {	always = no}
+		potential = { always = no }
+		base_buildtime = 1
+		resources = {
+			category = planet_districts
+			cost = {
+				minerals = 1
+			}
+		}
+	}
+# /
+
+# --------------- Food
+district_farming = {
+	base_buildtime = 240
+	
+	min_for_deposits_on_planet = 3	
+	max_for_deposits_on_planet = 15
+	
+	prerequisites = {
+		tech_industrial_farming
+	}
+
+	show_on_uncolonized = {
+		exists = from
+		from = {
+			tec_district_organic_swap = no
+			tec_farming_aqua_district_swap = no
+		}
+		tec_district_ecoworld_swap = no
+		uses_district_set = standard
+	}
+	
+	potential = {
+		exists = owner
+		owner = {
+			tec_district_organic_swap = no
+			tec_farming_aqua_district_swap = no
+		}
+		tec_district_ecoworld_swap = no
+		uses_district_set = standard
+	}
+	
+	allow = {
+		NOR = {
+			has_modifier = resort_colony
+			AND = {
+				exists = owner
+				owner = {
+					is_ai = yes
+				}
+				has_planet_flag = tec_chosen_ai_ecu
+			}
+			tec_has_machine_production_capital = yes
+		}
+	}
+
+	destroy_trigger = {
+		exists = owner
+		AND = {
+			owner = { is_ai = yes }
+			owner = { country_uses_food = no }
+		}
+	}
+	
+	conversion_ratio = 1
+	convert_to = {
+		district_farming_uncapped
+		district_tec_eco_farming
+		district_tec_eco_aqua_farming
+		district_tec_aqua_farming
+		district_tec_decadent_farming
+	}
+		
+	resources = {
+		category = planet_districts
+		cost = {
+			minerals = @base_cost
+		}
+		upkeep = {
+			energy = 1
+		}
+		upkeep = {
+			trigger = {
+				owner = {
+					has_valid_civic = civic_tec_syndical
+				}
+			}
+			energy = 0.25
+		}
+		# Automated production
+			produces = {	# BASE
+				trigger = {
+					exists = owner
+					owner = { tec_is_automated_empire = yes }
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				food = 1
+				multiplier = value:tec_automated_district_production|BASE|6|ECO_CAT|planet_farmers|RESOURCE|food|REQUISITON|has_produce_requisitorium|REQUISITION_AMOUNT|@requisitorium_food_reduction|
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = { tec_is_automated_empire = yes }
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				energy = 2
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						tec_is_automated_empire = yes
+						is_gestalt = no
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				consumer_goods = 1
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						tec_is_automated_empire = yes
+						is_gestalt = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				unity = 1
+			}
+		# /
+		# Resource production civic
+			produces = {
+				trigger = {
+					exists = owner
+					owner = {
+						tec_district_generate_basic_resources = yes
+					}
+				}
+				food = 2
+			}
+		# /	
+	}
+
+	# Overlord production for automated empires
+	overlord_resources = {
+		category = planet_requisitioned_food
+		produces = {
+			trigger = {
+				planet = {
+					exist = owner
+					owner = { tec_is_automated_empire = yes }
+					has_planet_flag = has_produce_requisitorium
+					tec_planet_allows_automation = yes
+				}
+			}
+			food = @requisitorium_food_overlord
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { tec_is_automated_empire = yes }
+			planet = {
+				tec_planet_allows_automation = yes
+			}
+		}
+		text = tec_district_is_automated
+	}
+	
+	# Modifiers
+		# Standard
+			planet_modifier = {
+				planet_housing_add = 2
+			}
+		# /
+		# Technologies
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_technology = tech_housing_agrarian_idyll 
+						has_valid_civic = civic_agrarian_idyll
+						is_lithoid_empire = no
+					}
+				}
+				modifier = {
+					planet_housing_add = 1
+				}
+			}
+		# /
+		# Traditions
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_agrarian_idyll
+						is_lithoid_empire = no
+						has_tradition = tr_tec_artifice_final_1
+					}
+				}
+				planet_amenities_add = 2
+			}
+		# /
+		# Civics
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_agrarian_idyll
+					}
+				}
+				modifier = {
+					planet_housing_add = 1
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_agrarian_idyll
+						is_lithoid_empire = no
+					}
+				}
+				modifier = {
+					planet_max_buildings_add = 0.35
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_tec_tribalism
+					}
+				}
+				modifier = {
+					planet_housing_add = 2
+					planet_amenities_add = 1
+				}
+			}
+		# /
+	# /
+	# Jobs
+		# Regular
+			triggered_planet_modifier = {	# Regular
+				potential = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+						is_fallen_empire_spiritualist = no
+					}
+				}
+				modifier = {
+					job_farmer_add = 2
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+						is_fallen_empire_spiritualist = no
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_farmer_add = -1
+					planet_amenities_add = -2
+				}
+			}
+			triggered_desc = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+						is_fallen_empire_spiritualist = no
+					}
+				}
+				text = job_farmer_effect_desc
+			}
+
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_tec_syndical
+					}
+				}
+				modifier = {
+					job_farmer_add = 1
+				}
+			}
+		# /
+		# Hive
+			triggered_planet_modifier = {	# Hive
+				potential = {
+					exists = owner
+					owner = { is_hive_empire = yes }
+				}
+				modifier = {
+					job_agri_drone_add = 3
+				}
+			}
+			triggered_planet_modifier = {	# Hive
+				potential = {
+					exists = owner
+					owner = {
+						is_hive_empire = yes 
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_agri_drone_add = -1
+					planet_amenities_no_happiness_add = -2
+				}
+			}
+			triggered_desc = {
+				trigger = {
+					exists = owner
+					owner = { is_gestalt = yes }
+				}
+				text = job_agri_drone_effect_desc
+			}
+		# /
+		# Machine
+			triggered_planet_modifier = {	# Machine
+				potential = {
+					exists = owner
+					owner = { is_machine_empire = yes }
+				}
+				modifier = {
+					job_agri_drone_add = 2
+					planet_housing_add = 1
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes 
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_agri_drone_add = -1
+					planet_amenities_no_happiness_add = -2
+				}
+			}
+			# Declared above
+		# /
+		# FE
+			triggered_planet_modifier = {	#Fe
+				potential = {
+					exists = owner
+					owner = { is_fallen_empire_spiritualist = yes }
+				}
+				modifier = {
+					job_fe_acolyte_farm_add = 2
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						is_fallen_empire_spiritualist = yes
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_fe_acolyte_farm_add = -1
+					planet_amenities_add = -2
+				}
+			}
+			triggered_desc = {
+				trigger = {
+					exists = owner
+					owner = { is_fallen_empire_spiritualist = yes }
+				}
+				text = job_fe_acolyte_farm_effect_desc
+			}
+		# /
+	# /
+}
+district_farming_uncapped = {
+	base_buildtime = 240
+	icon = district_farming
+	is_capped_by_modifier = no
+	
+	show_on_uncolonized = {
+		exists = from
+		from = {
+			tec_district_organic_swap = no
+			tec_farming_aqua_district_swap = no
+			tec_has_infinite_farming_district = yes
+		}
+		tec_district_ecoworld_swap = no
+	}
+	
+	potential = {
+		exists = owner
+		owner = {
+			tec_district_organic_swap = no
+			tec_farming_aqua_district_swap = no
+			tec_has_infinite_farming_district = yes
+		}
+		tec_district_ecoworld_swap = no
+	}
+	
+	allow = {
+		NOR = {
+			has_modifier = resort_colony
+			tec_has_machine_production_capital = yes
+		}
+	}
+	
+	conversion_ratio = 1
+	convert_to = {
+		district_farming
+		district_tec_eco_farming
+		district_tec_eco_aqua_farming
+		district_rw_farming
+		district_tec_aqua_farming
+		district_tec_decadent_farming
+	}
+		
+	resources = {
+		category = planet_districts
+		cost = {
+			minerals = @base_cost
+		}
+		upkeep = {
+			energy = 1
+		}
+		upkeep = {
+			trigger = {
+				owner = {
+					has_valid_civic = civic_tec_syndical
+				}
+			}
+			energy = 0.25
+		}
+		# Automated production
+			produces = {	# BASE
+				trigger = {
+					exists = owner
+					owner = { tec_is_automated_empire = yes }
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				food = 1
+				multiplier = value:tec_automated_district_production|BASE|6|ECO_CAT|planet_farmers|RESOURCE|food|REQUISITON|has_produce_requisitorium|REQUISITION_AMOUNT|@requisitorium_food_reduction|
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = { tec_is_automated_empire = yes }
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				energy = 2
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						tec_is_automated_empire = yes
+						is_gestalt = no
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				consumer_goods = 1
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						tec_is_automated_empire = yes
+						is_gestalt = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				unity = 1
+			}
+		# /
+		# Resource production civic
+			produces = {
+				trigger = {
+					exists = owner
+					owner = {
+						tec_district_generate_basic_resources = yes
+					}
+				}
+				food = 2
+			}
+		# /	
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_food
+		produces = {
+			trigger = {
+				planet = {
+					exist = owner
+					owner = { tec_is_automated_empire = yes }
+					has_planet_flag = has_produce_requisitorium
+					tec_planet_allows_automation = yes
+				}
+			}
+			food = @requisitorium_food_overlord
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { tec_is_automated_empire = yes }
+			planet = {
+				tec_planet_allows_automation = yes
+			}
+		}
+		text = tec_district_is_automated
+	}
+	
+	# Modifiers
+		# Standard
+			planet_modifier = {
+				planet_housing_add = 2
+			}
+		# /
+		# Technologies
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_technology = tech_housing_agrarian_idyll 
+						has_valid_civic = civic_agrarian_idyll
+						is_lithoid_empire = no
+					}
+				}
+				modifier = {
+					planet_housing_add = 1
+				}
+			}
+		# /
+		# Traditions
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_agrarian_idyll
+						is_lithoid_empire = no
+						has_tradition = tr_tec_artifice_final_1
+					}
+				}
+				planet_amenities_add = 2
+			}
+		# /
+		# Civics
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_agrarian_idyll
+					}
+				}
+				modifier = {
+					planet_housing_add = 1
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_agrarian_idyll
+						is_lithoid_empire = no
+					}
+				}
+				modifier = {
+					planet_max_buildings_add = 0.35
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_tec_tribalism
+					}
+				}
+				modifier = {
+					planet_housing_add = 2
+					planet_amenities_add = 1
+				}
+			}
+		# /
+	# /
+	# Jobs
+		# Regular
+			triggered_planet_modifier = {	# Regular
+				potential = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+						is_fallen_empire_spiritualist = no
+					}
+				}
+				modifier = {
+					job_farmer_add = 2
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+						is_fallen_empire_spiritualist = no
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_farmer_add = -1
+					planet_amenities_add = -2
+				}
+			}
+			triggered_desc = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+						is_fallen_empire_spiritualist = no
+					}
+				}
+				text = job_farmer_effect_desc
+			}
+
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_valid_civic = civic_tec_syndical
+					}
+				}
+				modifier = {
+					job_farmer_add = 1
+				}
+			}
+		# /
+		# Hive
+			triggered_planet_modifier = {	# Hive
+				potential = {
+					exists = owner
+					owner = { is_hive_empire = yes }
+				}
+				modifier = {
+					job_agri_drone_add = 3
+				}
+			}
+			triggered_planet_modifier = {	# Hive
+				potential = {
+					exists = owner
+					owner = {
+						is_hive_empire = yes 
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_agri_drone_add = -1
+					planet_amenities_no_happiness_add = -2
+				}
+			}
+			triggered_desc = {
+				trigger = {
+					exists = owner
+					owner = { is_gestalt = yes }
+				}
+				text = job_agri_drone_effect_desc
+			}
+		# /
+		# Machine
+			triggered_planet_modifier = {	# Machine
+				potential = {
+					exists = owner
+					owner = { is_machine_empire = yes }
+				}
+				modifier = {
+					job_agri_drone_add = 2
+					planet_housing_add = 1
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes 
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_agri_drone_add = -1
+					planet_amenities_no_happiness_add = -2
+				}
+			}
+			# Declared above
+		# /
+		# FE
+			triggered_planet_modifier = {	#Fe
+				potential = {
+					exists = owner
+					owner = { is_fallen_empire_spiritualist = yes }
+				}
+				modifier = {
+					job_fe_acolyte_farm_add = 2
+				}
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						is_fallen_empire_spiritualist = yes
+						tec_is_automated_empire = yes
+					}
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				modifier = {
+					planet_housing_add = -1
+					job_fe_acolyte_farm_add = -1
+					planet_amenities_add = -2
+				}
+			}
+			triggered_desc = {
+				trigger = {
+					exists = owner
+					owner = { is_fallen_empire_spiritualist = yes }
+				}
+				text = job_fe_acolyte_farm_effect_desc
+			}
+		# /
+	# /
+}
+# Food group
+	district_tec_aqua_farming = {
+		show_on_uncolonized = {	always = no}
+		potential = { always = no }
+		base_buildtime = 1
+		resources = {
+			category = planet_districts
+			cost = {
+				minerals = 1
+			}
+		}
+	}
+	district_tec_decadent_farming = {
+		show_on_uncolonized = {	always = no}
+		potential = { always = no }
+		base_buildtime = 1
+		resources = {
+			category = planet_districts
+			cost = {
+				minerals = 1
+			}
+		}
+	}
+# /
+
+

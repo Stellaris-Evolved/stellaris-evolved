@@ -1,0 +1,817 @@
+
+# TRAIT SORT NOTES:
+	#sorting_priority = 20		# Defining trait
+	#sorting_priority = 19		# Defining trait
+	#sorting_priority = 15		# Key trait
+	#sorting_priority = 14		# Key trait
+	#sorting_priority = 10		# Relevant trait
+	#sorting_priority = 5		# Relevant trait
+	#sorting_priority = 4		# Expensive trait 2
+	#sorting_priority = 3		# Expensive trait
+	#sorting_priority = 2		# Regular expensive trait
+	#sorting_priority = 1		# Regular trait
+	#sorting_priority = 0		# Meaningless trait
+# /
+
+# Trait sorting
+		# sorting_priority
+		# icon
+		# host_has_dlc
+		# cost
+		# initial
+		# randomized
+		# potential_crossbreeding_chance
+	# Archetypes
+		# allowed_archetypes
+		# species_class
+		# opposites
+	# Modifiers
+		# custom_tooltip/custom_tooltip_with_modifiers
+		# modifier
+		# triggered modifiers
+	# Modification
+		# species_potential_add
+		# species_possible_add
+		# species_possible_remove
+		# species_possible_merge_add
+	# External
+		# slave_cost
+		# assembly_score
+# /
+
+# UNIQUE TRAITS
+# -----------------------------------------
+trait_tec_machine_aquatic = {
+	sorting_priority = 20		# Defining trait
+	icon = "gfx/interface/icons/traits/origin_traits/trait_tec_machine_aquatic.dds"
+	cost = 1
+	host_has_dlc = "Aquatics Species Pack"
+
+	random_weight = {
+		MACHINE = 0.05
+	}
+
+	allowed_planet_classes = {
+		pc_ocean
+	}
+
+	species_possible_remove = {
+		if = {
+			limit = {
+				exists = from
+			}
+			if = {
+				limit = { NOT = { from = { has_ascension_perk = ap_hydrocentric } } }
+				custom_tooltip = {
+					fail_text = trait_aquatic_remove_evolutionary_mastery
+					from = {
+						OR = {
+							has_country_flag = can_add_advanced_traits
+							has_ascension_perk = ap_tec_cybernetic_revolution
+							has_ascension_perk = ap_tec_biopsionic
+							has_ascension_perk = ap_tec_replicant
+						}
+					}
+				}
+			}
+			else = {
+				custom_tooltip = {
+					fail_text = trait_aquatic_remove_hydrocentric
+					always = no
+				}
+			}
+		}
+	}
+	species_potential_add = {
+		exists = from
+		from = {
+			OR = {
+				has_country_flag = can_add_advanced_traits
+				has_ascension_perk = ap_tec_cybernetic_revolution
+				has_ascension_perk = ap_tec_biopsionic
+				has_ascension_perk = ap_tec_replicant
+			}
+		}
+	}
+	initial = yes
+
+	inline_script = traits/tec_mechanical_archetypes
+
+	ai_weight = {
+		weight = 1
+	}
+
+	custom_tooltip_with_modifiers = TRAIT_TEC_MACHINE_AQUATIC_EFFECT
+	triggered_pop_modifier = {
+		potential = {
+			exists = planet
+			planet = {
+				OR = {
+					is_wet = yes
+					has_modifier = flooded_habitat
+				}
+			}
+		}
+		planet_jobs_produces_mult = 0.1
+	}
+	triggered_pop_modifier = {
+		potential = {
+			exists = planet
+			planet = {
+				OR = {
+					is_wet = yes
+					has_modifier = flooded_habitat
+				}
+				exists = owner
+				owner = { has_ascension_perk = ap_hydrocentric }
+			}
+		}
+		planet_jobs_produces_mult = 0.05
+	}
+	triggered_pop_modifier = {
+		potential = {
+			exists = planet
+			planet = {
+				is_planet_class = pc_ocean 
+			}
+		}
+		pop_amenities_usage_mult = -0.1
+	}
+	triggered_pop_modifier = {
+		potential = {
+			exists = planet
+			planet = {
+				is_planet_class = pc_ocean
+				exists = owner
+				owner = { has_ascension_perk = ap_hydrocentric }
+			}
+		}
+		pop_amenities_usage_mult = -0.05
+	}
+	
+	triggered_pop_modifier = {
+		potential = {
+			exists = planet
+			planet = {
+				NOR = {
+					is_wet = yes
+					has_modifier = flooded_habitat
+				}
+			}
+		}
+		pop_environment_tolerance = -1.2
+	}
+	triggered_pop_modifier = {
+		potential = {
+			exists = planet
+			planet = {
+				NOR = {
+					is_wet = yes
+					has_modifier = flooded_habitat
+				}
+				exists = owner
+				owner = { has_ascension_perk = ap_hydrocentric }
+			}
+		}
+		pop_environment_tolerance = -0.6
+	}
+	assembly_score = {
+		modifier = {
+			add = 1
+			from = {
+				OR = {
+					is_wet = yes
+					has_modifier = flooded_habitat
+				}
+			}
+		}
+
+		modifier = {
+			subtract = 1
+			from = {
+				NOR = {
+					is_wet = yes
+					has_modifier = flooded_habitat
+				}
+				is_ideal = no
+			}
+		}
+	}
+}
+
+trait_tec_machine_biomass = {
+	sorting_priority = 10		# Relevant trait
+	icon = gfx/interface/icons/traits/machine_traits/trait_tec_machine_biomass.dds
+	cost = 0
+	initial = yes
+	randomized = yes
+	# Archetypes
+	inline_script = traits/tec_mechanical_archetypes
+	opposites = { "trait_tec_machine_clockwork" "trait_tec_machine_biobrain" }
+	# Modifiers
+	custom_tooltip = TRAIT_TEC_BIOMASS_EFFECT
+	modifier = {
+		planet_pops_robotics_upkeep_mult = -0.10
+	}
+	# Modification
+	species_potential_add = {
+		exists = from
+		from = {
+			is_machine_empire = yes
+		}
+	}
+	species_potential_add = {
+		exists = from
+		from = {
+			is_machine_empire = yes
+		}
+	}
+	species_potential_add = {
+		exists = from
+		from = {
+			is_machine_empire = yes
+		}
+	}
+	# External
+	slave_cost = {
+		energy = 500
+	}
+}
+
+trait_tec_machine_biobrain = {
+	sorting_priority = 10		# Relevant trait
+	icon = gfx/interface/icons/traits/machine_traits/trait_tec_machine_biobrain.dds
+	cost = 0
+	initial = yes
+	randomized = yes
+	# Archetypes
+	inline_script = traits/tec_mechanical_archetypes
+	opposites = { "trait_tec_machine_biomass" "trait_tec_machine_clockwork" }
+	# Modifiers
+	custom_tooltip = TRAIT_TEC_BIOBRAIN_EFFECT
+	modifier = {
+		planet_jobs_robotic_produces_mult = 0.05
+	}
+	# Modification
+	species_potential_add = {
+		exists = from
+		from = {
+			OR = {
+				is_machine_empire = yes
+				has_country_flag = tec_synth_slow_transition
+			}
+		}
+	}
+	species_potential_add = {
+		exists = from
+		from = {
+			OR = {
+				is_machine_empire = yes
+				has_country_flag = tec_synth_slow_transition
+			}
+		}
+	}
+	species_potential_add = {
+		exists = from
+		from = {
+			OR = {
+				is_machine_empire = yes
+				has_country_flag = tec_synth_slow_transition
+			}
+		}
+	}
+	# External
+	slave_cost = {
+		energy = 500
+	}
+	assembly_score = {
+		modifier = {
+			add = 0.5
+		}
+	}
+}
+
+trait_tec_machine_clockwork = {
+	sorting_priority = 10		# Relevant trait
+	icon = gfx/interface/icons/traits/machine_traits/trait_tec_machine_clockwork.dds
+	cost = 0
+	initial = yes
+	randomized = yes
+	# Archetypes
+	inline_script = traits/tec_mechanical_archetypes
+	opposites = { "trait_tec_machine_biomass" "trait_tec_machine_biobrain" }
+	# Modifiers
+	custom_tooltip = TRAIT_TEC_CLOCKWORK_EFFECT
+	# Modification
+	species_potential_add = {
+		exists = from
+		from = {
+			is_machine_empire = yes
+		}
+	}
+	species_potential_add = {
+		exists = from
+		from = {
+			is_machine_empire = yes
+		}
+	}
+	species_potential_add = {
+		exists = from
+		from = {
+			is_machine_empire = yes
+		}
+	}
+	# External
+	slave_cost = {
+		energy = 500
+	}
+}
+
+# STANDARD TRAITS
+# -----------------------------------------
+trait_tec_robot_erratic = {
+	icon = gfx/interface/icons/traits/machine_traits/trait_tec_robot_erratic.dds
+	cost = -2
+	# Archetypes
+	inline_script = traits/tec_mechanical_archetypes
+	opposites = {
+		"trait_robot_efficient_processors"
+		"trait_tec_robot_kinetic_processors"
+		"trait_tec_robot_overclocked_processors"
+	}
+	# Modifiers
+	modifier = {
+		planet_jobs_produces_mult = -0.05
+	}
+	# Modification
+	species_potential_add = {
+		always = yes
+	}
+	# External
+	slave_cost = {
+		energy = -200
+	}
+	assembly_score = {
+		modifier = {
+			subtract = 0.5
+		}
+	}
+}
+trait_tec_robot_dumb = {
+	icon = gfx/interface/icons/traits/machine_traits/trait_tec_robot_dumb.dds
+	cost = -2
+	# Archetypes
+	inline_script = traits/tec_mechanical_archetypes
+	opposites = {
+		"trait_robot_logic_engines" 
+		"trait_tec_robot_quantic_engines"
+	}
+	# Modifiers
+	modifier = {
+		planet_researchers_produces_mult = -0.1
+	}
+	# Modification
+	species_potential_add = {
+		always = yes
+	}
+	# External
+	slave_cost = {
+		energy = -200
+	}
+	assembly_score = {
+		modifier = {
+			subtract = 1.5
+			from = { has_research_designation = yes }
+		}
+		modifier = {
+			subtract = 1.5
+			from = { has_building = building_order_keep }
+		}
+	}
+}
+
+trait_tec_robot_crafter = {
+	sorting_priority = 2		# Regular expensive trait
+	icon = gfx/interface/icons/traits/machine_traits/trait_tec_robot_crafter.dds
+	cost = {
+		base = 2
+		modifier = {
+			add = -1
+			has_country_flag = tec_synth_malleability
+		}
+	}
+	# Archetypes
+	inline_script = traits/tec_mechanical_archetypes
+	opposites = {
+		"trait_tec_robot_uncrafter" 
+		"trait_tec_robot_meta_complex"
+	}
+	# Modifiers
+	custom_tooltip = TRAIT_TEC_PERFECTIONIST_EFFECT
+	modifier = {
+		planet_jobs_alloys_produces_mult = 0.05
+		planet_jobs_consumer_goods_produces_mult = 0.05
+	}
+	# Modification
+	species_potential_add = {
+		always = yes
+	}
+	# External
+	slave_cost = {
+		energy = 100
+	}
+	assembly_score = {
+		modifier = {
+			add = 0.5
+			from = { 
+				OR = {
+					has_industrial_designation = yes 
+					tec_has_alloy_designation = yes
+					tec_has_cg_designation = yes
+				}
+			}
+		}
+	}
+}
+trait_tec_robot_uncrafter = {
+	icon = gfx/interface/icons/traits/machine_traits/trait_tec_robot_uncrafter.dds
+	cost = -2
+	# Archetypes
+	inline_script = traits/tec_mechanical_archetypes
+	opposites = {
+		"trait_tec_robot_crafter"
+		"trait_tec_robot_meta_complex"
+	}
+	# Modifiers
+	custom_tooltip = TRAIT_TEC_UNCRAFTER_EFFECT
+	modifier = {
+		planet_jobs_alloys_produces_mult = -0.05
+		planet_jobs_consumer_goods_produces_mult = -0.05
+	}
+	# Modification
+	species_potential_add = {
+		always = yes
+	}
+	# External
+	slave_cost = {
+		energy = -200
+	}
+	assembly_score = {
+		modifier = {
+			subtract = 1.5
+			from = { 
+				OR = {
+					has_industrial_designation = yes 
+					tec_has_alloy_designation = yes
+					tec_has_cg_designation = yes
+				}
+			}
+		}
+	}
+}
+
+trait_tec_robot_natural_physicists = {
+	sorting_priority = 1		# Regular trait
+	icon = gfx/interface/icons/traits/machine_traits/trait_tec_robot_natural_physicists.dds
+	cost = {
+		base = 1
+	}
+	# Archetypes
+	inline_script = traits/tec_mechanical_archetypes
+	opposites = {
+		trait_tec_robot_natural_sociologists trait_tec_robot_natural_engineers
+	}
+	# Modifiers
+	modifier = {
+		planet_jobs_physics_research_produces_mult = 0.10
+	}
+	# Modification
+	species_potential_add = { # Synth and Machine only
+		exists = from
+		from = {
+			OR = {
+				is_machine_empire = yes
+				has_technology = tech_droid_workers
+				has_origin = origin_tec_slavetothesystem
+				has_origin = origin_tec_robosapiens
+			}
+			NOT = { has_policy_flag = ai_outlawed }
+		}
+	}
+	# External
+	slave_cost = {
+		energy = 500
+	}
+	assembly_score = {
+		modifier = {
+			add = 1
+			from = { has_research_designation = yes }
+		}
+		modifier = {
+			add = 1
+			from = { has_building = building_order_keep }
+		}
+	}
+}
+trait_tec_robot_natural_sociologists = {
+	sorting_priority = 1		# Regular trait
+	icon = gfx/interface/icons/traits/machine_traits/trait_tec_robot_natural_sociologists.dds
+	cost = {
+		base = 1
+	}
+	# Archetypes
+	inline_script = traits/tec_mechanical_archetypes
+	opposites = {
+		trait_tec_robot_natural_physicists trait_tec_robot_natural_engineers
+	}
+	# Modifiers
+	modifier = {
+		planet_jobs_society_research_produces_mult = 0.10
+	}
+	# Modification
+	species_potential_add = { # Synth and Machine only
+		exists = from
+		from = {
+			OR = {
+				is_machine_empire = yes
+				has_technology = tech_droid_workers
+				has_origin = origin_tec_slavetothesystem
+				has_origin = origin_tec_robosapiens
+			}
+			NOT = { has_policy_flag = ai_outlawed }
+		}
+	}
+	# External
+	slave_cost = {
+		energy = 500
+	}
+	assembly_score = {
+		modifier = {
+			add = 1
+			from = { has_research_designation = yes }
+		}
+		modifier = {
+			add = 1
+			from = { has_building = building_order_keep }
+		}
+	}
+}
+trait_tec_robot_natural_engineers = {
+	sorting_priority = 1		# Regular trait
+	icon = gfx/interface/icons/traits/machine_traits/trait_tec_robot_natural_engineers.dds
+	cost = {
+		base = 1
+	}
+	# Archetypes
+	inline_script = traits/tec_mechanical_archetypes
+	opposites = {
+		trait_tec_robot_natural_sociologists trait_tec_robot_natural_physicists
+	}
+	# Modifiers
+	modifier = {
+		planet_jobs_engineering_research_produces_mult = 0.10
+	}
+	# Modification
+	species_potential_add = { # Synth and Machine only
+		exists = from
+		from = {
+			OR = {
+				is_machine_empire = yes
+				has_technology = tech_droid_workers
+				has_origin = origin_tec_slavetothesystem
+			}
+			NOT = { has_policy_flag = ai_outlawed }
+		}
+	}
+	# External
+	slave_cost = {
+		energy = 500
+	}
+	assembly_score = {
+		modifier = {
+			add = 1
+			from = { has_research_designation = yes }
+		}
+		modifier = {
+			add = 1
+			from = { has_building = building_order_keep }
+		}
+	}
+}
+
+trait_tec_robot_weak_unity = {
+	icon = gfx/interface/icons/traits/machine_traits/trait_tec_robot_weak_unity.dds
+	cost = -2
+	# Archetypes
+	allowed_archetypes = { MACHINE }
+	opposites = {
+		"trait_tec_robot_hyperunity"
+		"trait_tec_robot_good_unity"
+		"trait_robot_propaganda_machines"
+	}
+	# Modifiers
+	modifier = {
+		planet_jobs_unity_produces_mult = -0.1
+	}
+	# Modification
+	species_potential_add = {
+		exists = from
+		from = {
+			OR = {
+				is_machine_empire = yes
+				has_technology = tech_droid_workers
+			}
+			NOT = { has_policy_flag = ai_outlawed }
+		}
+	}
+	# External
+	slave_cost = {
+		energy = -200
+	}
+	assembly_score = {
+		modifier = {
+			subtract = 1.5
+			from = { has_unity_designation = yes }
+		}
+		modifier = {
+			subtract = 1.5
+			from = { has_building = building_order_keep }
+		}
+	}
+}
+trait_tec_robot_good_unity = {
+	sorting_priority = 2		# Regular expensive trait
+	icon = gfx/interface/icons/traits/machine_traits/trait_tec_robot_good_unity.dds
+	cost = {
+		base = 2
+		modifier = {
+			add = -1
+			has_country_flag = tec_synth_malleability
+		}
+	}
+	# Archetypes
+	allowed_archetypes = { MACHINE }
+	opposites = {
+		"trait_tec_robot_hyperunity"
+		"trait_tec_robot_weak_unity"
+		"trait_robot_propaganda_machines"
+	}
+	# Modifiers
+	modifier = {
+		planet_jobs_unity_produces_mult = 0.1
+	}
+	# Modification
+	species_potential_add = {
+		exists = from
+		from = {
+			OR = {
+				is_machine_empire = yes
+				has_technology = tech_droid_workers
+			}
+			NOT = { has_policy_flag = ai_outlawed }
+		}
+	}
+	# External
+	slave_cost = {
+		energy = 1000
+	}
+	assembly_score = {
+		modifier = {
+			add = 1.5
+			from = { has_unity_designation = yes }
+		}
+		modifier = {
+			add = 1.5
+			from = { has_building = building_order_keep }
+		}
+	}
+}
+
+trait_tec_robot_fractal = {
+	sorting_priority = 10		# Relevant trait
+	icon = gfx/interface/icons/traits/machine_traits/trait_tec_robot_fractal.dds
+	cost = {
+		base = 2
+		modifier = {
+			add = -1
+			has_country_flag = tec_synth_malleability
+		}
+	}
+	# Archetypes
+	inline_script = traits/tec_mechanical_archetypes
+	opposites = {
+		"trait_robot_mass_produced" "trait_robot_custom_made" "trait_tec_robot_nanitebody"
+	}
+	# Modifiers
+	custom_tooltip = TRAIT_ROBOT_FRACTAL_EFFECT
+	# Modification
+	species_potential_add = {
+		exists = from
+		from = {
+			OR = {
+				has_technology = tech_droid_workers
+				is_machine_empire = yes
+			}
+			NOT = { has_policy_flag = ai_outlawed }
+		}
+	}
+	# External
+	slave_cost = {
+		energy = 1500
+	}
+	ai_weight = {
+		weight = 1
+	}
+}
+
+	# Experimental traits
+trait_tec_robot_unadaptable = {
+	icon = gfx/interface/icons/traits/machine_traits/trait_tec_robot_unadaptable.dds
+	cost = -3
+	# Archetypes
+	inline_script = traits/tec_mechanical_archetypes
+	# Modifiers
+	modifier = {
+		pop_environment_tolerance = -1.25
+	}
+	# Modification
+	species_potential_add = { # Synth and Machine only
+		exists = from
+		from = {
+			OR = {
+				is_machine_empire = yes
+				has_technology = tech_robotic_workers
+				has_origin = origin_tec_slavetothesystem
+				has_origin = origin_tec_robosapiens
+			}
+			NOT = { has_policy_flag = ai_outlawed }
+		}
+	}
+	# External
+	slave_cost = {
+		energy = -250
+	}
+}
+
+trait_tec_robot_weak = {
+	icon = gfx/interface/icons/traits/machine_traits/trait_tec_robot_weak.dds
+	cost = -1
+	# Archetypes
+	inline_script = traits/tec_mechanical_archetypes
+	opposites = {
+		"trait_robot_luxurious"
+		"trait_robot_recycled"
+	}
+	# Modifiers
+	modifier = {
+		planet_jobs_produces_mult = -0.05
+		planet_pop_assemblers_upkeep_mult = -0.50
+	}
+	# Modification
+	species_potential_add = { # Synth and Machine only
+		exists = from
+		from = {
+			OR = {
+				is_machine_empire = yes
+				has_technology = tech_robotic_workers
+				has_origin = origin_tec_slavetothesystem
+				has_origin = origin_tec_robosapiens
+			}
+			NOT = { has_policy_flag = ai_outlawed }
+		}
+	}
+	# External
+	slave_cost = {
+		energy = -100
+	}
+	assembly_score = {
+		modifier = {
+			subtract = 0.5
+		}
+	}
+}
+
+trait_tec_robot_noxious = {
+	icon = gfx/interface/icons/traits/machine_traits/trait_tec_robot_noxious.dds
+	cost = {
+		base = 2
+		modifier = {
+			add = -1
+			has_country_flag = tec_synth_malleability
+		}
+	}
+	# Archetypes
+	inline_script = traits/tec_mechanical_archetypes
+	# Modifiers
+	custom_tooltip = TRAIT_TEC_ROBOT_NOXIOUS_EFFECT
+	# Modification
+	species_potential_add = {
+		always = yes
+	}
+	# External
+	slave_cost = {
+		energy = 1000
+	}
+}
+# Toxic emmisions
+# Reduce habitability ceiling - produces exotic gases

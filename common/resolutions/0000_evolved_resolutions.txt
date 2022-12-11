@@ -1,0 +1,785 @@
+@resolution_weight_hated = 3
+@resolution_weight_disliked = 4
+@resolution_weight_unpopular = 5
+@resolution_weight_normal = 6
+@resolution_weight_popular = 6.5
+@resolution_weight_loved = 7
+
+@resolution_cost_t1 = 100
+@resolution_cost_t2 = 150
+@resolution_cost_t3 = 200
+@resolution_cost_t4 = 250
+@resolution_cost_t5 = 300
+@resolution_cost_denounce = 25
+
+@resolution_flag_timer = 360
+
+#example_resolution = {
+#	icon = "name of the icon key"
+#	resources = {} # cost and category
+#	target = yes/no # if this resolution requires a target country
+#	harmful = yes/no # if the AI should consider this harmful when choosing target
+#	modifier = {} # modifier to be applied to all community members if passed
+#	triggered_modifier = {} # triggered modifier to be applied, scope is country
+#	effect = {} # effect to be applied if passed, scope is country
+#	fail_effects = {} # effect to be applied if failed, scope is country
+#	potential = {} # potential trigger, scope is country
+#	allow = {} # allow trigger, scope is country
+#	ai_weight = {} # ai weight modifiers, scope is country
+#	valid_target = {} # valid targets trigger, scope is country
+#}
+
+# NOTE: Remember to add Resolutions to a Resolution Category!
+
+# Galactic Market Resolutions
+resolution_lgates_ban = {
+	icon = "GFX_resolution_galactic_studies"
+
+	resources = {
+		category = resolutions
+		cost = {
+			influence = @resolution_cost_t1
+		}
+	}
+	target = no
+
+	effect = {
+		custom_tooltip = resolution_lgates_opening_restricted
+		hidden_effect = {
+			set_global_flag = resolution_prohibited_lgates
+		}
+	}
+
+	fail_effects = {
+		hidden_effect = {
+		}
+	}
+
+	potential = {
+		always = no
+		# dlc locked
+		host_has_dlc = "Distant Stars Story Pack"
+		# 
+		NOR = {
+			has_global_flag = resolution_prohibited_lgates
+			has_global_flag = resolution_allow_lgates
+			has_global_flag = l_cluster_opened 
+		}
+
+		is_gestalt = no
+		is_homicidal = no
+		count_relation = {
+			limit = {
+				tec_is_default_country = yes
+				is_homicidal = no
+			}
+			count >= 3
+		}
+	}
+
+	ai_weight = {
+		weight = @resolution_weight_popular
+
+		modifier = {
+			factor = 2
+			is_megacorp = yes
+		}
+
+		modifier = {
+			factor = 1.25
+			OR = {
+				has_ai_personality = peaceful_traders
+				has_ai_personality = ruthless_capitalists
+			}
+		}
+
+		modifier = {
+			factor = 0.5
+			has_ai_personality = xenophobic_isolationists
+		}
+
+		modifier = {
+			factor = 0.8
+			is_xenophobe = yes
+		}
+
+		modifier = {
+			factor = 2
+			years_passed > 50
+		}
+
+		modifier = {
+			factor = 2
+			years_passed > 100
+		}
+
+		modifier = {
+			factor = 2
+			years_passed > 150
+		}
+	}
+}
+
+resolution_lgates_allow = {
+	icon = "GFX_resolution_galactic_studies"
+
+	resources = {
+		category = resolutions
+		cost = {
+			influence = @resolution_cost_t1
+		}
+	}
+	target = no
+
+	effect = {
+		custom_tooltip = resolution_lgates_opening_allow
+		hidden_effect = {
+			remove_global_flag = resolution_prohibited_lgates
+			set_global_flag = resolution_allow_lgates
+			every_country = {
+				if = {
+					limit = {
+						OR = {
+							NOT = { has_global_flag = l_cluster_opened }
+							has_technology = tech_lgate_activation
+							}
+						}
+					country_event = { id = distar.10900 }
+				}
+
+			}
+		}
+	}
+
+	fail_effects = {
+		hidden_effect = {
+		}
+	}
+
+	potential = {
+		always = no
+		# dlc locked
+		host_has_dlc = "Distant Stars Story Pack"
+		# 
+		has_global_flag = resolution_prohibited_lgates
+		NOR = {
+			has_global_flag = resolution_allow_lgates
+			has_global_flag = l_cluster_opened 
+		}
+
+		is_gestalt = no
+		is_homicidal = no
+		count_relation = {
+			limit = {
+				tec_is_default_country = yes
+				is_homicidal = no
+			}
+			count >= 3
+		}
+	}
+
+	ai_weight = {
+		weight = @resolution_weight_popular
+
+		modifier = {
+			factor = 10
+			years_passed > 79
+		}
+	}
+}
+
+resolution_arcane_tech_allow = {
+	icon = "GFX_resolution_galactic_studies"
+
+	resources = {
+		category = resolutions
+		cost = {
+			influence = @resolution_cost_t1
+		}
+	}
+	target = no
+
+	effect = {
+		custom_tooltip = resolution_arcane_tech_allow
+		hidden_effect = {
+			set_global_flag = resolution_arcane_tech_allow
+			every_country = {
+				if = {
+					limit = {
+						not = {
+							has_technology = tech_arcane_deciphering 
+							}
+					}
+					add_research_option = tech_arcane_deciphering
+				}
+			}
+		}
+	}
+
+	fail_effects = {
+		hidden_effect = {
+		}
+	}
+
+	potential = {
+		always = no
+		any_country = {
+			or = {
+				has_global_flag = baol_started
+				has_global_flag = zroni_started
+				has_resource = minor_artifacts
+			}
+		}
+		NOT = {
+			has_global_flag = resolution_arcane_tech_allow
+		}
+
+		is_gestalt = no
+		is_homicidal = no
+		count_relation = {
+			limit = {
+				tec_is_default_country = yes
+				is_homicidal = no
+			}
+			count >= 3
+		}
+	}
+
+	ai_weight = {
+		weight = @resolution_weight_popular
+
+		modifier = {
+			factor = 10
+			years_passed > 79
+		}
+	}
+}
+
+resolution_nanite_studies_allow = {
+	icon = "GFX_resolution_galactic_studies"
+
+	resources = {
+		category = resolutions
+		cost = {
+			influence = @resolution_cost_t1
+		}
+	}
+	target = no
+
+	effect = {
+		custom_tooltip = resolution_nanite_studies
+		hidden_effect = {
+			set_global_flag = resolution_allow_nanite_studies
+			every_country = {
+				if = {
+					limit = {
+						is_galactic_community_member = yes
+						has_global_flag = l_cluster_opened
+						not = {
+							has_technology = tech_nanite_transmutation
+						}
+					}
+					add_research_option = tech_nanite_transmutation
+					add_tech_progress = {
+						tech = tech_nanite_transmutation
+						progress = 0.25
+					}
+				}
+
+			}
+		}
+	}
+
+	fail_effects = {
+		hidden_effect = {
+		}
+	}
+
+	potential = {
+		always = no
+		#DISABLED
+		always = no
+		has_global_flag = l_cluster_opened
+		NOT = {
+			has_global_flag = resolution_allow_nanite_studies
+		}
+
+		is_gestalt = no
+		is_homicidal = no
+		count_relation = {
+			limit = {
+				tec_is_default_country = yes
+				is_homicidal = no
+			}
+			count >= 3
+		}
+	}
+
+	ai_weight = {
+		weight = @resolution_weight_popular
+
+		modifier = {
+			factor = 10
+			years_passed > 79
+		}
+	}
+}
+
+
+#
+#resolution_nanite_studies_ban = {
+#	icon = "GFX_resolution_galactic_studies"
+#
+#	resources = {
+#		category = resolutions
+#		cost = {
+#			influence = @resolution_cost_t1
+#		}
+#	}
+#	target = no
+#
+#	effect = {
+#		custom_tooltip = resolution_nanite_ban
+#		hidden_effect = {
+#			set_global_flag = resolution_nanite_ban
+#		}
+#	}
+#
+#	fail_effects = {
+#		hidden_effect = {
+#		}
+#	}
+#
+#
+#
+#	potential = {
+#		has_global_flag = l_cluster_opened
+#		any_country = {
+#			has_technology = tech_nanite_transmutation
+#		}
+#		NOR = {
+#			has_global_flag = resolution_nanite_ban
+#		}
+#		has_global_flag = resolution_allow_nanite_studies
+#		is_homicidal = no
+#		count_relation = {
+#			limit = {
+#				tec_is_default_country = yes
+#				is_homicidal = no
+#			}
+#			count >= 3
+#		}
+#	}
+#
+#	breach = {
+#		OR = {
+#			any_owned_planet = {
+#				OR = {
+#					has_building = building_nanite_transmuter
+#					has_building = building_advanced_nanite_transmuter
+#					has_building = building_advanced_nanite_transmuter_2
+#				}
+#				
+#				AND = {
+#					owner = {
+#						OR = {
+#							has_policy_flag = nanites_usage
+#							has_policy_flag = resources_into_nanites
+#						}
+#					}
+#				}
+#			}
+#			any_owned_planet = {
+#				OR = {
+#					has_building = building_nanite_food
+#					has_building = building_nanite_food_2
+#					has_building = building_nanite_minerals
+#					has_building = building_nanite_minerals_2
+#					has_building = building_nanite_alloys
+#					has_building = building_nanite_alloys_2
+#					has_building = building_nanite_goods
+#					has_building = building_nanite_goods_2
+#					has_building = building_nanite_experimental
+#					has_building = building_nanite_experimental_2
+#				}
+#			}
+#			any_controlled_ship = {
+#				OR = {
+#					has_component = SHIP_ARMOR_NANITE_ARMOR_S
+#					has_component = SHIP_ARMOR_NANITE_ARMOR_M
+#					has_component = SHIP_ARMOR_NANITE_ARMOR_L
+#					has_component = SHIP_ARMOR_NANITE_HULL_S
+#					has_component = SHIP_ARMOR_NANITE_HULL_M
+#					has_component = SHIP_ARMOR_NANITE_HULL_L
+#					has_component = SHIP_WEAPON_NANITE_ENERGY_S
+#					has_component = SHIP_WEAPON_NANITE_ENERGY_M
+#					has_component = SHIP_WEAPON_NANITE_ENERGY_L
+#					has_component = SHIP_WEAPON_NANITE_KINETIC_S
+#					has_component = SHIP_WEAPON_NANITE_KINETIC_M
+#					has_component = SHIP_WEAPON_NANITE_KINETIC_L
+#					has_component = SHIP_WEAPON_NANITE_WARHEADS_S
+#					has_component = SHIP_WEAPON_NANITE_WARHEADS_M
+#					has_component = SHIP_WEAPON_NANITE_WARHEADS_L
+#					has_component = SHIP_COMPONENT_NANITE_CLOUD_S
+#					has_component = SHIP_COMPONENT_NANITE_CLOUD_M
+#					has_component = SHIP_COMPONENT_NANITE_CLOUD_L
+#					has_component = AUTO_REPAIR_2
+#					has_component = SHIP_AURA_NANOBOT_CLOUD
+#				}
+#			}
+#		}
+#
+#	}
+#
+#	ai_weight = {
+#		weight = @resolution_weight_unpopular
+#
+#	}
+#}
+#
+
+resolution_rulesofwar_ban_massacre = {
+	icon = "GFX_resolution_rules_of_war"
+
+	resources = {
+		category = resolutions
+		cost = {
+			influence = @resolution_cost_t3
+		}
+	}
+	target = no
+	
+	potential = {
+		always = no
+		NOT = {
+			has_global_flag = colossus_aggro_banned
+		}
+		is_gestalt = no
+		is_homicidal = no
+		count_relation = {
+			limit = {
+				tec_is_default_country = yes
+				is_homicidal = no
+			}
+			count >= 3
+		}
+		any_country = {
+			is_galactic_community_member = yes
+			any_controlled_ship = {
+				is_ship_size = colossus
+			}
+		}
+	}
+
+
+	modifier = {
+	}
+
+	effect = {
+		custom_tooltip = resolution_rulesofwar_ban_massacre_tooltip
+		hidden_effect = {
+			set_global_flag = colossus_aggro_banned
+			every_playable_country = {
+				limit = {
+					any_controlled_ship = {
+						is_ship_size = colossus
+					}
+				}
+				country_event = { id = techaulfed.10300 }
+			}
+		}
+	}
+
+	fail_effects = {
+	}
+
+	breach = {
+		any_controlled_ship = {
+			OR = {
+				has_component = PLANET_KILLER_CRACKER
+				has_component = PLANET_KILLER_SHIELDER
+				has_component = PLANET_KILLER_NEUTRON
+				has_component = PLANET_KILLER_NANOBOTS
+				has_component = PLANET_KILLER_GODRAY
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = @resolution_weight_popular
+
+		modifier = {
+			factor = 0
+			OR = {
+				is_militarist = yes
+				is_xenophobe = yes
+				is_authoritarian = yes
+			}
+		}
+
+		modifier = {
+			factor = 2
+			OR = {
+				is_pacifist = yes
+				is_egalitarian = yes
+				is_ecologist = yes
+			}
+		}
+
+		modifier = {
+			factor = 0
+			OR = {
+				has_global_flag = galactic_focus_crisis_contingency
+				has_global_flag = galactic_focus_crisis_nanites		
+				has_global_flag = galactic_focus_crisis_contingency
+			}
+		}
+	}
+}
+
+resolution_rulesofwar_allow_massacre = {
+	icon = "GFX_repeal_red"
+
+	resources = {
+		category = resolutions
+		cost = {
+			influence = @resolution_cost_t3
+		}
+	}
+	target = no
+	
+	potential = {
+		always = no
+		has_global_flag = colossus_aggro_banned
+		is_gestalt = no
+		is_homicidal = no
+		count_relation = {
+			limit = {
+				tec_is_default_country = yes
+				is_homicidal = no
+			}
+			count >= 3
+		}
+		any_country = {
+			is_galactic_community_member = yes
+		}
+	}
+
+
+	modifier = {
+	}
+
+	effect = {
+		custom_tooltip = resolution_rulesofwar_allow_massacre_tooltip
+		hidden_effect = {
+			remove_global_flag = colossus_aggro_banned
+		}
+	}
+
+	fail_effects = {
+	}
+
+	breach = {
+	}
+
+	ai_weight = {
+		weight = @resolution_weight_hated
+
+		modifier = {
+			factor = 2
+			OR = {
+				is_militarist = yes
+				is_xenophobe = yes
+				is_authoritarian = yes
+			}
+		}
+
+		modifier = {
+			factor = 0
+			OR = {
+				is_pacifist = yes
+				is_egalitarian = yes
+				is_ecologist = yes
+			}
+		}
+
+		modifier = {
+			factor = 10
+			OR = {
+				has_global_flag = galactic_focus_crisis_contingency
+				has_global_flag = galactic_focus_crisis_nanites		
+				has_global_flag = galactic_focus_crisis_contingency
+			}
+		}
+	}
+}
+
+
+### COUNCIL SEATS
+resolution_galacticreforms_give_seat = {
+	icon = "GFX_resolution_council_member_permanent"
+
+	potential = {
+		always = no
+		has_federations_dlc = yes
+		is_galactic_council_established = yes
+	}
+
+	resources = {
+		category = resolutions
+		cost = {
+			influence = 10
+		}
+	}
+
+	target = yes
+	harmful = no
+	valid_target = {
+	#	is_ai = no
+		NOT = { is_same_value = from } # don't nominate yourself.
+		NOT = { is_in_federation_with = from } # Federations members can't nominate other fed members.
+		tec_is_default_country = yes
+		is_galactic_community_member = yes
+		is_part_of_galactic_council = no
+	}
+
+	effect = {
+		add_to_galactic_council = yes
+		add_permanent_councillor = yes
+	}
+
+	ai_weight = {
+		weight = @resolution_weight_normal
+	}
+}
+
+resolution_galacticreforms_revoke_seat = {
+	icon = "GFX_resolution_council_member_permanent"
+
+	potential = {
+		always = no
+		has_federations_dlc = yes
+		is_galactic_council_established = yes
+	}
+
+	resources = {
+		category = resolutions
+		cost = {
+			influence = 10
+		}
+	}
+
+	target = yes
+	harmful = yes
+	valid_target = {
+	#	is_ai = no
+		NOT = { is_same_value = from } # don't kick yourself.
+		NOT = { is_in_federation_with = from } # Federations members can't nominate other fed members.
+		tec_is_default_country = yes
+		is_galactic_community_member = yes
+		is_part_of_galactic_council = yes
+	}
+
+	effect = {
+		remove_from_galactic_council = yes
+		remove_permanent_councillor = yes
+	}
+
+	ai_weight = {
+		weight = @resolution_weight_disliked
+	}
+}
+
+resolution_galacticreforms_upgrade_seat = {
+	icon = "GFX_resolution_council_member_permanent"
+
+	potential = {
+		always = no
+		has_federations_dlc = yes
+		is_galactic_council_established = yes
+	}
+
+	resources = {
+		category = resolutions
+		cost = {
+			influence = 10
+		}
+	}
+
+	target = yes
+	harmful = no
+	valid_target = {
+	#	is_ai = no
+		NOT = { is_same_value = from } # don't nominate yourself.
+		NOT = { is_in_federation_with = from } # Federations members can't nominate other fed members.
+		tec_is_default_country = yes
+		is_galactic_community_member = yes
+		is_part_of_galactic_council = yes
+		is_permanent_councillor = no
+	}
+
+	effect = {
+		add_permanent_councillor = yes
+	}
+
+	ai_weight = {
+		weight = @resolution_weight_normal
+	}
+}
+
+# - - - - - - - - - - - - - - - - - - - - - #
+#TEST
+# - - - - - - - - - - - - - - - - - - - - - #
+#resolution_galacticreforms_denounce_ethic = {
+#	icon = "GFX_resolution_council_member_permanent"
+#
+#	potential = {
+#		always = no #remove
+#		has_federations_dlc = yes
+#		is_galactic_council_established = yes
+#	}
+#
+#	resources = {
+#		category = resolutions
+#		cost = {
+#			influence = 10
+#		}
+#	}
+#
+#	target = yes
+#	harmful = yes
+#	valid_target = {
+#	#	is_ai = no
+#		NOT = { is_same_value = from } # don't kick yourself.
+#		NOT = { is_in_federation_with = from } # Federations members can't nominate other fed members.
+#		tec_is_default_country = yes
+#		is_galactic_community_member = yes
+#		NOT = {
+#			has_same_ethos = prev
+#		}
+#		OR = {
+#			# mat vs spirit
+#			AND = {
+#				prev = {
+#					is_materialist = yes
+#				}
+#				is_spiritualist = yes
+#			}
+#			AND = {
+#				prev = {
+#					is_spiritualist = yes
+#				}
+#				is_materialist = yes
+#			}
+#			# etc etc
+#		}
+#	}
+#
+#	effect = {
+#		#add effects here
+#	}
+#
+#	ai_weight = {
+#		weight = @resolution_weight_disliked
+#	}
+#}

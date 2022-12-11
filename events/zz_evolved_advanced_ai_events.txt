@@ -1,0 +1,1869 @@
+# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - ######
+#####Adding traits bonus to eligible nations.
+# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - ######
+namespace = tec_ai
+
+#Initializer, on game start assigns personalities
+
+country_event = {
+	id = tec_ai.1
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = {
+		always = no #REMOVETHIS
+		has_global_flag = stellarisevolved 
+	}
+
+	immediate = {
+		every_playable_country = {
+			#How the empire develops
+			random_list = {
+				#Dumb Playstyle - pretty rare
+				2 = {
+					set_country_flag = tec_empire_dumb
+				}
+				#Mediocre Playstyle - common
+				6 = {
+					set_country_flag = tec_empire_common
+				}
+				#Skilled Playstyle - rare
+				2 = {
+					set_country_flag = tec_empire_skilled
+				}
+			}
+
+			#How the empire reacts
+			random_list = {
+				#Turtle tactics - Defensive - pretty rare
+				1 = {
+					set_country_flag = tec_empire_aggro_turtle
+				}
+				#Neutral tactics - Normal - most empires will do
+				6 = {
+					set_country_flag = tec_empire_aggro_neutral
+				}
+				#Bully tactics - aggressive - common
+				3 = {
+					set_country_flag = tec_empire_aggro_skilled
+				}
+			}
+
+			#How the empire builds/expands
+			random_list = {
+				#Tall expansion - pretty rare
+				1 = {
+					set_country_flag = tec_empire_build_tall
+				}
+				#Mixed expansion - Common
+				7 = {
+					set_country_flag = tec_empire_build_regular
+				}
+				#Extra-wide - rare
+				2 = {
+					set_country_flag = tec_empire_build_wide
+				}
+			}
+
+
+		}
+	}
+}
+
+# Marks the empire desire to build certain pops and follow a certain ap path
+# Empire will skip the tech/projects for other kinds of assembly
+country_event = {
+	id = tec_ai.10
+	hide_window = yes
+	is_triggered_only = yes
+	#fire_only_once = yes	#new empires also need it
+
+	trigger = {
+		always = no
+		#always = no #REMOVETHIS
+		has_global_flag = stellarisevolved
+		NOR = {
+			has_country_flag = tec_desires_to_build_robots		# Will attempt to make robots (and synthascend)
+			has_country_flag = tec_desires_to_build_bio			# Will attempt to make bioservants only (bioascend)
+			has_country_flag = tec_desires_to_build_clones		# Will attempt to make clones (bioascend)
+			has_country_flag = tec_desires_to_be_pure			# Will only try to grow pops on its own way (psioascend)
+			has_country_flag = tec_desires_to_build_zombies		# Will only make zombies
+		}
+	}
+
+	immediate = {
+		set_global_flag = tec_desired_assembly_distributed
+		# Assembly handler
+		every_playable_country = {
+			#First, fixed empires
+			#robots
+			limit = {
+				# Prevents messing with players
+				is_ai = yes
+			}
+			# Zombies
+			if = {
+				limit = {
+					tec_is_zombie_empire = yes
+				}
+				set_country_flag = tec_desires_to_build_zombies
+				#failsafe
+				remove_country_flag = tec_desires_to_build_robots
+				remove_country_flag = tec_desires_to_build_bio
+				remove_country_flag = tec_desires_to_build_clones
+				remove_country_flag = tec_desires_to_be_pure
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_origin = origin_mechanists
+						has_origin = origin_tec_robosapiens					# robotic empires always wants robots
+						has_origin = origin_tec_slavetothesystem
+						tec_is_robot_lover_spiritualist = yes					# praise the omnisiah
+						has_civic = civic_tec_corporate_robocorp
+						has_civic = civic_tec_computerized_extraction
+						has_civic = civic_tec_corporate_automatation
+						AND = {
+							is_machine_empire = yes
+							NOT = {
+								has_civic = civic_machine_assimilator	# assimilators are a rare case
+							}
+						}
+						AND = {
+							is_hive_empire = yes
+							tec_is_cyberhive = yes				# cyberhives may want to make robots
+						}
+					}
+				}
+				set_country_flag = tec_desires_to_build_robots
+				#failsafe
+				remove_country_flag = tec_desires_to_build_zombies
+				remove_country_flag = tec_desires_to_build_bio
+				remove_country_flag = tec_desires_to_build_clones
+				remove_country_flag = tec_desires_to_be_pure
+			}
+			# Bioservants
+			else_if = {
+				limit = {
+					OR = {
+						has_origin = origin_tec_bioservant
+						has_origin = origin_tec_hive_bioservant				# robotic empires always wants robots´
+					}
+				}
+				set_country_flag = tec_desires_to_build_bio	
+				#failsafe
+				remove_country_flag = tec_desires_to_build_zombies
+				remove_country_flag = tec_desires_to_build_robots
+				remove_country_flag = tec_desires_to_build_clones
+				remove_country_flag = tec_desires_to_be_pure
+			}
+
+			# Clones
+			else_if = {
+				limit = {
+					OR = {
+						has_origin = origin_tec_clones					# Make jeff great again
+					}
+				}
+				set_country_flag = tec_desires_to_build_clones	
+				#failsafe
+				remove_country_flag = tec_desires_to_build_zombies
+				remove_country_flag = tec_desires_to_build_robots
+				remove_country_flag = tec_desires_to_build_bio
+				remove_country_flag = tec_desires_to_be_pure
+			}
+
+
+			# Purity
+			else_if = {
+				limit = {
+					OR = {
+						AND = {
+							has_origin = origin_life_seeded
+							has_civic = civic_tec_gaia_affinity			#lifeseeded pure things wants to keep the pure thing going
+						}
+						has_civic = civic_tec_eco_keepers				# Pure treehuggers ecoterrorists
+						AND = {
+							is_hive_empire = yes
+							has_civic = civic_tec_hive_cyberhorror		# cyberhorrors are rapid breed locusts
+						}
+						AND = {
+							is_hive_empire = yes
+							tec_is_biohive = yes					# organic hives may want to breed disgustingly fast
+						}
+					}
+				}
+				set_country_flag = tec_desires_to_be_pure
+				#failsafe
+				remove_country_flag = tec_desires_to_build_zombies
+				remove_country_flag = tec_desires_to_build_robots
+				remove_country_flag = tec_desires_to_build_bio	
+				remove_country_flag = tec_desires_to_build_clones
+				
+			}
+
+
+			#Random
+			# Ethic based , and later random values
+			else = {
+				# extra check to be sure
+				if = {
+					limit = {
+						NOR = {
+							has_country_flag = tec_desires_to_build_robots		# Will attempt to make robots (and synthascend)
+							has_country_flag = tec_desires_to_build_bio			# Will attempt to make bioservants only (bioascend)
+							has_country_flag = tec_desires_to_build_clones		# Will attempt to make clones (bioascend)
+							has_country_flag = tec_desires_to_be_pure			# Will only try to grow pops on its own way (psioascend)
+						}
+					}
+					# this is when the fun begins
+					if = {
+						limit = {
+							# Materialist and industrialists want robots over other kinds of assemblies
+							OR = {
+								is_materialist = yes
+								is_industrialist = yes
+							}
+						}
+						random_list = {
+							1 = {
+								set_country_flag = tec_desires_to_be_pure
+							}
+							3 = {
+								set_country_flag = tec_desires_to_build_clones
+							}
+							3 = {
+								set_country_flag = tec_desires_to_build_bio	
+							}
+							9 = {
+								set_country_flag = tec_desires_to_build_robots
+							}
+						}
+					}
+
+
+					else_if = {
+						limit = {
+							# spiritualist and xenophobes may want to be pure
+							OR = {
+								is_spiritualist = yes
+								is_xenophobe = yes
+							}
+						}
+						random_list = {
+							1 = {
+								set_country_flag = tec_desires_to_build_robots
+							}
+							3 = {
+								set_country_flag = tec_desires_to_build_bio
+							}
+							3 = {
+								set_country_flag = tec_desires_to_build_clones
+							}
+							9 = {
+								set_country_flag = tec_desires_to_be_pure
+							}
+						}
+					}
+
+					else_if = {
+						limit = {
+							# capitalists, elitist, pluralists and communists may want to make either of the 3, not as much with purity
+							OR = {
+								is_competitive = yes
+								is_elitist = yes
+								is_pluralist = yes
+								is_cooperative = yes
+							}
+						}
+						random_list = {
+							1 = {
+								set_country_flag = tec_desires_to_be_pure
+							}
+							5 = {
+								set_country_flag = tec_desires_to_build_bio
+							}
+							5 = {
+								set_country_flag = tec_desires_to_build_clones
+							}
+							5 = {
+								set_country_flag = tec_desires_to_build_robots
+							}
+						}
+					}
+
+
+					else_if = {
+						limit = {
+							# xenophiles and green may slightly want more clones and bios than robots, or be pure
+							OR = {
+								is_ecologist = yes
+								is_xenophile = yes
+							}
+						}
+						random_list = {
+							2 = {
+								set_country_flag = tec_desires_to_be_pure
+							}
+							5 = {
+								set_country_flag = tec_desires_to_build_bio
+							}
+							5 = {
+								set_country_flag = tec_desires_to_build_clones
+							}
+							4 = {
+								set_country_flag = tec_desires_to_build_robots
+							}
+						}
+					}
+
+					else = {
+						# Why you do this
+						# Robots as its the stellaris standard
+						random_list = {
+							1 = {
+								set_country_flag = tec_desires_to_be_pure
+							}
+							3 = {
+								set_country_flag = tec_desires_to_build_bio
+							}
+							3 = {
+								set_country_flag = tec_desires_to_build_clones
+							}
+							6 = {
+								set_country_flag = tec_desires_to_build_robots
+							}
+						}
+					}
+				}
+			}
+		}
+		# Automation check every 5 years, so they keep with what the player wanted
+		# This is for preventing the ai to messing with assemblies and etc, they will continue doing it
+		every_playable_country = {
+			limit = {
+				is_ai = no
+			}
+			set_country_flag = tec_ignore_automation_assembly
+		}
+		# Ascension path handler
+		#every_playable_country = {
+			#limit = {
+			#	is_ai = no
+			#}
+			#has_country_flag = tec_desires_to_build_robots		# Will attempt to make robots (and synthascend)
+			#has_country_flag = tec_desires_to_build_bio			# Will attempt to make bioservants only (bioascend)
+			#has_country_flag = tec_desires_to_build_clones		# Will attempt to make clones (bioascend)
+			#has_country_flag = tec_desires_to_be_pure			# Will only try to grow pops on its own way (psioascend)
+			#has_country_flag = tec_desires_to_build_zombies		# Will only make zombies
+			# Bio ascension
+
+			# /
+
+			# Cybernetic ascension
+
+			# /
+
+			# 
+		#}
+	}
+}
+
+# initial marking
+event = {
+	id = tec_ai.101
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = no
+
+	trigger = {
+		has_global_flag = stellarisevolved 
+	}
+
+	immediate = {
+		every_galaxy_planet = {
+			limit = {
+				or = {
+					habitable_planet = yes
+					tec_is_habitable_regular_planet = yes
+				}
+			}
+			planet_event = {
+				id = tec_ai.100
+				days = 10
+			}
+		}
+	}
+}
+
+# Marks the planet based on size and deposits
+planet_event = {
+	id = tec_ai.100
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = no
+
+	trigger = {
+	#	always = no #REMOVETHIS
+		has_global_flag = stellarisevolved 
+	}
+
+	immediate = {
+		#Measure planet size
+		if = {
+			limit = {
+				planet_size >= 20
+				tec_is_arcology = no
+				NOR = {
+					has_planet_flag = tec_planet_big
+					has_planet_flag = tec_planet_medium_big
+					has_planet_flag = tec_planet_medium_small
+					has_planet_flag = tec_planet_small
+				}
+			}
+			set_planet_flag = tec_planet_big
+		}
+		if = {
+			limit = {
+				planet_size < 20
+				planet_size > 14
+				tec_is_arcology = no
+				NOR = {
+					has_planet_flag = tec_planet_big
+					has_planet_flag = tec_planet_medium_big
+					has_planet_flag = tec_planet_medium_small
+					has_planet_flag = tec_planet_small
+				}
+			}
+			set_planet_flag = tec_planet_medium_big
+		}
+		if = {
+			limit = {
+				planet_size < 15
+				planet_size > 12
+				tec_is_arcology = no
+				NOR = {
+					has_planet_flag = tec_planet_big
+					has_planet_flag = tec_planet_medium_big
+					has_planet_flag = tec_planet_medium_small
+					has_planet_flag = tec_planet_small
+				}
+			}
+			set_planet_flag = tec_planet_medium_small
+		}
+		if = {
+			limit = {
+				planet_size <= 12
+				tec_is_arcology = no
+				NOR = {
+					has_planet_flag = tec_planet_big
+					has_planet_flag = tec_planet_medium_big
+					has_planet_flag = tec_planet_medium_small
+					has_planet_flag = tec_planet_small
+				}
+			}
+			set_planet_flag = tec_planet_small
+		}
+
+		#FIX THIS - deposits mess calculations - done
+		#Count planet deposits
+		# Somehow the count goes for 300+, need to check why xd
+		# clear variables for further iterations
+		set_variable = {
+			which = tec_planet_mineral_potential
+			value = 0
+		}
+		set_variable = {
+			which = tec_planet_energy_potential
+			value = 0
+		}
+		set_variable = {
+			which = tec_planet_food_potential
+			value = 0
+		}
+
+		set_variable = {
+			which = tec_planet_research_potential
+			value = 0
+		}
+		set_variable = {
+			which = tec_planet_alloys_potential
+			value = 0
+		}
+		set_variable = {
+			which = tec_planet_cg_potential
+			value = 0
+		}
+
+		# ----------------------------------------------------------------------------------
+			# E N E R G Y districts 
+		# ----------------------------------------------------------------------------------
+		# Count deposits
+		tec_add_energy_districts = yes
+		# Count blockers
+
+
+		# Count modifiers
+	#	tec_add_energy_modifiers_from_vanilla = yes
+	#	tec_add_energy_modifiers_from_mods = yes
+		# conclusions
+		# poor mineral planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_energy_potential
+					value < 6
+				}
+			}
+			set_planet_flag = tec_energy_planet_1
+			remove_planet_flag = tec_energy_planet_2
+			remove_planet_flag = tec_energy_planet_3
+			remove_planet_flag = tec_energy_planet_4
+		}
+		# meh/usable mineral planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_energy_potential
+					value > 5
+				}
+				check_variable = {
+					which = tec_planet_energy_potential
+					value < 10
+				}
+			}
+			remove_planet_flag = tec_energy_planet_1
+			set_planet_flag = tec_energy_planet_2
+			remove_planet_flag = tec_energy_planet_3
+			remove_planet_flag = tec_energy_planet_4
+		}
+		# good/optimal mineral planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_energy_potential
+					value > 9
+				}
+				check_variable = {
+					which = tec_planet_energy_potential
+					value < 13
+				}
+				
+			}
+			remove_planet_flag = tec_energy_planet_1
+			remove_planet_flag = tec_energy_planet_2
+			set_planet_flag = tec_energy_planet_3
+			remove_planet_flag = tec_energy_planet_4
+		}
+		# extremely good farming planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_energy_potential
+					value > 12
+				}
+			}
+			remove_planet_flag = tec_energy_planet_1
+			remove_planet_flag = tec_energy_planet_2
+			remove_planet_flag = tec_energy_planet_3
+			set_planet_flag = tec_energy_planet_4
+		}
+		
+		
+		
+
+		
+
+		# ----------------------------------------------------------------------------------
+					# M I N E R A L districts 
+		# ----------------------------------------------------------------------------------
+		# Count deposits
+		tec_add_mineral_districts = yes
+		# Count modifiers
+	#	tec_add_mineral_modifiers_from_vanilla = yes
+	#	tec_add_mineral_modifiers_from_mods = yes
+		# conclusions
+		# poor mineral planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_mineral_potential
+					value < 6
+				}
+			}
+			set_planet_flag = tec_mineral_planet_1
+			remove_planet_flag = tec_mineral_planet_2
+			remove_planet_flag = tec_mineral_planet_3
+			remove_planet_flag = tec_mineral_planet_4
+		}
+		# meh/usable mineral planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_mineral_potential
+					value > 5
+				}
+				check_variable = {
+					which = tec_planet_mineral_potential
+					value < 10
+				}
+			}
+			remove_planet_flag = tec_mineral_planet_1
+			set_planet_flag = tec_mineral_planet_2
+			remove_planet_flag = tec_mineral_planet_3
+			remove_planet_flag = tec_mineral_planet_4
+		}
+		# good/optimal mineral planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_mineral_potential
+					value > 9
+				}
+				check_variable = {
+					which = tec_planet_mineral_potential
+					value < 13
+				}
+				
+			}
+			remove_planet_flag = tec_mineral_planet_1
+			remove_planet_flag = tec_mineral_planet_2
+			set_planet_flag = tec_mineral_planet_3
+			remove_planet_flag = tec_mineral_planet_4
+		}
+		# extremely good mining planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_mineral_potential
+					value > 12
+				}
+			}
+			remove_planet_flag = tec_mineral_planet_1
+			remove_planet_flag = tec_mineral_planet_2
+			remove_planet_flag = tec_mineral_planet_3
+			set_planet_flag = tec_mineral_planet_4
+		}
+
+		
+		# ----------------------------------------------------------------------------------
+					# F O O D districts 
+		# ----------------------------------------------------------------------------------
+		# Count deposits
+		tec_add_food_districts = yes
+		# Count blockers
+
+		# Count modifiers
+	#	tec_add_food_modifiers_from_vanilla = yes
+	#	tec_add_food_modifiers_from_mods = no
+
+
+		# conclusions
+		# poor farming planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_food_potential
+					value < 6
+				}
+			}
+			set_planet_flag = tec_food_planet_1
+			remove_planet_flag = tec_food_planet_2
+			remove_planet_flag = tec_food_planet_3
+			remove_planet_flag = tec_food_planet_4
+		}
+		# meh/usable farming planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_food_potential
+					value > 5
+				}
+				check_variable = {
+					which = tec_planet_food_potential
+					value < 10
+				}
+			}
+			remove_planet_flag = tec_food_planet_1
+			set_planet_flag = tec_food_planet_2
+			remove_planet_flag = tec_food_planet_3
+			remove_planet_flag = tec_food_planet_4
+		}
+		# good/optimal farming planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_food_potential
+					value > 9
+				}
+				check_variable = {
+					which = tec_planet_food_potential
+					value < 13
+				}
+				
+			}
+			remove_planet_flag = tec_food_planet_1
+			remove_planet_flag = tec_food_planet_2
+			set_planet_flag = tec_food_planet_3
+			remove_planet_flag = tec_food_planet_4
+		}
+		# extremely good farming planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_food_potential
+					value > 12
+				}
+			}
+			remove_planet_flag = tec_food_planet_1
+			remove_planet_flag = tec_food_planet_2
+			remove_planet_flag = tec_food_planet_3
+			set_planet_flag = tec_food_planet_4
+		}
+
+
+
+		# ----------------------------------------------------------------------------------
+					# A D V A N C E D	P R O D U C T I O N
+		# ----------------------------------------------------------------------------------
+		# R E S E A R C H
+		# Count modifiers + deposits
+		tec_add_research_modifiers_from_vanilla = yes
+		tec_add_research_modifiers_from_mods = no
+
+
+		# conclusions
+		# do not mark if not necessary
+		# poor research planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_research_potential
+					value > 0
+				}
+				check_variable = {
+					which = tec_planet_research_potential
+					value < 2
+				}
+			}
+			set_planet_flag = tec_research_planet_1
+			remove_planet_flag = tec_research_planet_2
+			remove_planet_flag = tec_research_planet_3
+			remove_planet_flag = tec_research_planet_4
+		}
+		# meh research planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_research_potential
+					value > 1
+				}
+				check_variable = {
+					which = tec_planet_research_potential
+					value < 3
+				}
+			}
+			remove_planet_flag = tec_research_planet_1
+			set_planet_flag = tec_research_planet_2
+			remove_planet_flag = tec_research_planet_3
+			remove_planet_flag = tec_research_planet_4
+		}
+		# good research planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_research_potential
+					value > 3
+				}
+				check_variable = {
+					which = tec_planet_research_potential
+					value < 10
+				}
+				
+			}
+			remove_planet_flag = tec_research_planet_1
+			remove_planet_flag = tec_research_planet_2
+			set_planet_flag = tec_research_planet_3
+			remove_planet_flag = tec_research_planet_4
+		}
+		# extremely good research planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_research_potential
+					value > 9 #9
+				}
+			}
+			remove_planet_flag = tec_research_planet_1
+			remove_planet_flag = tec_research_planet_2
+			remove_planet_flag = tec_research_planet_3
+			set_planet_flag = tec_research_planet_4
+		}
+
+
+		# A L L O Y S
+		# Count modifiers + deposits
+		tec_add_alloys_modifiers_from_vanilla = yes
+		tec_add_alloys_modifiers_from_mods = no
+
+
+		# conclusions
+		# do not mark if not necessary
+		# poor alloys planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_alloys_potential
+					value > 0
+				}
+				check_variable = {
+					which = tec_planet_alloys_potential
+					value < 2
+				}
+			}
+			set_planet_flag = tec_alloys_planet_1
+			remove_planet_flag = tec_alloys_planet_2
+			remove_planet_flag = tec_alloys_planet_3
+			remove_planet_flag = tec_alloys_planet_4
+		}
+		# meh alloys planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_alloys_potential
+					value > 1
+				}
+				check_variable = {
+					which = tec_planet_alloys_potential
+					value < 3
+				}
+			}
+			remove_planet_flag = tec_alloys_planet_1
+			set_planet_flag = tec_alloys_planet_2
+			remove_planet_flag = tec_alloys_planet_3
+			remove_planet_flag = tec_alloys_planet_4
+		}
+		# good alloys planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_alloys_potential
+					value > 3
+				}
+				check_variable = {
+					which = tec_planet_alloys_potential
+					value < 10
+				}
+				
+			}
+			remove_planet_flag = tec_alloys_planet_1
+			remove_planet_flag = tec_alloys_planet_2
+			set_planet_flag = tec_alloys_planet_3
+			remove_planet_flag = tec_alloys_planet_4
+		}
+		# extremely good alloys planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_alloys_potential
+					value > 9 #9
+				}
+			}
+			remove_planet_flag = tec_alloys_planet_1
+			remove_planet_flag = tec_alloys_planet_2
+			remove_planet_flag = tec_alloys_planet_3
+			set_planet_flag = tec_alloys_planet_4
+		}
+
+		
+		# C G
+		# Count modifiers + deposits
+		tec_add_cg_modifiers_from_vanilla = yes
+		tec_add_cg_modifiers_from_mods = no
+
+
+	# conclusions
+		# do not mark if not necessary
+		# poor cg planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_cg_potential
+					value > 0
+				}
+				check_variable = {
+					which = tec_planet_cg_potential
+					value < 2
+				}
+			}
+			set_planet_flag = tec_cg_planet_1
+			remove_planet_flag = tec_cg_planet_2
+			remove_planet_flag = tec_cg_planet_3
+			remove_planet_flag = tec_cg_planet_4
+		}
+		# meh cg planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_cg_potential
+					value > 1
+				}
+				check_variable = {
+					which = tec_planet_cg_potential
+					value < 3
+				}
+			}
+			remove_planet_flag = tec_cg_planet_1
+			set_planet_flag = tec_cg_planet_2
+			remove_planet_flag = tec_cg_planet_3
+			remove_planet_flag = tec_cg_planet_4
+		}
+		# good cg planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_cg_potential
+					value > 3
+				}
+				check_variable = {
+					which = tec_planet_cg_potential
+					value < 10
+				}
+				
+			}
+			remove_planet_flag = tec_cg_planet_1
+			remove_planet_flag = tec_cg_planet_2
+			set_planet_flag = tec_cg_planet_3
+			remove_planet_flag = tec_cg_planet_4
+		}
+		# extremely good cg planet
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_planet_cg_potential
+					value > 9 #9
+				}
+			}
+			remove_planet_flag = tec_cg_planet_1
+			remove_planet_flag = tec_cg_planet_2
+			remove_planet_flag = tec_cg_planet_3
+			set_planet_flag = tec_cg_planet_4
+		}
+
+		# Others must do cgs and alloys in masse, anyway
+		# Not taking in mind unity or strategics just because... too much
+		# Anyway in a future unity will be calc too
+
+
+		# ----------------------------------------------------------------------------------
+					# E C U M E N O P O L I S	F I N D E R 
+		# ----------------------------------------------------------------------------------
+		#wip
+		# Small ecus, but still ecus
+		if = {
+			limit = {
+				NOR = {
+					has_planet_flag = tec_energy_planet_4
+
+					has_planet_flag = tec_mineral_planet_4
+
+					has_planet_flag = tec_food_planet_4
+				}
+				has_planet_flag = tec_planet_medium_small
+			}
+			remove_planet_flag = tec_potential_ecu_4
+			remove_planet_flag = tec_potential_ecu_3
+			remove_planet_flag = tec_potential_ecu_2
+			set_planet_flag = tec_potential_ecu_1
+		}
+		
+		
+		# medium ecus, but still ecus
+		if = {
+			limit = {
+				NOR = {
+					has_planet_flag = tec_energy_planet_4
+
+					has_planet_flag = tec_mineral_planet_4
+
+					has_planet_flag = tec_food_planet_4
+				}
+				OR = {
+					has_planet_flag = tec_planet_big
+					has_planet_flag = tec_planet_medium_big
+				}
+			}
+			remove_planet_flag = tec_potential_ecu_4
+			remove_planet_flag = tec_potential_ecu_3
+			set_planet_flag = tec_potential_ecu_2
+			remove_planet_flag = tec_potential_ecu_1
+		}
+		
+		# pretty good candidate
+		if = {
+			limit = {
+				NOR = {
+					has_planet_flag = tec_energy_planet_4
+
+					has_planet_flag = tec_mineral_planet_4
+
+					has_planet_flag = tec_food_planet_4
+				}
+				OR = {
+					has_planet_flag = tec_planet_big
+					has_planet_flag = tec_planet_medium_big
+				}
+			}
+			set_planet_flag = tec_potential_ecu_3
+			remove_planet_flag = tec_potential_ecu_2
+			remove_planet_flag = tec_potential_ecu_1
+		}
+
+		# perfect candidate
+		if = {
+			limit = {
+				NOR = {
+					has_planet_flag = tec_energy_planet_3
+					has_planet_flag = tec_energy_planet_4
+
+					has_planet_flag = tec_mineral_planet_3
+					has_planet_flag = tec_mineral_planet_4
+
+					has_planet_flag = tec_food_planet_3
+					has_planet_flag = tec_food_planet_4
+				}
+				has_planet_flag = tec_planet_big
+			}
+			set_planet_flag = tec_potential_ecu_4
+			remove_planet_flag = tec_potential_ecu_3
+			remove_planet_flag = tec_potential_ecu_2
+			remove_planet_flag = tec_potential_ecu_1
+		}
+		# perfect candidate 2.0
+		if = {
+			limit = {
+				OR = {
+					has_planet_flag = tec_energy_planet_2
+					has_planet_flag = tec_energy_planet_1
+
+					has_planet_flag = tec_energy_planet_2
+					has_planet_flag = tec_energy_planet_1
+
+					has_planet_flag = tec_energy_planet_2
+					has_planet_flag = tec_energy_planet_1
+				}
+				OR = {
+					has_planet_flag = tec_planet_big
+					has_planet_flag = tec_planet_medium_big
+				}
+			}
+			set_planet_flag = tec_potential_ecu_4
+			remove_planet_flag = tec_potential_ecu_3
+			remove_planet_flag = tec_potential_ecu_2
+			remove_planet_flag = tec_potential_ecu_1
+		}
+	}
+}
+
+# Pseudoplan - launched every 10 years
+country_event = {
+	id = tec_ai.200
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = no
+
+	trigger = {
+		has_global_flag = stellarisevolved 
+	}
+
+	immediate = {
+		# Reset flags
+		remove_country_flag = tec_prio_habitats_high
+		remove_country_flag = tec_prio_habitats_mid
+		remove_country_flag = tec_prio_habitats_low
+
+		remove_country_flag = tec_prio_protoworlds_high
+		remove_country_flag = tec_prio_protoworlds_mid
+		remove_country_flag = tec_prio_protoworlds_low
+
+		remove_country_flag = tec_prio_elysium_high
+		remove_country_flag = tec_prio_elysium_mid
+	#	remove_country_flag = tec_prio_elysium_low
+
+		remove_country_flag = tec_prio_ecu_high
+		remove_country_flag = tec_prio_ecu_mid
+	#	remove_country_flag = tec_prio_ecu_low
+
+		remove_country_flag = tec_prio_ecoworld_high
+		remove_country_flag = tec_prio_ecoworld_mid
+	#	remove_country_flag = tec_prio_ecoworld_low
+
+		remove_country_flag = tec_prio_terraform_high
+	#	remove_country_flag = tec_prio_terraform_mid
+	#	remove_country_flag = tec_prio_terraform_low
+
+		remove_country_flag = tec_prio_megas_high
+	#	remove_country_flag = tec_prio_megas_mid
+		remove_country_flag = tec_prio_megas_low
+
+		# Check owned planets and start specialization
+		if = {
+			limit = {
+				num_owned_planets < 4
+			}
+			# Set pseudoplan tasks
+			set_country_flag = tec_prio_habitats_high
+			set_country_flag = tec_prio_protoworlds_high
+			set_country_flag = tec_prio_ecu_mid
+			set_country_flag = tec_prio_ecoworld_mid
+			set_country_flag = tec_prio_elysium_high
+			set_country_flag = tec_prio_ecoworld_high
+			set_country_flag = tec_prio_megas_low
+			# Sort planets
+
+
+			# Prioritize making habitats/protoworlds
+			# Kinda suited by the new habitat code
+			random_planet_within_border = {
+				limit = {
+					has_deposit_for = shipclass_mining_station
+				}
+				# insert effect here
+				set_planet_flag = tec_create_habitat_here
+			}
+
+			# Chose ecumenopolis candidate
+			random_owned_planet = {
+				limit = {
+					OR = {
+						has_planet_flag = tec_potential_ecu_1
+						has_planet_flag = tec_potential_ecu_2
+						has_planet_flag = tec_potential_ecu_3
+						has_planet_flag = tec_potential_ecu_4
+					}
+				}
+				# insert effect here
+				set_planet_flag = tec_create_ecu_here
+			}
+			# Chose terraform candidates
+		}
+		if = {
+			limit = {
+				num_owned_planets > 4
+				num_owned_planets < 11
+			}
+			# Set pseudoplan tasks
+			set_country_flag = tec_prio_habitats_mid
+			set_country_flag = tec_prio_protoworlds_mid
+			set_country_flag = tec_prio_elysium_high
+			set_country_flag = tec_prio_ecu_high
+			set_country_flag = tec_prio_ecoworld_high
+			set_country_flag = tec_prio_terraform_high
+			set_country_flag = tec_prio_megas_high
+			# Sort planets
+
+			# Prioritize making habitats/protoworlds
+			
+			# Chose ecumenopolis candidate
+
+			# Chose terraform candidates
+		}
+		if = {
+			limit = {
+				num_owned_planets > 9
+				num_owned_planets < 21
+			}
+			# Set pseudoplan tasks
+			set_country_flag = tec_prio_habitats_low
+			set_country_flag = tec_prio_protoworlds_low
+			set_country_flag = tec_prio_elysium_high
+			set_country_flag = tec_prio_ecu_high
+			set_country_flag = tec_prio_ecoworld_high
+			set_country_flag = tec_prio_terraform_high
+			set_country_flag = tec_prio_megas_high
+			# Sort planets
+
+			# Must have habitats for sure, anyway sort them too
+			
+			# Chose ecumenopolis candidate
+
+			# Chose terraform candidates
+		}
+		if = {
+			limit = {
+				num_owned_planets > 19
+				num_owned_planets < 31
+			}
+			# Set pseudoplan tasks
+			set_country_flag = tec_prio_habitats_low
+			set_country_flag = tec_prio_protoworlds_low
+			set_country_flag = tec_prio_elysium_mid
+			set_country_flag = tec_prio_ecu_high
+			set_country_flag = tec_prio_ecoworld_high
+			set_country_flag = tec_prio_terraform_high
+			set_country_flag = tec_prio_megas_high
+			# Sort planets
+
+			# habitats no so important at this point
+			
+			# Chose ecumenopolis candidate
+
+			# Chose terraform candidates
+		}
+		if = {
+			limit = {
+				num_owned_planets > 29
+			}
+			# uff...Set pseudoplan tasks
+			break = yes
+
+			# Sort planets
+
+			# habitats no so important at this point
+			
+			# Chose ecumenopolis candidate
+
+			# Chose terraform candidates
+		}
+	}
+}
+
+# Ecu handler
+country_event = {
+	id = tec_ai.500
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = no
+
+	trigger = {
+		has_global_flag = stellarisevolved 
+		is_ai = yes
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				OR = {
+					has_country_flag = tec_fulfilled_plan_decent
+					has_country_flag = tec_fulfilled_plan_medium
+					has_country_flag = tec_fulfilled_plan_nice
+				}
+				any_planet_within_border = {
+					OR = {
+						has_planet_flag = tec_potential_ecu_2
+						has_planet_flag = tec_potential_ecu_3
+						has_planet_flag = tec_potential_ecu_4
+					}
+					NOR = {
+						has_planet_flag = tec_plan_energy_planet
+						has_planet_flag = tec_plan_mineral_planet
+						has_planet_flag = tec_plan_food_planet
+					}
+				}
+			}
+			capital_scope = {
+				closest_system = {	# Closest system to capital
+					limit = {
+						any_system_planet = {
+							OR = {
+								has_planet_flag = tec_potential_ecu_2
+								has_planet_flag = tec_potential_ecu_3
+								has_planet_flag = tec_potential_ecu_4
+							}
+							NOR = {
+								has_planet_flag = tec_plan_energy_planet
+								has_planet_flag = tec_plan_mineral_planet
+								has_planet_flag = tec_plan_food_planet
+							}
+						}
+					}
+					random_system_planet = {
+						set_planet_flag = tec_chosen_ai_ecu
+					}
+				}
+			}
+		}
+		else_if = {	# takes capital
+			limit = {
+				always = no	# review
+			}
+			break = yes
+		}
+		
+		# Delete this
+
+		
+	}
+}
+
+
+
+
+
+
+
+
+# EVENT FOR SAVING FLAGS AND AVOIDING ERROR CLUTTERING, JUST DONT USE!!!
+country_event = {
+	id = tec_ai.666
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = no
+
+	trigger = {
+		always = no
+	}
+
+	immediate = {
+		set_country_flag = tec_originally_lithoid_replicant
+		set_country_flag = tec_can_genesplice
+
+		set_country_flag = tec_hates_robots
+		
+		set_country_flag = tec_fulfilled_plan_decent
+		set_country_flag = tec_fulfilled_plan_medium
+		set_country_flag = tec_fulfilled_plan_nice
+
+		# Assimilation
+			set_country_flag = tec_total_assimilation
+			set_country_flag = tec_biological_assimilation
+			set_country_flag = tec_replicant_assimilation
+			set_country_flag = tec_synthetic_assimilation
+			set_country_flag = synthetic_empire 
+			set_country_flag = replicant_empire
+			set_country_flag = tec_machine_encasing	
+
+			set_country_flag = tec_cybernetic_t1_assimilation
+			set_country_flag = tec_cybernetic_t2_assimilation
+											
+			set_country_flag = tec_psionic_assimilation
+			set_country_flag = tec_biopsionic_assimilation
+			set_country_flag = tec_cyberpsionic_assimilation
+			set_country_flag = tec_psienergy_assimilation
+
+			set_country_flag = tec_robot_into_machine_assimilation
+			set_country_flag = tec_machine_into_robot_assimilation
+			set_country_flag = tec_robot_total_assimilation
+
+			set_country_flag = tec_hive_trait_assimilation
+			set_country_flag = tec_hive_trait_deassimilation
+
+			set_country_flag = tec_hive_biological_assimilation
+			set_country_flag = tec_hive_replicant_assimilation
+											
+			set_country_flag = tec_hive_cybernetic_t1_assimilation
+			set_country_flag = tec_hive_cybernetic_t2_assimilation
+											
+			set_country_flag = tec_hive_psionic_assimilation
+			set_country_flag = tec_hive_cyberpsionic_assimilation
+			set_country_flag = tec_hive_biopsionic_assimilation
+
+			set_country_flag = tec_test_assimilations
+			set_country_flag = tec_test_assimilations_switch
+		# /
+
+		capital_scope = {
+			planet = {
+				set_planet_flag = tec_plan_energy_planet
+				set_planet_flag = tec_plan_mineral_planet
+				set_planet_flag = tec_plan_food_planet
+				set_planet_flag = tec_protoworld_changing_city
+				set_planet_flag = tec_protoworld_changing_hot_1
+				set_planet_flag = tec_protoworld_changing_wet_1
+				set_planet_flag = tec_protoworld_changing_cold_1
+				set_planet_flag = tec_protoworld_changing_perfect
+
+				set_planet_flag = necrophage_elevation_timer
+
+				set_planet_flag = tec_remnants_decadent_ecu	# remnants origin civic
+
+				set_planet_flag = parasite_branch_closed_cooldown_planet@root 
+
+				# Automated production
+				set_planet_flag = tec_automation_mechanic_off
+
+				# ai mark
+				set_planet_flag = tec_designated_as_ai_ecu
+				set_variable = {
+					which = num_housing_districts
+					value = 1
+				}
+				set_variable = {
+					which = num_industrial_districts
+					value = 1
+				}
+
+				# Scavengers
+				set_planet_flag = tec_relic_megastructure
+			}
+		}
+
+		random_situation = {
+			set_situation_flag = situation_tec_debug
+		}
+		# Unused vanilla
+		set_relation_flag = {
+			who = root
+			flag = AbandonedRefugees
+		}
+		set_country_flag = faction_capitalism_outraged_gc
+		set_country_flag = faction_elitist_outraged_gc
+		set_country_flag = faction_green_outraged_gc
+		set_country_flag = faction_militarist_outraged_gc
+		set_country_flag = faction_xenophobe_isolationist_outraged_gc
+		set_country_flag = faction_pluralist_outraged_gc
+		set_country_flag = faction_industrial_outraged_gc
+		set_country_flag = faction_egalitarian_outraged_gc
+		set_country_flag = faction_pacifist_outraged_gc
+		set_country_flag = faction_socialism_outraged_gc
+		set_country_flag = faction_xenophobe_supremacist_outraged_gc
+		set_country_flag = faction_materialist_outraged_gc
+		set_country_flag = faction_authoritarian_outraged_gc
+		set_country_flag = faction_spiritualist_outraged_gc
+		set_country_flag = faction_xenophile_outraged_gc
+
+		set_country_flag = suppress_vanilla_factions
+		set_country_flag = harvested_radiotrophic_dna
+		# vd
+		set_country_flag = tec_void_dweller_colonization_on
+		
+		# Delete this
+		set_country_flag = tec_waives_clone_origin_restrictions
+		set_global_flag = tec_test_arkships
+
+		# Other
+		set_country_flag = tec_test_aquatic_empire
+		set_country_flag = tec_test_bioarch_empire
+		set_country_flag = tec_test_megacity_empire
+		set_country_flag = tec_test_automation
+
+		set_country_flag = tec_has_encountered_other_species
+
+		set_country_flag = tec_wants_to_change_patron
+		set_country_flag = tec_ai_use_food_for_worlds
+
+		set_country_flag = tec_bioservants_are_alive
+
+		set_global_flag = tec_galcom_force_spread_true
+
+		# Aiauths
+		set_country_flag = tec_test_aiauth
+		set_country_flag = tec_test_aiauth_all_leaders
+		set_country_flag = tec_test_aiauth_swaps_governors
+		set_country_flag = tec_test_aiauth_swaps_researchers
+		set_country_flag = tec_test_aiauth_swaps_militars
+
+		# BTS
+		set_global_flag = tec_bt_1_unlocked
+		set_country_flag = tec_bt_2_unlocked
+		set_country_flag = tec_bt_2_spread_low_off
+		set_country_flag = tec_bt_2_spread_mid_off
+		set_country_flag = tec_bt_2_spread_high_off
+
+		# GAME RULES
+		# Note: best way would be to normalize those for all mods
+		capital_scope = {
+			set_planet_flag = can_organic_assemble_flag
+		}
+		set_country_flag = can_gene_mod_habitability
+		set_country_flag = can_add_advanced_traits
+		set_country_flag = can_add_negative_traits_organic
+		set_country_flag = can_remove_positive_traits_organic
+		set_country_flag = can_modify_organic_portraits
+		set_country_flag = can_resequence
+
+		# 
+		# Mod compatibility
+			# - Fiiral technology advanced
+			set_global_flag = tadv_active
+
+			# Gigas
+			capital_scope = {
+				set_planet_flag = giga_interstellar_ring
+				set_planet_flag = giga_penrose
+			}
+			set_global_flag = giga_game_started
+
+			set_global_flag = giga_habitats_disabled 
+			set_global_flag = giga_habitats_system_3
+			set_global_flag = giga_habitats_system_10
+			set_global_flag = giga_habitats_system_25
+			set_global_flag = giga_habitats_unlimited
+			set_global_flag = giga_habitats_pop_25
+			set_global_flag = giga_habitats_pop_50
+			set_global_flag = giga_habitats_pop_100
+
+			# Planetary diversity
+			set_global_flag = planetarydiversity
+
+			# GPM
+			set_global_flag = has_guillis_planet_modifiers_mod
+			set_country_flag = gpm_artifact_research_centre_unlocked
+			capital_scope = {
+				set_planet_flag = gpm_is_precursor_world
+			}
+
+			# ESC
+			set_country_flag = ESC_COUNTRY_FLAG_mod_allow_tesla_weapons
+			set_country_flag = ESC_COUNTRY_FLAG_mod_allow_cybernetic_amoeba
+			set_country_flag = ESC_COUNTRY_FLAG_machine_psionics
+			set_country_flag = ESC_COUNTRY_FLAG_mod_allow_basic_psionic_weapons
+			set_country_flag = ESC_COUNTRY_FLAG_mod_allow_advanced_psionic_weapons
+			set_country_flag = ESC_COUNTRY_FLAG_mod_allow_advanced_nanite_weapons
+			
+
+		#
+		# Test assimilation location
+		random_owned_species = {
+			limit = {
+				is_exact_same_species = owner_main_species
+			}
+			save_event_target_as = tec_target_species
+			modify_species = {
+				add_trait = trait_cybernetic
+				add_trait = trait_psionic
+				change_scoped_species = no
+				effect = {
+					set_species_flag = THIS_IS_THE_WAY
+					save_event_target_as = tec_new_species
+				}
+			}
+			event_target:tec_target_species = {
+				every_species_pop = {
+					change_species = event_target:tec_new_species
+				}
+			}
+		}
+
+		owner_species = {
+			save_event_target_as = tec_target_species
+			modify_species = {
+				add_trait = trait_cybernetic
+				change_scoped_species = no
+				effect = {
+					modify_species = {
+						add_trait = trait_psionic
+						change_scoped_species = no
+						effect = {
+							set_species_flag = THIS_IS_THE_WAY
+							save_event_target_as = tec_new_species
+						}
+					}
+				}
+			}
+			event_target:tec_target_species = {
+				every_species_pop = {
+					change_species = event_target:tec_new_species
+				}
+			}
+		}
+		if = {
+			limit = {
+				any_owned_species = {
+					is_same_species = owner_main_species
+					has_trait = trait_cybernetic
+					has_trait = trait_psionic
+				}
+			}
+			random_owned_species = {
+				limit = {
+					is_same_species = owner_main_species
+					has_trait = trait_cybernetic
+					has_trait = trait_psionic
+				}
+				save_event_target_as = tec_change_to_this
+			}
+			every_owned_species = {
+				limit = {
+					is_same_species = owner_main_species
+					NOR = {
+						has_trait = trait_cybernetic
+						has_trait = trait_psionic
+					}
+				}
+				every_species_pop = {
+					change_species = event_target:tec_change_to_this
+				}
+			}
+		}
+
+		random_owned_species = {
+			limit = {
+				has_trait = trait_cybernetic
+				has_trait = trait_psionic
+			}
+			save_event_target_as = tec_target_species
+			modify_species = {
+				remove_trait = trait_cybernetic
+				add_trait = trait_tec_advanced_cyborg
+				change_scoped_species = no
+				effect = {
+					modify_species = {
+						change_scoped_species = no
+						remove_trait = trait_psionic
+						effect = {
+							set_species_flag = THIS_IS_THE_WAY
+							save_event_target_as = tec_new_species
+						}
+					}
+					
+				}
+			}
+			event_target:tec_target_species = {
+				every_species_pop = {
+					change_species = event_target:tec_new_species
+				}
+			}
+		}
+
+		random_owned_species = {
+			limit = {
+				is_same_species = root.owner_main_species
+			}
+			save_event_target_as = tec_target_species_2
+			modify_species = {
+				add_trait = trait_cybernetic
+				change_scoped_species = no
+				effect = {
+					set_species_flag = THIS_IS_THE_CYBERWAY
+					save_event_target_as = tec_new_species_2
+				}
+			}
+			event_target:tec_target_species_2 = {
+				every_species_pop = {
+					change_species = event_target:tec_new_species_2
+				}
+			}
+		}
+
+		# test species changes and error log
+		owner_main_species = {
+			modify_species = {
+				species = this
+				add_trait = trait_social_pheromones
+				add_traits_at_start_of_list = yes
+				change_scoped_species = no
+				effect = {
+					modify_species = {
+						species = this
+						add_trait = trait_hive_mind
+						add_traits_at_start_of_list = yes
+						change_scoped_species = no
+						effect = {
+							set_timed_species_flag = {
+								flag = assimilation_species_of_species@prev
+								days = 30
+							}
+							set_timed_species_flag = {
+								flag = assimilation_species_of_empire@prevprev
+								days = 30
+							}
+							set_timed_species_flag = {
+								flag = tec_psi_hm_@prev
+								days = 30
+							}
+							save_event_target_as = tec_test_assimi
+						}
+					}
+				}
+			}
+		}
+		every_owned_pop = {
+			limit = {
+				is_same_species = owner_main_species
+			}
+			change_species = event_target:tec_test_assimi
+		}
+
+
+
+		owner_main_species = {
+			modify_species = {
+				species = this
+				add_trait = trait_intelligent
+				add_traits_at_start_of_list = yes
+				change_scoped_species = no
+				effect = {
+					set_timed_species_flag = {
+						flag = assimilation_species_of_species@prev
+						days = 30
+					}
+					set_timed_species_flag = {
+						flag = assimilation_species_of_empire@prevprev
+						days = 30
+					}
+					set_timed_species_flag = {
+						flag = tec_psi_hm_@prev
+						days = 30
+					}
+					save_event_target_as = tec_test_assimi
+				}
+			}
+		}
+		every_owned_pop = {
+			limit = {
+				is_same_species = owner_main_species
+			}
+			change_species = event_target:tec_test_assimi
+		}
+
+		
+	}
+}
+
+namespace = evolved_debug
+
+planet_event = {
+	id = evolved_debug.100
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		always = yes
+	}
+	
+	immediate = {
+		hidden_effect = {
+			tec_add_energy_districts = yes
+			tec_add_mineral_districts = yes
+			tec_add_food_districts = yes
+		}
+	}
+}
+
+planet_event = {
+	id = evolved_debug.10
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		always = yes
+	}
+	
+	immediate = {
+		clear_variable = 25percent
+		clear_variable = 75percent
+		while = {
+			count = 10
+			random_list = {
+				25 = {
+					change_variable = {
+						which = 25percent
+						value = 1
+					}
+				}
+				75 = {
+					change_variable = {
+						which = 75percent
+						value = 1
+					}
+				}
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = evolved_debug.1001
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		always = yes
+	}
+	
+	immediate = {
+		clear_variable = 25percent
+		clear_variable = 75percent
+		while = {
+			count = 100
+			random_list = {
+				25 = {
+					change_variable = {
+						which = 25percent
+						value = 1
+					}
+				}
+				75 = {
+					change_variable = {
+						which = 75percent
+						value = 1
+					}
+				}
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = evolved_debug.1000
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		always = yes
+	}
+	
+	immediate = {
+		clear_variable = 25percent
+		clear_variable = 75percent
+		while = {
+			count = 1000
+			random_list = {
+				250 = {
+					change_variable = {
+						which = 25percent
+						value = 1
+					}
+				}
+				750 = {
+					change_variable = {
+						which = 75percent
+						value = 1
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = evolved_debug.1019
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = tec_u_c_mecha
+		set_country_flag = tec_u_c_worker
+		set_country_flag = tec_u_c_bioimplants
+		set_country_flag = tec_u_c_brain
+		set_country_flag = tec_u_c_intralink
+		set_country_flag = tec_u_c_mindless
+		set_country_flag = tec_u_c_fashion
+		set_country_flag = tec_u_c_specialist
+		set_country_flag = tec_u_c_selfmaintenance
+		set_country_flag = tec_u_c_databank
+		set_country_flag = tec_u_c_extralimbs
+		set_country_flag = tec_u_cp_power
+		set_country_flag = tec_u_cp_equilibrium
+		set_country_flag = tec_u_cp_control
+
+	}
+}
+
+event = {
+	id = evolved_debug.99999
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		always = no
+	}
+
+	immediate = {
+		set_global_flag = tec_custom_assimilation_off
+	}
+}
+
+

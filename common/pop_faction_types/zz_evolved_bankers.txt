@@ -1,0 +1,788 @@
+# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
+# Individualists Bankers Faction
+# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
+
+bankers = {
+	election_header = "GFX_faction_header_yellow"
+	guiding_ethic = ethic_capitalism
+	
+	unique = yes
+	support_multiplier = 1
+
+	resources = {
+		category = pop_factions
+		produces = {
+			unity = @tec_fac_infl_produce
+		}
+		produces = {	# Political virtue
+			trigger = {
+				exists = owner
+				owner = {
+					has_valid_civic = civic_tec_political_virtue
+				}
+				faction_approval >= 0.5
+			}
+			energy = 1
+		}
+		produces = {	# Political virtue
+			trigger = {
+				exists = owner
+				owner = {
+					has_valid_civic = civic_tec_political_virtue
+					is_competitive = yes
+				}
+				faction_approval >= 0.5
+			}
+			energy = 0.2
+		}
+		produces = {	# Idealistic foundation
+			trigger = {
+				owner = {
+					has_valid_civic = civic_idealistic_foundation
+				}
+			}
+			influence = 0.005
+		}
+	}
+
+	#Note: number of potential or actual members is checked by POP_FACTION_MIN_POTENTIAL_MEMBERS define
+	is_potential = {
+		is_faction_allowed = yes
+	}
+
+	parameters = {
+		empire = {
+			type = country
+			valid_objects = {
+				is_same_value = root
+			}
+		}
+	}
+
+	can_join_pre_triggers = {
+		is_enslaved = no
+		is_being_purged = no
+	}
+
+	can_join_faction = {
+		is_shackled_robot = no
+		is_shackled_bioservant = no
+		tec_has_stapled_trait = no
+	}
+	
+	attraction = {
+		base = 150
+		
+		modifier = {
+			factor = 1.25
+			exists = from
+			from = {
+				exists = leader
+				leader = { leader_class = ruler }
+			}
+		}
+		
+		modifier = {
+			factor = 0.75
+			exists = from
+			from = {
+				NOT = { exists = leader }
+			}
+		}
+
+		# Should really check for citizenship instead
+		modifier = {
+			factor = 0.25
+			NOT = { is_same_species = owner_species }
+		}
+	}
+	
+	leader = {
+		base = 100
+
+		modifier = {
+			factor = 0
+			leader_class = ruler
+			owner = { has_authority = auth_imperial }
+		}
+
+		modifier = {
+			factor = 0.0
+			is_event_leader = yes
+		}
+	}
+	
+	demand = {
+		title = "FACTION_OUTRAGED_GC"
+		unfulfilled_title = "FACTION_OUTRAGED_GC"
+		desc = "FACTION_OUTRAGED_GC_DESC"
+
+		fulfilled_effect = -20
+		unfulfilled_effect = 0
+
+		potential = {
+			exists = owner
+			owner = {
+				has_country_flag = faction_capitalism_outraged_gc
+			}
+		}
+
+		trigger = {
+			owner = {
+				has_country_flag = faction_capitalism_outraged_gc
+			}
+		}
+	}
+
+	# ----------------------- D E M A N D S -----------------------
+		# Pos scaling
+			# Wealth capital (200-400-800 tv)
+			demand = {	# POS - WEALTH CAPITAL 1
+				title = "TEC_FAC_COMP_WEALTH_CAPITAL1"
+				unfulfilled_title = "TEC_FAC_COMP_NOWEALTH_CAPITAL1"
+				desc = "TEC_FAC_COMP_WEALTH_CAPITAL1_DESC"
+				
+				fulfilled_effect = 5
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+					owner = {
+						capital_scope = {
+							check_modifier_value = {
+								modifier = trade_value_add
+								value < 400
+							}
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						capital_scope = {
+							check_modifier_value = {
+								modifier = trade_value_add
+								value >= 200
+							}
+						}
+					}
+				}
+			}
+			demand = {	# POS - WEALTH CAPITAL 2
+				title = "TEC_FAC_COMP_WEALTH_CAPITAL2"
+				unfulfilled_title = "TEC_FAC_COMP_NOWEALTH_CAPITAL2"
+				desc = "TEC_FAC_COMP_WEALTH_CAPITAL2_DESC"
+				
+				fulfilled_effect = 10
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+					owner = {
+						capital_scope = {
+							check_modifier_value = {
+								modifier = trade_value_add
+								value < 800
+							}
+							check_modifier_value = {
+								modifier = trade_value_add
+								value > 199
+							}
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						capital_scope = {
+							check_modifier_value = {
+								modifier = trade_value_add
+								value >= 400
+							}
+						}
+					}
+				}
+			}
+			demand = {	# POS - WEALTH CAPITAL 3
+				title = "TEC_FAC_COMP_WEALTH_CAPITAL3"
+				unfulfilled_title = "TEC_FAC_COMP_NOWEALTH_CAPITAL3"
+				desc = "TEC_FAC_COMP_WEALTH_CAPITAL3_DESC"
+				
+				fulfilled_effect = 15
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+					owner = {
+						capital_scope = {
+							check_modifier_value = {
+								modifier = trade_value_add
+								value > 400
+							}
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						capital_scope = {
+							check_modifier_value = {
+								modifier = trade_value_add
+								value >= 800
+							}
+						}
+					}
+				}
+			}
+		# /
+		# Pos
+			# Economic fed
+			demand = {	# POS - ECONOMIC FEDERATION
+				title = "TEC_FAC_COMP_TRADEFED"
+				unfulfilled_title = "TEC_FAC_COMP_NO_TRADEFED"
+				desc = "TEC_FAC_COMP_TRADEFED_DESC"
+				
+				fulfilled_effect = 5
+				unfulfilled_effect = 0
+				potential = {
+					owner = {
+						num_communications > 2
+						OR = {
+							count_federation = {
+								count > 0
+							}
+							has_tradition = tr_diplomacy_the_federation
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						has_federation = yes
+						exists = federation
+						federation = {
+							has_federation_type = trade_federation
+						}
+					}
+				}
+			}
+			# Branch offices
+			demand = {	# POS - HAS BRANCH OFFICES
+				title = "TEC_FAC_COMP_HASBRANCHES"
+				unfulfilled_title = "TEC_FAC_COMP_NOTHASBRANCHES"
+				desc = "TEC_FAC_COMP_HASBRANCHES_DESC"
+				
+				fulfilled_effect = 5
+				unfulfilled_effect = 0
+				potential = {
+					owner = {
+						is_megacorp = no
+						any_relation = {
+							has_communications = root.owner
+							OR = {
+								is_megacorp = yes
+								tec_is_trade_gestalt = yes
+							}
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						any_owned_planet = {
+							is_colony = yes
+							has_branch_office = yes
+						}
+					}
+				}
+			}
+			demand = {	# POS - CREATE BRANCH OFFICE
+				title = "TEC_FAC_COMP_MEGAHASBRANCHES"
+				unfulfilled_title = "TEC_FAC_COMP_MEGANOTHASBRANCHES"
+				desc = "TEC_FAC_COMP_MEGAHASBRANCHES_DESC"
+				
+				fulfilled_effect = 5
+				unfulfilled_effect = 0
+				potential = {
+					owner = {
+						is_megacorp = yes
+						any_relation = {
+							has_communications = root.owner
+							OR = {
+								is_megacorp = no
+								AND = {
+									is_megacorp = yes
+									has_valid_civic = civic_tec_corporate_cooperacorp
+								}
+							}
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						any_relation = {
+							has_communications = root.owner
+							any_owned_planet = {
+								has_branch_office = yes
+								branch_office_owner = {
+									is_same_value = root.owner
+								}
+							}
+						}
+					}
+				}
+			}
+			# Mercantile
+			demand = {	# POS - MERCANTILE
+				title = "TEC_FAC_COMP_MERCANTILE"
+				unfulfilled_title = "TEC_FAC_COMP_NO_MERCANTILE"
+				desc = "TEC_FAC_COMP_MERCANTILE_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+				}
+				trigger = {
+					owner = {
+						tec_has_mercantile_traditions = yes
+					}
+				}
+			}
+		# /
+		# Neut
+			demand = {	# NEUT - PRIVATE MEDICINE
+				title = "TEC_FAC_COMP_PRIV_MEDICINE"
+				unfulfilled_title = "TEC_FAC_COMP_NO_PRIV_MEDICINE"
+				desc = "TEC_FAC_COMP_PRIV_MEDICINE_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = -5
+				potential = {
+					exists = owner
+					owner = {
+						can_set_policy = {
+							policy = healthcare
+							option = private_healthcare
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						has_policy_flag = private_healthcare
+					}
+				}
+			}
+			# Economic federation
+			demand = {	# NEU - LEADER OF ECONOMIC FEDERATION
+				title = "TEC_FAC_COMP_LEAD_TRADEFED"
+				unfulfilled_title = "TEC_FAC_COMP_NO_LEAD_TRADEFED"
+				desc = "TEC_FAC_COMP_LEAD_TRADEFED_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+					owner = {
+						has_federation = yes
+						exists = federation
+						federation = {
+							has_federation_type = trade_federation
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						is_federation_leader = yes
+					}
+				}
+			}
+			# Stratification
+			demand = {	# NEU - STRATA
+				title = "TEC_FAC_COMP_STRATIFY_POPS"
+				unfulfilled_title = "TEC_FAC_COMP_NO_STRATIFIED_POPS"
+				desc = "TEC_FAC_COMP_STRATIFY_POPS_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = -5
+				potential = {
+					exists = owner
+				}
+				trigger = {
+					owner = {
+						OR = {
+							NOT = {	# There are no species with stratified or academic
+								any_owned_species = {
+									NOR = {
+										has_living_standard = { type = living_standard_stratified country = prev }
+										has_living_standard = { type = living_standard_academic_privilege country = prev }
+										AND = {	# Decadence is also allowed
+											prevprev = {
+												is_pleasure_seeker = yes
+											}
+											has_living_standard = { type = living_standard_decadent country = prev }
+										}
+									}
+								}
+							}
+							any_owned_species = { # There are enslaved species
+								OR = {
+									has_citizenship_type = { type = citizenship_slavery country = prev }
+									has_citizenship_type = { type = citizenship_purge country = prev }
+									has_citizenship_type = { type = citizenship_robot_servitude country = prev }
+									has_citizenship_type = { type = citizenship_assimilation country = prev }
+								}
+							}
+							# Has specific civic
+							has_civic = civic_slaver_guilds
+							has_civic = civic_tec_forced_reeducation
+							has_civic = civic_tec_caste_system
+						}
+					}
+				}
+			}
+		# /
+		# Bad
+			# Mercantile stance
+			demand = {	# NEG - MERCANTILE STANCE
+				title = "TEC_FAC_COMP_MERCANTILE_STANCE"
+				unfulfilled_title = "TEC_FAC_COMP_NO_MERCANTILE"
+				desc = "TEC_FAC_COMP_MERCANTILE_STANCE_DESC"
+				fulfilled_effect = 0
+				unfulfilled_effect = -10
+				potential = {
+					exists = owner
+					owner = {
+						can_set_policy = {
+							policy = diplomatic_stance
+							option = diplo_stance_mercantile
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						has_policy_flag = diplo_stance_mercantile
+					}
+				}
+			}
+			# No social development
+			demand = {	# NEG - NO SOCIAL DEVELOPMENT
+				title = "TEC_FAC_COMP_NO_SOCIAL_DEVELOPMENT"
+				unfulfilled_title = "TEC_FAC_COMP_SOCIAL_DEVELOPMENT_IS_BAD"
+				desc = "TEC_FAC_COMP_NO_SOCIAL_DEVELOPMENT_DESC"		
+				fulfilled_effect = 0
+				unfulfilled_effect = -10
+				potential = {
+					exists = owner
+					owner = {
+						can_set_policy = {
+							policy = trade_policy
+							option = trade_policy_social
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						NOT = {
+							has_policy_flag = trade_conversion_social
+						}
+					}
+				}
+			}
+			# No planned economy
+			demand = {	# NEG - NO PLANNED ECONOMY
+				title = "TEC_FAC_COMP_NO_PLANNED_ECO"
+				unfulfilled_title = "TEC_FAC_COMP_PLANNED_ECO_IS_BAD"
+				desc = "TEC_FAC_COMP_NO_PLANNED_ECO_DESC"
+				fulfilled_effect = 0
+				unfulfilled_effect = -25
+				potential = {
+					exists = owner
+					owner = {
+						can_set_policy = {
+							policy = economic_stance
+							option = economic_stance_planned
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						has_policy_flag = economic_stance_planned
+					}
+				}
+			}
+			# No social welfare
+			demand = {	# NEG - NO SOCIAL WELFARE
+				title = "TEC_FAC_COMP_NO_WELFARE"
+				unfulfilled_title = "TEC_FAC_COMP_WELFARE_IS_BAD"
+				desc = "TEC_FAC_COMP_NO_WELFARE_DESC"
+				fulfilled_effect = 0
+				unfulfilled_effect = -25
+				potential = {
+					exists = owner
+				}
+				trigger = {
+					owner = {
+						NOT = {
+							any_owned_species = {
+								has_living_standard = {
+									type = living_standard_good 
+									country = prev
+								}
+							}
+						}
+					}
+				}
+			}
+		# /
+		demand = {	# NEG - FACTION NEGATIVE ECONOMY
+			title = "TEC_FACTION_NO_NEGATIVE_ECONOMY"
+			unfulfilled_title = "TEC_FACTION_BAD_ECONOMY"
+			desc = "TEC_FACTION_NO_NEGATIVE_ECONOMY_DESC"
+			fulfilled_effect = 0
+			unfulfilled_effect = -10
+			potential = {
+				exists = owner
+			}
+			trigger = {
+				owner = {
+					NOR = {
+						has_modifier = energy_deficit
+						has_modifier = minerals_deficit
+						has_modifier = food_deficit
+						has_modifier = alloys_deficit
+						has_modifier = minerals_deficit
+						#has_modifier = unity_deficit
+						has_modifier = consumer_goods_deficit
+						has_modifier = volatile_motes_deficit
+						has_modifier = exotic_gases_deficit
+						has_modifier = rare_crystals_deficit
+						has_modifier = nanites_deficit
+						#has_modifier = living_metal_deficit
+						#has_modifier = sr_zro_deficit
+					}
+				}
+			}
+		}
+
+	# / --------------------- D E M A N D S ---------------------
+
+	on_create = {
+		pop_faction_event = { id = factions.1 }
+	}
+
+	on_destroy = {
+		if = {
+			limit = {
+				has_modifier = promoted_capitalism
+			}
+			remove_modifier = promoted_capitalism
+		}
+		if = {
+			limit = {
+				has_modifier = suppressed_capitalism
+			}
+			remove_modifier = suppressed_capitalism
+		}
+	}
+	
+	actions = {
+		embrace_faction = {
+			title = "EMBRACE_FACTION"
+			description = "EMBRACE_FACTION_DESC"
+			
+			cost = {
+				influence = @tec_fac_embrace_cost
+			}
+			
+			potential = {
+				exists = owner
+				owner = {
+					OR = {
+						is_subject = no
+						NOT = { any_agreement = { agreement_preset = preset_dominion } }
+					}
+				}
+			}
+			
+			valid = {
+				custom_tooltip = {
+					fail_text = EMBRACE_FACTION_COOLDOWN
+					parameter:empire = {
+						NOT = { has_modifier = embraced_faction_timer }
+					}
+				}
+				support > @tec_fac_embrace_min_support
+				parameter:empire = {
+					NOT = { has_ethic = "ethic_fanatic_capitalism" }
+				}
+			}
+
+			effect = {
+				add_modifier = { modifier = embraced_faction days = @tec_fac_embrace_cd}
+				parameter:empire = {
+					shift_ethic = ethic_capitalism
+					hidden_effect = {
+						add_modifier = { modifier = embraced_faction_timer days = @tec_fac_embrace_cd}
+						every_pop_faction = {
+							limit = { NOT = { is_same_value = root } }
+							add_modifier = { modifier = embraced_another_faction days = @tec_fac_embrace_cd}
+						}
+					}
+				}
+				hidden_effect = {
+					save_event_target_as = TargetFaction
+					parameter:empire = {
+						every_relation = {
+							limit = {
+								is_ai = no
+								tec_is_default_country = yes
+								has_communications = prev
+								has_intel_level = {
+									who = prev
+									category = government
+									level >= 1
+								}
+							}
+							country_event = { id = factions.2000 }
+						}
+					}
+				}
+			}
+			
+			ai_weight = {
+				base = 1
+				modifier = {
+					factor = 0
+					support < 0.50
+					owner = {
+						has_ethic = ethic_capitalism
+					}
+				}
+				modifier = {
+					factor = 0
+					owner = { has_valid_civic = civic_fanatic_purifiers }
+				}
+				modifier = {
+					factor = 0
+					NOT = {
+						owner = {
+							exists = ruler
+							ruler = {
+								leader_of_faction = bankers
+							}
+						}
+					}
+				}
+				modifier = {
+					factor = 0
+					owner = {
+						count_pop_faction = {
+							count < 4
+						}
+					}
+				}
+			}
+		}
+		promote_faction = {
+			title = "PROMOTE_FACTION"
+			description = "PROMOTE_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					NOR = {
+						has_modifier = suppressed_capitalism
+						has_modifier = promoted_capitalism
+					}
+				}
+			}
+
+			effect = {
+				parameter:empire = {
+					add_modifier = { modifier = promoted_capitalism days = -1 }
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		cancel_promote_faction = {
+			title = "CANCEL_PROMOTE_FACTION"
+			description = "CANCEL_PROMOTE_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					has_modifier = promoted_capitalism
+				}
+			}
+
+			effect = {
+				parameter:empire = {
+					remove_modifier = promoted_capitalism
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		suppress_faction = {
+			title = "SUPPRESS_FACTION"
+			description = "SUPPRESS_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					NOR = {
+						has_modifier = suppressed_capitalism
+						has_modifier = promoted_capitalism 
+					}
+				}
+			}
+
+			effect = {
+				add_modifier = { modifier = suppressed_faction days = -1 }
+				parameter:empire = {
+					add_modifier = { modifier = suppressed_capitalism days = -1 }
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		cancel_suppress_faction = {
+			title = "CANCEL_SUPPRESS_FACTION"
+			description = "CANCEL_SUPPRESS_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					has_modifier = suppressed_capitalism
+				}
+			}
+
+			effect = {
+				remove_modifier = suppressed_faction
+				parameter:empire = {
+					remove_modifier = suppressed_capitalism
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+	}
+}
+
+
+
+	# ----------------------- D E M A N D S -----------------------
+		# Pos scaling
+
+		# /
+		# Pos
+
+		# /
+
+		# Neut
+
+		# /
+
+		# Bad
+
+		# /
+		
+	# /

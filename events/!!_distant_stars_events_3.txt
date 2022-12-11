@@ -1,0 +1,206 @@
+
+
+#################################
+#
+#################################
+
+namespace = distar
+
+# Killed Hatchling
+country_event = {
+	id = distar.5009
+	title = distar.5009.name
+	desc = distar.5009.desc
+	picture = GFX_evt_voidspawn
+	show_sound = event_space_whale
+	location = event_target:slain_guardian_system
+	trackable = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		from = { has_country_flag = hatchling_country }
+	}
+
+	immediate = {
+		set_country_flag = hatchling_killed # Achievement flag
+		set_country_flag = killed_hatchling
+		fromfrom.solar_system = {
+			save_event_target_as = slain_guardian_system
+		}
+		every_playable_country = {
+			limit = {
+				has_event_chain = curator_poi_chain
+				event_target:slain_guardian_system = {
+					is_point_of_interest = {
+						id = curator_poi_hatchling
+						event_chain = curator_poi_chain
+						owner = prev
+					}
+				}
+			}
+			remove_point_of_interest = curator_poi_hatchling
+			end_curator_chain = yes
+		}
+	}
+
+	option = {
+		name = distar.5009.a
+		event_target:hatchling_egg = {
+			enable_special_project = {
+				name = SHATTERED_EGG
+				location = this
+				owner = root
+			}
+		}
+		if = {
+			limit = {
+				exists = event_target:egg_owner
+				is_same_value = event_target:egg_owner
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = 72
+				min = 600
+				max = 6000
+			}
+		}
+		else_if = {
+			limit = {
+				OR = {
+					NOT = {
+						exists = event_target:egg_owner
+					}
+					AND = {
+						exists = event_target:egg_owner
+						is_same_value = event_target:egg_owner
+					}
+				}
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {
+		name = distar.5009.b
+		if = {
+			limit = {
+				exists = event_target:egg_owner
+				is_same_value = event_target:egg_owner
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = 72
+				min = 600
+				max = 6000
+			}
+		}
+		else_if = {
+			limit = {
+				OR = {
+					NOT = {
+						exists = event_target:egg_owner
+					}
+					AND = {
+						exists = event_target:egg_owner
+						is_same_value = event_target:egg_owner
+					}
+				}
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+		ai_chance = {
+			factor = 0
+		}
+	}
+	# Reanimate it!
+	option = {
+		ai_chance = {
+			factor = 100
+		}
+
+		name = galactic_features.385.reanimated
+
+		trigger = {
+			is_reanimator = yes
+		}
+
+		event_target:hatchling_egg = {
+			enable_special_project = {
+				name = "REANIMATE_VOIDSPAWN"
+				location = this
+				owner = root.owner
+			}
+		}
+	}
+	after = {
+		if = {
+			limit = { num_owned_planets > 0 }
+			generate_parade_city = yes
+			start_situation = {
+				type = leviathan_celebration_opportunity
+				target = event_target:parade_city
+				effect = {
+					set_situation_flag = celebration_voidspawn
+					set_situation_flag = standard_unity_reward
+				}
+			}
+		}
+	}
+}
+
+# Reanimated Voidspawn
+country_event = {
+	id = distar.5016
+	title = "distar.218.name"
+	desc = "distar.5016.desc"
+	location = event_target:hatchling_egg
+
+	is_triggered_only = yes
+
+	picture = GFX_evt_voidspawn
+	show_sound = event_space_whale
+
+	option = {
+		name = "it_hungers"
+
+		create_fleet = {
+			name = "NAME_Voidspawn"
+			effect = {
+				set_owner = root
+				create_ship = {
+					name = "NAME_Voidspawn"
+					design = "NAME_Voidspawn"
+					prefix = no
+					upgradable = no
+				}
+				set_location = {
+					target = event_target:hatchling_egg
+					distance = 0
+					angle = random
+				}
+				set_fleet_stance = passive
+			}
+			settings = {
+				can_upgrade = no
+				can_change_composition = no
+				can_change_leader = no
+				uses_naval_capacity = no
+				spawn_debris = no
+			}
+		}
+	}
+}

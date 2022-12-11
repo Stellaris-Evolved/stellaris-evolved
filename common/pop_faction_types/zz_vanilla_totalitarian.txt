@@ -1,0 +1,884 @@
+# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
+# Totalitarian Faction
+# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
+
+totalitarian = {
+	election_header = "GFX_faction_header_yellow"
+	guiding_ethic = ethic_authoritarian
+	
+	unique = yes
+	support_multiplier = 1
+	
+	resources = {
+		category = pop_factions
+		produces = {
+			unity = @tec_fac_infl_produce
+		}
+		produces = {	# Political virtue
+			trigger = {
+				owner = {
+					has_valid_civic = civic_tec_political_virtue
+				}
+				faction_approval >= 0.5
+			}
+			influence = 0.005
+		}
+		produces = {	# Political virtue
+			trigger = {
+				owner = {
+					has_valid_civic = civic_tec_political_virtue
+					is_authoritarian = yes
+				}
+				faction_approval >= 0.5
+			}
+			influence = 0.001
+		}
+		produces = {	# Idealistic foundation
+			trigger = {
+				owner = {
+					has_valid_civic = civic_idealistic_foundation
+				}
+			}
+			influence = 0.005
+		}
+	}
+
+	#Note: number of potential or actual members is checked by POP_FACTION_MIN_POTENTIAL_MEMBERS define
+	is_potential = {
+		is_faction_allowed = yes
+	}
+
+	parameters = {
+		empire = {
+			type = country
+			valid_objects = {
+				is_same_value = root
+			}
+		}
+	}
+
+	can_join_faction = {
+		is_shackled_robot = no
+		is_shackled_bioservant = no
+		tec_has_stapled_trait = no
+	}
+	
+	attraction = {
+		base = 150
+		
+		modifier = {
+			factor = 1.25
+			exists = from
+			from = {
+				exists = leader
+				leader = { leader_class = ruler }
+			}
+		}
+		
+		modifier = {
+			factor = 0.75
+			exists = from
+			from = {
+				NOT = { exists = leader }
+			}
+		}
+		
+		# Should really check for citizenship instead
+		modifier = {
+			factor = 0.25
+			NOT = { is_same_species = owner_species }
+		}
+	}
+	
+	leader = {
+		base = 100
+		
+		modifier = {
+			factor = 0.0
+			is_event_leader = yes
+		}
+	}
+	
+	demand = {
+		title = "FACTION_OUTRAGED_GC"
+		unfulfilled_title = "FACTION_OUTRAGED_GC"
+		desc = "FACTION_OUTRAGED_GC_DESC"
+
+		fulfilled_effect = -20
+		unfulfilled_effect = 0
+
+		potential = {
+			exists = owner
+			owner = {
+				has_country_flag = faction_authoritarian_outraged_gc
+			}
+		}
+
+		trigger = {
+			owner = {
+				has_country_flag = faction_authoritarian_outraged_gc
+			}
+		}
+	}
+	
+	# Evolved: List of demands
+		# Totalitarians wans a strong grasp over population
+		# Positives (only pos)
+			# 
+		# Neutral (pos and negs)
+			# 
+		# Negatives (only negs)
+			# 
+	# /
+
+	# ----------------------- D E M A N D S -----------------------
+		# Pos scaling
+			demand = {	# POS - SUBJECTS
+				title = "TEC_FAC_AUTH_HAS_SUBJECTS"
+				unfulfilled_title = "TEC_FAC_AUTH_NO_SUBJECTS"
+				desc = "TEC_FAC_AUTH_HAS_SUBJECTS_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = 0
+				
+				potential = {
+					exists = owner
+					owner = {
+						num_communications > 2
+						count_subject = {
+							count < 2
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						is_overlord = yes
+						count_subject = {
+							count = 1
+						}
+					}
+				}
+			}
+			demand = {	# POS - SUBJECTS
+				title = "TEC_FAC_AUTH_HAS_SUBJECTS"
+				unfulfilled_title = "TEC_FAC_AUTH_NO_SUBJECTS"
+				desc = "TEC_FAC_AUTH_HAS_SUBJECTS_DESC"
+				fulfilled_effect = 10
+				unfulfilled_effect = 0
+				
+				potential = {
+					exists = owner
+					owner = {
+						num_communications > 3
+						count_subject = {
+							count < 3
+						}
+						count_subject = {
+							count > 0
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						is_overlord = yes
+						count_subject = {
+							count = 2
+						}
+					}
+				}
+			}
+			demand = {	# POS - SUBJECTS
+				title = "TEC_FAC_AUTH_HAS_SUBJECTS"
+				unfulfilled_title = "TEC_FAC_AUTH_NO_SUBJECTS"
+				desc = "TEC_FAC_AUTH_HAS_SUBJECTS_DESC"
+				fulfilled_effect = 15
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+					owner = {
+						num_communications > 4
+						count_subject = {
+							count >= 2
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						is_overlord = yes
+						count_subject = {
+							count >= 3
+						}
+					}
+				}
+			}
+		# /
+		# Pos
+			# Autocracy
+			demand = {	# POS - AUTOCRACY
+				title = "TEC_FAC_AUTH_AUTOCRATIC_GOVERNMENT"
+				unfulfilled_title = "TEC_FAC_AUTH_NON_AUTOCRATIC_GOVERNMENT"
+				desc = "TEC_FAC_AUTH_AUTOCRATIC_GOVERNMENT_DESC"
+				fulfilled_effect = 10
+				unfulfilled_effect = 0
+
+				potential = {
+					exists = owner
+				}
+
+				trigger = {
+					owner = {
+						is_autocracy = yes
+					}
+				}
+			}
+			# Enslaving aliens = good
+			demand = {	# POS - NOPHILE
+				title = "TEC_FAC_AUTH_ENSLAVE_ALL_XENOS"
+				unfulfilled_title = "TEC_FAC_AUTH_NON_ENSLAVED_ALL_XENOS"
+				desc = "TEC_FAC_AUTH_ENSLAVE_ALL_XENOS_DESC"
+				fulfilled_effect = 10
+				unfulfilled_effect = -5
+				potential = {
+					exists = owner
+					owner = {
+						is_xenophobe = yes
+						any_owned_species = {
+							NOT = {
+								is_same_species = root.owner
+							}
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						NOT = {
+							any_owned_species = { # There are enslaved species
+								NOT = {
+									is_same_species = root.owner
+								}
+								NOR = {
+									has_citizenship_type = { type = citizenship_slavery country = prev }
+									has_citizenship_type = { type = citizenship_purge country = prev }
+									has_citizenship_type = { type = citizenship_robot_servitude country = prev }
+									has_citizenship_type = { type = citizenship_assimilation country = prev }
+								}
+							}
+						}
+					}
+				}
+			}
+			demand = {	# POS - NOPHILE
+				title = "TEC_FAC_AUTH_ENSLAVE_XENOS"
+				unfulfilled_title = "TEC_FAC_AUTH_NON_ENSLAVED_XENOS"
+				desc = "TEC_FAC_AUTH_ENSLAVE_XENOS_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = -5
+				potential = {
+					exists = owner
+					owner = {
+						NOR = {	# Xenos serve us
+							is_xenophobe = yes
+							is_xenophile = yes
+							is_pleasure_seeker = yes
+							is_homicidal = yes
+						}
+						any_owned_species = { # There are enslaved species
+							NOT = {
+								is_same_species = root.owner
+							}
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						any_owned_species = { # There are enslaved species
+							NOT = {
+								is_same_species = root.owner
+							}
+							OR = {
+								has_citizenship_type = { type = citizenship_slavery country = prev }
+								has_citizenship_type = { type = citizenship_purge country = prev }
+								has_citizenship_type = { type = citizenship_robot_servitude country = prev }
+								has_citizenship_type = { type = citizenship_assimilation country = prev }
+							}
+						}
+					}
+				}
+			}
+			demand = {	# POS - PHILE & HEDONISTS
+				title = "TEC_FAC_AUTH_SERVING_XENOS"
+				unfulfilled_title = "TEC_FAC_AUTH_NO_SERVING_XENOS"
+				desc = "TEC_FAC_AUTH_SERVING_XENOS_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = 0
+				#unfulfilled_effect = -0.01
+				potential = {
+					always = no
+					exists = owner
+					owner = {
+						OR = { # Xenos serve us
+							is_xenophile = yes
+							is_pleasure_seeker = yes
+						}
+						is_homicidal = no
+						any_owned_species = { # There are enslaved species
+							NOT = {
+								is_same_species = root.owner
+							}
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						any_owned_species = { # There are enslaved species
+							NOT = {
+								is_same_species = root.owner
+							}
+							OR = {
+								has_living_standard = { type = living_standard_stratified country = prev }
+								has_living_standard = { type = living_standard_decadent country = prev }
+								has_citizenship_type = { type = citizenship_slavery country = prev }
+								has_citizenship_type = { type = citizenship_purge country = prev }
+								has_citizenship_type = { type = citizenship_robot_servitude country = prev }
+								has_citizenship_type = { type = citizenship_assimilation country = prev }
+							}
+						}
+					}
+				}
+			}
+			# Police control
+			demand = {	# POS - STRONG CONTROL
+				title = "TEC_FAC_AUTH_STRONG_CONTROL"
+				unfulfilled_title = "TEC_FAC_AUTH_WEAK_CONTROL"
+				desc = "TEC_FAC_AUTH_STRONG_CONTROL_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+				}
+				trigger = {
+					owner = {
+						OR = {
+							has_valid_civic = civic_police_state
+							tec_has_control_traditions_finished = yes
+						}
+					}
+				}
+			}	
+			demand = {	# POS - TOTALITARIAN FED
+				title = TOTALITARIAN_FEDERATION
+				unfulfilled_title = TOTALITARIAN_FEDERATION_NOT_HEGEMONY
+				desc = TOTALITARIAN_FEDERATION_DESC
+
+				fulfilled_effect = 5
+				unfulfilled_effect = -0.001
+
+				potential = {
+					exists = owner.federation
+					has_federations_dlc = yes
+				}
+
+				trigger = {
+					owner.federation = { has_federation_type = hegemony_federation }
+				}
+			}
+		# /
+
+		# Neut	
+			demand = {	# NEU - STRATA
+				title = "TEC_FAC_AUTH_STRATIFY_POPS"
+				unfulfilled_title = "TEC_FAC_AUTH_NO_STRATIFIED_POPS"
+				desc = "TEC_FAC_AUTH_STRATIFY_POPS_DESC"
+				fulfilled_effect = 20
+				unfulfilled_effect = -10
+				potential = {
+					exists = owner
+				}
+				trigger = {
+					owner = {
+						OR = {
+							NOT = {	# There are no species with stratified or academic
+								any_owned_species = {
+									NOR = {
+										has_living_standard = { type = living_standard_stratified country = prev }
+										has_living_standard = { type = living_standard_academic_privilege country = prev }
+										AND = {	# Decadence is also allowed
+											prevprev = {
+												is_pleasure_seeker = yes
+											}
+											has_living_standard = { type = living_standard_decadent country = prev }
+										}
+									}
+								}
+							}
+							any_owned_species = { # There are enslaved species
+								OR = {
+									has_citizenship_type = { type = citizenship_slavery country = prev }
+									has_citizenship_type = { type = citizenship_purge country = prev }
+									has_citizenship_type = { type = citizenship_robot_servitude country = prev }
+									has_citizenship_type = { type = citizenship_assimilation country = prev }
+								}
+							}
+							# Has specific civic
+							has_civic = civic_slaver_guilds
+							has_civic = civic_tec_forced_reeducation
+							has_civic = civic_tec_caste_system
+						}
+					}
+				}
+			}
+
+			demand = {	# NEUT - CENTRALIZED STATE
+				title = "TEC_FAC_AUTH_CENTRALIZED_STATE"
+				unfulfilled_title = "TEC_FAC_AUTH_NO_CENTRALIZED_STATE"
+				desc = "TEC_FAC_AUTH_CENTRALIZED_STATE_DESC"
+
+				fulfilled_effect = 5
+				unfulfilled_effect = -5
+
+				potential = {
+					exists = owner
+					owner = {
+						can_set_policy = {
+							policy = bureaucracy
+							option = centralized_state
+						}
+					}
+				}
+
+				trigger = {
+					owner = {
+						has_policy_flag = centralized_state
+					}
+				}
+			}
+
+			demand = {	# NEUTR - LEADER LINEAGES
+				title = "TEC_FAC_AUTH_LINEAGES"
+				unfulfilled_title = "TEC_FAC_AUTH_NO_LINEAGES"
+				desc = "TEC_FAC_AUTH_LINEAGES_DESC"
+
+				fulfilled_effect = 5
+				unfulfilled_effect = -5
+
+				potential = {
+					exists = owner
+					owner = {
+						OR = {
+							has_technology = tech_selected_lineages
+							has_technology = tech_capacity_boosters
+						}
+					}
+				}
+
+				trigger = {
+					owner = {
+						OR = {
+							has_policy_flag = leader_enhancement_selected_lineages
+							has_policy_flag = leader_enhancement_capacity_boosters
+						}
+					}
+				}
+			}
+
+			demand = {	# NEU - GALCOM PARTICIPATION
+				title = "TEC_FAC_AUTH_GALCOM_SEAT"
+				unfulfilled_title = "TEC_FAC_AUTH_NO_GALCOM_SEAT"
+				desc = "TEC_FAC_AUTH_GALCOM_SEAT_DESC"
+
+				unfulfilled_effect = -5
+				fulfilled_effect = 10
+
+				potential = {
+					is_galactic_community_formed = yes
+					is_active_resolution = resolution_galacticreforms_form_council
+					exists = owner
+					owner = {
+						is_homicidal = no
+					}
+				}
+
+				trigger = {
+					owner = {
+						is_part_of_galactic_council = yes
+					}
+				}
+			}
+		# /
+
+		# Bad
+			demand = {
+				title = "TOTALITARIAN_BENEVOLENT_SUBJUGATION_POLICY"
+				unfulfilled_title = "TOTALITARIAN_NO_BENEVOLENT_SUBJUGATION_POLICY"
+				desc = "TOTALITARIAN_BENEVOLENT_SUBJUGATION_POLICY_DESC"
+		
+				unfulfilled_effect = -10
+				fulfilled_effect = 0.001
+		
+				potential = {
+					exists = owner
+					owner = {
+					is_subject = no
+						has_policy_flag = benevolent_terms
+					}
+				}
+		
+				trigger = {
+					owner = {
+						NOT = { has_policy_flag = benevolent_terms }
+					}
+				}
+			}
+
+			demand = {
+				title = "TOTALITARIAN_OPPRESSIVE_SUBJUGATION_POLICY"
+				unfulfilled_title = "TOTALITARIAN_ADOPT_OPPRESSIVE_SUBJUGATION_POLICY"
+				desc = "TOTALITARIAN_OPPRESSIVE_SUBJUGATION_POLICY_DESC"
+		
+				fulfilled_effect = 10
+				unfulfilled_effect = -0.001
+		
+				potential = {
+					exists = owner
+					owner = {
+						is_subject = no
+						NOT = { has_policy_flag = benevolent_terms }
+					}
+				}
+		
+				trigger = {
+					owner = {
+						has_policy_flag = oppressive_terms
+					}
+				}
+			}
+
+			demand = {	# BAD - NOT DEMOCRACY
+				title = "TEC_FAC_AUTH_NO_DEMOCRACY"
+				unfulfilled_title = "TEC_FAC_AUTH_HAS_DEMOCRACY"
+				desc = "TEC_FAC_AUTH_NO_DEMOCRACY_DESC"
+
+				unfulfilled_effect = -25
+				fulfilled_effect = 0
+
+				potential = {
+					exists = owner
+				}
+
+				trigger = {
+					owner = {
+						is_democracy = no
+					}
+				}
+			}
+
+			demand = {	# NEG - BEING A SUBJECT
+				title = "TEC_FAC_AUTH_NOT_BEING_SUBJECT"
+				unfulfilled_title = "TEC_FAC_AUTH_BEING_A_SUBJECT_IS_BAD"
+				desc = "TEC_FAC_AUTH_NOT_BEING_SUBJECT_DESC"
+				#.001
+				fulfilled_effect = 0
+				unfulfilled_effect = -10
+				potential = {
+					exists = owner
+				}
+				trigger = {
+					owner = {
+						is_subject = no
+					}
+				}
+			}
+
+			demand = {	# NEG - NO FREE MEDIA
+				title = "TEC_FAC_AUTH_NO_FREE_MEDIA"
+				unfulfilled_title = "TEC_FAC_AUTH_FREE_MEDIA_IS_BAD"
+				desc = "TEC_FAC_AUTH_NO_FREE_MEDIA_DESC"			
+				fulfilled_effect = 0
+				unfulfilled_effect = -10
+				potential = {
+					exists = owner
+					owner = {
+						can_set_policy = {
+							policy = interstellar_media
+							option = state_media
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						NOT = {
+							has_policy_flag = free_media 
+						}
+					}
+				}
+			}
+
+			demand = {	# NEG - NO WEAK STANCE
+				title = "TEC_FAC_AUTH_NO_WEAK_STANCE"
+				unfulfilled_title = "TEC_FAC_AUTH_WEAK_STANCE"
+				desc = "TEC_FAC_AUTH_NO_WEAK_STANCE_DESC"	
+				fulfilled_effect = 0
+				unfulfilled_effect = -5
+				potential = {
+					exists = owner
+					owner = {
+						is_unfriendly = yes
+						has_country_flag = has_encountered_other_empire
+						tec_has_supremacy_traditions_finished = yes
+					}
+				}
+				trigger = {
+					owner = {
+						OR = {
+							has_policy_flag = diplo_stance_supremacist
+							has_policy_flag = diplo_stance_extermination
+							has_policy_flag = diplo_stance_purification
+							has_policy_flag = diplo_stance_belligerent
+							has_policy_flag = diplo_stance_hunger
+						}
+					}
+				}
+			}
+
+		# /
+		demand = {	# NEG - FACTION NEGATIVE ECONOMY
+			title = "TEC_FACTION_NO_NEGATIVE_ECONOMY"
+			unfulfilled_title = "TEC_FACTION_BAD_ECONOMY"
+			desc = "TEC_FACTION_NO_NEGATIVE_ECONOMY_DESC"
+			fulfilled_effect = 0
+			unfulfilled_effect = -10
+			potential = {
+				exists = owner
+			}
+			trigger = {
+				owner = {
+					NOR = {
+						has_modifier = energy_deficit
+						has_modifier = minerals_deficit
+						has_modifier = food_deficit
+						has_modifier = alloys_deficit
+						has_modifier = minerals_deficit
+						#has_modifier = unity_deficit
+						has_modifier = consumer_goods_deficit
+						has_modifier = volatile_motes_deficit
+						has_modifier = exotic_gases_deficit
+						has_modifier = rare_crystals_deficit
+						has_modifier = nanites_deficit
+						#has_modifier = living_metal_deficit
+						#has_modifier = sr_zro_deficit
+					}
+				}
+			}
+		}
+	# /
+		
+	on_create = {
+		pop_faction_event = { id = factions.1 }
+	}
+
+	on_destroy = {
+		if = {
+			limit = {
+				has_modifier = promoted_authoritarian
+			}
+			remove_modifier = promoted_authoritarian
+		}
+		if = {
+			limit = {
+				has_modifier = suppressed_authoritarian
+			}
+			remove_modifier = suppressed_authoritarian
+		}
+	}
+
+	actions = {
+		embrace_faction = {
+			title = "EMBRACE_FACTION"
+			description = "EMBRACE_FACTION_DESC"
+			
+			cost = {
+				influence = @tec_fac_embrace_cost
+			}
+			
+			potential = {
+				exists = owner
+				owner = {
+					OR = {
+						is_subject = no
+						NOT = { any_agreement = { agreement_preset = preset_dominion } }
+					}
+				}
+			}
+			
+			valid = {
+				custom_tooltip = {
+					fail_text = EMBRACE_FACTION_COOLDOWN
+					parameter:empire = {
+						NOT = { has_modifier = embraced_faction_timer }
+					}
+				}
+				support > @tec_fac_embrace_min_support
+				parameter:empire = {
+					NOT = { has_ethic = "ethic_fanatic_authoritarian" }
+				}
+			}
+
+			effect = {
+				add_modifier = { modifier = embraced_faction days = @tec_fac_embrace_cd}
+				parameter:empire = {
+					shift_ethic = ethic_authoritarian
+					hidden_effect = {
+						add_modifier = { modifier = embraced_faction_timer days = @tec_fac_embrace_cd}
+						every_pop_faction = {
+							limit = { NOT = { is_same_value = root } }
+							add_modifier = { modifier = embraced_another_faction days = @tec_fac_embrace_cd}
+						}
+					}
+				}
+				hidden_effect = {
+					save_event_target_as = TargetFaction
+					parameter:empire = {
+						every_relation = {
+							limit = {
+								is_ai = no
+								tec_is_default_country = yes
+								has_communications = prev
+								has_intel_level = {
+									who = prev
+									category = government
+									level >= 1
+								}
+							}
+							country_event = { id = factions.2000 }
+						}
+					}
+				}
+			}
+			
+			ai_weight = {
+				base = 1
+				modifier = {
+					factor = 0
+					support < 0.50
+					owner = {
+						has_ethic = ethic_authoritarian
+					}
+				}
+				modifier = {
+					factor = 0
+					owner = { has_valid_civic = civic_fanatic_purifiers }
+				}
+				modifier = {
+					factor = 0
+					NOT = {
+						owner = {
+							exists = ruler
+							ruler = {
+								leader_of_faction = totalitarian
+							}
+						}
+					}
+				}
+				modifier = {
+					factor = 0
+					owner = {
+						count_pop_faction = {
+							count < 4
+						}
+					}
+				}
+			}
+		}
+		promote_faction = {
+			title = "PROMOTE_FACTION"
+			description = "PROMOTE_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					NOR = {
+						has_modifier = suppressed_authoritarian
+						has_modifier = promoted_authoritarian
+					}
+				}
+			}
+
+			effect = {
+				parameter:empire = {
+					add_modifier = { modifier = promoted_authoritarian days = -1 }
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		cancel_promote_faction = {
+			title = "CANCEL_PROMOTE_FACTION"
+			description = "CANCEL_PROMOTE_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					has_modifier = promoted_authoritarian
+				}
+			}
+
+			effect = {
+				parameter:empire = {
+					remove_modifier = promoted_authoritarian
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		suppress_faction = {
+			title = "SUPPRESS_FACTION"
+			description = "SUPPRESS_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					NOR = {
+						has_modifier = suppressed_authoritarian
+						has_modifier = promoted_authoritarian
+					}
+				}
+			}
+
+			effect = {
+				add_modifier = { modifier = suppressed_faction days = -1 }
+				parameter:empire = {
+					add_modifier = { modifier = suppressed_authoritarian days = -1 }
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		cancel_suppress_faction = {
+			title = "CANCEL_SUPPRESS_FACTION"
+			description = "CANCEL_SUPPRESS_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					has_modifier = suppressed_authoritarian
+				}
+			}
+
+			effect = {
+				remove_modifier = suppressed_faction
+				parameter:empire = {
+					remove_modifier = suppressed_authoritarian
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+	}
+}

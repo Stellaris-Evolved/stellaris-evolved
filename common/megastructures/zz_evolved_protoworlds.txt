@@ -1,0 +1,474 @@
+# PROTOWORLD
+tec_protoworld_0 = {
+	entity = "tec_terraform_array_off_entity"	#"construction_platform_entity"
+	construction_entity = "tec_terraform_array_off_entity"	# "construction_platform_entity"	#"tec_terraformstation_on_entity"
+	
+	portrait = "GFX_megastructure_construction_background"
+	show_galactic_map_icon = no
+	show_in_outliner = no
+
+	place_entity_on_planet_plane = yes
+	entity_offset = { x = 0 y = 0 }
+	scales_with_planet = yes
+	scale_offset = no
+
+
+	build_time = 1800
+	
+	resources = {
+		category = tec_protoworlds
+		cost = {
+			alloys = 1000
+			influence = 100
+			#mult = value:tec_protoworld_cost
+			# PDX PLEASE let us use triggered megastructures modifiers in any way Q_Q
+		}
+		upkeep = {
+			energy = 30
+		}
+	}
+	construction_blocks_and_blocked_by = none
+	
+	potential = {
+		has_tradition = tr_tec_outreach_finish
+		NOT = {
+			has_active_tradition = tr_tec_outreach_finish_terravore
+		}
+	}
+
+	possible = {
+		exists = starbase
+		# For now, inside borders, but ill add a way to make the mega on friendly territory
+		custom_tooltip = {
+			fail_text = "requires_inside_border"
+			is_inside_border = from
+		}
+	}
+
+	placement_rules = {
+		planet_possible = {
+			custom_tooltip = {
+				fail_text = "requires_no_anomaly"
+				NOT = { has_anomaly = yes }
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_existing_megastructure"
+				#can_build_megastructure_on_planet = yes
+				NOR = {
+					solar_system = {
+						has_star_flag = ring_world_built
+					}
+					has_planet_flag = megastructure
+					has_planet_flag = planetary_elysian_built
+
+					is_planet_class = pc_broken
+					is_planet_class = pc_shattered
+					is_planet_class = pc_shattered_2
+					is_planet_class = pc_egg_cracked
+
+					is_planet_class = pc_tec_elysium_0
+					is_planet_class = pc_tec_elysium_1
+					is_planet_class = pc_tec_elysium
+
+					is_planet_class = pc_shielded
+					is_planet_class = pc_habitat_shielded
+					is_planet_class = pc_ringworld_shielded
+
+					is_planet_class = pc_ringworld_habitable
+					is_planet_class = pc_ringworld_habitable_damaged
+					is_planet_class = pc_ringworld_tech
+					is_planet_class = pc_ringworld_tech_damaged
+					is_planet_class = pc_ringworld_seam
+					is_planet_class = pc_ringworld_seam_damaged
+
+					has_planet_flag = tec_protoworld_candidate
+				}
+			}
+
+			custom_tooltip = {
+				fail_text = "requires_no_gas_giant"
+				#can_build_megastructure_on_planet = yes
+				NOT = {
+					is_planet_class = pc_gas_giant
+				}
+			}
+
+			custom_tooltip = {
+				fail_text = "tec_requires_unhabitable_world"
+				#can_build_megastructure_on_planet = yes
+				NOT = {
+					has_modifier = terraforming_candidate
+				}
+				OR = {
+					is_planet_class = pc_barren
+					is_planet_class = pc_barren_cold
+					# future things
+					AND = {
+						from = {
+							always = no
+							#has_technology = tech_pm_tec_terraform_madness_geo
+						}
+						is_planet_class = pc_molten
+					}
+					AND = {
+						from = {
+							always = no
+							#has_technology = tech_pm_tec_terraform_madness_geo
+						}
+						is_planet_class = pc_frozen
+					}
+					AND = {
+						from = {
+							has_ascension_perk = ap_detox
+						}
+						is_planet_class = pc_toxic
+					}
+				}
+			}
+
+
+			custom_tooltip = {
+				fail_text = "requires_surveyed_planet"
+				is_surveyed = {			# prevent leaking habitability information
+					who = prev.from
+					status = yes
+				}
+			}
+
+			custom_tooltip = {
+				fail_text = "requires_not_star"
+				is_star = no
+			}
+		}
+	}
+
+	on_build_start = {
+		FROM = {
+			if = {
+				limit = {
+					# limits up to 9 times the var addition
+					check_variable = {
+						which = tec_protoworlds_created
+						value < 10
+					}
+				}
+				change_variable = {
+					which = tec_protoworlds_created
+					value = 1
+				}
+				set_variable = {
+					which = tec_total_protoworlds_created
+					value = tec_protoworlds_created
+				}
+			}
+			else = {
+				change_variable = {
+					which = tec_total_protoworlds_created
+					value = 1
+				}
+			}
+			# Refreshes costs
+			remove_modifier = modifier_tec_protoworld_cost
+			add_modifier = {
+				modifier = modifier_tec_protoworld_cost
+				mult = tec_protoworlds_created
+			}
+		}
+	}
+	on_build_cancel = {
+		FROM = {
+			if = {
+				limit = {
+					# limits up to 9 times the var addition
+					check_variable = {
+						which = tec_protoworlds_created
+						value < 10
+					}
+				}
+				change_variable = {
+					which = tec_protoworlds_created
+					value = -1
+				}
+				set_variable = {
+					which = tec_total_protoworlds_created
+					value = tec_protoworlds_created
+				}
+			}
+			else = {
+				change_variable = {
+					which = tec_total_protoworlds_created
+					value = -1
+				}
+			}
+			# Refreshes costs
+			remove_modifier = modifier_tec_protoworld_cost
+			add_modifier = {
+				modifier = modifier_tec_protoworld_cost
+				mult = tec_protoworlds_created
+			}
+		}
+	}
+	
+	on_build_complete = {
+		fromfrom.planet = {
+			set_planet_flag = tec_protoworld_candidate
+			if = {
+				limit = {
+					is_planet_class = pc_molten
+				}
+				set_planet_flag = tec_molten_protoworld
+			}
+			if = {
+				limit = {
+					is_planet_class = pc_toxic
+				}
+				set_planet_flag = tec_toxic_protoworld
+			}
+			if = {
+				limit = {
+					is_planet_class = pc_frozen
+				}
+				set_planet_flag = tec_frozen_protoworld
+			}
+		}
+		fromfrom = {
+			upgrade_megastructure_to = tec_protoworld_1
+		}
+		
+	}
+
+	
+	ai_weight = {
+		factor = 0
+	}
+	
+}
+
+tec_protoworld_1 = {
+	entity = "tec_terraform_array_on_entity"	#"construction_platform_entity"
+	construction_entity = "tec_terraform_array_on_entity"	# "construction_platform_entity"	#"tec_terraformstation_on_entity"
+	portrait = "GFX_megastructure_construction_background"
+	show_galactic_map_icon = no
+	show_in_outliner = yes
+
+	place_entity_on_planet_plane = yes
+	entity_offset = { x = 0 y = 0 }
+	scales_with_planet = yes
+	scale_offset = no
+
+	build_time = 720
+	
+	resources = {
+		category = megastructures
+		upkeep = {
+			energy = 30
+		}
+	}
+	construction_blocks_others = no
+	construction_blocked_by_others = no
+	
+	upgrade_from = {
+		tec_protoworld_0
+	}
+
+	on_build_start = {
+	}
+
+	on_build_cancel = {
+	}
+	
+	on_build_complete = {
+		fromfrom.planet = {
+			set_variable = {
+				which = tec_prev_size
+				value = 1
+			}
+			set_variable = {
+				which = tec_prev_size_temp
+				value = 1
+			}
+			while = {
+				limit = {
+					planet_size > 1
+				}
+				change_planet_size = -1
+				change_variable = {
+					which = tec_prev_size
+					value = 1
+				}
+				change_variable = {
+					which = tec_prev_size_temp
+					value = 1
+				}
+			}
+			while = {
+				limit = {
+					check_variable = {
+						which = tec_prev_size_temp
+						value > 0
+					}
+				}
+				change_variable = {
+					which = tec_prev_size_temp
+					value = -1
+				}
+				change_planet_size = 1
+			}
+			clear_variable = tec_prev_size_temp
+
+			if = {
+				limit = {
+					is_planet_class = pc_molten
+				}
+				set_planet_entity = {
+					entity = "tec_protoworld_hot_special_01_entity"
+				}
+			}
+			if = {
+				limit = {
+					is_planet_class = pc_toxic
+				}
+				set_planet_flag = tec_toxic_protoworld
+				set_planet_entity = {
+					entity = "tec_protoworld_wet_special_01_entity"
+				}
+			}
+			if = {
+				limit = {
+					is_planet_class = pc_frozen
+				}
+				set_planet_flag = tec_frozen_protoworld
+				set_planet_entity = {
+					entity = "tec_protoworld_cold_special_01_entity"
+				}
+			}
+			if = {
+				limit = {
+					OR = {
+						is_planet_class = pc_barren
+						is_planet_class = pc_barren_cold
+					}
+				}
+				set_planet_entity = {
+					entity = "tec_protoworld_basic_special_01_entity"
+				}
+			}
+		}
+		fromfrom = {
+			upgrade_megastructure_to = tec_protoworld_2
+		}
+		
+	}
+
+	ai_weight = {
+		factor = 0
+	}
+	
+}
+
+tec_protoworld_2 = {
+	entity = "tec_terraform_array_on_entity"	#"construction_platform_entity"
+	construction_entity = "tec_terraform_array_on_entity"	# "construction_platform_entity"	#"tec_terraformstation_on_entity"
+	portrait = "GFX_megastructure_construction_background"
+	show_galactic_map_icon = no
+	show_in_outliner = yes
+
+	place_entity_on_planet_plane = yes
+	entity_offset = { x = 0 y = 0 }
+	scales_with_planet = yes
+	scale_offset = no
+
+	build_time = 720
+	
+	resources = {
+		category = megastructures
+		upkeep = {
+			energy = 30
+		}
+	}
+	construction_blocks_others = no
+	construction_blocked_by_others = no
+	
+	upgrade_from = {
+		tec_protoworld_1
+	}
+
+	on_build_cancel = {
+	}
+	
+	on_build_complete = {
+		fromfrom.planet = {
+			set_planet_flag = suppress_archaeological_sites
+			set_planet_flag = colony_event
+			prevent_anomaly = yes
+			if = {
+				limit = {
+					is_planet_class = pc_molten
+				}
+				change_pc = pc_tec_protoworld
+				set_planet_entity = {
+					entity = "tec_protoworld_hot_01_entity"
+				}
+			}
+			else_if = {
+				limit = {
+					is_planet_class = pc_toxic
+				}
+				change_pc = pc_tec_protoworld
+				set_planet_entity = {
+					entity = "tec_protoworld_wet_01_entity"
+				}
+			}
+			else_if = {
+				limit = {
+					is_planet_class = pc_frozen
+				}
+				change_pc = pc_tec_protoworld
+				set_planet_entity = {
+					entity = "tec_protoworld_cold_01_entity"
+				}
+			}
+			else = {
+				change_pc = pc_tec_protoworld
+				set_planet_entity = {
+					entity = "tec_protoworld_basic_01_entity"
+				}
+			}
+			if = {
+				limit = {
+					has_modifier = pm_tec_protoworld_modifier
+				}
+				remove_modifier = pm_tec_protoworld_modifier
+			}
+			add_modifier = {
+				modifier = pm_tec_protoworld_modifier
+				days = -1
+			}
+			if = {
+				limit = {
+					planet_size < 10
+				}
+				set_planet_size = 10
+			}
+			if = {
+				limit = {
+					solar_system = {
+						owner = {
+							has_origin = origin_void_dwellers
+						}
+					}
+				}
+				create_colony = {
+					owner = solar_system.owner
+				}
+			}
+		}
+		remove_megastructure = fromfrom
+	}
+
+	
+	ai_weight = {
+		factor = 0
+	}
+	
+}

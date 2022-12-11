@@ -1,0 +1,492 @@
+# 	-	-	-	-	-	-	-	-	-	-	-
+# C O N S U M E 
+# 	-	-	-	-	-	-	-	-	-	-	-
+ # Note : weight is a % of 100 based around 1, so 0.3 is 33% of production, technically
+ # Ai will theorically never build/use more than the fraction weight % of the total accumulated wealth
+ # Static = max is the max used (static max base = 200 is for arcology project, in the case of influence)
+
+	# Example: Organic hivemind wants to make a building costing 1000 food, has 100 monthly production and 2000 stored food
+	# 			Unless the ai reaches a compfortable amount of stored food to allow that building to be made, it wont
+	#			The amount is dictated by the fraction and weight modifier (0.3 weight = 30% of storage)
+	#			So if the food is coded to have a weight of 0.3 for buildings in that case, the building will be made when 3k food are stored
+
+
+# Influence for certain buildings
+tec_influence_expenditure_planets_low = {
+	resource = influence
+	type = expenditure
+	category = planets
+
+	potential = {
+		resource_stockpile_compare = { resource = influence value < 100 }
+	}
+
+	weight = {
+		weight = 0.5
+	}
+}
+
+tec_influence_expenditure_planets_med = {
+	resource = influence
+	type = expenditure
+	category = planets
+
+	potential = {
+		resource_stockpile_compare = { resource = influence value >= 100 }
+		resource_stockpile_compare = { resource = influence value < 250	}
+	}
+
+	weight = {
+		weight = 0.3
+	}
+
+	# this is the cost of the arcology project decision
+	desired_max = {
+		base = 250
+	}
+}
+
+tec_influence_expenditure_planets_high = {
+	resource = influence
+	type = expenditure
+	category = planets
+
+	potential = {
+		resource_stockpile_compare = { resource = influence value >= 250 }
+	}
+
+	weight = {
+		weight = 0.20
+	}
+
+	desired_max = {
+		base = 200
+	}
+}
+
+# Alloys for blockers 
+tec_expenditure_alloys_blockers = {	# extremehigh and priority because rw origin
+	resource = alloys
+	type = expenditure
+	category = deposit_blockers
+
+	potential = {
+		OR = {
+			resource_stockpile_compare = {
+				resource = alloys value >= 2000 
+			}
+			has_monthly_income = {
+				resource = alloys
+				value > 1000
+			}
+		}
+		is_at_war = no
+		used_naval_capacity_percent > 0.75
+		any_owned_planet = {
+			is_planet_class = pc_ringworld_habitable
+			OR = {
+				has_deposit = d_tec_rw_minor_structural_damage
+				has_deposit = d_tec_rw_major_structural_damage
+			}
+		}
+	}
+
+	weight = {
+		weight = 1
+	}
+	desired_max = {	# Ringworld hyperblocker
+		base = 3000
+	}
+}
+
+tecexpenditure_zro_blockers = {	# extremehigh and priority because psionics
+	resource = sr_zro
+	type = expenditure
+	category = deposit_blockers
+
+	potential = {
+		resource_stockpile_compare = {
+			resource = sr_zro value >= 100
+		}
+	}
+
+	weight = {
+		weight = 0.5
+	}
+
+	desired_max = {
+		base = 200
+	}
+}
+
+# Food for buildings and decisions
+tec_food_expenditure_planets_low = {
+	resource = food
+	type = expenditure
+	category = planets
+
+	potential = {
+		resource_stockpile_compare = { resource = food value < 1000 }
+		OR = {
+			tec_uses_food_buildings = yes
+			tec_uses_food_buildings_smol = yes
+		}
+	}
+
+	weight = {
+		weight = 0.5
+	}
+}
+
+tec_food_expenditure_planets_med = {
+	resource = food
+	type = expenditure
+	category = planets
+
+	potential = {
+		resource_stockpile_compare = { resource = food value >= 1000 }
+		resource_stockpile_compare = { resource = food value < 2000	}
+		tec_uses_food_buildings = yes
+	}
+
+	weight = {
+		weight = 0.8
+	}
+}
+
+tec_food_expenditure_planets_high = {
+	resource = food
+	type = expenditure
+	category = planets
+
+	potential = {
+		resource_stockpile_compare = { resource = food value >= 2000 }
+		tec_uses_food_buildings = yes
+	}
+
+	weight = {
+		weight = 0.6
+	}
+}
+
+
+# Starbase organic hive fix
+tec_food_expenditure_starbases_low = {
+	resource = food
+	type = expenditure
+	category = starbases
+
+	potential = {
+		resource_stockpile_compare = { resource = food value < 1000 }
+		OR = {
+			tec_uses_food_buildings = yes
+			tec_uses_food_buildings_smol = yes
+		}
+	}
+
+	weight = {
+		weight = 0.3
+	}
+}
+
+tec_food_expenditure_starbases_med = {
+	resource = food
+	type = expenditure
+	category = starbases
+
+	potential = {
+		resource_stockpile_compare = { resource = food value >= 1000 }
+		resource_stockpile_compare = { resource = food value < 2000	}
+		tec_uses_food_buildings = yes
+	}
+
+	weight = {
+		weight = 0.4
+	}
+}
+
+tec_food_expenditure_starbases_high = {
+	resource = food
+	type = expenditure
+	category = starbases
+
+	potential = {
+		resource_stockpile_compare = { resource = food value >= 2000 }
+		tec_uses_food_buildings = yes
+	}
+
+	weight = {
+		weight = 0.5
+	}
+}
+
+tec_food_expenditure_decisions = {
+	resource = food
+	type = expenditure
+	category = decisions
+
+	potential = {
+		resource_stockpile_compare = { resource = food value >= 500 }
+	}
+
+	weight = {
+		weight = 0.5
+	}
+}
+
+tec_food_expenditure_decision_doit = {
+	resource = food
+	type = expenditure
+	category = decisions
+
+	potential = {
+		resource_stockpile_compare = { resource = food value >= 500 }
+		AND = {
+			is_ai = yes
+			has_country_flag = tec_ai_use_food_for_worlds
+		}
+	}
+
+	weight = {
+		weight = 0.8
+	}
+}
+
+# Energy for buildings
+tec_energy_expenditure_planets_low = {
+	resource = energy
+	type = expenditure
+	category = planets
+
+	potential = {
+		resource_stockpile_compare = { resource = food value < 1000 }
+	}
+
+	weight = {
+		weight = 0.6
+	}
+}
+
+tec_energy_expenditure_planets_med = {
+	resource = energy
+	type = expenditure
+	category = planets
+
+	potential = {
+		resource_stockpile_compare = { resource = energy value >= 1000 }
+		resource_stockpile_compare = { resource = energy value < 2000	}
+	}
+
+	weight = {
+		weight = 0.6
+	}
+}
+
+tec_energy_expenditure_planets_high = {
+	resource = energy
+	type = expenditure
+	category = planets
+
+	potential = {
+		resource_stockpile_compare = { resource = energy value >= 2000 }
+	}
+
+	weight = {
+		weight = 0.4
+	}
+}
+
+# Machine digitalization
+tec_energy_expenditure_starbases_low = {
+	resource = food
+	type = expenditure
+	category = starbases
+
+	potential = {
+		resource_stockpile_compare = { resource = energy value < 1000 }
+		tec_uses_energy_buildings = yes
+	}
+
+	weight = {
+		weight = 0.3
+	}
+}
+
+tec_energy_expenditure_starbases_med = {
+	resource = energy
+	type = expenditure
+	category = starbases
+
+	potential = {
+		resource_stockpile_compare = { resource = energy value >= 1000 }
+		resource_stockpile_compare = { resource = energy value < 2000	}
+		tec_uses_energy_buildings = yes
+	}
+
+	weight = {
+		weight = 0.4
+	}
+}
+
+tec_energy_expenditure_starbases_high = {
+	resource = energy
+	type = expenditure
+	category = starbases
+
+	potential = {
+		resource_stockpile_compare = { resource = energy value >= 2000 }
+		tec_uses_energy_buildings = yes
+	}
+
+	weight = {
+		weight = 0.5
+	}
+}
+
+
+
+tec_energy_expenditure_decisions_high = {
+	resource = energy
+	type = expenditure
+	category = decisions
+
+	potential = {
+		# only consider these kinds of decisions when "wealthy"
+		has_resource = {
+			type = energy
+			amount > 5000
+		}
+	}
+
+	weight = {
+		weight = 0.2
+	}
+}
+
+
+
+# Nanites for building
+tec_nanite_expenditure_planets_low = {
+	resource = nanites
+	type = expenditure
+	category = planets
+
+	potential = {
+		resource_stockpile_compare = { resource = nanites value < 50 }
+	}
+
+	weight = {
+		weight = 0.5
+	}
+}
+
+tec_nanite_expenditure_planets_med = {
+	resource = nanites
+	type = expenditure
+	category = planets
+
+	potential = {
+		resource_stockpile_compare = { resource = nanites value >= 50 }
+		resource_stockpile_compare = { resource = nanites value < 100	}
+	}
+
+	weight = {
+		weight = 0.5
+	}
+}
+
+tec_nanite_expenditure_planets_high = {
+	resource = nanites
+	type = expenditure
+	category = planets
+
+	potential = {
+		resource_stockpile_compare = { resource = nanites value >= 100 }
+	}
+
+	weight = {
+		weight = 0.4
+	}
+}
+
+tec_nanite_expenditure_decisions_high = {
+	resource = nanites
+	type = expenditure
+	category = decisions
+
+	potential = {
+		# only consider these kinds of decisions when "wealthy"
+		has_resource = {
+			type = nanites
+			amount > 50
+		}
+	}
+
+	weight = {
+		weight = 0.2
+	}
+}
+
+
+
+# Living metal for building
+tec_livingmetal_expenditure_planets_low = {
+	resource = sr_living_metal
+	type = expenditure
+	category = planets
+
+	potential = {
+		resource_stockpile_compare = { resource = sr_living_metal value < 50 }
+	}
+
+	weight = {
+		weight = 0.6
+	}
+}
+
+tec_livingmetal_expenditure_planets_med = {
+	resource = sr_living_metal
+	type = expenditure
+	category = planets
+
+	potential = {
+		resource_stockpile_compare = { resource = sr_living_metal value >= 50 }
+		resource_stockpile_compare = { resource = sr_living_metal value < 100	}
+	}
+
+	weight = {
+		weight = 0.6
+	}
+}
+
+tec_livingmetal_expenditure_planets_high = {
+	resource = sr_living_metal
+	type = expenditure
+	category = planets
+
+	potential = {
+		resource_stockpile_compare = { resource = sr_living_metal value >= 100 }
+	}
+
+	weight = {
+		weight = 0.4
+	}
+}
+
+tec_livingmetal_expenditure_decisions_high = {
+	resource = sr_living_metal
+	type = expenditure
+	category = decisions
+
+	potential = {
+		# only consider these kinds of decisions when "wealthy"
+		has_resource = {
+			type = sr_living_metal
+			amount > 100
+		}
+	}
+
+	weight = {
+		weight = 0.2
+	}
+}

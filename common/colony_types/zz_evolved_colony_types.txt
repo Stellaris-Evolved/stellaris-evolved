@@ -1,0 +1,351 @@
+# NEEDS MORE MODIFICATIONS MEMESIS
+
+#root = planet
+
+@small_planet_threshold = 18
+@free_districts_verylow_threshold = 3
+@free_districts_low_threshold = 5
+@free_districts_medium_threshold = 10
+@free_districts_high_threshold = 15
+@built_districts_low_threshold = 3
+@built_districts_medium_threshold = 4
+@built_districts_high_threshold = 8
+
+
+#trade bonus for ecu
+col_ecu_trade = {
+	icon = GFX_colony_type_habitat_trade
+
+	potential = {
+		OR = {
+			uses_district_set = city_world
+			uses_district_set = @pdecocity
+			uses_district_set = @pdcorpoarc
+		}
+	}
+
+	planet_modifier = {
+		planet_structures_upkeep_mult = -0.25
+		trade_value_mult = 0.25
+	}
+
+	weight_modifier = {
+		base = 10
+		modifier = {
+			add = 5
+			has_designation = col_ecu_trade
+		}
+		modifier = {
+			add = 3
+			num_districts = { type = district_tec_arcology_trade value >= 2 }
+		}
+		modifier = {
+			add = 5
+			num_districts = { type = district_tec_arcology_trade value >= 3 }
+		}
+		modifier = {
+			add = 2
+			OR = {
+				num_buildings = { type = building_commercial_zone value >= 2 }
+				num_buildings = { type = building_tec_trade_machine_1 value >= 2 }
+			}
+		}
+		modifier = {
+			add = 3
+			OR = {
+				num_buildings = { type = building_commercial_zone value >= 3 }
+				num_buildings = { type = building_tec_trade_machine_1 value >= 3 }
+			}
+		}
+		modifier = {
+			add = 4
+			OR = {
+				num_buildings = { type = building_commercial_zone value >= 4 }
+				num_buildings = { type = building_tec_trade_machine_1 value >= 4 }
+			}
+		}
+		modifier = {
+			add = 5
+			OR = {
+				num_buildings = { type = building_commercial_zone value >= 5 }
+				num_buildings = { type = building_tec_trade_machine_1 value >= 5 }
+			}
+		}
+		modifier = {
+			add = 4
+			OR = {
+				num_buildings = { type = building_commercial_megaplex value >= 1 }
+				num_buildings = { type = building_tec_trade_machine_2 value >= 1 }
+			}
+		}
+		modifier = {
+			add = 5
+			OR = {
+				num_buildings = { type = building_commercial_megaplex value >= 2 }
+				num_buildings = { type = building_tec_trade_machine_2 value >= 2 }
+			}
+		}
+		modifier = {
+			add = 10
+			OR = {
+				num_buildings = { type = building_galactic_stock_exchange value = 1 }
+				num_buildings = { type = building_tec_trade_machine_stonks value = 1 }
+			}
+		}
+		modifier = {
+			add = 10
+			OR = {
+				num_districts = { type = district_tec_arcology_trade value >= 4 }
+				OR = {
+					num_buildings = { type = building_commercial_zone value >= 5 }
+					num_buildings = { type = building_commercial_megaplex value >= 5 }
+					num_buildings = { type = building_tec_trade_machine_1 value >= 5 }
+					num_buildings = { type = building_tec_trade_machine_2 value >= 5 }
+				}
+			}
+		}
+	}
+}
+
+# Habitat Farming
+col_tec_habitat_food = {
+	icon = GFX_colony_type_tec_habitat_food
+
+	potential = {
+		uses_habitat_capitals = yes
+		has_planet_flag = tec_food_habitat
+	}
+	planet_modifier = {	# ignore this error, it works
+		planet_district_tec_hab_food_build_speed_mult = 0.25
+		planet_farmers_produces_mult = 0.1
+	}
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_galactic_community_member = yes
+				is_gestalt = no
+			}
+			OR = {
+				is_active_resolution = "resolution_greatergood_five_year_plans"
+				is_active_resolution = "resolution_greatergood_greater_than_ourselves"
+				is_active_resolution = "resolution_greatergood_balance_in_the_middle"
+				is_active_resolution = "resolution_greatergood_universal_prosperity_mandate"
+			}
+		}
+		modifier = {
+			planet_jobs_worker_produces_mult = 0.1
+		}
+	}
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_galactic_community_member = yes
+				is_gestalt = yes
+			}
+			OR = {
+				is_active_resolution = "resolution_greatergood_five_year_plans"
+				is_active_resolution = "resolution_greatergood_greater_than_ourselves"
+				is_active_resolution = "resolution_greatergood_balance_in_the_middle"
+				is_active_resolution = "resolution_greatergood_universal_prosperity_mandate"
+			}
+		}
+		modifier = {
+			planet_jobs_simple_drone_produces_mult = 0.1
+		}
+	}
+	# Evolved
+		triggered_planet_modifier = {
+			potential = {
+				exists = owner
+				owner = {
+					has_valid_civic = civic_tec_land_of_plenty
+				}
+			}
+			modifier = {
+				planet_farmers_food_produces_add = 0.5
+				planet_farmers_unity_produces_add = 0.5
+			}
+		}
+		triggered_planet_modifier = {
+			potential = {
+				exists = owner
+				owner = {
+					has_valid_civic = civic_tec_corporate_land_of_opportunity
+				}
+			}
+			modifier = {
+				planet_farmers_food_produces_add = 0.5
+			}
+		}
+		triggered_planet_modifier = {	# Planet ascension path
+			potential = {
+				exists = owner
+				owner = {
+					has_ascension_perk = ap_tec_planets_t2a
+				}
+			}
+			modifier = {
+				planet_farmers_food_produces_add = 1
+			}
+		}
+	# /
+
+	weight_modifier = {
+		base = 1000
+		modifier = {
+			factor = 2
+			owner = { has_monthly_income = { resource = food value < 0 } }
+		}
+		modifier = {
+			factor = 3
+			has_designation = col_tec_habitat_food
+		}
+		modifier = {
+			factor = 3
+			num_districts = { type = district_tec_hab_food value >= 3 }
+		}
+		modifier = {
+			factor = 0
+			exists = sector
+			sector = {
+				has_any_sector_focus = yes
+				not = { has_sector_focus = "production" }
+				not = { has_sector_focus = "balanced" }
+			}
+		}
+	}
+}
+
+# Ringworld Mining
+col_tec_ring_mining = {
+	icon = GFX_colony_type_mine
+
+	potential = {
+		uses_district_set = ring_world
+		NOR = {
+			has_planet_flag = tec_rw_spec_precursor
+			has_planet_flag = tec_rw_spec_science
+			has_planet_flag = tec_rw_spec_admin
+			has_planet_flag = tec_rw_spec_industry
+		}
+	}
+
+	planet_modifier = {
+		planet_miners_minerals_produces_mult = 0.25
+		pop_growth_speed = 0.1
+		planet_pop_assembly_mult = 0.1
+		planet_pop_assembly_organic_mult = 0.1
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_galactic_community_member = yes
+				is_gestalt = no
+			}
+			OR = {
+				is_active_resolution = "resolution_greatergood_five_year_plans"
+				is_active_resolution = "resolution_greatergood_greater_than_ourselves"
+				is_active_resolution = "resolution_greatergood_balance_in_the_middle"
+				is_active_resolution = "resolution_greatergood_universal_prosperity_mandate"
+			}
+		}
+		modifier = {
+			planet_jobs_worker_produces_mult = 0.1
+		}
+	}
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_galactic_community_member = yes
+				is_gestalt = yes
+			}
+			OR = {
+				is_active_resolution = "resolution_greatergood_five_year_plans"
+				is_active_resolution = "resolution_greatergood_greater_than_ourselves"
+				is_active_resolution = "resolution_greatergood_balance_in_the_middle"
+				is_active_resolution = "resolution_greatergood_universal_prosperity_mandate"
+			}
+		}
+		modifier = {
+			planet_jobs_simple_drone_produces_mult = 0.1
+		}
+	}
+
+	# Evolved
+		triggered_planet_modifier = {
+			potential = {
+				exists = owner
+				owner = {
+					has_valid_civic = civic_tec_land_of_plenty
+				}
+			}
+			modifier = {
+				planet_miners_minerals_produces_add = 0.5
+				planet_miners_unity_produces_add = 0.5
+			}
+		}
+		triggered_planet_modifier = {
+			potential = {
+				exists = owner
+				owner = {
+					has_valid_civic = civic_tec_corporate_land_of_opportunity
+				}
+			}
+			modifier = {
+				planet_miners_minerals_produces_add = 0.5
+			}
+		}
+		triggered_planet_modifier = {	# Planet ascension path
+			potential = {
+				exists = owner
+				owner = {
+					has_ascension_perk = ap_tec_planets_t2a
+				}
+			}
+			modifier = {
+				planet_miners_minerals_produces_add = 1
+			}
+		}
+	# /
+
+	weight_modifier = {
+		modifier = {
+			add = 100
+			has_designation = col_ring_farming
+		}
+		modifier = {
+			add = 200
+			is_capital = no
+			num_districts = { type = district_rw_farming value >= 1 }
+		}
+		modifier = {
+			factor = 0
+			exists = sector
+			sector = {
+				has_any_sector_focus = yes
+				not = { has_sector_focus = "production" }
+				not = { has_sector_focus = "balanced" }
+			}
+		}
+	}
+}
+
+# Capital Colonies
+#col_tec_capital_menial
+#col_tec_capital_industrial
+#col_tec_capital_foundry
+#col_tec_capital_factory
+#col_tec_capital_research
+#col_tec_capital_unity
+
+# Core sector colonies
+#col_tec_coreworld_capital
+#col_tec_coreworld
+
+# Rimworld Colonies
+#col_tec_rimworld

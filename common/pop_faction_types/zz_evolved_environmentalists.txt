@@ -1,0 +1,731 @@
+# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
+# Ecologist Environmentalists Faction
+# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
+
+environmentalists = {
+	election_header = "GFX_faction_header_yellow"
+	guiding_ethic = ethic_green
+	
+	unique = yes
+	support_multiplier = 1
+	
+	resources = {
+		category = pop_factions
+		produces = {
+			unity = @tec_fac_infl_produce
+		}
+		produces = {	# Political virtue
+			trigger = {
+				exists = owner
+				owner = {
+					has_valid_civic = civic_tec_political_virtue
+				}
+				faction_approval >= 0.5
+			}
+			food = 1
+		}
+		produces = {	# Political virtue
+			trigger = {
+				exists = owner
+				owner = {
+					has_valid_civic = civic_tec_political_virtue
+					is_ecologist = yes
+				}
+				faction_approval >= 0.5
+			}
+			food = 0.2
+		}
+		produces = {	# Idealistic foundation
+			trigger = {
+				owner = {
+					has_valid_civic = civic_idealistic_foundation
+				}
+			}
+			influence = 0.005
+		}
+	}
+	
+	#Note: number of potential or actual members is checked by POP_FACTION_MIN_POTENTIAL_MEMBERS define
+	is_potential = {
+		is_faction_allowed = yes
+	}
+
+	parameters = {
+		empire = {
+			type = country
+			valid_objects = {
+				is_same_value = root
+			}
+		}
+	}
+
+	can_join_pre_triggers = {
+		is_enslaved = no
+		is_being_purged = no
+	}
+
+	can_join_faction = {
+		is_shackled_robot = no
+		is_shackled_bioservant = no
+		tec_has_stapled_trait = no
+	}
+	
+	attraction = {
+		base = 150
+		
+		modifier = {
+			factor = 1.25
+			exists = from
+			from = {
+				exists = leader
+				leader = { leader_class = ruler }
+			}
+		}
+		
+		modifier = {
+			factor = 0.75
+			exists = from
+			from = {
+				NOT = { exists = leader }
+			}
+		}
+
+		# Should really check for citizenship instead
+		modifier = {
+			factor = 0.25
+			NOT = { is_same_species = owner_species }
+		}
+	}
+
+	leader = {
+		base = 100
+
+		modifier = {
+			factor = 0
+			leader_class = ruler
+			owner = { has_authority = auth_imperial }
+		}
+
+		modifier = {
+			factor = 0.0
+			is_event_leader = yes
+		}
+	}
+	
+	demand = {
+		title = "FACTION_OUTRAGED_GC"
+		unfulfilled_title = "FACTION_OUTRAGED_GC"
+		desc = "FACTION_OUTRAGED_GC_DESC"
+
+		fulfilled_effect = -20
+		unfulfilled_effect = 0
+
+		potential = {
+			exists = owner
+			owner = {
+				has_country_flag = faction_green_outraged_gc
+			}
+		}
+
+		trigger = {
+			owner = {
+				has_country_flag = faction_green_outraged_gc
+			}
+		}
+	}
+	
+# Evolved: List of demands
+		# Naturalists should value preserving nature
+		# Positive group
+			# Large bonuses
+				# Num terraformed or protoworlds
+			# /
+			# Small bonuses
+				# Green cg production
+				# Recycling campaign
+				# Ecologist civic
+				# Outreach
+				# Recently terraformed world
+			# /
+		# /
+
+		# Neutral
+			# Large bonuses
+				# Industrial efficiency - regulations
+			# /
+			# Small bonuses
+				# Mastery of nature
+				# Ecological Modularization
+			# /
+		# /
+
+		# Bad group
+		# Small penalties
+			# Recently created ecumenopolis	
+		# /
+		# Large penalties
+			# Industrial production
+			# No industrialization
+	# /
+
+	# ----------------------- D E M A N D S -----------------------
+		# Pos scaling
+			# Num terraformed or protoworlds
+			demand = {	# POS_TERRAFORMATION 1
+				title = "TEC_FAC_ECO_TERRAFORMED1"
+				unfulfilled_title = "TEC_FAC_ECO_TERRAFORMED1"
+				desc = "TEC_FAC_ECO_TERRAFORMED1_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+					owner = {
+						check_variable = {
+							which = tec_terraformed_worlds
+							value < 5
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						check_variable = {
+							which = tec_terraformed_worlds
+							value = 1
+						}
+					}
+				}
+			}
+			demand = {	# POS_TERRAFORMATION 2
+				title = "TEC_FAC_ECO_TERRAFORMED2"
+				unfulfilled_title = "TEC_FAC_ECO_TERRAFORMED2"
+				desc = "TEC_FAC_ECO_TERRAFORMED2_DESC"
+				fulfilled_effect = 10
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+					owner = {
+						check_variable = {
+							which = tec_terraformed_worlds
+							value < 10
+						}
+						check_variable = {
+							which = tec_terraformed_worlds
+							value >= 1
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						check_variable = {
+							which = tec_terraformed_worlds
+							value = 5
+						}
+					}
+				}
+			}
+			demand = {	# POS_TERRAFORMATION 3
+				title = "TEC_FAC_ECO_TERRAFORMED3"
+				unfulfilled_title = "TEC_FAC_ECO_TERRAFORMED3"
+				desc = "TEC_FAC_ECO_TERRAFORMED3_DESC"
+				fulfilled_effect = 15
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+					owner = {
+						check_variable = {
+							which = tec_terraformed_worlds
+							value >= 5
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						check_variable = {
+							which = tec_terraformed_worlds
+							value = 10
+						}
+					}
+				}
+			}
+		# /
+		# Pos
+			# Green cg production
+			demand = {	# POS - GREEN CGS
+				title = "TEC_FAC_ECO_GREEN_CGS"
+				unfulfilled_title = "TEC_FAC_ECO_NO_GREEN_CGS"
+				desc = "TEC_FAC_ECO_GREEN_CGS_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+					owner = {
+						can_set_policy = {
+							policy = goods_policy
+							option = consumer_goods_mixed
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						OR = {
+							has_policy_flag = consumer_goods_mixed
+							has_policy_flag = consumer_goods_food
+						}
+					}
+				}
+			}
+			# Recycling campaign
+			demand = {	# POS - RECYCLING CAMPAIGN
+				title = "TEC_FAC_ECO_RECEDIT"
+				unfulfilled_title = "TEC_FAC_ECO_NO_RECEDIT"
+				desc = "TEC_FAC_ECO_RECEDIT_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+					owner = {
+						has_technology = tech_planetary_unification
+					}
+				}
+				trigger = {
+					owner = {
+						has_edict = recycling_campaign
+					}
+				}
+			}
+			# Ecologist civic
+			demand = {	# POS - INTENSIFIED ECOLOGISM
+				title = "TEC_FAC_ECO_CIVICS"
+				unfulfilled_title = "TEC_FAC_ECO_NO_CIVICS"
+				desc = "TEC_FAC_ECO_CIVICS_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+				}
+				trigger = {
+					owner = {
+						OR = {
+							has_valid_civic = civic_tec_eco_engineers
+							has_valid_civic = civic_tec_eco_keepers
+							has_valid_civic = civic_environmentalist
+							has_valid_civic = civic_tec_corporate_megareclamators
+							has_valid_civic = civic_tec_tribalism
+							has_valid_civic = civic_agrarian_idyll
+							has_valid_civic = civic_tec_evoarchitects
+							tec_has_outreach_traditions_finished = yes
+						}
+					}
+				}
+			}
+		# /
+		# Neut
+			# Industrial efficiency - regulations
+			demand = {	# NEUT - INDUSTRIAL POLICY
+				title = "TEC_FAC_ECO_INDUEFFICIENCY"
+				unfulfilled_title = "TEC_FAC_ECO_NO_INDUEFFICIENCY"
+				desc = "TEC_FAC_ECO_INDUEFFICIENCY_DESC"
+				fulfilled_effect = 10
+				unfulfilled_effect = -10
+				potential = {
+					exists = owner
+					owner = {
+						can_set_policy = {
+							policy = industrial
+							option = industrial_efficiency
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						has_policy_flag = industrial_efficiency
+					}
+				}
+			}
+			# Ecological Modularization
+			demand = {	# NEUT - RECYCLYING POLICY
+				title = "TEC_FAC_ECO_RECYMODULARIZATION"
+				unfulfilled_title = "TEC_FAC_ECO_NO_RECYMODULARIZATION"
+				desc = "TEC_FAC_ECO_RECYMODULARIZATION_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = -5
+				potential = {
+					exists = owner
+					owner = {
+						can_set_policy = {
+							policy = recycling
+							option = green_recycling
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						has_policy_flag = green_recycling
+					}
+				}
+			}
+			# Mastery of nature
+			demand = {	# POS - MASTERY OF NATURE
+				title = "TEC_FAC_ECO_TERRAFORMPERKS"
+				unfulfilled_title = "TEC_FAC_ECO_NO_TERRAFORMPERKS"
+				desc = "TEC_FAC_ECO_TERRAFORMPERKS_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = -5
+				potential = {
+					exists = owner
+					owner = {
+						has_technology = tech_climate_restoration
+					}
+				}
+				trigger = {
+					owner = {
+						OR = {
+							has_ascension_perk = ap_mastery_of_nature
+							has_ascension_perk = ap_world_shaper
+						}
+					}
+				}
+			}
+		# /
+
+		# Bad
+			# Industrialized CGs
+			demand = {	# NEG - REGULAR CGS
+				title = "TEC_FAC_ECO_NO_MINERAL_CGS"
+				unfulfilled_title = "TEC_FAC_ECO_MINERAL_CGS_IS_BAD"
+				desc = "TEC_FAC_ECO_NO_MINERAL_CGS_DESC"
+				fulfilled_effect = 0
+				unfulfilled_effect = -5
+				potential = {
+					exists = owner
+					owner = {
+						can_set_policy = {
+							policy = goods_policy
+							option = consumer_goods_minerals
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						OR = {
+							has_policy_flag = consumer_goods_mixed
+							has_policy_flag = consumer_goods_food
+						}
+					}
+				}
+			}
+			# Recently created ecumenopolis
+			demand = {	# NEG - ENCASED WORLD 
+				title = "TEC_FAC_ECO_RECENT_ECU"
+				unfulfilled_title = "TEC_FAC_ECO_NO_RECENT_ECU"
+				desc = "TEC_FAC_ECO_RECENT_ECU_DESC"
+				fulfilled_effect = 0
+				unfulfilled_effect = -25
+				potential = {
+					exists = owner
+				}
+				trigger = {
+					owner = {
+						NOT = {
+							has_country_flag = tec_recently_created_ecumenopolis
+						}
+					}
+				}
+			}
+			# No industrial regulation
+			demand = {	# NEG - NO REGULATION
+				title = "TEC_FAC_ECO_NO_REGULATION"
+				unfulfilled_title = "TEC_FAC_ECO_NO_REGULATION_BAD"
+				desc = "TEC_FAC_ECO_NO_REGULATION_DESC"
+				fulfilled_effect = 0
+				unfulfilled_effect = -10
+				potential = {
+					exists = owner
+					owner = {
+						can_set_policy = {
+							policy = industrial
+							option = industrial_growth
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						OR = {
+							has_policy_flag = industrial_efficiency
+							has_policy_flag = mixed_industrial
+						}
+					}
+				}
+			}
+			# No recycling
+			demand = {	# NEG - NO RECYCL
+				title = "TEC_FAC_ECO_NO_RECYCL"
+				unfulfilled_title = "TEC_FAC_ECO_NO_RECYCL_BAD"
+				desc = "TEC_FAC_ECO_NO_RECYCL_DESC"
+				fulfilled_effect = 0
+				unfulfilled_effect = -10
+				potential = {
+					exists = owner
+					owner = {
+						OR = {
+							can_set_policy = {
+								policy = recycling
+								option = industrial_recycling
+							}
+							has_technology = tech_planetary_unification
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						OR = {
+							has_policy_flag = green_recycling
+							has_policy_flag = mixed_recycling
+							has_edict = recycling_campaign
+						}
+					}
+				}
+			}
+		# /
+		demand = {	# NEG - FACTION NEGATIVE ECONOMY
+			title = "TEC_FACTION_NO_NEGATIVE_ECONOMY"
+			unfulfilled_title = "TEC_FACTION_BAD_ECONOMY"
+			desc = "TEC_FACTION_NO_NEGATIVE_ECONOMY_DESC"
+			fulfilled_effect = 0
+			unfulfilled_effect = -10
+			potential = {
+				exists = owner
+			}
+			trigger = {
+				owner = {
+					NOR = {
+						has_modifier = energy_deficit
+						has_modifier = minerals_deficit
+						has_modifier = food_deficit
+						has_modifier = alloys_deficit
+						has_modifier = minerals_deficit
+						#has_modifier = unity_deficit
+						has_modifier = consumer_goods_deficit
+						has_modifier = volatile_motes_deficit
+						has_modifier = exotic_gases_deficit
+						has_modifier = rare_crystals_deficit
+						has_modifier = nanites_deficit
+						#has_modifier = living_metal_deficit
+						#has_modifier = sr_zro_deficit
+					}
+				}
+			}
+		}
+	# /
+
+	on_create = {
+		pop_faction_event = { id = factions.1 }
+	}
+
+	on_destroy = {
+		if = {
+			limit = {
+				has_modifier = promoted_green
+			}
+			remove_modifier = promoted_green
+		}
+		if = {
+			limit = {
+				has_modifier = suppressed_green
+			}
+			remove_modifier = suppressed_green
+		}
+	}
+	
+	actions = {
+		embrace_faction = {
+			title = "EMBRACE_FACTION"
+			description = "EMBRACE_FACTION_DESC"
+			
+			cost = {
+				influence = @tec_fac_embrace_cost
+			}
+			
+			potential = {
+				exists = owner
+				owner = {
+					OR = {
+						is_subject = no
+						NOT = { any_agreement = { agreement_preset = preset_dominion } }
+					}
+				}
+			}
+			
+			valid = {
+				custom_tooltip = {
+					fail_text = EMBRACE_FACTION_COOLDOWN
+					parameter:empire = {
+						NOT = { has_modifier = embraced_faction_timer }
+					}
+				}
+				support > @tec_fac_embrace_min_support
+				parameter:empire = {
+					NOT = { has_ethic = "ethic_fanatic_green" }
+				}
+			}
+
+			effect = {
+				add_modifier = { modifier = embraced_faction days = @tec_fac_embrace_cd}
+				parameter:empire = {
+					shift_ethic = ethic_green
+					hidden_effect = {
+						add_modifier = { modifier = embraced_faction_timer days = @tec_fac_embrace_cd}
+						every_pop_faction = {
+							limit = { NOT = { is_same_value = root } }
+							add_modifier = { modifier = embraced_another_faction days = @tec_fac_embrace_cd}
+						}
+					}
+				}
+				hidden_effect = {
+					save_event_target_as = TargetFaction
+					parameter:empire = {
+						every_relation = {
+							limit = {
+								is_ai = no
+								tec_is_default_country = yes
+								has_communications = prev
+								has_intel_level = {
+									who = prev
+									category = government
+									level >= 1
+								}
+							}
+							country_event = { id = factions.2000 }
+						}
+					}
+				}
+			}
+			
+			ai_weight = {
+				base = 1
+				modifier = {
+					factor = 0
+					support < 0.50
+					owner = {
+						has_ethic = ethic_green
+					}
+				}
+				modifier = {
+					factor = 0
+					owner = { has_valid_civic = civic_fanatic_purifiers }
+				}
+				modifier = {
+					factor = 0
+					NOT = {
+						owner = {
+							exists = ruler
+							ruler = {
+								leader_of_faction = environmentalists
+							}
+						}
+					}
+				}
+				modifier = {
+					factor = 0
+					owner = {
+						count_pop_faction = {
+							count < 4
+						}
+					}
+				}
+			}
+		}
+		promote_faction = {
+			title = "PROMOTE_FACTION"
+			description = "PROMOTE_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					NOR = {
+						has_modifier = suppressed_green
+						has_modifier = promoted_green 
+					}
+				}
+			}
+
+			effect = {
+				parameter:empire = {
+					add_modifier = { modifier = promoted_green days = -1 }
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		cancel_promote_faction = {
+			title = "CANCEL_PROMOTE_FACTION"
+			description = "CANCEL_PROMOTE_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					has_modifier = promoted_green
+				}
+			}
+
+			effect = {
+				parameter:empire = {
+					remove_modifier = promoted_green
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		suppress_faction = {
+			title = "SUPPRESS_FACTION"
+			description = "SUPPRESS_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					NOR = {
+						has_modifier = suppressed_green
+						has_modifier = promoted_green 
+					}
+				}
+			}
+
+			effect = {
+				add_modifier = { modifier = suppressed_faction days = -1 }
+				parameter:empire = {
+					add_modifier = { modifier = suppressed_green days = -1 }
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		cancel_suppress_faction = {
+			title = "CANCEL_SUPPRESS_FACTION"
+			description = "CANCEL_SUPPRESS_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					has_modifier = suppressed_green
+				}
+			}
+
+			effect = {
+				remove_modifier = suppressed_faction
+				parameter:empire = {
+					remove_modifier = suppressed_green
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+	}
+}

@@ -1,0 +1,468 @@
+# - - - - - - - - - - - - - - - - - - - - -
+# Empire edicts
+# - - - - - - - - - - - - - - - - - - - - -
+
+@Edict1Cost = 10
+@Edict2Cost = 20
+@Edict3Cost = 30
+
+@EdictPerpetual = -1
+
+@EdictDuration = 3600
+@ambitionDuration = 3600
+
+@tec_convergence_duration = 1800
+
+# -------------------------- AIAUTH
+tec_aiauth_menu = {	# Biopsionic
+	icon = "GFX_edict_type_time"
+	length = 0
+	resources = {
+		category = country	# To avoid scaling
+		cost = {
+			energy = 0
+		}
+	}
+	potential = {
+		tec_is_aiauth_empire = yes
+	}
+	effect = {
+		country_event = {
+			id = tec_aiauth.100
+			days = 0 
+		}
+	}
+	allow = {
+		NOT = {
+			has_country_flag = tec_active_aiauth_window
+		}
+	}
+	ai_weight = {
+		weight = 0
+	}
+}
+# -------------------------- Cultural overhaul edicts
+#Immortal Ruler
+immortal_ruler = {
+	icon = "GFX_edict_type_time"
+	length = 0
+	resources = {
+		category = edicts
+		cost = {
+			influence = 300
+		}
+	}
+	
+	potential = {
+		always = no	# deprecated
+		has_valid_civic = civic_imperial_cult
+		NOT = { has_country_flag = flag_immortal_ruler }
+	}
+
+	effect = {
+		country_event = { id = immortal_ruler.1 }
+		}
+	
+	
+	ai_weight = {
+		weight = 1
+	}
+}
+
+
+#Patriotic Call
+patriotic_call = {
+	icon = "GFX_edict_type_time"
+	length = @EdictDuration
+	resources = {
+		category = edicts
+		cost = {
+			influence = @Edict2Cost
+		}
+	}
+	
+	potential = {
+		always = no # deprecated
+		has_valid_civic = civic_citizen_service
+	}
+
+	modifier = {
+		
+		country_naval_cap_mult = 0.1
+		country_war_exhaustion_mult = -0.15
+		army_morale = 0.2
+		
+	}
+	
+	
+	ai_weight = {
+		weight = 1
+	}
+}
+
+
+#Divine Crusade
+div_crusade = {
+	icon = "GFX_edict_type_time"
+	length = @ambitionDuration
+	
+	is_ambition = yes
+	resources = {
+		category = edicts
+	}
+	potential = {
+		always = no # deprecated
+		has_valid_civic = civic_tec_crusaders
+	}
+	
+	allow = {
+		has_technology = tech_ascension_theory
+	}
+
+	modifier = {		
+		max_rivalries = 1
+		country_war_exhaustion_mult = -1
+		ship_fire_rate_mult = 0.10
+	}
+	
+	
+	ai_weight = {
+		weight = 1
+	}
+}
+
+# -------------------------- Evolved edicts
+# Perpetual edicts
+tec_arcane_dwelvers = {
+	length = @EdictPerpetual
+	icon = "GFX_edict_type_policy"
+
+	resources = {
+		category = country	# To avoid scaling
+		#edicts
+		cost = { #Activation Cost
+			trigger = {
+				NOT = { has_edict = tec_arcane_dwelvers }
+			}
+			minor_artifacts = 50	#@Edict1Cost
+		}
+		cost = { #Deactivation Cost
+			trigger = {
+				has_edict = tec_arcane_dwelvers
+			}
+			minor_artifacts = 50	#@Edict1Cost
+		}
+	}
+
+	modifier = {
+		country_base_minor_artifacts_produces_add = 0.5
+		planet_researchers_produces_mult = 0.05
+		country_unity_produces_mult = 0.05
+	}
+
+	potential = {
+		is_galactic_community_member = yes
+		OR = {
+			has_global_flag = resolution_arcane_tech_allow
+		}
+	}
+
+	ai_weight = {
+		weight = @EdictHighPrio
+	}
+}
+
+tec_equality_edict = {
+	length = @EdictPerpetual
+	icon = "GFX_edict_type_policy"
+
+	resources = {
+		category = edicts
+		upkeep = {
+			unity = @Edict1Cost
+		}
+	}
+
+	modifier = {
+		planet_resettlement_unemployed_mult = 2.00
+		pop_demotion_time_mult = -0.25
+	}
+
+	potential = {
+		is_pluralist = yes
+	}
+
+	ai_weight = {
+		weight = @EdictLowPrio
+	}
+}
+
+tec_social_state_edict = {
+	length = @EdictPerpetual
+	icon = "GFX_edict_type_policy"
+
+	resources = {
+		category = edicts
+		upkeep = {
+			unity = @Edict1Cost
+		}
+	}
+
+	modifier = {
+		pop_citizen_happiness = 0.05
+		planet_clerks_unity_produces_add = 1
+		planet_pops_consumer_goods_upkeep_mult = 0.1
+	}
+
+	potential = {
+		is_cooperative = yes
+	}
+
+	ai_weight = {
+		weight = @EdictHighPrio
+	}
+}
+
+tec_mortgage_edict = {
+	length = @EdictPerpetual
+	icon = "GFX_edict_type_policy"
+
+	resources = {
+		category = edicts
+		upkeep = {
+			unity = @Edict2Cost
+		}
+	}
+
+	potential = {
+		has_valid_civic = civic_tec_corporate_reanimators
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}
+
+# Campaigns
+tec_convergence_edict = {	# Biopsionic
+	length = @tec_convergence_duration
+	icon = "GFX_edict_type_time"
+	resources = {
+		category = country	# To avoid scaling
+		cost = {
+			sr_zro = 100
+		}
+	}
+	potential = {
+		has_country_flag = tec_unlocked_convergence
+	}
+	effect = {
+		country_event = {
+			id = tec_biopsionic_path.30022
+			days = 0 
+		}
+	}
+	ai_weight = {
+		weight = @EdictHighPrio
+	}
+}
+
+
+# Debug
+
+@situation_tec_gene_path_t1 = "situation_tec_gene_path_t1"
+
+tec_fix_my_ascension = {	# Debug wrong ascensions
+	length = 0
+	icon = "GFX_edict_type_time"
+	resources = {
+		category = country	# To avoid scaling
+	}
+	potential = {
+		OR = {
+			AND = {
+				has_tradition = tr_psionics_finish
+				NOR = {
+					has_country_flag = tec_psionics_gate
+				}
+			}
+			AND = {
+				has_tradition = tr_genetics_finish
+				NOR = {
+					has_country_flag = tec_genetics_gate
+				}
+			}
+			AND = {
+				has_tradition = tr_cybernetics_finish
+				NOR = {
+					has_country_flag = tec_cybernetics_gate
+				}
+			}
+			#AND = {
+			#	has_tradition = tr_synthetics_finish
+			#	NOR = {
+			#		has_country_flag = tec_synthetic_gate
+			#	}
+			#}
+
+			# Advanced ascensions
+			AND = {	# Psionics
+				has_tradition = tr_psionics_finish
+				any_situation = {
+					AND = {
+						is_situation_type = situation_tec_psionic_path_gate
+						situation_progress < 10
+					}
+				}
+			}
+			AND = { # ADV Cybernetics
+				has_ascension_perk = ap_tec_cybernetic_revolution
+				NOR = {
+					any_situation = {
+						is_situation_type = situation_tec_cybernetic_path_t2
+					}
+					# In case the situation was finished but the project did not
+					has_special_project = TEC_FINAL_ADVANCED_CYBERNETIC_PROJECT
+					# All finished
+					has_country_flag = tec_cybernetics_t2_completed
+				}
+			}
+		}
+	}
+	effect = {
+		if = {	# Fix psionics
+			limit = {
+				has_tradition = tr_psionics_mind_readers
+				has_trait = trait_latent_psionic
+			}
+			country_event = {
+				id = tec_psionic_path.120
+			}
+		}
+		if = {	# Fix psionic tradition
+			limit = {
+				has_tradition = tr_psionics_finish
+				NOT = {
+					has_country_flag = tec_psionics_gate
+				}
+			}
+			if = {
+				limit = {
+					any_situation = {
+						is_situation_type = situation_tec_psionic_path_gate
+					}
+				}
+				random_situation = {
+					limit = {
+						is_situation_type = situation_tec_psionic_path_gate
+					}
+					abort_situation = this
+				}
+			}
+			set_country_flag = tec_psionics_gate
+			country_event = {
+				id = tec_psionic_path.200
+				days = 1
+			}
+		}
+		if = {	# Fix genetic tradition
+			limit = {
+				has_tradition = tr_genetics_finish
+				NOT = {
+					has_country_flag = tec_genetics_gate
+				}
+			}
+			if = {
+				limit = {
+					any_situation = {
+						is_situation_type = @situation_tec_gene_path_t1
+					}
+				}
+				random_situation = {
+					limit = {
+						is_situation_type = @situation_tec_gene_path_t1
+					}
+					abort_situation = this
+				}
+			}
+			set_country_flag = tec_genetics_gate
+			country_event = {
+				id = tec_gene_path.200
+				days = 1
+			}
+		}
+		if = {	# Fix cybernetic tradition
+			limit = {
+				has_tradition = tr_cybernetics_finish
+				NOT = {
+					has_country_flag = tec_cybernetics_gate
+				}
+			}
+			if = {
+				limit = {
+					any_situation = {
+						is_situation_type = situation_tec_cybernetic_path_gate
+					}
+				}
+				random_situation = {
+					limit = {
+						is_situation_type = situation_tec_cybernetic_path_gate
+					}
+					abort_situation = this
+				}
+			}
+			set_country_flag = tec_cybernetics_gate
+			country_event = {
+				id = tec_cybernetic_path.200
+				days = 1
+			}
+		}
+		#if = {	# Fix synthetic tradition
+			#	limit = {
+			#		has_tradition = tr_synthetics_finish
+			#		NOT = {
+			#			has_country_flag = tec_synthetics_gate
+			#		}
+			#	}
+			#	country_event = {
+			#		id = tec_synthetic_path.200
+			#	}
+		#}
+
+		if = {	# Fix psionic gate trad
+			limit = {
+				has_tradition = tr_psionics_finish
+				any_situation = {
+					is_situation_type = situation_tec_psionic_path_gate
+				}
+			}
+			random_situation = {
+				limit = {
+					is_situation_type = situation_tec_psionic_path_gate
+				}
+				set_situation_locked = no
+			}
+		}
+		if = {	# Fix CYB ap situation
+			limit = {
+				has_ascension_perk = ap_tec_cybernetic_revolution
+				NOR = {
+					any_situation = {
+						is_situation_type = situation_tec_cybernetic_path_t2
+					}
+					# In case the situation was finished but the project did not
+					has_special_project = TEC_FINAL_ADVANCED_CYBERNETIC_PROJECT
+					# All finished
+					has_country_flag = tec_cybernetics_t2_completed
+				}
+			}
+			# Reloads the event
+			country_event = {
+				id = tec_cybernetic_path.300
+			}
+		}
+	}
+	ai_weight = {
+		weight = 99999
+	}
+}

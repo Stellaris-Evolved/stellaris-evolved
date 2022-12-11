@@ -1,0 +1,188 @@
+############################
+#
+############################
+
+namespace = aquatics
+
+#Gotta start with the important things... killing the dragon :(
+
+# This = owner of fleet 1 (combatant)
+# From = owner of fleet 2 (destroyed)
+# FromFrom = fleet 1
+# FromFromFrom = fleet 2
+country_event = { # Keeping this one for future gestalt reanimation
+	# It is just as vanilla
+	id = aquatics.105
+	title = aquatics.105.name
+	desc = {
+		text = aquatics.105.desc.origin_normal
+		trigger = {
+			from = { has_country_flag = here_be_the_dragon@root }
+			NOT = { has_ethic = ethic_gestalt_consciousness }
+			is_materialist = no
+		}
+	}
+	desc = {
+		text = aquatics.105.desc.origin_materialist
+		trigger = {
+			from = { has_country_flag = here_be_the_dragon@root }
+			is_materialist = yes
+		}
+	}
+	desc = {
+		text = aquatics.105.desc.origin_hive
+		trigger = {
+			from = { has_country_flag = here_be_the_dragon@root }
+			is_hive_empire = yes
+		}
+	}
+	desc = {
+		text = aquatics.105.desc.origin_machine
+		trigger = {
+			from = { has_country_flag = here_be_the_dragon@root }
+			is_machine_empire = yes
+		}
+	}
+	desc = {
+		text = aquatics.105.desc.others
+		trigger = {
+			NOT = { from = { has_country_flag = here_be_the_dragon@root } }
+		}
+	}
+
+	picture = GFX_evt_here_be_dragons
+	location = fromfrom
+	show_sound = event_mystic_reveal
+
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			is_country_type = origin_dragon
+			has_country_flag = here_be_the_dragon
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				NOT = { from = { has_country_flag = here_be_the_dragon@root } }
+			}
+			random_country = {
+				limit = { from = { has_country_flag = here_be_the_dragon@prev } }
+				country_event = { id = aquatics.110 }
+			}
+		}
+		fromfrom.solar_system = {
+			save_event_target_as = dragon_system
+			random_system_planet = {
+				limit = {
+					is_colony = yes
+				}
+				weights = {
+					base = 1
+					modifier = {
+						factor = 1000
+						NOT = { is_planet_class = pc_habitat }
+					}
+				}
+				save_event_target_as = dragon_planet
+			}
+		}
+		random_country = {
+			limit = { has_country_flag = dragon_dummy_for@from }
+			destroy_country = yes
+		}
+	}
+
+	option = {
+		name = aquatics.105.A
+		trigger = { from = { has_country_flag = here_be_the_dragon@root } }
+		grant_dragon_armor_effect = yes
+		add_modifier = {
+			modifier = slew_origin_dragon
+		}
+	}
+
+	option = {
+		name = aquatics.105.A
+		trigger = { NOT = { from = { has_country_flag = here_be_the_dragon@root } } }
+		grant_dragon_armor_effect = yes
+	}
+
+	option = {
+		name = galactic_features.385.reanimated
+		trigger = {
+			is_reanimator = yes
+			from = { has_country_flag = here_be_the_dragon@root }
+		}
+		add_modifier = {
+			modifier = slew_origin_dragon
+		}
+		enable_special_project = {
+			name = "REANIMATE_ORIGIN_DRAGON"
+			location = event_target:dragon_system.star
+			owner = root
+		}
+	}
+
+	option = {
+		name = galactic_features.385.reanimated
+		trigger = {
+			is_reanimator = yes
+			NOT = { from = { has_country_flag = here_be_the_dragon@root } }
+		}
+		enable_special_project = {
+			name = "REANIMATE_ORIGIN_DRAGON"
+			location = event_target:dragon_system.star
+			owner = root
+		}
+	}
+
+	after = {
+		if = {
+			limit = { exists = fromfrom.leader }
+			fromfrom.leader = {
+				if = {
+					limit = {
+						leader_class = admiral
+					}
+					add_trait = leader_trait_dragonslayer
+				}
+				ELSE_IF = {
+					limit = {
+						leader_class = general
+					}
+					add_trait = leader_trait_dragonbane
+				}
+			}
+		}
+		if = {
+			limit = { num_owned_planets > 0 }
+			generate_parade_city = yes
+			start_situation = {
+				type = leviathan_celebration_opportunity
+				target = event_target:parade_city
+				effect = {
+					set_situation_flag = celebration_hrozgar
+					set_situation_flag = standard_unity_reward
+				}
+			}
+		}
+	}
+}
+
+#Slain by someone else
+country_event = {
+	id = aquatics.110
+	title = aquatics.110.name
+	desc = aquatics.110.desc
+	picture = GFX_evt_here_be_dragons
+	location = fromfrom
+	show_sound = event_bad_omen
+	is_triggered_only = yes
+
+	option = {
+		name = aquatics.110.A
+	}
+}

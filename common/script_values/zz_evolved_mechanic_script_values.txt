@@ -1,0 +1,387 @@
+
+# Federation comm pacts
+# ------------------------------------------------------------
+tec_num_commercial_pacts_incl_fed = {
+	base = 0
+	modifier = {
+		add = trigger:num_commercial_pacts
+	}
+	modifier = {
+		add = trigger:count_federation_ally
+	}
+}
+
+# Planed scaled trade value generated
+# ------------------------------------------------------------
+tec_planet_trade_value = {
+	base = 0
+	add = modifier:trade_value_add
+	mult = modifier:trade_value_mult
+}
+
+# Protoworld scaling cost
+# ------------------------------------------------------------
+tec_protoworld_cost = {
+	base = 0
+	modifier = {
+		exists = space_owner
+		space_owner = {
+			is_variable_set = tec_protoworlds_created
+			check_variable = { # avoid 0 costs
+				which = tec_protoworlds_created
+				value > 0
+			}
+		}
+		add = space_owner.tec_protoworlds_created
+	}
+	add = owner.tec_protoworlds_created
+	#add = var:tec_protoworlds_created
+	#add = tec_protoworlds_created
+	mult = 0.5
+	add = 1
+	max = 5
+}
+
+# Leader production
+# ------------------------------------------------------------
+# Base
+tec_leader_scripted_production = {
+	base = 0
+	[[!BASE_VALUE] 
+		add = $BASE$
+	]
+	[[BASE_VALUE]
+		add = value:$BASE_VALUE$|BASE|$BASE$|
+	]
+
+	modifier = { # Gestalts and oligarchics add 1 resource more
+		mult = 1.25
+		exists = owner
+		owner = {
+			is_oligarchy = yes
+		}
+	}
+
+	modifier = { # Leader skill multiplier
+		mult = trigger:has_skill
+	}
+}
+
+tec_leader_level_count = {
+	base = 0.1
+	modifier = {
+		exists = owner
+		mult = trigger:has_skill
+	}
+	add = 1
+	# Level 6 leaders adds a mult of 1.6
+}
+
+tec_leader_scripted_upkeep = {
+	base = 1
+	[[!BASE_VALUE] 
+		add = $BASE$
+	]
+	[[BASE_VALUE]
+		add = value:$BASE_VALUE$|BASE|$BASE$|
+	]
+
+	modifier = { # Double production, double upkeep
+		mult = 2
+		exists = owner
+		owner = {
+			has_valid_civic = civic_tec_hive_anaxiomatic
+		}
+	}
+
+	modifier = { # Leader skill multiplier
+		mult = trigger:has_skill
+	}
+}
+
+tec_leader_add_per_tech_researched = {
+	base = 1
+	mult = $MULT$
+	# Old script
+		#modifier = {
+		#	exists = owner
+		#	add = owner.trigger:num_researched_techs
+		#}
+		#complex_trigger_modifier = {
+		#	trigger_scope = owner
+		#	trigger = num_researched_techs_of_tier
+		#	parameters = { tier = 0 }
+		#	mode = subtract
+		#}
+	# /
+	complex_trigger_modifier = {
+		trigger_scope = owner
+		trigger = num_researched_techs_of_tier
+		parameters = { tier = 1 }
+		mode = add
+		mult = 0.25
+	}
+	complex_trigger_modifier = {
+		trigger_scope = owner
+		trigger = num_researched_techs_of_tier
+		parameters = { tier = 2 }
+		mode = add
+		mult = 0.25
+	}
+	complex_trigger_modifier = {
+		trigger_scope = owner
+		trigger = num_researched_techs_of_tier
+		parameters = { tier = 3 }
+		mode = add
+		mult = 0.25
+	}
+	complex_trigger_modifier = {
+		trigger_scope = owner
+		trigger = num_researched_techs_of_tier
+		parameters = { tier = 4 }
+		mode = add
+		mult = 0.25
+	}
+	complex_trigger_modifier = {
+		trigger_scope = owner
+		trigger = num_researched_techs_of_tier
+		parameters = { tier >= 5 }
+		mode = add
+		mult = 0.25
+	}
+	# Each tech above level 0 adds $mult$
+}
+
+tec_leader_add_per_planet_ascension = {
+	base = 1
+	mult = $MULT$
+		#complex_trigger_modifier = {
+		#	trigger_scope = sector.sector_capital
+		#	trigger = has_planetary_ascension_tier
+		#	mode = add
+		#	mult = 0.1
+		#}
+	# There is no num_planetary_ascension_tier so
+		modifier = {
+			exists = sector.sector_capital
+			sector.sector_capital = {
+				has_planetary_ascension_tier = 1
+			}
+			add = 0.1
+		}
+		modifier = {
+			exists = sector.sector_capital
+			sector.sector_capital = {
+				has_planetary_ascension_tier = 2
+			}
+			add = 0.2
+		}
+		modifier = {
+			exists = sector.sector_capital
+			sector.sector_capital = {
+				has_planetary_ascension_tier = 3
+			}
+			add = 0.3
+		}
+		modifier = {
+			exists = sector.sector_capital
+			sector.sector_capital = {
+				has_planetary_ascension_tier = 4
+			}
+			add = 0.4
+		}
+		modifier = {
+			exists = sector.sector_capital
+			sector.sector_capital = {
+				has_planetary_ascension_tier = 5
+			}
+			add = 0.5
+		}
+		modifier = {
+			exists = sector.sector_capital
+			sector.sector_capital = {
+				has_planetary_ascension_tier = 6
+			}
+			add = 0.6
+		}
+		modifier = {
+			exists = sector.sector_capital
+			sector.sector_capital = {
+				has_planetary_ascension_tier = 7
+			}
+			add = 0.7
+		}
+		modifier = {
+			exists = sector.sector_capital
+			sector.sector_capital = {
+				has_planetary_ascension_tier = 8
+			}
+			add = 0.8
+		}
+		modifier = {
+			exists = sector.sector_capital
+			sector.sector_capital = {
+				has_planetary_ascension_tier = 9
+			}
+			add = 0.9
+		}
+		modifier = {
+			exists = sector.sector_capital
+			sector.sector_capital = {
+				has_planetary_ascension_tier = 10
+			}
+			add = 1
+		}
+	# /
+}
+
+# Specific leaders
+tec_leader_governor_production = {
+	base = 1
+	mult = $MULT$
+	mult = value:tec_leader_add_per_planet_ascension|MULT|1|
+	mult = trigger:has_level
+	modifier = { # Gestalts and oligarchics add more
+		mult = 1.25
+		exists = owner
+		owner = {
+			is_oligarchy = yes
+		}
+	}
+	# multiplier = value:tec_leader_governor_production|MULT|0.01|
+}
+
+tec_leader_scientist_production = {
+	base = 1
+	mult = $MULT$
+	mult = value:tec_leader_add_per_tech_researched|MULT|1|
+	mult = value:tec_leader_level_count
+	modifier = { # Gestalts and oligarchics add more
+		mult = 1.25
+		exists = owner
+		owner = {
+			is_oligarchy = yes
+		}
+	}
+	modifier = { # Anaxiomatic Splits
+		mult = 1.25
+		exists = owner
+		owner = {
+			has_valid_civic = civic_tec_hive_anaxiomatic
+		}
+	}
+	# multiplier = value:tec_leader_scientist_production|MULT|1|
+	# lvl 3 with 2 techs = 1x1x1x1.3 = 1.3
+	# Lvl 5 with 100 techs = 1x1x50x1.5 = 75
+	# Lvl 10 with 300 techs =  1x1x150x2 = 300
+}
+
+tec_leader_admiral_production = {
+	base = 1
+	mult = $MULT$
+	modifier = {
+		exists = fleet
+		add = fleet.trigger:fleet_size
+	}
+	mult = 0.5
+	mult = value:tec_leader_level_count
+	modifier = { # Gestalts and oligarchics add more
+		mult = 1.25
+		exists = owner
+		owner = {
+			is_oligarchy = yes
+		}
+	}
+	# multiplier = value:tec_leader_admiral_production|MULT|1|
+	# lvl 1 with 10 size fleet = 1x1x10x1.1 = 11
+	# lvl 3 with 30 size fleet = 1x1x30x1.3 = 33
+	# Lvl 5 with 50 size fleet = 1x1x50x1.5 = 75
+	# Lvl 10 with 250 s. fleet = 1x1x250x2 = 500
+}
+
+# Industrial count
+# ------------------------------------------------------------
+tec_industrial_district_count = {
+	base = 0
+	complex_trigger_modifier = {
+		trigger = num_districts
+		parameters = {
+			type = district_industrial
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_districts
+		parameters = {
+			type = district_hab_industrial
+		}
+		mode = add
+	}
+	# PD
+	complex_trigger_modifier = {
+		trigger = num_districts
+		parameters = {
+			type = district_pdhab_industrial
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_districts
+		parameters = {
+			type = district_archive_industrial
+		}
+		mode = add
+	}
+
+	# GIGA
+	complex_trigger_modifier = {
+		trigger = num_districts
+		parameters = {
+			type = district_giga_frameworld_industrial
+		}
+		mode = add
+	} 
+	complex_trigger_modifier = {
+		trigger = num_districts
+		parameters = {
+			type = district_giga_frameworld_industrial_advanced
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_districts
+		parameters = {
+			type = district_giga_gas_giant_habitat_industrial
+		}
+		mode = add
+	}
+	# below are arcology ones, with split production so your choice
+	complex_trigger_modifier = {
+		trigger = num_districts
+		parameters = {
+			type = district_interstellar_industrial
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_districts
+		parameters = {
+			type = district_penrose_industrial
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_districts
+		parameters = {
+			type = district_penrose_industrial
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_districts
+		parameters = {
+			type = district_virtual_alloys
+		}
+		mode = add
+	}
+}

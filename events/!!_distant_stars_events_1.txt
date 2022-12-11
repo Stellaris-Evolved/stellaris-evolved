@@ -1,0 +1,437 @@
+
+#################################
+#
+#
+#################################
+
+namespace = distar
+
+# -------------------------- Reanimators Changes
+ship_event = { #Disabled event for Reanimators
+	id = distar.58
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_ship_flag = lost_amoeba_ship
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				owner = {
+					is_reanimator = yes
+				}
+				#exists = event_target:amoeba_finding_scientist
+				NOT = { has_ship_flag = resurrected_once }
+			}
+			ship_event = { id = distar.340 }
+		}
+		else = {
+			if = {
+				limit = {
+					exists = event_target:amoeba_finding_scientist
+				}
+				fleet.owner = { country_event = { id = distar.57 } }
+			}
+			set_disabled = no
+			destroy_ship = this
+		}
+	}
+}
+
+ship_event = {
+	id = distar.340
+	title = "distar.57.name"
+	desc = {
+		trigger = { exists = event_target:amoeba_finding_scientist }
+		text = "distar.340.desc.science"
+	}
+	desc = {
+		trigger = { NOT = { exists = event_target:amoeba_finding_scientist } }
+		text = "distar.340.desc"
+	}
+	location = from
+
+	is_triggered_only = yes
+
+	picture = GFX_evt_friendly_amoeba
+	show_sound = event_mystic_reveal
+
+	trigger = {
+
+	}
+	option = {
+		name = "distar.340.a"
+
+		trigger = {
+			owner = {
+				is_reanimator = yes
+			}
+		}
+		if = {
+			limit = { exists = event_target:amoeba_finding_scientist }
+			event_target:amoeba_finding_scientist = {
+				add_trait = leader_trait_maniacal
+			}
+		}
+
+		enable_special_project = {
+			name = "REANIMATE_LOST_AMOEBA"
+			location = this
+			owner = root.owner
+		}
+	}
+
+	option = {
+		name = "distar.340.b"
+		if = {
+			limit = { exists = event_target:amoeba_finding_scientist }
+			event_target:amoeba_finding_scientist = {
+				add_trait = leader_trait_substance_abuser
+			}
+		}
+		hidden_effect = {
+			from = {
+				set_disabled = no
+				destroy_ship = this
+			}
+		}
+	}
+}
+
+# Undead Armies Reanimation
+country_event = {
+	id = distar.59
+	title = "distar.218.name"
+	desc = {
+		trigger = { exists = event_target:amoeba_finding_scientist }
+		text = "distar.59.desc" #This is the loc that mentions the scientist
+	}
+	desc = {
+		trigger = { NOT = { exists = event_target:amoeba_finding_scientist } }
+		text = "distar.59.desc.science" #This is the desc that doesn't mention the scientist
+	}
+	location = from
+
+	is_triggered_only = yes
+
+	picture = GFX_evt_friendly_amoeba
+	show_sound = event_mystic_reveal
+
+	immediate = {
+		random_controlled_ship = {
+			limit = {
+				has_ship_flag = lost_amoeba_ship
+			}
+			set_ship_flag = resurrected_once
+			save_event_target_as = reanimated_amoeba
+		}
+	}
+	option = {
+		name = "it_hungers"
+		event_target:reanimated_amoeba = {
+			set_disabled = no
+		}
+
+	}
+}
+
+country_event = { #Death of the Matriarch
+	id = distar.212
+	title = "distar.212.name"
+	desc = "distar.212.desc"
+	picture = GFX_evt_ancient_tiyanki
+	show_sound = event_space_whale
+	location = event_target:dead_matriarch
+
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:elderly_tiyanki_fleet
+		FromFromFrom.fleet = {
+			is_same_value = event_target:elderly_tiyanki_fleet
+		}
+	}
+
+	immediate = {
+		set_country_flag = tiyanki_killed # Achievement flag
+		create_ambient_object = {
+			type = "elderly_tiyanki_dead_object"
+			location = fromfromfrom
+			effect = {
+				save_event_target_as = dead_matriarch
+			}
+		}
+		every_playable_country = {
+			limit = {
+				has_event_chain = curator_poi_chain
+				fromfrom.solar_system = {
+					is_point_of_interest = {
+						id = curator_poi_tiyanki
+						event_chain = curator_poi_chain
+						owner = prev
+					}
+				}
+			}
+			remove_point_of_interest = curator_poi_tiyanki
+			end_curator_chain = yes
+		}
+	}
+
+	option = {
+		name = "distar.212.a"
+		trigger = { NOT = { has_valid_civic = civic_memorialist } }
+		hidden_effect = {
+			if = {
+				limit = { tec_is_default_country = yes }
+				country_event = { id = distar.213 }
+				country_event = { id = galcom.110 days = 60 }
+			}
+		}
+	}
+
+	option = {
+		name = UNDERSTOOD
+		trigger = { has_valid_civic = civic_memorialist }
+		hidden_effect = {
+			if = {
+				limit = { tec_is_default_country = yes }
+				country_event = { id = distar.213 }
+				country_event = { id = galcom.110 days = 60 }
+			}
+		}
+	}
+
+	option = {
+		name = galactic_features.385.reanimated
+
+		trigger = {
+			is_reanimator = yes
+		}
+
+		event_target:dead_matriarch = {
+			enable_special_project = {
+				name = "REANIMATE_TIYANKI_MATRIARCH"
+				location = this
+				owner = root.owner
+			}
+		}
+
+		hidden_effect = {
+			country_event = { id = distar.213 }
+			country_event = { id = galcom.110 days = 60 }
+		}
+	}
+
+	after = {
+		if = {
+			limit = {
+				is_robot_empire = no
+				num_owned_planets > 0
+			}
+			generate_parade_city = yes
+			start_situation = {
+				type = leviathan_celebration_opportunity
+				target = event_target:parade_city
+				effect = {
+					set_situation_flag = celebration_tiyanki_matriarch
+					set_situation_flag = standard_unity_reward
+				}
+			}
+		}
+	}
+}
+
+
+# Reanimated Matriarch
+country_event = {
+	id = distar.218
+	title = "distar.218.name"
+	desc = "distar.218.desc"
+	location = event_target:dead_matriarch
+
+	is_triggered_only = yes
+
+	picture = GFX_evt_ancient_tiyanki
+	show_sound = event_space_whale
+
+	option = {
+		name = "it_hungers"
+
+		create_fleet = {
+			name = "NAME_Elderly_Tiyanki"
+			effect = {
+				set_owner = root
+				create_ship = {
+					name = "NAME_Elderly_Tiyanki"
+					design = "NAME_Progenitor"
+					prefix = no
+					upgradable = no
+				}
+				set_location = {
+					target = event_target:dead_matriarch
+					distance = 0
+					angle = random
+				}
+				set_fleet_stance = passive
+			}
+			settings = {
+				can_upgrade = no
+				can_change_composition = no
+				can_change_leader = no
+				uses_naval_capacity = no
+				spawn_debris = no
+			}
+		}
+	}
+
+	after = {
+		if = {
+			limit = { exists = event_target:dead_matriarch }
+			event_target:dead_matriarch = {
+				destroy_ambient_object = this
+			}
+		}
+	}
+}
+
+
+
+# -------------------------- Brainslug Changes
+#Happy Little Brainslugs
+ship_event = {
+	id = distar.170
+	title = "distar.170.name"
+	desc = {
+		trigger = {
+			owner = {
+				NOR = {
+					has_authority = auth_machine_intelligence
+					# Evolved
+						has_valid_civic = civic_tec_pu_neuroslug
+					# /
+				}
+			}
+		}
+		text = "distar.170.desc"
+	}
+	desc = {
+		trigger = {
+			owner = {
+				has_authority = auth_machine_intelligence
+			}
+		}
+		text = "distar.170.desc.machi"
+	}
+	picture = GFX_evt_alien_nature
+	show_sound = event_alien_nature
+	location = from
+
+	is_triggered_only = yes
+
+	immediate = {
+		owner = {
+			set_country_flag = brainslug_divination_flag
+		}
+	}
+
+	option = {
+		trigger = {
+			owner = {
+				NOR = {
+					has_authority = auth_machine_intelligence
+					# Evolved
+						has_valid_civic = civic_tec_pu_neuroslug
+					# /
+				}
+				any_owned_pop = {
+					species = {
+						NOR = {
+							has_trait = trait_cybernetic
+							has_trait = trait_mechanical
+							has_trait = trait_machine_unit
+						}
+					}
+				}
+			}
+		}
+		name = "distar.170.a"
+		from = {
+			enable_special_project = {
+				name = "BRAINSLUG_PROJECT"
+				location = this
+				owner = root.owner
+			}
+		}
+	}
+
+	option = {
+		trigger = {
+			owner = {
+				NOR = {
+					has_authority = auth_machine_intelligence
+					# Evolved
+						has_valid_civic = civic_tec_pu_neuroslug
+					# /
+				}
+			}
+		}
+		name = NOTIME
+	}
+
+	option = {
+		trigger = {
+			owner = {
+				has_authority = auth_machine_intelligence
+			}
+		}
+		name = "distar.170.machi"
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier4researchreward
+				min = @tier4researchmin
+				max = @tier4researchmax
+			}
+		}
+	}
+
+	# Evolved
+		option = {
+			trigger = {
+				owner = {
+					has_valid_civic = civic_tec_pu_neuroslug
+				}
+			}
+			name = distar.170.tec_pu_neuroslug.retrieve
+			custom_tooltip = distar.170.tec_pu_neuroslug.retrieve.tooltip
+			
+			hidden_effect = {
+				owner = {
+					set_country_flag = tec_pu_neuroslug_retrieved_brainslugs
+				}
+			}
+		}
+
+		option = {
+			trigger = {
+				owner = {
+					has_valid_civic = civic_tec_pu_neuroslug
+				}
+			}
+			name = distar.170.tec_pu_neuroslug.destroy
+			custom_tooltip = distar.170.tec_pu_neuroslug.destroy.tooltip
+			owner = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier4researchreward
+					min = @tier4researchmin
+					max = @tier4researchmax
+				}
+			}
+		}
+	# /
+
+}

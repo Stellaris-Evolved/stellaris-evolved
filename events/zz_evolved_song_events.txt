@@ -1,0 +1,1853 @@
+# Song Events
+# ---------------- 
+namespace = tec_song_events
+
+# Main chain
+	# - Arpeggio Solaris			tec_song_events.2
+	# - Eerie Silence				tec_song_events.3
+	# - Signal Harmonization		tec_song_events.5
+	# - Final Accord				tec_song_events.14
+	# - Writing Our Own Score		tec_song_events.1202
+	# - Endings						tec_song_events.21	tec_song_events.22	tec_song_events.23
+
+# Situations
+	# Change of situation stage
+	# From nowhere					tec_song_events.10
+	# Soft Melodies					tec_song_events.11
+	# A beautiful ballade			tec_song_events.12
+	# Monthly situation events
+	# Intensified Harmonization		tec_song_events.6
+	# Empty Melody					tec_song_events.7
+	# Static Displacement			tec_song_events.8
+
+# Digsite
+	# 1- What the rocks Know		tec_song_events.1501
+	# 2- Notes in the stone			tec_song_events.1502
+	# 3- Instrumental underground	tec_song_events.1504
+	# 4- Scale of circumstances		tec_song_events.1505
+	# Final - Symphony				tec_song_events.1511
+	# Final - Sonata				tec_song_events.1512
+	# Final - Requiem				tec_song_events.1513
+
+
+# ----------- Event Group 0 - Setup ---------------
+# Mandatory test setup of planet_flag = colony_event
+# This event is necessary for artifically creating a chance for it to appear compared with other colony events as debug
+# This removes the need of overwriting 00_on_actions.txt for a proper colony event chance reproduction
+planet_event = {
+	id = tec_song_events.1
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		is_capital = no
+		original_owner = yes
+		has_ground_combat = no
+		is_occupied_flag = no
+		is_ai = no
+	}
+
+	trigger = {
+		num_pops > 0
+		NOR = {
+			AND = {
+				exists = owner
+				owner = {
+					has_country_flag = tec_song_eventchain_country
+				}
+			}
+			exists = archaeological_site
+			has_planet_flag = colony_event
+			is_artificial = yes
+		}
+	}
+
+	immediate = {
+		# Supresses other events
+		set_planet_flag = colony_event
+		set_planet_flag = suppress_archaeological_sites
+	}
+}
+
+# ----------- Event Group 1 - Setup ---------------
+# First event - random colony event
+# Arpeggio Solaris
+planet_event = {
+	id = tec_song_events.2
+	title = tec_song_events.2.name
+	desc = tec_song_events.2.desc
+	picture = GFX_evt_alien_city
+	show_sound = event_activating_unknown_technology
+
+	is_triggered_only = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		is_capital = no
+		original_owner = yes
+		has_ground_combat = no
+		is_occupied_flag = no
+		is_ai = no
+	}
+
+	trigger = {
+		NOR = {
+			AND = {
+				exists = owner
+				owner = {
+					OR = {
+						has_country_flag = tec_song_eventchain_country
+						has_country_flag = tec_song_ending_triggered
+					}
+				}
+			}
+			has_global_flag = tec_song_alternative_chain
+			has_planet_flag = colony_event
+			is_artificial = yes
+		}
+	}
+
+	option = {
+		name = tec_song_events.2.a
+		custom_tooltip = tec_song_events.2.a.tooltip
+		hidden_effect = {
+			owner = {
+				set_country_flag = tec_song_eventchain_country
+			}
+			set_planet_flag = tec_song_eventchain_planet
+			planet_event = {
+				id = tec_song_events.3
+				days = @songhalfyear
+				random = 20
+			}
+		}
+	}
+
+	option = {
+		name = tec_song_events.2.b
+		custom_tooltip = tec_song_events.2.b.tooltip
+		hidden_effect = {
+			# Lets cleanup the thing just in case
+			remove_planet_flag = colony_event
+			remove_planet_flag = suppress_archaeological_sites
+			owner = {
+				if = {
+					limit = { has_country_flag = tec_song_eventchain_country }
+					remove_country_flag = tec_song_eventchain_country
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+	}
+
+	immediate = {
+		# To avoid other events popping out of nowhere
+		hidden_effect = {
+			set_planet_flag = colony_event
+			set_planet_flag = suppress_archaeological_sites
+			
+		}
+	}
+}
+
+# Eerie Silence
+planet_event = {
+	id = tec_song_events.3
+	title = tec_song_events.3.name
+	desc = tec_song_events.3.desc
+	picture = GFX_evt_alien_city
+	show_sound = event_wind_ruins
+
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			has_country_flag = tec_song_eventchain_country
+			NOT = {
+				has_country_flag = tec_song_ending_triggered
+			}
+		}
+	}
+
+	option = {
+		name = tec_song_events.3.a
+		custom_tooltip = tec_song_events.3.a.tooltip
+		hidden_effect = {
+			owner = {
+				country_event = {
+					id = tec_song_events.4
+					days = @song1year
+					random = @song2months
+				}
+			}
+		}
+	}
+}
+
+# ----------- Event Group 2 - Situation ---------------
+# Timed event that sets the situation
+country_event = {
+	id = tec_song_events.4
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = {
+			has_country_flag = tec_song_ending_triggered
+		}
+		any_owned_planet = {
+			is_colony = yes
+			has_planet_flag = tec_song_eventchain_planet
+		}
+	}
+
+	immediate = {
+		random_owned_planet = {
+			limit = {
+				is_colony = yes
+				has_planet_flag = tec_song_eventchain_planet
+			}
+			save_event_target_as = tec_song_planet
+		}
+	}
+
+	after = {
+		country_event = { id = tec_song_events.5 }
+	}
+}
+
+# Situation starter controller
+# Signal Harmonization
+country_event = {
+	id = tec_song_events.5
+	title = "tec_song_events.5.name"
+	desc = "tec_song_events.5.desc"
+	picture = GFX_evt_physics_research
+	show_sound = event_alien_signal
+	is_triggered_only = yes
+	location = event_target:tec_song_planet
+
+	trigger = {
+		NOT = {
+			has_country_flag = tec_song_ending_triggered
+		}
+		exists = event_target:tec_song_planet
+	}
+
+	immediate = {
+		start_situation = {
+			type = situation_tec_song_harmonization
+			target = event_target:tec_song_planet
+			effect = {
+				save_event_target_as = new_situation
+			}
+		}
+		set_country_flag = tec_song_eventchain_triggered
+		hidden_effect = {
+			# Auto-cancels the situation after 10 years
+			# 15 years is more than enough for finishing this
+			country_event = {
+				id = tec_song_events.14
+				days = @song15years
+				#random = 60
+			}
+		}
+	}
+
+	option = {
+		name = tec_song_events.5.a # Force-search the patterns
+		icon = {
+			icon = GFX_situation_approach_fist
+			icon_background = GFX_situation_approach_bg_red
+			text = set_situation_approach_icon_text
+		}
+		event_target:new_situation = {
+			set_situation_approach = approach_tec_song_harmonization_force
+		}
+	}
+
+	option = {
+		name = tec_song_events.5.b # Wait for more info
+		icon = {
+			icon = GFX_situation_approach_shrug
+			icon_background = GFX_situation_approach_bg_yellow
+			text = set_situation_approach_icon_text
+		}
+		event_target:new_situation = {
+			set_situation_approach = approach_tec_song_harmonization_wait
+		}
+	}
+
+	option = {
+		name = tec_song_events.5.c # Study the song
+		icon = {
+			icon = GFX_situation_approach_research
+			icon_background = GFX_situation_approach_bg_green
+			text = set_situation_approach_icon_text
+		}
+		event_target:new_situation = {
+			set_situation_approach = approach_tec_song_harmonization_study
+		}
+	}
+
+	after = {
+		event_target:new_situation = {
+			set_situation_locked = no
+		}
+	}
+}
+
+# ---------------- Random events during the situation
+# Song intensifies
+situation_event = {
+	id = tec_song_events.6
+	title = "tec_song_events.6.name"
+	desc = "tec_song_events.6.desc"
+
+	picture = GFX_evt_physics_research
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	trigger = {
+		NOR = {
+			has_situation_flag = tec_song_harmonization_silence
+			has_situation_flag = tec_song_harmonization_intensify
+			has_situation_flag = tec_song_harmonization_noise
+		}
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = 1.5
+			current_situation_approach = approach_tec_song_harmonization_wait
+		}
+	}
+
+	immediate = {
+		hidden_effect = {
+			set_timed_situation_flag = {
+				flag = tec_song_harmonization_intensify
+				months = @song6months
+			}
+		}
+		add_situation_progress = 5
+	}
+
+	option = {
+		name = ACKNOWLEDGED
+		tooltip = {
+			add_situation_progress = 5
+		}
+		
+	}
+}
+
+# Song suddenly stops
+situation_event = {
+	id = tec_song_events.7
+	title = "tec_song_events.7.name"
+	desc = "tec_song_events.7.desc"
+
+	picture = GFX_evt_surreal_visions
+	show_sound = event_wind_ruins
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	trigger = {
+		NOR = {
+			has_situation_flag = tec_song_harmonization_silence
+			has_situation_flag = tec_song_harmonization_intensify
+			has_situation_flag = tec_song_harmonization_noise
+		}
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = 1.5
+			OR = {
+				current_situation_approach = approach_tec_song_harmonization_study
+				current_situation_approach = approach_tec_song_harmonization_force
+			}
+		}
+	}
+
+	immediate = {
+		hidden_effect = {
+			set_timed_situation_flag = {
+				flag = tec_song_harmonization_silence
+				months = @song6months
+			}
+		}
+		add_situation_progress = -5
+	}
+
+	option = {
+		name = UNFORTUNATE
+		tooltip = {
+			add_situation_progress = -5
+		}
+	}
+}
+
+# Song becomes noise
+situation_event = {
+	id = tec_song_events.8
+	title = "tec_song_events.8.name"
+	desc = "tec_song_events.8.desc"
+
+	picture = GFX_evt_surreal_visions
+	show_sound = event_activating_unknown_technology
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	trigger = {
+		NOR = {
+			has_situation_flag = tec_song_harmonization_silence
+			has_situation_flag = tec_song_harmonization_intensify
+			has_situation_flag = tec_song_harmonization_noise
+		}
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = 0.5
+			OR = {
+				current_situation_approach = approach_tec_song_harmonization_study
+				current_situation_approach = approach_tec_song_harmonization_force
+			}
+		}
+		modifier = {
+			factor = 1.5
+			current_situation_approach = approach_tec_song_harmonization_force
+		}
+	}
+
+	immediate = {
+		hidden_effect = {
+			set_timed_situation_flag = {
+				flag = tec_song_harmonization_noise
+				months = @song6months
+			}
+		}
+	}
+
+	option = {	# Radical approach
+		name = tec_song_events.8.a
+		tooltip = {
+			set_situation_approach = approach_tec_song_harmonization_force
+		}
+		icon = {
+			icon = GFX_situation_approach_fist
+			icon_background = GFX_situation_approach_bg_red
+			text = set_situation_approach_icon_text
+		}
+		trigger = {
+			hidden_trigger = {
+				current_situation_approach = approach_tec_song_harmonization_force
+			}
+		}
+		set_situation_approach = approach_tec_song_harmonization_force
+	}
+	option = {	# More radical approach
+		name = tec_song_events.8.a2
+		tooltip = {
+			set_situation_approach = approach_tec_song_harmonization_force
+		}
+		icon = {
+			icon = GFX_situation_approach_fist
+			icon_background = GFX_situation_approach_bg_red
+			text = set_situation_approach_icon_text
+		}
+		trigger = {
+			hidden_trigger = {
+				NOT = {
+					current_situation_approach = approach_tec_song_harmonization_force
+				}
+			}
+		}
+	}
+
+	option = {	# Be patient
+		name = tec_song_events.8.b
+		tooltip = {
+			set_situation_approach = approach_tec_song_harmonization_wait
+		}
+		icon = {
+			icon = GFX_situation_approach_shrug
+			icon_background = GFX_situation_approach_bg_yellow
+			text = set_situation_approach_icon_text
+		}
+		trigger = {
+			hidden_trigger = {
+				NOT = {
+					current_situation_approach = approach_tec_song_harmonization_wait
+				}
+			}
+		}
+		set_situation_approach = approach_tec_song_harmonization_wait
+	}
+	option = {	# Be patient but faster
+		name = tec_song_events.8.b2
+		tooltip = {
+			set_situation_approach = approach_tec_song_harmonization_wait
+		}
+		icon = {
+			icon = GFX_situation_approach_shrug
+			icon_background = GFX_situation_approach_bg_yellow
+			text = set_situation_approach_icon_text
+		}
+		trigger = {
+			hidden_trigger = {
+				current_situation_approach = approach_tec_song_harmonization_wait
+			}
+		}
+	}
+
+	option = {	# Research
+		name = tec_song_events.8.c
+		tooltip = {
+			set_situation_approach = approach_tec_song_harmonization_wait
+		}
+		icon = {
+			icon = GFX_situation_approach_research
+			icon_background = GFX_situation_approach_bg_green
+			text = set_situation_approach_icon_text
+		}
+		trigger = {
+			hidden_trigger = {
+				NOT = {
+					current_situation_approach = approach_tec_song_harmonization_study
+				}
+			}
+		}
+		set_situation_approach = approach_tec_song_harmonization_study
+	}
+	option = {	# Research harder
+		name = tec_song_events.8.c2
+		tooltip = {
+			set_situation_approach = approach_tec_song_harmonization_wait
+		}
+		icon = {
+			icon = GFX_situation_approach_research
+			icon_background = GFX_situation_approach_bg_green
+			text = set_situation_approach_icon_text
+		}
+		trigger = {
+			hidden_trigger = {
+				current_situation_approach = approach_tec_song_harmonization_study
+			}
+		}
+	}
+}
+
+# ---------------- Situation stage events
+# From nowhere - connects with subchain 1 - 10xx
+situation_event = {
+	id = tec_song_events.10
+	title = "tec_song_events.10.name"
+	desc = "tec_song_events.10.desc"
+
+	picture = GFX_evt_surreal_visions
+	show_sound = event_laboratory_sound
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		add_situation_progress = 5
+	}
+
+	option = {
+		name = tec_song_events.10.a
+		custom_tooltip = tec_song_events.10.a.tooltip
+		hidden_effect = {
+			owner = { save_event_target_as = tec_song_project_owner } 
+			target = { save_event_target_as = tec_song_planet }
+		}
+		event_target:tec_song_planet = {
+			enable_special_project = {
+				name = "TEC_SONG_PROJECT_DECRYPT"
+				location = this
+				owner = event_target:tec_song_project_owner
+			}
+		}
+	}
+	option = {
+		name = tec_song_events.10.b
+		custom_tooltip = tec_song_events.10.b.tooltip
+		tooltip = {
+			add_situation_progress = 5
+		}
+	}
+}
+
+# Soft Melodies
+situation_event = {
+	id = tec_song_events.11
+	title = "tec_song_events.11.name"
+	desc = "tec_song_events.11.desc"
+
+	picture = GFX_evt_surreal_visions
+	show_sound = event_mystic_reveal
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	option = {
+		name = tec_song_events.11.a
+	}
+}
+
+# A beautiful ballade - connects with subchain 2 - 12xx
+situation_event = {
+	id = tec_song_events.12
+	title = "tec_song_events.12.name"
+	desc = {
+		trigger = {
+			exists = owner
+			owner = {
+				is_gestalt = no
+				is_megacorp = no
+			}
+		}
+		text = tec_song_events.12.desc.regular
+	}
+	desc = {
+		trigger = {
+			exists = owner
+			owner = {
+				is_hive_empire = yes
+			}
+		}
+		text = tec_song_events.12.desc.hive
+	}
+	desc = {
+		trigger = {
+			exists = owner
+			owner = {
+				is_machine_empire = yes
+			}
+		}
+		text = tec_song_events.12.desc.machine
+	}
+
+	picture = GFX_evt_surreal_visions
+	show_sound = event_mystic_reveal
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	# Continue chain
+	option = {	# Regular
+		name = tec_song_events.12.a.regular
+		custom_tooltip = tec_song_events.12.a.regular.tooltip
+		trigger = {
+			exists = owner
+			owner = {
+				is_gestalt = no
+				is_megacorp = no
+			}
+		}
+		hidden_effect = {
+			owner = { save_event_target_as = tec_song_project_owner }
+			target = { save_event_target_as = tec_song_planet }
+		}
+		event_target:tec_song_planet = {
+			enable_special_project = {
+				name = "TEC_SONG_PROJECT_REGULAR"
+				location = this
+				owner = event_target:tec_song_project_owner
+			}
+		}
+		
+	}
+	option = {	# Corporate
+		name = tec_song_events.12.a.megacorp
+		custom_tooltip = tec_song_events.12.a.megacorp.tooltip
+		trigger = {
+			exists = owner
+			owner = {
+				is_gestalt = no
+				is_megacorp = yes
+			}
+		}
+		hidden_effect = {
+			owner = { save_event_target_as = tec_song_project_owner }
+			target = { save_event_target_as = tec_song_planet }
+		}
+		event_target:tec_song_planet = {
+			enable_special_project = {
+				name = "TEC_SONG_PROJECT_MEGACORP"
+				location = this
+				owner = event_target:tec_song_project_owner
+			}
+		}
+	}
+	option = {	# Gestalt
+		name = tec_song_events.12.a.gestalt
+		custom_tooltip = tec_song_events.12.a.gestalt.tooltip
+		trigger = {
+			exists = owner
+			owner = {
+				is_gestalt = yes
+			}
+		}
+		hidden_effect = {
+			owner = { save_event_target_as = tec_song_project_owner }
+			target = { save_event_target_as = tec_song_planet }
+		}
+		event_target:tec_song_planet = {
+			enable_special_project = {
+				name = "TEC_SONG_PROJECT_GESTALT"
+				location = this
+				owner = event_target:tec_song_project_owner
+			}
+		}
+	}
+
+	# Abort chain project
+	option = {
+		name = tec_song_events.12.b
+		custom_tooltip = tec_song_events.12.b.tooltip
+		hidden_effect = {
+			owner = { save_event_target_as = tec_song_project_owner }
+			target = { save_event_target_as = tec_song_planet }
+		}
+		event_target:tec_song_planet = {
+			enable_special_project = {
+				name = "TEC_SONG_PROJECT_DISRUPT"
+				location = this
+				owner = event_target:tec_song_project_owner
+			}
+		}
+	}
+}
+
+# Diminuendo - connects with subchain 3 - 13xx
+situation_event = {
+	id = tec_song_events.13
+	title = "tec_song_events.13.name"
+	desc = tec_song_events.13.desc
+
+	picture = GFX_evt_surreal_visions
+	show_sound = event_laboratory_sound
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	# Continue chain
+	option = {
+		name = tec_song_events.13.a
+		custom_tooltip = tec_song_events.13.a.tooltip
+		hidden_effect = {
+			owner = { save_event_target_as = tec_song_project_owner }
+			target = { save_event_target_as = tec_song_planet }
+		}
+		event_target:tec_song_planet = {
+			enable_special_project = {
+				name = "TEC_SONG_PROJECT_ALLORNOTHING"
+				location = this
+				owner = event_target:tec_song_project_owner
+			}
+		}
+	}
+	option = {	# let it go 
+		name = tec_song_events.13.b
+		custom_tooltip = tec_song_events.13.b.tooltip
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+	}
+}
+
+# Final accord - Cancels the event completely
+country_event = {
+	id = tec_song_events.14
+	title = "tec_song_events.14.name"
+	desc = {
+		trigger = {
+			is_gestalt = no
+		}
+		text = tec_song_events.14.desc.reg
+	}
+	desc = {
+		trigger = {
+			is_gestalt = yes
+		}
+		text = tec_song_events.14.desc.gestalt
+	}
+	picture = GFX_evt_surreal_visions
+	show_sound = event_power_down
+	location = event_target:tec_song_planet
+	is_triggered_only = yes
+
+	trigger = {
+		any_situation = {
+			is_situation_type = situation_tec_song_harmonization
+		}
+		# just in case
+		NOT = {
+			has_country_flag = tec_song_ending_triggered
+		}
+	}
+	option = {	# Triggers ending without rewards
+		name = tec_song_events.14.a
+		custom_tooltip = tec_song_events.14.a.tooltip
+		every_situation = {
+			limit = { is_situation_type = situation_tec_song_harmonization }
+			destroy_situation = this
+		}
+		hidden_effect = {
+			# this forcefully removes all special projects
+			set_country_flag = tec_song_ending_triggered
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+	}
+}
+
+# ---------------- Jumps to digsite part (4)
+# Creates the digsite - connects with digsite 1 - 15xx
+country_event = {
+	id = tec_song_events.15
+	title = "tec_song_events.15.name"
+	desc = tec_song_events.15.desc
+	picture = GFX_evt_surreal_visions
+	show_sound = event_mystic_reveal
+	location = event_target:tec_song_planet
+	is_triggered_only = yes
+
+	immediate = {
+		# Just in case
+		random_owned_planet = {
+			limit = {
+				is_colony = yes
+				has_planet_flag = tec_song_eventchain_planet
+			}
+			save_event_target_as = tec_song_planet
+		}
+	}
+
+	option = {
+		name = tec_song_events.15.a
+		custom_tooltip = tec_song_events.15.a.tooltip
+		hidden_effect = {
+			event_target:tec_song_planet = {
+				create_archaeological_site = site_tec_song_jukebox
+				owner = {
+					set_country_flag = tec_song_digisite_@prev
+				}
+			}
+		}
+	}
+}
+
+# ----------- Event Group 3 - Post-Situation ---------------
+# Subchain 1 - Attempting to decypher the signal
+# Decrypting Patterns
+situation_event = {
+	id = tec_song_events.1001
+	title = "tec_song_events.1001.name"
+	desc = "tec_song_events.1001.desc"
+
+	picture = GFX_evt_surreal_visions
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	option = {
+		name = tec_song_events.1001.a
+		custom_tooltip = tec_song_events.1001.a.tooltip
+	}
+}
+
+# Subchain 2 - Attempting to experiment with the colony
+# Writing Our Own Score
+country_event = {
+	id = tec_song_events.1202
+	title = "tec_song_events.1202.name"
+	desc = {
+		trigger = {
+			is_gestalt = no
+			is_megacorp = no
+		}
+		text = tec_song_events.1202.desc.regular
+	}
+	desc = {
+		trigger = {
+			is_gestalt = no
+			is_megacorp = yes
+		}
+		text = tec_song_events.1202.desc.megacorp
+	}
+	desc = {
+		trigger = {
+			is_gestalt = yes
+		}
+		text = tec_song_events.1202.desc.gestalt
+	}
+	picture = GFX_evt_surreal_visions
+	show_sound = event_mystic_reveal
+	is_triggered_only = yes
+	location = event_target:tec_song_planet
+
+	immediate = {
+		hidden_effect = {
+			random_owned_planet = {
+				limit = {
+					is_colony = yes
+					has_planet_flag = tec_song_eventchain_planet
+				}
+				save_event_target_as = tec_song_planet
+			}
+		}
+	}
+
+	# Continue chain
+	option = {	# Regular
+		name = tec_song_events.1202.a
+		custom_tooltip = tec_song_events.1202.a.tooltip
+		trigger = {
+			is_gestalt = no
+			is_megacorp = no
+		}
+		hidden_effect = {
+			save_event_target_as = tec_song_project_owner 
+		}
+		event_target:tec_song_planet = {
+			enable_special_project = {
+				name = "TEC_SONG_PROJECT_REGULAR"
+				location = this
+				owner = event_target:tec_song_project_owner
+			}
+		}
+	}
+	option = {	# Corporate
+		name = tec_song_events.1202.a.megacorp
+		custom_tooltip = tec_song_events.1202.a.megacorp.tooltip
+		trigger = {
+			is_gestalt = no
+			is_megacorp = yes
+		}
+		hidden_effect = {
+			save_event_target_as = tec_song_project_owner
+		}
+		event_target:tec_song_planet = {
+			enable_special_project = {
+				name = "TEC_SONG_PROJECT_MEGACORP"
+				location = this
+				owner = event_target:tec_song_project_owner
+			}
+		}
+	}
+	option = {	# Gestalt
+		name = tec_song_events.1202.a.gestalt
+		custom_tooltip = tec_song_events.1202.a.gestalt.tooltip
+		trigger = {
+			is_gestalt = yes
+		}
+		hidden_effect = {
+			save_event_target_as = tec_song_project_owner
+		}
+		event_target:tec_song_planet = {
+			enable_special_project = {
+				name = "TEC_SONG_PROJECT_GESTALT"
+				location = this
+				owner = event_target:tec_song_project_owner
+			}
+		}
+	}
+
+	# Abort chain
+	option = {	# Regular
+		name = tec_song_events.1202.b
+		custom_tooltip = tec_song_events.1202.b.tooltip
+		trigger = {
+			is_gestalt = no
+			is_megacorp = no
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+	}
+	option = {	# Corporate
+		name = tec_song_events.1202.b.megacorp
+		custom_tooltip = tec_song_events.1202.b.megacorp.tooltip
+		trigger = {
+			is_gestalt = no
+			is_megacorp = yes
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+	}
+	option = {	# Gestalt
+		name = tec_song_events.1202.b.gestalt
+		custom_tooltip = tec_song_events.1202.b.gestalt.tooltip
+		trigger = {
+			is_gestalt = yes
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+	}
+
+}
+
+# 50% post special project - good or bad based on tec_song_understanding var
+country_event = {
+	id = tec_song_events.1203
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		# Redo this just in case
+		random_owned_planet = {
+			limit = {
+				is_colony = yes
+				has_planet_flag = tec_song_eventchain_planet
+			}
+			save_event_target_as = tec_song_planet
+		}
+		# Sorts the chance of the thing going south
+		random_list = {
+			50 = {
+				modifier = {
+					factor = 1.33
+					has_country_flag = tec_song_decrypted
+				}
+				set_country_flag = tec_song_project_good
+			}
+			50 = {
+				set_country_flag = tec_song_project_bad
+			}
+		}
+	}
+
+	after = {
+		country_event = { id = tec_song_events.1204 }
+	}
+}
+
+country_event = {
+	id = tec_song_events.1204
+	title = "tec_song_events.1204.name"
+	desc = {
+		trigger = {
+			is_gestalt = no
+			is_megacorp = no
+			has_country_flag = tec_song_project_good
+		}
+		text = tec_song_events.1204.desc.regular.good
+	}
+	desc = {
+		trigger = {
+			is_gestalt = no
+			is_megacorp = no
+			has_country_flag = tec_song_project_bad
+		}
+		text = tec_song_events.1204.desc.regular.bad
+	}
+	desc = {
+		trigger = {
+			is_gestalt = no
+			is_megacorp = yes
+			has_country_flag = tec_song_project_good
+		}
+		text = tec_song_events.1204.desc.megacorp.good
+	}
+	desc = {
+		trigger = {
+			is_gestalt = no
+			is_megacorp = yes
+			has_country_flag = tec_song_project_bad
+		}
+		text = tec_song_events.1204.desc.megacorp.bad
+	}
+	desc = {
+		trigger = {
+			is_gestalt = yes
+			has_country_flag = tec_song_project_good
+		}
+		text = tec_song_events.1204.desc.gestalt.good
+	}
+	desc = {
+		trigger = {
+			is_gestalt = yes
+			has_country_flag = tec_song_project_bad
+		}
+		text = tec_song_events.1204.desc.gestalt.bad
+	}
+	picture = GFX_evt_surreal_visions
+	show_sound = event_mystic_reveal
+	is_triggered_only = yes
+	location = event_target:tec_song_planet
+
+	# Continue the project optionally
+	option = {	# Regular
+		name = tec_song_events.1204.a
+		custom_tooltip = tec_song_events.1204.a.tooltip
+	}
+
+	option = {	# Regular
+		name = tec_song_events.1204.b
+		custom_tooltip = tec_song_events.1204.b.tooltip
+		hidden_effect = {
+			set_timed_country_flag = {
+				flag = tec_song_cancel_population_project
+				days = 10
+			}
+		}
+	}
+}
+
+# Special project finished
+country_event = {
+	id = tec_song_events.1205
+	title = "tec_song_events.1205.name"
+	desc = {
+		trigger = {
+			is_gestalt = no
+			is_megacorp = no
+			has_country_flag = tec_song_project_good
+		}
+		text = tec_song_events.1205.desc.regular.good
+	}
+	desc = {
+		trigger = {
+			is_gestalt = no
+			is_megacorp = no
+			has_country_flag = tec_song_project_bad
+		}
+		text = tec_song_events.1205.desc.regular.bad
+	}
+	desc = {
+		trigger = {
+			is_gestalt = no
+			is_megacorp = yes
+			has_country_flag = tec_song_project_good
+		}
+		text = tec_song_events.1205.desc.megacorp.good
+	}
+	desc = {
+		trigger = {
+			is_gestalt = no
+			is_megacorp = yes
+			has_country_flag = tec_song_project_bad
+		}
+		text = tec_song_events.1205.desc.megacorp.bad
+	}
+	desc = {
+		trigger = {
+			is_gestalt = yes
+			has_country_flag = tec_song_project_good
+		}
+		text = tec_song_events.1205.desc.gestalt.good
+	}
+	desc = {
+		trigger = {
+			is_gestalt = yes
+			has_country_flag = tec_song_project_bad
+		}
+		text = tec_song_events.1205.desc.gestalt.bad
+	}
+	picture = GFX_evt_surreal_visions
+	is_triggered_only = yes
+	location = event_target:tec_song_planet
+
+	option = {	# Regular
+		name = tec_song_events.1205.a
+		trigger = {
+			has_country_flag = tec_song_project_good
+		}
+		event_target:tec_song_planet = {
+			add_modifier = {
+				modifier = pm_tec_song_good
+				days = 3600
+			}
+		}
+	}
+
+	option = {	# Bad
+		name = tec_song_events.1205.b
+		trigger = {
+			has_country_flag = tec_song_project_bad
+		}
+		event_target:tec_song_planet = {
+			add_modifier = {
+				modifier = pm_tec_song_bad
+				days = 3600
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			# Either in a good or bad way, they know
+			set_country_flag = tec_song_understood
+			# And, cleanup
+			switch = {
+				trigger = has_country_flag
+				tec_song_project_bad = { remove_country_flag = tec_song_project_bad }
+				tec_song_project_good = { remove_country_flag = tec_song_project_good }
+			}
+		}
+	}
+}
+
+
+# No more signals
+country_event = {
+	id = tec_song_events.1210
+	title = "tec_song_events.1210.name"
+	desc = {
+		trigger = {
+			has_country_flag = tec_song_disrupt_good
+		}
+		text = tec_song_events.1210.desc.good
+	}
+	desc = {
+		trigger = {
+			has_country_flag = tec_song_disrupt_bad
+		}
+		text = tec_song_events.1210.desc.bad
+	}
+
+	picture = GFX_evt_surreal_visions
+	show_sound = event_power_down
+	is_triggered_only = yes
+	location = event_target:tec_song_planet
+
+	option = {	# Regular
+		name = tec_song_events.1210.a
+		custom_tooltip = tec_song_events.1210.a.tooltip
+		event_target:tec_song_planet = {
+			add_planet_devastation = 10
+			add_modifier = {
+				modifier = pm_tec_song_disrupted_good
+				days = -1
+			}
+		}
+		trigger = {
+			has_country_flag = tec_song_disrupt_good
+		}
+	}
+
+	option = {	# Backlash
+		name = tec_song_events.1210.b
+		custom_tooltip = tec_song_events.1210.b.tooltip
+		event_target:tec_song_planet = {
+			add_planet_devastation = 10
+			add_modifier = {
+				modifier = pm_tec_song_bad
+				days = 7200
+			}
+		}
+		trigger = {
+			has_country_flag = tec_song_disrupt_bad
+		}
+	}
+
+	immediate = {
+		hidden_effect = {
+			set_country_flag = tec_song_ending_triggered
+		}
+	}
+}
+
+# Subchain 3 - Attempting to correct the signal stagnation
+situation_event = {
+	id = tec_song_events.1301
+	title = "tec_song_events.1301.name"
+	desc = {
+		trigger = {
+			owner = {
+				has_country_flag = tec_song_all_good
+			}
+		}
+		text = tec_song_events.1301.desc.good
+	}
+	desc = {
+		trigger = {
+			owner = {
+				has_country_flag = tec_song_all_bad
+			}
+		}
+		text = tec_song_events.1301.desc.bad
+	}
+	picture = GFX_evt_surreal_visions
+	show_sound = event_alien_signal
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	option = {	# Regular
+		name = tec_song_events.1301.a
+		custom_tooltip = tec_song_events.1301.a.tooltip
+		# triggers digsite shortly after
+		hidden_effect = {
+			owner = {
+				country_event = {
+					id = tec_song_events.15
+					days = 1
+				}
+			}
+		}
+		destroy_situation = this
+		trigger = {
+			owner = {
+				has_country_flag = tec_song_all_good
+			}
+		}
+	}
+
+	option = {	# Backlash
+		name = tec_song_events.1301.b
+		custom_tooltip = tec_song_events.1301.b.tooltip
+		add_situation_progress = -10
+		trigger = {
+			owner = {
+				has_country_flag = tec_song_all_bad
+			}
+		}
+	}
+
+	immediate = {
+		hidden_effect = {
+			owner = {
+				set_country_flag = tec_song_ending_triggered
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			owner = {
+				switch = {
+					trigger = has_country_flag
+					tec_song_all_good = { remove_country_flag = tec_song_all_good }
+					tec_song_all_bad = { remove_country_flag = tec_song_all_bad }
+				}
+			}
+		}
+	}
+}
+
+# ----------- Event Group 4 - Digsite ---------------
+# Step 1) What the rocks Know
+fleet_event = {
+	id = tec_song_events.1501
+	title = "tec_song_events.1501.name"
+	desc = "tec_song_events.1501.desc"
+	picture = GFX_evt_in_the_dark
+	show_sound = event_finding_loot
+	location = from
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		fromfrom = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		fromfrom = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = "tec_song_events.1501.a"
+	}
+}
+
+# Step 2) Notes in the stone
+fleet_event = {
+	id = tec_song_events.1502
+	title = "tec_song_events.1502.name"
+	desc = "tec_song_events.1502.desc"
+	picture = GFX_evt_in_the_dark
+	show_sound = event_finding_loot
+	location = from
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		fromfrom = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		fromfrom = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = "tec_song_events.1502.a"
+		site_tec_song_jukebox_mineral_reward_small = yes
+	}
+}
+
+# Step 3) Unraveled Secrets - unused
+fleet_event = {
+	id = tec_song_events.1503
+	title = "tec_song_events.1503.name"
+	desc = "tec_song_events.1503.desc"
+	picture = GFX_evt_in_the_dark
+	show_sound = event_finding_loot
+	location = from
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		fromfrom = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		fromfrom = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = "tec_song_events.1503.a"
+	}
+}
+
+# Step 3) Instrumental underground
+fleet_event = {
+	id = tec_song_events.1504
+	title = "tec_song_events.1504.name"
+	desc = "tec_song_events.1504.desc"
+	picture = GFX_evt_in_the_dark
+	show_sound = event_finding_loot
+	location = from
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		fromfrom = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		fromfrom = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = "tec_song_events.1504.a"
+		site_tec_song_jukebox_crystals_reward = yes
+	}
+}
+
+# Step 4) Scale of circumstances
+fleet_event = {
+	id = tec_song_events.1505
+	title = "tec_song_events.1505.name"
+	desc = "tec_song_events.1505.desc"
+	picture = GFX_evt_in_the_dark
+	show_sound = event_finding_loot
+	location = from
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		fromfrom = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		fromfrom = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = "tec_song_events.1505.a"
+		site_tec_song_jukebox_mineral_reward = yes
+	}
+}
+
+# This a dummy event for distributing one of the 3 possible endings
+fleet_event = {
+	id = tec_song_events.1506
+	hide_window = yes
+	
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		# Randomizes the outcome
+		random_list = {
+			33 = {
+				modifier = {	# Higher chance the higher the understanding
+					factor = 1.5
+					root.controller = {
+						has_country_flag = tec_song_decrypted
+						has_country_flag = tec_song_understood
+					}
+				}
+				root.controller = {
+					set_country_flag = tec_song_ending_symphony
+				}
+			}
+			33 = {
+				modifier = {	# Understanding is in the middle
+					factor = 1.5
+					root.controller = {
+						calc_true_if = {
+							amount = 1
+							has_country_flag = tec_song_decrypted
+							has_country_flag = tec_song_understood
+						}
+					}
+				}
+				root.controller = {
+					set_country_flag = tec_song_ending_sonata
+				}
+			}
+			33 = {
+				modifier = {	# Higher chance the lower the understanding
+					factor = 1.5
+					root.controller = {
+						NOR = {
+							has_country_flag = tec_song_decrypted
+							has_country_flag = tec_song_understood
+						}
+					}
+				}
+				root.controller = {
+					set_country_flag = tec_song_ending_requiem
+				}
+			}
+		}
+		# Distributes the ending
+		if = {
+			limit = {
+				root.controller = {
+					has_country_flag = tec_song_ending_symphony
+				}
+			}
+			fleet_event = {
+				id = tec_song_events.1511
+			}
+			root.controller = {
+				remove_country_flag = tec_song_ending_symphony
+			}
+		}
+		if = {
+			limit = {
+				root.controller = {
+					has_country_flag = tec_song_ending_sonata
+				}
+			}
+			fleet_event = {
+				id = tec_song_events.1512
+			}
+			root.controller = {
+				remove_country_flag = tec_song_ending_sonata
+			}
+		}
+		if = {
+			limit = {
+				root.controller = {
+					has_country_flag = tec_song_ending_requiem
+				}
+			}
+			fleet_event = {
+				id = tec_song_events.1513
+			}
+			root.controller = {
+				remove_country_flag = tec_song_ending_requiem
+			}
+		}
+	}
+	after = {
+		root.controller = {	# No longer needed
+			remove_country_flag = tec_song_decrypted
+			remove_country_flag = tec_song_understood
+		}
+		from = { expire_site_event = tec_song_events.1506 }
+	}
+}
+
+# Step 5A) Final - Symphony
+fleet_event = {
+	id = tec_song_events.1511
+	title = "tec_song_events.1511.name"
+	desc = "tec_song_events.1511.desc"
+	picture = GFX_evt_in_the_dark
+	show_sound = event_finding_loot
+	location = from
+
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		fromfrom = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		fromfrom = { set_site_progress_locked = no }
+		from = { expire_site_event = tec_song_events.1511 }
+	}
+
+	option = {
+		name = "tec_song_events.1511.a"
+		medium_artifact_reward = yes
+		From.Planet = {
+			add_deposit = d_tec_song_memorycave
+		}
+		hidden_effect = {
+			controller = {
+				country_event = {
+					id = tec_song_events.21
+					days = 1
+				}
+			}
+		}
+	}
+}
+
+# Step 5B) Final - Sonata
+fleet_event = {
+	id = tec_song_events.1512
+	#archaeology_window = yes
+	title = "tec_song_events.1512.name"
+	desc = "tec_song_events.1512.desc"
+	picture = GFX_evt_in_the_dark
+	show_sound = event_finding_loot
+	location = from
+
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		fromfrom = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		fromfrom = { set_site_progress_locked = no }
+		from = { expire_site_event = tec_song_events.1512 }
+	}
+
+	option = {
+		name = "tec_song_events.1512.a"
+		site_tec_song_jukebox_sonata_reward = yes
+		From.Planet = {
+			add_deposit = d_tec_song_crystalcave
+		}
+		hidden_effect = {
+			controller = {
+				country_event = {
+					id = tec_song_events.22
+					days = 1
+				}
+			}
+		}
+	}
+}
+
+# Step 5C) Final - Requiem
+fleet_event = {
+	id = tec_song_events.1513
+	#archaeology_window = yes
+	title = "tec_song_events.1513.name"
+	desc = "tec_song_events.1513.desc"
+	picture = GFX_evt_in_the_dark
+	show_sound = event_finding_loot
+	location = from
+
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		fromfrom = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		fromfrom = { set_site_progress_locked = no }
+		from = { expire_site_event = tec_song_events.1513 }
+	}
+
+	option = {
+		name = "tec_song_events.1513.a"
+		medium_artifact_reward = yes
+		From.Planet = {
+			add_deposit = d_tec_song_buriedship
+		}
+		hidden_effect = {
+			controller = {
+				country_event = {
+					id = tec_song_events.23
+					days = 1
+				}
+			}
+		}
+	}
+}
+
+# ----------- Event Group 5 - Ending ---------------
+# Ending A - Song is created as artistic expression (good ending)
+# ---------------------------------------------------------------------------
+country_event = {
+	id = tec_song_events.21
+	title = "tec_song_events.21.name"
+	desc = tec_song_events.21.desc
+	picture = GFX_evt_surreal_visions
+	is_triggered_only = yes
+	location = event_target:tec_song_planet
+
+	option = {
+		name = tec_song_events.21.a
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+	}
+
+	option = {
+		name = tec_song_events.21.b
+		add_monthly_resource_mult = {
+			resource = engineering_research
+			value = @tier3researchreward
+			min = @tier3researchmin
+			max = @tier3researchmax
+		}
+	}
+
+	option = {
+		name = tec_song_events.21.c
+		add_resource = {
+			minor_artifacts = 5
+			minerals = 500
+		}
+	}
+}
+
+# Ending B - Song is just a celestial coincidence (meh ending)
+# ---------------------------------------------------------------------------
+country_event = {
+	id = tec_song_events.22
+	title = "tec_song_events.22.name"
+	desc = tec_song_events.22.desc
+	picture = GFX_evt_surreal_visions
+	is_triggered_only = yes
+	location = event_target:tec_song_planet
+
+	option = {
+		name = tec_song_events.22.a
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+	}
+
+	option = {
+		name = tec_song_events.22.b
+		add_tech_option_or_research_effect = {
+			TECH = tech_mine_rare_crystals
+			PROGRESS = 0.75
+			CATEGORY = engineering_research
+		}
+	}
+}
+
+# Ending C - Song is a desesperate SOS message (bad ending)
+# ---------------------------------------------------------------------------
+country_event = {
+	id = tec_song_events.23
+	title = "tec_song_events.23.name"
+	desc = tec_song_events.23.desc
+	picture = GFX_evt_surreal_visions
+	is_triggered_only = yes
+	location = event_target:tec_song_planet
+
+	option = {
+		name = tec_song_events.23.a
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+	}
+
+	option = {
+		name = tec_song_events.23.b
+		add_tech_option_or_research_effect = {
+			TECH = tech_thrusters_3
+			PROGRESS = 0.25
+			CATEGORY = engineering_research
+		}
+	}
+}
+
+
+
+# ----------- Shorter version for debug/job test ---------------
+# This is done to be in exact requisites of the job apply, with exactly 6 narrative events
+# Some are reused from the main chain, some are slightly new to offer
+# All are triggered by has_global_flag = tec_song_alternative_chain
+# #1 Arpeggio Solaris
+
+# #2 Eerie silence
+
+# #3 A planet with a melody
+
+# #4 Tuning in
+
+# #5 Instrumental Secret
+
+# #6 
+
+
+# debug
+
+country_event = {
+	id = tec_song_events.22221
+	hide_window = yes
+
+	is_triggered_only = yes
+	immediate = {
+		set_country_flag = tec_song_ending_triggered
+		set_global_flag = tec_song_alternative_chain
+	}
+}

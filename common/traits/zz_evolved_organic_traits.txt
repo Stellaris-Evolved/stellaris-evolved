@@ -1,0 +1,822 @@
+
+# TRAIT SORT NOTES:
+	#sorting_priority = 20		# Defining trait
+	#sorting_priority = 19		# Defining trait
+	#sorting_priority = 15		# Key trait
+	#sorting_priority = 14		# Key trait
+	#sorting_priority = 10		# Relevant trait
+	#sorting_priority = 5		# Relevant trait
+	#sorting_priority = 4		# Expensive trait 2
+	#sorting_priority = 3		# Expensive trait
+	#sorting_priority = 2		# Regular expensive trait
+	#sorting_priority = 1		# Regular trait
+	#sorting_priority = 0		# Meaningless trait
+# /
+
+# Trait sorting
+		# sorting_priority
+		# icon
+		# host_has_dlc
+		# cost
+		# initial
+		# randomized
+		# potential_crossbreeding_chance
+	# Archetypes
+		# allowed_archetypes
+		# species_class
+		# opposites
+	# Modifiers
+		# custom_tooltip/custom_tooltip_with_modifiers
+		# modifier
+		# triggered modifiers
+	# Modification
+		# species_potential_add
+		# species_possible_add
+		# species_possible_remove
+		# species_possible_merge_add
+	# External
+		# slave_cost
+		# assembly_score
+# /
+
+# UNIQUE TRAITS
+# -----------------------------------------
+trait_tec_sterile = {
+	sorting_priority = 20		# Defining trait
+	icon = "gfx/interface/icons/traits/trait_indolent.dds"
+	cost = 0
+	initial = no
+	randomized = no
+	# Archetypes
+	inline_script = traits/tec_organic_archetypes
+	# Modifiers
+	infertile = yes
+	modifier = {
+		pop_happiness = -0.15
+	}
+
+	# Modification
+	species_potential_add = {
+		exists = from
+		from = {
+			is_ai = no
+		}
+		NOR = {
+			has_trait = trait_tec_cyborg_endo
+			has_trait = trait_tec_cyborg_endo_2
+			has_trait = trait_tec_cyborg_mecha
+		}
+	}
+	species_possible_remove = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+	# External
+
+}
+
+trait_tec_cryptobiotic = {
+	icon = "gfx/interface/icons/traits/regular_traits/trait_tec_cryptobiotic.dds"
+	sorting_priority = 5		# Relevant trait
+	cost = {
+		base = 2
+		modifier = {
+			add = -1
+			has_country_flag = tec_gene_malleability
+		}
+	}
+	potential_crossbreeding_chance = 0.1
+	# Archetypes
+	inline_script = traits/tec_organic_archetypes
+	# Modifiers
+	custom_tooltip = TRAIT_TEC_CRYPTOBIOTIC_EFFECT
+	modifier = {
+		pop_amenities_usage_add = -0.1
+	}
+	# Modification
+	species_possible_remove = {
+		can_remove_beneficial_genetic_traits = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+	# External
+	slave_cost = {
+		energy = 200
+	}
+}
+
+# Mitosis
+
+# NOTE: from RoAdd
+# TODO: maybe apply similar concept they added in vanilla with transgenesis
+# this might limit early game stuff but i feel i would make sense for 
+# bio path more than it is now
+trait_tec_metamorphosis = {
+	sorting_priority = 5		# Relevant trait
+	icon = gfx/interface/icons/traits/origin_traits/trait_tec_metamorphosis.dds
+	cost = {
+		base = 2
+		modifier = {
+			add = -1
+			has_country_flag = tec_gene_malleability
+		}
+	}
+	initial = yes
+	potential_crossbreeding_chance = 0
+	# Archetypes
+	inline_script = traits/tec_organic_archetypes
+	# Modifiers	
+	custom_tooltip = TRAIT_TEC_METAMORPHOSIS_EFFECT
+	triggered_pop_modifier = {	# Larvae
+		potential = {
+			has_pop_flag = tec_metamorphosis_phase_0
+			species = {
+				NOT = {
+					is_species_class = ART
+				}
+			}
+		}
+		planet_pops_upkeep_mult = 0.1
+		pop_amenities_usage_mult = 0.1
+	}
+	triggered_pop_modifier = {	# Larvae ART
+		potential = {
+			has_pop_flag = tec_metamorphosis_phase_0
+			species = {
+				is_species_class = ART
+			}
+		}
+		planet_pops_upkeep_mult = 0.15
+		pop_amenities_usage_mult = 0.15
+	}
+	triggered_pop_modifier = {	# Juvenile
+		potential = {
+			has_pop_flag = tec_metamorphosis_phase_1
+			NOT = {
+				has_pop_flag = tec_metamorphosis_phase_0
+			}
+			species = {
+				NOT = {
+					is_species_class = ART
+				}
+			}
+		}
+		planet_jobs_energy_produces_mult = 0.05
+		planet_jobs_minerals_produces_mult = 0.05
+		planet_jobs_food_produces_mult = 0.05
+		planet_pops_upkeep_mult = 0.05
+	}
+	triggered_pop_modifier = {	# Juvenile ART
+		potential = {
+			has_pop_flag = tec_metamorphosis_phase_1
+			NOT = {
+				has_pop_flag = tec_metamorphosis_phase_0
+			}
+			species = {
+				is_species_class = ART
+			}
+		}
+		planet_jobs_energy_produces_mult = 0.075
+		planet_jobs_minerals_produces_mult = 0.075
+		planet_jobs_food_produces_mult = 0.075
+		planet_pops_upkeep_mult = 0.075
+	}
+	triggered_pop_modifier = {	# Mature
+		potential = {
+			NOR = {
+				has_pop_flag = tec_metamorphosis_phase_0
+				has_pop_flag = tec_metamorphosis_phase_1
+			}
+			species = {
+				NOT = {
+					is_species_class = ART
+				}
+			}
+		}
+		planet_jobs_produces_mult = 0.05
+	}
+	triggered_pop_modifier = {	# Mature ART
+		potential = {
+			NOR = {
+				has_pop_flag = tec_metamorphosis_phase_0
+				has_pop_flag = tec_metamorphosis_phase_1
+			}
+			species = {
+				is_species_class = ART
+			}
+		}
+		planet_jobs_produces_mult = 0.075
+	}
+	# Modification
+	species_potential_add = {
+		can_do_advanced_gene_modding = yes
+	}
+	species_possible_remove = {
+		can_remove_beneficial_genetic_traits = yes
+	}
+	species_possible_merge_add = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+	# External
+	slave_cost = {
+		energy = 1000
+	}
+	assembly_score = {
+		modifier = {
+			add = 0.5 # due to scaling in time to all jobs
+		}
+		modifier = {
+			add = 0.25 # due to scaling in time to all jobs
+			is_species_class = ART
+		}
+	}
+}
+
+# TODO removed replicant, add similar mechanism to vanilla with lithoid trasncgenesis
+trait_tec_siliceous = {
+	sorting_priority = 5		# Relevant trait
+	icon = gfx/interface/icons/traits/origin_traits/trait_tec_siliceous.dds
+	cost = {
+		base = 2
+		modifier = {
+			add = -1
+			has_country_flag = tec_gene_malleability
+		}
+	}
+	initial = yes
+	potential_crossbreeding_chance = 0
+	# Archetypes
+	inline_script = traits/tec_biological_archetypes
+	# Modifiers
+	custom_tooltip = TRAIT_TEC_SILICEOUS_EFFECT
+	# Modification
+	species_potential_add = {
+		can_do_advanced_gene_modding = yes
+	}
+	species_possible_remove = {
+		can_remove_beneficial_genetic_traits = yes
+	}
+	species_possible_merge_add = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+	# External
+	slave_cost = {
+		energy = 1000
+	}
+}
+
+# TODO removed replicant, add similar mechanism to vanilla with lithoid trasncgenesis
+trait_tec_lithophytic = {
+	sorting_priority = 5		# Relevant trait
+	icon = gfx/interface/icons/traits/origin_traits/trait_tec_lithophytic.dds
+	cost = {
+		base = 2
+		modifier = {
+			add = -1
+			has_country_flag = tec_gene_malleability
+		}
+	}
+	initial = yes
+	potential_crossbreeding_chance = 0
+	# Archetypes
+	inline_script = traits/tec_lithoid_archetypes
+	# Modifiers
+	custom_tooltip = TRAIT_TEC_LITHOPHYTIC_EFFECT
+	triggered_pop_modifier = {
+		potential = {
+			exists = planet
+			planet = {
+				any_owned_species = {
+					is_species_class = PLANT
+				}
+			}
+		}
+		planet_pops_upkeep_mult = -0.1
+	}
+	# Modification
+	species_potential_add = {
+		can_do_advanced_gene_modding = yes
+	}
+	species_possible_remove = {
+		can_remove_beneficial_genetic_traits = yes
+	}
+	species_possible_merge_add = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+	# External
+	slave_cost = {
+		energy = 100
+	}
+}
+
+# STANDARD TRAITS
+# -----------------------------------------
+trait_industrious_lithoid = {
+	sorting_priority = 1		# Regular trait
+	icon = gfx/interface/icons/traits/trait_industrious.dds
+	cost = {
+		base = 1
+	}
+	potential_crossbreeding_chance = 1.0
+	inline_script = traits/tec_lithoid_archetypes
+	# Modifiers
+	modifier = {
+		planet_miners_minerals_produces_add = 0.5
+	}
+	# Modification
+	species_possible_remove = {
+		can_remove_beneficial_genetic_traits = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+	# External
+	slave_cost = {
+		energy = 500
+	}
+	assembly_score = {
+		modifier = {
+			add = 2
+			from = { has_mining_designation = yes }
+		}
+		modifier = {
+			add = 0.5
+			from = { has_rural_designation = yes }
+		}
+	}
+}
+
+# TODO add similar mechanism to vanilla with lithoid trasncgenesis
+trait_tec_lithoid_sedimentary = {
+	sorting_priority = 19		# Defining trait
+	icon = gfx/interface/icons/traits/origin_traits/trait_tec_lithoid_sedimentary.dds
+	host_has_dlc = "Lithoids Species Pack"
+	cost = {
+		base = 3
+		modifier = {
+			add = -1
+			has_country_flag = tec_gene_malleability
+		}
+	}
+	potential_crossbreeding_chance = 0.5
+	# Archetypes
+	inline_script = traits/tec_lithoid_archetypes
+	opposites = {
+		"trait_rapid_breeders" "trait_rapid_breeders_lithoid" "trait_incubator"
+		"trait_slow_breeders"
+
+		"trait_necrophage"
+		"trait_tec_clone_origin"
+		"trait_clone_soldier_infertile" "trait_clone_soldier_infertile_full_potential"
+
+		"trait_plantoid_budding" "trait_lithoid_budding"
+	}
+	# Modifiers
+	infertile = yes
+	custom_tooltip = TRAIT_TEC_LITHOID_SEDIMENTARY_EFFECT
+		# Organic Pop Assembly set by tec_sedimentary_rate in \pop_categories\ and zz_evolved_scripted_variables
+	# Modification
+	species_potential_add = {
+		can_do_advanced_gene_modding = yes
+	}
+	species_possible_remove = {
+		can_remove_beneficial_genetic_traits = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+	# External
+	slave_cost = {
+		energy = 2000
+	}
+}
+
+trait_tec_austere = {
+	sorting_priority = 2		# Regular expensive trait
+	cost = {
+		base = 2
+		modifier = {
+			add = -1
+			has_country_flag = tec_gene_malleability
+		}
+	}
+	initial = no
+	potential_crossbreeding_chance = 0.1
+	# Archetypes
+	inline_script = traits/tec_organic_archetypes
+	opposites = {
+		"trait_tec_delicate"
+	}
+	# Modifiers
+	modifier = {
+		pop_amenities_usage_mult = -0.2
+	}
+	# Modification
+	species_potential_add = {
+		always = no
+	}
+	species_possible_remove = {
+		can_remove_beneficial_genetic_traits = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+	# External
+	slave_cost = {
+		energy = 1000
+	}
+}
+trait_tec_delicate = {
+	cost = -2
+	initial = no
+	potential_crossbreeding_chance = 0.1
+	# Archetypes
+	inline_script = traits/tec_organic_archetypes
+	opposites = {
+		"trait_tec_austere" 
+		
+	}
+	# Modifiers
+	modifier = {
+		pop_amenities_usage_mult = 0.2
+	}
+	# Modification
+	species_potential_add = {
+		always = no
+	}
+	# External
+	slave_cost = {
+		energy = -200
+	}
+}
+
+trait_tec_unthrifty = {
+	icon = "gfx/interface/icons/traits/regular_traits/trait_tec_unthrifty.dds"
+	cost = -2
+	potential_crossbreeding_chance = 0.1
+	# Archetypes
+	inline_script = traits/tec_organic_archetypes
+	opposites = {
+		"trait_thrifty" 
+		"trait_hive_mind" 
+	}
+	# Modifiers
+	modifier = {
+		pop_job_trade_mult = -0.25
+	}
+	# Modification
+	species_potential_add = {
+		can_do_advanced_gene_modding = yes
+	}
+	# External
+	slave_cost = {
+		energy = -200
+	}
+	assembly_score = {
+		modifier = {
+			subtract = 1.5
+			from = { has_trade_designation = yes }
+		}
+	}
+}
+
+trait_tec_versatile = {
+	icon = "gfx/interface/icons/traits/regular_traits/trait_tec_versatile.dds"
+	sorting_priority = 3		# Expensive trait
+	cost = {
+		base = 3
+		modifier = {
+			add = -1
+			has_country_flag = tec_gene_malleability
+		}
+	}
+	potential_crossbreeding_chance = 0.1
+	# Archetypes
+	inline_script = traits/tec_organic_archetypes
+	opposites = {
+		"trait_tec_incompetent" 
+	}
+	# Modifiers
+	modifier = {
+		planet_jobs_produces_mult = 0.05
+	}
+	# Modification
+	species_possible_remove = {
+		can_remove_beneficial_genetic_traits = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+		# External
+	slave_cost = {
+		energy = 2000
+	}
+	assembly_score = {
+		modifier = {
+			add = 0.5 #always good
+		}
+	}
+}
+
+trait_tec_incompetent = {
+	icon = "gfx/interface/icons/traits/regular_traits/trait_tec_incompetent.dds"
+	cost = -2
+	potential_crossbreeding_chance = 0.1
+	# Archetypes
+	inline_script = traits/tec_organic_archetypes
+	opposites = {
+		"trait_tec_versatile" 
+	}
+	# Modifiers
+	modifier = {
+		planet_jobs_produces_mult = -0.05
+	}
+	# Modification
+	species_potential_add = {
+		can_do_advanced_gene_modding = yes
+	}
+	# External
+	slave_cost = {
+		energy = -200
+	}
+	assembly_score = {
+		subtract = {
+			add = 0.5 #always good
+		}
+	}
+}
+
+trait_tec_dumb = {
+	icon = "gfx/interface/icons/traits/regular_traits/trait_tec_dumb.dds"
+	cost = -2
+	# Archetypes
+	inline_script = traits/tec_organic_archetypes
+	opposites = {
+		"trait_erudite" "trait_tec_gene_brain" 							# bio
+		"trait_tec_replicant_brain"												# replicant
+		"trait_tec_cyborg_brain"										# cyborgs		
+		"trait_intelligent"
+
+		"trait_nerve_stapled"											# No happ
+	}
+	# Modifiers
+	modifier = {
+		planet_researchers_produces_mult = -0.1
+	}
+	# Modification
+	species_potential_add = {
+		can_do_advanced_gene_modding = yes
+	}
+	# External
+	slave_cost = {
+		energy = -200
+	}
+	assembly_score = {
+		modifier = {
+			subtract = 1.5
+			from = { has_research_designation = yes }
+		}
+		modifier = {
+			subtract = 1.5
+			from = { has_building = building_order_keep }
+		}
+	}
+}
+
+trait_tec_perfectionist = {
+	icon = "gfx/interface/icons/traits/regular_traits/trait_tec_perfectionist.dds"
+	sorting_priority = 2		# Regular expensive trait
+	cost = {
+		base = 2
+		modifier = {
+			add = -1
+			has_country_flag = tec_gene_malleability
+		}
+	}
+	potential_crossbreeding_chance = 0.1
+	# Archetypes
+	inline_script = traits/tec_organic_archetypes
+	opposites = {
+		"trait_tec_virtuous"
+	}
+	# Modifiers
+	custom_tooltip = TRAIT_TEC_PERFECTIONIST_EFFECT
+	modifier = {
+		planet_jobs_alloys_produces_mult = 0.05
+		planet_jobs_consumer_goods_produces_mult = 0.05
+	}
+	# Modification
+	species_possible_remove = {
+		can_remove_beneficial_genetic_traits = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+	# External
+	slave_cost = {
+		energy = 1000
+	}
+	assembly_score = {
+		modifier = {
+			add = 0.5
+			from = { 
+				OR = {
+					has_industrial_designation = yes 
+					tec_has_alloy_designation = yes
+					tec_has_cg_designation = yes
+				}
+			}
+		}
+	}
+}
+
+trait_tec_clone_template = {
+	sorting_priority = 5		# Relevant trait
+	icon = "gfx/interface/icons/traits/regular_traits/trait_tec_clone_template.dds"
+	cost = {
+		base = 2
+		modifier = {
+			add = -1
+			has_country_flag = tec_gene_malleability
+		}
+	}
+	initial = no
+	potential_crossbreeding_chance = 0
+	# Archetypes
+	allowed_archetypes = { BIOLOGICAL LITHOID BIOSERVANT REPLICANT}
+	opposites = {
+		"trait_tec_gene_fertile" 
+		"trait_rapid_breeders" "trait_rapid_breeders_lithoid" "trait_incubator"
+		"trait_slow_breeders" 
+		
+		"trait_plantoid_budding" "trait_lithoid_budding" "trait_tec_lithoid_sedimentary"
+
+		"trait_tec_clone_origin"
+	}
+	# Modifiers
+	modifier = {
+		pop_growth_speed = -0.1
+		pop_assembly_speed = 0.15
+		leader_age = -10
+	}
+	# Modification
+	species_potential_add = {
+		exists = from
+		from = {
+			has_technology = tech_cloning
+			NOT = {
+				has_origin = origin_tec_clones
+			}
+		}
+	}
+	species_possible_remove = {
+		can_remove_beneficial_genetic_traits = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+	# External
+	slave_cost = {
+		energy = 500
+	}
+}
+
+# REMOVED / UNUSED
+# -----------------------------------------
+trait_symbiotic = {
+	icon = "gfx/interface/icons/traits/origin_traits/trait_symbiotic.dds"
+	cost = 1
+	potential_crossbreeding_chance = 0.33
+	opposites = { "trait_intelligent" "trait_erudite" "trait_natural_engineers" "trait_natural_physicists" "trait_natural_sociologists" }
+	initial = no
+	species_potential_add = {
+		always = no
+	}
+
+	species_possible_remove = {
+		can_remove_beneficial_genetic_traits = yes
+	}
+	species_possible_merge_add = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+	
+	allowed_archetypes = { BIOLOGICAL LITHOID }
+
+	custom_tooltip = TRAIT_SYMBIOTIC_EFFECT
+	modifier = {
+		pop_happiness = 0.20
+		leader_skill_levels = -1
+		species_leader_exp_gain = -0.15
+	}
+}
+
+trait_slave_gene = {
+	icon = "gfx/interface/icons/traits/origin_traits/trait_slave_gene.dds"
+	cost = 1
+	potential_crossbreeding_chance = 0.33
+	opposites = { "trait_intelligent" "trait_erudite" "trait_natural_engineers" "trait_natural_physicists" "trait_natural_sociologists" }
+	initial = no
+	species_potential_add = {
+		always = no
+	}
+	species_possible_remove = {
+		can_remove_beneficial_genetic_traits = yes
+	}
+	species_possible_merge_add = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+	
+	allowed_archetypes = { BIOLOGICAL LITHOID }
+
+	custom_tooltip = TRAIT_SLAVE_GENE_EFFECT
+	modifier = {
+		planet_jobs_produces_mult = 0.15
+		army_damage_mult = 0.15
+		pop_growth_speed = -0.15
+	}
+}
+
+trait_ruler_immortal = {
+	cost = 1
+	species_potential_add = {
+		always = no
+	}
+	species_possible_remove = {
+		can_remove_beneficial_genetic_traits = yes
+	}
+	species_possible_merge_add = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+	icon = "gfx/interface/icons/traits/leader_traits/leader_trait_caravan_counter.dds"
+
+	immortal_leaders = yes
+	leader_trait = { ruler }
+	leader_class = { ruler }
+	initial = no
+	randomized = no
+	hide_age = yes
+}
+
+
+# - TEST
+
+trait_tec_test_scripvar = {
+	sorting_priority = 5		# Relevant trait
+	icon = gfx/interface/icons/traits/origin_traits/trait_tec_clone_origin.dds
+	cost = {
+		base = 0
+	}
+	initial = no
+	potential_crossbreeding_chance = 0
+	# Archetypes
+	allowed_archetypes = { BIOLOGICAL LITHOID BIOSERVANT REPLICANT}
+	opposites = {
+		trait_incubator
+	}
+	# Modifiers
+	custom_tooltip = TRAIT_TEC_TEST_SCRIPVAR_EFFECT
+	# Modification
+	species_potential_add = {
+		always = yes
+	}
+	species_potential_remove = {
+		always = yes
+	}
+	species_possible_add = {
+		always = yes
+	}
+	species_possible_merge_add = {
+		always = yes
+	}
+	species_possible_remove = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+	# External
+	slave_cost = {
+		energy = 500
+	}
+}

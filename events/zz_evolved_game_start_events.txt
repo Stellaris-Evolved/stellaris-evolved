@@ -1,0 +1,6061 @@
+# --------------------------------------------------------------
+#		These events control initial conditions
+#		Stellaris Evolved
+# --------------------------------------------------------------
+
+
+namespace = tec_flag
+
+event = {
+	id = tec_flag.0
+	hide_window = yes
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	trigger = { NOT = { has_global_flag = stellarisevolved } }
+	
+	immediate = {
+		if = {
+			limit = {
+				NOT = { has_global_flag = stellarisevolved }
+			}
+			set_global_flag = stellarisevolved
+		}
+	}
+}
+
+
+# Rebalancing vanilla events, origins and such
+namespace = tec_rebalance
+
+# Common fixes
+	# Initializers								tec_rebalance.1
+	# Planetary/empire modifiers				tec_rebalance.100
+	# Species handlers							tec_rebalance.200
+	# Edict/Policy handlers						tec_rebalance.3100
+	# Leader handlers							tec_rebalance.400
+	# Auth handlers								tec_rebalance.500
+	# Tech handlers								tec_rebalance.600
+
+	# Auth handlers								tec_rebalance.700
+
+	# Starbase handlers							tec_rebalance.1200
+
+# Origin fixes								tec_rebalance.10000
+	# - Mechanist							tec_rebalance.10050
+	# - Ringworld							tec_rebalance.10100	
+	# - Planet Unification					tec_rebalance.10200
+	# - Machine consolidation				tec_rebalance.10300
+	# - Teachers of the Shroud				tec_rebalance.10400
+	# - Syncretic Evolution					tec_rebalance.10500
+
+	# - Origin Civics						tec_rebalance.50000
+
+# -------------------------------------------------------------
+# COMMON FIXES
+
+# --------- tec_rebalance.1
+event = {	# Provides techs to every candidate country
+	id = tec_rebalance.10
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		every_country = {
+			limit = {
+				NOT = {
+					has_country_flag = tec_start_techs_given 
+				}
+				OR = {
+					tec_is_default_country = yes
+					is_country_type = default_exocolonist
+					is_country_type = default_exocolonist_ai
+				}
+			}
+			
+			if = {	# Mechanists
+				limit = {
+					has_origin = origin_mechanists
+				}
+				give_technology = { message = no tech = tech_robomodding }
+			}
+
+			if = {	# Mechanists cult
+				limit = {
+					has_origin = origin_mechanists
+					has_civic = civic_tec_machine_cult
+				}
+				give_technology = { message = no tech = tech_powered_exoskeletons }
+				give_technology = { message = no tech = tech_robotic_workers }
+			}
+
+			if = {	# Autoregressive Perfection
+				limit = {
+					has_origin = origin_mechanists
+					has_valid_civic = civic_tec_mecha_perfectionists
+				}
+				give_technology = { message = no tech = tech_droid_workers }
+			}
+
+			if = {	# Machine cults
+				limit = {
+					NOT = {
+						has_origin = origin_mechanists
+					}
+					has_civic = civic_tec_machine_cult
+				}
+				give_technology = { message = no tech = tech_powered_exoskeletons }
+				add_research_option = tech_robotic_workers
+			}
+
+			if = {	# Automatation
+				limit = {
+					OR = {
+						#has_civic = civic_tec_computerized_extraction
+						has_civic = civic_tec_corporate_automatation
+					}
+				}
+				give_technology = { message = no tech = tech_powered_exoskeletons }
+				add_research_option = tech_robotic_workers
+			}
+
+			if = {	# Space pioneers
+				limit = {
+					has_civic = civic_tec_space_pioneers
+				}
+				give_technology = { message = no tech = tech_tec_new_automated_exploration_2 }
+			}
+
+			if = {	# Evolutionary Architects
+				limit = {
+					has_civic = civic_tec_evoarchitects
+				}
+				give_technology = { message = no tech = tech_genome_mapping }
+			}
+
+			if = {	# Genetic perfection
+				limit = {
+					has_civic = civic_tec_hive_genetic
+				}
+				give_technology = { message = no tech = tech_gene_tailoring }
+			}
+
+			if = {	# Trade League
+				limit = {
+					has_civic = civic_corporate_dominion
+				}
+				give_technology = { message = no tech = tech_space_trading }
+			}
+
+			if = {	# Keepers of Harmony
+				limit = {
+					has_civic = civic_tec_eco_keepers
+				}
+				give_technology = { message = no tech = tech_paradise_dome }
+			}
+			
+			if = {	# Terraformers
+				limit = {
+					OR = {
+						has_civic = civic_tec_eco_engineers
+						has_civic = civic_tec_machine_terraformers
+					}
+				}
+				give_technology = { message = no tech = tech_terrestrial_sculpting }
+			}
+		
+			if = {	# Enlighted nospi 
+				limit = {
+					OR = {
+						has_valid_civic = civic_tec_enlightened_civilization
+						has_valid_civic = civic_tec_corporate_enlightment
+					}
+					NOR = {
+						has_ethic = ethic_spiritualist
+						has_ethic = ethic_fanatic_spiritualist
+					}
+				}
+				give_technology = { message = no tech = tech_heritage_site }
+			}
+			
+			if = {	# Enlighted spi
+				limit = {
+					OR = {
+						has_valid_civic = civic_tec_enlightened_civilization
+						has_valid_civic = civic_tec_corporate_enlightment
+					}
+					OR = {
+						has_ethic = ethic_spiritualist
+						has_ethic = ethic_fanatic_spiritualist
+					}
+				}
+				give_technology = { message = no tech = tech_holographic_rituals }
+			}
+
+			if = {	# Cyberdictatorship
+				limit = {
+					has_civic = civic_tec_cyber_dictatorship
+				}
+				give_technology = { message = no tech = tech_administrative_ai }
+			}
+			
+			if = {	# Star settlers
+				limit = {
+					OR = {
+						has_valid_civic = civic_tec_star_settlers
+						has_valid_civic = civic_tec_corporate_settlers
+					}
+				}
+				give_technology = { message = no tech = tech_galactic_ambitions }
+			}
+	
+			if = {	# Empath gestalts
+				limit = {
+					has_ethic = ethic_gestalt_empathy
+				}
+				add_research_option = tech_tec_gestalt_friendship
+			}
+
+			if = {	# Eyes in the sky
+				limit = {
+					has_valid_civic = civic_tec_hive_eyesinthesky
+				}
+				add_research_option = tech_starbase_3
+			}
+
+			set_country_flag = tec_start_techs_given
+		}
+		
+	}
+}
+
+# --------- tec_rebalance.10
+# Crime lord deal checker - every 2 years
+country_event = {
+	id = tec_rebalance.11
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		any_owned_planet = {
+			OR = {
+				AND = {
+					has_modifier = crime_lord_deal
+					planet_crime < 10
+				}
+				AND = {
+					OR = {
+						has_modifier = crime_lord_deal
+						has_modifier = crime_lord_deal_broken
+					}
+					owner = {
+						is_gestalt = yes
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {
+		every_owned_planet = {
+			limit = {
+				OR = {
+					AND = {
+						has_modifier = crime_lord_deal
+						planet_crime < 10
+					}
+					AND = {
+						OR = {
+							has_modifier = crime_lord_deal
+							has_modifier = crime_lord_deal_broken
+						}
+						owner = {
+							is_gestalt = yes
+						}
+					}
+					
+				}
+			}
+			random_list = {
+				50 = {
+					planet_event = {
+						id = tec_rebalance.12
+						days = 360
+						random = 60
+					}
+				}
+				50 = {
+
+				}
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = tec_rebalance.12
+	title = tec_rebalance.12
+	location = this
+	is_triggered_only = yes
+	show_sound = event_announcement
+	picture = GFX_evt_dark_alley
+
+	trigger = {
+		OR = {
+			AND = {
+				has_modifier = crime_lord_deal
+				planet_crime < 10
+			}
+			AND = {
+				OR = {
+					has_modifier = crime_lord_deal
+					has_modifier = crime_lord_deal_broken
+				}
+				owner = {
+					is_gestalt = yes
+				}
+			}
+		}
+	}
+
+	desc = {
+		text = tec_rebalance.12.nogestalt
+		trigger = {
+			hidden:root.owner = {
+				is_gestalt = no
+			}
+		}
+	}
+
+	desc = {
+		text = tec_rebalance.12.gestalt
+		trigger = {
+			hidden:root.owner = {
+				is_gestalt = yes
+			}
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+	}
+
+
+	immediate = {
+		hidden_effect = {
+			if = {
+				limit = {
+					owner = {
+						is_gestalt = yes
+					}
+				}
+				remove_modifier = crime_lord_deal
+				remove_modifier = crime_lord_deal_broken
+			}
+			if = {
+				limit = {
+					owner = {
+						is_gestalt = no
+					}
+				}
+				remove_modifier = crime_lord_deal
+			}
+		}
+	}
+}
+
+
+
+# --------- tec_rebalance.20
+# Species modification bonus remover
+country_event = {
+	id = tec_rebalance.21
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_modifier = modifier_tec_free_modification
+	}
+
+	immediate = {
+		remove_modifier = modifier_tec_free_modification
+	}
+}
+
+planet_event = {	# Terraform counter on action, from = country
+	id = tec_rebalance.30
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		from = {	# Only if they have the tech
+			has_technology = tech_terrestrial_sculpting
+		}
+	}
+	immediate = {
+		from = {
+			hidden_effect = {
+				change_variable = {
+					which = tec_terraformed_worlds
+					value = 1
+				}
+			}
+		}
+	}
+}
+
+country_event = {	# Megastructure counter on action, root = country, from = mega, fromfrom = system, fromfromfrom = constructing fleet
+	id = tec_rebalance.35
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		from = {	# Excludes non mega "megas"
+			NOR = {
+				is_megastructure_type = tec_protoworld_0
+				is_megastructure_type = tec_protoworld_1
+				is_megastructure_type = tec_protoworld_2
+			}
+		}
+	}
+	immediate = {
+		root = {
+			hidden_effect = {
+				change_variable = {
+					which = tec_constructed_megas
+					value = 1
+				}
+				set_timed_country_flag = {
+					flag = tec_recently_created_mega
+					years = 10
+				}
+			}
+		}
+	}
+}
+
+
+# --------------------- Planetary/empire handlers ------------------------ 100
+
+country_event = {	# recalcs aquatic districts 160
+	id = tec_rebalance.160
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		tec_is_aquatic_empire = yes
+	}
+
+	immediate = {
+		if = {	# Regular non lithoid
+			limit = {
+				owner = {
+					tec_is_aquatic_empire = yes
+					is_machine_empire = no
+					is_lithoid_empire = no
+				}
+			}
+			capital_scope = {
+				# Removes
+				while = {
+					limit = {
+						num_districts = {
+							type = district_farming
+							value > 0
+						}
+					}
+					change_variable = {
+						which = tec_temp_farm_districts
+						value = 1
+					}
+					remove_district = district_farming
+				}
+				while = {
+					limit = {
+						num_districts = {
+							type = district_farming_uncapped
+							value > 0
+						}
+					}
+					change_variable = {
+						which = tec_temp_farm_districts
+						value = 1
+					}
+					remove_district = district_farming_uncapped
+				}
+				while = {
+					limit = {
+						num_districts = {
+							type = district_tec_decadent_farming
+							value > 0
+						}
+					}
+					change_variable = {
+						which = tec_temp_farm_districts
+						value = 1
+					}
+					remove_district = district_tec_decadent_farming
+				}
+				# Adds
+				while = {
+					limit = {
+						check_variable = {
+							which = tec_temp_farm_districts
+							value > 0
+						}
+					}
+					add_district = district_tec_aqua_farming
+					change_variable = {
+						which = tec_temp_farm_districts
+						value = -1
+					}
+				}
+				clear_variable = tec_temp_farm_districts
+			}
+		}
+		if = {	# Regular lithoid
+			limit = {
+				owner = {
+					tec_is_aquatic_empire = yes
+					is_machine_empire = no
+					is_lithoid_empire = yes
+				}
+			}
+			capital_scope = {
+				# Removes
+				while = {
+					limit = {
+						num_districts = {
+							type = district_mining
+							value > 0
+						}
+					}
+					change_variable = {
+						which = tec_temp_mining_districts
+						value = 1
+					}
+					remove_district = district_mining
+				}
+				while = {
+					limit = {
+						num_districts = {
+							type = district_mining_uncapped
+							value > 0
+						}
+					}
+					change_variable = {
+						which = tec_temp_mining_districts
+						value = 1
+					}
+					remove_district = district_mining_uncapped
+				}
+				while = {
+					limit = {
+						num_districts = {
+							type = district_tec_decadent_mining
+							value > 0
+						}
+					}
+					change_variable = {
+						which = tec_temp_mining_districts
+						value = 1
+					}
+					remove_district = district_tec_decadent_mining
+				}
+				# Adds
+				while = {
+					limit = {
+						check_variable = {
+							which = tec_temp_mining_districts
+							value > 0
+						}
+					}
+					add_district = district_tec_aqua_mining
+					change_variable = {
+						which = tec_temp_mining_districts
+						value = -1
+					}
+				}
+				if = {	# Fix for necrophages and etc
+					limit = {
+						any_owned_species = {
+							is_lithoid = no
+							is_robotic_species = no
+						}
+					}
+					add_district_and_planet_size_if_needed_effect = {
+						district = district_farming
+					}
+				}
+				clear_variable = tec_temp_mining_districts
+			}
+		}
+		if = {	# Machine
+			limit = {
+				owner = {
+					tec_is_aquatic_empire = yes
+					is_machine_empire = yes
+				}
+			}
+			capital_scope = {
+				# Removes
+				while = {
+					limit = {
+						num_districts = {
+							type = district_generator
+							value > 0
+						}
+					}
+					change_variable = {
+						which = tec_temp_generator_districts
+						value = 1
+					}
+					remove_district = district_generator
+				}
+				while = {
+					limit = {
+						num_districts = {
+							type = district_generator_uncapped
+							value > 0
+						}
+					}
+					change_variable = {
+						which = tec_temp_generator_districts
+						value = 1
+					}
+					remove_district = district_generator_uncapped
+				}
+				while = {
+					limit = {
+						num_districts = {
+							type = district_tec_decadent_generator
+							value > 0
+						}
+					}
+					change_variable = {
+						which = tec_temp_generator_districts
+						value = 1
+					}
+					remove_district = district_tec_decadent_generator
+				}
+				# Adds
+				while = {
+					limit = {
+						check_variable = {
+							which = tec_temp_generator_districts
+							value > 0
+						}
+					}
+					add_district = district_tec_aqua_generator
+					change_variable = {
+						which = tec_temp_generator_districts
+						value = -1
+					}
+				}
+				clear_variable = tec_temp_generator_districts
+			}
+		}
+	}
+
+}
+
+country_event = {	# former colony.185
+	id = tec_rebalance.185
+	title = "colony.185.name"
+	desc = "colony.185.desc"
+
+	is_triggered_only = yes
+
+	show_sound = event_super_explosion
+
+	trigger = {
+		is_lithoid_devouring_swarm = yes
+		from = {
+			OR = {
+				num_free_districts = { type = any value <= 0 }
+				num_free_districts = { type = district_hive value <= 0 }
+			}
+		}
+	}
+
+	picture = GFX_evt_shattered_planet
+
+	immediate = {
+		from = {
+			every_owned_pop = {
+				resettle_pop = {
+					pop = this
+					planet = owner.capital_scope
+				}
+			}
+
+			change_pc = pc_shattered
+			clear_deposits = yes
+		}
+	}
+
+	option = {
+		name = colony.185.a
+		custom_tooltip = colony.185.a.tooltip
+		if = {
+			limit = {
+				has_ascension_perk = ap_become_the_crisis
+			}
+			complete_crisis_objective = crisobj_destroy_worlds
+		}
+	}
+}
+
+# --------------------- Species handlers ------------------------ 200
+country_event = {	# Adds special traits to FEs
+	id = tec_rebalance.210
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_global_flag = stellarisevolved
+	}
+
+	immediate = {
+		every_country = {
+			limit = {
+				OR = {
+					is_country_type = fallen_empire
+					is_country_type = awakened_fallen_empire
+				}
+			}
+			if = {
+				limit = {
+					is_fallen_empire_spiritualist = yes
+				}
+				random_list = {
+					33 = {
+						set_country_flag = tec_psionic_fe
+					}
+					33 = {
+						set_country_flag = tec_purepsionic_fe
+					}
+					33 = {
+						set_country_flag = tec_bio_fe
+					}
+				}
+				random_list = {
+					33 = {	# Zealots
+						country_add_ethic = ethic_fanatic_militarist
+					}
+					33 = {	# Industrialists
+						country_add_ethic = ethic_fanatic_industrial
+					}
+					33 = {	# Gaia creators
+						country_add_ethic = ethic_fanatic_green
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					is_fallen_empire_materialist = yes
+				}
+				random_list = {
+					33 = {
+						set_country_flag = tec_cyborg_fe
+					}
+					33 = {
+						set_country_flag = tec_synth_fe
+					}
+					33 = {
+						set_country_flag = tec_replicant_fe
+					}
+				}
+				random_list = {
+					33 = {	# Constructors
+						country_add_ethic = ethic_fanatic_industrial
+					}
+					33 = {	# Leaders
+						country_add_ethic = ethic_fanatic_elitist
+					}
+					33 = {	# Greed
+						country_add_ethic = ethic_fanatic_capitalism
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					is_fallen_empire_xenophile = yes
+				}
+				random_list = {
+					33 = {
+						set_country_flag = tec_bio_fe
+					}
+					33 = {
+						set_country_flag = tec_purepsi_fe
+					}
+					33 = {
+						set_country_flag = tec_cyberpsio_fe
+					}
+				}
+				random_list = {
+					33 = {	# Socialists
+						country_add_ethic = ethic_fanatic_socialism
+					}
+					33 = {	# Imposers
+						country_add_ethic = ethic_fanatic_authoritarian
+					}
+					33 = {	# Equalizers
+						country_add_ethic = ethic_fanatic_pluralist
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					is_fallen_empire_xenophobe = yes
+				}
+				random_list = {
+					33 = {
+						set_country_flag = tec_cyborg_fe
+					}
+					33 = {
+						set_country_flag = tec_bio_fe
+					}
+					33 = {
+						set_country_flag = tec_cyberpsio_fe
+					}
+				}
+				random_list = {
+					33 = {	# Warmongers
+						country_add_ethic = ethic_fanatic_militarist
+					}
+					33 = {	# Imposers
+						country_add_ethic = ethic_fanatic_authoritarian
+					}
+					33 = {	# Arrogants
+						country_add_ethic = ethic_fanatic_elitist
+					}
+				}
+			}
+		}
+	}
+
+}
+
+# --------------------- Edict/policy handlers ------------------------ 300
+# Greater Than Ourselves copycat - DEPRECATED
+country_event = {
+	id = tec_rebalance.310
+
+	hide_window = yes
+	is_triggered_only = yes
+	location = from
+
+	trigger = {
+		always = no
+		has_edict = tec_equality_edict
+
+		any_owned_pop = {
+			is_unemployed = yes
+			OR = {
+				is_pop_category = worker
+				is_pop_category = specialist
+				is_pop_category = ruler
+			}
+		}
+		NOT = {
+			has_country_flag = tec_equality_temporal_flag
+		}
+	}
+
+	immediate = {
+		set_timed_country_flag = {
+			flag = tec_equality_temporal_flag
+			days = 5
+		}
+		random_owned_pop = {
+			limit = {
+				is_unemployed = yes
+				OR = {
+					is_pop_category = worker
+					is_pop_category = specialist
+					is_pop_category = ruler
+				}
+
+				owner = {
+					any_owned_planet = {
+						free_housing >= 1
+						free_jobs >= 1
+						is_under_colonization = no
+						is_controlled_by = owner
+						has_orbital_bombardment = no
+					}
+				}
+			}
+			clear_pop_category = yes
+			save_event_target_as = tec_equality_target_pop
+
+			owner = {
+				random_owned_planet = {
+					limit = {
+						habitability = { who = event_target:tec_equality_target_pop value >= 0.5 }
+						free_housing >= 1
+						free_jobs >= 1
+						is_under_colonization = no
+						is_controlled_by = owner
+						has_orbital_bombardment = no
+					}
+					save_event_target_as = tec_equality_target_planet
+
+					if = {
+						limit = {
+							exists = event_target:tec_equality_target_pop
+							exists = event_target:tec_equality_target_planet
+						}
+						resettle_pop = {
+							pop = event_target:tec_equality_target_pop
+							planet = event_target:tec_equality_target_planet
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# Mortgage edict
+country_event = {
+	id = tec_rebalance.320
+
+	hide_window = yes
+	is_triggered_only = yes
+	location = from
+
+	trigger = {
+		has_edict = tec_mortgage_edict
+
+		any_owned_planet = {
+			has_building = building_dread_encampment
+		}
+	}
+
+	immediate = {
+		set_variable = {
+			which = tec_temp_mortgaged_pops
+			value = 0
+		}
+		every_owned_planet = {
+			limit = {
+				has_building = building_dread_encampment
+				any_owned_pop = {
+					has_job_category = worker
+				}
+			}
+			random = {
+				chance = 33
+				random_owned_pop = {
+					limit = {
+						is_pop_category = worker
+						OR = {
+							is_robot_pop = no
+							AND = {
+								owner = {
+									has_technology = tech_synthetic_workers
+								}
+								is_robot_pop = yes
+							}
+						}
+					}
+					owner = {
+						capital_scope = {
+							create_army = {
+								owner = root
+								species = prevprev
+								type = undead_army
+							}
+						}
+					}
+					kill_pop = yes
+				}
+				owner = {
+					change_variable = {
+						which = tec_temp_mortgaged_pops
+						value = 1
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_temp_mortgaged_pops
+					value > 0
+				}
+			}
+			create_message = {
+				type = MESSAGE_TEC_MORTGAGED_EVENT
+				localization = MESSAGE_TEC_MORTGAGED
+				days = 30
+				target = capital_scope
+				variable = {
+					type = variable
+					varname = tec_temp_mortgaged_pops
+					localization = VALUE
+					scope = capital_scope
+				}
+			}
+		}
+	}
+	
+}
+
+# --------------------- leader handlers ------------------------ 400
+# New Leaders Get custom traits
+country_event = {
+	id = tec_rebalance.400
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		always = yes
+	}
+
+	immediate = {
+		from = {
+			remove_leader_traits_after_modification = yes
+		}
+	}
+
+	after = {
+		from = {
+			add_leader_traits_after_modification = yes
+		}
+	}
+}
+
+# New Leaders are younger for the patronage civic
+country_event = {
+	id = tec_rebalance.410
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		owner = {
+			has_valid_civic = civic_tec_patronage
+		}
+	}
+
+	immediate = {
+		from = {
+			random_list = {
+				1 = { set_age = 24 }
+				1 = { set_age = 25 }
+				1 = { set_age = 26 }
+				1 = { set_age = 27 }
+				1 = { set_age = 28 }
+				1 = { set_age = 29 }
+				1 = { set_age = 30 }
+				1 = { set_age = 31 }
+				1 = { set_age = 32 }
+				1 = { set_age = 33 }
+				1 = { set_age = 34 }
+				1 = { set_age = 35 }
+			}
+		}
+	}
+}
+
+
+# Cerebrate and machine leader handling - 33% chance of leader having it
+# New Leaders Get Clone template Trait
+country_event = {
+	id = tec_rebalance.420
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		#only clone empires get leader traits
+		root = {
+			OR = {
+				has_valid_civic = civic_tec_hive_cerebrates
+				has_valid_civic = civic_tec_hive_cerebrates_cyborg
+				has_valid_civic = civic_machine_delegated_functions
+			}
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				has_valid_civic = civic_tec_hive_cerebrates
+			}
+			random_list = {
+				3 = {
+					from = {
+						if = {
+							limit = { leader_class = admiral }
+							add_trait = leader_trait_admiral_tec_cerebrate
+							break = yes
+						}
+						if = {
+							limit = { leader_class = general }
+							add_trait = leader_trait_general_tec_cerebrate
+							break = yes
+						}
+						if = {
+							limit = { leader_class = governor }
+							random_list = {
+								1 = {
+									add_trait = leader_trait_governor_tec_cerebrate
+								}
+								1 = {
+									add_trait = leader_trait_governor_tec_cerebrate_2
+								}
+							}
+							break = yes
+						}
+						if = {
+							limit = { leader_class = scientist }
+							add_trait = leader_trait_scientist_tec_cerebrate
+							break = yes
+						}
+					}
+				}
+				6 = {
+					break = yes
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				has_valid_civic = civic_tec_hive_cerebrates_cyborg
+			}
+			random_list = {
+				3 = {
+					from = {
+						if = {
+							limit = { leader_class = admiral }
+							add_trait = leader_trait_admiral_tec_matrices
+							break = yes
+						}
+						if = {
+							limit = { leader_class = general }
+							add_trait = leader_trait_general_tec_matrices
+							break = yes
+						}
+						if = {
+							limit = { leader_class = governor }
+							random_list = {
+								1 = {
+									add_trait = leader_trait_governor_tec_matrices
+								}
+								1 = {
+									add_trait = leader_trait_governor_tec_matrices_2
+								}
+							}
+							break = yes
+						}
+						if = {
+							limit = { leader_class = scientist }
+							add_trait = leader_trait_scientist_tec_matrices
+							break = yes
+						}
+					}
+				}
+				6 = {
+					break = yes
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				has_valid_civic = civic_machine_delegated_functions
+			}
+			random_list = {
+				3 = {
+					from = {
+						if = {
+							limit = { leader_class = admiral }
+							add_trait = leader_trait_admiral_tec_delegated
+							break = yes
+						}
+						if = {
+							limit = { leader_class = general }
+							add_trait = leader_trait_general_tec_delegated
+							break = yes
+						}
+						if = {
+							limit = { leader_class = governor }
+							random_list = {
+								1 = {
+									add_trait = leader_trait_governor_tec_delegated
+								}
+								1 = {
+									add_trait = leader_trait_governor_tec_delegated_2
+								}
+							}
+							break = yes
+						}
+						if = {
+							limit = { leader_class = scientist }
+							add_trait = leader_trait_scientist_tec_delegated
+							break = yes
+						}
+					}
+				}
+				6 = {
+					break = yes
+				}
+			}
+		}
+		else = {
+			break = yes
+		}
+		
+	}
+}
+
+# --------------------- Auth handlers ------------------------ 500
+# Handles generally empire init stricted civics to mirror ones post government change
+country_event = {	# Applied POST government change
+	id = tec_rebalance.550
+	is_triggered_only = yes
+	hide_window = yes
+
+	# No real need for trigger as government changes are not common
+
+	immediate = {
+		# Anglers
+			if = {	# Not megacorp
+				limit = {
+					is_megacorp = no
+					is_gestalt = no
+					has_civic = civic_corporate_anglers
+				}
+				force_remove_civic = civic_corporate_anglers
+				force_add_civic = civic_anglers
+			}
+			if = {	# Megacorp
+				limit = {
+					is_megacorp = yes
+					is_gestalt = no
+					has_civic = civic_anglers
+				}
+				force_remove_civic = civic_anglers
+				force_add_civic = civic_corporate_anglers
+			}
+		# /
+		# Agrarian Idyll
+		
+		# /
+		# Gardeners
+		
+		# /
+		# Machine Cult
+		
+		# /
+		# Evoarchitects
+		
+		# /
+		# Industrial automatation civic_tec_corporate_automatation
+
+		# /
+		# Inwards perfection
+
+		# /
+		# Barbaric Despoilers
+		
+		# /
+		# Idyllic Bloom
+		
+		# /
+		# civic_tec_corporate_pacificationcorp 
+		
+		# /
+	}
+}
+
+# Leader level handler (elitist, hivemind)
+country_event = {	# Applied ON leader spawn
+	id = tec_rebalance.560
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			has_ethic = ethic_elitist
+			has_ethic = ethic_fanatic_elitist
+			has_ethic = ethic_gestalt_consciousness
+		}
+		NOT = {	# Imbalanced
+			has_origin = origin_progenitor_hive
+		}
+	}
+
+	immediate = {
+		# Not gestalt
+		if = {
+			limit = {
+				has_ethic = ethic_elitist
+				from = {
+					has_skill < 4
+				}
+			}
+			from = {
+				add_skill = 1
+			}
+		}
+		else_if = {
+			limit = {
+				has_ethic = ethic_fanatic_elitist
+				from = {
+					has_skill < 4
+				}
+			}
+			from = {
+				if = {
+					limit = {
+						has_skill = 3
+					}
+					add_skill = 1
+				}
+				else_if = {
+					limit = {
+						has_skill = 2
+					}
+					add_skill = 2
+				}
+				else_if = {
+					limit = {
+						has_skill = 1
+					}
+					add_skill = 2
+				}
+				
+			}
+		}
+		# Gestalt
+		else_if = {
+			limit = {
+				has_ethic = ethic_gestalt_consciousness
+			}
+			if = {	# Ruler has level 3, leaders get an extra level
+				limit = {
+					has_country_flag = tec_gestalt_ruler_3
+				}
+				from = {
+					if = {
+						limit = {
+							has_skill = 1
+						}
+						add_skill = 1
+					}
+				}
+			}
+			if = { # Ruler has level 5, leaders get 2 extra levels
+				limit = {
+					has_country_flag = tec_gestalt_ruler_5
+				}
+				from = {
+					if = {
+						limit = {
+							has_skill = 2
+						}
+						add_skill = 1
+					}
+					if = {
+						limit = {
+							has_skill = 1
+						}
+						add_skill = 2
+					}
+				}
+			}
+			if = { # Ruler has level 7, leaders get 3 extra levels
+				limit = {
+					has_country_flag = tec_gestalt_ruler_7
+				}
+				from = {
+					if = {
+						limit = {
+							has_skill = 3
+						}
+						add_skill = 1
+					}
+					if = {
+						limit = {
+							has_skill = 2
+						}
+						add_skill = 2
+					}
+					if = {
+						limit = {
+							has_skill = 1
+						}
+						add_skill = 3
+					}
+				}
+			}
+			if = { # Ruler has level 9, leaders get 4 levels
+				limit = {
+					has_country_flag = tec_gestalt_ruler_9
+				}
+				from = {
+					if = {
+						limit = {
+							has_skill = 4
+						}
+						add_skill = 1
+					}
+					if = {
+						limit = {
+							has_skill = 3
+						}
+						add_skill = 2
+					}
+					if = {
+						limit = {
+							has_skill = 2
+						}
+						add_skill = 3
+					}
+					if = {
+						limit = {
+							has_skill = 1
+						}
+						add_skill = 4
+					}
+				}
+			}
+		}
+	}
+}
+
+# Gestalt ruler limiter
+country_event = {	# Keeps track of ruler level
+	id = tec_rebalance.561
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_ethic = ethic_gestalt_consciousness
+		NOT = {	# Imbalanced
+			has_origin = origin_progenitor_hive
+		}
+		from = {
+			leader_class = ruler
+		}
+	}
+
+	immediate = {
+		# Adds the ruler level threshhold as flag
+		if = {
+			limit = {
+				from = {
+					leader_class = ruler
+					has_skill = 3
+				}
+			}
+			set_country_flag = tec_gestalt_ruler_3
+		}
+		if = {
+			limit = {
+				from = {
+					leader_class = ruler
+					has_skill = 5
+				}
+			}
+			set_country_flag = tec_gestalt_ruler_5
+			remove_country_flag = tec_gestalt_ruler_3
+		}
+		if = {
+			limit = {
+				from = {
+					leader_class = ruler
+					has_skill = 7
+				}
+			}
+			set_country_flag = tec_gestalt_ruler_7
+			remove_country_flag = tec_gestalt_ruler_3
+			remove_country_flag = tec_gestalt_ruler_5
+		}
+		if = {
+			limit = {
+				from = {
+					leader_class = ruler
+					has_skill = 9
+				}
+			}
+			set_country_flag = tec_gestalt_ruler_9
+			remove_country_flag = tec_gestalt_ruler_3
+			remove_country_flag = tec_gestalt_ruler_5
+			remove_country_flag = tec_gestalt_ruler_7
+		}
+		# On pair levels, levels all the other leaders up
+		if = {	# Ruler has level 3, leaders get an extra level
+			limit = {
+				has_country_flag = tec_gestalt_ruler_3
+			}
+			every_owned_leader = {
+				limit = {
+					has_skill = 1
+				}
+				add_skill = 1
+			}
+			every_pool_leader = {
+				limit = {
+					has_skill = 1
+				}
+				add_skill = 1
+			}
+		}
+		if = { # Ruler has level 5, leaders get 2 extra levels
+			limit = {
+				has_country_flag = tec_gestalt_ruler_5
+			}
+			every_owned_leader = {
+				limit = {
+					has_skill = 1
+				}
+				add_skill = 2
+			}
+			every_owned_leader = {
+				limit = {
+					has_skill = 2
+				}
+				add_skill = 1
+			}
+			every_pool_leader = {
+				limit = {
+					has_skill = 1
+				}
+				add_skill = 2
+			}
+			every_pool_leader = {
+				limit = {
+					has_skill = 2
+				}
+				add_skill = 1
+			}
+
+		}
+		if = { # Ruler has level 7, leaders get 3 extra levels
+			limit = {
+				has_country_flag = tec_gestalt_ruler_7
+			}
+			every_owned_leader = {
+				limit = {
+					has_skill = 1
+				}
+				add_skill = 3
+			}
+			every_owned_leader = {
+				limit = {
+					has_skill = 2
+				}
+				add_skill = 2
+			}
+			every_owned_leader = {
+				limit = {
+					has_skill = 3
+				}
+				add_skill = 1
+			}
+
+			every_pool_leader = {
+				limit = {
+					has_skill = 1
+				}
+				add_skill = 3
+			}
+			every_pool_leader = {
+				limit = {
+					has_skill = 2
+				}
+				add_skill = 2
+			}
+			every_pool_leader = {
+				limit = {
+					has_skill = 3
+				}
+				add_skill = 1
+			}
+		}
+		if = { # Ruler has level 9, leaders start at level 4
+			limit = {
+				has_country_flag = tec_gestalt_ruler_9
+			}
+			every_owned_leader = {
+				limit = {
+					has_skill = 1
+				}
+				add_skill = 4
+			}
+			every_owned_leader = {
+				limit = {
+					has_skill = 2
+				}
+				add_skill = 3
+			}
+			every_owned_leader = {
+				limit = {
+					has_skill = 3
+				}
+				add_skill = 2
+			}
+			every_owned_leader = {
+				limit = {
+					has_skill = 4
+				}
+				add_skill = 1
+			}
+
+			every_pool_leader = {
+				limit = {
+					has_skill = 1
+				}
+				add_skill = 4
+			}
+			every_pool_leader = {
+				limit = {
+					has_skill = 2
+				}
+				add_skill = 3
+			}
+			every_pool_leader = {
+				limit = {
+					has_skill = 3
+				}
+				add_skill = 2
+			}
+			every_pool_leader = {
+				limit = {
+					has_skill = 4
+				}
+				add_skill = 1
+			}
+		}
+	}
+}
+
+country_event = {	# Applied POST government change
+	id = tec_rebalance.565
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		OR = {
+			has_ethic = ethic_elitist
+			has_ethic = ethic_fanatic_elitist
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				has_ethic = ethic_elitist
+			}
+			every_pool_leader = {
+				limit = {
+					has_skill < 4
+				}
+				add_skill = 1
+			}
+		}
+		else_if = {
+			limit = {
+				has_ethic = ethic_fanatic_elitist
+			}
+			every_pool_leader = {
+				limit = {
+					has_skill = 3
+				}
+				add_skill = 1
+			}
+			every_pool_leader = {
+				limit = {
+					has_skill = 2
+				}
+				add_skill = 2
+			}
+			every_pool_leader = {
+				limit = {
+					has_skill = 1
+				}
+				add_skill = 2
+			}
+		}
+	}
+}
+
+# --------------------- Tech handlers ------------------------ 600
+# New robotic workers - trigger
+# If robots are unlocked, create built species
+country_event = {
+	id = tec_rebalance.610
+	title = "tec_rebalance.610.name"
+	desc = {
+		trigger = {
+			is_regular_empire = yes
+			NOT = {
+				has_valid_civic = civic_tec_machine_cult
+			}
+		}
+		text = "tec_rebalance.610.desc.regular"
+	}
+
+	desc = {
+		trigger = {
+			is_regular_empire = yes
+			has_valid_civic = civic_tec_machine_cult
+		}
+		text = "tec_rebalance.610.desc.machicult"
+	}
+
+	desc = {
+		trigger = {
+			is_hive_empire = yes
+		}
+		text = "tec_rebalance.610.desc.hive"
+	}
+	picture = GFX_evt_robot_assembly_plant
+	show_sound = event_machinery
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOR = {
+			has_origin = origin_mechanists
+			has_country_flag = tec_built_first_robot
+		}
+		has_technology = tech_robotic_workers
+	}
+
+	immediate = {
+		hidden_effect = {
+			set_country_flag = tec_built_first_robot
+			# custom effect
+			tec_create_built_robot_species = yes
+			# Creates a fake leader
+			last_created_species = {
+				save_event_target_as = tec_temp_robot
+			}
+			create_saved_leader = {
+				class = envoy
+				creator = this
+				name = "Backup Portrait"
+				key = "tec_robot_portrait_leader"
+				species = event_target:tec_temp_robot
+			}
+			last_created_leader = {
+				set_leader_flag = tec_temp_robot_portrait_leader
+				save_event_target_as = tec_temp_robot_leader
+			}
+		}
+	}
+
+	option = {
+		name = tec_rebalance.610.a
+		custom_tooltip = tec_rebalance.610.tooltip
+		trigger = {
+			is_ai = no
+		}
+		hidden_effect = {
+			country_event = {	# customization
+				id = tec_rebalance.611
+			}
+		}
+	}
+
+	option = {
+		name = tec_rebalance.610.a
+		trigger = {
+			is_ai = yes
+		}
+		hidden_effect = {
+			capital_scope = {
+				create_pop = {
+					species = event_target:tec_temp_robot
+				}
+			}
+		}
+	}
+}
+
+# New robotic workers - Select the appearance
+country_event = {
+	id = tec_rebalance.611
+	title = "tec_rebalance.611.name"
+
+	desc = {
+		trigger = {
+			is_regular_empire = yes
+			NOT = {
+				has_valid_civic = civic_tec_machine_cult
+			}
+		}
+		text = "tec_rebalance.611.desc.regular"
+	}
+
+	desc = {
+		trigger = {
+			is_regular_empire = yes
+			has_valid_civic = civic_tec_machine_cult
+		}
+		text = "tec_rebalance.611.desc.machicult"
+	}
+
+	desc = {
+		trigger = {
+			is_hive_empire = yes
+		}
+		text = "tec_rebalance.611.desc.hive"
+	}
+
+	diplomatic = yes
+	diplomatic_title = BLANK_STRING
+	is_triggered_only = yes
+
+	picture_event_data = {
+		portrait = event_target:tec_temp_robot_leader
+		room = root
+		planet_background = root.capital_scope
+	}
+
+	immediate = {
+		activate_saved_leader = {
+			key = "tec_robot_portrait_leader"
+			effect = {
+				save_event_target_as = tec_temp_robot_leader
+			}
+		}
+		event_target:tec_temp_robot_leader = {
+			species = {
+				save_event_target_as = tec_temp_robot
+			}
+		}
+	}
+
+	option = {
+		name = tec_rebalance.611.confirm
+		custom_tooltip = tec_rebalance.611.confirm.tooltip
+		allow = {
+			hidden_trigger = {
+				NOT = {
+					has_country_flag = tec_reroll_robot_portrait
+				}
+			}
+		}
+		hidden_effect = {
+			remove_country_flag = tec_selected_robot_portrait
+			remove_country_flag = tec_selected_robot_neutral
+			remove_country_flag = tec_selected_robot_hum
+			remove_country_flag = tec_selected_robot_mam
+			remove_country_flag = tec_selected_robot_rep
+			remove_country_flag = tec_selected_robot_avi
+			remove_country_flag = tec_selected_robot_art
+			remove_country_flag = tec_selected_robot_mol
+			remove_country_flag = tec_selected_robot_fun
+			remove_country_flag = tec_selected_robot_pla
+			remove_country_flag = tec_selected_robot_lit
+			remove_country_flag = tec_selected_robot_nec
+			remove_country_flag = tec_selected_robot_aqu
+			remove_country_flag = tec_selected_robot_tox
+
+			if = {
+				limit = { # This prevents multiplayer cheese
+					NOT = {
+						has_country_flag = tec_delivered_robot_pop
+					}
+				}
+				set_timed_country_flag = {
+					flag = tec_delivered_robot_pop
+					days = 5
+				}
+				capital_scope = {
+					create_pop = {
+						species = event_target:tec_temp_robot
+					}
+				}
+			}
+			# Aiauth
+			every_owned_leader = {
+				limit = {
+					is_robotic_species = yes
+				}
+				change_species = event_target:tec_temp_robot_leader
+				change_leader_portrait = event_target:tec_temp_robot_leader
+			}
+			# Aiauth antibug
+			if = {
+				limit = {
+					exists = event_target:tec_aiauth_exiled_leader
+				}
+				event_target:tec_aiauth_exiled_leader = {
+					change_species = event_target:tec_temp_robot_leader
+					change_leader_portrait = event_target:tec_temp_robot_leader
+				}
+			}
+			activate_saved_leader = {
+				key = "tec_robot_portrait_leader"
+				add_to_owned = yes
+				effect = {
+					save_event_target_as = tec_kill_leader
+				}
+			}
+			event_target:tec_kill_leader = {
+				kill_leader = {
+					show_notification = no
+				}
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.space
+		allow = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.reroll
+		custom_tooltip = tec_rebalance.611.reroll.tooltip
+		allow = {
+			hidden_trigger = {
+				NOT = {
+					has_country_flag = tec_reroll_robot_portrait
+				}
+			}
+		}
+		hidden_effect = {
+			remove_country_flag = tec_selected_robot_portrait
+			remove_country_flag = tec_selected_robot_neutral
+			remove_country_flag = tec_selected_robot_hum
+			remove_country_flag = tec_selected_robot_mam
+			remove_country_flag = tec_selected_robot_rep
+			remove_country_flag = tec_selected_robot_avi
+			remove_country_flag = tec_selected_robot_art
+			remove_country_flag = tec_selected_robot_mol
+			remove_country_flag = tec_selected_robot_fun
+			remove_country_flag = tec_selected_robot_pla
+			remove_country_flag = tec_selected_robot_lit
+			remove_country_flag = tec_selected_robot_nec
+			remove_country_flag = tec_selected_robot_aqu
+			remove_country_flag = tec_selected_robot_tox
+			set_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.611
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.space
+		allow = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+	}
+
+	option = {
+		name = tec_rebalance.611.neutral
+		custom_tooltip = tec_rebalance.611.neutral.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species_portrait = default_robot
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = default_robot
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = default_robot
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_neutral
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.611
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.hum
+		custom_tooltip = tec_rebalance.611.hum.tooltip
+		allow = {
+			has_humanoids = yes
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = sd_hum_robot
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = sd_hum_robot
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = sd_hum_robot
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_hum
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.611
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.mam
+		custom_tooltip = tec_rebalance.611.mam.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = sd_mam_robot
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = sd_mam_robot
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = sd_mam_robot
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_mam
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.611
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.rep
+		custom_tooltip = tec_rebalance.611.rep.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = sd_rep_robot
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = sd_rep_robot
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = sd_rep_robot
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_rep
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.611
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.avi
+		custom_tooltip = tec_rebalance.611.avi.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = sd_avi_robot
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = sd_avi_robot
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = sd_avi_robot
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_avi
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.611
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.art
+		custom_tooltip = tec_rebalance.611.art.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = sd_art_robot
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = sd_art_robot
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = sd_art_robot
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_art
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.611
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.mol
+		custom_tooltip = tec_rebalance.611.mol.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = sd_mol_robot
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = sd_mol_robot
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = sd_mol_robot
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_mol
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.611
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.fun
+		custom_tooltip = tec_rebalance.611.fun.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = sd_fun_robot
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = sd_fun_robot
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = sd_fun_robot
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_fun
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.611
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.pla
+		custom_tooltip = tec_rebalance.611.pla.tooltip
+		allow = {
+			has_plantoids = yes
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = sd_pla_robot
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = sd_pla_robot
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = sd_pla_robot
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_pla
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.611
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.lit
+		custom_tooltip = tec_rebalance.611.lit.tooltip
+		allow = {
+			has_lithoids = yes
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = lith_machine
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = lith_machine
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = lith_machine
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_lit
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.611
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.nec
+		custom_tooltip = tec_rebalance.611.nec.tooltip
+		allow = {
+			has_necroids = yes
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = nec_machine
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = nec_machine
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = nec_machine
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_nec
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.611
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.aqu
+		custom_tooltip = tec_rebalance.611.aqu.tooltip
+		allow = {
+			has_aquatics = yes
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = aqu_machine
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = aqu_machine
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = aqu_machine
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_aqu
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.611
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.tox
+		custom_tooltip = tec_rebalance.611.tox.tooltip
+		allow = {
+			has_toxoids = yes
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = tox_machine
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = tox_machine
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = tox_machine
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_tox
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.611
+			}
+		}
+	}
+}
+
+# Robotic workers appearance for machinists
+country_event = {
+	id = tec_rebalance.612
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_origin = origin_mechanists
+		is_ai = no
+	}
+
+	immediate = {
+		hidden_effect = {
+			# Creates a fake leader
+			random_owned_pop = {
+				limit = {
+					has_trait = trait_mechanical
+				}
+				species = {
+					save_event_target_as = tec_temp_robot
+				}
+			}
+			create_saved_leader = {
+				class = envoy
+				creator = this
+				name = "Backup Portrait"
+				key = "tec_robot_portrait_leader"
+				species = event_target:tec_temp_robot
+			}
+			last_created_leader = {
+				set_leader_flag = tec_temp_robot_portrait_leader
+				save_event_target_as = tec_temp_robot_leader
+			}
+			country_event = {	# customization
+				id = tec_rebalance.613
+			}
+		}
+	}
+}
+country_event = {
+	id = tec_rebalance.613
+	title = "tec_rebalance.611.name"
+
+	desc = {
+		trigger = {
+			is_regular_empire = yes
+			has_origin = origin_mechanists
+		}
+		text = "tec_rebalance.611.desc.regular"
+	}
+
+	desc = {
+		trigger = {
+			is_regular_empire = yes
+			has_valid_civic = civic_tec_machine_cult
+		}
+		text = "tec_rebalance.611.desc.machicult"
+	}
+
+	desc = {
+		trigger = {
+			is_hive_empire = yes
+		}
+		text = "tec_rebalance.611.desc.hive"
+	}
+
+	diplomatic = yes
+	diplomatic_title = BLANK_STRING
+	is_triggered_only = yes
+
+	picture_event_data = {
+		portrait = event_target:tec_temp_robot_leader
+		room = root
+		planet_background = root.capital_scope
+	}
+
+	immediate = {
+		hidden_effect = {
+			activate_saved_leader = {
+				key = "tec_robot_portrait_leader"
+				effect = {
+					save_event_target_as = tec_temp_robot_leader
+				}
+			}
+			event_target:tec_temp_robot_leader = {
+				species = {
+					save_event_target_as = tec_temp_robot
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = tec_rebalance.611.confirm
+		custom_tooltip = tec_rebalance.611.confirm.og.tooltip
+		allow = {
+			hidden_trigger = {
+				NOT = {
+					has_country_flag = tec_reroll_robot_portrait
+				}
+			}
+		}
+		hidden_effect = {
+			remove_country_flag = tec_selected_robot_portrait
+			remove_country_flag = tec_selected_robot_neutral
+			remove_country_flag = tec_selected_robot_hum
+			remove_country_flag = tec_selected_robot_mam
+			remove_country_flag = tec_selected_robot_rep
+			remove_country_flag = tec_selected_robot_avi
+			remove_country_flag = tec_selected_robot_art
+			remove_country_flag = tec_selected_robot_mol
+			remove_country_flag = tec_selected_robot_fun
+			remove_country_flag = tec_selected_robot_pla
+			remove_country_flag = tec_selected_robot_lit
+			remove_country_flag = tec_selected_robot_nec
+			remove_country_flag = tec_selected_robot_aqu
+			remove_country_flag = tec_reroll_robot_portrait
+			if = {
+				limit = { # This prevents multiplayer cheese
+					NOT = {
+						has_country_flag = tec_delivered_robot_pop
+					}
+				}
+				set_timed_country_flag = {
+					flag = tec_delivered_robot_pop
+					days = 5
+				}
+				every_owned_pop = {
+					limit = {
+						has_trait = trait_mechanical
+					}
+					change_species = event_target:tec_temp_robot_leader
+				}
+				# Aiauth
+				every_owned_leader = {
+					limit = {
+						is_robotic_species = yes
+					}
+					change_species = event_target:tec_temp_robot_leader
+					change_leader_portrait = event_target:tec_temp_robot_leader
+				}
+				# Aiauth antibug
+				if = {
+					limit = {
+						exists = event_target:tec_aiauth_exiled_leader
+					}
+					event_target:tec_aiauth_exiled_leader = {
+						change_species = event_target:tec_temp_robot_leader
+						change_leader_portrait = event_target:tec_temp_robot_leader
+					}
+				}
+			}
+			event_target:tec_temp_robot_leader = {
+				kill_leader = {
+					show_notification = no
+				}
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.space
+		allow = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.reroll
+		custom_tooltip = tec_rebalance.611.reroll.tooltip
+		allow = {
+			hidden_trigger = {
+				NOT = {
+					has_country_flag = tec_reroll_robot_portrait
+				}
+			}
+		}
+		hidden_effect = {
+			remove_country_flag = tec_selected_robot_portrait
+			remove_country_flag = tec_selected_robot_neutral
+			remove_country_flag = tec_selected_robot_hum
+			remove_country_flag = tec_selected_robot_mam
+			remove_country_flag = tec_selected_robot_rep
+			remove_country_flag = tec_selected_robot_avi
+			remove_country_flag = tec_selected_robot_art
+			remove_country_flag = tec_selected_robot_mol
+			remove_country_flag = tec_selected_robot_fun
+			remove_country_flag = tec_selected_robot_pla
+			remove_country_flag = tec_selected_robot_lit
+			remove_country_flag = tec_selected_robot_nec
+			remove_country_flag = tec_selected_robot_aqu
+			set_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.613
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.space
+		allow = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+	}
+
+	option = {
+		name = tec_rebalance.611.neutral
+		custom_tooltip = tec_rebalance.611.neutral.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = default_robot
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = default_robot
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = default_robot
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_neutral
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.613
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.hum
+		custom_tooltip = tec_rebalance.611.hum.tooltip
+		allow = {
+			has_humanoids = yes
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = sd_hum_robot
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = sd_hum_robot
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = sd_hum_robot
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_hum
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.613
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.mam
+		custom_tooltip = tec_rebalance.611.mam.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = sd_mam_robot
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = sd_mam_robot
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = sd_mam_robot
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_mam
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.613
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.rep
+		custom_tooltip = tec_rebalance.611.rep.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = sd_rep_robot
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = sd_rep_robot
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = sd_rep_robot
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_rep
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.613
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.avi
+		custom_tooltip = tec_rebalance.611.avi.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = sd_avi_robot
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = sd_avi_robot
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = sd_avi_robot
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_avi
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.613
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.art
+		custom_tooltip = tec_rebalance.611.art.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = sd_art_robot
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = sd_art_robot
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = sd_art_robot
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_art
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.613
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.mol
+		custom_tooltip = tec_rebalance.611.mol.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = sd_mol_robot
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = sd_mol_robot
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = sd_mol_robot
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_mol
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.613
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.fun
+		custom_tooltip = tec_rebalance.611.fun.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = sd_fun_robot
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = sd_fun_robot
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = sd_fun_robot
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_fun
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.613
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.pla
+		custom_tooltip = tec_rebalance.611.pla.tooltip
+		allow = {
+			has_plantoids = yes
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = sd_pla_robot
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = sd_pla_robot
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = sd_pla_robot
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_pla
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.613
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.lit
+		custom_tooltip = tec_rebalance.611.lit.tooltip
+		allow = {
+			has_lithoids = yes
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = lith_machine
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = lith_machine
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = lith_machine
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_lit
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.613
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.nec
+		custom_tooltip = tec_rebalance.611.nec.tooltip
+		allow = {
+			has_necroids = yes
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = nec_machine
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = nec_machine
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = nec_machine
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_nec
+			country_event = {
+				id = tec_rebalance.613
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.aqu
+		custom_tooltip = tec_rebalance.611.aqu.tooltip
+		allow = {
+			has_aquatics = yes
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = aqu_machine
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = aqu_machine
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = aqu_machine
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_aqu
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.613
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.611.tox
+		custom_tooltip = tec_rebalance.611.tox.tooltip
+		allow = {
+			has_toxoids = yes
+			hidden_trigger = {
+				has_country_flag = tec_reroll_robot_portrait
+				NOR = {
+					event_target:tec_temp_robot_leader = {
+						species = {
+							species_portrait = tox_machine
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_robot = {
+				change_species_portrait = tox_machine
+			}
+			event_target:tec_temp_robot_leader = {
+				change_leader_portrait = tox_machine
+			}
+			set_country_flag = tec_selected_robot_portrait
+			set_country_flag = tec_selected_robot_tox
+			remove_country_flag = tec_reroll_robot_portrait
+			country_event = {
+				id = tec_rebalance.613
+			}
+		}
+	}
+}
+
+# New bioservant - trigger
+# If bios are unlocked, create built species
+country_event = {
+	id = tec_rebalance.615
+	title = "tec_rebalance.615.name"
+	desc = {
+		text = "tec_rebalance.615.desc"
+	}
+
+	picture = GFX_evt_clones
+	show_sound = event_engineered_evolution
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOR = {
+			has_country_flag = tec_built_first_bioservant
+			has_origin = origin_tec_bioservant
+		}
+		has_technology = tech_tec_bioservant
+	}
+
+	immediate = {
+		hidden_effect = {
+			set_country_flag = tec_built_first_bioservant
+			# custom effect
+			tec_create_built_bioservant_species = yes
+			# Creates a fake leader
+			last_created_species = {
+				save_event_target_as = tec_temp_bio
+			}
+			create_saved_leader = {
+				class = envoy
+				creator = this
+				name = "Backup Portrait"
+				key = "tec_bio_portrait_leader"
+				species = event_target:tec_temp_bio
+			}
+			last_created_leader = {
+				set_leader_flag = tec_temp_bio_portrait_leader
+				save_event_target_as = tec_temp_bio_leader
+			}
+		}
+	}
+
+	option = {
+		name = tec_rebalance.615.a
+		custom_tooltip = tec_rebalance.615.tooltip
+		trigger = {
+			is_ai = no
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					is_ai = no
+				}
+				country_event = {	# customization
+					id = tec_rebalance.616
+				}
+			}
+		}
+	}
+
+	option = {
+		name = tec_rebalance.615.a
+		trigger = {
+			is_ai = yes
+		}
+		hidden_effect = {
+			capital_scope = {
+				create_pop = {
+					species = event_target:tec_temp_bio
+				}
+			}
+		}
+	}
+}
+
+# New bioservant trigger - Select the appearance
+country_event = {
+	id = tec_rebalance.616
+	title = "tec_rebalance.616.name"
+
+	desc = {
+		trigger = {
+			is_regular_empire = yes
+		}
+		text = "tec_rebalance.616.desc.regular"
+	}
+
+	desc = {
+		trigger = {
+			is_hive_empire = yes
+		}
+		text = "tec_rebalance.616.desc.hive"
+	}
+
+	desc = {
+		trigger = {
+			is_machine_empire = yes
+		}
+		text = "tec_rebalance.616.desc.machine"
+	}
+
+	diplomatic = yes
+	diplomatic_title = BLANK_STRING
+	is_triggered_only = yes
+
+	picture_event_data = {
+		portrait = event_target:tec_temp_bio_leader
+		room = root
+		planet_background = root.capital_scope
+	}
+
+	immediate = {
+		activate_saved_leader = {
+			key = "tec_bio_portrait_leader"
+			effect = {
+				save_event_target_as = tec_temp_bio_leader
+			}
+		}
+		event_target:tec_temp_bio_leader = {
+			species = {
+				save_event_target_as = tec_temp_bio
+			}
+		}
+	}
+
+	option = {
+		name = tec_rebalance.616.confirm
+		custom_tooltip = tec_rebalance.616.confirm.tooltip
+		allow = {
+			hidden_trigger = {
+				NOT = {
+					has_country_flag = tec_reroll_bio_portrait
+				}
+			}
+		}
+		hidden_effect = {
+			remove_country_flag = tec_selected_bio_portrait
+			remove_country_flag = tec_selected_bio_hum
+			remove_country_flag = tec_selected_bio_mam
+			remove_country_flag = tec_selected_bio_rep
+			remove_country_flag = tec_selected_bio_avi
+			remove_country_flag = tec_selected_bio_art
+			remove_country_flag = tec_selected_bio_mol
+			remove_country_flag = tec_selected_bio_fun
+			remove_country_flag = tec_selected_bio_pla
+			remove_country_flag = tec_selected_bio_nec
+
+			if = {
+				limit = { # This prevents multiplayer cheese
+					NOT = {
+						has_country_flag = tec_delivered_bioservant_pop
+					}
+				}
+				set_timed_country_flag = {
+					flag = tec_delivered_bioservant_pop
+					days = 5
+				}
+				capital_scope = {
+					create_pop = {
+						species = event_target:tec_temp_bio
+					}
+				}
+			}
+
+			activate_saved_leader = {
+				key = "tec_bio_portrait_leader"
+				add_to_owned = yes
+				effect = {
+					save_event_target_as = tec_kill_leader
+				}
+			}
+			event_target:tec_kill_leader = {
+				kill_leader = {
+					show_notification = no
+				}
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.space
+		allow = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.reroll
+		custom_tooltip = tec_rebalance.616.reroll.tooltip
+		allow = {
+			hidden_trigger = {
+				NOT = {
+					has_country_flag = tec_reroll_bio_portrait
+				}
+			}
+		}
+		hidden_effect = {
+			remove_country_flag = tec_selected_bio_portrait
+			remove_country_flag = tec_selected_bio_hum
+			remove_country_flag = tec_selected_bio_mam
+			remove_country_flag = tec_selected_bio_rep
+			remove_country_flag = tec_selected_bio_avi
+			remove_country_flag = tec_selected_bio_art
+			remove_country_flag = tec_selected_bio_mol
+			remove_country_flag = tec_selected_bio_fun
+			remove_country_flag = tec_selected_bio_pla
+			remove_country_flag = tec_selected_bio_nec
+			remove_country_flag = tec_selected_bio_aqu
+			remove_country_flag = tec_selected_bio_tox
+			set_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.616
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.space
+		allow = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+	}
+
+	option = {
+		name = tec_rebalance.616.hum
+		custom_tooltip = tec_rebalance.616.hum.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_bio_portrait
+				NOT = {
+					event_target:tec_temp_bio_leader = {
+						species_portrait = pre_mam13
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = pre_mam13
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = pre_mam13
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_hum
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.616
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.mam
+		custom_tooltip = tec_rebalance.616.mam.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_bio_portrait
+				NOT = {
+					event_target:tec_temp_bio_leader = {
+						species_portrait = pre_mam6
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = pre_mam6
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = pre_mam6
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_mam
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.616
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.rep
+		custom_tooltip = tec_rebalance.616.rep.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_bio_portrait
+				NOT = {
+					event_target:tec_temp_bio_leader = {
+						species_portrait = pre_rep12
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = pre_rep12
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = pre_rep12
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_rep
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.616
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.avi
+		custom_tooltip = tec_rebalance.616.avi.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_bio_portrait
+				NOT = {
+					event_target:tec_temp_bio_leader = {
+						species_portrait = pre_avi12
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = pre_avi12
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = pre_avi12
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_avi
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.616
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.art
+		custom_tooltip = tec_rebalance.616.art.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_bio_portrait
+				NOT = {
+					event_target:tec_temp_bio_leader = {
+						species_portrait = pre_art11
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = pre_art11
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = pre_art11
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_art
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.616
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.mol
+		custom_tooltip = tec_rebalance.616.mol.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_bio_portrait
+				NOT = {
+					event_target:tec_temp_bio_leader = {
+						species_portrait = pre_mol3
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = pre_mol3
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = pre_mol3
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_mol
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.616
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.fun
+		custom_tooltip = tec_rebalance.616.fun.tooltip
+		allow = {
+			hidden_trigger = {
+				has_country_flag = tec_reroll_bio_portrait
+				NOT = {
+					event_target:tec_temp_bio_leader = {
+						species_portrait = pre_fun9
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = pre_fun9
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = pre_fun9
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_fun
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.616
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.pla
+		custom_tooltip = tec_rebalance.616.pla.tooltip
+		allow = {
+			has_plantoids = yes
+			hidden_trigger = {
+				has_country_flag = tec_reroll_bio_portrait
+				NOT = {
+					event_target:tec_temp_bio_leader = {
+						species_portrait = pla11
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = pla11
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = pla11
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_pla
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.616
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.nec
+		custom_tooltip = tec_rebalance.616.nec.tooltip
+		allow = {
+			has_necroids = yes
+			hidden_trigger = {
+				has_country_flag = tec_reroll_bio_portrait
+				NOT = {
+					event_target:tec_temp_bio_leader = {
+						species_portrait = nec1
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = nec1
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = nec1
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_nec
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.616
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.aqu
+		custom_tooltip = tec_rebalance.616.aqu.tooltip
+		allow = {
+			has_aquatics = yes
+			hidden_trigger = {
+				has_country_flag = tec_reroll_bio_portrait
+				NOT = {
+					event_target:tec_temp_bio_leader = {
+						species_portrait = aqu13
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = aqu13
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = aqu13
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_aqu
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.616
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.tox
+		custom_tooltip = tec_rebalance.616.tox.tooltip
+		allow = {
+			has_toxoids = yes
+			hidden_trigger = {
+				has_country_flag = tec_reroll_bio_portrait
+				NOT = {
+					event_target:tec_temp_bio_leader = {
+						species_portrait = tox4
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = tox4
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = tox4
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_tox
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.616
+			}
+		}
+	}
+}
+
+# Bioservant appearance for biocrafters
+country_event = {
+	id = tec_rebalance.617
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_origin = origin_tec_bioservant
+		is_ai = no
+	}
+
+	immediate = {
+		hidden_effect = {
+			# Creates a fake leader
+			random_owned_pop = {
+				limit = {
+					has_trait = trait_tec_bioservant
+				}
+				species = {
+					save_event_target_as = tec_temp_bio
+				}
+			}
+			create_saved_leader = {
+				class = envoy
+				creator = this
+				name = "Backup Portrait"
+				key = "tec_bio_portrait_leader"
+				species = event_target:tec_temp_bio
+			}
+			last_created_leader = {
+				set_leader_flag = tec_temp_bio_portrait_leader
+				save_event_target_as = tec_temp_bio_leader
+			}
+			country_event = {	# customization
+				id = tec_rebalance.618
+			}
+		}
+	}
+}
+country_event = {
+	id = tec_rebalance.618
+	title = "tec_rebalance.616.name"
+
+	desc = {
+		trigger = {
+			is_regular_empire = yes
+		}
+		text = "tec_rebalance.616.desc.regular"
+	}
+
+	desc = {
+		trigger = {
+			is_hive_empire = yes
+		}
+		text = "tec_rebalance.616.desc.hive"
+	}
+
+	desc = {
+		trigger = {
+			is_machine_empire = yes
+		}
+		text = "tec_rebalance.616.desc.machine"
+	}
+
+	diplomatic = yes
+	diplomatic_title = BLANK_STRING
+	is_triggered_only = yes
+
+	picture_event_data = {
+		portrait = event_target:tec_temp_bio_leader
+		room = root
+		planet_background = root.capital_scope
+	}
+
+	immediate = {
+		activate_saved_leader = {
+			key = "tec_bio_portrait_leader"
+			effect = {
+				save_event_target_as = tec_temp_bio_leader
+			}
+		}
+		event_target:tec_temp_bio_leader = {
+			species = {
+				save_event_target_as = tec_temp_bio
+			}
+		}
+	}
+
+	option = {
+		name = tec_rebalance.616.confirm
+		custom_tooltip = tec_rebalance.616.confirm.og.tooltip
+		allow = {
+			hidden_trigger = {
+				NOT = {
+					has_country_flag = tec_reroll_bio_portrait
+				}
+			}
+		}
+		hidden_effect = {
+			remove_country_flag = tec_selected_bio_portrait
+			remove_country_flag = tec_selected_bio_hum
+			remove_country_flag = tec_selected_bio_mam
+			remove_country_flag = tec_selected_bio_rep
+			remove_country_flag = tec_selected_bio_avi
+			remove_country_flag = tec_selected_bio_art
+			remove_country_flag = tec_selected_bio_mol
+			remove_country_flag = tec_selected_bio_fun
+			remove_country_flag = tec_selected_bio_pla
+			remove_country_flag = tec_selected_bio_nec
+			remove_country_flag = tec_selected_bio_aqu
+			remove_country_flag = tec_selected_bio_tox
+
+			if = {
+				limit = { # This prevents multiplayer cheese
+					NOT = {
+						has_country_flag = tec_delivered_bioservant_pop
+					}
+				}
+				set_timed_country_flag = {
+					flag = tec_delivered_bioservant_pop
+					days = 5
+				}
+				every_owned_pop = {
+					limit = {
+						has_trait = trait_mechanical
+					}
+					change_species = event_target:tec_temp_bio_leader
+				}
+			}
+
+			activate_saved_leader = {
+				key = "tec_bio_portrait_leader"
+				add_to_owned = yes
+				effect = {
+					save_event_target_as = tec_kill_leader
+				}
+			}
+			event_target:tec_kill_leader = {
+				kill_leader = {
+					show_notification = no
+				}
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.space
+		allow = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.reroll
+		custom_tooltip = tec_rebalance.616.reroll.tooltip
+		allow = {
+			hidden_trigger = {
+				NOT = {
+					has_country_flag = tec_reroll_bio_portrait
+				}
+			}
+		}
+		hidden_effect = {
+			remove_country_flag = tec_selected_bio_portrait
+			remove_country_flag = tec_selected_bio_hum
+			remove_country_flag = tec_selected_bio_mam
+			remove_country_flag = tec_selected_bio_rep
+			remove_country_flag = tec_selected_bio_avi
+			remove_country_flag = tec_selected_bio_art
+			remove_country_flag = tec_selected_bio_mol
+			remove_country_flag = tec_selected_bio_fun
+			remove_country_flag = tec_selected_bio_pla
+			remove_country_flag = tec_selected_bio_nec
+			remove_country_flag = tec_selected_bio_aqu
+			remove_country_flag = tec_selected_bio_tox
+			set_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.618
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.space
+		allow = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+	}
+
+	option = {
+		name = tec_rebalance.616.hum
+		custom_tooltip = tec_rebalance.616.hum.tooltip
+		allow = {
+			has_country_flag = tec_reroll_bio_portrait
+			NOR = {
+				event_target:tec_temp_bio_leader = {
+					species_portrait = pre_mam13
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = pre_mam13
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = pre_mam13
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_hum
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.618
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.mam
+		custom_tooltip = tec_rebalance.616.mam.tooltip
+		allow = {
+			has_country_flag = tec_reroll_bio_portrait
+			hidden_trigger = {
+				NOR = {
+					event_target:tec_temp_bio_leader = {
+						species_portrait = pre_mam6
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = pre_mam6
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = pre_mam6
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_mam
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.618
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.rep
+		custom_tooltip = tec_rebalance.616.rep.tooltip
+		allow = {
+			has_country_flag = tec_reroll_bio_portrait
+			hidden_trigger = {
+				NOR = {
+					has_country_flag = tec_selected_bio_portrait
+					event_target:tec_temp_bio_leader = {
+						species_portrait = pre_rep12
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = pre_rep12
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = pre_rep12
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_rep
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.618
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.avi
+		custom_tooltip = tec_rebalance.616.avi.tooltip
+		allow = {
+			has_country_flag = tec_reroll_bio_portrait
+			hidden_trigger = {
+				NOR = {
+					has_country_flag = tec_selected_bio_portrait
+					event_target:tec_temp_bio_leader = {
+						species_portrait = pre_avi12
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = pre_avi12
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = pre_avi12
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_avi
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.618
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.art
+		custom_tooltip = tec_rebalance.616.art.tooltip
+		allow = {
+			has_country_flag = tec_reroll_bio_portrait
+			hidden_trigger = {
+				NOR = {
+					has_country_flag = tec_selected_bio_portrait
+					event_target:tec_temp_bio_leader = {
+						species_portrait = pre_art11
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = pre_art11
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = pre_art11
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_art
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.618
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.mol
+		custom_tooltip = tec_rebalance.616.mol.tooltip
+		allow = {
+			has_country_flag = tec_reroll_bio_portrait
+			hidden_trigger = {
+				NOR = {
+					has_country_flag = tec_selected_bio_portrait
+					event_target:tec_temp_bio_leader = {
+						species_portrait = pre_mol3
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = pre_mol3
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = pre_mol3
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_mol
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.618
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.fun
+		custom_tooltip = tec_rebalance.616.fun.tooltip
+		allow = {
+			has_country_flag = tec_reroll_bio_portrait
+			hidden_trigger = {
+				NOR = {
+					has_country_flag = tec_selected_bio_portrait
+					event_target:tec_temp_bio_leader = {
+						species_portrait = pre_fun9
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = pre_fun9
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = pre_fun9
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_fun
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.618
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.pla
+		custom_tooltip = tec_rebalance.616.pla.tooltip
+		allow = {
+			has_plantoids = yes
+			has_country_flag = tec_reroll_bio_portrait
+			hidden_trigger = {
+				NOR = {
+					has_country_flag = tec_selected_bio_portrait
+					event_target:tec_temp_bio_leader = {
+						species_portrait = pla11
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = pla11
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = pla11
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_pla
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.618
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.nec
+		custom_tooltip = tec_rebalance.616.nec.tooltip
+		allow = {
+			has_necroids = yes
+			has_country_flag = tec_reroll_bio_portrait
+			hidden_trigger = {
+				NOR = {
+					has_country_flag = tec_selected_bio_portrait
+					event_target:tec_temp_bio_leader = {
+						species_portrait = nec1
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = nec1
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = nec1
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_nec
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.618
+			}
+		}
+	}
+	option = {
+		name = tec_rebalance.616.tox
+		custom_tooltip = tec_rebalance.616.tox.tooltip
+		allow = {
+			has_toxoids = yes
+			has_country_flag = tec_reroll_bio_portrait
+			hidden_trigger = {
+				NOR = {
+					has_country_flag = tec_selected_bio_portrait
+					event_target:tec_temp_bio_leader = {
+						species_portrait = tox4
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:tec_temp_bio = {
+				change_species_portrait = tox4
+			}
+			event_target:tec_temp_bio_leader = {
+				change_leader_portrait = tox4
+			}
+			set_country_flag = tec_selected_bio_portrait
+			set_country_flag = tec_selected_bio_tox
+			remove_country_flag = tec_reroll_bio_portrait
+			country_event = {
+				id = tec_rebalance.618
+			}
+		}
+	}
+}
+
+# New research and tradition discovered for certain civics
+country_event = {
+	id = tec_rebalance.650
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		tec_gains_influence_with_tech_or_traditions = yes
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				has_valid_civic = civic_tec_hive_pompous
+			}
+			random_list = {
+				33 = {
+					add_resource = {
+						influence = 2
+					}
+				}
+				33 = {
+					add_resource = {
+						influence = 3
+					}
+				}
+	
+				33 = {
+					add_resource = {
+						influence = 4
+					}
+				}
+			}
+		}
+	}
+}
+
+# --------------------- Authority handlers ------------------------ 700
+# AI authority
+country_event = {	# Gamestart
+	id = tec_rebalance.705
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		tec_aiauth_empire = yes
+	}
+
+	immediate = {
+		if = {	# Has robotic species
+			limit = {
+				OR = {
+					has_country_flag = done_first_robot
+					any_galaxy_species = {
+						has_species_flag = mechanical_species@root
+					}
+				}
+			}
+			random_galaxy_species = {
+				limit = {
+					has_species_flag = mechanical_species@root
+				}
+				save_event_target_as = tec_ai_species
+			}
+		}
+		else = {
+			# Creates the robot species
+			tec_create_built_robot_species = yes
+			set_country_flag = done_first_robot
+			random_galaxy_species = {
+				limit = {
+					has_species_flag = mechanical_species@prev
+				}
+				save_event_target_as = tec_ai_species
+			}
+		}
+		# Changes ruler AND governors/envoys - these always change
+			every_owned_leader = {
+				limit = {
+					leader_class = ruler
+				}
+				change_species = event_target:tec_ai_species
+				change_leader_portrait = event_target:tec_ai_species
+				# TO DO ADD SPECIFIC TRAIT 
+				#add_trait = trait_ruler_architectural_sense
+				set_age = 150
+			}
+			every_owned_leader = {
+				limit = {
+					leader_class = governor
+				}
+				# TO DO ADD SPECIFIC TRAIT 
+				change_species = event_target:tec_ai_species
+				set_age = 100
+			}
+			every_pool_leader = {
+				limit = {
+					leader_class = governor
+				}
+				# TO DO ADD SPECIFIC TRAIT 
+				change_species = event_target:tec_ai_species
+				set_age = 100
+			}
+			every_owned_leader = {
+				limit = {
+					leader_class = envoy
+				}
+				change_species = event_target:tec_ai_species
+				set_age = 100
+			}
+			every_pool_leader = {
+				limit = {
+					leader_class = envoy
+				}
+				change_species = event_target:tec_ai_species
+				set_age = 100
+			}
+		# /	
+		# Changes the rest of scientists if suitable
+			if = {
+				limit = {
+					OR = {
+						tec_aiauth_swaps_all_leaders = yes
+						tec_aiauth_swaps_leader_researchers = yes
+					}
+				}
+				every_owned_leader = {
+					limit = {
+						leader_class = scientist
+					}
+					change_species = event_target:tec_ai_species
+					set_age = 100
+				}
+				every_pool_leader = {
+					limit = {
+						leader_class = scientist
+					}
+					change_species = event_target:tec_ai_species
+					set_age = 100
+				}
+			}
+		# /
+		# Changes the rest of admirals/generals if suitable
+			if = {
+				limit = {
+					OR = {
+						tec_aiauth_swaps_all_leaders = yes
+						tec_aiauth_swaps_leaders_militars = yes
+					}
+				}
+				every_owned_leader = {
+					limit = {
+						leader_class = admiral
+					}
+					change_species = event_target:tec_ai_species
+					set_age = 100
+				}
+				every_pool_leader = {
+					limit = {
+						leader_class = admiral
+					}
+					change_species = event_target:tec_ai_species
+					set_age = 100
+				}
+				every_owned_leader = {
+					limit = {
+						leader_class = general
+					}
+					change_species = event_target:tec_ai_species
+					set_age = 100
+				}
+				every_pool_leader = {
+					limit = {
+						leader_class = general
+					}
+					change_species = event_target:tec_ai_species
+					set_age = 100
+				}
+			}
+		# /	
+	}
+}
+
+#country_event = {	# If a empire changes midgame
+
+#country_event = {	# If somehow the main platform dies, is repaired
+
+
+
+# --------------------- Starbase handlers ------------------------ 1200
+# Changes starbase modules when the XXL cannons are researched
+country_event = {
+	id = tec_rebalance.1200
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_technology = tech_tec_sb_xxl_cannons
+	}
+
+	immediate = {
+		every_owned_starbase = {
+			limit = {
+				has_starbase_module = gun_battery
+			}
+			if = {
+				limit = {
+					count_starbase_modules = {
+						count = 1
+						type = gun_battery
+					}
+				}
+				while = {
+					count = 1
+					remove_starbase_module = {
+						module = gun_battery
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_cannons
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 2
+						type = gun_battery
+					}
+				}
+				while = {
+					count = 2
+					remove_starbase_module = {
+						module = gun_battery
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_cannons
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 3
+						type = gun_battery
+					}
+				}
+				while = {
+					count = 3
+					remove_starbase_module = {
+						module = gun_battery
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 3
+					module = tec_starbase_m_xxl_cannons
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 4
+						type = gun_battery
+					}
+				}
+				while = {
+					count = 4
+					remove_starbase_module = {
+						module = gun_battery
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 3
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 4
+					module = tec_starbase_m_xxl_cannons
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 5
+						type = gun_battery
+					}
+				}
+				while = {
+					count = 5
+					remove_starbase_module = {
+						module = gun_battery
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 3
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 4
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 5
+					module = tec_starbase_m_xxl_cannons
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 6
+						type = gun_battery
+					}
+				}
+				while = {
+					count = 6
+					remove_starbase_module = {
+						module = gun_battery
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 3
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 4
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 5
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 6
+					module = tec_starbase_m_xxl_cannons
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 7
+						type = gun_battery
+					}
+				}
+				while = {
+					count = 7
+					remove_starbase_module = {
+						module = gun_battery
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 3
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 4
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 5
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 6
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 7
+					module = tec_starbase_m_xxl_cannons
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 8
+						type = gun_battery
+					}
+				}
+				while = {
+					count = 8
+					remove_starbase_module = {
+						module = gun_battery
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 3
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 4
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 5
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 6
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 7
+					module = tec_starbase_m_xxl_cannons
+				}
+				set_starbase_module = {
+					slot = 8
+					module = tec_starbase_m_xxl_cannons
+				}
+			}
+		}
+	}
+
+}
+
+# Changes starbase modules when the XXL hangars are researched
+country_event = {
+	id = tec_rebalance.1201
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_technology = tech_tec_sb_xxl_hangars
+	}
+
+	immediate = {
+		every_owned_starbase = {
+			limit = {
+				has_starbase_module = hangar_bay
+			}
+			if = {
+				limit = {
+					count_starbase_modules = {
+						count = 1
+						type = hangar_bay
+					}
+				}
+				while = {
+					count = 1
+					remove_starbase_module = {
+						module = hangar_bay
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_hangars
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 2
+						type = hangar_bay
+					}
+				}
+				while = {
+					count = 2
+					remove_starbase_module = {
+						module = hangar_bay
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_hangars
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 3
+						type = hangar_bay
+					}
+				}
+				while = {
+					count = 3
+					remove_starbase_module = {
+						module = hangar_bay
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 3
+					module = tec_starbase_m_xxl_hangars
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 4
+						type = hangar_bay
+					}
+				}
+				while = {
+					count = 4
+					remove_starbase_module = {
+						module = hangar_bay
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 3
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 4
+					module = tec_starbase_m_xxl_hangars
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 5
+						type = hangar_bay
+					}
+				}
+				while = {
+					count = 5
+					remove_starbase_module = {
+						module = hangar_bay
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 3
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 4
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 5
+					module = tec_starbase_m_xxl_hangars
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 6
+						type = hangar_bay
+					}
+				}
+				while = {
+					count = 6
+					remove_starbase_module = {
+						module = hangar_bay
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 3
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 4
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 5
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 6
+					module = tec_starbase_m_xxl_hangars
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 7
+						type = hangar_bay
+					}
+				}
+				while = {
+					count = 7
+					remove_starbase_module = {
+						module = hangar_bay
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 3
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 4
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 5
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 6
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 7
+					module = tec_starbase_m_xxl_hangars
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 8
+						type = hangar_bay
+					}
+				}
+				while = {
+					count = 8
+					remove_starbase_module = {
+						module = hangar_bay
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 3
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 4
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 5
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 6
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 7
+					module = tec_starbase_m_xxl_hangars
+				}
+				set_starbase_module = {
+					slot = 8
+					module = tec_starbase_m_xxl_hangars
+				}
+			}
+		}
+	}
+
+}
+
+# Changes starbase modules when the XXL missiles are researched
+country_event = {
+	id = tec_rebalance.1203
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_technology = tech_tec_sb_xxl_missiles
+	}
+
+	immediate = {
+		every_owned_starbase = {
+			limit = {
+				has_starbase_module = missile_battery
+			}
+			if = {
+				limit = {
+					count_starbase_modules = {
+						count = 1
+						type = missile_battery
+					}
+				}
+				while = {
+					count = 1
+					remove_starbase_module = {
+						module = missile_battery
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_missiles
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 2
+						type = missile_battery
+					}
+				}
+				while = {
+					count = 2
+					remove_starbase_module = {
+						module = missile_battery
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_missiles
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 3
+						type = missile_battery
+					}
+				}
+				while = {
+					count = 3
+					remove_starbase_module = {
+						module = missile_battery
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 3
+					module = tec_starbase_m_xxl_missiles
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 4
+						type = missile_battery
+					}
+				}
+				while = {
+					count = 4
+					remove_starbase_module = {
+						module = missile_battery
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 3
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 4
+					module = tec_starbase_m_xxl_missiles
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 5
+						type = missile_battery
+					}
+				}
+				while = {
+					count = 5
+					remove_starbase_module = {
+						module = missile_battery
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 3
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 4
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 5
+					module = tec_starbase_m_xxl_missiles
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 6
+						type = missile_battery
+					}
+				}
+				while = {
+					count = 6
+					remove_starbase_module = {
+						module = missile_battery
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 3
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 4
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 5
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 6
+					module = tec_starbase_m_xxl_missiles
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 7
+						type = missile_battery
+					}
+				}
+				while = {
+					count = 7
+					remove_starbase_module = {
+						module = missile_battery
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 3
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 4
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 5
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 6
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 7
+					module = tec_starbase_m_xxl_missiles
+				}
+			}
+			else_if = {
+				limit = {
+					count_starbase_modules = {
+						count = 8
+						type = missile_battery
+					}
+				}
+				while = {
+					count = 8
+					remove_starbase_module = {
+						module = missile_battery
+					}
+				}
+				set_starbase_module = {
+					slot = 1
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 2
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 3
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 4
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 5
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 6
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 7
+					module = tec_starbase_m_xxl_missiles
+				}
+				set_starbase_module = {
+					slot = 8
+					module = tec_starbase_m_xxl_missiles
+				}
+			}
+		}
+	}
+
+}
+
+
+
+# -------------------------------------------------------------
+# ORIGIN FIXES
+
+# --------------------- UNSORTED ------------------------ < 10100
+# Void dwellers - fix servitor and assimilator pops 
+country_event = {
+	id = tec_rebalance.10010
+	hide_window = yes
+	fire_only_once = yes
+	trigger = {
+		OR = {
+			has_civic = civic_machine_servitor
+			has_civic = civic_machine_assimilator
+		}
+		has_origin = origin_void_dwellers
+	}
+	immediate = {
+		every_owned_pop = {
+			limit = {
+				NOT = { is_same_species = root }
+				NOT = { pop_has_trait = trait_pc_habitat_preference }
+				OR = { is_organic_species = yes is_lithoid = yes }
+			}
+			modify_species = {
+				species = this
+				ideal_planet_class = pc_habitat
+			}
+		}
+		every_owned_species = {
+			limit = {
+				NOR = {
+					has_trait = trait_cybernetic
+					has_trait = trait_machine_unit
+				}
+				
+			}
+			set_citizenship_type = {
+				type = citizenship_organic_trophy
+			}
+		}
+		every_owned_species = {
+			limit = {
+				has_trait = trait_cybernetic
+			}
+			set_citizenship_type = {
+				type = citizenship_full_machine
+			}
+			set_living_standard = {
+				type = living_standard_hive_mind
+			}
+		}
+	}
+}
+
+# Origin traits
+# Fixes machine organic pops
+country_event = {
+	id = tec_rebalance.10020
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = {
+		is_machine_empire = yes
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				any_owned_species = {
+					OR = {
+						has_trait = trait_tec_machine_biobrain
+						has_trait = trait_tec_machine_biomass	
+					}
+				}
+			}
+			set_country_flag = tec_organic_trait_machines
+			capital_scope = {
+				add_deposit = d_tec_biomass_deposit
+				owner = {
+					give_technology = {
+						tech = tech_eco_simulation
+						message = no
+					}
+					give_technology = {
+						tech = tech_hydroponics
+						message = no
+					}
+				}
+				if = {
+					limit = {
+						uses_district_set = standard
+						owner = {
+							tec_is_aquatic_empire = no
+						}
+					}
+					add_district_and_planet_size_if_needed_effect = {
+						district = district_farming
+					} 
+				}
+			}
+		}
+		if = {
+			limit = {
+				any_owned_species = {
+					has_trait = trait_tec_machine_biomass
+				}
+			}
+			set_country_flag = tec_organic_trait_machines_biomass
+		}
+		if = {
+			limit = {
+				any_owned_species = {
+					has_trait = trait_tec_machine_biobrain
+				}
+			}
+			set_country_flag = tec_organic_trait_machines_biobrain
+		}
+		if = {
+			limit = {
+				any_owned_species = {
+					has_trait = trait_tec_machine_clockwork
+				}
+			}
+			set_country_flag = tec_machine_clockwork
+		}
+	}
+}
+country_event = {	# Fixes compat things with guillis/pd overwriting entire planets
+	id = tec_rebalance.10021
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = {
+		is_machine_empire = yes
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				has_country_flag = tec_organic_trait_machines
+				any_owned_species = {
+					OR = {
+						has_trait = trait_tec_machine_biobrain
+						has_trait = trait_tec_machine_biomass	
+					}
+				}
+				capital_scope = {
+					NOT = {
+						has_deposit = d_tec_biomass_deposit
+					}
+				}
+			}
+			set_country_flag = tec_organic_trait_machines
+			capital_scope = {
+				add_deposit = d_tec_biomass_deposit
+				owner = {
+					give_technology = {
+						tech = tech_eco_simulation
+						message = no
+					}
+					give_technology = {
+						tech = tech_hydroponics
+						message = no
+					}
+				}
+				if = {
+					limit = {
+						uses_district_set = standard
+						owner = {
+							tec_is_aquatic_empire = no
+						}
+					}
+					add_district_and_planet_size_if_needed_effect = {
+						district = district_farming
+					} 
+				}
+			}
+		}
+	}
+}
+
+# Fixes organic pops
+country_event = {
+	id = tec_rebalance.10025
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = {
+		any_owned_species = {
+			OR = {
+				has_trait = trait_tec_metamorphosis
+			}
+		}
+	}
+
+	immediate = {
+		if = { # Metamorphosis - (30% old, 40% juvenile, 30% larval)
+			limit = {
+				any_owned_species = {
+					has_trait = trait_tec_metamorphosis
+				}
+			}
+			every_owned_planet = {
+				limit = {
+					any_owned_species = {
+						has_trait = trait_tec_metamorphosis
+					}
+				}
+				every_owned_pop = {	# Rulers will always be matures
+					limit = {
+						species = {
+							has_trait = trait_tec_metamorphosis
+						}
+						OR = {
+							has_job_category = ruler
+							has_job_category = tec_brood_drone
+							has_job_category = tec_prime_drone
+						}
+					}
+					remove_pop_flag = tec_metamorphosis_phase_0
+					remove_pop_flag = tec_metamorphosis_phase_1
+				}
+				every_owned_pop = {	# Specialists will be phase 1
+					limit = {
+						species = {
+							has_trait = trait_tec_metamorphosis
+						}
+						OR = {
+							has_job_category = specialist
+							has_job_category = complex_drone
+							has_job_category = tec_hedonists
+							has_job_category = bio_trophy
+						}
+					}
+					remove_pop_flag = tec_metamorphosis_phase_0
+				}
+				# Larvas will be phase 0
+				every_owned_pop = {	# Specialists will be phase 1
+					limit = {
+						species = {
+							has_trait = trait_tec_metamorphosis
+						}
+						OR = {
+							has_job_category = worker
+							has_job_category = simple_drone
+							has_job_category = slave
+						}
+					}
+					random = {
+						chance = 50
+						remove_pop_flag = tec_metamorphosis_phase_0
+					}
+				}
+			}
+			set_country_flag = tec_origin_trait_metamorphosis
+		}
+	}
+}
+
+# --------------------- MECHANIST ------------------------ < 10100
+# Automation rebalance
+country_event = {
+	id = tec_rebalance.10050
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = {
+		tec_is_automated_empire = yes
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				is_machine_empire = no
+			}
+			capital_scope = {
+				while = {
+					count = 5
+					random_owned_pop = {
+						limit = {
+							NOT = {
+								has_trait = trait_mechanical
+							}
+						}
+						kill_pop = yes
+					}
+				}
+			}
+		}
+		else = {
+			capital_scope = {
+				while = {
+					count = 5
+					random_owned_pop = {
+						limit = {
+							has_trait = trait_mechanical
+						}
+						kill_pop = yes
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+# --------------------- SHATTERED RING ------------------------ 10100
+#Adds blockers and balance rw districts at start
+country_event = {
+	id = tec_rebalance.10100
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_origin = origin_shattered_ring
+		NOT = {
+			has_country_flag = tec_ringworld_origin
+		}
+	}
+
+	immediate = {
+		set_country_flag = tec_ringworld_origin
+		capital_scope = {
+			solar_system = {
+				every_system_planet = {
+					limit = {
+						is_planet_class = pc_ringworld_habitable
+					}
+					set_planet_entity = {
+						entity = "ringworld_habitable_entity_01_entity"
+						graphical_culture = PREVPREVPREV
+					}
+				}
+				every_system_planet = {
+					limit = {
+						is_planet_class = pc_ringworld_seam
+					}
+					set_planet_entity = {
+						entity = "ringworld_seam_entity_01_entity"
+						graphical_culture = PREVPREVPREV
+					}
+				}
+				every_system_planet = {
+					limit = {
+						is_planet_class = pc_ringworld_tech
+					}
+					set_planet_entity = {
+						entity = "ringworld_tech_entity_01_entity"
+						graphical_culture = PREVPREVPREV
+					}
+				}
+			}
+		}
+	}
+
+}
+
+#First deposit cleared
+planet_event = {
+	id = tec_rebalance.10111
+	hide_window = no
+	title = tec_ringworld_origin_cleared_blocker
+	is_triggered_only = yes
+	show_sound = event_mystic_reveal
+	picture = GFX_evt_fallen_empire
+	
+	trigger = {
+		owner = {
+			has_origin = origin_shattered_ring
+		}
+		
+	}
+
+	desc = {
+		trigger = {
+			owner = {
+				has_origin = origin_shattered_ring
+			}
+		}
+		text = "tec_rw_cleared_blocker_1.a"
+	}
+
+	desc = {
+		trigger = {
+			owner = {
+				NOT = {
+					has_origin = origin_shattered_ring
+				}
+			}
+			
+		}
+		text = "tec_rw_cleared_blocker_1.b"
+	}
+
+
+
+	option = {
+		name = TEC_STILL_WORK_TO_DO
+	}
+}
+
+#Second deposit cleared - Triggers the interloper clearing if conditions are met
+planet_event = {
+	id = tec_rebalance.10112
+	hide_window = no
+	title = tec_ringworld_origin_cleared_all_blockers
+	show_sound = event_mystic_reveal
+	picture = GFX_evt_fallen_empire
+	is_triggered_only = yes
+
+	trigger = {
+		always = yes
+	}
+
+	desc = {
+		trigger = {
+			owner = {
+				has_origin = origin_shattered_ring
+			}
+			
+		}
+		text = "tec_rw_cleared_blocker_2.a"
+	}
+
+	desc = {
+		trigger = {
+			owner = {
+				NOT = {
+					has_origin = origin_shattered_ring
+				}
+			}
+		}
+		text = "tec_rw_cleared_blocker_2.b"
+	}
+
+	
+
+	option = {
+		trigger = {
+			owner = {
+				has_origin = origin_shattered_ring
+			}
+		}
+		name = "TEC_STILL_WORK_TO_DO_REMOVE_INTERLOPER"
+
+		hidden_effect = {
+			root = {
+				solar_system = {
+					random_system_planet = {
+						limit = {
+							is_planet_class = pc_ringworld_seam_damaged
+							has_planet_flag = starting_mining_target
+							has_planet_flag = starting_deposit
+						}
+						save_event_target_as = tec_rw_fix_ring@owner
+						set_planet_flag = tec_rw_fix@root
+					}
+		
+					
+					random_system_planet = {
+						limit = {
+							is_planet_class = pc_shattered_2
+							has_planet_flag = starting_mining_target
+							has_planet_flag = starting_deposit
+						}
+						save_event_target_as = tec_rw_fix_interloper@owner
+						set_planet_flag = tec_rw_fix_interloper@root
+						owner = {
+							enable_special_project = {
+								name = TEC_REMOVE_INTERLOPER
+								owner = prev
+								location = event_target:tec_rw_fix_interloper@owner
+							}
+						}
+					}
+				}
+				
+			}
+			owner = {
+				enable_special_project = {
+					name = TEC_REMOVE_INTERLOPER
+					owner = owner
+					location = event_target:tec_rw_fix_interloper@owner
+				}
+			}
+		}
+		custom_tooltip = "tec_rw_fix_project_available"
+	}
+
+	option = {
+		trigger = {
+			owner = {
+				NOT = {
+					has_origin = origin_shattered_ring	
+				}
+			}
+		}
+		name = EXCELLENT
+	}
+}
+
+# After removing the interloper
+planet_event = {
+	id = tec_rebalance.10120
+	hide_window = no
+	title = tec_ringworld_origin_repaired_interlover
+	show_sound = event_ringworld_build_complete
+	picture = GFX_evt_ringworld
+	is_triggered_only = yes
+
+	desc = {
+		trigger = {
+			owner = {
+				has_origin = origin_shattered_ring
+			}
+		}
+		text = "tec_rw_cleared_interloper_1.a"
+	}
+
+	desc = {
+		trigger = {
+			owner = {
+				NOT = {
+						has_origin = origin_shattered_ring
+				}
+			}
+		}
+		text = "tec_rw_cleared_interloper_1.b"
+	}
+
+	immediate = {
+		this = {
+			solar_system = {
+				#GO
+				#AWAY
+				random_system_planet = {
+					limit = {
+						is_planet_class = pc_ringworld_tech_damaged
+					}
+					remove_planet = yes
+				}
+				random_system_planet = {
+					limit = {
+						is_planet_class = pc_ringworld_tech_damaged
+					}
+					remove_planet = yes
+				}
+				random_system_planet = {
+					limit = {
+						is_planet_class = pc_ringworld_tech_damaged
+					}
+					remove_planet = yes
+				}
+				#GO
+				#AWAY
+				random_system_planet = {
+					limit = {
+						is_planet_class = pc_shattered_2
+						has_planet_flag = starting_mining_target
+						has_planet_flag = starting_deposit
+						has_planet_flag = tec_rw_fix_interloper@root
+					}
+					solar_system = {
+						random_system_planet = {
+							limit = {
+								is_planet_class = pc_ringworld_seam_damaged
+								has_planet_flag = starting_mining_target
+								has_planet_flag = starting_deposit
+								has_planet_flag = tec_rw_fix@root
+							}
+							solar_system = {
+								random_system_planet = {
+									limit = {
+										is_planet_class = pc_ringworld_tech_damaged
+									}
+									remove_planet = yes
+								}
+								random_system_planet = {
+									limit = {
+										is_planet_class = pc_ringworld_seam_damaged
+									}
+									remove_planet = yes
+								}
+								random_system_planet = {
+									limit = {
+										is_planet_class = pc_ringworld_habitable_damaged
+									}
+									remove_planet = yes
+								}
+								spawn_megastructure = {
+									name = "Repairable Damage"
+									type = "ring_world_ruined"
+									owner = this.owner
+									orbit_angle = 90
+									orbit_distance = 45
+									planet = star
+								}
+								while = {
+									count = 3
+									random_system_planet = {
+										limit = {
+											is_planet_class = pc_ringworld_tech_damaged
+										}
+										remove_planet = yes
+									}
+									random_system_planet = {
+										limit = {
+											is_planet_class = pc_ringworld_seam_damaged
+										}
+										remove_planet = yes
+									}
+									
+								}
+								every_system_ambient_object = {
+									limit = {
+										OR = {
+											is_ambient_object_type = large_debris_object
+											is_ambient_object_type = medium_debris_01_object
+											is_ambient_object_type = medium_debris_02_object
+											is_ambient_object_type = small_debris_object
+										}
+									}
+									destroy_ambient_object = this
+								}
+								
+							}
+							while = {
+								count = 2
+								remove_planet = yes
+							}
+						}
+
+						# GO AWAY
+						
+						# GO AWAY 2
+						random_system_planet = {
+							limit = {
+								is_planet_class = pc_ringworld_tech_damaged
+							}
+							remove_planet = yes
+						}
+						random_system_planet = {
+							limit = {
+								is_planet_class = pc_shattered_2
+								has_planet_flag = starting_mining_target
+								has_planet_flag = starting_deposit
+								has_planet_flag = tec_rw_fix_interloper@root
+							}
+							remove_planet = yes
+						}
+						
+						
+					}
+				}
+			}
+			
+		}
+		
+	}
+
+	option = {
+		trigger = {
+			owner = {
+				has_origin = origin_shattered_ring
+			}
+		}
+		name = "TEC_INTERLOPER_REMOVED_RING_FIXED"
+		owner = {
+			add_resource = {
+				unity = 500
+			}
+		}
+	}
+
+	option = {
+		trigger = {
+			NOT = {
+				owner = {
+					has_origin = origin_shattered_ring
+				}
+			}
+		}
+		name = EXCELLENT
+	}
+}
+
+# --------------------- PLANETARY UNIFICATION ------------------------ 10200
+# PU up - Gives a smaller bonus after 10 years
+country_event = {
+	id = tec_rebalance.10210
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			has_origin = origin_default
+		}
+		NOT = {
+			has_country_flag = prosperous_unification_empire
+		}
+	}
+
+	immediate = {
+		set_global_flag = stellarisevolved	# extra set to be sure it's active
+		hidden_effect = {
+			if = {
+				limit = {
+					has_origin = origin_default
+				}
+				set_country_flag = prosperous_unification_empire
+				capital_scope = {
+					planet_event = {
+						id = tec_rebalance.10211
+						days = 3600
+					}
+				}
+			}
+		}
+	}
+}
+
+# PU up - planet event
+planet_event = {
+	id = tec_rebalance.10211
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		owner = {	# if the owner is nuked out... this is out too
+			has_origin = origin_default
+		}
+	}
+
+	immediate = {
+		hidden_effect = {
+			if = {
+				limit = {
+					owner = {
+						is_gestalt = no
+					}
+				}
+				# just in case
+				remove_modifier = pm_tec_prosp_uni_mod 
+				# adds the new one
+				add_modifier = {
+					modifier = pm_tec_prosp_uni_mod_2
+					days = -1
+				}
+			}
+			else = {
+				# just in case
+				remove_modifier = pm_tec_prosp_uni_mod_gestalt
+				# adds the new one
+				add_modifier = {
+					modifier = pm_tec_prosp_uni_mod_gestalt_2
+					days = -1
+				}
+			}
+		}
+	}
+}
+
+
+# --------------------- MACHINE CONSOLIDATION ------------------------ 10300
+#Adds blockers and balance consolidation origin at start
+country_event = {
+	id = tec_rebalance.10310
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_origin = origin_machine
+		NOT = {
+			has_country_flag = tec_consolidation_origin
+		}
+	}
+
+	immediate = {
+		set_country_flag = tec_consolidation_origin
+		capital_scope = {
+			add_deposit = d_tec_machine_rubble_big
+			while = {
+				count = 5
+				add_deposit = d_tec_machine_rubble
+			}
+		}
+	}
+
+}
+
+# --------------------- TEACHERS OF THE SHROUD ------------------------ 10400
+# Gives access to the shroud some time after researching psionic theory
+country_event = {
+	id = tec_rebalance.10410
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_technology = tech_psionic_theory
+		has_origin = origin_shroudwalker_apprentice
+		NOT = {
+			has_country_flag = tec_shroudwalker_shroud_gating
+		}
+	}
+
+	immediate = {
+		hidden_effect = {
+			set_country_flag = tec_shroudwalker_shroud_gating
+			event_target:global_event_country = {
+				change_variable = {
+					which = tec_number_of_psiascended_empires
+					value = 1
+				}
+			}
+			country_event = { id = tec_psionic_path.110 days = 30 random = 20 }
+		}
+	}
+
+}
+
+# --------------------- SYNCRETIC EVOLUTION ------------------------ 10500
+# Handles starting conditions
+country_event = {
+	id = tec_rebalance.10510
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_origin = origin_syncretic_evolution
+	}
+
+	immediate = {
+		hidden_effect = {
+			owner_main_species = {
+				save_event_target_as = tec_sync_main_species
+			}
+			random_owned_species = {
+				limit = {
+					NOT = {
+						is_same_value = event_target:tec_elder_species
+					}
+				}
+				save_event_target_as = tec_sync_secondary_species
+			}
+			if = {
+				limit = {
+					is_hive_empire = yes
+				}
+				event_target:tec_sync_secondary_species = {
+					modify_species = {
+						species = this
+						add_trait = trait_hive_mind
+						add_traits_at_start_of_list = yes
+						change_scoped_species = no
+						effect = {
+							set_species_flag = syncretic_species@root.owner
+							save_event_target_as = tec_sync_secondary_new_species
+							set_citizenship_type = {
+								country = root.owner
+								type = citizenship_full
+							}
+							set_living_standard = {
+								country = root.owner
+								type = living_standard_hive_mind
+							}
+						}
+					}
+				}
+				every_owned_pop = {
+					limit = {
+						species = {
+							is_same_species = event_target:tec_sync_secondary_species
+						}
+					}
+					change_species = event_target:tec_sync_secondary_new_species
+				}
+			}
+
+			if = {
+				limit = {
+					has_valid_civic = civic_tec_se_elders
+				}
+				event_target:tec_sync_main_species = {
+					set_species_flag = tec_elder_species_@root
+				}
+				event_target:tec_sync_secondary_species = {
+					if = {
+						limit = {
+							has_trait = trait_syncretic_proles
+						}
+						modify_species = {
+							remove_trait = trait_syncretic_proles
+							effect = {
+								set_species_flag = tec_elevated_species_@root
+								save_event_target_as = tec_sync_secondary_new_species
+							}
+						}
+						every_owned_pop = {
+							limit = {
+								species = {
+									is_same_species = event_target:tec_sync_secondary_species
+								}
+							}
+							change_species = event_target:tec_sync_secondary_new_species
+						}
+					}
+					else = {
+						set_species_flag = tec_elevated_species_@root
+					}
+				}
+			}
+		}
+	}
+
+}
+
+# --------------------- ORIGIN CIVIC CONDITIONS ------------------------ 50000
+# --------- Postapoc Wastelanders - 50100
+# Adds all the conditions
+country_event = {
+	id = tec_rebalance.50110
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		tec_is_wastelander_empire = yes
+	}
+
+	immediate = {
+		set_country_flag = tec_wastelander_origin
+		capital_scope = {
+			# +- 2 jobs
+			add_building = building_tec_scavenge_center
+			remove_district = district_mining
+
+			# Adds the ruins and deposits
+			add_building = building_tec_ruined_civillian
+			add_building = building_tec_ruined_industry
+			add_building = building_tec_ruined_science
+
+			add_deposit = d_tec_ruined_civillian
+			add_deposit = d_tec_ruined_industry
+			add_deposit = d_tec_ruined_science
+		}
+	}
+}
+
+	# Deposit being cleared
+planet_event = {
+	id = tec_rebalance.50111
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		last_building_changed = building_tec_scavenged_science_dummy
+	}
+
+	immediate = {
+		remove_deposit = d_tec_ruined_science
+		add_building = building_tec_scavenged_science
+		remove_building = building_tec_scavenged_science_dummy
+	}
+}
+
+planet_event = {
+	id = tec_rebalance.50112
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		last_building_changed = building_tec_scavenged_industry_dummy
+	}
+
+	immediate = {
+		remove_deposit = d_tec_ruined_industry
+		add_building = building_tec_scavenged_industry
+		remove_building = building_tec_scavenged_industry_dummy
+	}
+}
+
+planet_event = {
+	id = tec_rebalance.50113
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		last_building_changed = building_tec_scavenged_civillian_dummy
+	}
+
+	immediate = {
+		remove_deposit = d_tec_ruined_civillian
+		add_building = building_tec_scavenged_civillian
+		remove_building = building_tec_scavenged_civillian_dummy
+	}
+}
+
+
+
+# Fixes for ongoing games 
+namespace = tec_fix
+
+country_event = {	# Fixes to missing flags - on country yearly pulse
+	id = tec_fix.10
+	hide_window = yes
+	is_triggered_only = yes
+	
+	trigger = {
+		OR = {
+			# Fixed gene ascension not working
+				AND = {
+					has_country_flag = tec_genetics_t2_completed
+					NOT = {
+						has_country_flag = tec_biological_assimilation
+					}
+				}
+			# /
+			# Fixed X
+				#AND = {
+				#	has_country_flag = tec_genetics_t2_completed
+				#	NOT = {
+				#		has_country_flag = tec_biological_assimilation
+				#	}
+				#}
+			# /
+
+		}
+	
+	}
+	
+	immediate = {
+		# Fixed gene ascension not working
+			if = {
+				limit = {
+					has_country_flag = tec_genetics_t2_completed
+					NOT = { has_country_flag = tec_biological_assimilation }
+				}
+				set_country_flag = tec_biological_assimilation
+			}
+		# /
+	}
+}
+
+event = {	# Antiearly unemployment - on 
+	id = tec_fix.20
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		every_playable_country = {
+			add_modifier = {
+				modifier = modifier_tec_unemployment_fix
+				months = 1
+			}
+		}
+	}
+}

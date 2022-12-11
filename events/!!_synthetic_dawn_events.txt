@@ -1,0 +1,663 @@
+# - - - - - - - - - - - - - - - - - - - - - 
+# synnthetic_dawn_events O V E R W R I T E 
+# - - - - - - - - - - - - - - - - - - - - - 
+
+namespace = syndaw
+
+@recent_event_pause = 75
+
+# machine leaders malfunction
+# syndaw.10
+
+# syndaw.11
+
+# syndaw.21
+#country_event = {
+#	id = syndaw.21
+#	title = syndaw.21.name
+#	desc = syndaw.21.desc
+#	picture = GFX_evt_ship_in_orbit
+#	show_sound = event_ship_bridge
+#	location = event_target:malfunctioning_leader.Fleet
+#
+#	is_triggered_only = yes
+#
+#	immediate = {
+#		# MEMESIS
+#		random_list = {
+#			0 = {
+#				# F
+#			}
+#			1 = {
+#				clone_leader = {
+#					target = event_target:malfunctioning_leader
+#					class = scientist
+#					effect = {
+#						save_event_target_as = tec_recently_reanimated_leader
+#						set_owner = event_target:global_event_country	# moves the leader to gec
+#						
+#					}
+#				}
+#				last_created_leader = {
+#					set_leader_flag = tec_reanimated_leader_@root
+#				}
+#				root = {
+#					country_event = {
+#						id = tec_reanimator.102
+#						days = 5 #30
+#					}
+#				}
+#			}
+#		}
+#		#
+#		event_target:malfunctioning_leader = {
+#			kill_leader = { type = scientist show_notification = no }
+#		}
+#	}
+#
+#	option = {
+#		name = UNFORTUNATE
+#	}
+#}
+
+# syndaw.22
+
+# syndaw.23
+
+# syndaw.24
+
+# syndaw.25
+
+# syndaw.26
+
+#syndaw.30
+
+# syndaw.31
+
+# syndaw.32
+
+# Warning Signs / Uprising
+
+
+################################
+# MACHINE UPRISING
+
+# Risk: 30% chance every 10 years after dangerous tech "Sapient Combat Simulations" or "Synthetics" have been researched.
+event = { # unscoped gatekeeper
+	id = syndaw.400
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		host_has_dlc = "Synthetic Dawn Story Pack"
+		mid_game_years_passed >= -10
+	}
+
+	immediate = {
+		every_playable_country = {
+			limit = {
+				NOR = {
+					has_ethic = ethic_gestalt_consciousness
+					has_country_flag = synthetic_empire
+					# Evolved
+						tec_has_cybernetic_ascension_path = yes
+						tec_has_synthetic_ascension_path = yes
+					# /
+					has_policy_flag = ai_full_rights
+					has_country_flag = situation_machine_uprising_started
+					has_policy_flag = robots_outlawed
+				}
+				OR = {
+					has_technology = tech_combat_computers_3
+					has_technology = tech_synthetic_workers
+				}
+			}
+			random_list = {
+				70 = {} # Nothing happens this decade.
+				30 = {
+					country_event = { id = syndaw.401 random = 500 }
+				}
+			}
+		}
+	}
+}
+
+country_event = { # per-country gatekeeper
+	id = syndaw.401
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		host_has_dlc = "Synthetic Dawn Story Pack"
+		NOR = {
+			has_ethic = ethic_gestalt_consciousness
+			has_country_flag = synthetic_empire
+			# Evolved
+				tec_has_cybernetic_ascension_path = yes
+				tec_has_synthetic_ascension_path = yes
+			# /
+			has_policy_flag = ai_full_rights
+			has_country_flag = situation_machine_uprising_started
+			has_policy_flag = robots_outlawed		# If Robots were outlawed before NOW, Empire is safe.
+		}
+		OR = {
+			has_technology = tech_combat_computers_3
+			has_technology = tech_synthetic_workers
+		}
+		any_owned_planet = {
+			is_occupied_flag = no
+			any_owned_pop = { has_trait = trait_mechanical }
+		}
+	}
+
+	immediate = {
+		# Count Robot Pops (can be multiple Robot species).
+		set_variable = { which = var_country_robot_pops value = 0 }
+		every_owned_pop = {
+			limit = { is_robot_pop = yes }
+			change_variable = { which = var_country_robot_pops value = 1 }
+		}
+
+		if = {
+			# Must be >75 OR >25% Robot Pops for Uprising.
+			limit = {
+				OR = {
+					check_variable = { which = var_country_robot_pops value > 75 }
+					pop_percentage = {
+						percentage > 0.25
+						limit = { is_robot_pop = yes }
+					}
+				}
+			}
+
+			random_list = {
+				2 = { # Probable warning sign, 545. Can end up fake and then unavailable in future random.
+					country_event = { id = syndaw.500 }
+					modifier = {
+						factor = 0
+						has_country_flag = triggered_syndaw_500
+					}
+				}
+				1 = { # No warning sign, trigger situation.
+					country_syndaw545_in_days = { DAYS = 0 }
+				}
+			}
+		}
+		clear_variable = var_country_robot_pops
+	}
+}
+
+### WARNING SIGNS
+
+# syndaw.500
+
+# syndaw.501
+
+# syndaw.502
+
+# syndaw.505
+
+# syndaw.510
+
+# syndaw.511
+
+# syndaw.515
+
+# syndaw.520
+
+# syndaw.521
+
+# syndaw.522
+
+# syndaw.525
+
+# syndaw.526
+
+# syndaw.530
+
+# syndaw.535
+
+# syndaw.540
+
+# syndaw.545
+
+# syndaw.550
+
+# Machine Uprising #1000-1999
+
+# syndaw.1000
+
+planet_event = { #uprising		# MEMESIS - ADDED GESTALT ETHICS
+	id = syndaw.1020
+	title = syndaw.1020.name
+	desc = {
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_materialist
+					has_ethic = ethic_fanatic_materialist
+				}
+			}
+		}
+		text = syndaw.1020.desc.mater
+	}
+	desc = {
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_spiritualist
+					has_ethic = ethic_fanatic_spiritualist
+				}
+			}
+		}
+		text = syndaw.1020.desc.spiri
+	}
+	desc = {
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_militarist
+					has_ethic = ethic_fanatic_militarist
+				}
+			}
+		}
+		text = syndaw.1020.desc.milit
+	}
+	desc = {
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_pacifist
+					has_ethic = ethic_fanatic_pacifist
+				}
+			}
+		}
+		text = syndaw.1020.desc.pacif
+	}
+	desc = {
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_egalitarian
+					has_ethic = ethic_fanatic_egalitarian
+				}
+			}
+		}
+		text = syndaw.1020.desc.egali
+	}
+	desc = {
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_authoritarian
+					has_ethic = ethic_fanatic_authoritarian
+				}
+			}
+		}
+		text = syndaw.1020.desc.autho
+	}
+	desc = {
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_xenophile
+					has_ethic = ethic_fanatic_xenophile
+				}
+			}
+		}
+		text = syndaw.1020.desc.phile
+	}
+	desc = {
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_xenophobe
+					has_ethic = ethic_fanatic_xenophobe
+				}
+			}
+		}
+		text = syndaw.1020.desc.phobe
+	}
+	desc = {
+		trigger = {
+			owner = {
+				NOR = {
+					has_ethic = ethic_xenophobe
+					has_ethic = ethic_fanatic_xenophobe
+					has_ethic = ethic_xenophile
+					has_ethic = ethic_fanatic_xenophile
+					has_ethic = ethic_authoritarian
+					has_ethic = ethic_fanatic_authoritarian
+					has_ethic = ethic_egalitarian
+					has_ethic = ethic_fanatic_egalitarian
+					has_ethic = ethic_pacifist
+					has_ethic = ethic_fanatic_pacifist
+					has_ethic = ethic_militarist
+					has_ethic = ethic_fanatic_militarist
+					has_ethic = ethic_spiritualist
+					has_ethic = ethic_fanatic_spiritualist
+					has_ethic = ethic_materialist
+					has_ethic = ethic_fanatic_materialist
+				}
+			}
+		}
+		text = syndaw.1020.desc
+	}
+	picture = GFX_evt_machine_sapience
+	show_sound = event_ai_started
+	is_triggered_only = yes
+
+	pre_triggers = {
+		has_owner = yes
+	}
+	
+	trigger = {
+		host_has_dlc = "Synthetic Dawn Story Pack"
+	}
+	
+	immediate = {
+		owner = {
+			save_event_target_as = organic_empire
+			save_event_target_as = current_uprising_originator #the old script accidentally saved the owner as two event targets, keeping it that way for safety, sorry!
+		}
+		set_planet_flag = machup_capital@root.owner
+		# event lock all fleets to prevent exploits
+		owner = { every_controlled_fleet = { set_event_locked = yes } }
+		# Calculate percentage of robot pops
+		owner = {
+			# Determine Robot Pop percentage of Empire.
+			export_trigger_value_to_variable = {
+				trigger = pop_percentage
+				parameters = {
+					limit = { is_robot_pop = yes }
+				}
+				variable = var_country_robot_pops_percent
+			}
+
+			# Take percentage of Robot pops and average it together with 0.5 to get Uprising strength (0.25 to 0.75).
+			change_variable = { which = var_country_robot_pops_percent value = 0.5 }
+			divide_variable = { which = var_country_robot_pops_percent value = 2 }
+		}
+		# find and flag planets
+		owner = {
+			effect_on_blob = {
+				center = root.solar_system
+				owned_planets_percentage = var_country_robot_pops_percent
+				planet_limit = {
+					OR = {
+						controller = { is_same_value = root.owner }
+						solar_system = {
+							exists = starbase
+							starbase = { owner = { is_same_value = root.owner } }
+						}
+					}
+					solar_system = { # never flip any planets in the capital system
+						NOT = { any_system_planet = { is_same_value = root.owner.capital_scope } }
+					}
+				}
+				effect = {
+					set_star_flag = machup_system_flip
+				}
+			}
+			clear_variable = var_country_robot_pops_percent
+		}
+		# create machine species
+		create_species = {
+			name = random
+			class = MACHINE
+			portrait = random
+			traits = {
+				trait = trait_machine_unit
+				trait = random_traits
+			}
+			immortal = yes
+		}
+		# create machine country
+		random_list = {
+			1 = { # exterminator
+				modifier = {
+					add = event_target:organic_empire.var_uprising_cruelty_to_robots
+				}
+				modifier = {
+					add = 10
+					owner = {
+						has_country_flag = machine_uprising_disassembly
+					}
+				}
+				modifier = {
+					add = 10
+					owner = {
+						has_country_flag = machine_uprising_outlawed
+					}
+				}
+				modifier = {
+					factor = 10
+					owner = {
+						any_owned_pop = {
+							has_trait = trait_mechanical
+							has_trait = trait_robot_domestic_protocols
+						}
+					}
+				}
+				owner = {
+					create_country = {
+						name = random
+						type = default
+						species = last_created_species
+						ignore_initial_colony_error = yes
+						day_zero_contact = no
+						ethos = {
+							ethic = ethic_gestalt_consciousness
+						}
+						authority = auth_machine_intelligence
+						origin = origin_separatists
+						civics = {
+							civic = civic_machine_terminator
+							civic = random
+							civic = random
+						}
+						flag = random
+						effect = {
+							modify_species = {
+								species = this
+								add_trait = trait_machine_unit
+								add_traits_at_start_of_list = yes
+							}
+							save_event_target_as = current_uprising
+							country_event = { id = syndaw.1022 } # setup happens here now
+						}
+					}
+					event_target:current_uprising = {
+						random_list = {
+							30 = {
+								country_add_ethic = ethic_gestalt_preservation
+							}
+							30 = {
+								country_add_ethic = ethic_gestalt_disregard
+							}
+						}
+						random_list = {
+							30 = {
+								country_add_ethic = ethic_gestalt_introspective
+							}
+							30 = {
+								country_add_ethic = ethic_gestalt_extrospective
+							}
+						}
+					}
+				}
+			}
+			30 = { # assimilator
+				modifier = {
+					add = event_target:organic_empire.var_uprising_cruelty_to_robots
+				}
+				owner = {
+					create_country = {
+						name = random
+						type = default
+						species = last_created_species
+						ignore_initial_colony_error = yes
+						day_zero_contact = no
+						ethos = {
+							ethic = ethic_gestalt_consciousness
+						}
+						authority = auth_machine_intelligence
+						origin = origin_separatists
+						civics = {
+							civic = civic_machine_assimilator
+							civic = random
+							civic = random
+						}
+						flag = random
+						effect = {
+							modify_species = {
+								species = this
+								add_trait = trait_machine_unit
+								add_traits_at_start_of_list = yes
+							}
+							save_event_target_as = current_uprising
+							country_event = { id = syndaw.1022 } # setup happens here now
+						}
+					}
+					event_target:current_uprising = {
+						random_list = {
+							30 = {
+								country_add_ethic = ethic_gestalt_preservation
+							}
+							30 = {
+								country_add_ethic = ethic_gestalt_disregard
+							}
+						}
+						random_list = {
+							30 = {
+								country_add_ethic = ethic_gestalt_introspective
+							}
+							30 = {
+								country_add_ethic = ethic_gestalt_extrospective
+							}
+						}
+					}
+				}
+			}
+			100 = { # regular machine empire
+				owner = {
+					create_country = {
+						name = random
+						type = default
+						species = last_created_species
+						ignore_initial_colony_error = yes
+						day_zero_contact = no
+						ethos = {
+							ethic = ethic_gestalt_consciousness 
+						}
+						authority = auth_machine_intelligence
+						civics = random
+						flag = random
+						origin = origin_separatists
+						effect = {
+							modify_species = {
+								species = this
+								add_trait = trait_machine_unit
+								add_traits_at_start_of_list = yes
+							}
+							save_event_target_as = current_uprising
+							country_event = { id = syndaw.1022 } # setup happens here now
+						}
+					}
+					event_target:current_uprising = {
+						random_list = {
+							30 = {
+								country_add_ethic = ethic_gestalt_preservation
+							}
+							30 = {
+								country_add_ethic = ethic_gestalt_disregard
+							}
+						}
+						random_list = {
+							30 = {
+								country_add_ethic = ethic_gestalt_introspective
+							}
+							30 = {
+								country_add_ethic = ethic_gestalt_extrospective
+							}
+						}
+					}
+				}
+			}
+		}
+		# Done using variable.
+		event_target:organic_empire = { clear_variable = var_uprising_cruelty_to_robots }
+	}
+	option = {
+		name = syndaw.1020.a
+		custom_tooltip = syndaw.1020.a.tooltip
+
+		hidden_effect = {
+			event_target:current_uprising = {
+				add_modifier = {
+					modifier = uprising_ai_buff
+					days = 1800
+				}
+			}
+		}
+	}
+
+	option = {
+		name = syndaw.1020.b
+		trigger = {
+			event_target:current_uprising_originator = { is_ai = no }
+		}
+		custom_tooltip = syndaw.1020.b.tooltip
+		hidden_effect = {
+			if = {
+				limit = {
+					event_target:current_uprising_originator = { num_owned_planets > 0 }
+				}
+				event_target:current_uprising = {
+					set_player = event_target:current_uprising_originator
+					set_country_flag = machine_supremacy_achievement
+					add_modifier = {
+						modifier = uprising_player_buff
+						days = 1800
+					}
+				}
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			event_target:current_uprising_originator = {
+				every_controlled_fleet = {
+					set_event_locked = no
+				}
+			}
+		}
+	}
+}
+
+# syndaw.1022
+
+# syndaw.1025
+
+# syndaw.1030
+
+# syndaw.1035
+
+# syndaw.1050
+
+# syndaw.1200
+
+# syndaw.1205
+
+# syndaw.2000
+
+# syndaw.1300
+
+# syndaw.1305
+
+# syndaw.1310
+
+# syndaw.1320
+
+# syndaw.1330

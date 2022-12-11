@@ -1,0 +1,630 @@
+# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
+# Peaceful Prosperity Faction
+# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
+
+prosperity = {
+	election_header = "GFX_faction_header_yellow"
+	guiding_ethic = ethic_pacifist
+	
+	unique = yes
+	support_multiplier = 1
+	
+	resources = {
+		category = pop_factions
+		produces = {
+			unity = @tec_fac_infl_produce
+		}
+		produces = {	# Political virtue
+			trigger = {
+				owner = {
+					has_valid_civic = civic_tec_political_virtue
+				}
+				faction_approval >= 0.5
+			}
+			consumer_goods = 0.25
+		}
+		produces = {	# Political virtue
+			trigger = {
+				owner = {
+					has_valid_civic = civic_tec_political_virtue
+					is_pacifist = yes
+				}
+				faction_approval >= 0.5
+			}
+			consumer_goods = 0.05
+		}
+		produces = {	# Idealistic foundation
+			trigger = {
+				owner = {
+					has_valid_civic = civic_idealistic_foundation
+				}
+			}
+			influence = 0.005
+		}
+	}
+
+	#Note: number of potential or actual members is checked by POP_FACTION_MIN_POTENTIAL_MEMBERS define
+	is_potential = {
+		is_faction_allowed = yes
+	}
+
+	parameters = {
+		empire = {
+			type = country
+			valid_objects = {
+				is_same_value = root
+			}
+		}
+	}
+
+	can_join_pre_triggers = {
+		is_enslaved = no
+		is_being_purged = no
+	}
+
+	can_join_faction = {
+		is_shackled_robot = no
+		is_shackled_bioservant = no
+		tec_has_stapled_trait = no
+	}
+	
+	attraction = {
+		base = 100
+		
+		modifier = {
+			factor = 1.25
+			exists = from
+			from = {
+				exists = leader
+				leader = { leader_class = ruler }
+			}
+		}
+		
+		modifier = {
+			factor = 0.75
+			exists = from
+			from = {
+				NOT = { exists = leader }
+			}
+		}
+		
+		modifier = {
+			factor = 1.5
+			
+			OR = {
+				has_ethic = ethic_pacifist
+				has_ethic = ethic_fanatic_pacifist
+			}
+		}
+		
+		# Should really check for citizenship instead
+		modifier = {
+			factor = 1.25
+			NOT = { is_same_species = owner_species }
+		}
+	}
+	
+	leader = {
+		base = 100
+		
+		modifier = {
+			factor = 0.0
+			OR = {
+				leader_class = admiral
+				leader_class = general
+			}
+		}
+		
+		modifier = {
+			factor = 0.0
+			is_event_leader = yes
+		}
+	}
+	
+	demand = {
+		title = "FACTION_OUTRAGED_GC"
+		unfulfilled_title = "FACTION_OUTRAGED_GC"
+		desc = "FACTION_OUTRAGED_GC_DESC"
+
+		fulfilled_effect = -20
+		unfulfilled_effect = 0
+
+		potential = {
+			exists = owner
+			owner = {
+				has_country_flag = faction_pacifist_outraged_gc
+			}
+		}
+
+		trigger = {
+			owner = {
+				has_country_flag = faction_pacifist_outraged_gc
+			}
+		}
+	}
+
+	# Evolved: List of demands
+		# Prosperity wants peace, harmony and development
+		# Positives (only pos)
+			# 
+		# Neutral (pos and negs)
+			# 
+		# Negatives (only negs)
+			# 
+	# /
+
+	# ----------------------- D E M A N D S -----------------------
+		# Pos scaling
+
+		# /
+		# Pos
+			demand = {	# POS - 5000 EC
+				title = "PROSPERITY_LIQUIDITY"
+				unfulfilled_title = "PROSPERITY_NO_LIQUIDITY"
+				desc = "PROSPERITY_LIQUIDITY_DESC"
+
+				fulfilled_effect = 10
+				unfulfilled_effect = 0
+
+				potential = { # TODO get a reasonable trigger for counting colonies?
+					exists = owner
+					owner = {
+						any_owned_planet = {
+							NOT = { is_same_value = root.capital_scope }
+							root = {
+								owner = {
+									any_owned_planet = {
+										NOR = {
+											is_same_value = prevprevprev
+											is_same_value = root.owner.capital_scope
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				trigger = {
+					owner = { resource_stockpile_compare = { resource = energy value >= 5000 } }
+				}
+			}
+			demand = {	# POS - MERCANTILE STANCE
+				title = "MERCANTILE_DIPLO_STANCE"
+				unfulfilled_title = "MERCANTILE_DIPLO_STANCE"
+				desc = "MERCANTILE_DIPLO_STANCE_DESC"
+				fulfilled_effect = 10
+				unfulfilled_effect = 0
+				potential = {
+					exists = owner
+					owner = {
+						is_homicidal = no
+						tec_is_default_country = yes
+						has_policy_flag = diplo_stance_mercantile
+					}
+				}
+				trigger = {
+					owner = {
+						has_policy_flag = diplo_stance_mercantile
+					}
+				}
+			}
+			demand = {	# POS - ARCANE PEACEFUL
+				title = "PROSPERITY_PEACEFUL_APPLICATIONS"
+				unfulfilled_title = "PROSPERITY_NO_PEACEFUL_APPLICATIONS"
+				desc = "PROSPERITY_PEACEFUL_APPLICATIONS_DESC"
+
+				fulfilled_effect = 5
+				unfulfilled_effect = 0
+
+				potential = {
+					exists = owner
+					owner = {
+						host_has_dlc = "Ancient Relics Story Pack"
+						has_technology = tech_arcane_deciphering
+						OR = {
+							has_modifier = artifact_find_peaceful_application_happy_bios
+							has_modifier = artifact_find_peaceful_application_consumer_goods
+							has_modifier = artifact_find_peaceful_application_amenities
+							has_modifier = artifact_find_peaceful_application_leader_improvement
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						OR = {
+							has_modifier = artifact_find_peaceful_application_happy_bios
+							has_modifier = artifact_find_peaceful_application_consumer_goods
+							has_modifier = artifact_find_peaceful_application_amenities
+							has_modifier = artifact_find_peaceful_application_leader_improvement
+						}
+					}
+				}
+			}
+			
+		# /
+
+		# Neut
+			demand = { 	# NEUT - NO WARS PHY
+				title = "PROSPERITY_PHILOSOPHY"
+				unfulfilled_title = "PROSPERITY_NO_PHILOSOPHY"
+				desc = "PROSPERITY_PHILOSOPHY_DESC"
+				fulfilled_effect = 10
+				unfulfilled_effect = -10
+				potential = {
+					exists = owner
+					owner = {
+						any_relation = {
+							has_communications = root.owner
+							tec_is_default_country = yes
+							NOT = { exists = overlord }
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						has_policy_flag = no_wars
+					}
+				}
+			}
+			demand = {	# NEUT - PEACE
+				title = "PROSPERITY_PEACE"
+				unfulfilled_title = "PROSPERITY_NO_PEACE"
+				desc = "PROSPERITY_PEACE_DESC"
+				fulfilled_effect = 5
+				unfulfilled_effect = -10
+				potential = {
+					exists = owner
+				}
+				trigger = {
+					owner = {
+						is_at_war = no
+					}
+				}
+			}
+		# /
+
+		# Bad
+			demand = {	# NEG - NO AGGRO
+				title = "PROSPERITY_NOT_AGGRESSOR"
+				unfulfilled_title = "PROSPERITY_AGGRESSOR"
+				desc = "PROSPERITY_NOT_AGGRESSOR_DESC"
+				unfulfilled_effect = -30
+				fulfilled_effect = 0
+				potential = {
+					exists = owner
+					owner = {
+						num_communications > 2
+					}
+				}
+				trigger = {
+					owner = {
+						NOR = {
+							has_country_flag = entered_war_as_attacker
+							any_war = { is_war_participant = { who = prev side = attackers } }
+						}
+					}
+				}
+			}
+			demand = {	# NEG - ARCANE MILITARY
+				title = "PROSPERITY_MILITARY_APPLICATIONS"
+				unfulfilled_title = "PROSPERITY_NO_MILITARY_APPLICATIONS"
+				desc = "PROSPERITY_MILITARY_APPLICATIONS_DESC"
+
+				unfulfilled_effect = -5
+				fulfilled_effect = 0
+
+				potential = {
+					exists = owner
+					owner = {
+						host_has_dlc = "Ancient Relics Story Pack"
+						has_technology = tech_arcane_deciphering
+						OR = {
+							has_modifier = artifact_find_military_application_army
+							has_modifier = artifact_find_military_application_shield_damage
+							has_modifier = artifact_find_military_application_armor_damage
+						}
+					}
+				}
+
+				trigger = {
+					owner = {
+						NOR = {
+							has_modifier = artifact_find_military_application_army
+							has_modifier = artifact_find_military_application_shield_damage
+							has_modifier = artifact_find_military_application_armor_damage
+						}
+					}
+				}
+			}
+			demand = {	# NEG - AGGR STANCE
+				title = "AGGRESSIVE_DIPLO_STANCE"
+				unfulfilled_title = "AGGRESSIVE_DIPLO_STANCE"
+				desc = "AGGRESSIVE_DIPLO_STANCE_DESC"
+				fulfilled_effect = 0
+				unfulfilled_effect = -10
+				potential = {
+					exists = owner
+					owner = {
+						is_homicidal = no
+						tec_is_default_country = yes
+						OR = {
+							has_policy_flag = diplo_stance_belligerent
+							has_policy_flag = diplo_stance_supremacist
+						}
+					}
+				}
+				trigger = {
+					owner = {
+						NOR = {
+							has_policy_flag = diplo_stance_belligerent
+							has_policy_flag = diplo_stance_supremacist
+						}
+					}
+				}
+			}
+			demand = {	# NEG - MIL FED
+				title = PROSPERITY_FEDERATION
+				unfulfilled_title = PROSPERITY_FEDERATION_NOT_MILITARIST
+				desc = PROSPERITY_FEDERATION_DESC
+		
+				unfulfilled_effect = -10
+				fulfilled_effect = 0.001
+		
+				potential = {
+					exists = owner.federation
+					owner.federation = { has_federation_type = military_federation }
+				}
+		
+				trigger = {
+					OR = {
+						NOT = { exists = owner.federation }
+						owner.federation = {
+							NOT = { has_federation_type = military_federation }
+						}
+					}
+				}
+			}
+		
+		# /
+		demand = {	# NEG - FACTION NEGATIVE ECONOMY
+			title = "TEC_FACTION_NO_NEGATIVE_ECONOMY"
+			unfulfilled_title = "TEC_FACTION_BAD_ECONOMY"
+			desc = "TEC_FACTION_NO_NEGATIVE_ECONOMY_DESC"
+			fulfilled_effect = 0
+			unfulfilled_effect = -10
+			potential = {
+				exists = owner
+			}
+			trigger = {
+				owner = {
+					NOR = {
+						has_modifier = energy_deficit
+						has_modifier = minerals_deficit
+						has_modifier = food_deficit
+						has_modifier = alloys_deficit
+						has_modifier = minerals_deficit
+						#has_modifier = unity_deficit
+						has_modifier = consumer_goods_deficit
+						has_modifier = volatile_motes_deficit
+						has_modifier = exotic_gases_deficit
+						has_modifier = rare_crystals_deficit
+						has_modifier = nanites_deficit
+						#has_modifier = living_metal_deficit
+						#has_modifier = sr_zro_deficit
+					}
+				}
+			}
+		}
+	# /
+
+	on_create = {
+		pop_faction_event = { id = factions.1 }
+	}
+	
+	on_destroy = {
+		if = {
+			limit = {
+				has_modifier = promoted_pacifist
+			}
+			remove_modifier = promoted_pacifist
+		}
+		if = {
+			limit = {
+				has_modifier = suppressed_pacifist
+			}
+			remove_modifier = suppressed_pacifist
+		}
+	}
+
+	actions = {
+		embrace_faction = {
+			title = "EMBRACE_FACTION"
+			description = "EMBRACE_FACTION_DESC"
+			
+			cost = {
+				influence = @tec_fac_embrace_cost
+			}
+			
+			potential = {
+				exists = owner
+				owner = {
+					OR = {
+						is_subject = no
+						NOT = { any_agreement = { agreement_preset = preset_dominion } }
+					}
+				}
+			}
+			
+			valid = {
+				custom_tooltip = {
+					fail_text = EMBRACE_FACTION_COOLDOWN
+					parameter:empire = {
+						NOT = { has_modifier = embraced_faction_timer }
+					}
+				}
+				support > @tec_fac_embrace_min_support
+				parameter:empire = {
+					NOT = { has_ethic = "ethic_fanatic_pacifist" }
+				}
+			}
+
+			effect = {
+				add_modifier = { modifier = embraced_faction days = @tec_fac_embrace_cd}
+				parameter:empire = {
+					shift_ethic = ethic_pacifist
+					hidden_effect = {
+						add_modifier = { modifier = embraced_faction_timer days = @tec_fac_embrace_cd}
+						every_pop_faction = {
+							limit = { NOT = { is_same_value = root } }
+							add_modifier = { modifier = embraced_another_faction days = @tec_fac_embrace_cd}
+						}
+					}
+				}
+				hidden_effect = {
+					save_event_target_as = TargetFaction
+					parameter:empire = {
+						every_relation = {
+							limit = {
+								is_ai = no
+								tec_is_default_country = yes
+								has_communications = prev
+								has_intel_level = {
+									who = prev
+									category = government
+									level >= 1
+								}
+							}
+							country_event = { id = factions.2000 }
+						}
+					}
+				}
+			}
+			
+			ai_weight = {
+				base = 1
+				modifier = {
+					factor = 0
+					support < 0.50
+					owner = {
+						has_ethic = ethic_pacifist
+					}
+				}
+				modifier = {
+					factor = 0
+					owner = { has_valid_civic = civic_fanatic_purifiers }
+				}
+				modifier = {
+					factor = 0
+					NOT = {
+						owner = {
+							exists = ruler
+							ruler = {
+								leader_of_faction = prosperity
+							}
+						}
+					}
+				}
+				modifier = {
+					factor = 0
+					owner = {
+						count_pop_faction = {
+							count < 4
+						}
+					}
+				}
+			}
+		}
+		promote_faction = {
+			title = "PROMOTE_FACTION"
+			description = "PROMOTE_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					NOR = {
+						has_modifier = suppressed_pacifist
+						has_modifier = promoted_pacifist
+					}
+				}
+			}
+
+			effect = {
+				parameter:empire = {
+					add_modifier = { modifier = promoted_pacifist days = -1 }
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		cancel_promote_faction = {
+			title = "CANCEL_PROMOTE_FACTION"
+			description = "CANCEL_PROMOTE_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					has_modifier = promoted_pacifist
+				}
+			}
+
+			effect = {
+				parameter:empire = {
+					remove_modifier = promoted_pacifist
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		suppress_faction = {
+			title = "SUPPRESS_FACTION"
+			description = "SUPPRESS_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					NOR = {
+						has_modifier = suppressed_pacifist
+						has_modifier = promoted_pacifist
+					}
+				}
+			}
+
+			effect = {
+				add_modifier = { modifier = suppressed_faction days = -1 }
+				parameter:empire = {
+					add_modifier = { modifier = suppressed_pacifist days = -1 }
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		cancel_suppress_faction = {
+			title = "CANCEL_SUPPRESS_FACTION"
+			description = "CANCEL_SUPPRESS_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					has_modifier = suppressed_pacifist
+				}
+			}
+
+			effect = {
+				remove_modifier = suppressed_faction
+				parameter:empire = {
+					remove_modifier = suppressed_pacifist
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+	}
+}

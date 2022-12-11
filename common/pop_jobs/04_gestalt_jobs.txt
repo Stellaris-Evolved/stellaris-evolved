@@ -1,0 +1,3135 @@
+# - - - - - - - - - - - - - - - - - - - - - ##
+# Gestalt Jobs
+# - - - - - - - - - - - - - - - - - - - - - ##
+spawning_drone = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_spawning_pool
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_robot_pop = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+		drone_individual_pop_check_trigger = no	#prevents free individuals
+	}
+
+	resources = {
+		category = planet_jobs
+		upkeep = {
+			trigger = {
+				is_lithoid = no
+			}
+			food = 5
+		}
+		upkeep = {
+			trigger = {
+				is_lithoid = yes
+			}
+			minerals = 5
+		}
+	}
+
+	planet_modifier = {
+		planet_pop_assembly_organic_add = 2
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
+		}
+		planet_amenities_no_happiness_add = 5
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_origin = origin_necrophage }
+			exists = planet.growing_species
+			planet.growing_species = {
+				NOT = { has_trait = trait_hive_mind }
+			}
+		}
+		modifier = {
+			pop_growth_speed = 0.1
+		}
+	}
+
+	weight = {
+		weight = @spawner_drone_job_weight
+		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+		modifier = {
+			factor = 0.5 # job is less useful if pop control is active, but still gives amenities
+			planet = {
+				has_modifier = planet_population_control_gestalt
+			}
+		}
+		modifier = {
+			factor = 0.01 # crisis purge
+			exists = planet
+			exists = planet.controller
+			planet.controller = {
+				OR = {
+					is_country_type = swarm
+					is_country_type = ai_empire
+				}
+			}
+		}
+
+		# Robots can't get this job
+		modifier = {
+			factor = 0
+			has_trait = trait_mechanical
+		}
+	}
+}
+
+
+offspring_drone = {	# Digievolved
+	category = tec_brood_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_offspring_nest
+	icon = spawning_drone
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_robot_pop = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+		species = {
+			is_same_species = root.owner	
+		}
+	}
+	
+	resources = {
+		category = planet_jobs
+		upkeep = {
+			trigger = {
+				is_lithoid = no
+			}
+			food = 5
+		}
+		upkeep = {
+			trigger = {
+				is_lithoid = yes
+			}
+			minerals = 5
+		}
+		produces = {
+			unity = 5
+		}
+		produces = {
+			trigger = {
+				planet = {
+					tec_has_research_designation = yes
+				}
+			}
+			physics_research = 10
+			society_research = 10
+			engineering_research = 10
+		}
+		produces = {
+			trigger = {
+				planet = {
+					tec_has_alloy_designation = yes
+				}
+			}
+			alloys = 5
+		}
+	}
+
+	planet_modifier = {
+		planet_jobs_simple_drone_produces_mult = 0.1
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			planet = {
+				is_capital = yes
+			}
+		}
+		planet_stability_add = 5
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
+		}
+		planet_amenities_no_happiness_add = 5
+		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_origin = origin_necrophage }
+			exists = planet.growing_species
+			planet.growing_species = {
+				NOT = { has_trait = trait_hive_mind }
+			}
+		}
+		modifier = {
+			pop_growth_speed = 0.1
+		}
+	}
+
+	weight = {
+		weight = @spawner_drone_job_weight
+		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+		modifier = {
+			factor = 2
+			has_job = offspring_drone
+		}
+		modifier = {
+			factor = 0.01 # crisis purge
+			exists = planet
+			exists = planet.controller
+			planet.controller = {
+				OR = {
+					is_country_type = swarm
+					is_country_type = ai_empire
+				}
+			}
+		}
+	}
+}
+
+cyber_drone = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_spawning_pool
+	icon = machine_nurse
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+
+	possible = { can_think = yes }
+
+	resources = {
+		category = planet_pop_assemblers
+		upkeep = {
+			alloys = 1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			can_assemble_cyborg_pop = yes
+			can_assemble_hive_pop = yes
+		}
+		modifier = {
+			planet_pop_assembly_organic_add = 1.5
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
+		}
+		planet_amenities_no_happiness_add = 5
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	weight = {
+		weight = @spawner_drone_job_weight
+		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+		modifier = {
+			factor = 0.5 # job is less useful if pop control is active, but still gives amenities
+			planet = {
+				has_modifier = planet_population_control_gestalt
+			}
+		}
+		modifier = {
+			factor = 0.01 # crisis purge
+			exists = planet
+			exists = planet.controller
+			planet.controller = {
+				OR = {
+					is_country_type = swarm
+					is_country_type = ai_empire
+				}
+			}
+		}
+	}
+}
+
+#assembler
+replicator = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_robot_assembly_plant
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+		drone_individual_pop_check_trigger = no	#prevents free individuals
+	}
+
+	resources = {
+		category = planet_pop_assemblers
+		upkeep = {
+			alloys = 2
+		}
+	}
+
+	planet_modifier = {
+		planet_pop_assembly_add = 2
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			planet = {
+				exists = assembling_species
+				assembling_species = {
+					tec_is_replicant = yes
+				}
+			}
+		}
+		planet_pop_assembly_add = -2
+		planet_pop_assembly_organic_add = 2
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			planet = {
+				has_building = building_deployment_post
+			}
+			owner = {
+				is_machine_empire = yes
+				has_tradition = tr_tec_outreach_1
+			}
+		}
+		planet_stability_add = 5
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_valid_civic = civic_tec_machine_reimaginators
+			}
+		}
+		modifier = {
+			planet_amenities_no_happiness_add = 5
+		}
+	}
+
+	weight = {
+		weight = 10000
+		modifier = {
+			factor = 0.01 # crisis purge
+			exists = planet
+			exists = planet.controller
+			planet.controller = {
+				tec_control_crisis_country = yes
+			}
+		}
+
+		# Robots can't get this job
+		modifier = {
+			factor = 0
+			has_trait = trait_mechanical
+		}
+	}
+}
+
+crucible_drone = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_clinic
+	icon = healthcare
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+
+	possible = { can_think = yes }
+
+	resources = {
+		category = planet_doctors
+		upkeep = {
+			alloys = 2
+		}
+		upkeep = {
+			trigger = {
+				exists = planet
+				planet = {
+					exists = growing_species
+					growing_species = {
+						is_lithoid = no
+						tec_is_cybernetic_species = yes
+					}
+				}
+			}
+			food = 10
+		}
+		upkeep = {
+			trigger = {
+				exists = planet
+				planet = {
+					exists = growing_species
+					growing_species = {
+						is_lithoid = yes
+						tec_is_cybernetic_species = yes
+					}
+				}
+			}
+			minerals = 10
+		}
+	}
+
+	planet_modifier = {
+		pop_growth_speed = 0.25
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
+		}
+		planet_amenities_add = 5
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+
+	weight = {
+		weight = @spawner_drone_job_weight
+		modifier = {
+			factor = 0.01 # crisis purge
+			exists = planet
+			exists = planet.controller
+			planet.controller = {
+				OR = {
+					is_country_type = swarm
+					is_country_type = ai_empire
+				}
+			}
+		}
+	}
+}
+
+# Complex
+coordinator = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_machine_capital
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+		drone_individual_pop_check_trigger = no	#prevents free individuals
+	}
+
+	resources = {
+		category = planet_administrators
+		produces = {
+			unity = 4
+		}
+		upkeep = {
+			physics_research = 2
+			society_research = 2
+			engineering_research = 2
+		}
+	}
+
+	triggered_country_modifier = {
+		potential = {
+			always = yes
+		}
+		country_edict_fund_add = 2
+		mult = value:job_total_output_modifier|JOB|bureaucrat|RESOURCE|unity|
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_tradition = tr_tec_statecraft_4
+			}
+		}
+		planet_amenities_no_happiness_add = 2
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			planet = { has_modifier = planet_artifact_relays_machine }
+		}
+		modifier = {
+			planet_stability_add = 2
+			planet_jobs_simple_drone_produces_mult = 0.01
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_active_tradition = tr_synchronicity_integrated_preservation
+			}
+		}
+		modifier = {
+			planet_crime_no_happiness_add = -3
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_valid_civic = civic_tec_machine_node
+			}
+		}
+		modifier = {
+			planet_jobs_simple_drone_produces_mult = 0.01
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_valid_civic = civic_tec_machine_coordination
+			}
+		}
+		planet_stability_add = 1
+	}
+
+	weight = {
+		weight = @synapse_drone_job_weight
+		mult = value:job_weights_modifier|JOB|coordinator|RESOURCE|unity|
+		modifier = {
+			factor = 0.9
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			tec_is_cyborg_species = yes
+		}
+		modifier = {
+			factor = 2
+			has_job = coordinator
+		}
+
+		# Robots can't get this job
+		modifier = {
+			factor = 0
+			has_trait = trait_mechanical
+		}
+	}
+}
+
+evaluator = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_simulation_1
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible = {
+		drone_job_check_trigger = yes
+		drone_individual_pop_check_trigger = no	#prevents free individuals
+	}
+
+	resources = {
+		category = planet_evaluators
+		produces = {
+			unity = 4
+		}
+		upkeep = {
+			energy = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
+		}
+		planet_amenities_no_happiness_add = 3
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	#inline_script = "jobs/tec_culture_worker_hive_outputs"
+	# Ethic bonuses
+		# Ecology
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_ethic = ethic_gestalt_disregard
+					}
+				}
+				planet_structures_cost_mult = -0.03
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_ethic = ethic_gestalt_preservation
+					}
+				}
+				planet_structures_upkeep_mult = -0.03
+			}
+		# /
+		# Interaction
+			triggered_country_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_ethic = ethic_gestalt_empathy
+					}
+				}
+				country_edict_fund_add = 5
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_ethic = ethic_gestalt_apathy
+					}
+				}
+				planet_crime_no_happiness_mult = -0.05
+			}
+		# /
+		# Ego
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_ethic = ethic_gestalt_introspective
+					}
+				}
+				pop_amenities_usage_mult = -0.05
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_ethic = ethic_gestalt_extrospective
+					}
+				}
+				planet_researchers_upkeep_mult = -0.03
+			}
+		# /
+
+	# /
+
+	weight = {
+		weight = @synapse_drone_job_weight
+		mult = value:job_weights_modifier|JOB|evaluator|RESOURCE|unity|
+		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+	}
+}
+
+synapse_drone = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_hive_capital
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_robot_pop = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+		drone_individual_pop_check_trigger = no	#prevents free individuals
+	}
+
+	resources = {
+		category = planet_administrators
+		produces = {
+			unity = 4
+		}
+		upkeep = {
+			trigger = {
+				owner = {
+					has_civic = civic_tec_hive_neuraxial
+				}
+			}
+			physics_research = 1
+			society_research = 1
+			engineering_research = 1
+		}
+		upkeep = {
+			trigger = {
+				is_lithoid = no
+			}
+			food = 2
+			energy = 2
+		}
+		upkeep = {
+			trigger = {
+				is_lithoid = yes
+			}
+			minerals = 2
+			energy = 2
+		}
+	}
+
+	planet_modifier = {
+		planet_jobs_simple_drone_produces_mult = 0.01
+	}
+
+	triggered_country_modifier = {
+		potential = {
+			always = yes
+		}
+		country_edict_fund_add = 2
+		mult = value:job_total_output_modifier|JOB|bureaucrat|RESOURCE|unity|
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			planet = {
+				has_building = building_tec_hive_sapling
+			}
+			owner = {
+				has_tradition = tr_tec_outreach_1
+			}
+		}
+		planet_stability_add = 5
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_tradition = tr_tec_statecraft_4
+			}
+		}
+		planet_amenities_no_happiness_add = 2
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_valid_civic = civic_tec_hive_node
+			}
+		}
+		planet_stability_add = 1
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			planet = { has_modifier = planet_artifact_relays_hivemind }
+		}
+		planet_stability_add = 2
+		planet_jobs_simple_drone_produces_mult = 0.01
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_active_tradition = tr_synchronicity_instinctive_synchronization }
+		}
+		planet_amenities_no_happiness_add = 2
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_valid_civic = civic_tec_hive_neuraxial
+			}
+		}
+		planet_researchers_produces_mult = 0.02
+	}
+
+	weight = {
+		weight = @synapse_drone_job_weight
+		mult = value:job_weights_modifier|JOB|synapse_drone|RESOURCE|unity|
+		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+		modifier = {
+			factor = 1.5
+			has_job = synapse_drone
+		}
+
+		# Robots can't get this job
+		modifier = {
+			factor = 0
+			has_trait = trait_mechanical
+		}
+	}
+}
+
+brain_drone = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_research_lab_1
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_robot_pop = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+		if = {
+			limit = {
+				exists = owner
+				owner = {
+					NAND = {
+						has_valid_civic = civic_tec_se_elders
+						has_ethic = ethic_gestalt_empathy
+					}
+				}
+			}
+			drone_individual_pop_check_trigger = no	#prevents free individuals
+		}
+	}
+
+	resources = {
+		category = planet_researchers
+		produces = {
+			physics_research = 4
+			engineering_research = 4
+			society_research = 4
+		}
+		upkeep = {
+			trigger = {
+				owner = {
+					has_civic = civic_tec_hive_neuraxial_cyborg
+				}
+			}
+			unity = 1
+		}
+		upkeep = {
+			trigger = {
+				exists = owner
+				owner = {
+					tec_is_cyberhive = no
+					is_lithoid_empire = no
+				}
+			}
+			food = 6
+		}
+		upkeep = {
+			trigger = {
+				exists = owner
+				owner = {
+					tec_is_cyberhive = no
+					is_lithoid_empire = yes
+				}
+			}
+			minerals = 4
+		}
+		upkeep = {
+			trigger = {
+				exists = owner
+				owner = {
+					tec_is_cyberhive = yes
+				}
+			}
+			energy = 6
+		}
+		upkeep = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_science_ministry
+				}
+			}
+			energy = 2
+		}
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_research
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_science_ministry
+				}
+			}
+			physics_research = 2
+			engineering_research = 2
+			society_research = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_valid_civic = civic_tec_hive_neuraxial_cyborg
+			}
+		}
+		modifier = {
+			planet_administrators_produces_mult = 0.02
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_valid_civic = civic_tec_hive_myoneural
+			}
+		}
+		planet_amenities_no_happiness_add = 1
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	weight = {
+		weight = @complex_drone_job_weight
+		mult = value:job_weights_research_modifier|JOB|brain_drone|
+
+		modifier = {
+			factor = 0.9
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			tec_is_cyborg_species = yes
+		}
+
+		# Robots can't get this job
+		modifier = {
+			factor = 0
+			has_trait = trait_mechanical
+		}
+	}
+}
+
+calculator = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_research_lab_1
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+		drone_individual_pop_check_trigger = no	#prevents free individuals
+	}
+
+	resources = {
+		category = planet_researchers
+		produces = {
+			physics_research = 4
+			engineering_research = 4
+			society_research = 4
+		}
+		upkeep = {
+			energy = 4
+		}
+		upkeep = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_science_ministry
+				}
+			}
+			energy = 2
+		}
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_research
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_science_ministry
+				}
+			}
+			physics_research = 2
+			engineering_research = 2
+			society_research = 2
+		}
+	}
+
+	weight = {
+		weight = @complex_drone_job_weight
+		mult = value:job_weights_research_modifier|JOB|calculator|
+		modifier = {
+			factor = 1.25
+			has_job = calculator
+		}
+
+		modifier = {
+			factor = 0.9
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			tec_is_cyborg_species = yes
+		}
+
+		# Robots can't get this job
+		modifier = {
+			factor = 0
+			has_trait = trait_mechanical
+		}
+	}
+}
+
+artisan_drone = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_organic_sanctuary
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no 
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+		if = {
+			limit = {
+				exists = owner
+				owner = {
+					NAND = {
+						has_valid_civic = civic_tec_se_elders
+						has_ethic = ethic_gestalt_empathy
+					}
+				}
+			}
+			drone_individual_pop_check_trigger = no	#prevents free individuals
+		}
+	}
+
+	resources = {
+		category = planet_artisans
+		produces = {
+			consumer_goods = 6
+		}
+		upkeep = {
+			minerals = 6
+		}
+
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_produce_requisitorium
+					exists = owner.overlord
+					owner.overlord = { is_gestalt = no }
+				}
+			}
+			consumer_goods = @requisitorium_consumer_goods_reduction
+		}
+	}
+
+	
+	overlord_resources = {
+		category = planet_requisitioned_consumer_goods
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_produce_requisitorium
+					exists = owner.overlord
+					owner.overlord = { is_gestalt = no }
+				}
+			}
+			consumer_goods = @requisitorium_consumer_goods_overlord
+		}
+	}
+
+	weight = {
+		weight = @complex_drone_job_weight
+		mult = value:job_weights_modifier|JOB|artisan_drone|RESOURCE|consumer_goods|
+		modifier = {
+			factor = 0.9
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			tec_is_cyborg_species = yes
+		}
+		modifier = {
+			factor = 2
+			OR = {
+				has_job = artisan_drone
+				AND = {
+					exists = owner
+					owner = { has_deficit = consumer_goods }
+				}
+			}
+		}
+
+		# Robots can't get this job, unless droid
+		modifier = {
+			factor = 0
+			tec_is_non_advanced_robot = yes
+		}
+	}
+}
+
+fabricator = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_foundry_1
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+		drone_individual_pop_check_trigger = no	#prevents free individuals
+	}
+
+	resources = {
+		category = planet_metallurgists
+		produces = {
+			alloys = 4
+		}
+		upkeep = {
+			minerals = 8
+		}
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			alloys = @requisitorium_alloys_reduction
+		}
+
+		upkeep = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+					exists = owner
+					owner = {
+						tec_is_quantum_alloys_empire = no
+					}
+				}
+			}
+			minerals = 2
+		}
+		# Quantum alloys
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						tec_is_quantum_alloys_empire = yes
+					}
+				}
+				minerals = -4
+				energy = 8
+			}
+			upkeep = {
+				trigger = {
+					planet = {
+						has_planet_flag = has_material_requisitorium
+					}
+					exists = owner
+					owner = {
+						tec_is_quantum_alloys_empire = yes
+					}
+				}
+				minerals = 1
+				energy = 3
+			}
+		# /
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_alloys
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			alloys = @requisitorium_alloys_overlord
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_valid_civic = civic_tec_machine_reimaginators
+			}
+		}
+		planet_amenities_no_happiness_add = 1
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	weight = {
+		weight = @complex_drone_job_weight
+		mult = value:job_weights_modifier|JOB|fabricator|RESOURCE|alloys|
+		modifier = {
+			factor = 0.9
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			tec_is_cyborg_species = yes
+		}
+
+		# Robots can't get this job, unless droid
+		modifier = {
+			factor = 0
+			tec_is_non_advanced_robot = yes
+		}
+	}
+}
+
+alloy_drone = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_foundry_1
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+		if = {
+			limit = {
+				exists = owner
+				owner = {
+					NAND = {
+						has_valid_civic = civic_tec_se_elders
+						has_ethic = ethic_gestalt_empathy
+					}
+				}
+			}
+			drone_individual_pop_check_trigger = no	#prevents free individuals
+		}
+	}
+
+	resources = {
+		category = planet_metallurgists
+		produces = {
+			alloys = 3
+		}
+		upkeep = {
+			minerals = 6
+		}
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			alloys = @requisitorium_alloys_reduction
+		}
+		upkeep = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+				exists = owner
+				owner = {
+					tec_is_quantum_alloys_empire = no
+				}	
+			}
+			minerals = 2
+		}
+		# Quantum alloys
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						tec_is_quantum_alloys_empire = yes
+					}
+				}
+				minerals = -3
+				energy = 6
+			}
+			upkeep = {
+				trigger = {
+					planet = {
+						has_planet_flag = has_material_requisitorium
+					}
+					exists = owner
+					owner = {
+						tec_is_quantum_alloys_empire = yes
+					}
+				}
+				minerals = 1
+				energy = 3
+			}
+		# /
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_alloys
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			alloys = @requisitorium_alloys_overlord
+		}
+	}
+
+	weight = {
+		weight = @complex_drone_job_weight
+		mult = value:job_weights_modifier|JOB|alloy_drone|RESOURCE|alloys|
+	
+		# Robots can't get this job, unless droid
+		modifier = {
+			factor = 0
+			tec_is_non_advanced_robot = yes
+		}
+	}
+}
+
+catalytic_drone = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_foundry_1
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+		if = {
+			limit = {
+				exists = owner
+				owner = {
+					NAND = {
+						has_valid_civic = civic_tec_se_elders
+						has_ethic = ethic_gestalt_empathy
+					}
+				}
+			}
+			drone_individual_pop_check_trigger = no	#prevents free individuals
+		}
+	}
+
+	resources = {
+		category = planet_metallurgists
+		produces = {
+			alloys = 3
+		}
+		produces = {
+			trigger = {
+				exists = owner
+				owner = {
+					is_robot_empire = yes
+				}
+			}
+			alloys = 1
+		}
+
+		upkeep = {
+			food = 9
+		}
+		upkeep = {
+			trigger = {
+				exists = owner
+				owner = {
+					is_robot_empire = yes
+				}
+			}
+			food = 3
+		}
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			alloys = @requisitorium_alloys_reduction
+		}
+
+		upkeep = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			food = 3
+		}
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_alloys
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			alloys = @requisitorium_alloys_overlord
+		}
+	}
+
+	weight = {
+		weight = @complex_drone_job_weight
+		mult = value:job_weights_modifier|JOB|catalytic_drone|RESOURCE|alloys|
+
+		# Robots can't get this job, unless droid
+		modifier = {
+			factor = 0
+			tec_is_non_advanced_robot = yes
+		}
+	}
+}
+
+chemist_drone = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_chemical_plant
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+		if = {
+			limit = {
+				owner = {
+					NAND = {
+						has_valid_civic = civic_tec_se_elders
+						has_ethic = ethic_gestalt_empathy
+					}
+				}
+			}
+			drone_individual_pop_check_trigger = no	#prevents free individuals
+		}
+	}
+
+	resources = {
+		category = planet_chemists
+		produces = {
+			volatile_motes = 2
+		}
+		upkeep = {
+			minerals = 10
+			energy = 5
+		}
+	}
+
+	weight = {
+		weight = @complex_drone_job_weight
+		mult = value:job_weights_modifier|JOB|chemist_drone|RESOURCE|volatile_motes|
+
+		# Robots can't get this job, unless droid
+		modifier = {
+			factor = 0
+			tec_is_non_advanced_robot = yes
+		}
+	}
+}
+
+translucer_drone = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_crystal_plant
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+		if = {
+			limit = {
+				exists = owner
+				owner = {
+					NAND = {
+						has_valid_civic = civic_tec_se_elders
+						has_ethic = ethic_gestalt_empathy
+					}
+				}
+			}
+			drone_individual_pop_check_trigger = no	#prevents free individuals
+		}
+	}
+
+	resources = {
+		category = planet_translucers
+		produces = {
+			rare_crystals = 2
+		}
+		upkeep = {
+			minerals = 15
+		}
+	}
+
+	weight = {
+		weight = @complex_drone_job_weight
+		mult = value:job_weights_modifier|JOB|translucer_drone|RESOURCE|rare_crystals|
+
+		# Robots can't get this job, unless droid
+		modifier = {
+			factor = 0
+			tec_is_non_advanced_robot = yes
+		}
+	}
+}
+
+gas_refiner_drone = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_refinery
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+		if = {
+			limit = {
+				exists = owner
+				owner = {
+					NAND = {
+						has_valid_civic = civic_tec_se_elders
+						has_ethic = ethic_gestalt_empathy
+					}
+				}
+			}
+			drone_individual_pop_check_trigger = no	#prevents free individuals
+		}
+	}
+
+	resources = {
+		category = planet_refiners
+		produces = {
+			exotic_gases = 2
+		}
+		upkeep = {
+			minerals = 10
+		}
+		upkeep = {
+			trigger = {
+				owner = { is_lithoid_empire = no }
+			}
+			food = 5
+		}
+		upkeep = {
+			trigger = {
+				owner = { is_lithoid_empire = yes }
+			}
+			minerals = 5
+		}
+	}
+
+	weight = {
+		weight = @complex_drone_job_weight
+		mult = value:job_weights_modifier|JOB|gas_refiner_drone|RESOURCE|exotic_gases|
+
+		# Robots can't get this job, unless droid
+		modifier = {
+			factor = 0
+			tec_is_non_advanced_robot = yes
+		}
+	}
+}
+
+patrol_drone = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_stronghold
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+		if = {
+			limit = {
+				exists = owner
+				owner = {
+					NAND = {
+						has_valid_civic = civic_tec_se_elders
+						has_ethic = ethic_gestalt_empathy
+					}
+				}
+			}
+			drone_individual_pop_check_trigger = no	#prevents free individuals
+		}
+	}
+
+	resources = {
+		category = planet_jobs
+		produces = {
+			unity = 2
+		}
+	}
+
+	planet_modifier = {
+		planet_crime_no_happiness_add = -20
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			has_trait = trait_tec_cyberpsio_control
+		}
+		planet_jobs_produces_mult = 0.01
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_tradition = tr_tec_control_final_2
+			}
+		}
+		planet_stability_add = 1
+	}
+
+	pop_modifier = {
+		pop_defense_armies_add = 2
+	}
+
+
+	weight = {
+		weight = @complex_drone_job_weight
+		mult = value:job_weights_modifier|JOB|patrol_drone|RESOURCE|unity|FACTOR|0.25|
+		
+		# Produce armies
+		modifier = {
+			factor = 5
+			tec_greatly_boost_armies = yes
+		}
+		modifier = {
+			factor = 3
+			tec_boost_armies = yes
+		}
+		modifier = {
+			factor = 0.5
+			tec_reduces_armies = yes
+		}
+		modifier = {
+			factor = 0.25
+			tec_greatly_reduces_armies = yes
+		}
+
+		# Crime autotrigger - Gestalts handle crime in a worse way than regular empires
+		modifier = {
+			factor = 0.01
+			planet = { planet_crime < 15 }
+			exists = owner
+			owner = {
+				is_ai = yes
+			}
+		}
+		modifier = {
+			factor = 1
+			planet = { planet_crime >= 10 }
+		}
+		modifier = {
+			factor = 5
+			planet = { planet_crime >= 15 }
+		}
+		modifier = {
+			factor = 25
+			planet = { planet_crime >= 20 }
+		}
+		modifier = {
+			weight = 25
+			exists = owner
+			owner = { is_at_war = yes }
+		}
+
+		# Robots can't get this job, unless droid
+		modifier = {
+			factor = 0
+			tec_is_non_advanced_robot = yes
+		}
+	}
+}
+
+#Menial
+mote_harvesting_drone = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_mote_harvesting_traps
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+		if = {
+			limit = {
+				exists = owner
+				owner = {
+					NAND = {
+						has_valid_civic = civic_tec_se_elders
+						has_ethic = ethic_gestalt_empathy
+					}
+				}
+			}
+			drone_individual_pop_check_trigger = no	#prevents free individuals
+		}
+	}
+
+	resources = {
+		category = planet_sr_miners
+		produces = {
+			volatile_motes = 2
+		}
+		produces = {
+			trigger = {
+				exists = planet
+				planet = {
+					has_active_building = building_tec_mote_harvesters
+				}
+			}
+			volatile_motes = 1
+		}
+		upkeep = {
+			energy = 1
+		}
+	}
+
+	weight = {
+		weight = @complex_drone_job_weight
+		mult = value:job_weights_modifier|JOB|mote_harvesting_drone|RESOURCE|volatile_motes|
+		modifier = {
+			factor = 1.1
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			tec_is_cyborg_species = yes
+		}
+
+		# Crafted pops modifier
+		modifier = {
+			factor = 2
+			tec_is_crafted_sentient_pop = yes
+		}
+		modifier = {
+			factor = 200
+			tec_is_crafted_nonsapient_pop = yes
+		}
+		#Prioritize serving species
+		modifier = {
+			factor = 3
+			OR = {
+				tec_has_stapled_trait = yes
+			}
+		}
+	}
+}
+
+crystal_mining_drone = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_crystal_mines
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+		if = {
+			limit = {
+				exists = owner
+				owner = {
+					NAND = {
+						has_valid_civic = civic_tec_se_elders
+						has_ethic = ethic_gestalt_empathy
+					}
+				}
+			}
+			drone_individual_pop_check_trigger = no	#prevents free individuals
+		}
+	}
+
+	resources = {
+		category = planet_sr_miners
+		produces = {
+			rare_crystals = 2
+		}
+		produces = {
+			trigger = {
+				exists = planet
+				planet = {
+					has_active_building = building_tec_crystal_mines
+				}
+			}
+			rare_crystals = 1
+		}
+		upkeep = {
+			energy = 1
+		}
+	}
+
+	weight = {
+		weight = @complex_drone_job_weight
+		mult = value:job_weights_modifier|JOB|crystal_mining_drone|RESOURCE|rare_crystals|
+		modifier = {
+			factor = 1.1
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			tec_is_cyborg_species = yes
+		}
+
+		# Crafted pops modifier
+		modifier = {
+			factor = 2
+			tec_is_crafted_sentient_pop = yes
+		}
+		modifier = {
+			factor = 200
+			tec_is_crafted_nonsapient_pop = yes
+		}
+		#Prioritize serving species
+		modifier = {
+			factor = 3
+			OR = {
+				tec_has_stapled_trait = yes
+			}
+		}
+	}
+}
+
+gas_extraction_drone = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_gas_extractors
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+		if = {
+			limit = {
+				exists = owner
+				owner = {
+					NAND = {
+						has_valid_civic = civic_tec_se_elders
+						has_ethic = ethic_gestalt_empathy
+					}
+				}
+			}
+			drone_individual_pop_check_trigger = no	#prevents free individuals
+		}
+	}
+
+	resources = {
+		category = planet_sr_miners
+		produces = {
+			exotic_gases = 2
+		}
+		produces = {
+			trigger = {
+				exists = planet
+				planet = {
+					has_active_building = building_tec_gas_extractors
+				}
+			}
+			exotic_gases = 1
+		}
+		upkeep = {
+			energy = 1
+		}
+	}
+
+	weight = {
+		weight = @complex_drone_job_weight
+		mult = value:job_weights_modifier|JOB|gas_extraction_drone|RESOURCE|exotic_gases|
+		modifier = {
+			factor = 1.1
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			tec_is_cyborg_species = yes
+		}
+		modifier = {
+			factor = 5
+			has_job = gas_extraction_drone
+		}
+
+		# Crafted pops modifier
+		modifier = {
+			factor = 2
+			tec_is_crafted_sentient_pop = yes
+		}
+		modifier = {
+			factor = 200
+			tec_is_crafted_nonsapient_pop = yes
+		}
+		#Prioritize serving species
+		modifier = {
+			factor = 3
+			OR = {
+				tec_has_stapled_trait = yes
+			}
+		}
+	}
+}
+
+mining_drone = {
+	category = simple_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_mineral_purification_plant
+
+	possible_pre_triggers = {
+		has_owner = yes
+		#is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+
+	resources = {
+		category = planet_miners
+		produces = {
+			minerals = 4
+		}
+		# Species bonuses/maluses
+			#produces = {
+			#	trigger = {
+			#		is_lithoid = yes
+			#	}
+			#	minerals = 1
+			#}
+		# /
+		produces = {
+			trigger = {
+				owner = {
+					is_lithoid_empire = yes
+					has_valid_civic = civic_tec_hive_menial
+				}
+			}
+			minerals = 0.5
+		}
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			minerals = @requisitorium_minerals_reduction
+		}
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_minerals
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			minerals = @requisitorium_minerals_overlord
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_lithoid_empire = yes
+				has_valid_civic = civic_tec_hive_menial
+			}
+		}
+		planet_amenities_no_happiness_add = 1
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	weight = {
+		weight = @simple_drone_job_weight
+		mult = value:job_weights_modifier|JOB|mining_drone|RESOURCE|minerals|
+		modifier = {
+			factor = 1.2
+			has_job = mining_drone
+		}
+
+		modifier = {
+			factor = 1.1
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			tec_is_cyborg_species = yes
+		}
+		
+		# Crafted pops modifier
+		modifier = {
+			factor = 2
+			tec_is_crafted_sentient_pop = yes
+		}
+		modifier = {
+			factor = 200
+			tec_is_crafted_nonsapient_pop = yes
+		}
+
+		#Prioritize serving species
+		modifier = {
+			factor = 3
+			OR = {
+				tec_has_stapled_trait = yes
+			}
+		}
+
+		modifier = {
+			factor = 0.9
+			NOT = { has_job = mining_drone }
+			owner = {
+				has_monthly_income = {
+					resource = minerals
+					value > 85
+				}
+			}
+		}
+	}
+}
+
+agri_drone = {
+	category = simple_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_food_processing_facility
+
+	possible_pre_triggers = {
+		has_owner = yes
+		#is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+
+	resources = {
+		category = planet_farmers
+		produces = {
+			food = 6
+		}
+		produces = {
+			trigger = {
+				exists = owner
+				owner = {
+					is_lithoid_empire = no
+					has_valid_civic = civic_tec_hive_menial
+				}
+			}
+			food = 0.5
+		}
+		# Species bonuses/maluses
+			#produces = {
+			#	trigger = {
+			#		is_lithoid = no
+			#		is_robotic_species = no
+			#	}
+			#	food = 1
+			#}
+			#produces = {
+			#	trigger = {
+			#		exists = owner
+			#		owner = {
+			#			is_robot_empire = yes
+			#		}
+			#	}
+			#	food = -1
+			#}
+		# /
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_produce_requisitorium
+				}
+			}
+			food = @requisitorium_food_reduction
+		}
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_food
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_produce_requisitorium
+				}
+			}
+			food = @requisitorium_food_overlord
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_lithoid_empire = no
+				has_valid_civic = civic_tec_hive_menial
+			}
+		}
+		planet_amenities_no_happiness_add = 1
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	weight = {
+		weight = @simple_drone_job_weight
+		mult = value:job_weights_modifier|JOB|agri_drone|RESOURCE|food|
+		modifier = {
+			factor = 1.2
+			has_job = agri_drone
+		}
+				
+		modifier = {
+			factor = 0.9
+			owner = {
+				is_robot_empire = yes
+			}
+		}
+		modifier = {
+			factor = 1.1
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			tec_is_cyborg_species = yes
+		}
+
+		modifier = {
+			factor = 0.5
+			has_trait = trait_lithoid
+
+			owner = {
+				is_lithoid_empire = yes
+				has_monthly_income = {
+					resource = food
+					value >= 0
+				}
+			}
+		}
+
+		# Crafted pops modifier
+		modifier = {
+			factor = 2
+			tec_is_crafted_sentient_pop = yes
+		}
+		modifier = {
+			factor = 200
+			tec_is_crafted_nonsapient_pop = yes
+		}
+
+		#Prioritize serving species
+		modifier = {
+			factor = 3
+			OR = {
+				tec_has_stapled_trait = yes
+			}
+		}
+		
+		modifier = {
+			factor = 0.9
+			NOT = { has_job = agri_drone }
+			owner = {
+				has_monthly_income = {
+					resource = food
+					value > 50
+				}
+			}
+		}
+	}
+}
+
+technician_drone = {
+	category = simple_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_energy_grid
+
+	possible_pre_triggers = {
+		has_owner = yes
+		#is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+
+	resources = {
+		category = planet_technician
+		produces = {
+			energy = 6
+		}
+		produces = {
+			trigger = {
+				exists = owner
+				owner = {
+					has_valid_civic = civic_tec_machine_menial
+				}
+			}
+			energy = 0.5
+		}
+		# Species bonuses/maluses
+			#produces = {
+			#	trigger = {
+			#		exists = owner
+			#		owner = {
+			#			is_robot_empire = yes
+			#		}
+			#	}
+			#	energy = 2
+			#}
+		# /
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_energy_requisitorium
+				}
+			}
+			energy = @requisitorium_energy_reduction
+		}
+	}
+	overlord_resources = {
+		category = planet_requisitioned_energy
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_energy_requisitorium
+				}
+			}
+			energy = @requisitorium_energy_overlord
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_valid_civic = civic_tec_machine_menial
+			}
+		}
+		planet_amenities_no_happiness_add = 1
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				tec_is_quantum_alloys_empire = yes
+			}
+			planet = {
+				NOR = {
+					has_active_building = building_coordinated_fulfillment_center_1
+					has_active_building = building_coordinated_fulfillment_center_2
+				}
+			}
+		}
+		planet_metallurgists_produces_mult = 0.005
+	}
+
+	weight = {
+		weight = @simple_drone_job_weight
+		mult = value:job_weights_modifier|JOB|technician_drone|RESOURCE|energy|
+		modifier = {
+			factor = 1.2
+			has_job = technician_drone
+		}
+		
+		modifier = {
+			factor = 1.1
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			tec_is_cyborg_species = yes
+		}
+
+		# Crafted pops modifier
+		modifier = {
+			factor = 2
+			tec_is_crafted_sentient_pop = yes
+		}
+		modifier = {
+			factor = 200
+			tec_is_crafted_nonsapient_pop = yes
+		}
+		#Prioritize serving species
+		modifier = {
+			factor = 1.5
+			OR = {
+				tec_has_stapled_trait = yes
+			}
+		}
+
+		modifier = {
+			factor = 0.9
+			NOT = { has_job = technician_drone }
+			owner = {
+				has_monthly_income = {
+					resource = energy
+					value > 50
+				}
+			}
+		}
+		
+	}
+}
+
+maintenance_drone = {
+	category = simple_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_maintenance_depot
+
+	possible_pre_triggers = {
+		has_owner = yes
+		#is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+
+	resources = {
+		category = planet_maintenancedrones
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
+		}
+		planet_amenities_no_happiness_add = 4
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			owner = { has_active_tradition = tr_versatility_finish }
+		}
+		planet_amenities_no_happiness_add = 2
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	#triggered_planet_modifier = {
+		#potential = {
+		#	planet = {
+		#		is_ringworld = yes
+		#		has_building = building_alpha_hub
+		#	}
+		#}
+		#planet_amenities_no_happiness_add = 1
+		#mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	#}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = planet.orbital_defence
+			planet.orbital_defence = {
+				exists = starbase
+				starbase = {
+					has_starbase_building = ring_maintenance_hub
+				}
+			}
+		}
+		planet_amenities_no_happiness_add = 1
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_valid_civic = civic_tec_machine_performance
+			}
+		}
+		planet_amenities_no_happiness_add = 1
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	weight = {
+		weight = @maintenance_drone_job
+		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+		modifier = {
+			factor = 1.1
+			has_job = maintenance_drone
+		}
+
+		modifier = {
+			mult = value:job_weights_modifier|JOB|maintenance_drone|RESOURCE|unity|FACTOR|0.25|
+			exists = owner
+			owner = {
+				has_valid_civic = civic_machine_maintenance_protocols
+			}
+		}
+
+		modifier = {
+			factor = 1.1
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			tec_is_cyborg_species = yes
+		}
+
+		# Lets test if this works as it should
+		modifier = {
+			factor = 100 # <- hive mind amenities jobs are non specialist so they have base weight 1 instead of 1000 but we still want them
+			NOT = { has_job = maintenance_drone }
+			planet = {
+				free_amenities < 3
+			}
+		}
+
+		modifier = {
+			factor = 100 # <- hive mind amenities jobs are non specialist so they have base weight 1 instead of 1000 but we still want them
+			has_job = maintenance_drone
+			planet = {
+				free_amenities < 8
+			}
+		}
+
+		modifier = { # Fix unassigned drones
+			factor = 10
+			is_unemployed = yes
+		}
+	}
+}
+
+warrior_drone = {
+	category = simple_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_stronghold
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+
+	resources = {
+		category = planet_soldiers
+	}
+	
+	country_modifier = {
+		country_naval_cap_add = 4
+	}
+
+	triggered_planet_modifier = {
+		modifier = {
+			planet_stability_add = 1
+		}
+		mult = planet.modifier:job_soldier_stability_add
+	}
+
+	triggered_country_modifier = {
+		potential = {
+			planet = {
+				exists = owner
+				owner = { has_technology = "tech_ground_defense_planning" }
+			}
+		}
+		modifier = {
+			country_naval_cap_add = 2
+		}
+	}
+
+	pop_modifier = {
+		pop_defense_armies_add = 4
+	}
+
+	triggered_country_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_tradition = tr_tec_might_final_3
+			}
+		}
+		modifier = {
+			country_naval_cap_add = 1
+		}
+	}
+
+	triggered_country_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_valid_civic = civic_tec_machine_warform
+			}
+		}
+		modifier = {
+			country_naval_cap_add = 1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			planet = {
+				OR = {
+					has_modifier = compliance_protocols
+					has_modifier = hunter_killer_drones
+				}
+			}
+		}
+		modifier = {
+			planet_stability_add = 5
+		}
+	}
+
+	weight = {
+		weight = 5
+		modifier = {
+			weight = 100
+			exists = owner
+			owner = { is_at_war = yes }
+		}
+		modifier = {
+			factor = 10
+			planet = {
+				OR = {
+					has_modifier = compliance_protocols
+					has_modifier = hunter_killer_drones
+				}
+			}
+		}
+
+		modifier = {
+			factor = 0.9
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			tec_is_cyborg_species = yes
+		}
+		modifier = {
+			factor = 0
+			planet = { num_pops < 12 }
+			owner = { is_ai = yes }
+		}
+
+		# Crafted pops modifier
+		modifier = {
+			factor = 2
+			tec_is_crafted_sentient_pop = yes
+		}
+
+		# Produce armies
+		modifier = {
+			factor = 2
+			tec_greatly_boost_armies = yes
+		}
+		modifier = {
+			factor = 1.5
+			tec_boost_armies = yes
+		}
+		modifier = {
+			factor = 0.5
+			tec_reduces_armies = yes
+		}
+		modifier = {
+			factor = 0.25
+			tec_greatly_reduces_armies = yes
+		}
+
+		#Prioritize serving species
+		modifier = {
+			factor = 1.05
+			OR = {
+				tec_has_stapled_trait = yes
+			}
+		}
+
+		# Robots can't get this job, unless droid
+		modifier = {
+			factor = 0
+			tec_is_non_advanced_robot = yes
+			has_military_service_type = {
+				type = military_service_limited
+			}
+		}
+	}
+}
+
+bluelotus_drone = {
+	category = complex_drone
+	is_capped_by_modifier = yes
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_illicit_research_labs
+	icon = foundry
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+		drone_individual_pop_check_trigger = no	#prevents free individuals
+	}
+
+	resources = {
+		category = planet_metallurgists
+		produces = {
+			alloys = 4
+		}
+
+		upkeep = {
+			trigger = {
+				has_phototrophic_energy_upkeep = yes
+			}
+			energy = @living_standard_phototrophic_normal
+		}
+		upkeep = {
+			trigger = {
+				has_food_upkeep = yes
+				is_phototrophic = no
+				tec_is_lithotrophic = no
+			}
+			food = @living_standard_food_normal
+		}
+		upkeep = {
+			trigger = {
+				has_food_upkeep = yes
+				is_phototrophic = no
+				tec_is_lithotrophic = yes
+			}
+			food = @tec_lithotrophic_normal
+			minerals = @tec_lithotrophic_normal
+		}
+		upkeep = {
+			trigger = {
+				has_food_upkeep = yes
+				is_phototrophic = yes
+				tec_is_lithotrophic = no
+			}
+			food = @living_standard_phototrophic_normal
+		}
+		upkeep = {
+			trigger = {
+				has_food_upkeep = yes
+				is_phototrophic = yes
+				tec_is_lithotrophic = yes
+			}
+			food = @tec_lithotrophic_low
+			minerals = @tec_lithotrophic_low
+		}
+		upkeep = {
+			trigger = {
+				has_mineral_upkeep = yes
+				is_phototrophic = no
+				tec_is_lithotrophic = no
+			}
+			minerals = @living_standard_food_normal
+		}
+		upkeep = {
+			trigger = {
+				has_mineral_upkeep = yes
+				is_phototrophic = no
+				tec_is_lithotrophic = yes
+			}
+			minerals = @tec_lithotrophic_normal
+			food = @tec_lithotrophic_normal
+		}
+		upkeep = {
+			trigger = {
+				has_mineral_upkeep = yes
+				is_phototrophic = yes
+				tec_is_lithotrophic = no
+			}
+			minerals = @living_standard_phototrophic_normal
+		}
+		upkeep = {
+			trigger = {
+				has_mineral_upkeep = yes
+				is_phototrophic = yes
+				tec_is_lithotrophic = yes
+			}
+			minerals = @tec_lithotrophic_low
+			food = @tec_lithotrophic_low
+		}
+		upkeep = {
+			trigger = {
+				is_robotic_or_voidspawn_species = yes
+			}
+			energy = @living_standard_energy_normal
+		}
+		upkeep = {
+			trigger = {
+				tec_is_bioservant = yes
+			}
+			food = @living_standard_food_normal
+		}
+	}
+
+	weight = {
+		weight = @complex_drone_job_weight
+		mult = value:job_weights_modifier|JOB|bluelotus_drone|RESOURCE|alloys|
+	}
+}
+
+chronicle_drone = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_galactic_memorial_1
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+		drone_individual_pop_check_trigger = no	#prevents free individuals
+	}
+
+	resources = {
+		category = planet_evaluators
+		produces = {
+			unity = 4
+		}
+		upkeep = {
+			trigger = {
+				is_robotic_or_voidspawn_species = yes
+				exists = owner
+				owner = {
+					tec_is_cyberhive = no
+				}
+			}
+			minerals = 1
+			energy = 2
+		}
+		upkeep = {
+			trigger = {
+				has_food_upkeep = yes
+				exists = owner
+				owner = {
+					tec_is_cyberhive = no
+				}
+			}
+			energy = 1
+			food = 2
+		}
+		upkeep = {
+			trigger = {
+				has_mineral_upkeep = yes
+				exists = owner
+				owner = {
+					tec_is_cyberhive = no
+				}
+			}
+			energy = 1
+			minerals = 2
+		}
+		upkeep = {
+			trigger = {
+				exists = owner
+				owner = {
+					tec_is_cyberhive = yes
+				}
+			}
+			physics_research = 2
+			society_research = 2
+			engineering_research = 2
+		}
+	}
+
+	planet_modifier = {
+		planet_stability_add = 2.5
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_active_tradition = tr_synchronicity_integrated_preservation
+			}
+		}
+		modifier = {
+			planet_crime_no_happiness_add = -3
+		}
+	}
+
+	#inline_script = "jobs/tec_culture_worker_hive_outputs"
+	# Ethic bonuses
+		# Ecology
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_ethic = ethic_gestalt_disregard
+					}
+				}
+				planet_structures_cost_mult = -0.03
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_ethic = ethic_gestalt_preservation
+					}
+				}
+				planet_structures_upkeep_mult = -0.03
+			}
+		# /
+		# Interaction
+			triggered_country_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_ethic = ethic_gestalt_empathy
+					}
+				}
+				country_edict_fund_add = 5
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_ethic = ethic_gestalt_apathy
+					}
+				}
+				planet_crime_no_happiness_mult = -0.05
+			}
+		# /
+		# Ego
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_ethic = ethic_gestalt_introspective
+					}
+				}
+				pop_amenities_usage_mult = -0.05
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						has_ethic = ethic_gestalt_extrospective
+					}
+				}
+				planet_researchers_upkeep_mult = -0.03
+			}
+		# /
+	# /
+
+	weight = {
+		weight = @complex_drone_job_weight
+		mult = 2
+		mult = value:job_weights_modifier|JOB|chronicle_drone|RESOURCE|unity|
+
+		modifier = {
+			factor = 0.01 # crisis purge
+			exists = planet
+			exists = planet.controller
+			planet.controller = {
+				OR = {
+					is_country_type = swarm
+					is_country_type = ai_empire
+				}
+			}
+		}
+
+		# Robots can't get this job
+		modifier = {
+			factor = 0
+			has_trait = trait_mechanical
+		}
+	}
+}
+
+scrap_miner_drone = {
+	category = simple_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_mineral_purification_plant
+	icon = miner
+
+	possible_pre_triggers = {
+		has_owner = yes
+		#is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		tec_has_stapled_trait = no
+	}
+
+	resources = {
+		category = planet_miners
+		produces = {
+			minerals = 2
+			alloys = 1
+		}
+		# Species bonuses/maluses
+			#produces = {
+			#	trigger = {
+			#		is_lithoid = yes
+			#	}
+			#	minerals = 1
+			#}
+		# /
+	}
+	weight = {
+		weight = @simple_drone_job_weight
+		mult = value:job_weights_multiple_resources_modifier|JOB|scrap_miner_drone|RESOURCE1|minerals|WEIGHT1|0.7|RESOURCE2|alloys|WEIGHT2|0.3|
+
+		modifier = {
+			factor = 1.1
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			tec_is_cyborg_species = yes
+		}
+		
+		# Crafted pops modifier
+		modifier = {
+			factor = 2
+			tec_is_crafted_sentient_pop = yes
+		}
+		modifier = {
+			factor = 200
+			tec_is_crafted_nonsapient_pop = yes
+		}
+
+		#Prioritize serving species
+		modifier = {
+			factor = 3
+			OR = {
+				tec_has_stapled_trait = yes
+			}
+		}
+
+		modifier = {
+			factor = 0.9
+			NOT = { has_job = scrap_miner_drone }
+			owner = {
+				has_monthly_income = {
+					resource = minerals
+					value > 85
+				}
+			}
+		}
+	}
+}
+
+
+bath_attendant_hive = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_toxic_bath
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+	}
+
+	possible_precalc = can_fill_drone_job
+
+	possible = { can_think = yes }
+
+	triggered_planet_modifier = {
+		planet_pop_assembly_organic_mult = 0.015
+		pop_environment_tolerance = -0.0075
+		mult = planet.value:toxic_attendant_growth
+	}
+
+	resources = {
+		category = planet_bath_attendants_hive
+		upkeep = {
+			trigger = {
+				is_lithoid = no
+			}
+			food = 4
+		}
+		upkeep = {
+			trigger = {
+				is_lithoid = yes
+			}
+			minerals = 4
+		}
+	}
+
+	weight = {
+		weight = @spawner_drone_job_weight
+		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+		modifier = {
+			factor = 0.5 # job is less useful if pop control is active, but still gives amenities
+			planet = {
+				has_modifier = planet_population_control_gestalt
+			}
+		}
+		modifier = {
+			factor = 0.01 # crisis purge
+			exists = planet
+			exists = planet.controller
+			planet.controller = {
+				OR = {
+					is_country_type = swarm
+					is_country_type = ai_empire
+				}
+			}
+		}
+	}
+}
+
+bath_attendant_machine = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_toxic_bath
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+	}
+
+	possible_precalc = can_fill_drone_job
+
+	possible = { can_think = yes }
+
+	triggered_planet_modifier = {
+		planet_pop_assembly_mult = 0.01
+		pop_amenities_usage_mult = 0.01
+		mult = planet.value:toxic_attendant_growth
+	}
+	
+
+	resources = {
+		category = planet_bath_attendants_machine
+		upkeep = {
+			minerals = 4
+		}
+	}
+
+	weight = {
+		weight = @spawner_drone_job_weight
+		modifier = {
+			factor = 0.01 # crisis purge
+			exists = planet
+			exists = planet.controller
+			planet.controller = {
+				OR = {
+					is_country_type = swarm
+					is_country_type = ai_empire
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,238 @@
+#################################
+#
+# Leviathan & Enclave Events
+# by Maximilian Olbers, Niclas Karlsson,
+# Rufus Tronde & Henrik Thyrwall
+#
+#################################
+
+namespace = leviathans
+
+# victorious admiral gains dragonslayer trait
+country_event = {
+	id = leviathans.670
+	title = leviathans.670.name
+	desc = {
+		text = leviathans.670.desc
+		trigger = {
+			NOT = { has_ethic = ethic_gestalt_consciousness }
+			fromfrom = {
+				exists = leader
+			}
+		}
+	}
+	desc = {
+		text = leviathans.670.desc.noleader
+		trigger = {
+			NOT = { has_ethic = ethic_gestalt_consciousness }
+			fromfrom = {
+				NOT = { exists = leader }
+			}
+		}
+	}
+	desc = {
+		text = leviathans.670.desc.gesta
+		trigger = {
+			has_ethic = ethic_gestalt_consciousness
+		}
+	}
+	picture = GFX_evt_space_dragon
+	location = fromfrom
+	show_sound = event_mystic_reveal
+
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			is_country_type = guardian_dragon
+			NOR = {
+				has_country_flag = rubricator_dragon_country
+				has_country_flag = here_be_the_dragon
+			}
+		}
+		#fromfromfrom = {
+		#	has_fleet_flag = dragon_fleet
+		#}
+	}
+
+	immediate = {
+		every_country = {
+			limit = {
+				tec_is_default_country = yes
+				has_modifier = draconic_beats
+			}
+			remove_modifier = draconic_beats
+		}
+		fromfrom.solar_system = {
+			save_event_target_as = slain_guardian_system
+		}
+		every_country = {
+			limit = {
+				tec_is_default_country = yes
+				has_event_chain = curator_poi_chain
+				event_target:slain_guardian_system = {
+					is_point_of_interest = {
+						id = curator_poi_dragon
+						event_chain = curator_poi_chain
+						owner = prev
+					}
+				}
+			}
+			remove_point_of_interest = curator_poi_dragon
+			end_curator_chain = yes
+		}
+	}
+
+	option = {
+		name = leviathans.670.a
+		trigger = {
+			fromfrom = {
+				exists = leader
+			}
+		}
+		fromfrom = {
+			leader = {
+				if = {
+					limit = {
+						leader_class = admiral
+					}
+					add_trait = leader_trait_dragonslayer
+				}
+				ELSE_IF = {
+					limit = {
+						leader_class = general
+					}
+					add_trait = leader_trait_dragonbane
+				}
+			}
+		}
+		add_resource = { influence = 300 }
+		add_relic = r_dragon_trophy
+	}
+
+	option = {
+		name = leviathans.670.a
+		trigger = {
+			fromfrom = {
+				NOT = {
+					exists = leader
+				}
+			}
+		}
+		add_resource = { influence = 300 }
+		add_relic = r_dragon_trophy
+	}
+	option = {
+		name = galactic_features.385.reanimated
+
+		trigger = {
+			is_reanimator = yes
+			fromfrom = {
+				exists = leader
+			}
+		}
+
+		enable_special_project = {
+			name = "REANIMATE_GUARDIAN_DRAGON"
+			location = fromfrom.solar_system.star
+			owner = root.owner
+		}
+		fromfrom = {
+			leader = {
+				if = {
+					limit = {
+						leader_class = admiral
+					}
+					add_trait = leader_trait_dragonslayer
+				}
+				ELSE_IF = {
+					limit = {
+						leader_class = general
+					}
+					add_trait = leader_trait_dragonbane
+				}
+			}
+		}
+		add_resource = { influence = 300 }
+		add_relic = r_dragon_trophy
+	}
+	option = {
+		name = galactic_features.385.reanimated
+
+		trigger = {
+			is_reanimator = yes
+			fromfrom = {
+				NOT = {
+					exists = leader
+				}
+			}
+		}
+
+		enable_special_project = {
+			name = "REANIMATE_GUARDIAN_DRAGON"
+			location = fromfrom.solar_system.star
+			owner = root.owner
+		}
+
+		add_resource = { influence = 300 }
+		add_relic = r_dragon_trophy
+	}
+	after = {
+		if = {
+			limit = { num_owned_planets > 0 }
+			generate_parade_city = yes
+			start_situation = {
+				type = leviathan_celebration_opportunity
+				target = event_target:parade_city
+				effect = {
+					set_situation_flag = celebration_ether_drake
+					set_situation_flag = standard_unity_reward
+				}
+			}
+		}
+	}
+}
+
+
+# Undead Armies Reanimation
+country_event = {
+	id = leviathans.675
+	title = "distar.218.name"
+	desc = "leviathans.675.desc"
+	location = from
+
+	is_triggered_only = yes
+
+	picture = GFX_evt_space_dragon
+	show_sound = event_mystic_reveal
+
+	option = {
+		name = "it_hungers"
+
+		create_fleet = {
+			name = "NAME_Avice"
+			effect = {
+				set_owner = root
+				create_ship = {
+					name = "NAME_Avice"
+					design = "NAME_Grand_Dragon"
+					prefix = no
+					upgradable = no
+				}
+				set_location = {
+					target = from
+					distance = 0
+					angle = random
+				}
+				set_fleet_stance = passive
+			}
+			settings = {
+				can_upgrade = no
+				can_change_composition = no
+				can_change_leader = no
+				uses_naval_capacity = no
+				spawn_debris = no
+			}
+		}
+	}
+}
