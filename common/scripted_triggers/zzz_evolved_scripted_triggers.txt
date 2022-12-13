@@ -5,6 +5,9 @@ is_socialism = {
 	OR = {
 		has_ethic = ethic_fanatic_socialism
 		has_ethic = ethic_socialism
+		
+		has_ethic = @ethic_cooperative
+		has_ethic = @ethic_fanatic_cooperative
 	}
 }
 
@@ -12,6 +15,9 @@ is_capitalism = {
 	OR = {
 		has_ethic = ethic_fanatic_capitalism
 		has_ethic = ethic_capitalism
+		
+		has_ethic = @ethic_competitive
+		has_ethic = @ethic_fanatic_competitive
 	}
 }
 
@@ -19,6 +25,9 @@ is_ecologist = {
 	OR = {
 		has_ethic = ethic_fanatic_green
 		has_ethic = ethic_green
+
+		has_ethic = @ethic_ecocentric
+		has_ethic = @ethic_fanatic_ecocentric
 	}
 }
 
@@ -26,6 +35,9 @@ is_industrialist = {
 	OR = {
 		has_ethic = ethic_fanatic_industrial
 		has_ethic = ethic_industrial
+		
+		has_ethic = @ethic_anthropocentric
+		has_ethic = @ethic_fanatic_anthropocentric
 	}
 }
 
@@ -1341,6 +1353,7 @@ tec_has_psionic_ascension_origin = {
 	OR = {
 		has_origin = origin_shroudwalker_apprentice		# Origin
 		has_origin = origin_tec_psionicspecies			# Origin
+		has_origin = origin_pd_shroud
 	}
 }
 
@@ -1588,11 +1601,11 @@ tec_has_infinite_menial_districts = {
 		uses_district_set = hive_world
 		uses_district_set = machine_world
 		uses_district_set = shattered_ring_world
-		uses_district_set = @pdnecroplanet
 		AND = {
 			uses_district_set = city_world
 			has_planet_flag = tec_remnants_decadent_ecu
 		}
+		tec_is_pd_menial_uncapped = yes
 	}
 }
 
@@ -1669,23 +1682,34 @@ tec_is_special_colony_restrictive_advanced = {
 # Compatibility scripts
 tec_invalidates_arcology_project_comp = {
 	OR = {
-		uses_district_set = city_world
+		tec_is_city_planet = yes
+		tec_is_special_colony = yes
 		# Wenkwort
 		has_modifier = pm_wenkwort_custodian
+
 		# Planetary diversity compatibility
-		is_planet_class = @pc_pdshroud
-		tec_is_pd_city_planet = yes
+		tec_is_pd_necropolis = yes  # just in case - techincally does not exist
+		is_pd_shroud_world = yes
 		is_pd_unique = yes
+		is_pd_planetary_megaproject = yes
 	}
 }
 
 tec_invalidates_ecoworld_project_comp = {
 	OR = {
-		uses_district_set = city_world
-		# Planetary diversity compatibility
-		tec_is_pd_city_planet = yes
-		is_pd_unique = yes
-	}
+		tec_is_city_planet = yes
+		tec_is_special_colony = yes
+
+		tec_is_hive_world = yes
+		tec_is_machine_world  = yes
+		tec_is_nuked_world = yes
+		tec_is_relic_world = yes
+
+		# PD
+		tec_is_pd_necropolis = yes # just in case - techincally does not exist
+		tec_is_pd_wasteland = yes
+		is_pd_planetary_megaproject = yes
+	} 
 }
 
 # To apply - roadd tirggers
@@ -1882,11 +1906,10 @@ tec_is_vanilla_habitable_regular_planet = {
 tec_is_habitable_regular_planet = {
 	OR = {
 		tec_is_vanilla_habitable_regular_planet = yes
-
 		# Generic
 		uses_district_set = standard
-
-		tec_is_pd_regular_planet = yes
+		# PD
+		is_pd_regular = yes
 	}
 }
 
@@ -1919,18 +1942,25 @@ tec_is_habitat = {
 	}
 }
 
+tec_uses_habitat_districts = {
+	OR = {
+		uses_district_set = habitat
+	}
+}
+
 tec_is_ringworld = {
 	OR = {
-		# is_ringworld = yes
-		# vanilla changed the check
-		uses_district_set = ring_world
-		uses_district_set = @penrose_ring
-		uses_district_set = @interstellar_ring
+		is_ringworld = yes
+
 	}
 }
 
 tec_uses_ringworld_districts = {
-	tec_is_ringworld = yes
+	OR = {
+	uses_district_set = ring_world
+	uses_district_set = @penrose_ring
+	uses_district_set = @interstellar_ring
+	}
 }
 
 tec_is_elysium = {
@@ -1943,7 +1973,7 @@ tec_is_elysium = {
 tec_is_city_planet = {
 	OR = {
 		uses_district_set = city_world
-		tec_is_pd_city_planet = yes
+		is_pd_arcology = yes
 	}
 }
 
@@ -1956,6 +1986,7 @@ tec_is_viable_voidwellerneutral_planet = {
 		uses_district_set = city_world
 		is_planet_class = pc_relic
 		is_planet_class = pc_gaia
+		has_modifier = pm_tec_ecoworld_planet
 		#pd compo - DISABLED COMPO
 		tec_is_pd_void_neutral_planets = yes
 	}
@@ -1965,8 +1996,7 @@ tec_is_viable_voidwellerneutral_planet = {
 # only for exotic and gaia worlds
 tec_is_viable_lifegood_planet = {
 	OR = {
-		
-		is_planet_class = pc_gaia
+		tec_is_gaia_world = yes
 		tec_is_pd_perfect_planets = yes
 	}
 }
@@ -1974,8 +2004,8 @@ tec_is_viable_lifegood_planet = {
 # for special arcologies
 tec_is_viable_lifeneutral_planet = {
 	OR = {
-		is_planet_class = pc_tec_elysium
-		is_planet_class = pc_ringworld_habitable
+		tec_is_elysium = yes
+		tec_is_ringworld = yes
 		tec_is_pd_perfect_planets = yes
 	}
 }
@@ -2058,6 +2088,58 @@ tec_is_machine_aquatic_owner = {
 # By Roadd - need organisation
 tec_is_ecoworld = {
 	has_modifier = pm_tec_ecoworld_planet
+}
+
+tec_is_arcology_habitat = {
+	OR = {
+		has_planet_flag = tec_arcology_habitat
+		has_modifier = pm_tec_arcology_habitat
+	}
+}
+
+tec_is_hive_world = {
+	OR = {
+		is_planet_class = pc_hive
+		# PD
+		is_pd_hive_world = yes
+	}
+}
+
+tec_is_machine_world = {
+	OR = {
+		is_planet_class = pc_machine
+		# PD
+		is_pd_machine = yes
+	}
+}
+
+tec_is_nuked_world = {
+	OR = {
+		is_planet_class = pc_nuked
+		tec_is_pd_nuked_world = yes
+	}
+}
+
+tec_is_relic_world = {
+	OR = {
+		is_planet_class = pc_relic
+		tec_is_pd_relic_world = yes
+	}
+}
+
+tec_is_gaia_world = {
+	OR = {
+		is_planet_class = pc_gaia
+		is_pd_gaia = yes
+	}
+}
+
+tec_is_aquatic_planet = {
+	OR = {
+		is_planet_class = pc_ocean
+		tec_is_pd_aquatic_planet = yes
+		has_modifier = flooded_habitat
+	}
 }
 
 tec_district_ecoworld_swap = {
@@ -2158,11 +2240,14 @@ tec_has_standard_habitation_district = {
 		uses_district_set = machine_world
 		uses_district_set = shattered_ring_world
 		uses_district_set = @pdnecroplanet
+		uses_district_set = @pdscrapyard
+		uses_district_set = @pdbioforge
+		uses_district_set = @pdbiofort
+		uses_district_set = @pdfloraforge
+		uses_district_set = @pdflorafort
 		has_planet_flag = tec_remnants_decadent_ecu
 	}
-	NOT = {
-		has_modifier = pm_tec_ecoworld_planet
-	}
+	tec_is_ecoworld = no
 }
 
 tec_has_standard_industrial_district = {
@@ -2175,9 +2260,8 @@ tec_has_standard_industrial_district = {
 		has_planet_flag = tec_ecumenopolis_spec_militarized
 		has_planet_flag = tec_ecumenopolis_spec_science
 		has_planet_flag = tec_ecumenopolis_spec_admin
-
-		has_modifier = pm_tec_ecoworld_planet
 	}
+	tec_is_ecoworld = no
 }
 
 tec_allows_machine_alt_capitals = {
@@ -2470,8 +2554,77 @@ tec_has_patrol_drone_swap = {
 	always = no
 }
 
+
 tec_is_cyberarch_empire = {
 	OR = {
 		has_valid_civic = civic_tec_machine_digitalization
 	}
+}
+
+tec_has_scrap_miner = {
+	OR = {
+		is_planet_class = pc_shattered_ring_habitable
+	}
+}
+
+tec_is_unspecced_city_planet = {
+	NOR = {
+		has_planet_flag = tec_ecumenopolis_spec_militarized
+		has_planet_flag = tec_ecumenopolis_spec_science
+		has_planet_flag = tec_ecumenopolis_spec_admin
+		has_planet_flag = tec_ecumenopolis_spec_precursor
+	}
+}
+
+tec_is_precursor_city_planet = {
+	has_planet_flag = tec_ecumenopolis_spec_precursor 
+}
+
+tec_is_military_city_planet = {
+	has_planet_flag = tec_ecumenopolis_spec_militarized 
+}
+
+tec_is_admin_city_planet = {
+	has_planet_flag = tec_ecumenopolis_spec_admin 
+}
+
+tec_is_science_city_planet = {
+	has_planet_flag = tec_ecumenopolis_spec_science 
+}
+
+tec_is_decadent_city_planet = {
+	has_planet_flag = tec_remnants_decadent_ecu
+}
+
+tec_is_specced_ringworld = {
+	OR = {
+		has_planet_flag = tec_rw_spec_science
+		has_planet_flag = tec_rw_spec_admin
+		has_planet_flag = tec_rw_spec_industry
+	}
+}
+
+tec_is_unspecced_ringworld = {
+	NOR = {
+		has_planet_flag = tec_rw_spec_precursor
+		has_planet_flag = tec_rw_spec_science
+		has_planet_flag = tec_rw_spec_admin
+		has_planet_flag = tec_rw_spec_industry
+	}
+}
+
+tec_is_precursor_ringworld = {
+	has_planet_flag = tec_rw_spec_precursor
+}
+
+tec_is_science_ringworld = {
+	has_planet_flag = tec_rw_spec_science
+}
+
+tec_is_industry_ringworld = {
+	has_planet_flag = tec_rw_spec_industry
+}
+
+tec_is_admin_ringworld = { # scrapped
+	has_planet_flag = tec_rw_spec_admin
 }
