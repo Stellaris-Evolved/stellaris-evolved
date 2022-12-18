@@ -33,7 +33,17 @@ district_tec_aqua_generator = {
 	}
 	
 	allow = {
-		NOT = { has_modifier = resort_colony }
+		NOR = {
+			has_modifier = resort_colony 
+			AND = {
+				exists = owner
+				owner = {
+					is_ai = yes
+				}
+				has_planet_flag = tec_chosen_ai_ecu
+			}
+			tec_has_machine_production_capital = yes
+		}
 	}
 	
 	conversion_ratio = 1
@@ -61,17 +71,6 @@ district_tec_aqua_generator = {
 			}
 			minerals = -50
 		}
-		# Resource production civic
-			produces = {
-				trigger = {
-					exists = owner
-					owner = {
-						tec_district_generate_basic_resources = yes
-					}
-				}
-				energy = 2
-			}
-		# /	
 		upkeep = {
 			energy = 1
 		}
@@ -84,174 +83,89 @@ district_tec_aqua_generator = {
 			}
 			energy = 0.25
 		}
+		# Automated production
+			produces = {	# BASE
+				trigger = {
+					exists = owner
+					owner = { tec_is_automated_empire = yes }
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				energy = 1
+				multiplier = value:tec_automated_district_production|BASE|6|ECO_CAT|planet_technician|RESOURCE|energy|REQUISITON|has_energy_requisitorium|REQUISITION_AMOUNT|@requisitorium_energy_reduction|
+			}
+		# /
+		# Resource production civic
+			produces = {
+				trigger = {
+					exists = owner
+					owner = {
+						tec_district_generate_basic_resources = yes
+					}
+				}
+				energy = 2
+			}
+		# /
 	}
 
-	triggered_desc = {
-		trigger = {
-			exists = owner
+	# Overlord production for automated empires
+	overlord_resources = {
+		category = planet_requisitioned_energy
+		produces = {
+			trigger = {
+				planet = {
+					exist = owner
+					owner = { tec_is_automated_empire = yes }
+					has_planet_flag = has_energy_requisitorium
+					tec_planet_allows_automation = yes
+				}
+			}
+			energy = @requisitorium_energy_overlord
+		}
+	}
+
+	inline_script = districts/inline_evolved_rural_district_modifiers
+
+	inline_script = {
+		script = jobs/inline_evolved_technician
+		regular_count = 0
+		hive_count = 0
+		machine_count = 0
+		machine_aquatic_count = 2 # change to 1 when adequate job is created
+		display = with_desc
+		trigger = ""
+	}
+
+	inline_script = {
+		script = jobs/inline_evolved_technician_swaps
+		machine_count = 1
+		display = with_desc
+		trigger = "
+			NAND = {
+				owner = {
+					tec_is_automated_empire = yes
+				}
+				planet = {
+					tec_planet_allows_automation = yes
+				}
+			}
+		"
+	}
+
+	inline_script = {
+		script = jobs/inline_evolved_technician
+		regular_count = 0
+		hive_count = 0
+		machine_count = 0
+		machine_aquatic_count = 1
+		display = no_desc
+		trigger = "
 			owner = {
-				has_technology = tech_power_hub_2
+				tec_has_extra_menial_district_job = yes
 			}
-			planet = {
-				NOR = {
-					has_active_building = building_energy_nexus
-					has_active_building = building_energy_complex
-				}
-			}
-		}
-		text = tec_upgradeable_district_jobs_energy
+		"
 	}
-
-	# Modifiers
-		# Standard
-			planet_modifier = {
-				planet_housing_add = 2
-			}
-		# /
-		# Technologies
-		# /
-		# Traditions
-		# /
-		# Origins
-		# /
-		# Civics
-		triggered_planet_modifier = {
-			potential = {
-				exists = owner
-				owner = {
-					has_valid_civic = civic_agrarian_idyll
-				}
-			}
-			modifier = {
-				planet_housing_add = 1
-			}
-		}
-
-		triggered_planet_modifier = {
-			potential = {
-				exists = owner
-				owner = {
-					has_valid_civic = civic_tec_tribalism
-				}
-			}
-			modifier = {
-				planet_housing_add = 2
-				planet_amenities_add = 1
-			}
-		}
-		# /
-	# /
-	# Jobs
-		# Regular
-			triggered_planet_modifier = { 	# regular
-				potential = {
-					exists = owner
-					owner = {
-						is_gestalt = no
-						is_fallen_empire_spiritualist = no
-					}
-				}
-				modifier = {
-					job_technician_add = 2
-				}
-			}
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_valid_civic = civic_tec_syndical
-					}
-				}
-				modifier = {
-					job_technician_add = 1
-				}
-			}
-			triggered_desc = {
-				trigger = {
-					exists = owner
-					owner = {
-						is_gestalt = no
-						is_fallen_empire_spiritualist = no
-					}
-				}
-				text = job_technician_effect_desc
-			}
-		# /
-		# Hive
-			triggered_planet_modifier = {	# Hive
-				potential = {
-					exists = owner
-					owner = { is_hive_empire = yes }
-				}
-				modifier = {
-					job_technician_drone_add = 3
-				}
-			}
-			triggered_desc = {
-				trigger = {
-					exists = owner
-					owner = { is_gestalt = yes }
-				}
-				text = job_technician_drone_effect_desc
-			}
-		# /
-		# Machine
-			triggered_planet_modifier = {	# Machine
-				potential = {
-					exists = owner
-					owner = {
-						is_machine_empire = yes 
-					}
-				}
-				modifier = {
-					job_technician_drone_add = 2
-					planet_housing_add = 1
-				}
-			}
-
-			triggered_planet_modifier = {	# Machine
-				potential = {
-					exists = owner
-					owner = {
-						is_machine_empire = yes 
-						tec_is_aquatic_empire = yes
-					}
-				}
-				modifier = {
-					job_tec_hydrorelay_drone_add = 1
-					planet_housing_add = 1
-				}
-			}
-			triggered_desc = {
-				trigger = {
-					exists = owner
-					owner = {
-						is_machine_empire = yes
-						tec_is_aquatic_empire = yes 
-					}
-				}
-				text = job_tec_hydrorelay_drone_effect_desc
-			}
-		# /
-		# FE
-			triggered_planet_modifier = { #fe
-				potential = {
-					exists = owner
-					owner = { is_fallen_empire_spiritualist = yes }
-				}
-				modifier = {
-					job_fe_acolyte_generator_add = 2
-				}
-			}
-			triggered_desc = {
-				trigger = {
-					exists = owner
-					owner = { is_fallen_empire_spiritualist = yes }
-				}
-				text = job_fe_acolyte_generator_effect_desc
-			}
-		# /
-	# /
 }
 
 district_tec_aqua_mining = {
@@ -275,7 +189,17 @@ district_tec_aqua_mining = {
 	}
 
 	allow = {
-		NOT = { has_modifier = resort_colony }
+		NOR = {
+			has_modifier = resort_colony 
+			AND = {
+				exists = owner
+				owner = {
+					is_ai = yes
+				}
+				has_planet_flag = tec_chosen_ai_ecu
+			}
+			tec_has_machine_production_capital = yes
+		}
 	}
 	
 	conversion_ratio = 1
@@ -303,17 +227,6 @@ district_tec_aqua_mining = {
 			}
 			minerals = -50
 		}
-		# Resource production civic
-			produces = {
-				trigger = {
-					exists = owner
-					owner = {
-						tec_district_generate_basic_resources = yes
-					}
-				}
-				minerals = 2
-			}
-		# /	
 		upkeep = {
 			energy = 1
 		}
@@ -332,374 +245,157 @@ district_tec_aqua_mining = {
 			}
 			energy = 0.2
 		}
+		# Automated production
+			produces = {	# BASE
+				trigger = {
+					exists = owner
+					owner = { tec_is_automated_empire = yes }
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				minerals = 1
+				multiplier = value:tec_automated_district_production|BASE|4|ECO_CAT|planet_miners|RESOURCE|minerals|REQUISITON|has_material_requisitorium|REQUISITION_AMOUNT|@requisitorium_minerals_reduction|
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = { tec_is_automated_empire = yes }
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				energy = 1
+			}
+		# /	
+		# Resource production civic
+			produces = {
+				trigger = {
+					exists = owner
+					owner = {
+						tec_district_generate_basic_resources = yes
+					}
+				}
+				minerals = 2
+			}
+		# /	
 	}
 
-	triggered_desc = {
-		trigger = {
+	# Overlord production for automated empires
+	overlord_resources = {
+		category = planet_requisitioned_minerals
+		produces = {
+			trigger = {
+				planet = {
+					exist = owner
+					owner = { tec_is_automated_empire = yes }
+					has_planet_flag = has_material_requisitorium
+					tec_planet_allows_automation = yes
+				}
+			}
+			minerals = @requisitorium_minerals_overlord
+		}
+	}
+
+	inline_script = districts/inline_evolved_rural_district_modifiers
+
+	inline_script = {
+		script = jobs/inline_evolved_miner
+		regular_count = 0
+		regular_aquatic_count = 1
+		hive_count = 0
+		hive_aquatic_count = 2
+		machine_count = 0
+		display = with_desc
+		trigger = ""
+	}
+	inline_script = {
+		script = jobs/inline_evolved_miner_swaps
+		regular_count = 1
+		hive_count = 1
+		display = with_desc
+		trigger = "
+			NAND = {
+				owner = {
+					tec_is_automated_empire = yes
+				}
+				planet = {
+					tec_planet_allows_automation = yes
+				}
+			}
+		"
+	}
+
+	inline_script = {
+		script = jobs/inline_evolved_miner
+		regular_count = 0
+		regular_aquatic_count = 1
+		hive_count = 0
+		hive_aquatic_count = 1
+		machine_count = 0
+		display = no_desc
+		trigger = "
+			owner = {
+				tec_has_extra_menial_district_job = yes
+			}
+		"
+	}
+
+	inline_script = {
+		script = districts/inline_evolved_agrarian_idyll_modifiers
+		trigger = "
+			owner = {
+				is_lithoid_empire = yes
+			}
+		"
+	}
+
+	triggered_planet_modifier = {
+		potential = {
 			exists = owner
 			owner = {
-				has_technology = tech_mineral_purification_2
-			}
-			planet = {
-				NOR = {
-					has_active_building = building_mineral_purification_hub
-					has_active_building = building_mineral_purification_complex
-				}
+				has_valid_civic = civic_tec_eco_keepers
 			}
 		}
-		text = tec_upgradeable_district_jobs_minerals
+		modifier = {
+			planet_amenities_add = -1
+		}
 	}
 
-	# Modifiers
-		# Standard
-			planet_modifier = {
-				planet_housing_add = 2
+	inline_script = {
+		script = jobs/inline_evolved_miner
+		regular_count = 0
+		regular_aquatic_count = 1
+		hive_count = 0
+		hive_aquatic_count = 0
+		machine_count = 0
+		display = no_desc
+		trigger = "
+			owner = {
+				has_valid_civic = civic_mining_guilds
 			}
-		# /
-		# Technologies
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_technology = tech_tec_housing_lithoid_idyll
-						has_valid_civic = civic_agrarian_idyll
-						is_lithoid_empire = yes
-					}
-				}
-				modifier = {
-					planet_housing_add = 1
-				}
-			}
-		# /
-		# Traditions
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_valid_civic = civic_agrarian_idyll
-						is_lithoid_empire = yes
-						has_tradition = tr_tec_artifice_final_1
-					}
-				}
-				planet_amenities_add = 2
-			}
-		# /
-		# Origins
-		# /
-		# Civics
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_valid_civic = civic_agrarian_idyll
-					}
-				}
-				modifier = {
-					planet_housing_add = 1
-				}
-			}
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_valid_civic = civic_agrarian_idyll
-						is_lithoid_empire = yes
-					}
-				}
-				modifier = {
-					planet_max_buildings_add = 0.35
-				}
-			}
+		"
+	}
 
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_valid_civic = civic_tec_tribalism
-					}
-				}
-				modifier = {
-					planet_housing_add = 2
-					planet_amenities_add = 1
-				}
-			}
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_origin = origin_subterranean }
+		}
+		modifier = {
+			planet_housing_add = 1
+		}
+	}
 
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_valid_civic = civic_tec_eco_keepers
-					}
-				}
-				modifier = {
-					planet_amenities_add = -1
-				}
-			}
-		# /
-	# /
-	# Jobs
-		# Regular
-			triggered_planet_modifier = {	# Regular
-				potential = {
-					exists = owner
-					owner = {
-						is_gestalt = no
-						is_fallen_empire_spiritualist = no
-						NAND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = yes
-						}
-					}
-				}
-				modifier = {
-					job_miner_add = 2
-				}
-			}
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_valid_civic = civic_mining_guilds
-						NAND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = yes
-						}
-					}
-				}
-				modifier = {
-					planet_housing_add = 1
-					job_miner_add = 1
-				}
-			}
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_valid_civic = civic_tec_syndical
-						NAND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = yes
-						}
-					}
-				}
-				modifier = {
-					job_miner_add = 1
-				}
-			}
-			triggered_desc = {
-				trigger = {
-					exists = owner
-					owner = {
-						is_gestalt = no
-						is_fallen_empire_spiritualist = no
-						NAND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = yes
-						}
-					}
-				}
-				text = job_miner_effect_desc
-			}
-
-			triggered_planet_modifier = {	# Regular
-				potential = {
-					exists = owner
-					owner = {
-						is_gestalt = no
-						is_fallen_empire_spiritualist = no
-						AND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = yes
-						}
-					}
-				}
-				modifier = {
-					job_tec_reef_miner_add = 1
-					job_pearl_diver_add = 1
-				}
-			}
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_valid_civic = civic_mining_guilds
-						AND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = yes
-						}
-					}
-				}
-				modifier = {
-					planet_housing_add = 1
-					job_tec_reef_miner_add = 1
-				}
-			}
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_valid_civic = civic_tec_syndical
-						AND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = yes
-						}
-					}
-				}
-				modifier = {
-					job_tec_reef_miner_add = 1
-				}
-			}
-			triggered_desc = {
-				trigger = {
-					exists = owner
-					owner = {
-						is_gestalt = no
-						is_fallen_empire_spiritualist = no
-						AND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = yes
-						}
-					}
-				}
-				text = job_tec_reef_miner_effect_desc
-			}
-			triggered_desc = {
-				trigger = {
-					exists = owner
-					owner = {
-						is_gestalt = no
-						is_fallen_empire_spiritualist = no
-						AND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = yes
-						}
-					}
-				}
-				text = job_pearl_diver_effect_desc
-			}
-		# /
-		# Hive
-			triggered_planet_modifier = {	#Hive
-				potential = {
-					exists = owner
-					owner = {
-						is_hive_empire = yes
-						NAND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = yes
-						}
-					}
-				}
-				modifier = {
-					job_mining_drone_add = 3
-				}
-			}
-			triggered_desc = {
-				trigger = {
-					exists = owner
-					owner = {
-						is_gestalt = yes
-						NAND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = yes
-						}
-					}
-				}
-				text = job_mining_drone_effect_desc
-			}
-
-			triggered_planet_modifier = {	#Hive
-				potential = {
-					exists = owner
-					owner = {
-						is_hive_empire = yes 
-						AND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = yes
-						}
-					}
-				}
-				modifier = {
-					job_tec_reef_drone_add = 2
-					job_tec_depth_drone_add = 1
-				}
-			}
-			triggered_desc = {
-				trigger = {
-					exists = owner
-					owner = {
-						is_hive_empire = yes
-						AND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = yes
-						}
-					}
-				}
-				text = job_tec_reef_drone_effect_desc
-			}
-			triggered_desc = {
-				trigger = {
-					exists = owner
-					owner = {
-						is_hive_empire = yes
-						AND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = yes
-						}
-					}
-				}
-				text = job_tec_depth_drone_effect_desc
-			}
-		# /
-		# Machine
-			triggered_planet_modifier = {	#Machine
-				potential = {
-					exists = owner
-					owner = {
-						is_machine_empire = yes 
-					}
-				}
-				modifier = {
-					job_mining_drone_add = 2
-					planet_housing_add = 1
-				}
-			}
-		# /
-		# FE
-			triggered_planet_modifier = {	#Fe
-				potential = {
-					exists = owner
-					owner = {
-						is_fallen_empire_spiritualist = yes 
-					}
-				}
-				modifier = {
-					job_fe_acolyte_mine_add = 2
-				}
-			}
-			triggered_desc = {
-				trigger = {
-					exists = owner
-					owner = { is_fallen_empire_spiritualist = yes }
-				}
-				text = job_fe_acolyte_mine_effect_desc
-			}
-		# /
-	# /
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_origin = origin_subterranean }
+		}
+		modifier = {
+			planet_max_buildings_add = 0.34
+		}
+	}
 }
 
 district_tec_aqua_farming = {
@@ -739,7 +435,17 @@ district_tec_aqua_farming = {
 	}
 	
 	allow = {
-		NOT = { has_modifier = resort_colony }
+		NOR = {
+			has_modifier = resort_colony
+			AND = {
+				exists = owner
+				owner = {
+					is_ai = yes
+				}
+				has_planet_flag = tec_chosen_ai_ecu
+			}
+			tec_has_machine_production_capital = yes
+		}
 	}
 	
 	conversion_ratio = 1
@@ -768,6 +474,40 @@ district_tec_aqua_farming = {
 			}
 			minerals = -50
 		}
+		upkeep = {
+			energy = 1
+		}
+		upkeep = {
+			trigger = {
+				owner = {
+					has_valid_civic = civic_tec_syndical
+				}
+			}
+			energy = 0.25
+		}
+		# Automated production
+			produces = {	# BASE
+				trigger = {
+					exists = owner
+					owner = { tec_is_automated_empire = yes }
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				food = 1
+				multiplier = value:tec_automated_district_production|BASE|6|ECO_CAT|planet_farmers|RESOURCE|food|REQUISITON|has_produce_requisitorium|REQUISITION_AMOUNT|@requisitorium_food_reduction|
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = { tec_is_automated_empire = yes }
+					planet = {
+						tec_planet_allows_automation = yes
+					}
+				}
+				energy = 1
+			}
+		# /
 		# Resource production civic
 			produces = {
 				trigger = {
@@ -779,344 +519,80 @@ district_tec_aqua_farming = {
 				food = 2
 			}
 		# /	
-		upkeep = {
-			energy = 1
-		}
-		upkeep = {
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_food
+		produces = {
 			trigger = {
+				planet = {
+					exist = owner
+					owner = { tec_is_automated_empire = yes }
+					has_planet_flag = has_produce_requisitorium
+					tec_planet_allows_automation = yes
+				}
+			}
+			food = @requisitorium_food_overlord
+		}
+	}
+
+	inline_script = districts/inline_evolved_rural_district_modifiers
+
+	inline_script = {
+		script = jobs/inline_evolved_farmer
+		regular_count = 0
+		regular_aquatic_count = 1
+		hive_count = 0
+		hive_aquatic_count = 2
+		machine_count = 0
+		display = with_desc
+		trigger = ""
+	}
+	inline_script = {
+		script = jobs/inline_evolved_farmer_swaps
+		regular_count = 1
+		hive_count = 1
+		display = with_desc
+		trigger = "
+			NAND = {
 				owner = {
-					has_valid_civic = civic_tec_syndical	
+					tec_is_automated_empire = yes
+				}
+				planet = {
+					tec_planet_allows_automation = yes
 				}
 			}
-			energy = 0.25
-		}
+		"
 	}
 
-	triggered_desc = {
-		trigger = {
-			exists = owner
+	inline_script = {
+		script = jobs/inline_evolved_farmer
+		regular_count = 0
+		regular_aquatic_count = 1
+		hive_count = 0
+		hive_aquatic_count = 1
+		machine_count = 0
+		display = no_desc
+		trigger = "
 			owner = {
-				has_technology = tech_food_processing_2
+				tec_has_extra_menial_district_job = yes
 			}
-			planet = {
-				NOR = {
-					has_active_building = building_food_processing_center
-					has_active_building = building_food_processing_complex
-				}
-			}
-		}
-		text = tec_upgradeable_district_jobs_food
+		"
 	}
 
-	# Modifiers
-		# Standard
-			planet_modifier = {
-				planet_housing_add = 2
+	inline_script = {
+		script = districts/inline_evolved_agrarian_idyll_modifiers
+		trigger = "
+			owner = {
+				is_lithoid_empire = no
 			}
-		# /
-		# Technologies
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_technology = tech_housing_agrarian_idyll 
-						has_valid_civic = civic_agrarian_idyll
-						is_lithoid_empire = no
-					}
-				}
-				modifier = {
-					planet_housing_add = 1
-				}
-			}
-		# /
-		# Traditions
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_valid_civic = civic_agrarian_idyll
-						is_lithoid_empire = no
-						has_tradition = tr_tec_artifice_final_1
-					}
-				}
-				planet_amenities_add = 2
-			}
-		# /
-		# Origins
-		# /
-		# Civics
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_valid_civic = civic_agrarian_idyll
-					}
-				}
-				modifier = {
-					planet_housing_add = 1
-				}
-			}
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_valid_civic = civic_agrarian_idyll
-						is_lithoid_empire = no
-					}
-				}
-				modifier = {
-					planet_max_buildings_add = 0.35
-				}
-			}
-
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_valid_civic = civic_tec_tribalism
-					}
-				}
-				modifier = {
-					planet_housing_add = 2
-					planet_amenities_add = 1
-				}
-			}
-		# /
-	# /
-	# Jobs
-		# Regular
-			triggered_planet_modifier = {	# Regular
-				potential = {
-					exists = owner
-					owner = {
-						is_gestalt = no
-						is_fallen_empire_spiritualist = no
-						NAND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = no
-						}
-						
-					}
-				}
-				modifier = {
-					job_farmer_add = 2
-				}
-			}
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_valid_civic = civic_tec_syndical
-						NAND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = no
-						}
-					}
-				}
-				modifier = {
-					job_farmer_add = 1
-				}
-			}
-			triggered_desc = {
-				trigger = {
-					exists = owner
-					owner = {
-						is_gestalt = no
-						is_fallen_empire_spiritualist = no
-						NAND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = no
-						}
-					}
-				}
-				text = job_farmer_effect_desc
-			}
-
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						is_gestalt = no
-						is_fallen_empire_spiritualist = no
-						AND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = no
-						}
-					}
-				}
-				modifier = {
-					job_angler_add = 1
-					job_pearl_diver_add = 1
-				}
-			}
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_valid_civic = civic_tec_syndical
-						AND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = no
-						}
-					}
-				}
-				modifier = {
-					job_angler_add = 1
-				}
-			}
-			triggered_desc = {
-				trigger = {
-					exists = owner
-					owner = {
-						is_gestalt = no
-						is_fallen_empire_spiritualist = no
-						AND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = no
-						}
-					}
-				}
-				text = job_aqu_angler_effect_desc
-			}
-			triggered_desc = {
-				trigger = {
-					exists = owner
-					owner = {
-						is_gestalt = no
-						is_fallen_empire_spiritualist = no
-						AND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = no
-						}
-					}
-				}
-				text = job_pearl_diver_effect_desc
-			}
-		# /
-		# Hive
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						is_hive_empire = yes 
-						AND = {
-							tec_is_aquatic_empire = no
-							is_machine_empire = no
-						}
-					}
-				}
-				modifier = {
-					job_agri_drone_add = 3
-				}
-			}
-			triggered_desc = {
-				trigger = {
-					exists = owner
-					owner = {
-						is_gestalt = yes
-						is_fallen_empire_spiritualist = no
-						NAND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = no
-						}
-					}
-				}
-				text = job_agri_drone_effect_desc
-			}
-
-			triggered_planet_modifier = {	# Hive
-				potential = {
-					exists = owner
-					owner = {
-						is_hive_empire = yes 
-						AND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = no
-						}
-					}
-				}
-				modifier = {
-					job_tec_aqua_drone_add = 2
-					job_tec_depth_drone_add = 1
-				}
-			}
-			triggered_desc = {
-				trigger = {
-					exists = owner
-					owner = {
-						is_gestalt = yes
-						is_fallen_empire_spiritualist = no
-						AND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = no
-						}
-					}
-				}
-				text = job_tec_aqua_drone_effect_desc
-			}
-			triggered_desc = {
-				trigger = {
-					exists = owner
-					owner = {
-						is_gestalt = yes
-						is_fallen_empire_spiritualist = no
-						AND = {
-							tec_is_aquatic_empire = yes
-							is_machine_empire = no
-							is_lithoid_empire = no
-						}
-					}
-				}
-				text = job_tec_depth_drone_effect_desc
-			}
-		# /
-		# Machine
-			triggered_planet_modifier = {	# Machine
-				potential = {
-					exists = owner
-					owner = {
-						is_machine_empire = yes 
-					}
-				}
-				modifier = {
-					job_agri_drone_add = 2
-					planet_housing_add = 1
-				}
-			}
-			# desc above
-		# /
-		# FE
-			triggered_planet_modifier = {	#Fe
-				potential = {
-					exists = owner
-					owner = { is_fallen_empire_spiritualist = yes }
-				}
-				modifier = {
-					job_fe_acolyte_farm_add = 2
-				}
-			}
-			triggered_desc = {
-				trigger = {
-					exists = owner
-					owner = { is_fallen_empire_spiritualist = yes }
-				}
-				text = job_fe_acolyte_farm_effect_desc
-			}
-		# /
-	# /
+		"
+	}
 }
 
 # --------------- Decadent world
+
+# TODO check and adapt with inlines
 district_tec_decadent_generator = {
 	base_buildtime = 240
 
@@ -1831,6 +1307,7 @@ district_tec_decadent_farming = {
 
 # Discarded - to rework
 # --------------- Arkship
+# TODO check and adapt with inlines
 district_tec_ark_housing = {
 	icon = district_hab_housing
 	base_buildtime = 240
