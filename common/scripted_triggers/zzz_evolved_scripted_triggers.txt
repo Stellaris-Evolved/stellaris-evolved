@@ -483,6 +483,14 @@ tec_is_bioarch_empire = {	# Swaps certain costs
 	}
 }
 
+
+tec_is_cyberarch_empire = {
+	OR = {
+		has_valid_civic = civic_tec_machine_digitalization
+		has_country_flag = tec_test_cyberarch_empire
+	}
+}
+
 tec_is_megacity_empire = {	# Swaps certain districts and etc
 	OR = {
 		#has_valid_civic = civic_tec_megacities
@@ -1721,59 +1729,6 @@ tec_invalidates_ecoworld_project_comp = {
 	} 
 }
 
-# To apply - roadd tirggers
-tec_is_unspecialized_ecu = {
-	NOR = {
-		has_planet_flag = tec_ecumenopolis_spec_militarized
-		has_planet_flag = tec_ecumenopolis_spec_science
-		has_planet_flag = tec_ecumenopolis_spec_admin
-		has_planet_flag = tec_ecumenopolis_spec_precursor
-	}
-}
-
-tec_is_military_ecu = {
-	has_planet_flag = tec_ecumenopolis_spec_militarized
-}
-
-tec_is_research_ecu = {
-	has_planet_flag = tec_ecumenopolis_spec_science
-}
-
-tec_is_admin_ecu = {
-	has_planet_flag = tec_ecumenopolis_spec_admin
-}
-
-tec_is_menial_elysium = {
-	NOR = {
-		has_planet_flag = tec_civ_elysium
-		has_planet_flag = tec_mil_elysium
-	}
-}
-
-tec_is_civilian_elysium = {
-	has_planet_flag = tec_civ_elysium
-}
-
-tec_is_military_elysium = {
-	has_planet_flag = tec_mil_elysium
-}
-
-tec_is_menial_rw = {
-	NOR = {
-		has_planet_flag = tec_rw_spec_science
-		has_planet_flag = tec_rw_spec_industry
-		has_planet_flag = tec_rw_spec_admin
-	}
-}
-
-tec_is_science_rw = {
-	has_planet_flag = tec_rw_spec_science
-}
-
-tec_is_industry_rw = {
-	has_planet_flag = tec_rw_spec_industry
-}
-
 tec_has_any_menial_district = {
 	OR = {
 		# Energy
@@ -1925,19 +1880,13 @@ tec_is_habitable_regular_planet = {
 tec_is_arcology = {
 	OR = {
 		tec_is_city_planet = yes
-		#is_planet_class = pc_city_cyberhive
-		#is_planet_class = pc_machine_forge
-		#is_planet_class = pc_hive_biosentient
-		
-		uses_habitat_capitals = yes
-		tec_is_ringworld = yes
-		tec_is_elysium = yes
+		tec_is_space_arcology = yes
 	}
 }
 
 tec_is_space_arcology = {
 	OR = {
-		uses_habitat_capitals = yes
+		tec_is_habitat = yes
 		tec_is_ringworld = yes
 		tec_is_elysium = yes
 		tec_is_modded_space_arcology = yes
@@ -1947,28 +1896,17 @@ tec_is_space_arcology = {
 tec_is_habitat = {
 	OR = {
 		uses_district_set = habitat
-		tec_is_pd_habitat_mimic_planet = yes
-	}
-}
-
-tec_uses_habitat_districts = {
-	OR = {
-		uses_district_set = habitat
+		# PD
+		uses_district_set = @pdplanethab
+		# gigas
+		is_giga_habitat = yes
 	}
 }
 
 tec_is_ringworld = {
 	OR = {
-		is_ringworld = yes
-
-	}
-}
-
-tec_uses_ringworld_districts = {
-	OR = {
-	uses_district_set = ring_world
-	uses_district_set = @penrose_ring
-	uses_district_set = @interstellar_ring
+		uses_district_set = ring_world
+		is_giga_ringworld = yes
 	}
 }
 
@@ -1985,6 +1923,22 @@ tec_is_city_planet = {
 		is_pd_arcology = yes
 	}
 }
+
+tec_uses_habitat_districts = {
+	OR = {
+		uses_district_set = habitat
+	}
+}
+
+tec_uses_ringworld_districts = {
+	OR = {
+		uses_district_set = ring_world
+		uses_district_set = @penrose_ring
+		uses_district_set = @interstellar_ring
+	}
+}
+
+
 
 #void dweller traits
 # neutral
@@ -2022,46 +1976,52 @@ tec_is_neutral_planet = {
 # Aquatic species
 tec_is_wet_planet_exceptions = {	# Outside is_wet trigger
 	OR = {
-		# Gaias are always good
-		is_planet_class = pc_gaia
+		tec_is_gaia_world = yes
+		tec_is_flooded = yes
+		tec_is_wet_planet_origin_exceptions = yes
+	}
+}
+
+tec_is_wet_planet_origin_exceptions = {
+	OR = {
 		# Nuked start 
 		AND = {
 			owner = {
-				has_origin = origin_post_apocalyptic
+				tec_has_nuked_world_origin = yes
 			}
-			is_planet_class = pc_nuked
+			tec_is_nuked_world = yes
 		}
 		AND = {
 			from = {
-				has_origin = origin_post_apocalyptic
+				tec_has_nuked_world_origin = yes
 			}
-			is_planet_class = pc_nuked
+			tec_is_nuked_world = yes
 		}
 		# Hive start
-			#AND = {
-			#	owner = {
-			#		has_origin = origin_tec_hiveplanet
-			#	}
-			#	is_planet_class = pc_hive
-			#}
-			#AND = {
-			#	from = {
-			#		has_origin = origin_tec_hiveplanet
-			#	}
-			#	is_planet_class = pc_hive
-			#}
+		AND = {
+			owner = {
+				tec_has_hive_world_origin = yes
+			}
+			tec_is_hive_world = yes
+		}
+		AND = {
+			from = {
+				tec_has_hive_world_origin = yes
+			}
+			tec_is_hive_world = yes
+		}
 		# Machine Start
 		AND = {
 			owner = {
-				has_origin = origin_machine
+				tec_has_machine_world_origin = yes
 			}
-			is_planet_class = pc_machine
+			tec_is_machine_world = yes
 		}
 		AND = {
 			from = {
-				has_origin = origin_machine
+				tec_has_machine_world_origin = yes
 			}
-			is_planet_class = pc_machine
+			tec_is_machine_world = yes
 		}
 		# 
 	}
@@ -2147,7 +2107,52 @@ tec_is_aquatic_planet = {
 	OR = {
 		is_planet_class = pc_ocean
 		tec_is_pd_aquatic_planet = yes
-		has_modifier = flooded_habitat
+		tec_is_flooded = yes
+	}
+}
+
+tec_has_nuked_world_origin = {
+	OR = {
+		has_origin = origin_post_apocalyptic
+		has_origin = @origin_pd_radiotrophic_mutants
+		has_origin = @origin_disharmonious_unity
+		has_origin = @originsextended_starless
+		has_origin = @originsextended_magnetica
+		has_origin = @originsextended_graveyard
+	}
+}
+
+tec_has_hive_world_origin = {
+	OR = {
+		has_origin = @origin_tec_hiveplanet
+		has_origin = @origin_pd_hive
+		has_origin = @origin_hive
+		has_origin = @originsextended_infest
+	}
+}
+
+tec_has_machine_world_origin = {
+	OR = {
+		has_origin = origin_machine
+		has_origin = @originsextended_core
+	}
+}
+
+tec_has_relic_world_origin = {
+	OR = {
+		has_origin = origin_remnants
+		has_origin = @origin_reliquary
+		has_origin = @origin_mem_from_the_ashes
+		has_origin = @origin_mem_ceaseless_gaze
+		# has_origin = @origin_pd_scrapyard_world # Commented cause not relic planet type but similar enough
+	}
+}
+
+tec_has_gaia_world_origin = {
+	OR = {
+		has_origin = origin_life_seeded
+		has_origin = @originsextended_gaia
+		has_origin = @origin_resort_world
 	}
 }
 
@@ -2586,6 +2591,18 @@ tec_has_colonist_swap = {
 	always = no
 }
 
+tec_has_clerk_swap = {
+	always = no
+}
+
+tec_has_coordinator_swap = {
+	always = no
+}
+
+tec_has_soldier_swap = {
+	always = no
+}
+
 tec_has_maintenance_swap = {
 	always = no
 }
@@ -2594,11 +2611,8 @@ tec_has_patrol_drone_swap = {
 	always = no
 }
 
-
-tec_is_cyberarch_empire = {
-	OR = {
-		has_valid_civic = civic_tec_machine_digitalization
-	}
+tec_has_warrior_drone_swap = {
+	always = no
 }
 
 tec_has_scrap_miner = {
@@ -2606,6 +2620,22 @@ tec_has_scrap_miner = {
 		is_planet_class = pc_shattered_ring_habitable
 	}
 }
+
+
+tec_has_matter_miner = {
+	OR = {
+		tec_uses_ringworld_districts = yes
+	}
+}
+
+tec_has_special_miner = {
+	OR = {
+		tec_has_scrap_miner = yes
+		tec_has_matter_miner = yes
+	}
+}
+
+
 
 tec_is_unspecced_city_planet = {
 	NOR = {
@@ -2667,4 +2697,38 @@ tec_is_industry_ringworld = {
 
 tec_is_admin_ringworld = { # scrapped
 	has_planet_flag = tec_rw_spec_admin
+}
+
+tec_is_unspecced_elysium = {
+	NOR = {
+		has_planet_flag = tec_civ_elysium
+		has_planet_flag = tec_mil_elysium
+	}
+}
+
+tec_is_civilian_elysium = {
+	has_planet_flag = tec_civ_elysium
+}
+
+tec_is_military_elysium = {
+	has_planet_flag = tec_mil_elysium
+}
+
+tec_has_extra_menial_district_job = {
+	OR = {
+		has_valid_civic = civic_tec_syndical
+		# We can add similar civics to this for megacorps 
+		# or gestalts or even traditions etc
+	}
+}
+
+tec_is_flooded = {
+	# Can be used to allow flooded elysiums and ringworlds
+	OR = {
+		has_modifier = flooded_habitat
+		AND = {
+			has_modifier = hyceanfloodedhabitat
+			owner = { has_origin = origin_pd_hycean_aquatic }
+		}
+	}
 }
