@@ -1880,19 +1880,13 @@ tec_is_habitable_regular_planet = {
 tec_is_arcology = {
 	OR = {
 		tec_is_city_planet = yes
-		#is_planet_class = pc_city_cyberhive
-		#is_planet_class = pc_machine_forge
-		#is_planet_class = pc_hive_biosentient
-		
-		uses_habitat_capitals = yes
-		tec_is_ringworld = yes
-		tec_is_elysium = yes
+		tec_is_space_arcology = yes
 	}
 }
 
 tec_is_space_arcology = {
 	OR = {
-		uses_habitat_capitals = yes
+		tec_is_habitat = yes
 		tec_is_ringworld = yes
 		tec_is_elysium = yes
 		tec_is_modded_space_arcology = yes
@@ -1902,28 +1896,17 @@ tec_is_space_arcology = {
 tec_is_habitat = {
 	OR = {
 		uses_district_set = habitat
-		tec_is_pd_habitat_mimic_planet = yes
-	}
-}
-
-tec_uses_habitat_districts = {
-	OR = {
-		uses_district_set = habitat
+		# PD
+		uses_district_set = @pdplanethab
+		# gigas
+		is_giga_habitat = yes
 	}
 }
 
 tec_is_ringworld = {
 	OR = {
-		is_ringworld = yes
-
-	}
-}
-
-tec_uses_ringworld_districts = {
-	OR = {
-	uses_district_set = ring_world
-	uses_district_set = @penrose_ring
-	uses_district_set = @interstellar_ring
+		uses_district_set = ring_world
+		is_giga_ringworld = yes
 	}
 }
 
@@ -1940,6 +1923,22 @@ tec_is_city_planet = {
 		is_pd_arcology = yes
 	}
 }
+
+tec_uses_habitat_districts = {
+	OR = {
+		uses_district_set = habitat
+	}
+}
+
+tec_uses_ringworld_districts = {
+	OR = {
+		uses_district_set = ring_world
+		uses_district_set = @penrose_ring
+		uses_district_set = @interstellar_ring
+	}
+}
+
+
 
 #void dweller traits
 # neutral
@@ -1977,48 +1976,50 @@ tec_is_neutral_planet = {
 # Aquatic species
 tec_is_wet_planet_exceptions = {	# Outside is_wet trigger
 	OR = {
-		# Gaias are always good
 		tec_is_gaia_world = yes
-		AND = {
-			is_artificial = yes
-			tec_is_flooded = yes
-		}
+		tec_is_flooded = yes
+		tec_is_wet_planet_origin_exceptions = yes
+	}
+}
+
+tec_is_wet_planet_origin_exceptions = {
+	OR = {
 		# Nuked start 
 		AND = {
 			owner = {
-				tec_is_nuked_world_origin = yes
+				tec_has_nuked_world_origin = yes
 			}
 			tec_is_nuked_world = yes
 		}
 		AND = {
 			from = {
-				tec_is_nuked_world_origin = yes
+				tec_has_nuked_world_origin = yes
 			}
 			tec_is_nuked_world = yes
 		}
 		# Hive start
 		AND = {
 			owner = {
-				tec_is_hive_world_origin = yes
+				tec_has_hive_world_origin = yes
 			}
 			tec_is_hive_world = yes
 		}
 		AND = {
 			from = {
-				tec_is_hive_world_origin = yes
+				tec_has_hive_world_origin = yes
 			}
 			tec_is_hive_world = yes
 		}
 		# Machine Start
 		AND = {
 			owner = {
-				tec_is_machine_world_origin = yes
+				tec_has_machine_world_origin = yes
 			}
 			tec_is_machine_world = yes
 		}
 		AND = {
 			from = {
-				tec_is_machine_world_origin = yes
+				tec_has_machine_world_origin = yes
 			}
 			tec_is_machine_world = yes
 		}
@@ -2110,7 +2111,7 @@ tec_is_aquatic_planet = {
 	}
 }
 
-tec_is_nuked_world_origin = {
+tec_has_nuked_world_origin = {
 	OR = {
 		has_origin = origin_post_apocalyptic
 		has_origin = @origin_pd_radiotrophic_mutants
@@ -2121,7 +2122,7 @@ tec_is_nuked_world_origin = {
 	}
 }
 
-tec_is_hive_world_origin = {
+tec_has_hive_world_origin = {
 	OR = {
 		has_origin = @origin_tec_hiveplanet
 		has_origin = @origin_pd_hive
@@ -2130,14 +2131,14 @@ tec_is_hive_world_origin = {
 	}
 }
 
-tec_is_machine_world_origin = {
+tec_has_machine_world_origin = {
 	OR = {
 		has_origin = origin_machine
 		has_origin = @originsextended_core
 	}
 }
 
-tec_is_relic_world_origin = {
+tec_has_relic_world_origin = {
 	OR = {
 		has_origin = origin_remnants
 		has_origin = @origin_reliquary
@@ -2147,7 +2148,7 @@ tec_is_relic_world_origin = {
 	}
 }
 
-tec_is_gaia_world_origin = {
+tec_has_gaia_world_origin = {
 	OR = {
 		has_origin = origin_life_seeded
 		has_origin = @originsextended_gaia
@@ -2725,5 +2726,9 @@ tec_is_flooded = {
 	# Can be used to allow flooded elysiums and ringworlds
 	OR = {
 		has_modifier = flooded_habitat
+		AND = {
+			has_modifier = hyceanfloodedhabitat
+			owner = { has_origin = origin_pd_hycean_aquatic }
+		}
 	}
 }
