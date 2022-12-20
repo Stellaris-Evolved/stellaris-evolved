@@ -3211,6 +3211,143 @@ tec_matterminer_drone = {
 }
 
 # ------------ Aquatic worlds ---------------
+
+tec_thermogenertor_drone = {
+	category = simple_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_energy_grid
+	icon = technician_drone
+
+	possible_pre_triggers = {
+		has_owner = yes
+		#is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+
+	resources = {
+		category = planet_technician
+		produces = {
+			energy = 8
+		}
+		# Species bonuses/maluses
+			#produces = {
+			#	trigger = {
+			#		exists = owner
+			#		owner = {
+			#			is_robot_empire = yes
+			#		}
+			#	}
+			#	energy = 2
+			#}
+		# /
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_energy_requisitorium
+				}
+			}
+			energy = @requisitorium_energy_reduction
+		}
+	}
+	overlord_resources = {
+		category = planet_requisitioned_energy
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_energy_requisitorium
+				}
+			}
+			energy = @requisitorium_energy_overlord
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
+		}
+		planet_amenities_no_happiness_add = 2
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_valid_civic = civic_tec_machine_menial
+			}
+		}
+		planet_amenities_no_happiness_add = 1
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				tec_is_quantum_alloys_empire = yes
+			}
+			planet = {
+				NOR = {
+					has_active_building = building_coordinated_fulfillment_center_1
+					has_active_building = building_coordinated_fulfillment_center_2
+				}
+			}
+		}
+		planet_metallurgists_produces_mult = @tec_quantum_technician
+	}
+
+	weight = {
+		weight = @simple_drone_job_weight
+		mult = value:job_weights_modifier|JOB|technician_drone|RESOURCE|energy|
+		modifier = {
+			factor = 1.2
+			has_job = technician_drone
+		}
+		
+		modifier = {
+			factor = 1.1
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			tec_is_cyborg_species = yes
+		}
+
+		# Crafted pops modifier
+		modifier = {
+			factor = 2
+			tec_is_crafted_sentient_pop = yes
+		}
+		modifier = {
+			factor = 200
+			tec_is_crafted_nonsapient_pop = yes
+		}
+		#Prioritize serving species
+		modifier = {
+			factor = 1.5
+			OR = {
+				tec_has_stapled_trait = yes
+			}
+		}
+
+		modifier = {
+			factor = 0.9
+			NOT = { has_job = technician_drone }
+			owner = {
+				has_monthly_income = {
+					resource = energy
+					value > 50
+				}
+			}
+		}
+		
+	}
+}
+
 tec_hydrorelay_drone = {
 	category = complex_drone
 	condition_string = DRONE_JOB_TRIGGER
@@ -3306,15 +3443,6 @@ tec_reef_drone = {
 			#	minerals = 1
 			#}
 		# /
-		produces = {
-			trigger = {
-				owner = {
-					is_lithoid_empire = yes
-					has_valid_civic = civic_tec_hive_menial
-				}
-			}
-			minerals = 0.5
-		}
 		produces = {
 			trigger = {
 				planet = {
@@ -3449,25 +3577,6 @@ tec_aqua_drone = {
 		# /
 		produces = {
 			trigger = {
-				exists = owner
-				owner = {
-					is_lithoid_empire = no
-					has_valid_civic = civic_tec_hive_menial
-				}
-			}
-			food = 0.5
-		}
-		produces = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_robot_empire = yes
-				}
-			}
-			food = -1
-		}
-		produces = {
-			trigger = {
 				planet = {
 					has_planet_flag = has_produce_requisitorium
 				}
@@ -3491,7 +3600,7 @@ tec_aqua_drone = {
 		potential = {
 			always = yes
 		}
-		planet_amenities_no_happiness_add = 3
+		planet_amenities_no_happiness_add = 2
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
 
