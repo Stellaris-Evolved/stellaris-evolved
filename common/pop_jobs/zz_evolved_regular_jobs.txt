@@ -4184,6 +4184,67 @@ tec_astrologer = {				# Astrologer
 
 
 # ------------ Assembly jobs ---------------
+
+tec_master_roboticist = {
+	icon = roboticist
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_robot_assembly_complex
+	clothes_texture_index = 3
+		
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+	
+	resources = {
+		category = planet_pop_assemblers
+		inline_script = {
+			script = jobs/inline_evolved_robotic_assembly_upkeep
+			base = 1
+			mult = value:tec_assembly_building_tier
+		}
+		produces = {
+			trigger = {	exists = owner }
+			engineering_research = 0.5
+			mult = value:tec_master_assembler_research_output
+		}
+	}
+
+	triggered_planet_modifier = {
+		planet_amenities_no_happiness_add = 10
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	
+	inline_script = {
+		script = modifiers/inline_evolved_assembly_robotic
+		trigger = ""
+		mult = value:tec_assembly_building_tier
+	}
+
+	weight = {
+		weight = 50000
+		# prio job, right?
+		modifier = {
+			factor = 0.01 # crisis purge
+			exists = planet
+			exists = planet.controller
+			planet.controller = {
+				tec_control_crisis_country = yes
+			}
+		}
+	}
+}
+
 tec_bioengineer = {				# Bioservants
 	category = specialist
 	condition_string = SPECIALIST_JOB_TRIGGER
@@ -4209,24 +4270,65 @@ tec_bioengineer = {				# Bioservants
 
 	resources = {
 		category = planet_pop_assemblers
-		upkeep = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_lithoid_empire = no
-				}
-			}
-			food = 10
+		inline_script = {
+			script = jobs/inline_evolved_bio_assembly_upkeep
+			base = 10
+			mult = 1
 		}
-		upkeep = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_lithoid_empire = yes
-				}
+	}
+
+	weight = {
+		weight = 50000
+		# prio job, right?
+		modifier = {
+			factor = 0.01 # crisis purge
+			exists = planet
+			exists = planet.controller
+			planet.controller = {
+				tec_control_crisis_country = yes
 			}
-			minerals = 10
 		}
+	}
+}
+
+tec_master_bioengineer  = {			# Cloning
+	icon = tec_bioengineer
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_tec_bioservant_plant_2
+	clothes_texture_index = 3
+		
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+	
+	resources = {
+		category = planet_pop_assemblers
+		inline_script = {
+			script = jobs/inline_evolved_bio_assembly_upkeep
+			base = 5
+			mult = value:tec_assembly_building_tier
+		}
+		produces = {
+			trigger = {	exists = owner }
+			society_research = 0.5
+			mult = value:tec_master_assembler_research_output
+		}
+	}
+	
+	inline_script = {
+		script = modifiers/inline_evolved_assembly_organic
+		trigger = ""
+		mult = value:tec_assembly_building_tier
 	}
 
 	weight = {
@@ -4264,59 +4366,12 @@ tec_cloner = {					# Cloning
 	
 	resources = {
 		category = planet_pop_assemblers
-		upkeep = {
-			trigger = {
-				planet = {
-					exists = assembling_species
-					assembling_species = {
-						NOT = {
-							has_trait = trait_lithoid
-						}
-					}
-				}
-			}
-			food = 8
-			consumer_goods = 2
+		inline_script = {
+			script = jobs/inline_evolved_bio_assembly_upkeep
+			base = 8
+			mult = 1
 		}
 		upkeep = {
-			trigger = {
-				planet = {
-					exists = assembling_species
-					assembling_species = {
-						has_trait = trait_lithoid
-					}
-				}
-			}
-			minerals = 8
-			consumer_goods = 2
-		}
-		# This is for displaying the job upkeep on the building construction part
-		upkeep = {
-			trigger = {
-				owner = {
-					is_lithoid = no
-				}
-				planet = {
-					NOT = {
-						exists = assembling_species
-					}
-				}
-			}
-			food = 8
-			consumer_goods = 2
-		}
-		upkeep = {
-			trigger = {
-				owner = {
-					is_lithoid = yes
-				}
-				planet = {
-					NOT = {
-						exists = assembling_species
-					}
-				}
-			}
-			minerals = 8
 			consumer_goods = 2
 		}
 	}
@@ -4371,74 +4426,21 @@ tec_master_cloner = {			# Cloning
 	
 	resources = {
 		category = planet_pop_assemblers
-		upkeep = {
-			trigger = {
-				planet = {
-					exists = assembling_species
-					assembling_species = {
-						is_lithoid = no
-					}
-				}
-			}
-			food = 5
+		inline_script = {
+			script = jobs/inline_evolved_bio_assembly_upkeep
+			base = 5
 			mult = value:tec_assembly_building_tier
 		}
-		upkeep = {
-			trigger = {
-				planet = {
-					exists = assembling_species
-					assembling_species = {
-						is_lithoid = yes
-					}
-				}
-			}
-			minerals = 5
-			mult = value:tec_assembly_building_tier
-		}
-		# This is for displaying the job upkeep on the building construction part
-			upkeep = {
-				trigger = {
-					exists = owner
-					owner = {
-						is_lithoid = no
-					}
-					planet = {
-						NOT = {
-							exists = assembling_species
-						}
-					}
-				}
-				food = 5
-				mult = value:tec_assembly_building_tier
-			}
-			upkeep = {
-				trigger = {
-					exists = owner
-					owner = {
-						is_lithoid = yes
-					}
-					planet = {
-						NOT = {
-							exists = assembling_species
-						}
-					}
-				}
-				minerals = 5
-				mult = value:tec_assembly_building_tier
-			}
-		# /
 		produces = {
 			trigger = {	exists = owner }
 			society_research = 0.5
 			mult = value:tec_master_assembler_research_output
 		}
 	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		planet_pop_assembly_organic_add = 1
+	
+	inline_script = {
+		script = modifiers/inline_evolved_assembly_organic
+		trigger = ""
 		mult = value:tec_assembly_building_tier
 	}
 
