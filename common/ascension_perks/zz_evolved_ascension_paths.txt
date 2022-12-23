@@ -13,7 +13,6 @@
 # -----------------------------------------
 # ------------------------------------------------- Psionics
 ap_mind_over_matter = { 			# Psionic Tier I
-
 	potential = {
 		has_utopia = yes
 	
@@ -204,7 +203,6 @@ ap_mind_over_matter = { 			# Psionic Tier I
 }
 
 ap_tec_psionic_ascendance = {		# Psionic Tier II
-	
 	potential = {
 		has_utopia = yes
 
@@ -517,8 +515,7 @@ ap_engineered_evolution = {			# Biologic Tier I
 	}
 }
 
-ap_tec_genetic_perfection = {		# Biologic Tier II
-	
+ap_tec_genetic_perfection = {		# Biologic Tier II	
 	potential = {
 		# tec_has_genetic_ascension_path = yes
 		has_utopia = yes
@@ -643,7 +640,6 @@ ap_tec_genetic_perfection = {		# Biologic Tier II
 
 # ------------------------------------------------- Cybernetics
 ap_the_flesh_is_weak = {			# Cybernetics Tier I
-
 	potential = {
 		has_utopia = yes
 		tec_has_main_ascension_path = no
@@ -887,7 +883,6 @@ ap_the_flesh_is_weak = {			# Cybernetics Tier I
 }
 
 ap_tec_cybernetic_revolution = {	# Cybernetics Tier II
-	
 	potential = {
 		# has_ascension_perk = ap_tec_cybernetic_fascination
 		has_utopia = yes
@@ -1005,9 +1000,7 @@ ap_tec_cybernetic_revolution = {	# Cybernetics Tier II
 
 # ------------------------------------------------- Synthetics
 ap_synthetic_evolution = {			# Synthetics Tier I
-	
 	potential = {
-
 		# has_ascension_perk = ap_the_flesh_is_weak
 		has_utopia = yes
 		
@@ -1185,7 +1178,6 @@ ap_synthetic_evolution = {			# Synthetics Tier I
 }
 
 ap_tec_synthetic_singularity = {	# Synthetics Tier II
-
 	potential = {
 		# has_ascension_perk = ap_synthetic_evolution
 		has_utopia = yes
@@ -1283,6 +1275,7 @@ ap_tec_synthetic_singularity = {	# Synthetics Tier II
 		custom_tooltip = tec_ap_unlock_singularity_tradition
 		custom_tooltip = ap_tec_synthetic_singularity_steps
 	}
+
 	ai_weight = {
 		factor = 10000
 	}
@@ -1290,7 +1283,6 @@ ap_tec_synthetic_singularity = {	# Synthetics Tier II
 
 # ------------------------------------------------- Mixed
 ap_tec_replicant = {				# Biologic + Machine regular
-	
 	potential = {
 		has_utopia = yes
 
@@ -1411,7 +1403,6 @@ ap_tec_replicant = {				# Biologic + Machine regular
 }
 
 ap_tec_biopsionic = {				# Biologic + Psionic regular
-
 	potential = {
 		has_utopia = yes
 
@@ -1509,7 +1500,6 @@ ap_tec_biopsionic = {				# Biologic + Psionic regular
 }
 
 ap_tec_cyberpsionic = {				# Machine + Psionic regular
-
 	potential = {
 		has_utopia = yes
 
@@ -1609,13 +1599,7 @@ ap_tec_cyberpsionic = {				# Machine + Psionic regular
 
 # ------------------------------------------------- Machine
 ap_synthetic_age = {				# Mechanical Tier I
-	modifier = {
-		MACHINE_species_trait_points_add = 2
-		modify_species_cost_mult = -0.25
-	}
-
 	potential = {
-		always = no
 		has_synthethic_dawn = yes
 		is_machine_empire = yes
 		NOT = {
@@ -1624,10 +1608,6 @@ ap_synthetic_age = {				# Mechanical Tier I
 	}
 
 	possible = {
-		custom_tooltip = {
-			fail_text = "TEMPORARILY DISABLED"
-			always = no
-		}
 		custom_tooltip = {
 			fail_text = "requires_ascension_perks_1"
 			num_ascension_perks > 0
@@ -1639,7 +1619,31 @@ ap_synthetic_age = {				# Mechanical Tier I
 	}
 
 	on_enabled = {
-		if = {
+		custom_tooltip = "tec_ap_synthetic_age_tooltip"
+		hidden_effect = {
+			# Global Controller
+				event_target:global_event_country = {
+					change_variable = {
+						which = tec_number_of_cyberascended_empires
+						value = 1
+					}
+				}
+			# /
+			# Effects
+				if = {
+					limit = {
+						has_country_flag = tec_advanced_ascension
+					}
+					tec_give_machine_cyb_t1_ap_effect = yes
+				}
+				else = {
+					country_event = {
+						id = tec_machine_path.100
+					}
+				}
+			# /
+		}
+		if = {	# Pre-steps - robomodding
 			limit = {
 				NOT = {
 					has_technology = tech_robomodding_m
@@ -1650,30 +1654,30 @@ ap_synthetic_age = {				# Mechanical Tier I
 				add_research_option = tech_robomodding_m
 			}
 		}
-		custom_tooltip = ap_synthetic_age_steps
-		hidden_effect = {
-			if = {
-				limit = {
-					has_country_flag = tec_advanced_ascension
-				}
-				tec_give_machine_cyb_t1_ap_effect = yes
-			}
-			else = {
-				country_event = {
-					id = tec_machine_path.100
+		custom_tooltip = tec_ap_unlock_synthetics_tradition
+		if = {	# Notify Lacking Tech
+			limit = {
+				NOT = {
+					has_technology = tech_robomodding_m
 				}
 			}
+			custom_tooltip = tec_ap_synthetic_age_stopped
 		}
+
+		custom_tooltip = ap_synthetic_age_steps
 	}
+
+	modifier = {
+		MACHINE_species_trait_points_add = 2
+		modify_species_cost_mult = -0.25
+	}
+
 	ai_weight = {
 		factor = 1000
 	}
 }
 
 ap_tec_machine_mechanic_3 = {		# Mechanical Tier II
-	modifier = {
-		MACHINE_species_trait_points_add = 4
-	}
 
 	potential = {
 		always = no
@@ -1719,8 +1723,10 @@ ap_tec_machine_mechanic_3 = {		# Mechanical Tier II
 
 		custom_tooltip = ap_tec_machine_mechanic_3_steps
 	}
-	
 
+	modifier = {
+		MACHINE_species_trait_points_add = 4
+	}
 
 	ai_weight = {
 		factor = 1000

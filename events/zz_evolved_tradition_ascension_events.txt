@@ -84,25 +84,24 @@ planet_event = {
 				}
 				tec_is_habitable_regular_planet = yes
 			}
-			random_list = {
-				50 = {
-					set_planet_flag = tec_discovered_wonder
-					add_random_non_blocker_deposit = yes
-					create_message = {
-						type = MESSAGE_TYPE_PLANET_PROSPECTED
-						localization = MESSAGE_PLANET_PROSPECTED
-						days = 30
-						target = this
-						variable = {
-							type = name
-							localization = PLANET
-							scope = this
-						}
-						variable = {
-							type = name
-							localization = DEPOSIT
-							scope = last_added_deposit
-						}
+			set_planet_flag = tec_discovered_wonder
+			while = {
+				count = 2
+				add_random_non_blocker_deposit = yes
+				create_message = {
+					type = MESSAGE_TYPE_PLANET_PROSPECTED
+					localization = MESSAGE_PLANET_PROSPECTED
+					days = 30
+					target = this
+					variable = {
+						type = name
+						localization = PLANET
+						scope = this
+					}
+					variable = {
+						type = name
+						localization = DEPOSIT
+						scope = last_added_deposit
 					}
 				}
 			}
@@ -114,63 +113,59 @@ planet_event = {
 				}
 				uses_habitat_capitals = yes
 			}
-			random_list = {
-				50 = {
-					set_planet_flag = tec_discovered_wonder
-					if = {
-						limit = {
-							has_planet_flag = mining_habitat
-						}
+			set_planet_flag = tec_discovered_wonder
+			if = {
+				limit = {
+					has_planet_flag = mining_habitat
+				}
+				add_deposit = d_tec_engineered_mining
+			}
+			else_if = {
+				limit = {
+					has_planet_flag = energy_habitat
+				}
+				add_deposit = d_tec_engineered_generator
+			}
+			else_if = {
+				limit = {
+					has_planet_flag = tec_food_habitat
+				}
+				add_deposit = d_tec_engineered_food
+			}
+			else_if = {
+				limit = {
+					NOR = {
+						has_planet_flag = mining_habitat
+						has_planet_flag = energy_habitat
+						has_planet_flag = tec_food_habitat	
+					}
+				}
+				random_list = {
+					10 = {
 						add_deposit = d_tec_engineered_mining
 					}
-					else_if = {
-						limit = {
-							has_planet_flag = energy_habitat
-						}
+					10 = {
 						add_deposit = d_tec_engineered_generator
 					}
-					else_if = {
-						limit = {
-							has_planet_flag = tec_food_habitat
-						}
+					10 = {
 						add_deposit = d_tec_engineered_food
 					}
-					else_if = {
-						limit = {
-							NOR = {
-								has_planet_flag = mining_habitat
-								has_planet_flag = energy_habitat
-								has_planet_flag = tec_food_habitat	
-							}
-						}
-						random_list = {
-							10 = {
-								add_deposit = d_tec_engineered_mining
-							}
-							10 = {
-								add_deposit = d_tec_engineered_generator
-							}
-							10 = {
-								add_deposit = d_tec_engineered_food
-							}
-						}
-					}
-					create_message = {
-						type = MESSAGE_TYPE_PLANET_PROSPECTED
-						localization = MESSAGE_PLANET_PROSPECTED
-						days = 30
-						target = this
-						variable = {
-							type = name
-							localization = PLANET
-							scope = this
-						}
-						variable = {
-							type = name
-							localization = DEPOSIT
-							scope = last_added_deposit
-						}
-					}
+				}
+			}
+			create_message = {
+				type = MESSAGE_TYPE_PLANET_PROSPECTED
+				localization = MESSAGE_PLANET_PROSPECTED
+				days = 30
+				target = this
+				variable = {
+					type = name
+					localization = PLANET
+					scope = this
+				}
+				variable = {
+					type = name
+					localization = DEPOSIT
+					scope = last_added_deposit
 				}
 			}
 		}
@@ -845,6 +840,55 @@ country_event = {
 	}
 }
 
+# ----------- Discovery ---------------
+# tr_discovery_finish
+# on tech researched
+country_event = {
+	id = tec_tradition.705
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			has_tradition = tr_discovery_finish
+			has_active_tradition = tr_discovery_federations_finish
+		}
+	}
+
+	immediate = {
+		change_variable = {
+			which = tec_discovery_finisher
+			value = 1
+		}
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_discovery_finisher
+					value >= 5
+				}
+			}
+			change_variable = {
+				which = tec_discovery_finisher_roll
+				value = 10
+			}
+			random = {
+				chance = tec_discovery_finisher_roll
+				add_random_research_option = {
+					add_progress = 0.25
+				}
+				set_variable = {
+					which = tec_discovery_finisher
+					value = 0
+				}
+				set_variable = {
+					which = tec_discovery_finisher_roll
+					value = 0
+				}
+			}
+		}
+	}
+}
+
 # ----------- Invention ---------------
 # tr_tec_invention_3:0 "Uncovering Possibilities"
 # on tech researched
@@ -862,25 +906,19 @@ country_event = {
 			10 = {
 				add_monthly_resource_mult = {
 					resource = energy
-					value = 1
-					min = 20
-					max = 200
+					value = 0.2
 				}
 			}
 			10 = {
 				add_monthly_resource_mult = {
 					resource = minerals
-					value = 1
-					min = 20
-					max = 200
+					value = 0.2
 				}
 			}
 			10 = {
 				add_monthly_resource_mult = {
 					resource = food
-					value = 1
-					min = 20
-					max = 200
+					value = 0.2
 				}
 			}
 		}
@@ -4838,13 +4876,19 @@ country_event = { # T1 picked
 	option = {
 		name = "tec_gene_path.100.a"
 		custom_tooltip = "tec_gene_path.100.a.tooltip"
-		hidden_effect = { 
+		hidden_effect = {
 			save_event_target_as = tec_target_country
-			capital_scope = {
-				enable_special_project = {
-					name = PROJECT_TEC_GENE_PATH_T1
-					location = this
-					owner = root
+			event_target:tec_target_country = {
+				start_situation = {
+					type = situation_tec_gene_path_t1
+					target = event_target:tec_target_country.capital_scope
+					effect = {
+						save_event_target_as = new_situation
+					}
+				}
+				event_target:new_situation = {
+					set_situation_locked = no
+					set_situation_approach = situation_approach_tec_gene_path_t1_neutral
 				}
 			}
 		}
@@ -4853,9 +4897,9 @@ country_event = { # T1 picked
 
 # Situation
 situation_event = { # Gene T1 - 15%
-	id = tec_gene_path.10015
-	title = "tec_gene_path.10015.name"
-	desc = "tec_gene_path.10015.desc"
+	id = tec_gene_path.10055
+	title = "tec_gene_path.10055.name"
+	desc = "tec_gene_path.10055.desc"
 
 	picture = GFX_evt_overtuned
 	is_triggered_only = yes
@@ -4875,8 +4919,8 @@ situation_event = { # Gene T1 - 15%
 	}
 
 	option = {
-		name = tec_gene_path.10015.a
-		custom_tooltip = tec_gene_path.10015.a.tooltip
+		name = tec_gene_path.10055.a
+		custom_tooltip = tec_gene_path.10055.a.tooltip
 		icon = {
 			icon = GFX_situation_approach_genetics
 			icon_background = GFX_situation_approach_bg_green
@@ -4886,9 +4930,9 @@ situation_event = { # Gene T1 - 15%
 }
 
 situation_event = { # Gene T1 - 45%
-	id = tec_gene_path.10045
-	title = "tec_gene_path.10045.name"
-	desc = "tec_gene_path.10045.desc"
+	id = tec_gene_path.10070
+	title = "tec_gene_path.10070.name"
+	desc = "tec_gene_path.10070.desc"
 
 	picture = GFX_evt_overtuned
 	is_triggered_only = yes
@@ -4908,8 +4952,8 @@ situation_event = { # Gene T1 - 45%
 	}
 
 	option = {
-		name = tec_gene_path.10045.a
-		custom_tooltip = tec_gene_path.10045.a.tooltip
+		name = tec_gene_path.10070.a
+		custom_tooltip = tec_gene_path.10070.a.tooltip
 		icon = {
 			icon = GFX_situation_approach_genetics
 			icon_background = GFX_situation_approach_bg_green
@@ -4919,9 +4963,9 @@ situation_event = { # Gene T1 - 45%
 }
 
 situation_event = { # Gene T1 - 75%
-	id = tec_gene_path.10075
-	title = "tec_gene_path.10075.name"
-	desc = "tec_gene_path.10075.desc"
+	id = tec_gene_path.10085
+	title = "tec_gene_path.10085.name"
+	desc = "tec_gene_path.10085.desc"
 
 	picture = GFX_evt_overtuned
 	is_triggered_only = yes
@@ -4941,8 +4985,8 @@ situation_event = { # Gene T1 - 75%
 	}
 
 	option = {
-		name = tec_gene_path.10075.a
-		custom_tooltip = tec_gene_path.10075.a.tooltip
+		name = tec_gene_path.10085.a
+		custom_tooltip = tec_gene_path.10085.a.tooltip
 		icon = {
 			icon = GFX_situation_approach_genetics
 			icon_background = GFX_situation_approach_bg_green
@@ -4951,8 +4995,8 @@ situation_event = { # Gene T1 - 75%
 	}
 
 	option = {
-		name = tec_gene_path.10075.b
-		custom_tooltip = tec_gene_path.10075.b.tooltip
+		name = tec_gene_path.10085.b
+		custom_tooltip = tec_gene_path.10085.b.tooltip
 		allow = {
 			always = no
 		}
@@ -12156,6 +12200,7 @@ namespace = tec_psionic_hive_path
 # ------------------------------------------------------------ tec_machine_path.xxx
 namespace = tec_machine_path
 
+# --------------- T1
 country_event = { # T1 picked
 	id = tec_machine_path.100
 	title = "tec_machine_path.100.name"
@@ -12171,6 +12216,124 @@ country_event = { # T1 picked
 	}
 }
 
+# --------------- Situation
+situation_event = { # Machine t1 25%
+	id = tec_machine_path.10025
+	title = "tec_machine_path.10025.name"
+	desc = "tec_machine_path.10025.desc"
+
+	picture = GFX_evt_tec_synthetic_recognition
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+
+	option = {
+		name = tec_machine_path.10025.a
+		custom_tooltip = tec_machine_path.10025.a.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_ai
+			icon_background = GFX_situation_approach_bg_tec_blue
+			text = tec_icon_text_neutral_outcome
+		}
+	}
+}
+situation_event = { # Machine t1 50%
+	id = tec_machine_path.10050
+	title = "tec_machine_path.10050.name"
+	desc = "tec_machine_path.10050.desc"
+
+	picture = GFX_evt_tec_synthetic_first
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+
+	option = {
+		name = tec_machine_path.10050.a
+		custom_tooltip = tec_machine_path.10050.a.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_ai
+			icon_background = GFX_situation_approach_bg_tec_blue
+			text = tec_icon_text_neutral_outcome
+		}
+	}
+}
+situation_event = { # Machine t1 75%
+	id = tec_machine_path.10075
+	title = "tec_machine_path.10075.name"
+	desc = "tec_machine_path.10075.desc"
+
+	picture = GFX_evt_machine_sapience
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+
+	option = {
+		name = tec_machine_path.10075.a
+		custom_tooltip = tec_machine_path.10075.a.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_ai
+			icon_background = GFX_situation_approach_bg_tec_blue
+			text = tec_icon_text_neutral_outcome
+		}
+	}
+}
+
+country_event = { # Finished
+	id = tec_machine_path.105
+	title = "tec_machine_path.105.name"
+	desc = "tec_machine_path.105.desc"
+	picture = GFX_evt_tec_synthetic_first
+	show_sound = event_synthetic_evolution
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = "tec_machine_path.105.a"
+		custom_tooltip = tec_machine_path.105.a.tooltip
+		hidden_effect = {
+			set_country_flag = tec_synth_path_unlocked_tradition_1
+		}
+	}
+}
+
+# T2
 country_event = { # T2 picked
 	id = tec_machine_path.200
 	title = "tec_machine_path.200.name"
@@ -12183,7 +12346,7 @@ country_event = { # T2 picked
 
 	option = {
 		name = "tec_machine_path.200.a"
-		custom_tooltip = tec_machine_path.200.b
+		custom_tooltip = tec_machine_path.200.a.tooltip
 		hidden_effect = {
 			set_country_flag = tec_completed_synth_t2
 		}
