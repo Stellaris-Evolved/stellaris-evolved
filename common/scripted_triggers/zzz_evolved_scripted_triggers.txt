@@ -61,16 +61,20 @@ is_pluralist = {
 tec_has_special_ruler_feature = {
 	# NOTE: USE ONLY FOR PLANETS!!!! NOT OTHER SCRIPTS
 	#OR = {
-		AND = {
-			has_planet_flag = toxic_knights_habitat
-			owner = {
-				has_origin = origin_toxic_knights
-			}
-		}
+		tec_has_toxic_knights_feature = yes
 		#AND = {
 		#	has_planet_flag = 
 		#}
 	#}
+}
+
+tec_has_toxic_knights_feature = {
+	AND = {
+		has_planet_flag = toxic_knights_habitat
+		owner = {
+			has_origin = origin_toxic_knights
+		}
+	}
 }
 
 tec_has_ruler_civic = {
@@ -483,6 +487,14 @@ tec_is_bioarch_empire = {	# Swaps certain costs
 	}
 }
 
+
+tec_is_cyberarch_empire = {
+	OR = {
+		has_valid_civic = civic_tec_machine_digitalization
+		has_country_flag = tec_test_cyberarch_empire
+	}
+}
+
 tec_is_megacity_empire = {	# Swaps certain districts and etc
 	OR = {
 		#has_valid_civic = civic_tec_megacities
@@ -560,6 +572,13 @@ tec_is_wastelander_empire = {	# Scraps!
 tec_is_agrarian_idyll_empire = {	# Agrarian Idyll
 	OR = {
 		has_valid_civic = civic_agrarian_idyll
+	}
+}
+
+tec_is_idyllic_bloom_empire = {
+	OR = {
+		has_valid_civic = civic_idyllic_bloom
+		has_valid_civic = civic_hive_idyllic_bloom
 	}
 }
 
@@ -1353,7 +1372,12 @@ tec_has_psionic_ascension_origin = {
 	OR = {
 		has_origin = origin_shroudwalker_apprentice		# Origin
 		has_origin = origin_tec_psionicspecies			# Origin
+		# PD
 		has_origin = @origin_pd_shroud
+		# Origins Expanded
+		has_origin = @origin_psionic_abilities
+		# Origins Extended
+		has_origin = @originsextended_psi
 	}
 }
 
@@ -1364,9 +1388,9 @@ tec_has_genetic_ascension_path = {
 	}
 }
 tec_has_genetic_ascension_origin = {
-	#OR = {
+	OR = {
 		has_origin = origin_tec_genetics
-	#}
+	}
 }
 
 tec_has_cybernetic_ascension_path = {
@@ -1376,9 +1400,18 @@ tec_has_cybernetic_ascension_path = {
 	}
 }
 tec_has_cybernetic_ascension_origin = {
-	#OR = {
+	OR = {
 		has_origin = origin_tec_cyborgs					# Origin
-	#}
+		# Origins Extended
+		has_origin = @originsextended_cyb
+	}
+}
+
+tec_has_cybernetic_ascension_path_exception = {
+	OR = {
+		has_valid_civic = civic_machine_assimilator     # Assimilators can take cybernetic
+		tec_is_cyberhive = yes                          # Cyberhives 
+	}
 }
 
 tec_has_synthetic_ascension_path = {
@@ -1389,7 +1422,35 @@ tec_has_synthetic_ascension_path = {
 	}
 }
 tec_has_synthetic_ascension_origin = {
-	always = no
+	OR = {
+		always = no
+	}
+}
+
+tec_has_main_ascension_path = {
+	OR = {
+		tec_has_psionic_ascension_path = yes
+		tec_has_genetic_ascension_path = yes
+		tec_has_cybernetic_ascension_path = yes
+		tec_has_synthetic_ascension_path = yes
+		# PD
+		tec_has_pd_biosynth_ascension_path = yes
+	}
+}
+
+tec_has_secondary_ascension_path = {
+	OR = {
+		has_ascension_perk = ap_tec_genetic_perfection			# perfect bio			
+		has_ascension_perk = ap_tec_psionic_ascendance			# perfect psi
+		has_ascension_perk = ap_tec_synthetic_singularity		# perfect synth
+		has_ascension_perk = ap_tec_cybernetic_revolution		# perfect cyborg
+		has_ascension_perk = ap_tec_replicant					# biorobot
+		has_ascension_perk = ap_tec_cyberpsionic				# psiorobot
+		has_ascension_perk = ap_tec_biopsionic					# biopsi
+
+		has_ascension_perk = ap_tec_hive_psionic_3		# hivepsi good
+		has_ascension_perk = ap_tec_hive_psionic_shatter			# hivepsi bad
+	}
 }
 
 # DECISIONS
@@ -1587,7 +1648,7 @@ tec_can_assemble_sedimentary_species = {
 # ---------------------------------------------------
 tec_has_all_slots_unlocked = {
 	OR = {
-		tec_is_city_planet = yes
+		tec_is_city_world = yes
 		tec_is_elysium = yes
 		tec_is_ringworld = yes
 		tec_is_uncapped_planet = yes
@@ -1682,13 +1743,13 @@ tec_is_special_colony_restrictive_advanced = {
 # Compatibility scripts
 tec_invalidates_arcology_project_comp = {
 	OR = {
-		tec_is_city_planet = yes
+		tec_is_city_world = yes
 		tec_is_special_colony = yes
 		# Wenkwort
 		has_modifier = pm_wenkwort_custodian
 
 		# Planetary diversity compatibility
-		tec_is_pd_necropolis = yes  # just in case - techincally does not exist
+		tec_is_pd_necropolis = yes	# just in case - techincally does not exist
 		is_pd_shroud_world = yes
 		is_pd_unique = yes
 		is_pd_planetary_megaproject = yes
@@ -1697,11 +1758,11 @@ tec_invalidates_arcology_project_comp = {
 
 tec_invalidates_ecoworld_project_comp = {
 	OR = {
-		tec_is_city_planet = yes
+		tec_is_city_world = yes
 		tec_is_special_colony = yes
 
 		tec_is_hive_world = yes
-		tec_is_machine_world  = yes
+		tec_is_machine_world = yes
 		tec_is_nuked_world = yes
 		tec_is_relic_world = yes
 
@@ -1710,59 +1771,6 @@ tec_invalidates_ecoworld_project_comp = {
 		tec_is_pd_wasteland = yes
 		is_pd_planetary_megaproject = yes
 	} 
-}
-
-# To apply - roadd tirggers
-tec_is_unspecialized_ecu = {
-	NOR = {
-		has_planet_flag = tec_ecumenopolis_spec_militarized
-		has_planet_flag = tec_ecumenopolis_spec_science
-		has_planet_flag = tec_ecumenopolis_spec_admin
-		has_planet_flag = tec_ecumenopolis_spec_precursor
-	}
-}
-
-tec_is_military_ecu = {
-	has_planet_flag = tec_ecumenopolis_spec_militarized
-}
-
-tec_is_research_ecu = {
-	has_planet_flag = tec_ecumenopolis_spec_science
-}
-
-tec_is_admin_ecu = {
-	has_planet_flag = tec_ecumenopolis_spec_admin
-}
-
-tec_is_menial_elysium = {
-	NOR = {
-		has_planet_flag = tec_civ_elysium
-		has_planet_flag = tec_mil_elysium
-	}
-}
-
-tec_is_civilian_elysium = {
-	has_planet_flag = tec_civ_elysium
-}
-
-tec_is_military_elysium = {
-	has_planet_flag = tec_mil_elysium
-}
-
-tec_is_menial_rw = {
-	NOR = {
-		has_planet_flag = tec_rw_spec_science
-		has_planet_flag = tec_rw_spec_industry
-		has_planet_flag = tec_rw_spec_admin
-	}
-}
-
-tec_is_science_rw = {
-	has_planet_flag = tec_rw_spec_science
-}
-
-tec_is_industry_rw = {
-	has_planet_flag = tec_rw_spec_industry
 }
 
 tec_has_any_menial_district = {
@@ -1915,20 +1923,14 @@ tec_is_habitable_regular_planet = {
 
 tec_is_arcology = {
 	OR = {
-		tec_is_city_planet = yes
-		#is_planet_class = pc_city_cyberhive
-		#is_planet_class = pc_machine_forge
-		#is_planet_class = pc_hive_biosentient
-		
-		uses_habitat_capitals = yes
-		tec_is_ringworld = yes
-		tec_is_elysium = yes
+		tec_is_city_world = yes
+		tec_is_space_arcology = yes
 	}
 }
 
 tec_is_space_arcology = {
 	OR = {
-		uses_habitat_capitals = yes
+		tec_is_habitat = yes
 		tec_is_ringworld = yes
 		tec_is_elysium = yes
 		tec_is_modded_space_arcology = yes
@@ -1938,28 +1940,17 @@ tec_is_space_arcology = {
 tec_is_habitat = {
 	OR = {
 		uses_district_set = habitat
-		tec_is_pd_habitat_mimic_planet = yes
-	}
-}
-
-tec_uses_habitat_districts = {
-	OR = {
-		uses_district_set = habitat
+		# PD
+		uses_district_set = @pdplanethab
+		# gigas
+		is_giga_habitat = yes
 	}
 }
 
 tec_is_ringworld = {
 	OR = {
-		is_ringworld = yes
-
-	}
-}
-
-tec_uses_ringworld_districts = {
-	OR = {
-	uses_district_set = ring_world
-	uses_district_set = @penrose_ring
-	uses_district_set = @interstellar_ring
+		uses_district_set = ring_world
+		is_giga_ringworld = yes
 	}
 }
 
@@ -1970,12 +1961,28 @@ tec_is_elysium = {
 	}
 }
 
-tec_is_city_planet = {
+tec_is_city_world = {
 	OR = {
 		uses_district_set = city_world
 		is_pd_arcology = yes
 	}
 }
+
+tec_uses_habitat_districts = {
+	OR = {
+		uses_district_set = habitat
+	}
+}
+
+tec_uses_ringworld_districts = {
+	OR = {
+		uses_district_set = ring_world
+		uses_district_set = @penrose_ring
+		uses_district_set = @interstellar_ring
+	}
+}
+
+
 
 #void dweller traits
 # neutral
@@ -2013,46 +2020,52 @@ tec_is_neutral_planet = {
 # Aquatic species
 tec_is_wet_planet_exceptions = {	# Outside is_wet trigger
 	OR = {
-		# Gaias are always good
-		is_planet_class = pc_gaia
+		tec_is_gaia_world = yes
+		tec_is_flooded = yes
+		tec_is_wet_planet_origin_exceptions = yes
+	}
+}
+
+tec_is_wet_planet_origin_exceptions = {
+	OR = {
 		# Nuked start 
 		AND = {
 			owner = {
-				has_origin = origin_post_apocalyptic
+				tec_has_nuked_world_origin = yes
 			}
-			is_planet_class = pc_nuked
+			tec_is_nuked_world = yes
 		}
 		AND = {
 			from = {
-				has_origin = origin_post_apocalyptic
+				tec_has_nuked_world_origin = yes
 			}
-			is_planet_class = pc_nuked
+			tec_is_nuked_world = yes
 		}
 		# Hive start
-			#AND = {
-			#	owner = {
-			#		has_origin = origin_tec_hiveplanet
-			#	}
-			#	is_planet_class = pc_hive
-			#}
-			#AND = {
-			#	from = {
-			#		has_origin = origin_tec_hiveplanet
-			#	}
-			#	is_planet_class = pc_hive
-			#}
+		AND = {
+			owner = {
+				tec_has_hive_world_origin = yes
+			}
+			tec_is_hive_world = yes
+		}
+		AND = {
+			from = {
+				tec_has_hive_world_origin = yes
+			}
+			tec_is_hive_world = yes
+		}
 		# Machine Start
 		AND = {
 			owner = {
-				has_origin = origin_machine
+				tec_has_machine_world_origin = yes
 			}
-			is_planet_class = pc_machine
+			tec_is_machine_world = yes
 		}
 		AND = {
 			from = {
-				has_origin = origin_machine
+				tec_has_machine_world_origin = yes
 			}
-			is_planet_class = pc_machine
+			tec_is_machine_world = yes
 		}
 		# 
 	}
@@ -2138,7 +2151,52 @@ tec_is_aquatic_planet = {
 	OR = {
 		is_planet_class = pc_ocean
 		tec_is_pd_aquatic_planet = yes
-		has_modifier = flooded_habitat
+		tec_is_flooded = yes
+	}
+}
+
+tec_has_nuked_world_origin = {
+	OR = {
+		has_origin = origin_post_apocalyptic
+		has_origin = @origin_pd_radiotrophic_mutants
+		has_origin = @origin_disharmonious_unity
+		has_origin = @originsextended_starless
+		has_origin = @originsextended_magnetica
+		has_origin = @originsextended_graveyard
+	}
+}
+
+tec_has_hive_world_origin = {
+	OR = {
+		has_origin = @origin_tec_hiveplanet
+		has_origin = @origin_pd_hive
+		has_origin = @origin_hive
+		has_origin = @originsextended_infest
+	}
+}
+
+tec_has_machine_world_origin = {
+	OR = {
+		has_origin = origin_machine
+		has_origin = @originsextended_core
+	}
+}
+
+tec_has_relic_world_origin = {
+	OR = {
+		has_origin = origin_remnants
+		has_origin = @origin_reliquary
+		has_origin = @origin_mem_from_the_ashes
+		has_origin = @origin_mem_ceaseless_gaze
+		# has_origin = @origin_pd_scrapyard_world # Commented cause not relic planet type but similar enough
+	}
+}
+
+tec_has_gaia_world_origin = {
+	OR = {
+		has_origin = origin_life_seeded
+		has_origin = @originsextended_gaia
+		has_origin = @origin_resort_world
 	}
 }
 
@@ -2393,6 +2451,37 @@ overlord_has_more_than_num_science_ships_in_orbit = {
 	}
 }
 
+# This one is from evolved
+tec_has_constructors_in_orbit = {
+	planet = {
+		count_fleet_in_orbit = {
+			count = $NUM$
+			limit = {
+				count_controlled_ship = {
+					count = all
+					limit = {
+						is_ship_size = constructor
+					}
+				}
+			}
+		}
+	}
+}
+tec_has_more_than_num_constructors_in_orbit = {
+	planet = {
+		count_fleet_in_orbit = {
+			count > $NUM$
+			limit = {
+				count_controlled_ship = {
+					count = all
+					limit = {
+						is_ship_size = constructor
+					}
+				}
+			}
+		}
+	}
+}
 
 # D E P O S I T S 
 # -------------- SPECIAL RESOURCES ----------------
@@ -2546,6 +2635,20 @@ tec_has_colonist_swap = {
 	always = no
 }
 
+tec_has_clerk_swap = {
+	always = no
+}
+
+tec_has_coordinator_swap = {
+	always = no
+}
+
+tec_has_soldier_swap = {
+	OR = {
+		has_valid_civic = civic_tec_corporate_militarybureau
+	}
+}
+
 tec_has_maintenance_swap = {
 	always = no
 }
@@ -2554,11 +2657,8 @@ tec_has_patrol_drone_swap = {
 	always = no
 }
 
-
-tec_is_cyberarch_empire = {
-	OR = {
-		has_valid_civic = civic_tec_machine_digitalization
-	}
+tec_has_warrior_drone_swap = {
+	always = no
 }
 
 tec_has_scrap_miner = {
@@ -2566,6 +2666,22 @@ tec_has_scrap_miner = {
 		is_planet_class = pc_shattered_ring_habitable
 	}
 }
+
+
+tec_has_matter_miner = {
+	OR = {
+		tec_uses_ringworld_districts = yes
+	}
+}
+
+tec_has_special_miner = {
+	OR = {
+		tec_has_scrap_miner = yes
+		tec_has_matter_miner = yes
+	}
+}
+
+
 
 tec_is_unspecced_city_planet = {
 	NOR = {
@@ -2627,4 +2743,76 @@ tec_is_industry_ringworld = {
 
 tec_is_admin_ringworld = { # scrapped
 	has_planet_flag = tec_rw_spec_admin
+}
+
+tec_is_unspecced_elysium = {
+	NOR = {
+		has_planet_flag = tec_civ_elysium
+		has_planet_flag = tec_mil_elysium
+	}
+}
+
+tec_is_civilian_elysium = {
+	has_planet_flag = tec_civ_elysium
+}
+
+tec_is_military_elysium = {
+	has_planet_flag = tec_mil_elysium
+}
+
+tec_has_extra_menial_district_job = {
+	OR = {
+		has_valid_civic = civic_tec_syndical
+		# We can add similar civics to this for megacorps 
+		# or gestalts or even traditions etc
+	}
+}
+
+tec_is_flooded = {
+	# Can be used to allow flooded elysiums and ringworlds
+	OR = {
+		has_modifier = flooded_habitat
+		AND = {
+			has_modifier = hyceanfloodedhabitat
+			owner = { has_origin = origin_pd_hycean_aquatic }
+		}
+	}
+}
+
+tec_has_hired_job = {
+	OR = {
+		has_job = tec_hired_miner
+		has_job = tec_hired_farmer
+		has_job = tec_hired_technician
+		has_job = tec_hired_catalytic
+		has_job = tec_hired_soldier
+		has_job = tec_hired_foundry
+		has_job = tec_hired_artisan
+		has_job = tec_hired_researcher
+		has_job = tec_hired_entertainer
+		# Preacher here too
+		has_job = preacher
+	}
+}
+
+tec_is_spiritual_seekers = {
+	OR = {
+		has_valid_civic = civic_tec_spiritual_seekers 
+		has_valid_civic = civic_tec_corporate_seekers
+	}
+}
+
+tec_has_toxic_baths = {
+	OR = {
+		has_valid_civic = civic_toxic_baths
+		has_valid_civic = civic_corporate_toxic_baths
+		has_valid_civic = civic_hive_toxic_baths
+		has_valid_civic = civic_machine_toxic_baths
+	}
+}
+
+tec_allows_machine_assembly_for_cyborg = {
+	OR = {
+		has_active_tradition = tr_cybernetics_assembly_standards
+	}
 }

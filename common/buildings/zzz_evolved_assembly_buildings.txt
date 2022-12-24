@@ -101,9 +101,7 @@ building_robot_assembly_plant = {
 		
 	show_tech_unlock_if = {
 		is_regular_empire = yes 
-		NOT = {
-			has_valid_civic = civic_tec_machine_cult
-		}
+		tec_is_machine_cult = no
 	}
 
 	upgrades = {
@@ -118,15 +116,16 @@ building_robot_assembly_plant = {
 		}
 		owner = {
 			is_regular_empire = yes 
+			tec_is_machine_cult = no
 			NOR = {
 				has_policy_flag = robots_outlawed 
-				has_valid_civic = civic_tec_machine_cult
 				has_policy_flag = tec_purity_assembly
 			}
 		}
 		NOT = {
 			has_modifier = slave_colony 
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 
 
@@ -143,11 +142,13 @@ building_robot_assembly_plant = {
 				has_country_flag = tec_desires_to_build_robots
 			}
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
+			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_regular_empire = no 
@@ -201,64 +202,31 @@ building_robot_assembly_plant = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b1_minerals
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
 		}
-		upkeep = {
-			energy = @b1_upkeep
-		}
-	}
-	
-	planet_modifier = {
-		job_roboticist_add = 1
-	}
-	
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				has_valid_civic = civic_tec_corporate_robocorp 
-			}
-		}
-		modifier = {
-			job_tec_minor_roboticist_add = 1
-		}
-	}
-	
-	triggered_desc = {
-		trigger = {
-			OR = {
-				NOT = { exists = owner }
-				AND = {
-					exists = owner
-					owner = {
-						NOT = { has_policy_flag = roboticist_output_build_cyborgs }
-					}
-				}
-			}
-
-		}
-		text = job_roboticist_effect_desc
 	}
 
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = {
-				has_policy_flag = roboticist_output_build_cyborgs
-			}
-		}
-		text = job_roboticist_cyborg_effect_desc
+	inline_script = {
+		script = jobs/inline_evolved_roboticist
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_roboticist = no"
+	}
+
+	inline_script = {
+		script = jobs/inline_evolved_master_roboticist
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_roboticist = yes"
 	}
 	
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = {
-				has_civic = civic_tec_corporate_robocorp
-			}
-		}
-		text = job_tec_minor_roboticist_effect_desc
+	inline_script = {
+		script = buildings/effects/inline_evolved_corporate_robocorp
+		tier = 1
 	}
 
 	ai_resource_production = {
@@ -278,9 +246,7 @@ building_robot_assembly_complex = {
 
 	show_tech_unlock_if = {
 		is_regular_empire = yes 
-		NOT = {
-			has_valid_civic = civic_tec_machine_cult
-		}
+		tec_is_machine_cult = no
 	}
 
 	upgrades = {
@@ -295,13 +261,14 @@ building_robot_assembly_complex = {
 		}
 		owner = {
 			is_regular_empire = yes 
+			tec_is_machine_cult = no
 			NOR = {
 				has_policy_flag = robots_outlawed 
-				has_valid_civic = civic_tec_machine_cult
 				has_policy_flag = tec_purity_assembly	
 			}
 		}
 		NOT = { has_modifier = slave_colony }
+		tec_invalidates_assembly_buildings = no
 	}
 
 	allow = {
@@ -316,12 +283,14 @@ building_robot_assembly_complex = {
 				has_country_flag = tec_desires_to_build_robots
 			}
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 
 	
 	destroy_trigger = {
 		exists = owner
 		OR = {
+			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_regular_empire = no 
@@ -367,95 +336,67 @@ building_robot_assembly_complex = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b2_minerals
-			rare_crystals = @b2_rare_cost
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
 		}
-		upkeep = {
-			energy = @b2_upkeep
-			rare_crystals = @b2_rare_upkeep
+		
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 2
+			rare = rare_crystals
+		}
+
+
+		inline_script = {
+			script = jobs/resources/inline_evolved_robotic_assembly_upkeep
+			base = 1
+			mult = value:tec_assembly_cost_scaling_building
+			trigger = "tec_has_master_roboticist = no"
 		}
 	}
 
-	planet_modifier = {
-		job_roboticist_add = 1
+	inline_script = {
+		script = jobs/inline_evolved_roboticist
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_roboticist = no"
 	}
-	triggered_desc = {
-		text = job_roboticist_effect_desc
-	}
+
+	inline_script = {
+		script = jobs/inline_evolved_master_roboticist
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_roboticist = yes"
+	}	
 	
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_valid_civic = civic_tec_corporate_robocorp }
-		}
-		modifier = {
-			job_tec_minor_roboticist_add = 2
-		}
+	inline_script = {
+		script = buildings/effects/inline_evolved_corporate_robocorp
+		tier = 2
 	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_assembly_robotic
+		mult = 1
+		trigger = "tec_has_master_roboticist = no"
+	}
+
 	triggered_desc = {
 		trigger = {
 			exists = owner
-			owner = {
-				has_civic = civic_tec_corporate_robocorp
-			}
+			tec_has_master_roboticist = yes
+			tec_has_t2_robotic_buildings = no
 		}
-		text = job_tec_minor_roboticist_effect_desc
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			planet = {
-				exists = assembling_species
-				assembling_species = {
-					tec_is_replicant_species = no
-				}
-			}
-		}
-		modifier = {
-			planet_pop_assembly_add = 1
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			planet = {
-				exists = assembling_species
-				assembling_species = {
-					tec_is_replicant_species = yes
-				}
-			}
-		}
-		modifier = {
-			planet_pop_assembly_organic_add = 1
-		}
-	}
-
-	ai_weight = {
-		weight = 50000
-		modifier = {
-			factor = 0
-			OR = {
-				#is_planet_class = pc_habitat
-				#is_planet_class = pc_city
-				num_buildings = { type = any value >= 14 }
-				owner = {
-					has_monthly_income = {
-						resource = energy
-						value < 5
-					}
-				}
-			}
-		}
-	}
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
+		text = job_tec_master_roboticist_effect_t2_desc
 	}
 }
 
 building_robot_assembly_plant_3 = {
 	base_buildtime = @b3_time
+	icon = building_tec_robot_assembly_plant_3
  	position_priority = 20		# Assembly/growth
 	category = pop_assembly
 	can_build = no
@@ -466,9 +407,7 @@ building_robot_assembly_plant_3 = {
 
 	show_tech_unlock_if = {
 		is_regular_empire = yes 
-		NOT = {
-			has_valid_civic = civic_tec_machine_cult
-		}
+		tec_is_machine_cult = no
 	}
 
 	potential = {
@@ -479,13 +418,14 @@ building_robot_assembly_plant_3 = {
 		}
 		owner = {
 			is_regular_empire = yes 
+			tec_is_machine_cult = no
 			NOR = {
 				has_policy_flag = robots_outlawed 
-				has_valid_civic = civic_tec_machine_cult
 				has_policy_flag = tec_purity_assembly	
 			}
 		}
 		NOT = { has_modifier = slave_colony }
+		tec_invalidates_assembly_buildings = no
 	}
 	
 	allow = {
@@ -499,11 +439,13 @@ building_robot_assembly_plant_3 = {
 				has_country_flag = tec_desires_to_build_robots
 			}
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 	
 	destroy_trigger = {
 		exists = owner
 		OR = {
+			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_regular_empire = no 
@@ -549,73 +491,48 @@ building_robot_assembly_plant_3 = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b3_minerals
-			rare_crystals = @b3_rare_cost
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 3
 		}
-		upkeep = {
-			energy = @b3_upkeep
-			rare_crystals = @tec_b3_rare_upkeep
+		
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 3
+			rare = rare_crystals
 		}
 	}
 	
-	planet_modifier = {
-		job_roboticist_add = 2
+	inline_script = {
+		script = jobs/inline_evolved_roboticist
+		count = 2
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_roboticist = no"
 	}
-	triggered_desc = {
-		text = job_roboticist_effect_desc
+
+	inline_script = {
+		script = jobs/inline_evolved_master_roboticist
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_roboticist = yes"
 	}
 	
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_valid_civic = civic_tec_corporate_robocorp }
-		}
-		modifier = {
-			job_tec_minor_roboticist_add = 2
-		}
+	
+	inline_script = {
+		script = buildings/effects/inline_evolved_corporate_robocorp
+		tier = 3
 	}
+
 	triggered_desc = {
 		trigger = {
 			exists = owner
-			owner = {
-				has_civic = civic_tec_corporate_robocorp
-			}
+			tec_has_master_roboticist = yes
+			tec_has_t3_robotic_buildings = no
 		}
-		text = job_tec_minor_roboticist_effect_desc
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			planet = {
-				exists = assembling_species
-				assembling_species = {
-					tec_is_replicant = no
-				}
-			}
-		}
-		modifier = {
-			planet_pop_assembly_add = 1
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			planet = {
-				exists = assembling_species
-				assembling_species = {
-					tec_is_replicant = yes
-				}
-			}
-		}
-		modifier = {
-			planet_pop_assembly_organic_add = 1
-		}
-	}
-
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
+		text = job_tec_master_roboticist_effect_t3_desc
 	}
 }
 
@@ -654,7 +571,7 @@ building_hive_robot_assembly_plant = {
 		NOT = {
 			has_modifier = slave_colony 
 		}
-		
+		tec_invalidates_assembly_buildings = no
 	}
 
 	allow = {
@@ -669,11 +586,13 @@ building_hive_robot_assembly_plant = {
 				has_country_flag = tec_desires_to_build_robots
 			}
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
+			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_hive_empire = no 
@@ -728,112 +647,26 @@ building_hive_robot_assembly_plant = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b1_minerals
-		}
-		upkeep = {
-			energy = @b1_upkeep
-		}
-		# Special resource civics
-		cost = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			minerals = @b1_minus_minerals
-			food = @b1_half_minerals
-		}
-		upkeep = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			energy = @b1_minus_upkeep
-			food = @b1_half_upkeep
-		}
-		cost = {
-			trigger = {
-				owner = {
-					has_valid_civic = civic_tec_machine_digitalization
-				}
-			}
-			minerals = @b1_minus_minerals
-			energy = @b1_half_minerals
-		}
-		upkeep = {
-			trigger = {
-				planet = {
-					exists = assembling_species
-					assembling_species = {
-						tec_is_replicant = no
-					}
-				}
-			}
-			alloys = 2
-		}
-		upkeep = {
-			trigger = {
-				planet = {
-					exists = assembling_species
-					assembling_species = {
-						tec_is_replicant = yes
-					}
-					owner = {
-						has_policy_flag = tec_replicant_food
-					}
-				}
-			}
-			alloys = 1
-			food = 3
-		}
-		upkeep = {
-			trigger = {
-				planet = {
-					exists = assembling_species
-					assembling_species = {
-						tec_is_replicant = yes
-					}
-					owner = {
-						has_policy_flag = tec_replicant_minerals
-					}
-				}
-			}
-			alloys = 1
-			minerals = 3
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
 		}
 	}
 
-	planet_modifier = {
-		job_tec_replicator_drone_add = 1
-	}
-	triggered_desc = {
-		text = job_tec_replicator_drone_effect_desc
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			planet = {
-				exists = assembling_species
-				assembling_species = {
-					tec_is_replicant = no
-				}
-			}
-		}
-		modifier = {
-			planet_pop_assembly_add = 1
-		}
+	inline_script = {
+		script = jobs/inline_evolved_roboticist
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_roboticist = no"
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			planet = {
-				exists = assembling_species
-				assembling_species = {
-					tec_is_replicant = yes
-				}
-			}
-		}
-		modifier = {
-			planet_pop_assembly_organic_add = 1
-		}
+	inline_script = {
+		script = jobs/inline_evolved_master_roboticist
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_roboticist = yes"
 	}
 
 	ai_resource_production = {
@@ -873,6 +706,7 @@ building_hive_robot_assembly_plant_2 = {
 		NOT = {
 			has_modifier = slave_colony 
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 
 	allow = {
@@ -886,11 +720,13 @@ building_hive_robot_assembly_plant_2 = {
 				has_country_flag = tec_desires_to_build_robots
 			}
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
+			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_hive_empire = no 
@@ -944,72 +780,56 @@ building_hive_robot_assembly_plant_2 = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b2_minerals
-			rare_crystals = @b2_rare_cost
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
 		}
-		upkeep = {
-			energy = @b2_upkeep
-			rare_crystals = @b2_rare_upkeep
+		
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 2
+			rare = rare_crystals
 		}
-		# Special resource civics
-		cost = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			minerals = @b2_minus_minerals
-			food = @b2_half_minerals
-		}
-		upkeep = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			energy = @b2_minus_upkeep
-			food = @b2_half_upkeep
-		}
-		cost = {
-			trigger = {
-				owner = { has_valid_civic = civic_tec_machine_digitalization }
-			}
-			minerals = @b2_minus_minerals
-			energy = @b2_half_minerals
+
+		# passive assembly cost
+		inline_script = {
+			script = jobs/resources/inline_evolved_robotic_assembly_upkeep
+			base = 1
+			mult = value:tec_assembly_cost_scaling_building
+			trigger = "tec_has_master_roboticist = no"
 		}
 	}
 
-	planet_modifier = {
-		job_tec_replicator_drone_add = 1
+	inline_script = {
+		script = jobs/inline_evolved_roboticist
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_roboticist = no"
 	}
+
+	inline_script = {
+		script = jobs/inline_evolved_master_roboticist
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_roboticist = yes"
+	}
+	
+	inline_script = {
+		script = modifiers/inline_evolved_assembly_robotic
+		mult = 1
+		trigger = "tec_has_master_roboticist = no"
+	}
+
 	triggered_desc = {
-		text = job_tec_replicator_drone_effect_desc
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			planet = {
-				exists = assembling_species
-				assembling_species = {
-					tec_is_replicant = no
-				}
-			}
+		trigger = {
+			exists = owner
+			tec_has_master_roboticist = yes
+			tec_has_t2_robotic_buildings = no
 		}
-		modifier = {
-			planet_pop_assembly_add = 1
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			planet = {
-				exists = assembling_species
-				exists = assembling_species
-				assembling_species = {
-					tec_is_replicant = yes
-				}
-			}
-		}
-		modifier = {
-			planet_pop_assembly_organic_add = 1
-		}
+		text = job_tec_master_roboticist_effect_t2_desc
 	}
 	
 	ai_resource_production = {
@@ -1047,6 +867,7 @@ building_hive_robot_assembly_plant_3 = {
 		NOT = {
 			has_modifier = slave_colony 
 		}
+		tec_invalidates_assembly_buildings = no
 		
 	}
 
@@ -1061,11 +882,13 @@ building_hive_robot_assembly_plant_3 = {
 				has_country_flag = tec_desires_to_build_robots
 			}
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
+			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_hive_empire = no 
@@ -1120,43 +943,42 @@ building_hive_robot_assembly_plant_3 = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b3_minerals
-			rare_crystals = @b3_rare_cost
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 3
 		}
-		upkeep = {
-			energy = @b3_upkeep
-			rare_crystals = @tec_b3_rare_upkeep
-		}
-		# Special resource civics
-		cost = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			minerals = @b3_minus_minerals
-			food = @b3_half_minerals
-		}
-		upkeep = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			energy = @b3_minus_upkeep
-			food = @b3_half_upkeep
-		}
-		cost = {
-			trigger = {
-				owner = { has_valid_civic = civic_tec_machine_digitalization }
-			}
-			minerals = @b3_minus_minerals
-			energy = @b3_half_minerals
+		
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 3
+			rare = rare_crystals
 		}
 	}
 	
-	planet_modifier = {
-		job_tec_replicator_drone_add = 2
+	inline_script = {
+		script = jobs/inline_evolved_roboticist
+		count = 2
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_roboticist = no"
 	}
+
+	inline_script = {
+		script = jobs/inline_evolved_master_roboticist
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_roboticist = yes"
+	}
+
 	triggered_desc = {
-		text = job_tec_replicator_drone_effect_desc
+		trigger = {
+			exists = owner
+			tec_has_master_roboticist = yes
+			tec_has_t3_robotic_buildings = no
+		}
+		text = job_tec_master_roboticist_effect_t3_desc
 	}
 
 	ai_resource_production = {
@@ -1182,33 +1004,34 @@ building_mecha_monastery_1 = {
 	}
 
 	show_tech_unlock_if = {
-		has_valid_civic = civic_tec_machine_cult 
+		tec_is_machine_cult = yes
 	}
 
 	potential = {
 		exists = owner
 		owner = {
-			has_valid_civic = civic_tec_machine_cult 
+			tec_is_machine_cult = yes
 		}
 		NOT = {
 			has_modifier = slave_colony 
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 
 	allow = {
 		tec_only_one_assembly_building = no
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
+			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_regular_empire = no 
 					has_policy_flag = robots_outlawed
-					NOT = {
-						has_valid_civic = civic_tec_machine_cult
-					}
+					tec_is_machine_cult = no
 				}
 			}
 			has_modifier = slave_colony
@@ -1249,24 +1072,38 @@ building_mecha_monastery_1 = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b1_minerals
-		}
-		upkeep = {
-			energy = @b1_upkeep
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
 		}
 	}
 	
 	planet_modifier = {
-		job_tec_techno_priest_add = 1
 		pop_ethic_spiritualist_attraction_mult = 0.05
 		pop_ethic_industrial_attraction_mult = 0.05	
 	}
 
-	triggered_desc = {
-		text = job_tec_techno_priest_effect_desc
+	inline_script = {
+		script = jobs/inline_evolved_roboticist
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_roboticist = no"
 	}
-		
+
+	inline_script = {
+		script = jobs/inline_evolved_master_roboticist
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_roboticist = yes"
+	}
+	
+	inline_script = {
+		script = buildings/effects/inline_evolved_corporate_robocorp
+		tier = 1
+	}
+
 	ai_resource_production = {
 		trigger = { always = yes }
 		alloys = 5
@@ -1282,7 +1119,7 @@ building_mecha_monastery_2 = {
 	prerequisites = { "tech_droid_workers" }
 
 	show_tech_unlock_if = {
-		has_valid_civic = civic_tec_machine_cult 
+		tec_is_machine_cult = yes
 	}
 
 	upgrades = {
@@ -1297,21 +1134,21 @@ building_mecha_monastery_2 = {
 		}
 		owner = {
 			is_regular_empire = yes 
-			has_valid_civic = civic_tec_machine_cult
+			tec_is_machine_cult = yes
 		}
 		NOT = { has_modifier = slave_colony }
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
+			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_regular_empire = no 
 					has_policy_flag = robots_outlawed
-					NOT = {
-						has_valid_civic = civic_tec_machine_cult
-					}
+					tec_is_machine_cult = no
 				}
 			}
 			has_modifier = slave_colony
@@ -1352,75 +1189,66 @@ building_mecha_monastery_2 = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b2_minerals
-			rare_crystals = @b2_rare_cost
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
 		}
-		upkeep = {
-			energy = @b2_upkeep
-			rare_crystals = @b2_rare_upkeep
+		
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 2
+			rare = rare_crystals
+		}
+
+		# passive assembly cost
+		inline_script = {
+			script = jobs/resources/inline_evolved_robotic_assembly_upkeep
+			base = 1
+			mult = value:tec_assembly_cost_scaling_building
+			trigger = "tec_has_master_roboticist = no"
 		}
 	}
 
 	planet_modifier = {
-		job_tec_techno_priest_add = 1
 		pop_ethic_spiritualist_attraction_mult = 0.10
 		pop_ethic_industrial_attraction_mult = 0.10
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			planet = {
-				exists = assembling_species
-				assembling_species = {
-					tec_is_replicant = no
-				}
-			}
-		}
-		modifier = {
-			planet_pop_assembly_add = 1
-		}
+	inline_script = {
+		script = jobs/inline_evolved_roboticist
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_roboticist = no"
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			planet = {
-				exists = assembling_species
-				assembling_species = {
-					tec_is_replicant = no
-				}
-			}
-		}
-		modifier = {
-			planet_pop_assembly_organic_add = 1
-		}
+	inline_script = {
+		script = jobs/inline_evolved_master_roboticist
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_roboticist = yes"
 	}
 
-	
-	triggered_desc = {
-		text = job_tec_techno_priest_effect_desc
+	inline_script = {
+		script = buildings/effects/inline_evolved_corporate_robocorp
+		tier = 2
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_valid_civic = civic_tec_corporate_robocorp }
-		}
-		modifier = {
-			job_tec_minor_roboticist_add = 2
-		}
+	inline_script = {
+		script = modifiers/inline_evolved_assembly_robotic
+		mult = 1
+		trigger = "tec_has_master_roboticist = no"
 	}
+
 	triggered_desc = {
 		trigger = {
 			exists = owner
-			owner = {
-				has_civic = civic_tec_corporate_robocorp
-			}
+			tec_has_master_roboticist = yes
+			tec_has_t2_robotic_buildings = no
 		}
-		text = job_tec_minor_roboticist_effect_desc
+		text = job_tec_master_roboticist_effect_t2_desc
 	}
-
-
 
 	ai_resource_production = {
 		trigger = { always = yes }
@@ -1438,7 +1266,7 @@ building_mecha_monastery_3 = {
 	}
 
 	show_tech_unlock_if = {
-		has_valid_civic = civic_tec_machine_cult 
+		tec_is_machine_cult = yes
 	}
 
 	potential = {
@@ -1449,21 +1277,21 @@ building_mecha_monastery_3 = {
 		}
 		owner = {
 			is_regular_empire = yes 
-			has_valid_civic = civic_tec_machine_cult
+			tec_is_machine_cult = yes
 		}
 		NOT = { has_modifier = slave_colony }
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
+			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_regular_empire = no 
 					has_policy_flag = robots_outlawed
-					NOT = {
-						has_valid_civic = civic_tec_machine_cult
-					}
+					tec_is_machine_cult = no
 				}
 			}
 			has_modifier = slave_colony
@@ -1504,41 +1332,52 @@ building_mecha_monastery_3 = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b3_minerals
-			rare_crystals = @b3_rare_cost
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 3
 		}
-		upkeep = {
-			energy = @b3_upkeep
-			rare_crystals = @tec_b3_rare_upkeep
+		
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 3
+			rare = rare_crystals
 		}
 	}
 
 	planet_modifier = {
-		job_tec_techno_priest_add = 2
 		pop_ethic_spiritualist_attraction_mult = 0.15
 		pop_ethic_industrial_attraction_mult = 0.15
 	}
-	triggered_desc = {
-		text = job_tec_techno_priest_effect_desc
+
+	inline_script = {
+		script = jobs/inline_evolved_roboticist
+		count = 2
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_roboticist = no"
 	}
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_valid_civic = civic_tec_corporate_robocorp }
-		}
-		modifier = {
-			job_tec_minor_roboticist_add = 1
-		}
+
+	inline_script = {
+		script = jobs/inline_evolved_master_roboticist
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_roboticist = yes"
 	}
+	
+	inline_script = {
+		script = buildings/effects/inline_evolved_corporate_robocorp
+		tier = 3
+	}
+
 	triggered_desc = {
 		trigger = {
 			exists = owner
-			owner = {
-				has_civic = civic_tec_corporate_robocorp
-			}
+			tec_has_master_roboticist = yes
+			tec_has_t3_robotic_buildings = no
 		}
-		text = job_tec_minor_roboticist_effect_desc
+		text = job_tec_master_roboticist_effect_t3_desc
 	}
 
 	ai_resource_production = {
@@ -1568,10 +1407,8 @@ building_machine_assembly_plant = {
 		exists = owner
 		owner = {
 			is_machine_empire = yes 
-			NOT = {
-				has_valid_civic = civic_tec_machine_reimaginators
-			}
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 		
 	allow = {
@@ -1582,21 +1419,15 @@ building_machine_assembly_plant = {
 				num_buildings = { type = any value <= 18 }
 			}
 		}
-		owner = {
-			NOT = {
-				has_valid_civic = civic_tec_machine_reimaginators
-			}
-		}
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
+			tec_invalidates_assembly_buildings = yes
 			owner = {
 				is_robot_empire = no
-			}
-			owner = {
-				has_valid_civic = civic_tec_machine_reimaginators
 			}
 			AND = {
 				owner = { is_ai = yes }
@@ -1632,28 +1463,35 @@ building_machine_assembly_plant = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b1_minerals
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
 		}
-		upkeep = {
-			energy = @b1_upkeep
-		}
-		# Special resource civics
-		cost = {
-			trigger = {
-				owner = { has_valid_civic = civic_tec_machine_digitalization }
-			}
-			minerals = @b1_minus_minerals
-			energy = @b1_half_minerals
+
+		# passive assembly cost
+		inline_script = {
+			script = jobs/resources/inline_evolved_robotic_assembly_upkeep
+			base = 1
+			mult = value:tec_assembly_cost_scaling_building
+			trigger = ""
 		}
 	}
 
-	planet_modifier = {
-		job_replicator_add = 1
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = replicator
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = ""
 	}
-	triggered_desc = {
-		text = job_replicator_effect_desc
+
+	inline_script = {
+		script = modifiers/inline_evolved_assembly_robotic
+		mult = 1
+		trigger = ""
 	}
+
 	
 	ai_resource_production = {
 		trigger = { always = yes }
@@ -1684,29 +1522,21 @@ building_machine_assembly_complex = {
 		exists = owner
 		owner = {
 			is_machine_empire = yes
-			NOT = {
-				has_valid_civic = civic_tec_machine_reimaginators
-			}
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 		
 	allow = {
 		exists = owner
-		owner = {
-			NOT = {
-				has_valid_civic = civic_tec_machine_reimaginators
-			}
-		}
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
+			tec_invalidates_assembly_buildings = yes
 			owner = {
 				is_robot_empire = no
-			}
-			owner = {
-				has_valid_civic = civic_tec_machine_reimaginators
 			}
 			AND = {
 				owner = { is_ai = yes }
@@ -1742,56 +1572,40 @@ building_machine_assembly_complex = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b2_minerals
-			rare_crystals = @b2_rare_cost
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
 		}
-		upkeep = {
-			energy = @b2_upkeep
-			rare_crystals = @b2_rare_upkeep
+		
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 2
+			rare = rare_crystals
 		}
-		# Special resource civics
-		cost = {
-			trigger = {
-				owner = { has_valid_civic = civic_tec_machine_digitalization }
-			}
-			minerals = @b2_minus_minerals
-			energy = @b2_half_minerals
+
+		# passive assembly cost
+		inline_script = {
+			script = jobs/resources/inline_evolved_robotic_assembly_upkeep
+			base = 2
+			mult = value:tec_assembly_cost_scaling_building
+			trigger = ""
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			planet = {
-				exists = assembling_species
-				assembling_species = {
-					tec_is_replicant = no
-				}
-			}
-		}
-		modifier = {
-			planet_pop_assembly_add = 1
-		}
-	}
-	triggered_planet_modifier = {
-		potential = {
-			planet = {
-				exists = assembling_species
-				assembling_species = {
-					tec_is_replicant = yes
-				}
-			}
-		}
-		modifier = {
-			planet_pop_assembly_organic_add = 1
-		}
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = replicator
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = ""
 	}
 
-	planet_modifier = {
-		job_replicator_add = 1
-	}
-	triggered_desc = {
-		text = job_replicator_effect_desc
+	inline_script = {
+		script = modifiers/inline_evolved_assembly_robotic
+		mult = 2
+		trigger = ""
 	}
 	
 	ai_resource_production = {
@@ -1819,10 +1633,8 @@ building_machine_assembly_plant_3 = {
 		exists = owner
 		owner = {
 			is_machine_empire = yes 
-			NOT = {
-				has_valid_civic = civic_tec_machine_reimaginators
-			}
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 		
 	allow = {
@@ -1833,21 +1645,15 @@ building_machine_assembly_plant_3 = {
 				NOT = { is_planet_class = pc_habitat }
 			}
 		}
-		owner = {
-			NOT = {
-				has_valid_civic = civic_tec_machine_reimaginators
-			}
-		}
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
+			tec_invalidates_assembly_buildings = yes
 			owner = {
 				is_machine_empire = no
-			}
-			owner = {
-				has_valid_civic = civic_tec_machine_reimaginators
 			}
 			AND = {
 				owner = { is_ai = yes }
@@ -1883,29 +1689,39 @@ building_machine_assembly_plant_3 = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b3_minerals
-			rare_crystals = @b3_rare_cost
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
 		}
-		upkeep = {
-			energy = @b3_upkeep
-			rare_crystals = @tec_b3_rare_upkeep
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 2
+			rare = rare_crystals
 		}
-		# Special resource civics
-		cost = {
-			trigger = {
-				owner = { has_valid_civic = civic_tec_machine_digitalization }
-			}
-			minerals = @b3_minus_minerals
-			energy = @b3_half_minerals
+
+		# passive assembly cost
+		inline_script = {
+			script = jobs/resources/inline_evolved_robotic_assembly_upkeep
+			base = 2
+			mult = value:tec_assembly_cost_scaling_building
+			trigger = ""
 		}
 	}
 	
-	planet_modifier = {
-		job_replicator_add = 2
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = replicator
+		count = 2
+		mult = 1
+		display = with_desc
+		trigger = ""
 	}
-	triggered_desc = {
-		text = job_replicator_effect_desc
+
+	inline_script = {
+		script = modifiers/inline_evolved_assembly_robotic
+		mult = 2
+		trigger = ""
 	}
 	
 	ai_resource_production = {
@@ -1940,18 +1756,23 @@ building_tec_bioservant_plant_1 = {
 				has_policy_flag = tec_purity_assembly
 			}
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 
 	allow = {
 		tec_only_one_assembly_building = no
+		tec_invalidates_assembly_buildings = no
 	}
 	
 	destroy_trigger = {
-		owner = {
-			OR = {
-				is_machine_empire = yes
-				is_mechanical_empire = yes
-				has_policy_flag = tec_purity_assembly
+		OR = {
+			tec_invalidates_assembly_buildings = yes
+			owner = {
+				OR = {
+					is_machine_empire = yes
+					is_mechanical_empire = yes
+					has_policy_flag = tec_purity_assembly
+				}
 			}
 			
 		}
@@ -1980,19 +1801,26 @@ building_tec_bioservant_plant_1 = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b1_minerals
-		}
-		upkeep = {
-			energy = @b1_upkeep
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
 		}
 	}
 
-	planet_modifier = {
-		job_tec_bioengineer_add = 1
+	inline_script = {
+		script = jobs/inline_evolved_bioengineer
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_bioengineer = no"
 	}
-	triggered_desc = {
-		text = job_tec_bioengineer_effect_desc
+
+	inline_script = {
+		script = jobs/inline_evolved_master_bioengineer
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_bioengineer = yes"
 	}
 	
 	ai_resource_production = {
@@ -2024,15 +1852,19 @@ building_tec_bioservant_plant_2 = {
 				has_policy_flag = tec_purity_assembly
 			}
 		}
+		tec_invalidates_assembly_buildings = no
 		
 	}
 	
 	destroy_trigger = {
-		owner = {
-			OR = {
-				is_machine_empire = yes
-				is_mechanical_empire = yes
-				has_policy_flag = tec_purity_assembly
+		OR = {
+			tec_invalidates_assembly_buildings = yes
+			owner = {
+				OR = {
+					is_machine_empire = yes
+					is_mechanical_empire = yes
+					has_policy_flag = tec_purity_assembly
+				}
 			}
 		}
 	}
@@ -2060,23 +1892,56 @@ building_tec_bioservant_plant_2 = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b2_minerals
-			exotic_gases = @b2_rare_cost
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
 		}
-		upkeep = {
-			energy = @b2_upkeep
-			exotic_gases = @b2_rare_upkeep
-			food = 8
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 2
+			rare = exotic_gases
+		}
+
+		# passive assembly cost
+		inline_script = {
+			script = jobs/resources/inline_evolved_bio_assembly_upkeep
+			base = 1
+			mult = value:tec_assembly_cost_scaling_building
+			trigger = "tec_has_master_bioengineer = no"
 		}
 	}
 
-	planet_modifier = {
-		job_tec_bioengineer_add = 1
-		planet_pop_assembly_organic_add = 1
+	inline_script = {
+		script = jobs/inline_evolved_bioengineer
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_bioengineer = no"
 	}
+
+	inline_script = {
+		script = jobs/inline_evolved_master_bioengineer
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_bioengineer = yes"
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_assembly_organic
+		mult = 1
+		trigger = "tec_has_master_bioengineer = no"
+	}
+
 	triggered_desc = {
-		text = job_tec_bioengineer_effect_desc
+		trigger = {
+			exists = owner
+			tec_has_master_bioengineer = yes
+			tec_has_t2_bioservant_buildings = no
+		}
+		text = job_tec_master_bioengineer_effect_t2_desc
 	}
 	
 	ai_resource_production = {
@@ -2105,16 +1970,20 @@ building_tec_bioservant_plant_3 = {
 				has_policy_flag = tec_purity_assembly
 			}
 		}
+		tec_invalidates_assembly_buildings = no
 		
 	}
 
 	destroy_trigger = {
 		exists = owner
-		owner = {
-			OR = {
-				is_machine_empire = yes
-				is_mechanical_empire = yes
-				has_policy_flag = tec_purity_assembly
+		OR = {
+			tec_invalidates_assembly_buildings = yes
+			owner = {
+				OR = {
+					is_machine_empire = yes
+					is_mechanical_empire = yes
+					has_policy_flag = tec_purity_assembly
+				}
 			}
 		}
 	}
@@ -2142,24 +2011,43 @@ building_tec_bioservant_plant_3 = {
 	
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b4_minerals
-			exotic_gases = @b3_rare_cost
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 3
 		}
-		upkeep = {
-			energy = @b4_upkeep
-			exotic_gases = @tec_b3_rare_upkeep
-			food = 8
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 3
+			rare = exotic_gases
 		}
 	}
 	
-	planet_modifier = {
-		job_tec_bioengineer_add = 2
+	inline_script = {
+		script = jobs/inline_evolved_bioengineer
+		count = 2
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_bioengineer = no"
 	}
+
+	inline_script = {
+		script = jobs/inline_evolved_master_bioengineer
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_bioengineer = yes"
+	}	
+
 	triggered_desc = {
-		text = job_tec_bioengineer_effect_desc
+		trigger = {
+			exists = owner
+			tec_has_master_bioengineer = yes
+			tec_has_t3_bioservant_buildings = no
+		}
+		text = job_tec_master_bioengineer_effect_t3_desc
 	}
-		
+
 	ai_resource_production = {
 		trigger = { always = yes }
 		alloys = 20
@@ -2187,17 +2075,24 @@ building_tec_hive_bioservant_plant_1 = {
 		owner = {
 			has_country_flag = is_hive_bioservant_empire 
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 
 	allow = {
 		tec_only_one_assembly_building = no
+		tec_invalidates_assembly_buildings = no
 	}
 	
 	destroy_trigger = {
 		exists = owner
-		owner = {
-			is_machine_empire = yes
-			is_mechanical_empire = yes
+		OR = {
+			tec_invalidates_assembly_buildings = yes
+			owner = {
+				OR = {
+					is_machine_empire = yes
+					is_mechanical_empire = yes
+				}
+			}
 		}
 	}
 	
@@ -2222,43 +2117,27 @@ building_tec_hive_bioservant_plant_1 = {
 	
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b1_minerals
-		}
-		upkeep = {
-			energy = @b1_upkeep
-		}
-		# Special resource civics
-		cost = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			minerals = @b1_minus_minerals
-			food = @b1_half_minerals
-		}
-		upkeep = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			energy = @b1_minus_upkeep
-			food = @b1_half_upkeep
-		}
-		cost = {
-			trigger = {
-				owner = { has_valid_civic = civic_tec_machine_digitalization }
-			}
-			minerals = @b1_minus_minerals
-			energy = @b1_half_minerals
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
 		}
 	}
 
-	planet_modifier = {
-		job_tec_bioengineer_drone_add = 2
+	inline_script = {
+		script = jobs/inline_evolved_bioengineer
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_bioengineer = no"
 	}
-		
-	triggered_desc = {
-		text = job_tec_bioengineer_drone_effect_desc
-	}
+
+	inline_script = {
+		script = jobs/inline_evolved_master_bioengineer
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_bioengineer = yes"
+	}	
 	
 	ai_resource_production = {
 		trigger = { always = yes }
@@ -2289,12 +2168,19 @@ building_tec_hive_bioservant_plant_2 = {
 		owner = {
 			has_country_flag = is_hive_bioservant_empire 
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 	
 	destroy_trigger = {
-		owner = {
-			is_machine_empire = yes
-			is_mechanical_empire = yes
+		OR = {
+			tec_invalidates_assembly_buildings = yes
+			
+			owner = {
+				OR = {
+					is_machine_empire = yes
+					is_mechanical_empire = yes
+				}
+			}
 		}
 	}
 
@@ -2319,46 +2205,55 @@ building_tec_hive_bioservant_plant_2 = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b2_minerals
-			exotic_gases = @b2_rare_cost
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
 		}
-		upkeep = {
-			energy = @b2_upkeep
-			exotic_gases = @b2_rare_upkeep
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 2
+			rare = exotic_gases
 		}
-		# Special resource civics
-		cost = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			minerals = @b2_minus_minerals
-			food = @b2_half_minerals
-		}
-		upkeep = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			energy = @b2_minus_upkeep
-			food = @b2_half_upkeep
-		}
-		cost = {
-			trigger = {
-				owner = { has_valid_civic = civic_tec_machine_digitalization }
-			}
-			minerals = @b2_minus_minerals
-			energy = @b2_half_minerals
+
+		# passive assembly cost
+		inline_script = {
+			script = jobs/resources/inline_evolved_bio_assembly_upkeep
+			base = 1
+			mult = value:tec_assembly_cost_scaling_building
+			trigger = "tec_has_master_bioengineer = no"
 		}
 	}
 	
-	planet_modifier = {
-		job_tec_bioengineer_drone_add = 3
+	inline_script = {
+		script = jobs/inline_evolved_bioengineer
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_bioengineer = no"
 	}
-	
-	
-	
+
+	inline_script = {
+		script = jobs/inline_evolved_master_bioengineer
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_bioengineer = yes"
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_assembly_organic
+		mult = 1
+		trigger = "tec_has_master_bioengineer = no"
+	}
+
 	triggered_desc = {
-		text = job_tec_bioengineer_effect_desc
+		trigger = {
+			exists = owner
+			tec_has_master_bioengineer = yes
+			tec_has_t2_bioservant_buildings = no
+		}
+		text = job_tec_master_bioengineer_effect_t2_desc
 	}
 	
 	ai_resource_production = {
@@ -2386,13 +2281,20 @@ building_tec_hive_bioservant_plant_3 = {
 		owner = {
 			has_country_flag = is_hive_bioservant_empire 
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 	
 	destroy_trigger = {
-		owner = {
-			is_machine_empire = yes
-			is_mechanical_empire = yes
+		OR = {
+			tec_invalidates_assembly_buildings = yes
+			owner = {
+				OR = {
+					is_machine_empire = yes
+					is_mechanical_empire = yes
+				}
+			}
 		}
+		
 	}
 	
 	convert_to = {
@@ -2413,47 +2315,44 @@ building_tec_hive_bioservant_plant_3 = {
 		#Extreme pop growth
 			building_tec_gene_clinic_3
 	}
-	
-	planet_modifier = {
-		job_tec_bioengineer_drone_add = 4
-	}
-	
+
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b3_minerals
-			exotic_gases = @b3_rare_cost
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 3
 		}
-		upkeep = {
-			energy = @b3_upkeep
-			exotic_gases = @tec_b3_rare_upkeep
-		}
-		# Special resource civics
-		cost = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			minerals = @b3_minus_minerals
-			food = @b3_half_minerals
-		}
-		upkeep = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			energy = @b3_minus_upkeep
-			food = @b3_half_upkeep
-		}
-		cost = {
-			trigger = {
-				owner = { has_valid_civic = civic_tec_machine_digitalization }
-			}
-			minerals = @b3_minus_minerals
-			energy = @b3_half_minerals
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 3
+			rare = exotic_gases
 		}
 	}
 	
+	inline_script = {
+		script = jobs/inline_evolved_bioengineer
+		count = 2
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_bioengineer = no"
+	}
+
+	inline_script = {
+		script = jobs/inline_evolved_master_bioengineer
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_bioengineer = yes"
+	}	
+	
 	triggered_desc = {
-		text = job_tec_bioengineer_drone_effect_desc
+		trigger = {
+			exists = owner
+			tec_has_master_bioengineer = yes
+			tec_has_t3_bioservant_buildings = no
+		}
+		text = job_tec_master_bioengineer_effect_t3_desc
 	}
 	
 	ai_resource_production = {
@@ -2514,15 +2413,18 @@ building_clone_vats = {
 		}
 
 		NOT = { has_modifier = resort_colony }
+		tec_invalidates_assembly_buildings = no
 	}
 
 	allow = {
 		tec_only_one_assembly_building = no
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
+			tec_invalidates_assembly_buildings = yes
 			owner = {
 				has_policy_flag = tec_purity_assembly
 			}
@@ -2559,75 +2461,26 @@ building_clone_vats = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b1_minerals
-		}
-		upkeep = {
-			energy = @b1_upkeep
-		}
-		# Special resource civics
-		cost = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			minerals = @b1_minus_minerals
-			food = @b1_half_minerals
-		}
-		upkeep = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			energy = @b1_minus_upkeep
-			food = @b1_half_upkeep
-		}
-		cost = {
-			trigger = {
-				owner = { has_valid_civic = civic_tec_machine_digitalization }
-			}
-			minerals = @b1_minus_minerals
-			energy = @b1_half_minerals
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_gestalt = no
-			}
-		}
-		job_tec_cloner_add = 1
-	}
-	triggered_desc = {
-		trigger = {
-			owner = {
-				is_gestalt = no
-			}
-		}
-		text = job_tec_cloner_effect_desc
+	inline_script = {
+		script = jobs/inline_evolved_cloner
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_cloner = no"
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_gestalt = yes
-			}
-		}
-		job_tec_cloner_drone_add = 1
-	}
-	triggered_desc = {
-		trigger = {
-			owner = {
-				is_gestalt = yes
-			}
-		}
-		text = job_tec_cloner_drone_effect_desc
-	}
-
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 20
+	inline_script = {
+		script = jobs/inline_evolved_master_cloner
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_cloner = yes"
 	}
 }
 
@@ -2675,11 +2528,13 @@ building_clone_vats_2 = {
 			}
 		}
 		NOT = { has_modifier = resort_colony }
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
+			tec_invalidates_assembly_buildings = yes
 			owner = {
 				has_policy_flag = tec_purity_assembly
 			}
@@ -2716,86 +2571,55 @@ building_clone_vats_2 = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b2_minerals
-			exotic_gases = @b2_rare_cost
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
 		}
-		upkeep = {
-			energy = @b2_upkeep
-			exotic_gases = @b2_rare_upkeep
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 2
+			rare = exotic_gases
 		}
-		# Special resource civics
-		cost = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			minerals = @b2_minus_minerals
-			food = @b2_half_minerals
-		}
-		upkeep = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			energy = @b2_minus_upkeep
-			food = @b2_half_upkeep
-		}
-		cost = {
-			trigger = {
-				owner = { has_valid_civic = civic_tec_machine_digitalization }
-			}
-			minerals = @b2_minus_minerals
-			energy = @b2_half_minerals
+
+		# passive assembly cost
+		inline_script = {
+			script = jobs/resources/inline_evolved_bio_assembly_upkeep
+			base = 1
+			mult = value:tec_assembly_cost_scaling_building
+			trigger = "tec_has_master_cloner = no"
 		}
 	}
 
-	planet_modifier = {
-		planet_pop_assembly_organic_add = 1
+	inline_script = {
+		script = jobs/inline_evolved_cloner
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_cloner = no"
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_gestalt = no
-			}
-		}
-		job_tec_cloner_add = 1
+	inline_script = {
+		script = jobs/inline_evolved_master_cloner
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_cloner = yes"
 	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_assembly_organic
+		mult = 1
+		trigger = "tec_has_master_cloner = no"
+	}
+
 	triggered_desc = {
 		trigger = {
-			owner = {
-				is_gestalt = no
-			}
-		}
-		text = job_tec_cloner_effect_desc
-	}
-
-	triggered_planet_modifier = {
-		potential = {
 			exists = owner
-			owner = {
-				is_gestalt = yes
-			}
+			tec_has_master_cloner = yes
+			tec_has_t2_cloning_buildings = no
 		}
-		job_tec_cloner_drone_add = 1
-	}
-	triggered_desc = {
-		trigger = {
-			owner = {
-				is_gestalt = yes
-			}
-		}
-		text = job_tec_cloner_drone_effect_desc
-	}
-
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 20
-	}
-	#Free resources for ais, competitive ai
-	ai_resource_production = {
-		trigger = { always = yes}
-		exotic_gases = @b2_rare_upkeep
+		text = job_tec_master_cloner_effect_t2_desc
 	}
 }
 
@@ -2839,11 +2663,13 @@ building_clone_vats_3 = {
 			}
 		}
 		NOT = { has_modifier = resort_colony }
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
+			tec_invalidates_assembly_buildings = yes
 			owner = {
 				has_policy_flag = tec_purity_assembly
 			}
@@ -2880,83 +2706,41 @@ building_clone_vats_3 = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b3_minerals
-			exotic_gases = @b3_rare_cost
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 3
 		}
-		upkeep = {
-			energy = @b3_upkeep
-			exotic_gases = @tec_b3_rare_upkeep
-		}
-		# Special resource civics
-		cost = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			minerals = @b3_minus_minerals
-			food = @b3_half_minerals
-		}
-		upkeep = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			energy = @b3_minus_upkeep
-			food = @b3_half_upkeep
-		}
-		cost = {
-			trigger = {
-				owner = { has_valid_civic = civic_tec_machine_digitalization }
-			}
-			minerals = @b3_minus_minerals
-			energy = @b3_half_minerals
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 3
+			rare = exotic_gases
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_gestalt = no
-			}
-		}
-		job_tec_cloner_add = 2
+	inline_script = {
+		script = jobs/inline_evolved_cloner
+		count = 2
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_cloner = no"
 	}
+
+	inline_script = {
+		script = jobs/inline_evolved_master_cloner
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_cloner = yes"
+	}
+
 	triggered_desc = {
 		trigger = {
-			owner = {
-				is_gestalt = no
-			}
-		}
-		text = job_tec_cloner_effect_desc
-	}
-
-	triggered_planet_modifier = {
-		potential = {
 			exists = owner
-			owner = {
-				is_gestalt = yes
-			}
+			tec_has_master_cloner = yes
+			tec_has_t3_clonings_building = no
 		}
-		job_tec_cloner_drone_add = 2
-	}
-	triggered_desc = {
-		trigger = {
-			owner = {
-				is_gestalt = yes
-			}
-		}
-		text = job_tec_cloner_drone_effect_desc
-	}
-
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 20
-	}
-
-	#Free resources for ais, competitive ai
-	ai_resource_production = {
-		trigger = { always = yes}
-		exotic_gases = @tec_b4_rare_upkeep
+		text = job_tec_master_cloner_effect_t3_desc
 	}
 }
 
@@ -2993,15 +2777,18 @@ building_tec_gene_clinic_1 = {
 				has_country_flag = tec_desires_to_be_pure
 			}
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 
 	allow = {
 		tec_only_one_assembly_building = no
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
+			tec_invalidates_assembly_buildings = yes
 			AND = {
 				owner = { is_ai = yes }
 				planet = {
@@ -3040,48 +2827,18 @@ building_tec_gene_clinic_1 = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b1_minerals
-		}
-		upkeep = {
-			energy = @b1_upkeep
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_gestalt = no
-			}
-		}
-		job_tec_cloner_add = 1
-	}
-	triggered_desc = {
-		trigger = {
-			owner = {
-				is_gestalt = no
-			}
-		}
-		text = job_tec_cloner_effect_desc
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_gestalt = yes
-			}
-		}
-		job_tec_cloner_drone_add = 1
-	}
-	triggered_desc = {
-		trigger = {
-			owner = {
-				is_gestalt = yes
-			}
-		}
-		text = job_tec_cloner_drone_effect_desc
+	inline_script = {
+		script = jobs/inline_evolved_cloner
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = ""
 	}
 
 	ai_resource_production = {
@@ -3114,11 +2871,13 @@ building_tec_gene_clinic_2 = {
 			has_policy_flag = tec_purity_assembly
 		}
 		NOT = { has_modifier = resort_colony }
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
+			tec_invalidates_assembly_buildings = yes
 			AND = {
 				owner = { is_ai = yes }
 				planet = {
@@ -3157,54 +2916,39 @@ building_tec_gene_clinic_2 = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b2_minerals
-			exotic_gases = @b2_rare_cost
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
 		}
-		upkeep = {
-			energy = @b2_upkeep
-			exotic_gases = @b2_rare_upkeep
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 2
+			rare = exotic_gases
+		}
+
+		# passive assembly cost
+		inline_script = {
+			script = jobs/resources/inline_evolved_bio_assembly_upkeep
+			base = 1
+			mult = value:tec_assembly_cost_scaling_building
+			trigger = ""
 		}
 	}
 
-	planet_modifier = {
-		planet_pop_assembly_organic_add = 1
+	inline_script = {
+		script = jobs/inline_evolved_cloner
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = ""
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_gestalt = no
-			}
-		}
-		job_tec_cloner_add = 1
-	}
-	triggered_desc = {
-		trigger = {
-			owner = {
-				is_gestalt = no
-			}
-		}
-		text = job_tec_cloner_effect_desc
-	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_gestalt = yes
-			}
-		}
-		job_tec_cloner_drone_add = 1
-	}
-	triggered_desc = {
-		trigger = {
-			owner = {
-				is_gestalt = yes
-			}
-		}
-		text = job_tec_cloner_drone_effect_desc
+	inline_script = {
+		script = modifiers/inline_evolved_assembly_organic
+		mult = 1
+		trigger = ""
 	}
 
 	ai_resource_production = {
@@ -3238,11 +2982,13 @@ building_tec_gene_clinic_3 = {
 			has_policy_flag = tec_purity_assembly
 		}
 		NOT = { has_modifier = resort_colony }
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
+			tec_invalidates_assembly_buildings = yes
 			AND = {
 				owner = { is_ai = yes }
 				planet = {
@@ -3281,50 +3027,24 @@ building_tec_gene_clinic_3 = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b3_minerals
-			exotic_gases = @b3_rare_cost
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 3
 		}
-		upkeep = {
-			energy = @b3_upkeep
-			exotic_gases = @tec_b3_rare_upkeep
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 3
+			rare = exotic_gases
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_gestalt = no
-			}
-		}
-		job_tec_cloner_add = 2
-	}
-	triggered_desc = {
-		trigger = {
-			owner = {
-				is_gestalt = no
-			}
-		}
-		text = job_tec_cloner_effect_desc
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_gestalt = yes
-			}
-		}
-		job_tec_cloner_drone_add = 2
-	}
-	triggered_desc = {
-		trigger = {
-			owner = {
-				is_gestalt = yes
-			}
-		}
-		text = job_tec_cloner_drone_effect_desc
+	inline_script = {
+		script = jobs/inline_evolved_cloner
+		count = 2
+		mult = 1
+		display = with_desc
+		trigger = ""
 	}
 
 	ai_resource_production = {
@@ -3361,19 +3081,24 @@ building_spawning_pool = {
 			num_buildings = { type = any value < 15 }
 			owner = { is_ai = no }
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 	
 	allow = {
 		tec_only_one_assembly_building = no
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
-		owner = {
-			OR = {
-				is_hive_empire = no 
-				tec_is_biohive = yes
-				tec_hive_can_have_spawningpools = no
+		OR = {
+			tec_invalidates_assembly_buildings = yes
+			owner = {
+				OR = {
+					is_hive_empire = no 
+					tec_is_biohive = yes
+					tec_hive_can_have_spawningpools = no
+				}
 			}
 		}
 	}
@@ -3401,33 +3126,9 @@ building_spawning_pool = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b1_minerals
-		}
-		upkeep = {
-			energy = @b1_upkeep
-		}
-		# Special resource civics
-		cost = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			minerals = @b1_minus_minerals
-			food = @b1_half_minerals
-		}
-		upkeep = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			energy = @b1_minus_upkeep
-			food = @b1_half_upkeep
-		}
-		cost = {
-			trigger = {
-				owner = { has_valid_civic = civic_tec_machine_digitalization }
-			}
-			minerals = @b1_minus_minerals
-			energy = @b1_half_minerals
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
 		}
 	}
 
@@ -3435,40 +3136,13 @@ building_spawning_pool = {
 		text = spawning_pool_tooltip
 	}
 
-	planet_modifier = {
-		job_spawning_drone_add = 1
-	}
-	triggered_desc = {
-		trigger = {
-			NAND = {
-				exists = owner
-				owner = {
-					has_origin = origin_necrophage
-				}
-				exists = growing_species
-				growing_species = {
-					NOT = {
-						has_trait = trait_hive_mind
-					}
-				}
-			}
-		}
-		text = job_spawning_drone_effect_desc
-	}
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = {
-				has_origin = origin_necrophage
-			}
-			exists = growing_species
-			growing_species = {
-				NOT = {
-					has_trait = trait_hive_mind
-				}
-			}
-		}
-		text = job_spawning_drone_necrophage_effect_desc
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = spawning_drone
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = ""
 	}
 	
 	ai_resource_production = {
@@ -3505,6 +3179,7 @@ building_spawning_pool_2 = {
 			num_buildings = { type = any value < 15 }
 			owner = { is_ai = no }
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 
 	allow = {
@@ -3513,15 +3188,19 @@ building_spawning_pool_2 = {
 			is_hive_empire = yes
 			tec_hive_can_have_spawningpools = yes
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
-		owner = {
-			OR = {
-				is_hive_empire = no
-				tec_is_biohive = yes
-				tec_hive_can_have_spawningpools = no
+		OR = {
+			tec_invalidates_assembly_buildings = yes
+			owner = {
+				OR = {
+					is_hive_empire = no
+					tec_is_biohive = yes
+					tec_hive_can_have_spawningpools = no
+				}
 			}
 		}
 	}
@@ -3549,35 +3228,23 @@ building_spawning_pool_2 = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b2_minerals
-			exotic_gases = @b2_rare_cost
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
 		}
-		upkeep = {
-			energy = @b2_upkeep
-			exotic_gases = @b2_rare_upkeep
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 2
+			rare = exotic_gases
 		}
-		# Special resource civics
-		cost = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			minerals = @b2_minus_minerals
-			food = @b2_half_minerals
-		}
-		upkeep = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			energy = @b2_minus_upkeep
-			food = @b2_half_upkeep
-		}
-		cost = {
-			trigger = {
-				owner = { has_valid_civic = civic_tec_machine_digitalization }
-			}
-			minerals = @b2_minus_minerals
-			energy = @b2_half_minerals
+
+		# passive assembly cost
+		inline_script = {
+			script = jobs/resources/inline_evolved_bio_assembly_upkeep
+			base = 1
+			mult = value:tec_assembly_cost_scaling_building
+			trigger = ""
 		}
 	}
 
@@ -3585,42 +3252,20 @@ building_spawning_pool_2 = {
 		text = spawning_pool_tooltip
 	}
 
-	planet_modifier = {
-		job_spawning_drone_add = 1
-		planet_pop_assembly_organic_add = 1
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = spawning_drone
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = ""
 	}
-	
-	triggered_desc = {
-		trigger = {
-			NAND = {
-				exists = owner
-				owner = {
-					has_origin = origin_necrophage
-				}
-				exists = growing_species
-				growing_species = {
-					NOT = {
-						has_trait = trait_hive_mind
-					}
-				}
-			}
-		}
-		text = job_spawning_drone_effect_desc
-	}
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = {
-				has_origin = origin_necrophage
-			}
-			exists = growing_species
-			growing_species = {
-				NOT = {
-					has_trait = trait_hive_mind
-				}
-			}
-		}
-		text = job_spawning_drone_necrophage_effect_desc
+
+
+	inline_script = {
+		script = modifiers/inline_evolved_assembly_organic
+		mult = 1
+		trigger = ""
 	}
 	
 	ai_resource_production = {
@@ -3657,15 +3302,19 @@ building_spawning_pool_3 = {
 			num_buildings = { type = any value < 15 }
 			owner = { is_ai = no }
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
-		owner = {
-			OR = {
-				is_hive_empire = no
-				tec_is_biohive = yes
-				tec_hive_can_have_spawningpools = no
+		OR = {
+			tec_invalidates_assembly_buildings = yes
+			owner = {
+				OR = {
+					is_hive_empire = no
+					tec_is_biohive = yes
+					tec_hive_can_have_spawningpools = no
+				}
 			}
 		}
 	}
@@ -3693,75 +3342,28 @@ building_spawning_pool_3 = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b3_minerals
-			exotic_gases = @b3_rare_cost
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 3
 		}
-		upkeep = {
-			energy = @b3_upkeep
-			exotic_gases = @tec_b3_rare_upkeep
-		}
-		# Special resource civics
-		cost = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			minerals = @b3_minus_minerals
-			food = @b3_half_minerals
-		}
-		upkeep = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			energy = @b3_minus_upkeep
-			food = @b3_half_upkeep
-		}
-		cost = {
-			trigger = {
-				owner = { has_valid_civic = civic_tec_machine_digitalization }
-			}
-			minerals = @b3_minus_minerals
-			energy = @b3_half_minerals
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 3
+			rare = exotic_gases
 		}
 	}
 	triggered_desc = {
 		text = spawning_pool_tooltip
 	}
 
-	planet_modifier = {
-		job_spawning_drone_add = 2
-	}
-	triggered_desc = {
-		trigger = {
-			NAND = {
-				exists = owner
-				owner = {
-					has_origin = origin_necrophage
-				}
-				exists = growing_species
-				growing_species = {
-					NOT = {
-						has_trait = trait_hive_mind
-					}
-				}
-			}
-		}
-		text = job_spawning_drone_effect_desc
-	}
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = {
-				has_origin = origin_necrophage
-			}
-			exists = growing_species
-			growing_species = {
-				NOT = {
-					has_trait = trait_hive_mind
-				}
-			}
-		}
-		text = job_spawning_drone_necrophage_effect_desc
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = spawning_drone
+		count = 2
+		mult = 1
+		display = with_desc
+		trigger = ""
 	}
 	
 	ai_resource_production = {
@@ -3793,19 +3395,25 @@ building_tec_biohive_spawning_pool_1 = {
 			num_buildings = { type = any value < 15 }
 			owner = { is_ai = no }
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 	
 	allow = {
 		tec_only_one_assembly_building = no
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
-		owner = {
-			OR = {
-				is_hive_empire = no
-				tec_is_biohive = no
-				tec_hive_can_have_spawningpools = no
+		OR = {
+			
+			tec_invalidates_assembly_buildings = yes
+			owner = {
+				OR = {
+					is_hive_empire = no
+					tec_is_biohive = no
+					tec_hive_can_have_spawningpools = no
+				}
 			}
 		}
 	}
@@ -3831,76 +3439,21 @@ building_tec_biohive_spawning_pool_1 = {
 			#building_tec_biohive_spawning_pool_1
 	}
 
-	planet_modifier = {
-		job_spawning_drone_add = 1
-	}
-
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b1_minerals
-		}
-		upkeep = {
-			energy = @b1_upkeep
-		}
-		# Special resource civics
-		cost = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			minerals = @b1_minus_minerals
-			food = @b1_half_minerals
-		}
-		upkeep = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			energy = @b1_minus_upkeep
-			food = @b1_half_upkeep
-		}
-		cost = {
-			trigger = {
-				owner = { has_valid_civic = civic_tec_machine_digitalization }
-			}
-			minerals = @b1_minus_minerals
-			energy = @b1_half_minerals
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
 		}
 	}
 
-	triggered_desc = {
-		trigger = {
-			NAND = {
-				exists = owner
-				owner = {
-					has_origin = origin_necrophage
-				}
-				exists = growing_species
-				growing_species = {
-					NOT = {
-						has_trait = trait_hive_mind
-					}
-				}
-			}
-		}
-		text = job_spawning_drone_effect_desc
-	}
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = {
-				has_origin = origin_necrophage
-			}
-			exists = growing_species
-			growing_species = {
-				NOT = {
-					has_trait = trait_hive_mind
-				}
-			}
-		}
-		text = job_spawning_drone_necrophage_effect_desc
-	}
-	triggered_desc = {
-		text = spawning_pool_tooltip
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = spawning_drone
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = ""
 	}
 
 	ai_resource_production = {
@@ -3939,6 +3492,7 @@ building_tec_biohive_spawning_pool_2 = {
 			num_buildings = { type = any value < 15 }
 			owner = { is_ai = no }
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 
 	allow = {
@@ -3948,15 +3502,19 @@ building_tec_biohive_spawning_pool_2 = {
 			tec_is_biohive = yes
 			tec_hive_can_have_spawningpools = yes
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
-		owner = {
-			OR = {
-				is_hive_empire = no
-				tec_hive_can_have_spawningpools = no
-				tec_is_biohive = no
+		OR = {
+			tec_invalidates_assembly_buildings = yes
+			owner = {
+				OR = {
+					is_hive_empire = no
+					tec_hive_can_have_spawningpools = no
+					tec_is_biohive = no
+				}
 			}
 		}
 	}
@@ -3984,34 +3542,23 @@ building_tec_biohive_spawning_pool_2 = {
 		
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b2_minerals
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
 		}
-		upkeep = {
-			energy = @b2_upkeep
-			#food = @b1_upkeep
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 2
+			rare = exotic_gases
 		}
-		# Special resource civics
-		cost = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			minerals = @b2_minus_minerals
-			food = @b2_half_minerals
-		}
-		upkeep = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			energy = @b2_minus_upkeep
-			food = @b2_half_upkeep
-		}
-		cost = {
-			trigger = {
-				owner = { has_valid_civic = civic_tec_machine_digitalization }
-			}
-			minerals = @b2_minus_minerals
-			energy = @b2_half_minerals
+
+		# passive assembly cost
+		inline_script = {
+			script = jobs/resources/inline_evolved_bio_assembly_upkeep
+			base = 1
+			mult = value:tec_assembly_cost_scaling_building
+			trigger = ""
 		}
 	}
 
@@ -4019,43 +3566,21 @@ building_tec_biohive_spawning_pool_2 = {
 		text = spawning_pool_tooltip
 	}
 
-	planet_modifier = {
-		job_spawning_drone_add = 1
-		planet_pop_assembly_organic_add = 1
-	}
-	triggered_desc = {
-		trigger = {
-			NAND = {
-				exists = owner
-				owner = {
-					has_origin = origin_necrophage
-				}
-				exists = growing_species
-				growing_species = {
-					NOT = {
-						has_trait = trait_hive_mind
-					}
-				}
-			}
-		}
-		text = job_spawning_drone_effect_desc
-	}
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = {
-				has_origin = origin_necrophage
-			}
-			exists = growing_species
-			growing_species = {
-				NOT = {
-					has_trait = trait_hive_mind
-				}
-			}
-		}
-		text = job_spawning_drone_necrophage_effect_desc
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = spawning_drone
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = ""
 	}
 
+
+	inline_script = {
+		script = modifiers/inline_evolved_assembly_organic
+		mult = 1
+		trigger = ""
+	}
 
 	ai_resource_production = {
 		trigger = { always = yes }
@@ -4080,6 +3605,7 @@ building_tec_biohive_spawning_pool_3 = {
 
 	allow = {
 		has_major_upgraded_capital = yes
+		tec_invalidates_assembly_buildings = no
 	}
 
 	potential = {
@@ -4093,15 +3619,19 @@ building_tec_biohive_spawning_pool_3 = {
 			num_buildings = { type = any value < 15 }
 			owner = { is_ai = no }
 		}
+		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
-		owner = {
-			OR = {
-				is_hive_empire = no
-				tec_is_biohive = no
-				tec_hive_can_have_spawningpools = no
+		OR = {
+			tec_invalidates_assembly_buildings = yes
+			owner = {
+				OR = {
+					is_hive_empire = no
+					tec_is_biohive = no
+					tec_hive_can_have_spawningpools = no
+				}
 			}
 		}
 	}
@@ -4129,36 +3659,15 @@ building_tec_biohive_spawning_pool_3 = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b3_minerals
-			exotic_gases = @b3_rare_cost
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 3
 		}
-		upkeep = {
-			energy = @b3_upkeep
-			#food = @b3_upkeep
-			exotic_gases = @tec_b3_rare_upkeep
-		}
-		# Special resource civics
-		cost = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			minerals = @b3_minus_minerals
-			food = @b3_half_minerals
-		}
-		upkeep = {
-			trigger = {
-				owner = { tec_is_bioarch_empire = yes }
-			}
-			energy = @b3_minus_upkeep
-			food = @b3_half_upkeep
-		}
-		cost = {
-			trigger = {
-				owner = { has_valid_civic = civic_tec_machine_digitalization }
-			}
-			minerals = @b3_minus_minerals
-			energy = @b3_half_minerals
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 3
+			rare = exotic_gases
 		}
 	}
 
@@ -4166,43 +3675,14 @@ building_tec_biohive_spawning_pool_3 = {
 		text = spawning_pool_tooltip
 	}
 
-	planet_modifier = {
-		job_spawning_drone_add = 2
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = spawning_drone
+		count = 2
+		mult = 1
+		display = with_desc
+		trigger = ""
 	}
-	
-	triggered_desc = {
-		trigger = {
-			NAND = {
-				exists = owner
-				owner = {
-					has_origin = origin_necrophage
-				}
-				exists = growing_species
-				growing_species = {
-					NOT = {
-						has_trait = trait_hive_mind
-					}
-				}
-			}
-		}
-		text = job_spawning_drone_effect_desc
-	}
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = {
-				has_origin = origin_necrophage
-			}
-			exists = growing_species
-			growing_species = {
-				NOT = {
-					has_trait = trait_hive_mind
-				}
-			}
-		}
-		text = job_spawning_drone_necrophage_effect_desc
-	}
-	
 
 	ai_resource_production = {
 		trigger = { always = yes }
@@ -4313,11 +3793,9 @@ building_tec_splicechamber = {
 	
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b1_minerals
-		}
-		upkeep = {
-			energy = @b1_upkeep
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
 		}
 	}
 	
@@ -4439,13 +3917,15 @@ building_tec_splicechamber_2 = {
 	
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b2_minerals
-			exotic_gases = @b2_rare_cost
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
 		}
-		upkeep = {
-			energy = @b2_upkeep
-			exotic_gases = @b2_rare_upkeep
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 2
+			rare = exotic_gases
 		}
 	}
 
@@ -4560,30 +4040,37 @@ building_necrophage_elevation_chamber = {
 	
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b1_minerals
-		}
-		upkeep = {
-			energy = @b1_upkeep
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
 		}
 	}
 
-	planet_modifier = {
-		job_necro_apprentice_add = 1
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = necro_apprentice
+		display = with_desc
+		count = 1
+		mult = 1
+		trigger = ""
 	}
-	
-	#you are not meant to run out of necrophaging pops on a planet with this building
-	triggered_planet_modifier = {
-		potential = {
-			num_organic_pops_per_year >= 0.2
-		}
-		job_necro_apprentice_add = 1
+
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = necro_apprentice
+		display = no_desc
+		count = 1
+		mult = 1
+		trigger = "num_organic_pops_per_year >= 0.2"
 	}
-	triggered_planet_modifier = {
-		potential = {
-			num_organic_pops_per_year >= 0.3
-		}
-		job_necro_apprentice_add = 1
+
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = necro_apprentice
+		display = no_desc
+		count = 1
+		mult = 1
+		trigger = "num_organic_pops_per_year >= 0.3"
 	}
 		
 	desc = {
@@ -4603,46 +4090,6 @@ building_necrophage_elevation_chamber = {
 		text = building_necrophage_elevation_chamber_desc_hive
 	}
 	
-	triggered_desc = {
-		text = job_necro_apprentice_effect_desc
-		trigger = {
-			exists = owner
-			owner = {
-				is_lithoid_empire = no
-				is_hive_empire = no
-			}
-		}
-	}
-	triggered_desc = {
-		text = job_necro_apprentice_effect_lithoid_desc
-		trigger = {
-			exists = owner
-			owner = {
-				is_lithoid_empire = yes
-				is_hive_empire = no
-			}
-		}
-	}
-	triggered_desc = {
-		text = job_necro_apprentice_effect_hive_desc
-		trigger = {
-			exists = owner
-			owner = {
-				is_lithoid_empire = no
-				is_hive_empire = yes
-			}
-		}
-	}
-	triggered_desc = {
-		text = job_necro_apprentice_effect_hive_lithoid_desc
-		trigger = {
-			exists = owner
-			owner = {
-				is_lithoid_empire = yes
-				is_hive_empire = yes
-			}
-		}
-	}
 
 	triggered_desc = {
 		text = necrophage_elevation_timer_tooltip
@@ -4721,29 +4168,40 @@ building_necrophage_house_of_apotheosis = {
 		}
 	}
 	
-	planet_modifier = {
-		job_necro_apprentice_add = 6
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			is_planet_class = pc_hive
-			exists = owner
-			owner = { is_hive_empire = yes }
-		}
-		job_necro_apprentice_add = 4
-	}
-	
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b2_minerals
-			exotic_gases = @b2_rare_cost
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
 		}
-		upkeep = {
-			energy = @b2_upkeep
-			exotic_gases = @b2_rare_upkeep
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 2
+			rare = exotic_gases
 		}
+	}
+
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = necro_apprentice
+		display = with_desc
+		count = 6
+		mult = 1
+		trigger = ""
+	}
+
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = necro_apprentice
+		display = no_desc
+		count = 4
+		mult = 1
+		trigger = "
+			exists = owner
+			owner = { is_hive_empire = yes }
+			tec_is_hive_world = yes
+		"
 	}
 
 	desc = {
@@ -4763,46 +4221,6 @@ building_necrophage_house_of_apotheosis = {
 		text = building_necrophage_house_of_apotheosis_desc_hive
 	}
 
-	triggered_desc = {
-		text = job_necro_apprentice_effect_desc
-		trigger = {
-			exists = owner
-			owner = {
-				is_lithoid_empire = no
-				is_hive_empire = no
-			}
-		}
-	}
-	triggered_desc = {
-		text = job_necro_apprentice_effect_lithoid_desc
-		trigger = {
-			exists = owner
-			owner = {
-				is_lithoid_empire = yes
-				is_hive_empire = no
-			}
-		}
-	}
-	triggered_desc = {
-		text = job_necro_apprentice_effect_hive_desc
-		trigger = {
-			exists = owner
-			owner = {
-				is_lithoid_empire = no
-				is_hive_empire = yes
-			}
-		}
-	}
-	triggered_desc = {
-		text = job_necro_apprentice_effect_hive_lithoid_desc
-		trigger = {
-			exists = owner
-			owner = {
-				is_lithoid_empire = yes
-				is_hive_empire = yes
-			}
-		}
-	}
 	triggered_desc = {
 		text = necrophage_elevation_timer_tooltip
 		trigger = {
@@ -4879,11 +4297,9 @@ building_posthumous_employment_center = {
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b1_minerals
-		}
-		upkeep = {
-			energy = @b1_upkeep
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
 		}
 	}
 
@@ -4932,42 +4348,35 @@ building_clinic = {
 		}
 	}
 	
-	planet_modifier = {
-		job_healthcare_add = 2
+	prerequisites = {
+		"tech_frontier_health"
 	}
-	
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_policy_flag = public_healthcare }
-		}
-		modifier = {
-			job_healthcare_add = 1
-		}
+
+	upgrades = {
+		"building_hospital"
 	}
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b1_minerals
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
 		}
-		upkeep = {
-			energy = @b1_upkeep
-		}
+
+		inline_script = buildings/resources/inline_evolved_public_healthcare_upkeep
 	}
-	
-	prerequisites = {
-		"tech_frontier_health"
+
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = healthcare
+		display = with_desc
+		count = @b1_jobs
+		mult = 1
+		trigger = ""
 	}
-	
-	upgrades = {
-		"building_hospital"
-	}
-	
-	triggered_desc = {
-		text = job_healthcare_effect_desc
-	}
-	
+
+	inline_script = buildings/effects/inline_evolved_public_healthcare
+
 	ai_resource_production = {
 		trigger = { always = yes }
 		alloys = 5
@@ -5002,39 +4411,7 @@ building_hospital = {
 			}
 		}
 	}
-	
-	planet_modifier = {
-		job_healthcare_add = 4
-	}
-	
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_policy_flag = public_healthcare }
-		}
-		modifier = {
-			job_healthcare_add = 1
-		}
-	}
 
-	resources = {
-		category = planet_buildings
-		cost = {
-			minerals = @b2_minerals
-			exotic_gases = @b2_rare_cost
-		}
-		upkeep = {
-			energy = @b2_upkeep
-			exotic_gases = @b2_rare_upkeep
-		}
-		upkeep = {
-				trigger = {
-				owner = { has_policy_flag = public_healthcare }
-			}
-			energy = 2
-		}
-	}
-	
 	prerequisites = {
 		"tech_frontier_hospital"
 	}
@@ -5046,6 +4423,34 @@ building_hospital = {
 	show_tech_unlock_if = {
 		is_regular_empire = yes
 	}
+
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 2
+			rare = exotic_gases
+		}
+
+		inline_script = buildings/resources/inline_evolved_public_healthcare_upkeep
+	}
+
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = healthcare
+		display = with_desc
+		count = @b2_jobs
+		mult = 1
+		trigger = ""
+	}
+
+	inline_script = buildings/effects/inline_evolved_public_healthcare
 
 	triggered_desc = {
 		text = job_healthcare_effect_desc
@@ -5086,38 +4491,6 @@ building_hospital_2 = {
 		}
 	}
 	
-	planet_modifier = {
-		job_healthcare_add = 6
-	}
-	
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_policy_flag = public_healthcare }
-		}
-		modifier = {
-			job_healthcare_add = 1
-		}
-	}
-
-	resources = {
-		category = planet_buildings
-		cost = {
-			minerals = @b3_minerals
-			exotic_gases = @b3_rare_cost
-		}
-		upkeep = {
-			energy = @b3_upkeep
-			exotic_gases = @tec_b3_rare_upkeep
-		}
-		upkeep = {
-				trigger = {
-				owner = { has_policy_flag = public_healthcare }
-			}
-			energy = 2
-		}
-	}
-	
 	prerequisites = {
 		"tech_tec_frontier_hospital_2"
 	}
@@ -5126,10 +4499,35 @@ building_hospital_2 = {
 		is_regular_empire = yes
 	}
 
-	triggered_desc = {
-		text = job_healthcare_effect_desc
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 3
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 3
+			rare = exotic_gases
+		}
+
+		inline_script = buildings/resources/inline_evolved_public_healthcare_upkeep
 	}
+
 	
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = healthcare
+		display = with_desc
+		count = @b3_jobs
+		mult = 1
+		trigger = ""
+	}
+
+	inline_script = buildings/effects/inline_evolved_public_healthcare
+
+
 	ai_resource_production = {
 		trigger = { always = yes }
 		alloys = 5
@@ -5154,10 +4552,7 @@ building_toxic_bath = {
 		NOT = { has_modifier = slave_colony }
 		owner = {
 			is_regular_empire = yes
-			OR = {
-				has_valid_civic = civic_toxic_baths
-				has_valid_civic = civic_corporate_toxic_baths
-			}
+			tec_has_toxic_baths = yes
 		}
 	}
 	destroy_trigger = {
@@ -5165,36 +4560,29 @@ building_toxic_bath = {
 		OR = {
 			owner = {
 				OR = {
+					is_regular_empire = no			
 					is_regular_empire = no
-					NOR = {
-						has_valid_civic = civic_toxic_baths
-						has_valid_civic = civic_corporate_toxic_baths
-					}
 				}
 			}
 			has_modifier = slave_colony
 		}
 	}
-	planet_modifier = {
-		job_bath_attendant_add = @b1_jobs
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_megacorp = no }
-		}
-		text = job_toxic_baths_effect_desc
-	}
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b1_minerals
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
 		}
-		upkeep = {
-			energy = @b1_upkeep
-		}
+	}
+
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = bath_attendant
+		count = @b1_jobs
+		mult = 1
+		display = with_desc
+		trigger = ""
 	}
 }
 
@@ -5225,25 +4613,22 @@ building_toxic_bath_hive = {
 			}
 		}
 	}
-	planet_modifier = {
-		job_bath_attendant_hive_add = @b1_jobs
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-		}
-		text = job_toxic_baths_effect_hive_desc
-	}
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b1_minerals
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
 		}
-		upkeep = {
-			energy = @b1_upkeep
-		}
+	}
+
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = bath_attendant_hive
+		count = @b1_jobs
+		mult = 1
+		display = with_desc
+		trigger = ""
 	}
 }
 
@@ -5270,25 +4655,22 @@ building_toxic_bath_machine = {
 			}
 		}
 	}
-	planet_modifier = {
-		job_bath_attendant_machine_add = @b1_jobs
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-		}
-		text = job_toxic_baths_effect_machine_desc
-	}
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b1_minerals
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
 		}
-		upkeep = {
-			energy = @b1_upkeep
-		}
+	}
+
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = bath_attendant_machine
+		count = @b1_jobs
+		mult = 1
+		display = with_desc
+		trigger = ""
 	}
 }
 
@@ -5315,26 +4697,24 @@ building_offspring_nest = {
 		owner = { NOT = { has_origin = origin_progenitor_hive } }
 	}
 
-	planet_modifier = {
-		job_offspring_drone_add = 1
-	}
 
 	resources = {
 		category = planet_buildings
-		cost = {
-			minerals = @b1_minerals
-		}
-		upkeep = {
-			energy = 2
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
 		}
 	}
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { has_origin = origin_progenitor_hive }
-		}
-		text = job_offspring_drone_effect_desc
+	
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = offspring_drone
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = ""
 	}
+
 	triggered_desc = {
 		text = offspring_nest_tooltip
 	}
@@ -5387,6 +4767,14 @@ building_clone_army_clone_vat = {
 		}
 	}
 
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
+		}
+	}
+
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
@@ -5418,16 +4806,6 @@ building_clone_army_clone_vat = {
 			check_variable = { which = clone_pops_missing_per_vat value > 12 }
 		}
 		modifier = { planet_pop_assembly_organic_add = 5 }
-	}
-
-	resources = {
-		category = planet_buildings
-		cost = {
-			minerals = @b2_minerals
-		}
-		upkeep = {
-			energy = @b2_upkeep
-		}
 	}
 
 	upgrades = {

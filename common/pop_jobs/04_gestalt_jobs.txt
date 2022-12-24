@@ -131,12 +131,34 @@ offspring_drone = {	# Digievolved
 			minerals = 5
 		}
 		produces = {
+			unity = 5 # maybe comment this if too strong
+		}
+		produces = {
+			trigger = {
+				planet = {
+					has_unity_designation = no
+					has_research_designation = no
+					has_foundry_designation = no
+					has_mining_designation = no
+					has_generator_designation = no
+					has_farming_designation = no
+					has_rural_designation = no
+				}
+			}
 			unity = 5
 		}
 		produces = {
 			trigger = {
 				planet = {
-					tec_has_research_designation = yes
+					has_unity_designation = yes
+				}
+			}
+			unity = 10
+		}
+		produces = {
+			trigger = {
+				planet = {
+					has_research_designation = yes
 				}
 			}
 			physics_research = 10
@@ -146,10 +168,44 @@ offspring_drone = {	# Digievolved
 		produces = {
 			trigger = {
 				planet = {
-					tec_has_alloy_designation = yes
+					has_foundry_designation = yes
 				}
 			}
 			alloys = 5
+		}
+		produces = {
+			trigger = {
+				planet = {
+					has_mining_designation = yes
+				}
+			}
+			minerals = 10
+		}
+		produces = {
+			trigger = {
+				planet = {
+					has_farming_designation = yes
+				}
+			}
+			food = 10
+		}
+		produces = {
+			trigger = {
+				planet = {
+					has_generator_designation = yes
+				}
+			}
+			energy = 10
+		}
+		produces = {
+			trigger = {
+				planet = {
+					has_rural_designation = yes
+				}
+			}
+			minerals = 5
+			food = 5
+			energy = 5
 		}
 	}
 
@@ -297,39 +353,18 @@ replicator = {
 
 	resources = {
 		category = planet_pop_assemblers
-		upkeep = {
-			alloys = 2
+		inline_script = {
+			script = jobs/resources/inline_evolved_robotic_assembly_upkeep
+			base = 1
+			mult = 1
+			trigger = ""
 		}
 	}
 
-	planet_modifier = {
-		planet_pop_assembly_add = 2
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			planet = {
-				exists = assembling_species
-				assembling_species = {
-					tec_is_replicant = yes
-				}
-			}
-		}
-		planet_pop_assembly_add = -2
-		planet_pop_assembly_organic_add = 2
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			planet = {
-				has_building = building_deployment_post
-			}
-			owner = {
-				is_machine_empire = yes
-				has_tradition = tr_tec_outreach_1
-			}
-		}
-		planet_stability_add = 5
+	inline_script = {
+		script = modifiers/inline_evolved_assembly_robotic
+		trigger = ""
+		mult = 1
 	}
 
 	triggered_planet_modifier = {
@@ -487,7 +522,7 @@ coordinator = {
 		potential = {
 			exists = owner
 			owner = {
-				has_tradition = tr_tec_statecraft_4
+				has_tradition = tr_tec_statecraft_final_1
 			}
 		}
 		planet_amenities_no_happiness_add = 2
@@ -734,21 +769,9 @@ synapse_drone = {
 
 	triggered_planet_modifier = {
 		potential = {
-			planet = {
-				has_building = building_tec_hive_sapling
-			}
-			owner = {
-				has_tradition = tr_tec_outreach_1
-			}
-		}
-		planet_stability_add = 5
-	}
-
-	triggered_planet_modifier = {
-		potential = {
 			exists = owner
 			owner = {
-				has_tradition = tr_tec_statecraft_4
+				has_tradition = tr_tec_statecraft_final_1
 			}
 		}
 		planet_amenities_no_happiness_add = 2
@@ -1063,8 +1086,11 @@ artisan_drone = {
 		produces = {
 			consumer_goods = 6
 		}
-		upkeep = {
-			minerals = 6
+		inline_script = {
+			script = jobs/resources/inline_evolved_cg_job_upkeep
+			upkeep = 6
+			multiplier = 1
+			trigger = ""
 		}
 
 		produces = {
@@ -1632,6 +1658,7 @@ patrol_drone = {
 
 	possible_precalc = can_fill_drone_job
 	possible = {
+		battle_thrall_job_check_trigger = yes 
 		tec_has_stapled_trait = no
 		if = {
 			limit = {
@@ -2009,15 +2036,6 @@ mining_drone = {
 		# /
 		produces = {
 			trigger = {
-				owner = {
-					is_lithoid_empire = yes
-					has_valid_civic = civic_tec_hive_menial
-				}
-			}
-			minerals = 0.5
-		}
-		produces = {
-			trigger = {
 				planet = {
 					has_planet_flag = has_material_requisitorium
 				}
@@ -2116,16 +2134,6 @@ agri_drone = {
 		category = planet_farmers
 		produces = {
 			food = 6
-		}
-		produces = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_lithoid_empire = no
-					has_valid_civic = civic_tec_hive_menial
-				}
-			}
-			food = 0.5
 		}
 		# Species bonuses/maluses
 			#produces = {
@@ -2264,15 +2272,6 @@ technician_drone = {
 		category = planet_technician
 		produces = {
 			energy = 6
-		}
-		produces = {
-			trigger = {
-				exists = owner
-				owner = {
-					has_valid_civic = civic_tec_machine_menial
-				}
-			}
-			energy = 0.5
 		}
 		# Species bonuses/maluses
 			#produces = {
@@ -2415,16 +2414,16 @@ maintenance_drone = {
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
 
-	#triggered_planet_modifier = {
-		#potential = {
-		#	planet = {
-		#		is_ringworld = yes
-		#		has_building = building_alpha_hub
-		#	}
-		#}
-		#planet_amenities_no_happiness_add = 1
-		#mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
-	#}
+	triggered_planet_modifier = {
+		potential = {
+			planet = {
+				has_ringworld_output_boost = yes
+				has_building = building_alpha_hub
+			}
+		}
+		planet_amenities_no_happiness_add = 1
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
 
 	triggered_planet_modifier = {
 		potential = {
@@ -2513,6 +2512,10 @@ warrior_drone = {
 	}
 
 	possible_precalc = can_fill_drone_job
+
+	possible = {
+		battle_thrall_job_check_trigger = yes
+	}
 
 	resources = {
 		category = planet_soldiers
@@ -2985,6 +2988,19 @@ scrap_miner_drone = {
 			#}
 		# /
 	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_lithoid_empire = yes
+				has_valid_civic = civic_tec_hive_menial
+			}
+		}
+		planet_amenities_no_happiness_add = 1
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
 	weight = {
 		weight = @simple_drone_job_weight
 		mult = value:job_weights_multiple_resources_modifier|JOB|scrap_miner_drone|RESOURCE1|minerals|WEIGHT1|0.7|RESOURCE2|alloys|WEIGHT2|0.3|

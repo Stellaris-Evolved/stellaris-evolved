@@ -57,16 +57,6 @@ colonist = {
 		potential = {
 			exists = owner
 			owner = {
-				has_tradition = tr_tec_outreach_1
-			}
-		}
-		planet_stability_add = 5
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
 				has_valid_civic = civic_tec_corporate_settlers
 			}
 		}
@@ -159,14 +149,7 @@ researcher = {
 		}
 	}
 
-	triggered_planet_modifier = {	# Capitalized innovation
-		potential = {
-			exists = owner
-			owner = { has_valid_civic = civic_tec_capitalized_innovation }
-		}
-		trade_value_add = 3
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
+	inline_script = jobs/effects/inline_evolved_tec_capitalized_innovation
 	
 	weight = {
 		# Specialist weight
@@ -1475,7 +1458,7 @@ bureaucrat = {
 		potential = {
 			exists = owner
 			owner = {
-				has_tradition = tr_tec_statecraft_4
+				has_tradition = tr_tec_statecraft_final_1
 			}
 		}
 		planet_amenities_add = 2
@@ -1759,46 +1742,11 @@ roboticist = {
 	
 	resources = {
 		category = planet_pop_assemblers
-		upkeep = {
-			trigger = {
-				planet = {
-					exists = assembling_species
-					assembling_species = {
-						tec_is_replicant = yes
-					}
-				}
-			}
-			alloys = 2
-		}
-		upkeep = {
-			trigger = {
-				planet = {
-					exists = assembling_species
-					assembling_species = {
-						tec_is_replicant = yes
-					}
-					owner = {
-						has_policy_flag = tec_replicant_food
-					}
-				}
-			}
-			alloys = 1
-			food = 5
-		}
-		upkeep = {
-			trigger = {
-				planet = {
-					exists = assembling_species
-					assembling_species = {
-						tec_is_replicant = yes
-					}
-					owner = {
-						has_policy_flag = tec_replicant_minerals
-					}
-				}
-			}
-			alloys = 1
-			minerals = 5
+		inline_script = {
+			script = jobs/resources/inline_evolved_robotic_assembly_upkeep
+			base = 2
+			mult = 1
+			trigger = ""
 		}
 	}
 
@@ -1810,29 +1758,10 @@ roboticist = {
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
 
-	planet_modifier = {
-		planet_pop_assembly_add = 2
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			OR = {
-				planet = {
-					exists = assembling_species
-					assembling_species = {
-						is_robotic_species = no
-					}
-				}
-				planet = {
-					exists = owner
-					owner = {
-						tec_is_replicant_empire = yes
-					}
-				}
-			}
-		}
-		planet_pop_assembly_add = -2
-		planet_pop_assembly_organic_add = 2
+	inline_script = {
+		script = modifiers/inline_evolved_assembly_robotic
+		trigger = ""
+		mult = 2
 	}
 
 	triggered_planet_modifier = {
@@ -3364,8 +3293,12 @@ artisan = {
 		produces = {
 			consumer_goods = 6
 		}
-		upkeep = {
-			minerals = 6
+
+		inline_script = {
+			script = jobs/resources/inline_evolved_cg_job_upkeep
+			upkeep = 6
+			multiplier = 1
+			trigger = ""
 		}
 
 		produces = {
@@ -3457,8 +3390,12 @@ artificer = {
 		produces = {
 			consumer_goods = 7
 		}
-		upkeep = {
-			minerals = 6
+
+		inline_script = {
+			script = jobs/resources/inline_evolved_cg_job_upkeep
+			upkeep = 6
+			multiplier = 1
+			trigger = ""
 		}
 
 		produces = {
@@ -3544,6 +3481,25 @@ pearl_diver = {
 		produces = {
 			consumer_goods = 6
 		}
+		
+		inline_script = {
+			script = jobs/resources/inline_evolved_cg_job_upkeep
+			upkeep = 4
+			multiplier = 1
+			trigger = ""
+		}
+
+		inline_script = {
+			script = jobs/resources/inline_evolved_cg_job_upkeep
+			upkeep = 2
+			multiplier = 1
+			trigger = "
+				owner = {
+					is_lithoid_empire = yes
+				}
+			"
+		}
+
 		upkeep = {
 			trigger = {
 				exists = owner
@@ -3552,64 +3508,7 @@ pearl_diver = {
 				}
 			}
 			food = 3
-			minerals = 4
 		}
-		upkeep = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_lithoid_empire = yes
-				}
-			}
-			minerals = 6
-		}
-		# Had to do this because the policy messed up some jobs
-			upkeep = {
-				trigger = {
-					exists = owner
-					owner = {
-						is_lithoid_empire = no
-						has_policy_flag = consumer_goods_mixed
-					}
-				}
-				food = -2		# 3+4-2 = 5
-				minerals = 1	# 4-3+1 = 2
-			}
-			upkeep = {
-				trigger = {
-					exists = owner
-					owner = {
-						is_lithoid_empire = no
-						has_policy_flag = consumer_goods_food
-					}
-				}
-				food = -3		# 3+8-3 = 8
-				minerals = 2	# 4-6+2 = 0
-			}
-
-			#upkeep = {	# Not necessary
-				#trigger = {
-				#	exists = owner
-				#	owner = {
-				#		is_lithoid_empire = yes
-				#		has_policy_flag = consumer_goods_mixed
-				#	}
-				#}
-				#food = -0		# 0+4-0 = 4
-				#minerals = 0	# 6-3+0 = 3
-			#}
-			#upkeep = { # Not necessary
-				#trigger = {
-				#	exists = owner
-				#	owner = {
-				#		is_lithoid_empire = yes
-				#		has_policy_flag = consumer_goods_food
-				#	}
-				#}
-				#food = -4 		# 0+8-4 = 8
-				#minerals = 0	# 6-6+0 = 0
-			#}
-		# /
 
 		produces = {
 			trigger = {

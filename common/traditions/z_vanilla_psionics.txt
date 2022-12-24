@@ -15,6 +15,8 @@ tr_psionics_adopt = {
 		}
 	}
 
+	custom_tooltip = tr_psionics_adopt_tooltip
+
 	on_enabled = {
 		hidden_effect = {
 			if = {
@@ -46,25 +48,35 @@ tr_psionics_adopt = {
 }
 
 tr_psionics_finish = {
+	
+	custom_tooltip_with_modifiers = tr_psionics_finish_tooltip
 	modifier = {
-		country_edict_fund_add = 50
+		edicts_upkeep_mult = -0.1
+		shroud_delve_cooldown = -0.2
 		ascension_perks_add = 1
 	}
 
 	on_enabled = {
 		hidden_effect = {
+			# Shroud Covenant
+			if = {
+				limit = {
+					has_country_flag = has_shroud_patron
+					NOT = {
+						has_country_flag = covenant_end_of_the_cycle
+					}
+				}
+				country_event = { id = utopia.2658 days = 360 }
+				set_country_flag = confirmation_incoming
+			}
 			# Psionic traits
 			set_country_flag = tec_announced_psionic_traits
-			# Commune with the ineffable
-			#country_event = {
-			#	id = tec_psionic_path.150
-			#	days = 1800
-			#}
 			# T2 Gate
 			set_country_flag = tec_psionics_gate
 			country_event = {
 				id = tec_psionic_path.200
 				days = 360
+				random = 120
 			}
 		}
 	}
@@ -75,7 +87,7 @@ tr_psionics_finish = {
 }
 
 tr_psionics_psi_corps = {
-
+	custom_tooltip = tr_psionics_psi_corps_tooltip
 	on_enabled = {
 		hidden_effect = {
 			# Gives thought enforcement
@@ -88,27 +100,19 @@ tr_psionics_psi_corps = {
 				}
 				add_research_option = tech_thought_enforcement
 			}
-			# Gives psi corps
+			# Unlocks the Psi-Corps building
 			# Checked by tradition
 		}
 	}
-
 	ai_weight = {
 		factor = 1000
 	}
 }
 
 tr_psionics_mind_readers = {
-
-	on_enabled = {
-		hidden_effect = {
-			# Convert species into full psionic
-			country_event = {
-				id = tec_psionic_path.120
-			}
-			# Enables Psi Assimilation
-			set_country_flag = tec_psionic_assimilation
-		}
+	custom_tooltip = tr_psionics_mind_readers_tooltip
+	modifier = {
+		add_base_country_intel = 10
 	}
 	ai_weight = {
 		factor = 1000
@@ -120,6 +124,36 @@ tr_psionics_psionic_assimilation = {
 		has_tradition = tr_psionics_psi_corps
 		has_tradition = tr_psionics_mind_readers
 	}
+
+	custom_tooltip = tr_psionics_psionic_assimilation_tooltip
+
+	on_enabled = {
+		hidden_effect = {
+			# Convert species into full psionic
+			country_event = {
+				id = tec_psionic_path.120
+			}
+			country_event = {	# Shroud enclave event
+				id = enclave.7000
+				days = 360
+				random = 720
+			}
+			# Enables Psi Assimilation
+			set_country_flag = tec_psionic_assimilation
+		}
+	}
+
+	ai_weight = {
+		factor = 1000
+	}
+}
+
+tr_psionics_breach_shroud = {
+	possible = {
+		has_tradition = tr_psionics_psionic_assimilation
+	}
+
+	custom_tooltip = tr_psionics_breach_shroud_tooltip
 
 	on_enabled = {
 		hidden_effect = {
@@ -135,29 +169,14 @@ tr_psionics_psionic_assimilation = {
 	}
 }
 
-tr_psionics_breach_shroud = {
-	possible = {
-		has_tradition = tr_psionics_psionic_assimilation
-	}
-
-	modifier = {
-		intel_encryption_add = 2
-		intel_decryption_add = 2
-	}
-
-	ai_weight = {
-		factor = 1000
-	}
-}
-
 tr_psionics_shrouded_encryption = {
 	possible = {
 		has_tradition = tr_psionics_psionic_assimilation
 	}
 
 	modifier = {
-		intel_decryption_add = 2
 		intel_encryption_add = 2
+		intel_decryption_add = 2
 	}
 
 	ai_weight = {
