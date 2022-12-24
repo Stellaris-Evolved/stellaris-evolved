@@ -14,7 +14,6 @@
 
 # --------------------------- Biological A --------------------------------
 # --------------- T1
-#situation_tec_gene_path_t1
 situation_tec_gene_path_t1 = {
 	desc = {
 		text = situation_tec_gene_path_t1_desc
@@ -651,7 +650,210 @@ situation_tec_gene_path_t2 = {
 
 # --------------------------- Cybernetics --------------------------------
 # --------------- T1
-#situation_tec_cybernetic_path_t1
+# --------------- T1
+situation_tec_cybernetic_path_t1 = {
+	desc = {
+		text = situation_tec_cybernetic_path_t1_desc
+		trigger = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+	}
+	picture = GFX_evt_scientific_experiments
+	category = positive
+	complete_icon_frame = GFX_situation_outcome_frame_green
+	complete_icon = GFX_situation_outcome_unknown
+	fail_icon_frame = GFX_situation_outcome_frame_red
+	fail_icon = GFX_situation_outcome_negative
+	start_value = 0
+	progress_direction = monodirectional
+
+	on_start = {
+		set_situation_locked = yes
+	}
+
+	on_fail = {
+		# This should never happen, but if it does...
+		owner = {
+			start_situation = {
+				type = situation_tec_cybernetic_path_t1
+				target = capital_scope
+				effect = {
+					save_event_target_as = new_situation
+				}
+			}
+		}
+		event_target:new_situation = {
+			set_situation_locked = no
+		}
+	}
+
+	on_monthly = {
+		random_events = {
+			# Nothing
+			200 = 0
+			# Negative random outcomes
+			#2 = tec_cybernetic_path.10011
+			#2 = tec_cybernetic_path.10012
+			#5 = tec_cybernetic_path.10013
+			# Positive random outcomes
+			#2 = tec_cybernetic_path.10021
+			#2 = tec_cybernetic_path.10022
+			#1 = tec_cybernetic_path.10023
+		}
+	}
+	
+	on_progress_complete = {
+		hidden_effect = {
+			owner = {
+				country_event = {
+					id = tec_cybernetic_path.105
+				}
+			}
+			destroy_situation = this
+		}
+		custom_tooltip = situation_tec_cybernetic_path_t1_finish_tooltip
+		destroy_situation = this
+	}
+
+	stages = {
+		situation_tec_cybernetic_path_t1_stage_0 = { #25%
+			icon = GFX_situation_stage_tec_0
+			icon_background = GFX_situation_stage_frame_red
+			end = 10
+		}
+
+		situation_tec_cybernetic_path_t1_stage_1 = { #25%
+			icon = GFX_situation_stage_1
+			icon_background = GFX_situation_stage_frame_tec_orange
+			end = 25
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_cybernetic_path.10010
+					}
+				}
+			}
+		}
+
+		situation_tec_cybernetic_path_t1_stage_1 = { #25%
+			icon = GFX_situation_stage_2
+			icon_background = GFX_situation_stage_frame_tec_yellow
+			end = 50
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_cybernetic_path.10025
+					}
+				}
+			}
+		}
+
+		situation_tec_cybernetic_path_t1_stage_2 = { #50%
+			icon = GFX_situation_stage_3
+			icon_background = GFX_situation_stage_frame_green
+			end = 75
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_cybernetic_path.10050
+					}
+				}
+			}
+		}
+
+		situation_tec_cybernetic_path_t1_stage_3 = { #75%
+			icon = GFX_situation_stage_4
+			icon_background = GFX_situation_stage_frame_blue
+			end = 90
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_cybernetic_path.10075
+					}
+				}
+			}
+		}
+
+		situation_tec_cybernetic_path_t1_stage_3 = { #75%
+			icon = GFX_situation_stage_5
+			icon_background = GFX_situation_stage_frame_tec_purple
+			end = 100
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_cybernetic_path.10090
+					}
+				}
+			}
+		}
+	}
+
+	# Approaches
+	approach = { # Basic
+		name = situation_approach_tec_cybernetic_path_t1_slow
+		icon = GFX_situation_approach_tec_cyb
+		icon_background = GFX_situation_approach_bg_green
+		on_select = {
+			custom_tooltip = situation_approach_tec_cybernetic_path_t1_slow_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				engineering_research = @tec_path_cost_low
+			}
+		}
+	}
+	approach = { # Forced
+		name = situation_approach_tec_cybernetic_path_t1_fast
+		icon = GFX_situation_approach_tec_cyb
+		icon_background = GFX_situation_approach_bg_tec_orange
+		potential = {
+			has_situation_flag = tec_cyb_t1_unlock_fast
+		}
+		on_select = {
+			custom_tooltip = situation_approach_tec_cybernetic_path_t1_fast_tooltip
+		}
+		resources = {
+			category = situations
+			upkeep = {
+				engineering_research = @tec_path_cost_high
+			}
+		}
+	}
+
+	monthly_progress = {
+		base = 0
+		# Debug
+		modifier = {
+			add = 5
+			desc = EXCELLENT
+			OR = {
+				has_situation_flag = situation_tec_debug
+				owner = {
+					has_country_flag = situation_tec_debug
+				}
+			}
+		}
+		# Passive
+		modifier = {
+			add = 2
+			desc = situation_approach_tec_cybernetic_path_t1_slow
+			current_situation_approach = situation_approach_tec_cybernetic_path_t1_slow
+		}
+		# Subevents
+		modifier = {
+			add = 5
+			desc = situation_string_tec_cybernetic_path_t1_fast
+			current_situation_approach = situation_approach_tec_cybernetic_path_t1_fast
+		}
+	}
+
+	abort_trigger = {
+		NOT = { exists = owner }
+	}
+}
 # --------------- Gating A
 situation_tec_cybernetic_path_gate = {
 	desc = {
@@ -2359,16 +2561,29 @@ situation_tec_machine_path_t1 = {
 	}
 
 	stages = {
-		situation_tec_machine_path_t1_stage_1 = { #25%
+		situation_tec_machine_path_t1_stage_0 = { #25%
 			icon = GFX_situation_stage_tec_0
 			icon_background = GFX_situation_stage_frame_red
 			end = 25
 		}
 
-		situation_tec_machine_path_t1_stage_2 = { #50%
+		situation_tec_machine_path_t1_stage_1 = { #25%
 			icon = GFX_situation_stage_1
 			icon_background = GFX_situation_stage_frame_tec_orange
 			end = 50
+			on_first_enter = {
+				hidden_effect = {
+					situation_event = {
+						id = tec_machine_path.10025
+					}
+				}
+			}
+		}
+
+		situation_tec_machine_path_t1_stage_2 = { #50%
+			icon = GFX_situation_stage_2
+			icon_background = GFX_situation_stage_frame_tec_yellow
+			end = 75
 			on_first_enter = {
 				hidden_effect = {
 					situation_event = {
@@ -2379,9 +2594,9 @@ situation_tec_machine_path_t1 = {
 		}
 
 		situation_tec_machine_path_t1_stage_3 = { #75%
-			icon = GFX_situation_stage_2
-			icon_background = GFX_situation_stage_frame_tec_yellow
-			end = 75
+			icon = GFX_situation_stage_3
+			icon_background = GFX_situation_stage_frame_green
+			end = 100
 			on_first_enter = {
 				hidden_effect = {
 					situation_event = {

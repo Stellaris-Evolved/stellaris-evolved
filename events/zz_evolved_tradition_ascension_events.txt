@@ -853,6 +853,9 @@ country_event = {
 			has_tradition = tr_discovery_finish
 			has_active_tradition = tr_discovery_federations_finish
 		}
+		NOT = {
+			has_country_flag = tec_discovery_finisher_cd
+		}
 	}
 
 	immediate = {
@@ -873,8 +876,13 @@ country_event = {
 			}
 			random = {
 				chance = tec_discovery_finisher_roll
+				set_timed_country_flag = {
+					flag = tec_discovery_finisher_cd
+					days = 1
+				}
 				add_random_research_option = {
 					add_progress = 0.25
+					ignore_prereqs = no
 				}
 				set_variable = {
 					which = tec_discovery_finisher
@@ -6260,7 +6268,7 @@ namespace = tec_bio_path
 # ------------------------------------------------------------ tec_cybernetic_path.xxx
 namespace = tec_cybernetic_path
 
-# --------------- T1
+# --------------- T1 pick
 country_event = { # Cybernetic T1 Picked - shared with synths
 	id = tec_cybernetic_path.100
 	title = "tec_cybernetic_path.100.name"
@@ -6300,17 +6308,24 @@ country_event = { # Cybernetic T1 Picked - shared with synths
 		name = "tec_cybernetic_path.100.a"
 		custom_tooltip = "tec_cybernetic_path.100.a.tooltip"
 		trigger = {
-			tec_is_cyberhive = no
+			NOR = {
+				tec_is_cyberhive = yes
+				tec_has_cybernetic_ascension_origin = yes
+			}
 		}
-		hidden_effect = { # Gives the special project
-			save_event_target_as = flesh_weak_owner
-			event_target:flesh_weak_owner = {
-				capital_scope = {
-					enable_special_project = {
-						name = FLESH_IS_WEAK_PROJECT
-						location = this
-						owner = root
+		hidden_effect = { # Gives the situation
+			save_event_target_as = tec_temp_country
+			event_target:tec_temp_country = {
+				start_situation = {
+					type = situation_tec_cybernetic_path_t1
+					target = event_target:tec_temp_country.capital_scope
+					effect = {
+						save_event_target_as = new_situation
 					}
+				}
+				event_target:new_situation = {
+					set_situation_locked = no
+					set_situation_approach = situation_approach_tec_cybernetic_path_t1_slow
 				}
 			}
 		}
@@ -6319,30 +6334,432 @@ country_event = { # Cybernetic T1 Picked - shared with synths
 		name = "tec_cybernetic_path.100.b"
 		custom_tooltip = "tec_cybernetic_path.100.b.tooltip"
 		trigger = {
-			tec_is_cyberhive = yes
+			OR = {
+				tec_is_cyberhive = yes
+				tec_has_cybernetic_ascension_origin = yes
+			}
 		}
-		hidden_effect = {
-			set_country_flag = tec_cybernetic_path_unlocked_tradition_1
+		hidden_effect = { # Gives the situation
+			save_event_target_as = tec_temp_country
+			event_target:tec_temp_country = {
+				start_situation = {
+					type = situation_tec_cybernetic_path_t1_cyborg
+					target = event_target:tec_temp_country.capital_scope
+					effect = {
+						save_event_target_as = new_situation
+					}
+				}
+				event_target:new_situation = {
+					set_situation_locked = no
+					set_situation_approach = situation_approach_tec_cybernetic_path_t1_cyborg_slow
+				}
+			}
 		}
 	}
 }
 
-country_event = { # T1 Project finished - No Hivemind
-	id = tec_cybernetic_path.10001
-	title = "tec_cybernetic_path.10001.name"
+# --------------- T1 situation
+situation_event = { # t1 10%
+	id = tec_cybernetic_path.10010
+	title = "tec_cybernetic_path.10010.name"
+	desc = "tec_cybernetic_path.10010.desc"
+
+	picture = GFX_evt_cybernetics
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			if = {
+				limit = {
+					has_situation_flag = tec_cyb_t1_unlock_fast
+				}
+				set_situation_approach = situation_approach_tec_cybernetic_path_t1_fast
+			}
+			set_situation_locked = no
+		}
+	}
+
+	option = {
+		name = tec_cybernetic_path.10010.a
+		custom_tooltip = tec_cybernetic_path.10010.a.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_yellow
+			text = tec_icon_text_neutral_outcome
+		}
+	}
+	option = {
+		name = tec_cybernetic_path.10010.b
+		custom_tooltip = tec_cybernetic_path.10010.b.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_red
+			text = set_situation_approach_icon_text
+		}
+		hidden_effect = {
+			set_situation_flag = tec_cyb_t1_unlock_fast
+		}
+	}
+}
+situation_event = { # t1 25%
+	id = tec_cybernetic_path.10025
+	title = "tec_cybernetic_path.10025.name"
+	desc = "tec_cybernetic_path.10025.desc"
+
+	picture = GFX_evt_cybernetics
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+
+	option = {
+		name = tec_cybernetic_path.10025.a
+		custom_tooltip = tec_cybernetic_path.10025.a.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_tec_blue
+			text = tec_icon_text_neutral_outcome
+		}
+	}
+}
+situation_event = { # t1 50%
+	id = tec_cybernetic_path.10050
+	title = "tec_cybernetic_path.10050.name"
+	desc = "tec_cybernetic_path.10050.desc"
+
+	picture = GFX_evt_scientific_experiments
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			# Confirmation
+			situation_event = {
+				id = tec_cybernetic_path.10051
+			}
+		}
+	}
+
+	option = {
+		name = tec_cybernetic_path.10050.a
+		custom_tooltip = tec_cybernetic_path.10050.a.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_yellow
+			text = tec_icon_text_neutral_outcome
+		}
+		hidden_effect = {
+			owner = {
+				set_country_flag = tec_cybernetic_module_versatility
+			}
+		}
+	}
+	option = {
+		name = tec_cybernetic_path.10050.b
+		custom_tooltip = tec_cybernetic_path.10050.b.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_yellow
+			text = tec_icon_text_neutral_outcome
+		}
+		hidden_effect = {
+			owner = {
+				set_country_flag = tec_cybernetic_module_research
+			}
+		}
+	}
+	option = {
+		name = tec_cybernetic_path.10050.c
+		custom_tooltip = tec_cybernetic_path.10050.c.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_yellow
+			text = tec_icon_text_neutral_outcome
+		}
+		hidden_effect = {
+			owner = {
+				set_country_flag = tec_cybernetic_module_industrial
+			}
+		}
+	}
+}
+situation_event = { # t1 51%
+	id = tec_cybernetic_path.10051
+	title = "tec_cybernetic_path.10051.name"
 	desc = {
-		text = "tec_cybernetic_path.10001.desc"
+		text = "tec_cybernetic_path.10050.desc_versatility"
+		trigger = {
+			owner = {
+				has_country_flag = tec_cybernetic_module_versatility
+			}
+		}
+	}
+	desc = {
+		text = "tec_cybernetic_path.10050.desc_research"
+		trigger = {
+			owner = {
+				has_country_flag = tec_cybernetic_module_research
+			}
+		}
+	}
+	desc = {
+		text = "tec_cybernetic_path.10050.desc_industrial"
+		trigger = {
+			owner = {
+				has_country_flag = tec_cybernetic_module_industrial
+			}
+		}
+	}
+
+	picture = GFX_evt_scientific_experiments
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	option = {
+		name = tec_cybernetic_path.10051.a
+		custom_tooltip = tec_cybernetic_path.10051.a.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_yellow
+			text = tec_icon_text_neutral_outcome
+		}
+		hidden_effect = {
+			owner = {
+				remove_country_flag = tec_cybernetic_module_versatility
+				remove_country_flag = tec_cybernetic_module_research
+				remove_country_flag = tec_cybernetic_module_industrial
+			}
+			situation_event = {
+				id = tec_cybernetic_path.10050
+			}
+		}
+	}
+	option = {
+		name = tec_cybernetic_path.10051.b
+		custom_tooltip = tec_cybernetic_path.10051.b.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_yellow
+			text = tec_icon_text_neutral_outcome
+		}
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+}
+situation_event = { # t1 75%
+	id = tec_cybernetic_path.10075
+	title = "tec_cybernetic_path.10075.name"
+	desc = "tec_cybernetic_path.10075.desc"
+
+	picture = GFX_evt_cybernetics
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+
+	option = {
+		name = tec_cybernetic_path.10075.a
+		custom_tooltip = tec_cybernetic_path.10075.a.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_tec_blue
+			text = tec_icon_text_neutral_outcome
+		}
+	}
+}
+situation_event = { # t1 90%
+	id = tec_cybernetic_path.10090
+	title = "tec_cybernetic_path.10090.name"
+	desc = "tec_cybernetic_path.10090.desc"
+
+	picture = GFX_evt_scientific_experiments
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+
+	option = {
+		name = tec_cybernetic_path.10090.a
+		custom_tooltip = tec_cybernetic_path.10090.a.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_yellow
+			text = tec_icon_text_neutral_outcome
+		}
+		hidden_effect = {
+			owner = {
+				set_country_flag = tec_cybernetic_submodule_lifespan
+			}
+		}
+	}
+	option = {
+		name = tec_cybernetic_path.10090.b
+		custom_tooltip = tec_cybernetic_path.10090.b.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_yellow
+			text = tec_icon_text_neutral_outcome
+		}
+		hidden_effect = {
+			owner = {
+				set_country_flag = tec_cybernetic_submodule_warfare
+			}
+		}
+	}
+	option = {
+		name = tec_cybernetic_path.10090.c
+		custom_tooltip = tec_cybernetic_path.10090.c.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_yellow
+			text = tec_icon_text_neutral_outcome
+		}
+		hidden_effect = {
+			owner = {
+				set_country_flag = tec_cybernetic_submodule_survival
+			}
+		}
+	}
+	option = {
+		name = tec_cybernetic_path.10090.d
+		custom_tooltip = tec_cybernetic_path.10090.d.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_yellow
+			text = tec_icon_text_neutral_outcome
+		}
+		hidden_effect = {
+			owner = {
+				set_country_flag = tec_cybernetic_submodule_recycling
+			}
+		}
+	}
+	option = {
+		name = tec_cybernetic_path.10090.e
+		custom_tooltip = tec_cybernetic_path.10090.e.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_yellow
+			text = tec_icon_text_neutral_outcome
+		}
+		hidden_effect = {
+			owner = {
+				set_country_flag = tec_cybernetic_submodule_construction
+			}
+		}
+	}
+	option = {
+		name = tec_cybernetic_path.10090.f
+		custom_tooltip = tec_cybernetic_path.10090.f.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_yellow
+			text = tec_icon_text_neutral_outcome
+		}
+		hidden_effect = {
+			owner = {
+				set_country_flag = tec_cybernetic_submodule_knowledge
+			}
+		}
+	}
+}
+
+# --------------- T1 finish
+country_event = { # T1 Situation finished - No Hivemind
+	id = tec_cybernetic_path.105
+	title = "tec_cybernetic_path.105.name"
+	desc = {
+		text = "tec_cybernetic_path.105.desc"
 		trigger = {
 			is_regular_empire = yes
+			tec_has_cybernetic_ascension_origin = no
 		}
 	}
 	desc = {
-		text = "tec_cybernetic_path.10001.desc.hive"
+		text = "tec_cybernetic_path.105.desc.hive"
 		trigger = {
-			is_regular_empire = no
+			is_hive_empire = yes
+			NOR = {
+				tec_is_cyberhive = yes
+				tec_has_cybernetic_ascension_origin = yes
+			}
 		}
 	}
-	picture = GFX_evt_robot_assembly_plant
+	desc = {
+		text = "tec_cybernetic_path.105.desc.cyborg"
+		trigger = {
+			is_regular_empire = yes
+			tec_has_cybernetic_ascension_origin = yes
+		}
+	}
+	desc = {
+		text = "tec_cybernetic_path.105.desc.cyborg.gestalt"
+		trigger = {
+			is_regular_empire = no
+			OR = {
+				has_valid_civic = civic_machine_assimilator
+				tec_is_cyberhive = yes
+				tec_has_cybernetic_ascension_origin = yes
+			}
+		}
+	}
+	picture = GFX_evt_scientific_experiments
 	show_sound = event_the_flesh_is_weak
 	trackable = yes
 
@@ -6350,8 +6767,14 @@ country_event = { # T1 Project finished - No Hivemind
 
 	immediate = {
 		hidden_effect = {
+			set_country_flag = tec_cybernetic_path_unlocked_tradition_1
 			set_country_flag = flesh_weakened
-			tec_create_cybernetic_species = yes
+			if = {
+				limit = {
+					is_machine_empire = no
+				}
+				tec_create_cybernetic_species = yes
+			}
 			set_country_flag = tec_cybernetic_t1_assimilation
 		}
 	}
@@ -6364,7 +6787,7 @@ country_event = { # T1 Project finished - No Hivemind
 					tec_is_cyberhive = no
 				}
 				country_event = {
-					id = tec_cybernetic_path.10002
+					id = tec_cybernetic_path.10501
 				}
 			}
 			else = {
@@ -6379,7 +6802,7 @@ country_event = { # T1 Project finished - No Hivemind
 						has_communications = root
 					}
 					country_event = {
-						id = tec_cybernetic_path.10010
+						id = tec_cybernetic_path.10510
 						days = 5 
 					}
 				}
@@ -6388,8 +6811,8 @@ country_event = { # T1 Project finished - No Hivemind
 	}
 	
 	option = {
-		name = "tec_cybernetic_path.10001.a"
-		custom_tooltip = "tec_cybernetic_path.10001.a.tooltip"
+		name = "tec_cybernetic_path.105.a"
+		custom_tooltip = "tec_cybernetic_path.105.a.tooltip"
 		hidden_effect = { # Gives the special project
 			save_event_target_as = tec_cyber_1_owner
 			set_country_flag = tec_cybernetic_path_unlocked_tradition_1
@@ -6398,23 +6821,18 @@ country_event = { # T1 Project finished - No Hivemind
 }
 
 country_event = { # T1 Project finished - Hivemind (change of auth)
-	id = tec_cybernetic_path.10002
-	title = "tec_cybernetic_path.10002.name"
-	desc = "tec_cybernetic_path.10002.desc"
+	id = tec_cybernetic_path.10501
+	title = "tec_cybernetic_path.10501.name"
+	desc = "tec_cybernetic_path.10501.desc"
 	picture = GFX_evt_robot_assembly_plant
 	show_sound = event_the_flesh_is_weak
 	trackable = yes
 
 	is_triggered_only = yes
 
-	immediate = {
-		set_country_flag = flesh_weakened
-		tec_create_cybernetic_species = yes
-	}
-
 	option = {
-		name = "tec_cybernetic_path.10002.a"
-		custom_tooltip = "tec_cybernetic_path.10002.a.tooltip"
+		name = "tec_cybernetic_path.10501.a"
+		custom_tooltip = "tec_cybernetic_path.10501.a.tooltip"
 		hidden_effect = {
 			change_government = {
 				authority = auth_tec_hive_cybernetic
@@ -6489,12 +6907,16 @@ country_event = { # T1 Project finished - Hivemind (change of auth)
 				}
 				force_remove_civic = civic_tec_hive_necrophage
 			}
+			change_government = {
+				authority = auth_tec_hive_cybernetic
+				remove_invalid_civics = yes
+			}
 		}
 	}
 
 	option = {
-		name = "tec_cybernetic_path.10002.b"
-		custom_tooltip = "tec_cybernetic_path.10002.b.tooltip"
+		name = "tec_cybernetic_path.10501.b"
+		custom_tooltip = "tec_cybernetic_path.10501.b.tooltip"
 		trigger = { # Biohives are forced to change
 			hidden_trigger = {
 				tec_is_biohive = no
@@ -6518,7 +6940,7 @@ country_event = { # T1 Project finished - Hivemind (change of auth)
 				years = 1
 			}
 			country_event = {
-				id = tec_cybernetic_path.10010
+				id = tec_cybernetic_path.10510
 				days = 5 
 			}
 		}
@@ -6527,12 +6949,12 @@ country_event = { # T1 Project finished - Hivemind (change of auth)
 }
 
 country_event = { # T1 Notification for Other Nations
-	id = tec_cybernetic_path.10010
+	id = tec_cybernetic_path.10510
 	picture = GFX_evt_robot_assembly_plant
 	show_sound = event_the_flesh_is_weak
-	title = "tec_cybernetic_path.10010.name"
+	title = "tec_cybernetic_path.10510.name"
 	desc = {
-		text = tec_cybernetic_path.10010.desc
+		text = tec_cybernetic_path.10510.desc
 		trigger = {
 			OR = {
 				is_spiritualist = no
@@ -6547,7 +6969,7 @@ country_event = { # T1 Notification for Other Nations
 		}
 	}
 	desc = {
-		text = tec_cybernetic_path.10010.spi.desc
+		text = tec_cybernetic_path.10510.spi.desc
 		trigger = {
 			OR = {
 				has_ethic = ethic_spiritualist
@@ -6560,7 +6982,7 @@ country_event = { # T1 Notification for Other Nations
 		}
 	}
 	desc = {
-		text = tec_cybernetic_path.10010.hive.desc
+		text = tec_cybernetic_path.10510.hive.desc
 		trigger = {
 			from = {
 				is_hive_empire = yes
@@ -6571,7 +6993,7 @@ country_event = { # T1 Notification for Other Nations
 		}
 	}
 	desc = {
-		text = tec_cybernetic_path.10010.hive.to.cyberhive.desc
+		text = tec_cybernetic_path.10510.hive.to.cyberhive.desc
 		trigger = {
 			from = {
 				is_hive_empire = yes
@@ -6583,10 +7005,10 @@ country_event = { # T1 Notification for Other Nations
 	is_triggered_only = yes
 
 	option = {
-		name = "tec_cybernetic_path.10010.a"
+		name = "tec_cybernetic_path.10510.a"
 	}
 	option = {
-		name = "tec_cybernetic_path.10010.b"
+		name = "tec_cybernetic_path.10510.b"
 		trigger = {
 			OR = {
 				has_ethic = ethic_spiritualist
@@ -6596,7 +7018,7 @@ country_event = { # T1 Notification for Other Nations
 		}
 	}
 	option = {
-		name = "tec_cybernetic_path.10010.c"
+		name = "tec_cybernetic_path.10510.c"
 		trigger = {
 			OR = {
 				is_machine_empire = yes
@@ -6605,7 +7027,7 @@ country_event = { # T1 Notification for Other Nations
 		}
 	}
 	option = {
-		name = "tec_cybernetic_path.10010.d"
+		name = "tec_cybernetic_path.10510.d"
 		trigger = {
 			OR = {
 				is_cyborg_empire = yes
@@ -6614,7 +7036,7 @@ country_event = { # T1 Notification for Other Nations
 		}
 	}
 	option = {
-		name = "tec_cybernetic_path.10010.e"
+		name = "tec_cybernetic_path.10510.e"
 		trigger = {
 			OR = {
 				has_valid_civic = civic_tec_machine_cult
@@ -6623,7 +7045,7 @@ country_event = { # T1 Notification for Other Nations
 		}
 	}
 	option = {
-		name = "tec_cybernetic_path.10010.f"
+		name = "tec_cybernetic_path.10510.f"
 		trigger = {
 			OR = {
 				has_valid_civic = civic_machine_terminator
@@ -6635,7 +7057,7 @@ country_event = { # T1 Notification for Other Nations
 	}
 }
 
-# --------------- Gating
+# --------------- T2 Gating
 country_event = { # Cybernetic T2 Picked - Cybernetic fascination
 	id = tec_cybernetic_path.200
 	title = "tec_cybernetic_path.200.name"
@@ -7188,6 +7610,7 @@ situation_event = { # Bad 3 A - Cyb failure bombs planet
 	}
 }
 
+# --------------- T2 gating Finish
 country_event = { # Situation finished
 	id = tec_cybernetic_path.205
 	title = "tec_cybernetic_path.205.name"
@@ -7216,7 +7639,7 @@ country_event = { # Situation finished
 	}
 }
 
-# --------------- T2
+# --------------- T2 Pick
 country_event = { # Cybernetic T2 Picked - Cybernetic Revolution
 	id = tec_cybernetic_path.300
 	title = "tec_cybernetic_path.300.name"
@@ -7289,7 +7712,7 @@ country_event = { # Cybernetic T2 Picked - Cybernetic Revolution
 	}
 }
 
-# T2 Situation
+# --------------- T2 Situation
 situation_event = { # Cyb 2A - 25% - First batch of traits
 	id = tec_cybernetic_path.30025
 	title = "tec_cybernetic_path.30025.name"
@@ -7644,7 +8067,7 @@ situation_event = { # Bad 2 2A - Terrorist attack implants
 		}
 	}
 }
-# T3 Situation finished
+# --------------- T2 Finish
 country_event = { # Situation finished
 	id = tec_cybernetic_path.305
 	title = "tec_cybernetic_path.305.name"
@@ -7672,7 +8095,6 @@ country_event = { # Situation finished
 		}
 	}
 }
-
 country_event = {
 	id = tec_cybernetic_path.310
 	title = "tec_cybernetic_path.310.name"
@@ -7699,7 +8121,6 @@ country_event = {
 		}
 	}
 }
-
 
 # Synth path
 # ------------------------------------------------------------ tec_synth_path.xxx
@@ -12213,6 +12634,22 @@ country_event = { # T1 picked
 
 	option = {
 		name = "tec_machine_path.100.a"
+		custom_tooltip = "tec_machine_path.100.a.tooltip"
+		hidden_effect = {
+			save_event_target_as = tec_target_country
+			event_target:tec_target_country = {
+				start_situation = {
+					type = situation_tec_machine_path_t1
+					target = event_target:tec_target_country.capital_scope
+					effect = {
+						save_event_target_as = new_situation
+					}
+				}
+				event_target:new_situation = {
+					set_situation_locked = no
+				}
+			}
+		}
 	}
 }
 
@@ -12329,6 +12766,8 @@ country_event = { # Finished
 		custom_tooltip = tec_machine_path.105.a.tooltip
 		hidden_effect = {
 			set_country_flag = tec_synth_path_unlocked_tradition_1
+			set_country_flag = tec_machine_synthetic_trait
+			machine_synthetic_leader_effect = yes
 		}
 	}
 }
