@@ -25,78 +25,22 @@ decision_arcology_project = {
 	}
 
 	potential = {
-		tec_is_relic_world = no
-		tec_invalidates_arcology_project_comp = no
-
-		habitable_structure = no
-		tec_is_arcology = no
-
 		exists = owner
-		owner = {
-			has_ascension_perk = ap_arcology_project
-			NOT = {
-				has_ethic = ethic_fanatic_green
-			}
-			NOR = {
-				has_civic = civic_tec_corporate_urbancorp
-				has_civic = civic_agrarian_idyll
-				has_civic = civic_tec_eco_keepers
-			}
-		}
+		tec_arcology_project_potential = yes
+		owner = { tec_is_urbancorp = no }
 	}
 
 	allow = {
-		if = {	# Note: I feel this extremely cheesy, but whatever
-			limit = { owner = { is_ai = no } }
-			custom_tooltip = {
-				fail_text = decision_arcology_project_requirements
-				if = {
-					limit = {
-						owner = {
-							NOT = {
-								tec_is_megacity_empire = yes
-							}
-						}
-					}
-					free_district_slots < 1
-					num_districts = { type = district_farming value < 1 }
-					num_districts = { type = district_mining value < 1 }
-					num_districts = { type = district_generator value < 1 }
-					num_districts = { type = district_tec_proto_farming value < 1 }
-					num_districts = { type = district_tec_proto_mining value < 1 }
-					num_districts = { type = district_tec_proto_generator value < 1 }
-				}
-				if = {
-					limit = {
-						owner = {
-							tec_is_megacity_empire = yes
-						}
-					}
-					# MEMESIS MEGACITY CHANGES
-				}
-			}
-		}
-		custom_tooltip = {
-			fail_text = decision_tec_arcology_blocker_tweaks
-			OR = {
-				num_uncleared_blockers < 1
-				owner = {
-					tec_can_enact_overstrip = yes
-				}
-			}
-		}
+		tec_arcology_project_allow = yes
 	}
 
 	effect = {
 		# Make city-planet
 		custom_tooltip = decision_arcology_project_effects
 		hidden_effect = {
-			# Handles special deposits
-			tec_ecu_deposits_handler_before = yes
-			clear_deposits = yes
+			tec_ecu_logic_start = { change_pc = pc_city }
+			
 			set_industrial_focus_flags = yes
-			remove_modifier = pm_tec_industrialized_planet
-			change_pc = pc_city
 			relic_world_conversion_effect = {
 				DISTRICT = district_arcology_housing
 				VARIABLE = num_housing_districts
@@ -105,22 +49,15 @@ decision_arcology_project = {
 				DISTRICT = district_arcology_arms_industry
 				VARIABLE = num_industrial_districts
 			}
+
 			set_ecu_industrial_districts_effect = yes
-			#Included Planetary diversity things
-			tec_ecu_planet_entity = yes
-			# Ecological resolution & factions handler
-			tec_ecu_ecological_resolution = yes
+			
 			owner = {
 				country_event = { id = distar.201 } # port for living planet distar.197, triggers in event
 			}
 			planet_event = { id = mega.200 }
-			#Ecumenopolis specialization modifier
-			remove_planet_flag = tec_ecumenopolis_spec_militarized
-			remove_planet_flag = tec_ecumenopolis_spec_science
-			remove_planet_flag = tec_ecumenopolis_spec_admin
-
-			# Handles special deposits
-			tec_ecu_deposits_handler_after = yes
+			
+			tec_ecu_logic_finish = yes
 		}
 	}
 
@@ -144,45 +81,22 @@ decision_arcology_project_relic = {
 	}
 
 	potential = {
-		is_planet_class = pc_relic
-		tec_invalidates_arcology_project_comp = no
-
-		habitable_structure = no
-		tec_is_arcology = no
 		exists = owner
-		owner = {
-		#	is_regular_empire = yes 
-			NOT = {
-				has_civic = civic_tec_corporate_urbancorp 
-			}
-		}
+		tec_arcology_project_relic_potential = yes
+		owner = { tec_is_urbancorp = no }
 	}
 
 	allow = {
-		owner = {
-			has_technology = tech_housing_2 
-		}
-		custom_tooltip = {
-			fail_text = decision_tec_arcology_blocker_tweaks
-			OR = {
-				num_uncleared_blockers < 1
-				owner = {
-					tec_can_enact_overstrip = yes
-				}
-			}
-		}
+		tec_arcology_project_relic_allow = yes
 	}
 
 	effect = {
 		# Make city-planet
 		custom_tooltip = decision_arcology_project_effects
 		hidden_effect = {
-			# Handles special deposits
-			tec_ecu_deposits_handler_before = yes
-			clear_deposits = yes
+			tec_ecu_logic_start = { change_pc = pc_city relic = yes }
+			
 			set_industrial_focus_flags = yes
-			remove_modifier = pm_tec_industrialized_planet
-			change_pc = pc_city
 			relic_world_conversion_effect = {
 				DISTRICT = district_arcology_housing
 				VARIABLE = num_housing_districts
@@ -191,34 +105,14 @@ decision_arcology_project_relic = {
 				DISTRICT = district_arcology_arms_industry
 				VARIABLE = num_industrial_districts
 			}
+
 			set_ecu_industrial_districts_effect = yes
-			#Included Planetary diversity things
-			tec_ecu_planet_entity = yes
-			# Ecological resolution & factions handler
-			tec_ecu_ecological_resolution = yes
-			add_deposit = d_former_relic_world
-			planet_event = {
+			
+			planet_event = { 
 				id = mega.201 
 			}
-
-			while = {
-				count = 4
-				solar_system = {
-					random_system_ambient_object = {
-						limit = {
-							has_ambient_object_flag = relic_world_debris 
-						}
-						destroy_ambient_object = this
-					}
-				}
-			}
-			#Ecumenopolis specialization modifier
-			remove_planet_flag = tec_ecumenopolis_spec_militarized
-			remove_planet_flag = tec_ecumenopolis_spec_science
-			remove_planet_flag = tec_ecumenopolis_spec_admin
-			set_planet_flag = tec_ecumenopolis_was_relic_planet
-			# Handles special deposits
-			tec_ecu_deposits_handler_after = yes
+			
+			tec_ecu_logic_finish = { relic = yes }
 		}
 	}
 	ai_weight = {
@@ -241,91 +135,22 @@ decision_arcology_project_tec_corporate_urbancorp = {
 	}
 	
 	potential = {
-		tec_is_relic_world = no
-		tec_invalidates_arcology_project_comp = no
-
-		habitable_structure = no
-		tec_is_arcology = no
 		exists = owner
-		owner = {
-			AND = {
-				has_civic = civic_tec_corporate_urbancorp
-				has_ascension_perk = ap_arcology_project 
-			}
-			NOT = {
-				has_ethic = ethic_fanatic_green
-			}
-		}
+		tec_arcology_project_potential = yes
+		owner = { tec_is_urbancorp = yes }
 	}
 	
 	allow = {
-		if = {	# Note: I feel this extremely cheesy, but whatever
-			limit = { owner = { is_ai = no } }
-			custom_tooltip = {
-				fail_text = decision_arcology_project_requirements
-				if = {
-					limit = {
-						owner = {
-							NOT = {
-								tec_is_megacity_empire = yes
-							}
-						}
-					}
-					free_district_slots < 1
-					num_districts = { type = district_farming value < 1 }
-					num_districts = { type = district_mining value < 1 }
-					num_districts = { type = district_generator value < 1 }
-					num_districts = { type = district_tec_proto_farming value < 1 }
-					num_districts = { type = district_tec_proto_mining value < 1 }
-					num_districts = { type = district_tec_proto_generator value < 1 }
-				}
-				if = {
-					limit = {
-						owner = {
-							tec_is_megacity_empire = yes
-						}
-					}
-					# MEMESIS MEGACITY CHANGES
-					always = no
-					#calc_true_if = {
-					#	amount = 3
-					#	has_building = building_tec_megacity_standard_3
-					#	has_building = building_tec_megacity_standard_3
-					#	has_building = building_tec_megacity_standard_3
-					#	has_building = building_tec_megacity_research_3
-					#	has_building = building_tec_megacity_research_3
-					#	has_building = building_tec_megacity_research_3
-					#	has_building = building_tec_megacity_cg_3
-					#	has_building = building_tec_megacity_cg_3
-					#	has_building = building_tec_megacity_cg_3
-					#	has_building = building_tec_megacity_alloy_3
-					#	has_building = building_tec_megacity_alloy_3
-					#	has_building = building_tec_megacity_alloy_3
-					#}
-				}
-			}
-		}
-		custom_tooltip = {
-			fail_text = decision_tec_arcology_blocker_tweaks
-			OR = {
-				num_uncleared_blockers < 1
-				owner = {
-					tec_can_enact_overstrip = yes
-				}
-			}
-		}
+		tec_arcology_project_allow = yes
 	}
 	
 	effect = {
 		# Make city-planet
 		custom_tooltip = decision_arcology_project_effects
 		hidden_effect = {
-			# Handles special deposits
-			tec_ecu_deposits_handler_before = yes
-			clear_deposits = yes
+			tec_ecu_logic_start = { change_pc = pc_city }
+			
 			set_industrial_focus_flags = yes
-			remove_modifier = pm_tec_industrialized_planet
-			change_pc = pc_city
 			relic_world_conversion_effect = {
 				DISTRICT = district_arcology_housing
 				VARIABLE = num_housing_districts
@@ -334,21 +159,15 @@ decision_arcology_project_tec_corporate_urbancorp = {
 				DISTRICT = district_arcology_arms_industry
 				VARIABLE = num_industrial_districts
 			}
+
 			set_ecu_industrial_districts_effect = yes
-			#Included Planetary diversity things
-			tec_ecu_planet_entity = yes
-			# Ecological resolution & factions handler
-			tec_ecu_ecological_resolution = yes
+			
 			owner = {
 				country_event = { id = distar.201 } # port for living planet distar.197, triggers in event
 			}
 			planet_event = { id = mega.200 }
-			#Ecumenopolis specialization modifier
-			remove_planet_flag = tec_ecumenopolis_spec_militarized
-			remove_planet_flag = tec_ecumenopolis_spec_science
-			remove_planet_flag = tec_ecumenopolis_spec_admin
-			# Handles special deposits
-			tec_ecu_deposits_handler_after = yes
+			
+			tec_ecu_logic_finish = yes
 		}
 	
 		# /
@@ -374,45 +193,22 @@ decision_arcology_project_relic_tec_corporate_urbancorp = {
 	}
 	
 	potential = {
-		is_planet_class = pc_relic
-		tec_invalidates_arcology_project_comp = no
-		
-		habitable_structure = no
-		tec_is_arcology = no
 		exists = owner
-		owner = {
-			AND = {
-				has_civic = civic_tec_corporate_urbancorp
-				is_regular_empire = yes 
-			}
-		}
+		tec_arcology_project_relic_potential = yes
+		owner = { tec_is_urbancorp = yes }
 	}
 	
 	allow = {
-		owner = {
-			has_technology = tech_housing_2 
-		}
-		custom_tooltip = {
-			fail_text = decision_tec_arcology_blocker_tweaks
-			OR = {
-				num_uncleared_blockers < 1
-				owner = {
-					tec_can_enact_overstrip = yes
-				}
-			}
-		}
+		tec_arcology_project_relic_allow = yes
 	}
 	
 	effect = {
 		# Make city-planet
 		custom_tooltip = decision_arcology_project_effects
 		hidden_effect = {
-			# Handles special deposits
-			tec_ecu_deposits_handler_before = yes
-			clear_deposits = yes
+			tec_ecu_logic_start = { change_pc = pc_city relic = yes }
+			
 			set_industrial_focus_flags = yes
-			remove_modifier = pm_tec_industrialized_planet
-			change_pc = pc_city
 			relic_world_conversion_effect = {
 				DISTRICT = district_arcology_housing
 				VARIABLE = num_housing_districts
@@ -421,29 +217,14 @@ decision_arcology_project_relic_tec_corporate_urbancorp = {
 				DISTRICT = district_arcology_arms_industry
 				VARIABLE = num_industrial_districts
 			}
+
 			set_ecu_industrial_districts_effect = yes
-			#Included Planetary diversity things
-			tec_ecu_planet_entity = yes
-			# Ecological resolution & factions handler
-			tec_ecu_ecological_resolution = yes
-			add_deposit = d_former_relic_world
-			planet_event = { id = mega.201 }
-			while = {
-				count = 4
-				solar_system = {
-					random_system_ambient_object = {
-						limit = { has_ambient_object_flag = relic_world_debris }
-						destroy_ambient_object = this
-					}
-				}
+			
+			planet_event = { 
+				id = mega.201 
 			}
-			#Ecumenopolis specialization modifier
-			remove_planet_flag = tec_ecumenopolis_spec_militarized
-			remove_planet_flag = tec_ecumenopolis_spec_science
-			remove_planet_flag = tec_ecumenopolis_spec_admin
-			set_planet_flag = tec_ecumenopolis_was_relic_planet
-			# Handles special deposits
-			tec_ecu_deposits_handler_after = yes
+			
+			tec_ecu_logic_finish = { relic = yes }
 		}
 		
 	}
@@ -479,6 +260,8 @@ decision_tec_military_ecu = {
 	potential = {
 		OR = {
 			is_planet_class = pc_city
+			# Pd compat
+			is_planet_class = pc_milarc
 		}
 		exists = space_owner
 		owner = {
@@ -496,6 +279,9 @@ decision_tec_military_ecu = {
 	effect = {
 		custom_tooltip = decision_tec_military_ecu_effects
 		hidden_effect = {
+			# pd compat
+			change_pc = pc_city
+			remove_deposit = d_milarc
 			
 			set_planet_flag = tec_ecumenopolis_spec_militarized
 			set_planet_flag = tec_ecumenopolis_militarized_army
@@ -506,6 +292,8 @@ decision_tec_military_ecu = {
 			remove_planet_flag = tec_ecumenopolis_spec_admin
 			remove_planet_flag = tec_ecumenopolis_spec_precursor
 			remove_planet_flag = tec_ecumenopolis_militarized_navy
+
+			tec_ecu_planet_entity = yes
 		}
 	}
 	ai_weight = {
@@ -529,6 +317,7 @@ decision_tec_science_ecu = {
 	potential = {
 		OR = {
 			is_planet_class = pc_city
+			is_planet_class = pc_ecocity
 		}
 		exists = space_owner
 		owner = {
@@ -547,6 +336,9 @@ decision_tec_science_ecu = {
 	effect = {
 		custom_tooltip = decision_tec_science_ecu_effects
 		hidden_effect = {
+			change_pc = pc_city
+			remove_deposit = d_ecogarden
+
 			set_planet_flag = tec_ecumenopolis_spec_science
 			set_planet_flag = tec_ecumenopolis_refinery_nospec
 
@@ -556,6 +348,8 @@ decision_tec_science_ecu = {
 			remove_planet_flag = tec_ecumenopolis_spec_admin
 			remove_planet_flag = tec_ecumenopolis_spec_precursor
 			remove_planet_flag = tec_ecumenopolis_militarized_navy
+
+			tec_ecu_planet_entity = yes
 		}
 		
 	}
@@ -580,6 +374,7 @@ decision_tec_administration_ecu = {
 	potential = {
 		OR = {
 			is_planet_class = pc_city
+			is_planet_class = pc_ecocity
 		}
 		exists = space_owner
 		owner = {
@@ -598,6 +393,9 @@ decision_tec_administration_ecu = {
 	effect = {
 		custom_tooltip = decision_tec_administration_ecu_effects
 		hidden_effect = {
+			change_pc = pc_city
+			remove_deposit = d_ecogarden
+
 			set_planet_flag = tec_ecumenopolis_spec_admin
 
 			#anticheese
@@ -608,6 +406,8 @@ decision_tec_administration_ecu = {
 			remove_planet_flag = tec_ecumenopolis_militarized_army
 
 			remove_planet_flag = tec_ecumenopolis_spec_precursor
+			
+			tec_ecu_planet_entity = yes
 		}
 	}
 	ai_weight = {
