@@ -1362,6 +1362,9 @@ tec_has_discovery_traditions_finished = {
 
 # ASCENSION PATHS
 # -------------- MAIN PATHS ----------------
+
+# Psionic
+
 tec_has_psionic_ascension_path = {
 	OR = {
 		has_ascension_perk = ap_mind_over_matter		# Psi AP
@@ -1381,6 +1384,15 @@ tec_has_psionic_ascension_origin = {
 	}
 }
 
+tec_has_psionic_ascension_finished = {
+	OR = {
+		# Might include hybrid paths
+		has_tradition = tr_psionics_finish 
+	}
+}
+
+# Genetic
+
 tec_has_genetic_ascension_path = {
 	OR = {
 		has_ascension_perk = ap_engineered_evolution
@@ -1392,6 +1404,15 @@ tec_has_genetic_ascension_origin = {
 		has_origin = origin_tec_genetics
 	}
 }
+
+tec_has_genetic_ascension_finished = {
+	OR = {
+		# Might include hybrid paths
+		has_tradition = tr_genetics_finish 
+	}
+}
+
+# Cybernetic
 
 tec_has_cybernetic_ascension_path = {
 	OR = {
@@ -1409,10 +1430,20 @@ tec_has_cybernetic_ascension_origin = {
 
 tec_has_cybernetic_ascension_path_exception = {
 	OR = {
-		has_valid_civic = civic_machine_assimilator     # Assimilators can take cybernetic
-		tec_is_cyberhive = yes                          # Cyberhives 
+		has_valid_civic = civic_machine_assimilator		# Assimilators can take cybernetic
+		tec_is_cyberhive = yes							# Cyberhives 
 	}
 }
+
+tec_has_cybernetic_ascension_finished = {
+	OR = {
+		# Might include hybrid paths
+		has_tradition = tr_cybernetics_finish 
+		has_tradition = tr_cybernetics_assimilator_finish 
+	}
+}
+
+# Synthetic
 
 tec_has_synthetic_ascension_path = {
 	OR = {
@@ -1427,6 +1458,15 @@ tec_has_synthetic_ascension_origin = {
 	}
 }
 
+tec_has_synthetic_ascension_finished = {
+	OR = {
+		# Might include hybrid paths
+		has_tradition = tr_synthetics_finish 
+	}
+}
+
+# Generic
+
 tec_has_main_ascension_path = {
 	OR = {
 		tec_has_psionic_ascension_path = yes
@@ -1437,6 +1477,18 @@ tec_has_main_ascension_path = {
 		tec_has_pd_biosynth_ascension_path = yes
 	}
 }
+
+tec_has_main_ascension_finished = {
+	OR = {
+		tec_has_psionic_ascension_finished = yes
+		tec_has_genetic_ascension_finished = yes
+		tec_has_cybernetic_ascension_finished = yes
+		tec_has_synthetic_ascension_finished = yes
+		# PD
+		tec_has_pd_biosynth_ascension_finished = yes
+	}
+}
+
 
 tec_has_secondary_ascension_path = {
 	OR = {
@@ -1519,7 +1571,7 @@ tec_is_cyborg_species_no_repl = {
 	}
 }
 
-tec_is_psionic_species = {
+tec_is_psionic_species = {			# Including latent
 	OR = {
 		has_trait = trait_latent_psionic
 		has_trait = trait_psionic
@@ -1528,9 +1580,11 @@ tec_is_psionic_species = {
 	}
 }
 
-tec_is_total_psionic_species = {
+tec_is_total_psionic_species = {	# Not latent
 	OR = {
 		has_trait = trait_psionic
+		has_trait = @trait_tec_cyberpsionic
+		has_trait = @trait_tec_pure_psionic
 	}
 }
 
@@ -1775,68 +1829,17 @@ tec_invalidates_ecoworld_project_comp = {
 
 tec_has_any_menial_district = {
 	OR = {
-		# Energy
-		num_districts = {
-			type = district_generator
-			value > 0
+		check_variable_arithmetic = {
+			which = value:farming_districts_value
+			   value >= 0
 		}
-		num_districts = {
-			type = district_generator_uncapped
-			value > 0
+		check_variable_arithmetic = {
+			which = value:mining_districts_value
+			   value >= 0
 		}
-		num_districts = {
-			type = district_tec_aqua_generator
-			value > 0
-		}
-		num_districts = {
-			type = district_tec_eco_generator
-			value > 0
-		}
-		num_districts = {
-			type = district_tec_eco_aqua_generator
-			value > 0
-		}
-		# Minerals
-		num_districts = {
-			type = district_mining
-			value > 0
-		}
-		num_districts = {
-			type = district_mining_uncapped
-			value > 0
-		}
-		num_districts = {
-			type = district_tec_aqua_mining
-			value > 0
-		}
-		num_districts = {
-			type = district_tec_eco_mining
-			value > 0
-		}
-		num_districts = {
-			type = district_tec_eco_aqua_mining
-			value > 0
-		}
-		# Food
-		num_districts = {
-			type = district_farming
-			value > 0
-		}
-		num_districts = {
-			type = district_farming_uncapped
-			value > 0
-		}
-		num_districts = {
-			type = district_tec_aqua_farming
-			value > 0
-		}
-		num_districts = {
-			type = district_tec_eco_farming
-			value > 0
-		}
-		num_districts = {
-			type = district_tec_eco_aqua_farming
-			value > 0
+		check_variable_arithmetic = {
+			which = value:generators_districts_value
+			   value >= 0
 		}
 	}
 }
@@ -2814,5 +2817,165 @@ tec_has_toxic_baths = {
 tec_allows_machine_assembly_for_cyborg = {
 	OR = {
 		has_active_tradition = tr_cybernetics_assembly_standards
+	}
+}
+
+
+tec_is_urbancorp = {
+	optimize_memory
+	OR = {
+		has_civic = civic_tec_corporate_urbancorp
+	}
+}
+
+# Ecu decisions
+
+tec_arcology_project_potential = {
+	optimize_memory
+	tec_is_relic_world = no
+	tec_invalidates_arcology_project_comp = no
+
+	habitable_structure = no
+	tec_is_arcology = no
+
+	exists = owner
+	owner = {
+		has_ascension_perk = ap_arcology_project
+		NOT = {
+			has_ethic = ethic_fanatic_green
+		}
+		NOR = {
+			has_civic = civic_agrarian_idyll
+			has_civic = civic_tec_eco_keepers
+		}
+	}
+}
+
+tec_arcology_project_relic_potential = {
+	optimize_memory
+	# PD compat
+	is_planet_class = pc_[[milarc]milarc_]relic
+	
+	tec_invalidates_arcology_project_comp = no
+	habitable_structure = no
+	tec_is_arcology = no
+}
+
+tec_ecoworld_project_potential = {
+	tec_is_arcology = no
+	tec_invalidates_ecoworld_project_comp = no
+
+	tec_is_ecoworld = no
+
+	habitable_structure = no
+	tec_is_arcology = no
+
+	exists = owner
+		owner = {
+			NOR = {
+				has_ethic = ethic_fanatic_industrial
+				has_valid_civic = civic_hive_devouring_swarm
+			}
+			OR = {
+				is_ecologist = yes
+				has_ascension_perk = ap_mastery_of_nature
+			}
+		}
+}
+
+tec_arcology_project_allow = {
+	optimize_memory
+	if = {	# Note: I feel this extremely cheesy, but whatever
+		limit = { owner = { is_ai = no } }
+		custom_tooltip = {
+			# PD compat
+			fail_text = decision_[[eco]eco_]arcology_project_requirements
+			if = {
+				limit = {
+					owner = {
+						tec_is_megacity_empire = no
+					}
+				}
+				free_district_slots < 1
+
+				# PD compat
+				[[eco]num_districts = { type = district_industrial value < 1 }]
+				check_variable_arithmetic = {
+					which = value:farming_districts_value
+           			value = 0
+				}
+				check_variable_arithmetic = {
+					which = value:mining_districts_value
+           			value = 0
+				}
+				check_variable_arithmetic = {
+					which = value:generators_districts_value
+           			value = 0
+				}
+			}
+			if = {
+				limit = {
+					owner = {
+						tec_is_megacity_empire = yes
+					}
+				}
+				# MEMESIS MEGACITY CHANGES
+			}
+		}
+	}
+	custom_tooltip = {
+		fail_text = decision_tec_arcology_blocker_tweaks
+		OR = {
+			num_uncleared_blockers < 1
+			owner = {
+				tec_can_enact_overstrip = yes
+			}
+		}
+	}
+}
+
+tec_arcology_project_relic_allow = {
+	optimize_memory
+	owner = { 
+		has_technology = tech_housing_2 
+	}
+	custom_tooltip = {
+		fail_text = decision_tec_arcology_blocker_tweaks
+		OR = {
+			num_uncleared_blockers < 1
+			owner = {
+				tec_can_enact_overstrip = yes
+			}
+		}
+	}
+}
+
+tec_ecoworld_project_allow = {
+	optimize_memory
+	custom_tooltip = {
+		fail_text = decision_tec_ecoworld_project_requirements
+		OR = {
+			check_variable_arithmetic = {
+				which = value:farming_districts_value
+				   value >= 6
+			}
+			check_variable_arithmetic = {
+				which = value:mining_districts_value
+				   value >= 6
+			}
+			check_variable_arithmetic = {
+				which = value:generators_districts_value
+				   value >= 6
+			}
+		}
+	}
+	custom_tooltip = {
+		fail_text = decision_tec_arcology_blocker_tweaks
+		OR = {
+			num_uncleared_blockers < 1
+			owner = {
+				tec_can_enact_overstrip = yes
+			}
+		}
 	}
 }

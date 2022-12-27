@@ -830,6 +830,7 @@ country_event = {	# MEMESIS GESTALTS
 		custom_tooltip = "venture.shroud.a.tooltip"
 		trigger = {
 			is_gestalt = no
+			NOT = { has_country_flag = shroud_intro }
 		}
 		allow = {
 			resource_stockpile_compare = {
@@ -837,7 +838,6 @@ country_event = {	# MEMESIS GESTALTS
 				value >= 1000
 			}
 		}
-
 
 		add_resource = {
 			energy = -1000
@@ -967,7 +967,7 @@ country_event = {	# MEMESIS GESTALTS
 							NOT = {
 								has_country_flag = has_shroud_patron
 							}
-
+							has_country_flag = offered_covenant # Can't randomly form a covenant unless you've offered one previously and failed.
 						}
 						country_event = { id = utopia.3300 }
 					}
@@ -980,10 +980,11 @@ country_event = {	# MEMESIS GESTALTS
 		}
 	}
 	option = {
-		name = "utopia.3000.b"
-		custom_tooltip = "venture.shroud.b.tooltip"
+		name = "utopia.3000.c"
+		custom_tooltip = "venture.shroud.c.tooltip"
 		trigger = {
 			is_gestalt = no
+			NOT = { has_country_flag = shroud_intro }
 		}
 		allow = {
 			resource_stockpile_compare = {
@@ -1207,10 +1208,11 @@ country_event = {	# MEMESIS GESTALTS
 		}
 	}
 	option = {
-		name = "utopia.3000.c"
-		custom_tooltip = "venture.shroud.c.tooltip"
+		name = "utopia.3000.d"
+		custom_tooltip = "venture.shroud.d.tooltip"
 		trigger = {
 			is_gestalt = no
+			NOT = { has_country_flag = shroud_intro }
 		}
 		allow = {
 			resource_stockpile_compare = {
@@ -1440,6 +1442,7 @@ country_event = {	# MEMESIS GESTALTS
 		#"venture.shroud.tooltip"
 		trigger = {
 			is_hive_empire = yes
+			NOT = { has_country_flag = shroud_intro }
 		}
 		allow = {
 			resource_stockpile_compare = {
@@ -1467,6 +1470,7 @@ country_event = {	# MEMESIS GESTALTS
 			NOR = {
 				has_ascension_perk = @ap_tec_machine_psi_2
 			}
+			NOT = { has_country_flag = shroud_intro }
 		}
 		allow = {
 			resource_stockpile_compare = {
@@ -1623,6 +1627,7 @@ country_event = {	# MEMESIS GESTALTS
 		trigger = {
 			is_machine_empire = yes
 			has_ascension_perk = @ap_tec_machine_psi_2
+			NOT = { has_country_flag = shroud_intro }
 		}
 		allow = {
 			resource_stockpile_compare = {
@@ -1771,6 +1776,49 @@ country_event = {	# MEMESIS GESTALTS
 			tec_add_shroud_cd_effect = yes
 		}
 	}
+	# First time?
+	option = { #First time trying to breach
+		name = "utopia.3000.a"
+		trigger = {
+			has_country_flag = shroud_intro
+		}
+		allow = {
+			resource_stockpile_compare = { resource = energy value >= 1000 }
+		}
+
+		add_resource = { energy = -1000 }
+
+		hidden_effect = {
+			country_event = { id = utopia.2657 }
+			tec_add_shroud_cd_effect = yes
+
+			remove_country_flag = shroud_intro
+		}
+	}
+	option = { #Try to contact a specific patron
+		name = "utopia.3000.b"
+		trigger = {
+			NOR = { 
+				has_country_flag = shroud_intro
+				has_country_flag = has_shroud_patron
+			}
+		}
+		allow = {
+			resource_stockpile_compare = { resource = energy value >= 2000 }
+			resource_stockpile_compare = { resource = sr_zro value >= 500 }
+		}
+
+		add_resource = { 
+			energy = -2000
+			sr_zro = -500
+		}
+
+
+		hidden_effect = {
+			country_event = { id = utopia.3005 }
+			tec_add_shroud_cd_effect = yes
+		}
+	}
 
 	option = {
 		name = "exit.shroud"
@@ -1781,10 +1829,6 @@ country_event = {	# MEMESIS GESTALTS
 	after = {
 		hidden_effect = {
 			remove_country_flag = shroud_diplomacy_engaged
-			if = {
-				limit = { has_country_flag = shroud_intro }
-				remove_country_flag = shroud_intro
-			}
 			if = {
 				limit = {
 					has_country_flag = tec_entered_shroud
@@ -2115,28 +2159,24 @@ country_event = {
 
 	option = {
 		name = "exit.shroud"
-		every_owned_leader = {
-			limit = {
-				OR = {
-					species = {
-						has_trait = trait_psionic 
+		hidden_effect = {
+			every_owned_leader = {
+				limit = {
+					OR = {
+						species = {
+							tec_is_total_psionic_species = yes
+						}
 					}
-					species = {
-						has_trait = @trait_tec_pure_psionic
-					}
-					species = {
-						has_trait = @trait_tec_cyberpsionic
+					NOR = {
+						has_trait = leader_trait_admiral_chosen
+						has_trait = leader_trait_general_chosen
+						has_trait = leader_trait_governor_chosen
+						has_trait = leader_trait_ruler_chosen
+						has_trait = leader_trait_scientist_chosen
 					}
 				}
-				NOR = {
-					has_trait = leader_trait_admiral_chosen
-					has_trait = leader_trait_general_chosen
-					has_trait = leader_trait_governor_chosen
-					has_trait = leader_trait_ruler_chosen
-					has_trait = leader_trait_scientist_chosen
-				}
+				add_trait = leader_trait_shroud_age
 			}
-			add_trait = leader_trait_shroud_age
 		}
 		default_hide_option = yes
 	}
@@ -2454,8 +2494,8 @@ country_event = {
 		if = {
 			limit = {
 				NOR = {
-					has_technology = tech_psi_jump_drive_1 
-					has_tech_option = tech_psi_jump_drive_1 
+					has_technology = tech_psi_jump_drive_1
+					has_tech_option = tech_psi_jump_drive_1
 				}
 			}
 			add_research_option = tech_psi_jump_drive_1
@@ -2583,7 +2623,7 @@ country_event = {
 		if = {
 			limit = {
 				NOR = {
-					has_technology = tech_psionic_shield 
+					has_technology = tech_psionic_shield
 					has_tech_option = tech_psionic_shield
 				}
 			}
@@ -2771,7 +2811,7 @@ country_event = {
 	}
 }
 
-# Vision 10
+# Vision 10 - Chosen One
 country_event = {
 	id = utopia.3190
 	title = "utopia.3000.name"
@@ -2822,6 +2862,39 @@ country_event = {
 				33 = { set_leader_flag = medium_psi }
 				33 = { set_leader_flag = low_psi }
 			}
+		}
+		random_owned_leader = {
+			limit = {
+				NOR = {
+					is_same_value = event_target:leader_1
+					is_same_value = event_target:leader_2
+				}
+				OR = {
+					has_trait = leader_trait_admiral_chosen
+					has_trait = leader_trait_general_chosen
+					has_trait = leader_trait_governor_chosen
+					has_trait = leader_trait_scientist_chosen
+					has_trait = leader_trait_ruler_chosen
+					has_trait = leader_trait_general_composer_chosen
+					has_trait = leader_trait_governor_composer_chosen
+					has_trait = leader_trait_ruler_composer_chosen
+					has_trait = leader_trait_scientist_composer_chosen
+					has_trait = leader_trait_admiral_eater_chosen
+					has_trait = leader_trait_general_eater_chosen
+					has_trait = leader_trait_governor_eater_chosen
+					has_trait = leader_trait_ruler_eater_chosen
+					has_trait = leader_trait_admiral_instrument_chosen
+					has_trait = leader_trait_governor_instrument_chosen
+					has_trait = leader_trait_ruler_instrument_chosen
+					has_trait = leader_trait_scientist_instrument_chosen
+					has_trait = leader_trait_admiral_whisperers_chosen
+					has_trait = leader_trait_general_whisperers_chosen
+					has_trait = leader_trait_ruler_whisperers_chosen
+					has_trait = leader_trait_scientist_whisperers_chosen
+				}
+			}
+			save_event_target_as = leader_3
+			set_leader_flag = high_psi 
 		}
 	}
 
@@ -3038,6 +3111,18 @@ country_event = {	# MEMESIS LEADER TRAITS
 	option = {
 		name = "exit.shroud"
 		default_hide_option = yes
+		event_target:chosen_leader = {
+			remove_trait_effect = { TRAIT = leader_trait_stubborn }
+			remove_trait_effect = { TRAIT = leader_trait_substance_abuser }
+			remove_trait_effect = { TRAIT = leader_trait_arrested_development }
+			remove_trait_effect = { TRAIT = leader_trait_nervous }
+			remove_trait_effect = { TRAIT = leader_trait_lethargic }
+			remove_trait_effect = { TRAIT = leader_trait_armchair_commander }
+			remove_trait_effect = { TRAIT = leader_trait_corrupt }
+			remove_trait_effect = { TRAIT = leader_trait_paranoid }
+			remove_trait_effect = { TRAIT = leader_trait_traumatized }
+			remove_trait_effect = { TRAIT = leader_trait_maimed }
+		}
 		if = {
 			limit = { event_target:chosen_leader = { leader_class = admiral } }
 			event_target:chosen_leader = {
@@ -3542,6 +3627,12 @@ country_event = {
 		set_country_flag = shroud_diplomacy_engaged
 		if = {
 			limit = {
+				NOT = { has_country_flag = offered_covenant }
+			}
+			set_country_flag = offered_covenant
+		}
+		if = {
+			limit = {
 				any_owned_leader = {
 					OR = {
 						has_trait = leader_trait_admiral_chosen
@@ -3753,6 +3844,7 @@ country_event = {	# MEMESIS ADD EXTRA LEADER TRAITS
 
 # Pick a Patron to contact
 # utopia.3303
+# TO DO - Add evolved features
 
 # The Whisperers in the Void
 # utopia.3304
@@ -3882,7 +3974,7 @@ country_event = { # MEMESIS ADD EXTRA LEADER TRAITS
 	}
 }
 
-# Whisperers - Madness
+# Whisperers - Dangerous Ideas - Faction drift and Stability
 country_event = { # MEMESIS ADD EXTRA POP TRAITS
 	id = utopia.3333
 	title = "utopia.3333.name"
@@ -3915,10 +4007,9 @@ country_event = { # MEMESIS ADD EXTRA POP TRAITS
 					has_modifier = whisperers_psychosis
 				}
 				any_owned_pop = {
-					has_trait = "trait_psionic"
+					tec_is_psionic_species = yes
 				}
 			}
-			save_event_target_as = planet_target
 			random_owned_pop = {
 				kill_pop = yes
 			}
@@ -3927,16 +4018,14 @@ country_event = { # MEMESIS ADD EXTRA POP TRAITS
 	
 	option = {
 		name = "utopia.3333.opt.a"
-		event_target:planet_target = {
-			add_modifier = {
-				modifier = whisperers_madness
-				days = 3600
-			}
+		add_modifier = {
+			modifier = whisperers_madness
+			days = 3600
 		}
 	}
 }
 
-# Whisperers - Psychosis
+# Whisperers - Psychosis - Unity loss and faction drift
 country_event = { # MEMESIS ADD EXTRA POP TRAITS
 	id = utopia.3334
 	title = "utopia.3334.name"
@@ -3949,7 +4038,7 @@ country_event = { # MEMESIS ADD EXTRA POP TRAITS
 	
 	trigger = {
 		any_owned_planet = {
-			num_pops > 5
+			num_pops > 1
 			NOR = {
 				has_modifier = whisperers_madness
 				has_modifier = whisperers_psychosis
@@ -3963,7 +4052,7 @@ country_event = { # MEMESIS ADD EXTRA POP TRAITS
 	immediate = {
 		random_owned_planet = {
 			limit = {
-				num_pops > 5
+				num_pops > 1
 				NOR = {
 					has_modifier = whisperers_madness
 					has_modifier = whisperers_psychosis
@@ -3971,43 +4060,6 @@ country_event = { # MEMESIS ADD EXTRA POP TRAITS
 				any_owned_pop = {
 					has_trait = "trait_psionic"
 				}
-			}
-			save_event_target_as = planet_target
-			if = {
-				limit = {
-					num_pops > 20
-				}
-				random_owned_pop = {
-					kill_pop = yes
-				}
-				random_owned_pop = {
-					kill_pop = yes
-				}
-			}
-			if = {
-				limit = {
-					num_pops > 15
-				}
-				random_owned_pop = {
-					kill_pop = yes
-				}
-				random_owned_pop = {
-					kill_pop = yes
-				}
-			}
-			if = {
-				limit = {
-					num_pops > 10
-				}
-				random_owned_pop = {
-					kill_pop = yes
-				}
-				random_owned_pop = {
-					kill_pop = yes
-				}
-			}
-			random_owned_pop = {
-				kill_pop = yes
 			}
 			random_owned_pop = {
 				kill_pop = yes
@@ -4027,7 +4079,7 @@ country_event = { # MEMESIS ADD EXTRA POP TRAITS
 }
 
 
-# Eater - Peckish
+# Eater - Nibbly - Eats Leader
 # utopia.3335
 
 # Eater - Hungry
@@ -4060,20 +4112,12 @@ country_event = { # MEMESIS ADD EXTRA POP TRAITS
 		random_owned_planet = {
 			limit = {
 				any_owned_pop = {
-					OR = {
-						has_trait = trait_psionic
-						has_trait = @trait_tec_pure_psionic
-						has_trait = @trait_tec_cyberpsionic
-					}
+					tec_is_psionic_species = yes
 				}
 			}
 			random_owned_pop = {
 				limit = {
-					OR = {
-						has_trait = trait_psionic
-						has_trait = @trait_tec_pure_psionic
-						has_trait = @trait_tec_cyberpsionic
-					}
+					tec_is_psionic_species = yes
 				}
 				species = { save_event_target_as = species_target }
 			}
@@ -4114,6 +4158,22 @@ country_event = { # MEMESIS REVIEW - NEW CIVICS MAYBE?
 				has_trait = leader_trait_governor_chosen
 				has_trait = leader_trait_scientist_chosen
 				has_trait = leader_trait_ruler_chosen
+				has_trait = leader_trait_general_composer_chosen
+				has_trait = leader_trait_governor_composer_chosen
+				has_trait = leader_trait_ruler_composer_chosen
+				has_trait = leader_trait_scientist_composer_chosen
+				has_trait = leader_trait_admiral_eater_chosen
+				has_trait = leader_trait_general_eater_chosen
+				has_trait = leader_trait_governor_eater_chosen
+				has_trait = leader_trait_ruler_eater_chosen
+				has_trait = leader_trait_admiral_instrument_chosen
+				has_trait = leader_trait_governor_instrument_chosen
+				has_trait = leader_trait_ruler_instrument_chosen
+				has_trait = leader_trait_scientist_instrument_chosen
+				has_trait = leader_trait_admiral_whisperers_chosen
+				has_trait = leader_trait_general_whisperers_chosen
+				has_trait = leader_trait_ruler_whisperers_chosen
+				has_trait = leader_trait_scientist_whisperers_chosen
 			}
 		}
 	}
@@ -4132,6 +4192,22 @@ country_event = { # MEMESIS REVIEW - NEW CIVICS MAYBE?
 					has_trait = leader_trait_governor_chosen
 					has_trait = leader_trait_scientist_chosen
 					has_trait = leader_trait_ruler_chosen
+					has_trait = leader_trait_general_composer_chosen
+					has_trait = leader_trait_governor_composer_chosen
+					has_trait = leader_trait_ruler_composer_chosen
+					has_trait = leader_trait_scientist_composer_chosen
+					has_trait = leader_trait_admiral_eater_chosen
+					has_trait = leader_trait_general_eater_chosen
+					has_trait = leader_trait_governor_eater_chosen
+					has_trait = leader_trait_ruler_eater_chosen
+					has_trait = leader_trait_admiral_instrument_chosen
+					has_trait = leader_trait_governor_instrument_chosen
+					has_trait = leader_trait_ruler_instrument_chosen
+					has_trait = leader_trait_scientist_instrument_chosen
+					has_trait = leader_trait_admiral_whisperers_chosen
+					has_trait = leader_trait_general_whisperers_chosen
+					has_trait = leader_trait_ruler_whisperers_chosen
+					has_trait = leader_trait_scientist_whisperers_chosen
 				}
 			}
 			save_event_target_as = chosen_one
@@ -4191,6 +4267,9 @@ country_event = { # MEMESIS REVIEW - NEW CIVICS MAYBE?
 		}
 		force_add_civic = civic_psionic_sovereign
 		set_government_cooldown = no
+		ruler = {
+			exile_leader_as = destituted_ruler_chosen_one
+		}
 		set_leader = event_target:chosen_one
 		hidden_effect = {
 			every_country = {
