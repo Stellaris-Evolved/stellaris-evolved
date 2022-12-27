@@ -943,7 +943,7 @@ planet_event = {
 
 # Assimilate Pops on Yearly Pulse
 event = {
-	id = tec_assimilation.63
+	id = tec_assimilation.64
 	hide_window = yes
 	is_triggered_only = yes
 
@@ -981,8 +981,11 @@ event = {
 						has_country_flag = tec_biological_assimilation			# Convert into themselves
 						has_country_flag = tec_hive_biological_assimilation
 						has_country_flag = tec_biopsionic_assimilation
+						has_country_flag = tec_hive_biopsionic_assimilation
 						has_country_flag = tec_replicant_assimilation
+						has_country_flag = tec_hive_replicant_assimilation
 						has_country_flag = tec_ethereal_assimilation
+						has_country_flag = tec_psienergy_assimilation
 						has_country_flag = tec_machine_encasing					# Convert organics into robots
 					}
 				}
@@ -997,7 +1000,102 @@ event = {
 					# How new assimilation works
 						# Empire - Type - Checker for is_exact_same_species with appropiate traits, else create new effect
 						# Reduced load on late game by 50%, tests are still going
-					# /	
+					# /
+					# Machine empires assimilation
+					if = {
+						limit = {
+							prev = {
+								is_machine_empire = yes
+							}
+						}
+						# Robots into machines
+						if = {		# RM A
+							limit = {
+								has_trait = trait_mechanical
+								prev = {
+									OR = {
+										has_technology = tech_tec_robot_assimilation
+										has_active_tradition = tr_synthetics_adopt
+										has_active_tradition = tr_synthetics_adopt_machine
+									}
+								}
+							}
+							set_timed_species_flag = {
+								flag = tec_rm_a
+								days = 10
+							}
+						}
+						# Machines into main species
+						if = {		# MM A
+							limit = {
+								OR = {
+									has_trait = trait_machine_unit
+									has_trait = @trait_tec_replicant_standard
+								}
+								NOT = {
+									is_same_value = prev.owner_main_species
+								}
+								prev = {
+									OR = {
+										has_technology = tech_tec_robot_assimilation
+										has_active_tradition = tr_synthetics_adopt
+										has_active_tradition = tr_synthetics_adopt_machine
+									}
+								}
+							}
+							set_timed_species_flag = {
+								flag = tec_mm_a
+								days = 10
+							}
+						}
+						# Hiveminds into biotrophies
+						if = {
+							limit = {
+								prev = {
+									has_valid_civic = civic_machine_servitor
+									NOT = {
+										has_ethic = ethic_gestalt_apathy
+									}
+								}
+								has_trait = trait_hive_mind
+							}
+							tec_machine_hive_into_biotrophy_assimilation_script = yes
+						}
+						# Cyborgs
+						if = {		# MCYB A - 
+							limit = {
+								prev = {
+									OR = {
+										has_valid_civic = civic_machine_assimilator
+										has_country_flag = tec_cybernetic_t1_assimilation
+										has_country_flag = tec_cybernetic_t2_assimilation
+									}
+								}
+							}
+							if = {		# CYB T1 - trait_cybernetic
+								limit = {
+									prev = {
+										OR = {
+											has_valid_civic = civic_machine_assimilator
+											has_country_flag = tec_cybernetic_t1_assimilation	
+										}
+										NOT = {
+											has_country_flag = tec_cybernetic_t2_assimilation
+										}
+									}
+								}
+								tec_machine_cybernetic_t1_assimilation_script = yes
+							}
+							else_if = {		# CYB T2 - trait_tec_advanced_cyborg
+								limit = {
+									prev = {
+										has_country_flag = tec_cybernetic_t2_assimilation						
+									}
+								}
+								tec_machine_cybernetic_t2_assimilation_script = yes
+							}
+						}
+					}
 					# Hivemind empires assimilation
 					if = {
 						limit = {
@@ -1026,7 +1124,7 @@ event = {
 							}
 						}
 						# Hivemind
-						if = {		# HIV ONLY A 
+						if = {		# HIV ONLY A
 							limit = {
 								prev = {
 									tec_is_cyberhive = no
@@ -1037,23 +1135,18 @@ event = {
 												has_country_flag = can_add_advanced_traits
 												has_technology = tech_tec_hive_assimilation
 											}
-											NOR = {
-												has_country_flag = tec_biological_assimilation
-												has_country_flag = tec_hive_biological_assimilation
-											}
 										}
 									}
-									NOR = {
-										has_country_flag = tec_biological_assimilation
-										has_country_flag = tec_hive_replicant_assimilation
-										
+									NOR = {									
 										has_country_flag = tec_hive_cybernetic_t1_assimilation
 										has_country_flag = tec_hive_cybernetic_t2_assimilation
 										
 										has_country_flag = tec_hive_psionic_assimilation
 										has_country_flag = tec_hive_cyberpsionic_assimilation
-										has_country_flag = tec_hive_biopsionic_assimilation
 									}
+								}
+								NOT = {
+									has_trait = trait_hive_mind
 								}
 							}
 							tec_hivemind_trait_assimilation_script = yes
@@ -1114,93 +1207,6 @@ event = {
 							tec_hivemind_cyberpsionic_assimilation_script = yes
 						}
 					}
-					# Machine empires assimilation
-					if = {
-						limit = {
-							prev = {
-								is_machine_empire = yes
-							}
-						}
-						# Robots into machines
-						if = {		# RM A
-							limit = {
-								has_trait = trait_mechanical
-								prev = {
-									has_technology = tech_tec_robot_assimilation
-								}
-							}
-							set_timed_species_flag = {
-								flag = tec_rm_a
-								days = 10
-							}
-						}
-						# Machines into main species
-						if = {		# MM A
-							limit = {
-								OR = {
-									has_trait = trait_machine_unit
-									has_trait = @trait_tec_replicant_standard
-								}
-								NOT = {
-									is_same_value = prev.owner_main_species
-								}
-								prev = {
-									has_technology = tech_tec_robot_assimilation
-								}
-							}
-							set_timed_species_flag = {
-								flag = tec_mm_a
-								days = 10
-							}
-						}
-						# Hiveminds into biotrophies
-						if = {
-							limit = {
-								prev = {
-									has_valid_civic = civic_machine_servitor
-									NOT = {
-										has_ethic = ethic_gestalt_apathy
-									}
-								}
-								has_trait = trait_hive_mind
-							}
-							tec_machine_hive_into_biotrophy_assimilation_script = yes
-						}
-						# Cyborgs
-						if = {		# MCYB A - 
-							limit = {
-								prev = {
-									OR = {
-										has_valid_civic = civic_machine_assimilator
-										has_country_flag = tec_cybernetic_t1_assimilation
-										has_country_flag = tec_cybernetic_t2_assimilation
-									}
-								}
-							}
-							if = {		# CYB T1 - trait_cybernetic
-								limit = {
-									prev = {
-										OR = {
-											has_valid_civic = civic_machine_assimilator
-											has_country_flag = tec_cybernetic_t1_assimilation	
-										}
-										NOT = {
-											has_country_flag = tec_cybernetic_t2_assimilation
-										}
-									}
-								}
-								tec_machine_cybernetic_t1_assimilation_script = yes
-							}
-							else_if = {		# CYB T2 - trait_tec_advanced_cyborg
-								limit = {
-									prev = {
-										has_country_flag = tec_cybernetic_t2_assimilation						
-									}
-								}
-								tec_machine_cybernetic_t2_assimilation_script = yes
-							}
-						}
-					}
 					# Regular empires assimilation
 					if = {
 						limit = {
@@ -1232,17 +1238,11 @@ event = {
 							limit = {
 								prev = {
 									NOR = {
-										has_country_flag = tec_biological_assimilation
-										has_country_flag = tec_replicant_assimilation
-										
-										has_country_flag = tec_synthetic_assimilation
 										has_country_flag = tec_cybernetic_t1_assimilation
 										has_country_flag = tec_cybernetic_t2_assimilation
 										
 										has_country_flag = tec_psionic_assimilation
-										has_country_flag = tec_biopsionic_assimilation
 										has_country_flag = tec_cyberpsionic_assimilation
-										has_country_flag = tec_psienergy_assimilation
 									}
 									has_technology = tech_tec_hive_deassimilation
 									
@@ -1297,27 +1297,21 @@ event = {
 							tec_regular_cyberpsionic_assimilation_script = yes
 						}
 						# Pure psio assimilation
-						if = {		# PSI A - 
-							limit = {
-								prev = {
-									has_country_flag = tec_biopsionic_assimilation
-								}
-							}
-							tec_regular_biopsionic_assimilation_script = yes
-						}
+						# This is total now
 						# Energy entity assimilation
+						# This is total
 					}
 				}
 			}
 
 			every_owned_planet = {	# REGULAR QUEUE
 				planet_event = {
-					id = tec_assimilation.64 
+					id = tec_assimilation.65 
 				}
 			}
 			every_owned_planet = {	# CRAFTED QUEUE
 				planet_event = {
-					id = tec_assimilation.65
+					id = tec_assimilation.6501
 				}
 			}
 		}
@@ -1327,7 +1321,7 @@ event = {
 
 # Assimilate Pops
 planet_event = {
-	id = tec_assimilation.64
+	id = tec_assimilation.65
 	hide_window = yes
 	is_triggered_only = yes
 
@@ -1393,6 +1387,7 @@ planet_event = {
 								has_country_flag = tec_hive_biological_assimilation
 								has_country_flag = tec_biopsionic_assimilation
 								has_country_flag = tec_ethereal_assimilation
+								has_country_flag = tec_psienergy_assimilation
 								#has_country_flag = tec_hive_cyberpsionic_assimilation		# Convert into robots or drones
 								AND = {
 									has_country_flag = tec_replicant_assimilation			# Convert into new replicants
@@ -1674,7 +1669,7 @@ planet_event = {
 
 # Assimilate Pops - Crafted species
 planet_event = {
-	id = tec_assimilation.65
+	id = tec_assimilation.6501
 	hide_window = yes
 	is_triggered_only = yes
 

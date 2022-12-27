@@ -6,25 +6,23 @@ citizenship_full = {
 
 	potential = {
 		exists = from
-		NOT = {
-			from = {
-				is_machine_empire = yes 
-			}
+		from = {
+			is_machine_empire = no
 		}
 		NOR = {
 			AND = {
-				has_trait = trait_machine_unit
+				has_trait = trait_mechanical
 				is_shackled_robot_species_rights = yes
-				from = {
-					has_policy_flag = ai_servitude
-				}
+				#from = {
+					#has_policy_flag = ai_servitude
+				#}
 			}
 			AND = {
 				has_trait = @trait_tec_bioservant
 				is_shackled_bioservant_species_rights = yes
-				from = {
-					has_policy_flag = bioservant_servitude 
-				}
+				#from = {
+					#has_policy_flag = bioservant_servitude 
+				#}
 			}
 		}
 	}
@@ -43,7 +41,9 @@ citizenship_full = {
 		custom_tooltip = {
 			fail_text = "HIVE_MIND_SPECIES_CITIZENS_ONLY"
 			OR = {
-				NOT = { from = { is_hive_empire = yes } }
+				from = {
+					is_hive_empire = no
+				}
 				has_trait = trait_hive_mind
 			}
 		}
@@ -207,6 +207,7 @@ citizenship_assimilation = {
 								has_ethic = ethic_gestalt_consciousness 
 							}
 							root = {
+								has_trait = trait_hive_mind
 								NOR = {
 									has_trait = trait_mechanical
 									has_trait = trait_machine_unit
@@ -215,8 +216,10 @@ citizenship_assimilation = {
 						}
 						AND = { # Hive trait Assimilation
 							# Note - Hiveminds will be able to assimilate without aps, just with tech, but for organics
+							is_hive_empire = yes
 							OR = {
-								is_hive_empire = yes
+								has_country_flag = can_add_advanced_traits
+								has_technology = tech_tec_hive_assimilation
 								has_country_flag = tec_hive_trait_assimilation
 							}
 							NOT = { # swarms only devours
@@ -226,6 +229,7 @@ citizenship_assimilation = {
 								NOR = {
 									has_trait = trait_mechanical
 									has_trait = trait_machine_unit
+									has_trait = trait_hive_mind
 								}
 							}
 						}
@@ -240,13 +244,20 @@ citizenship_assimilation = {
 							}
 						}
 						AND = {	# Regular Cyborg Assimilation
-							OR = {
-								has_country_flag = flesh_weakened 
-								has_country_flag = tec_cybernetic_t1_assimilation
-								has_country_flag = tec_cybernetic_t2_assimilation
-							}
+							has_country_flag = tec_cybernetic_t1_assimilation
 							root = {
 								NOR = {
+									has_trait = trait_cybernetic
+									has_trait = trait_mechanical
+									has_trait = trait_machine_unit
+								}
+							}
+						}
+						AND = {	# Adv Cyborg Assimilation
+							has_country_flag = tec_cybernetic_t2_assimilation
+							root = {
+								NOR = {
+									has_trait = trait_tec_advanced_cyborg
 									has_trait = trait_mechanical
 									has_trait = trait_machine_unit
 								}
@@ -274,12 +285,13 @@ citizenship_assimilation = {
 							has_country_flag = tec_biopsionic_assimilation
 							root = {
 								NOR = {
+									has_trait = trait_tec_pure_psionic
 									has_trait = trait_mechanical
 									has_trait = trait_machine_unit
 								}
 							}
 						}
-						AND = { # Biological assimilation
+						AND = { # Biological assimilation (total organic)
 							has_country_flag = tec_biological_assimilation
 							root = {
 								NOR = {
@@ -292,7 +304,7 @@ citizenship_assimilation = {
 						has_country_flag = tec_synthetic_assimilation
 						# Replicant Assimilation (total)
 						has_country_flag = tec_replicant_assimilation
-						# Replicant Assimilation
+						# Replicant Assimilation (total)
 						has_country_flag = tec_total_assimilation
 					}
 				}
@@ -671,7 +683,7 @@ citizenship_assimilation = {
 					is_regular_empire = yes
 				}
 			}
-			if = {
+			if = {		# Test
 				limit = {
 					from = {
 						OR = {
@@ -1210,11 +1222,7 @@ citizenship_assimilation = {
 		modifier = {
 			factor = 0
 			from = {
-				OR = {
-					has_valid_civic = civic_hive_devouring_swarm
-					has_valid_civic = civic_fanatic_purifiers
-					has_valid_civic = civic_machine_terminator
-				}
+				is_homicidal = yes
 			}
 		}
 		modifier = {	# Prevents ais from autoassimilating at start
