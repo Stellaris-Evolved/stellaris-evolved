@@ -336,6 +336,8 @@ druid = {					#
 		planet_amenities_add = 3
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
+
+	inline_script = jobs/effects/type/inline_evolved_priest_effect
 	
 	weight = {
 		weight = @worker_job_weight
@@ -411,16 +413,7 @@ tec_peasant = {				#
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				has_policy_flag = economic_stance_planned
-			}
-		}
-		planet_amenities_add = 1
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
-	}
+	inline_script = jobs/effects/type/inline_evolved_clerk_effect
 
 	weight = {
 		weight = @clerk_job_weight
@@ -595,31 +588,24 @@ tec_labrat = {				# Creative Testing
 		upkeep = {
 			consumer_goods = 2
 		}
-		upkeep = {
-			trigger = {
-				planet = {
-					has_planet_flag = has_science_ministry
-				}
-			}
+		inline_script = {
+			script = jobs/resources/inline_evolved_science_requisition_resources
 			consumer_goods = 1
+			energy = 0
+			mult = 1
 		}
 	}
 
 	overlord_resources = {
 		category = planet_requisitioned_research
-		produces = {
-			trigger = {
-				planet = {
-					has_planet_flag = has_science_ministry
-				}
-			}
-			physics_research = 2
-			engineering_research = 2
-			society_research = 2
+		inline_script = {
+			script = jobs/resources/inline_evolved_science_requisition_overlord_resources
+			research = 2
+			mult = 1
 		}
 	}
 
-	inline_script = jobs/effects/inline_evolved_tec_capitalized_innovation
+	inline_script = jobs/effects/type/inline_evolved_researcher_effect
 	
 	weight = {
 		# Specialist weight
@@ -690,13 +676,10 @@ tec_reef_miner = {			# Aquatic
 			#	minerals = 1
 			#}
 		# /
-		produces = {
-			trigger = {
-				planet = {
-					has_planet_flag = has_material_requisitorium
-				}
-			}
+		inline_script = {
+			script = jobs/resources/inline_evolved_material_miner_requisition_resources
 			minerals = @requisitorium_minerals_reduction
+			mult = 1
 		}
 	}
 
@@ -720,42 +703,7 @@ tec_reef_miner = {			# Aquatic
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				has_valid_civic = civic_tec_corporate_land_of_opportunity
-			}
-			planet = {
-				OR = {
-					is_capital = yes
-					tec_has_mining_designation = yes
-				}
-			}
-		}
-		trade_value_add = 1
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_mercantile_trickle_up_economics }
-		}
-		trade_value_add = 1
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				has_valid_civic = civic_agrarian_idyll
-			}
-		}
-		planet_amenities_add = 2
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
-	}
+	inline_script = jobs/effects/type/inline_evolved_miner_effect
 
 	weight = {
 		weight = @worker_job_weight
@@ -820,7 +768,7 @@ tec_planner = {				# Outreach
 	possible_precalc = can_fill_worker_job
 
 	resources = {
-		category = planet_jobs_productive
+		category = planet_colonists
 		produces = {
 			unity = 4
 		}
@@ -1050,16 +998,7 @@ tec_planner = {				# Outreach
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				has_valid_civic = civic_tec_corporate_settlers
-			}
-		}
-		trade_value_add = 5
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
+	inline_script = jobs/effects/inline_evolved_tec_corporate_settlers
 
 	weight = {
 		weight = @specialist_job_weight
@@ -1129,6 +1068,21 @@ tec_hired_miner = {
 			minerals = 2
 			multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
 		}
+
+		inline_script = {
+			script = jobs/resources/inline_evolved_material_miner_requisition_resources
+			minerals = @[ requisitorium_minerals_reduction / 2 ]
+			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+		}
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_minerals
+		inline_script = {
+			script = jobs/resources/inline_evolved_material_miner_requisition_overlord_resources
+			minerals = @[ requisitorium_minerals_overlord / 2 ]
+			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+		}
 	}
 
 	triggered_planet_modifier = {
@@ -1146,6 +1100,9 @@ tec_hired_miner = {
 		trade_value_add = 1
 		mult = value:tec_hired_job_trade_value
 	}
+
+	inline_script = jobs/effects/type/inline_evolved_miner_effect
+
 	weight = {
 		weight = @worker_job_weight
 		mult = value:job_weights_modifier|JOB|tec_hired_miner|RESOURCE|minerals|FACTOR|0.75|
@@ -1217,15 +1174,21 @@ tec_hired_farmer = {
 			food = 3
 			multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
 		}
-	}
-	
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_valid_civic = civic_agrarian_idyll }
+
+		inline_script = {
+			script = jobs/resources/inline_evolved_produce_farmer_requisition_resources
+			food = @[ requisitorium_food_reduction / 2]
+			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
 		}
-		planet_amenities_add = 2
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_food
+		inline_script = {
+			script = jobs/resources/inline_evolved_produce_farmer_requisition_overlord_resources
+			food = @[ requisitorium_food_overlord / 2 ]
+			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+		}
 	}
 
 	triggered_planet_modifier = {
@@ -1244,6 +1207,8 @@ tec_hired_farmer = {
 		mult = value:tec_hired_job_trade_value
 		
 	}
+
+	inline_script = jobs/effects/type/inline_evolved_farmer_effect
 	
 	weight = {
 		weight = @worker_job_weight
@@ -1341,6 +1306,22 @@ tec_hired_technician = {
 			energy = 3
 			multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
 		}
+
+
+		inline_script = {
+			script = jobs/resources/inline_evolved_energy_requisition_resources
+			energy = @[ requisitorium_energy_reduction / 2 ]
+			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+		}
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_energy
+		inline_script = {
+			script = jobs/resources/inline_evolved_energy_requisition_overlord_resources
+			energy = @[ requisitorium_energy_overlord / 2 ]
+			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+		}
 	}
 
 	triggered_planet_modifier = {
@@ -1360,21 +1341,7 @@ tec_hired_technician = {
 		
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				tec_is_quantum_alloys_empire = yes
-			}
-			planet = {
-				NOR = {
-					has_active_building = building_coordinated_fulfillment_center_1
-					has_active_building = building_coordinated_fulfillment_center_2
-				}
-			}
-		}
-		planet_metallurgists_produces_mult = @tec_quantum_technician
-	}
+	inline_script = jobs/effects/type/inline_evolved_technician_effect
 
 	weight = {
 		weight = @worker_job_weight
@@ -1458,6 +1425,13 @@ tec_hired_soldier = {
 		}
 	}
 
+	triggered_pop_modifier = {
+		potential = {
+			always = yes
+		}
+		pop_defense_armies_add = 1
+		mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+
 	triggered_country_modifier = {
 		potential = {
 			always = yes
@@ -1481,30 +1455,9 @@ tec_hired_soldier = {
 		trade_value_add = 1
 		mult = value:tec_hired_job_trade_value
 	}
-
-	triggered_country_modifier = {
-		potential = {
-			planet = {
-				exists = owner 
-				owner = { has_technology = "tech_ground_defense_planning" }
-			}
-		}
-		modifier = {
-			country_naval_cap_add = 2
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				has_valid_civic = civic_tec_martial_brotherhood
-			}
-		}
-		planet_amenities_add = 1
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
-	}
 	
+	inline_script = jobs/effects/type/inline_evolved_soldier_effect
+
 	weight = {
 		weight = @soldier_job_weight
 		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
@@ -1610,18 +1563,30 @@ tec_hired_foundry = {
 		}
 	
 		# Quantum alloys
-			upkeep = {
-				trigger = {
-					exists = owner
-					owner = {
-						tec_is_quantum_alloys_empire = yes
-					}
-				}
-				minerals = -1.5
-				energy = 3
-				multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+			inline_sscript = {
+				script = jobs/resources/inline_evolved_tec_quantum_alloys
+				count = 1.5
+				mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+				trigger = ""
 			}
 		# /
+
+		inline_script = {
+			script = jobs/resources/inline_evolved_material_foundry_requisition_resources
+			minerals = 1
+			food = 0
+			alloys = @[ requisitorium_alloys_reduction / 2 ]
+			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+		}
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_alloys
+		inline_script = {
+			script = jobs/resources/inline_evolved_material_foundry_requisition_overlord_resources
+			alloys = @[ requisitorium_alloys_overlord / 2]
+			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+		}
 	}
 
 	triggered_planet_modifier = {
@@ -1639,7 +1604,8 @@ tec_hired_foundry = {
 		trade_value_add = 1
 		mult = value:tec_hired_job_trade_value
 	}
-
+	
+	inline_script = jobs/effects/type/inline_evolved_foundry_effect
 
 	weight = {
 		# Specialist job Weight
@@ -1686,6 +1652,23 @@ tec_hired_catalytic = {
 			food = 4
 			multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
 		}
+
+		inline_script = {
+			script = jobs/resources/inline_evolved_material_foundry_requisition_resources
+			minerals = 0
+			food = 1.5
+			alloys = @[ requisitorium_alloys_reduction / 2 ]
+			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+		}
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_alloys
+		inline_script = {
+			script = jobs/resources/inline_evolved_material_foundry_requisition_overlord_resources
+			alloys = @[ requisitorium_alloys_overlord / 2]
+			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+		}
 	}
 
 	
@@ -1704,6 +1687,8 @@ tec_hired_catalytic = {
 		trade_value_add = 1
 		mult = value:tec_hired_job_trade_value
 	}
+
+	inline_script = jobs/effects/type/inline_evolved_foundry_effect
 
 	weight = {
 		# Specialist job Weight
@@ -1752,6 +1737,22 @@ tec_hired_artisan = {
 			multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
 			trigger = ""
 		}
+
+		inline_script = {
+			script = jobs/resources/inline_evolved_produce_artisan_requisition_resources
+			minerals = 0.5
+			consumer_goods = @[ requisitorium_consumer_goods_reduction / 2 ]
+			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+		}
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_consumer_goods
+		inline_script = {
+			script = jobs/resources/inline_evolved_produce_artisan_requisition_overlord_resources
+			alloys = @[ requisitorium_consumer_goods_overlord / 2]
+			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+		}
 	}
 	
 	triggered_planet_modifier = {
@@ -1769,6 +1770,9 @@ tec_hired_artisan = {
 		trade_value_add = 1
 		mult = value:tec_hired_job_trade_value
 	}
+
+	inline_script = jobs/effects/type/inline_evolved_artisan_effect
+	
 
 	weight = {
 		# Specialist job Weight
@@ -1830,27 +1834,20 @@ tec_hired_researcher = {
 			consumer_goods = 1
 			multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
 		}
-		upkeep = {
-			trigger = {
-				planet = {
-					has_planet_flag = has_science_ministry
-				}
-			}
-			consumer_goods = 1
+		inline_script = {
+			script = jobs/resources/inline_evolved_science_requisition_resources
+			consumer_goods = 0.5
+			energy = 0
+			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
 		}
 	}
 
 	overlord_resources = {
 		category = planet_requisitioned_research
-		produces = {
-			trigger = {
-				planet = {
-					has_planet_flag = has_science_ministry
-				}
-			}
-			physics_research = 2
-			engineering_research = 2
-			society_research = 2
+		inline_script = {
+			script = jobs/resources/inline_evolved_science_requisition_overlord_resources
+			research = 1
+			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
 		}
 	}
 
@@ -1870,7 +1867,7 @@ tec_hired_researcher = {
 		mult = value:tec_hired_job_trade_value
 	}
 	
-	inline_script = jobs/effects/inline_evolved_tec_capitalized_innovation
+	inline_script = jobs/effects/type/inline_evolved_researcher_effect
 	
 	weight = {
 		# Specialist weight
@@ -1960,29 +1957,7 @@ tec_hired_entertainer = {
 		mult = value:tec_hired_job_trade_value
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet
-			planet = {
-				OR = {
-					AND = {
-						has_branch_office = yes
-						exists = branch_office_owner
-						branch_office_owner = {
-							is_pleasure_seeker = yes
-						}
-					}
-					owner = {
-						is_pleasure_seeker = yes
-					}
-				}
-			}
-
-		}
-		modifier = {
-			pop_growth_speed = 0.01
-		}
-	}
+	inline_script = jobs/effects/inline_evolved_pleasure_seeker_entertainer
 
 	weight = {
 		# Specialist job Weight
@@ -2073,13 +2048,10 @@ tec_matterminer = {			# Ringworld/Matter Synthesis
 			#	minerals = 1
 			#}
 		# /
-		produces = {
-			trigger = {
-				planet = {
-					has_planet_flag = has_material_requisitorium
-				}
-			}
+		inline_script = {
+			script = jobs/resources/inline_evolved_material_miner_requisition_resources
 			minerals = @requisitorium_minerals_reduction
+			mult = 1
 		}
 	}
 
@@ -2111,6 +2083,8 @@ tec_matterminer = {			# Ringworld/Matter Synthesis
 		trade_value_add = 1
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
 	}
+
+	inline_script = jobs/effects/type/inline_evolved_miner_effect
 	
 	weight = {
 		weight = @worker_job_weight

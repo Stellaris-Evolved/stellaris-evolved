@@ -2,7 +2,7 @@
 # for the purpose of standardization and reducing repetition.
 
 # Below we will document general parameter names used in the inlines in this
-# folder, with the prefix `tec_`
+# folder, with the prefix `inline_evolved_`
 
 # trigger - allows passing a trigger when a job is added/description is displayed.
 	# Some jobs have some innate conditions, the trigger in this cases being extra
@@ -12,7 +12,9 @@
 	# Also useful for capital for conditional hald swaps as seen in regular file.
 # /
 
-# count - ammount of jobs that will given
+# count - amount of jobs that will given
+
+# mult - mult value to pass to the triggered modifiers
 
 # display - specify how the modifier is displayed, mainly if triggered description is added or not.
 	# Valid values: `with_desc` and `no_desc`. When defaults are allowed, will default to `with_desc`
