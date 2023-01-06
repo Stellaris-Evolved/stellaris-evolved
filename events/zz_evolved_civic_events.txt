@@ -1803,153 +1803,6 @@ country_event = {
 # Trait pickers
 
 
-
-
-# Life seeded events
-# ------------------------------------------------------------
-namespace = tec_gaiaseeded
-pop_event = {
-	id = tec_gaiaseeded.1
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		OR = {
-			AND = {
-				has_trait = @trait_tec_natural_sync
-				from = {
-					tec_is_perfect_planet = no
-				}
-			}
-			AND = {
-				has_trait = @trait_tec_natural_sync_neutral
-				from = {
-					tec_is_neutral_planet = no
-				}
-			}
-			AND = {
-				OR = {
-					has_trait = @trait_tec_natural_sync_bad
-				}
-				from = {
-					tec_is_perfect_planet = yes
-					tec_is_neutral_planet = yes
-				}
-			}
-		}
-	}
-
-	immediate = {
-		# Organic void dwellers
-		if = {
-			limit = {
-				has_trait = trait_pc_gaia_preference
-				OR = {
-					has_trait = @trait_tec_natural_sync
-					has_trait = @trait_tec_natural_sync_neutral
-					has_trait = @trait_tec_natural_sync_bad
-				}
-			}
-			# Good
-			if = {
-				limit = {
-					NOT = {
-						has_trait = @trait_tec_natural_sync
-					}
-					from = {
-						tec_is_perfect_planet = yes
-					}
-				}
-				modify_species = {
-					species = this
-					remove_trait = @trait_tec_natural_sync_bad
-				}
-				modify_species = {
-					species = this
-					remove_trait = @trait_tec_natural_sync_neutral
-				}
-				modify_species = {
-					species = this
-					add_trait = @trait_tec_natural_sync
-				}
-			}
-			# Neutral
-			else_if = {
-				limit = {
-					NOT = {
-						has_trait = @trait_tec_natural_sync_bad
-					}
-					from = {
-						tec_is_neutral_planet = yes
-					}
-				}
-				modify_species = {
-					species = this
-					remove_trait = @trait_tec_natural_sync_bad
-				}
-				modify_species = {
-					species = this
-					add_trait = @trait_tec_natural_sync_neutral
-				}
-				modify_species = {
-					species = this
-					remove_trait = @trait_tec_natural_sync
-				}
-			}
-			# Bad
-			else_if = {
-				limit = {
-					NOT = {
-						has_trait = @trait_tec_natural_sync_bad
-					}
-					from = {
-						tec_is_perfect_planet = no
-						tec_is_neutral_planet = no
-					}
-				}
-				modify_species = {
-					species = this
-					add_trait = @trait_tec_natural_sync_bad
-				}
-				modify_species = {
-					species = this
-					remove_trait = @trait_tec_natural_sync_neutral
-				}
-				modify_species = {
-					species = this
-					remove_trait = @trait_tec_natural_sync
-				}
-			}
-		}
-		# if species dont have gaia preference and the natural sync, removes natural sync
-		if = {
-			limit = {
-				NOT = {
-					has_trait = trait_pc_gaia_preference
-				}
-				OR = {
-					has_trait = @trait_tec_natural_sync
-					has_trait = @trait_tec_natural_sync_neutral
-					has_trait = @trait_tec_natural_sync_bad
-				}
-			}
-			modify_species = {
-				species = this
-				remove_trait = @trait_tec_natural_sync_bad
-			}
-			modify_species = {
-				species = this
-				remove_trait = @trait_tec_natural_sync_neutral
-			}
-			modify_species = {
-				species = this
-				remove_trait = @trait_tec_natural_sync
-			}
-		}
-	}
-}
-
 # Dread armies - reanimators
 # ------------------------------------------------------------
 namespace = tec_reanimator
@@ -4928,7 +4781,10 @@ planet_event = {
 	trigger = {
 		has_planet_flag = tec_servitor_snatcher_candidate
 		has_branch_office = yes
-		has_building = building_tec_machinecorp_carebots_2
+		has_holding = {
+			holding = building_tec_machinecorp_carebots_2
+			owner = branch_office_owner
+		}
 		# double check just in case
 		branch_office_owner = {
 			is_gestalt = yes
