@@ -2409,7 +2409,7 @@ country_event = {	# Gamestart
 	is_triggered_only = yes
 
 	trigger = {
-		tec_aiauth_empire = yes
+		tec_is_aiauth_empire = yes
 	}
 
 	immediate = {
@@ -3554,14 +3554,15 @@ country_event = {	# Fixes compat things with guillis/pd overwriting entire plane
 				}
 				if = {
 					limit = {
-						uses_district_set = standard
-						owner = {
-							tec_is_aquatic_empire = no
+						OR = {
+							uses_district_set = standard
+							tec_has_rural_mimics = yes
 						}
 					}
 					add_district_and_planet_size_if_needed_effect = {
 						district = district_farming
 					} 
+					validate_planet_buildings_and_districts = yes
 				}
 			}
 		}
@@ -4323,17 +4324,21 @@ country_event = {
 		set_country_flag = tec_wastelander_origin
 		capital_scope = {
 			# +- 2 jobs
-			add_building = building_tec_scavenge_center
+			add_deposit = d_tec_ruined_civillian
+			add_deposit = d_tec_ruined_industry
+			add_deposit = d_tec_ruined_science
 			remove_district = district_mining
+			add_district_and_planet_size_if_needed_effect = {
+				district = district_city
+			}
+			add_building = building_tec_scavenge_center
+			
 
 			# Adds the ruins and deposits
 			add_building = building_tec_ruined_civillian
 			add_building = building_tec_ruined_industry
 			add_building = building_tec_ruined_science
 
-			add_deposit = d_tec_ruined_civillian
-			add_deposit = d_tec_ruined_industry
-			add_deposit = d_tec_ruined_science
 		}
 	}
 }
@@ -4433,17 +4438,39 @@ country_event = {	# Fixes to missing flags - on country yearly pulse
 	}
 }
 
-event = {	# Antiearly unemployment - on 
+country_event = {	# Antiearly unemployment - on 
 	id = tec_fix.20
 	hide_window = yes
 	is_triggered_only = yes
 	
 	immediate = {
-		every_playable_country = {
+		add_modifier = {
+			modifier = modifier_tec_unemployment_fix
+			months = 1
+		}
+	}
+}
+
+country_event = { # Fix districts and buildings
+	id = tec_fix.21
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		every_owned_planet = {
 			add_modifier = {
-				modifier = modifier_tec_unemployment_fix
-				months = 1
+				modifier = tec_planet_validation_fix
+				days = -1
 			}
+			calculate_modifier = yes
+			validate_planet_buildings_and_districts = yes
+			every_owned_pop = {
+				limit = { is_unemployed = yes }
+				clear_pop_category = yes
+			}
+			check_planet_employment = yes
+			remove_modifier = tec_planet_validation_fix
+			calculate_modifier = yes
 		}
 	}
 }
