@@ -13,10 +13,10 @@ district_tec_rw_trade = { # megacorp
 		tec_uses_ringworld_districts = yes
 		exists = from
 		from = {
-			is_megacorp = yes
-			is_regular_empire = yes
+			tec_uses_trade_value = yes
 			is_fallen_empire = no
 		}
+		tec_is_unspecced_ringworld = no
 		tec_is_precursor_ringworld = no
 	}
 
@@ -24,10 +24,10 @@ district_tec_rw_trade = { # megacorp
 		tec_uses_ringworld_districts = yes
 		exists = owner
 		owner = {
-			is_megacorp = yes
-			is_regular_empire = yes
+			tec_uses_trade_value = yes
 			is_fallen_empire = no
 		}
+		tec_is_unspecced_ringworld = no
 		tec_is_precursor_ringworld = no
 	}
 
@@ -41,25 +41,15 @@ district_tec_rw_trade = { # megacorp
 		category = planet_districts
 		cost = {
 			minerals = @rw_cost
-			#rare_crystals = @rw_cost_sr
+			rare_crystals = @rw_cost_sr
 		}
 		upkeep = {
 			energy = @rw_maintenance
-			#rare_crystals = @rw_maintenance_sr
+			rare_crystals = @rw_maintenance_sr
 		}
 	}
 
-	triggered_desc = {
-		trigger = {
-			planet = {
-				OR = {
-					has_deposit = d_tec_rw_minor_structural_damage
-					has_deposit = d_tec_rw_major_structural_damage
-				}
-			}
-		}
-		text = tec_damage_deposit_ringworld_section_desc
-	}
+
 	triggered_desc = {
 		trigger = {
 			planet = {
@@ -73,103 +63,43 @@ district_tec_rw_trade = { # megacorp
 	# Modifiers
 		# Standard
 			planet_modifier = {
-				planet_housing_add = 25
-			}
-
-			triggered_planet_modifier = {
-				potential = {
-					has_deposit = d_tec_rw_minor_structural_damage
-				}
-				modifier = {
-					planet_housing_add = -5		#15>20
-				}
-			}
-			triggered_planet_modifier = {
-				potential = {
-					has_deposit = d_tec_rw_major_structural_damage
-				}
-				modifier = {
-					planet_housing_add = -5		#20>35
-				}
+				planet_housing_add = 10
 			}
 		# /
-		inline_script = {
-			script = districts/inline_evolved_habitation_housing_modifiers
-			count = 5
-			trigger = "
-				NOT = {
-					has_deposit = d_tec_rw_minor_structural_damage
-				}
-			"
-		}
-
-		inline_script = districts/effects/inline_evolved_tec_artifice_2
 	# /
 	# Jobs
 		inline_script = {
 			script = jobs/inline_evolved_clerk
-			count = 10
+			count = 8
 			mult = 1
 			display = with_desc
 			trigger = ""
 		}
 
 		inline_script = {
-			script = jobs/inline_evolved_clerk
-			count = 5
-			mult = 1
-			display = no_desc
-			trigger = "
-				owner = { is_fallen_empire = no }
-			"
-		}
-
-		inline_script = {
-			script = jobs/inline_evolved_clerk
-			count = -4
-			mult = 1
-			display = no_desc
-			trigger = "
-				has_deposit = d_tec_rw_minor_structural_damage
-			"
-		}
-
-		inline_script = {
-			script = jobs/inline_evolved_clerk
-			count = -4
-			mult = 1
-			display = no_desc
-			trigger = "
-				has_deposit = d_tec_rw_major_structural_damage
-			"
-		}
-
-		inline_script = {
-			script = jobs/inline_evolved_clerk
-			count = 3
-			mult = 1
-			display = no_desc
-			trigger = "
-				NOT = {
-					has_deposit = d_tec_rw_minor_structural_damage
-				}
-				owner = { has_active_tradition = tr_mercantile_trickle_up_economics }
-			"
+			script = districts/effects/inline_evolved_mercantile_trickle_up_economics
+			count = 2
+			trigger = ""
 		}
 
 		inline_script = {
 			script = jobs/inline_evolved_job
 			job = merchant
-			count = 1
+			count = 2
 			mult = 1
 			display = with_desc
 			trigger = "
 				exists = owner
 				owner = {
 					is_regular_empire = yes
-					has_active_tradition = tr_mercantile_commercial_enterprise
 				}
 			"
+		}
+
+		inline_script = {
+			script = districts/effects/inline_evolved_mercantile_commercial_enterprise
+			trigger = ""
+			count = 2
 		}
 	# /
 	# Planet
@@ -225,8 +155,8 @@ district_tec_rw_replicator = {
 
 	conversion_ratio = 1
 	convert_to = {
+		district_tec_rw_forge
 		district_tec_rw_refinery
-		district_tec_rw_naval
 	}
 
 	resources = {
@@ -244,17 +174,6 @@ district_tec_rw_replicator = {
 	triggered_desc = {
 		trigger = {
 			planet = {
-				OR = {
-					has_deposit = d_tec_rw_minor_structural_damage
-					has_deposit = d_tec_rw_major_structural_damage
-				}
-			}
-		}
-		text = tec_damage_deposit_ringworld_section_desc
-	}
-	triggered_desc = {
-		trigger = {
-			planet = {
 				has_deposit = d_arcane_generator
 				NOT = { has_district = district_tec_rw_replicator }
 			}
@@ -267,30 +186,7 @@ district_tec_rw_replicator = {
 			planet_modifier = {
 				planet_housing_add = 15
 			}
-			triggered_planet_modifier = {
-				potential = {
-					has_deposit = d_tec_rw_minor_structural_damage
-				}
-				planet_housing_add = -2
-			}
-			triggered_planet_modifier = {
-				potential = {
-					has_deposit = d_tec_rw_major_structural_damage
-				}
-				planet_housing_add = -3
-			}
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						is_machine_empire = yes
-					}
-					NOT = { 
-						has_deposit = d_tec_rw_major_structural_damage 
-					}
-				}
-				planet_housing_add = 5
-			}
+			inline_script = districts/effects/inline_evolved_tec_ringworld_damaged_section_menial
 		# /
 		# Traditions
 		# /
@@ -410,6 +306,8 @@ district_tec_rw_administrative = {
 	conversion_ratio = 1
 	convert_to = {
 		district_tec_rw_administrative_gestalt
+		district_rw_farming
+		district_tec_rw_industry
 	}
 	
 	resources = {
@@ -422,6 +320,16 @@ district_tec_rw_administrative = {
 			energy = @rw_maintenance
 			rare_crystals = @rw_maintenance_sr
 		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			planet = {
+				has_deposit = d_arcane_generator
+				NOT = { has_district = district_tec_rw_administrative }
+			}
+		}
+		text = arcane_generator_upkeep_desc
 	}
 
 	# Modifiers
@@ -442,6 +350,7 @@ district_tec_rw_administrative = {
 			display = with_desc
 			trigger = ""
 		}
+		inline_script =  districts/effects/inline_evolved_tec_ringworld_damaged_section
 	# /
 	# Planet
 		triggered_planet_modifier = {
@@ -483,6 +392,8 @@ district_tec_rw_administrative_gestalt = {
 	conversion_ratio = 1
 	convert_to = {
 		district_tec_rw_administrative
+		district_rw_farming
+		district_tec_rw_industry
 	}
 
 	resources = {
@@ -495,6 +406,16 @@ district_tec_rw_administrative_gestalt = {
 			energy = @rw_maintenance
 			rare_crystals = @rw_maintenance_sr
 		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			planet = {
+				has_deposit = d_arcane_generator
+				NOT = { has_district = district_tec_rw_administrative_gestalt }
+			}
+		}
+		text = arcane_generator_upkeep_desc
 	}
 
 	# Modifiers
@@ -553,7 +474,7 @@ district_tec_rw_research = {
 	conversion_ratio = 1
 	convert_to = {
 		district_rw_generator
-		district_tec_rw_forge
+		district_tec_rw_naval
 	}
 
 	resources = {
@@ -572,7 +493,7 @@ district_tec_rw_research = {
 		trigger = {
 			planet = {
 				has_deposit = d_arcane_generator
-				NOT = { has_district = district_rw_science }
+				NOT = { has_district = district_tec_rw_research }
 			}
 		}
 		text = arcane_generator_upkeep_desc
@@ -630,7 +551,7 @@ district_tec_rw_refinery = {
 	conversion_ratio = 1
 	convert_to = {
 		district_tec_rw_replicator
-		district_tec_rw_naval
+		district_tec_rw_forge
 	}
 
 	resources = {
@@ -717,8 +638,9 @@ district_tec_rw_forge = {
 
 	conversion_ratio = 1
 	convert_to = {
-		district_tec_rw_research
-		district_rw_generator
+		district_tec_rw_refinery
+		district_tec_rw_replicator
+		district_rw_industrial
 	}
 
 	resources = {
@@ -795,8 +717,10 @@ district_tec_rw_industry = {
 
 	conversion_ratio = 1
 	convert_to = {
-		district_tec_rw_refinery
-		district_tec_rw_replicator
+		district_rw_farming
+		district_tec_rw_administrative
+		district_tec_rw_administrative_gestalt
+		district_rw_industrial
 	}
 
 	resources = {
@@ -872,8 +796,8 @@ district_tec_rw_naval = {
 
 	conversion_ratio = 1
 	convert_to = {
-		district_tec_rw_refinery
-		district_tec_rw_replicator
+		district_tec_rw_research
+		district_rw_generator
 	}
 
 	resources = {
@@ -975,8 +899,8 @@ district_tec_rw_leisure = {
 
 	conversion_ratio = 1
 	convert_to = {
-		district_tec_rw_unity_gestalt
-		district_rw_farming
+		district_rw_industrial
+		district_tec_rw_maintenance
 	}
 
 	resources = {
@@ -1072,7 +996,7 @@ district_tec_rw_leisure = {
 	}
 }
 
-district_tec_rw_unity_gestalt = {
+district_tec_rw_maintenance = {
 	icon = district_arcology_leisure 	# CHANGE THIS
 	base_buildtime = @rw_district_buildtime
 	is_capped_by_modifier = no
@@ -1104,6 +1028,12 @@ district_tec_rw_unity_gestalt = {
 		tec_is_precursor_ringworld = no
 	}
 
+	conversion_ratio = 1
+	convert_to = {
+		district_rw_industrial
+		district_tec_rw_leisure
+	}
+
 	resources = {
 		category = planet_districts
 		cost = {
@@ -1120,7 +1050,7 @@ district_tec_rw_unity_gestalt = {
 		trigger = {
 			planet = {
 				has_deposit = d_arcane_generator
-				NOT = { has_district = district_tec_rw_unity_gestalt }
+				NOT = { has_district = district_tec_rw_maintenance }
 			}
 		}
 		text = arcane_generator_upkeep_desc
@@ -1134,24 +1064,32 @@ district_tec_rw_unity_gestalt = {
 		# /
 	# /
 	# Jobs
-		# Hive
-			inline_script = {
-				script = jobs/inline_evolved_synapse
-				count = 10
-				mult = 1
-				display = with_desc
-				trigger = ""
-			}
-		# /
-		# Machine
-			inline_script = {
-				script = jobs/inline_evolved_coordinator
-				count = 10
-				mult = 1
-				display = with_desc
-				trigger = ""
-			}
-		# /
+		inline_script = {
+			script = jobs/inline_evolved_job
+			job = tec_spareparts_drone
+			count = 3
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+		inline_script = {
+			script = jobs/inline_evolved_maintenance_drone
+			count = 3
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+
+		inline_script = {
+			script = jobs/inline_evolved_technician
+			regular_count = 4
+			hive_count = 4
+			machine_count = 4
+			machine_aquatic_count = 4
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
 	# /
 	# Planet
 		triggered_planet_modifier = {
@@ -1165,387 +1103,3 @@ district_tec_rw_unity_gestalt = {
 	# /
 }
 
-# --------------- Removed
-district_rw_commercial = {
-	base_buildtime = @rw_district_buildtime
-	is_capped_by_modifier = no
-
-	show_on_uncolonized = {
-		always = no
-		tec_uses_ringworld_districts = yes
-		exists = from
-		from = {
-			is_megacorp = yes
-			is_regular_empire = yes
-			is_fallen_empire = no
-		}
-		tec_is_specced_ringworld = yes
-		tec_is_precursor_ringworld = no
-	}
-
-	potential = {
-		always = no
-		tec_uses_ringworld_districts = yes
-		exists = owner
-		owner = {
-			is_megacorp = yes
-			is_regular_empire = yes
-			is_fallen_empire = no
-		}
-		tec_is_specced_ringworld = yes
-		tec_is_precursor_ringworld = no
-	}
-
-	convert_to = {
-		district_rw_city
-		district_rw_hive
-		district_rw_commercial
-	}
-
-	resources = {
-		category = planet_districts
-		cost = {
-			minerals = @rw_cost
-		#	rare_crystals = @rw_cost_sr
-		}
-		upkeep = {
-			energy = @rw_maintenance
-		#	rare_crystals = @rw_maintenance_sr
-		}
-	}
-
-	triggered_planet_modifier = {
-	#	planet_housing_add = 20
-	#	job_merchant_add = 5
-	#	job_artisan_add = 5
-	#	job_clerk_add = 10
-		planet_housing_add = 40
-		job_merchant_add = 5
-		job_clerk_add = 15
-	}
-
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				has_valid_civic = civic_agrarian_idyll
-			}
-		}
-		modifier = {
-			planet_housing_add = -10
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_regular_empire = yes
-				is_fallen_empire = no
-			}
-		}
-		modifier = {
-			job_clerk_add = 10
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			NOT = {
-				has_deposit = d_tec_rw_minor_structural_damage
-			}
-			exists = owner
-			owner = { has_active_tradition = tr_prosperity_public_works }
-		}
-		modifier = {
-			planet_housing_add = 10
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			NOT = {
-				has_deposit = d_tec_rw_minor_structural_damage
-			}
-			exists = owner
-			owner = {
-				has_technology = tech_housing_1
-			}
-		}
-		modifier = {
-			planet_housing_add = 10
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			NOT = {
-				has_deposit = d_tec_rw_minor_structural_damage
-			}
-			exists = owner
-			owner = {
-				has_technology = tech_housing_2
-				NOT = { has_valid_civic = civic_agrarian_idyll }
-			}
-		}
-		modifier = {
-			planet_housing_add = 10
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			NOT = {
-				has_deposit = d_tec_rw_minor_structural_damage
-			}
-			exists = owner
-			owner = { has_active_tradition = tr_mercantile_trickle_up_economics }
-		}
-		modifier = {
-			job_clerk_add = 10
-		}
-	}
-
-
-	triggered_planet_modifier = {
-		potential = {
-			has_deposit = d_tec_rw_minor_structural_damage
-			owner = {
-				is_regular_empire = yes
-			}
-		}
-		modifier = {
-			planet_housing_add = -5
-			job_clerk_add = -5
-			job_merchant_add = -2
-		}
-	}
-
-
-	triggered_planet_modifier = {
-		potential = {
-			has_deposit = d_tec_rw_major_structural_damage
-			owner = {
-				is_regular_empire = yes
-			}
-		}
-		modifier = {
-			planet_housing_add = -15
-			job_clerk_add = -5
-			job_merchant_add = -3
-		}
-	}
-
-	triggered_desc = {
-		trigger = {
-			planet = {
-				OR = {
-					has_deposit = d_tec_rw_minor_structural_damage
-					has_deposit = d_tec_rw_major_structural_damage
-				}
-			}
-		}
-		text = tec_damage_deposit_ringworld_section_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			planet = {
-				has_deposit = d_arcane_generator
-				NOT = { has_district = district_rw_commercial }
-			}
-		}
-		text = arcane_generator_upkeep_desc
-	}
-
-	triggered_desc = {
-		text = job_merchant_effect_desc
-	}
-
-	triggered_desc = {
-		text = job_artisan_effect_desc
-	}
-
-	triggered_desc = {
-		text = job_clerk_effect_desc
-	}
-
-	ai_weight = {
-		weight = 0
-
-		modifier = {
-			weight = 250
-			owner = {
-				has_monthly_income = {
-					resource = energy
-					value < 200
-				}
-			}
-		}
-
-		modifier = {
-			factor = 0.01
-			OR = {
-				planet = { has_district = district_rw_farming }
-				planet = { has_district = district_rw_science }
-				planet = { has_district = district_rw_generator }
-			}
-		}
-	}
-
-	ai_resource_production = {
-		energy = 10
-		trigger = {
-			always = yes
-		}
-	}
-}
-district_rw_science = {
-	base_buildtime = @rw_district_buildtime
-	is_capped_by_modifier = no
-
-	show_on_uncolonized = {
-		always = no
-		tec_uses_ringworld_districts = yes
-		tec_is_science_ringworld = yes
-		tec_is_precursor_ringworld = no
-
-	}
-
-	potential = {
-		always = no
-		tec_uses_ringworld_districts = yes
-		tec_is_science_ringworld = yes
-		tec_is_precursor_ringworld = no
-	}
-
-	resources = {
-		category = planet_districts
-		cost = {
-			minerals = @rw_cost
-			exotic_gases = @rw_cost_sr
-		}
-		upkeep = {
-			energy = @rw_maintenance
-			exotic_gases = @rw_maintenance_sr
-		}
-	}
-
-	triggered_planet_modifier = {
-		planet_housing_add = 30
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_regular_empire = yes }
-		}
-		modifier = {
-			job_researcher_add = 28
-			job_head_researcher_add = 2
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_hive_empire = yes }
-		}
-		modifier = {
-			job_brain_drone_add = 30
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_machine_empire = yes }
-		}
-		modifier = {
-			job_calculator_add = 30
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			NOT = {
-				has_deposit = d_tec_rw_major_structural_damage
-			}
-		}
-		planets_physics_research_produces_mult = 0.05
-		planets_society_research_produces_mult = 0.05
-		planets_engineering_research_produces_mult = 0.05
-	}
-
-	triggered_desc = {
-		trigger = {
-			planet = {
-				has_deposit = d_arcane_generator
-				NOT = { has_district = district_rw_science }
-			}
-		}
-		text = arcane_generator_upkeep_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_regular_empire = yes }
-		}
-		text = job_head_researcher_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_regular_empire = yes }
-		}
-		text = job_researcher_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_hive_empire = yes }
-		}
-		text = job_brain_drone_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_machine_empire = yes }
-		}
-		text = job_calculator_effect_desc
-	}
-
-	ai_weight = {
-		weight = 0
-
-		modifier = {
-			weight = 250
-			owner = {
-				has_monthly_income = {
-					resource = consumer_goods
-					value > 50
-				}
-			}
-		}
-
-		modifier = {
-			factor = 0.01
-			OR = {
-				planet = { has_district = district_rw_farming }
-				planet = { has_district = district_rw_commercial }
-				planet = { has_district = district_rw_generator }
-			}
-		}
-	}
-
-	ai_resource_production = {
-		exotic_gases = 1
-		trigger = {always = yes }
-	}
-
-}
