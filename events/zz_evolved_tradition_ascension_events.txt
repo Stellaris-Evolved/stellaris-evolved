@@ -6197,8 +6197,10 @@ country_event = { # T2A Situation finished
 		every_country = {
 			limit = {
 				is_ai = no
-				NOT = {
+				NOR = {
 					is_same_value = root
+					# TO DO policy for muting other empire things 
+					has_country_flag = tec_mute_empire_announces
 				}
 				has_communications = root
 			}
@@ -9791,7 +9793,10 @@ country_event = { # # T1 picked - og utopia.2600
 			event_target:new_situation = {
 				set_situation_locked = no
 			}
-		}	
+		}
+		allow = {
+			has_technology = tech_psionic_theory
+		}
 	}
 
 	option = {
@@ -9818,7 +9823,42 @@ country_event = { # # T1 picked - og utopia.2600
 			event_target:new_situation = {
 				set_situation_locked = no
 			}
-		}	
+		}
+		allow = {
+			has_technology = tech_psionic_theory
+		}
+	}
+
+	option = {
+		name = "tec_psionic_path.100.c"
+		custom_tooltip = "tec_psionic_path.100.c.tooltip"
+		icon = {
+			icon = GFX_situation_approach_research
+			icon_background = GFX_situation_approach_bg_red
+			text = set_situation_approach_icon_text
+		}
+		trigger = {
+			NOT = {
+				has_technology = tech_psionic_theory
+			}
+		}
+		hidden_effect = { 
+			save_event_target_as = tec_target_country
+			event_target:tec_target_country = {
+				start_situation = {
+					type = situation_tec_psionic_path_t1
+					target = event_target:tec_target_country.capital_scope
+					effect = {
+						save_event_target_as = new_situation
+						set_situation_approach = situation_approach_tec_psionic_path_t1_notech
+						set_situation_locked = no
+					}
+				}
+			}
+			event_target:new_situation = {
+				set_situation_locked = no
+			}
+		}
 	}
 }
 
@@ -12861,34 +12901,486 @@ namespace = tec_replicant_path
 country_event = { # Biosynths on pick
 	id = tec_replicant_path.300
 	title = "tec_replicant_path.300.name"
-	desc = "tec_replicant_path.300.desc"
-	picture = GFX_evt_cybernetics
+	desc = {
+		text = "tec_replicant_path.300.desc"
+		trigger = {
+			always = yes
+		}
+	}
+	desc = {
+		text = "tec_replicant_path.300.desc.genetics"
+		trigger = {
+			always = no
+		}
+	}
+	desc = {
+		text = "tec_replicant_path.300.desc.cybernetics"
+		trigger = {
+			always = no
+		}
+	}
+	desc = {
+		text = "tec_replicant_path.300.desc.replicant"
+		trigger = {
+			always = no
+		}
+	}
+	picture = GFX_evt_scientific_experiments
 	show_sound = event_synthetic_evolution
 	trackable = yes
 
 	is_triggered_only = yes
 
+	#option = {
+		#name = "tec_replicant_path.300.a"
+		#hidden_effect = {
+		#	save_event_target_as = tec_replicant_owner
+		#}
+		#capital_scope = {
+		#	enable_special_project = {
+		#		name = "TEC_REPLICANT_PROJECT"
+		#		location = this
+		#		owner = root
+		#	}
+		#}
+	#}
+
 	option = {
 		name = "tec_replicant_path.300.a"
-		hidden_effect = {
-			save_event_target_as = tec_replicant_owner
+		custom_tooltip = "tec_replicant_path.300.a.tooltip"
+		icon = {
+			icon = GFX_situation_approach_tec_ai
+			icon_background = GFX_situation_approach_bg_tec_blue
+			text = set_situation_approach_icon_text
 		}
-		capital_scope = {
-			enable_special_project = {
-				name = "TEC_REPLICANT_PROJECT"
-				location = this
-				owner = root
+		hidden_effect = { 
+			save_event_target_as = tec_target_country
+			event_target:tec_target_country = {
+				start_situation = {
+					type = situation_tec_replicant_path_t2
+					target = event_target:tec_target_country.capital_scope
+					effect = {
+						save_event_target_as = new_situation
+						set_situation_approach = situation_approach_tec_replicant_path_t2_neutral
+						set_situation_locked = no
+					}
+				}
+			}
+			event_target:new_situation = {
+				set_situation_locked = no
+			}
+		}
+		allow = {
+			has_technology = tech_neuro_quantum_links
+			has_technology = tech_gene_tailoring
+		}
+	}
+
+	option = {
+		name = "tec_replicant_path.300.b"
+		custom_tooltip = "tec_replicant_path.300.b.tooltip"
+		icon = {
+			icon = GFX_situation_approach_research
+			icon_background = GFX_situation_approach_bg_red
+			text = set_situation_approach_icon_text
+		}
+		trigger = {
+			NOR = {
+				has_technology = tech_neuro_quantum_links
+				has_technology = tech_gene_tailoring
+			}
+		}
+		hidden_effect = { 
+			save_event_target_as = tec_target_country
+			event_target:tec_target_country = {
+				start_situation = {
+					type = situation_tec_replicant_path_t2
+					target = event_target:tec_target_country.capital_scope
+					effect = {
+						save_event_target_as = new_situation
+						set_situation_approach = situation_approach_tec_replicant_path_t2_notech
+						set_situation_locked = no
+					}
+				}
+			}
+			event_target:new_situation = {
+				set_situation_locked = no
 			}
 		}
 	}
 }
 
 # T3 situation
-# 10%
-# 25% - Elections
-# 50%
-# 75% - Results
-# 90% - Preparing population
+situation_event = { # 10%
+	id = tec_replicant_path.30010
+	title = "tec_replicant_path.30010.name"
+	desc = "tec_replicant_path.30010.desc"
+
+	picture = GFX_evt_scientific_experiments
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+
+	option = {
+		name = tec_replicant_path.30010.a
+		custom_tooltip = tec_replicant_path.30010.a.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_ai
+			icon_background = GFX_situation_approach_bg_green
+			text = set_situation_approach_icon_text
+		}
+		hidden_effect = {
+			set_situation_flag = situation_tec_replicant_path_t2_unlock_approachs
+		}
+		set_situation_approach = situation_approach_tec_replicant_path_t2_slow
+	}
+	option = {
+		name = tec_replicant_path.30010.b
+		custom_tooltip = tec_replicant_path.30010.b.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_ai
+			icon_background = GFX_situation_approach_bg_red
+			text = set_situation_approach_icon_text
+		}
+		hidden_effect = {
+			set_situation_flag = situation_tec_replicant_path_t2_unlock_approachs
+		}
+		set_situation_approach = situation_approach_tec_replicant_path_t2_fast
+	}
+}
+situation_event = { # 20% - Indicate combined
+	id = tec_replicant_path.30020
+	title = "tec_replicant_path.30020.name"
+	desc = "tec_replicant_path.30020.desc"
+
+	picture = GFX_evt_scientific_experiments
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+
+	option = {
+		name = tec_replicant_path.30020.a
+		custom_tooltip = tec_replicant_path.30010.a.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_ai
+			icon_background = GFX_situation_approach_bg_yellow
+			text = tec_icon_text_good_outcome
+		}
+	}
+}
+situation_event = { # 40% - Indicate upgraded
+	id = tec_replicant_path.30040
+	title = "tec_replicant_path.30040.name"
+	desc = "tec_replicant_path.30040.desc"
+
+	picture = GFX_evt_scientific_experiments
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+
+	option = {
+		name = tec_replicant_path.30040.a
+		custom_tooltip = tec_replicant_path.30040.a.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_ai
+			icon_background = GFX_situation_approach_bg_yellow
+			text = tec_icon_text_good_outcome
+		}
+	}
+}
+situation_event = { # 50% - Decide
+	id = tec_replicant_path.30050
+	title = "tec_replicant_path.30050.name"
+	desc = {
+		text = "tec_replicant_path.30050.desc"
+		trigger = {
+			NOT = {
+				has_situation_flag = situation_tec_replicant_path_t2_picked
+			}
+		}
+	}
+	desc = {
+		text = "tec_replicant_path.30050.desc.revisited"
+		trigger = {
+			has_situation_flag = situation_tec_replicant_path_t2_picked
+		}
+	}
+
+	picture = GFX_evt_genetic_modification
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			situation_event = {
+				id = tec_replicant_path.30051
+			}
+		}
+	}
+
+	option = {
+		name = tec_replicant_path.30050.a.standard
+		custom_tooltip = tec_replicant_path.30050.a.standard.tooltip
+		icon = {
+			icon = GFX_situation_approach_pop
+			icon_background = GFX_situation_approach_bg_tec_blue
+			text = tec_icon_text_good_outcome
+		}
+		hidden_effect = {
+			set_situation_flag = situation_tec_replicant_path_t2_picked
+		}
+	}
+	option = {
+		name = tec_replicant_path.30050.a.combined
+		custom_tooltip = tec_replicant_path.30050.a.combined.tooltip
+		icon = {
+			icon = GFX_situation_approach_this_is_fine
+			icon_background = GFX_situation_approach_bg_tec_blue
+			text = tec_icon_text_good_outcome
+		}
+		hidden_effect = {
+			set_situation_flag = situation_tec_replicant_path_t2_picked
+			owner = {
+				set_country_flag = tec_replicant_combined
+			}
+		}
+	}
+	
+	option = {
+		name = tec_replicant_path.30050.a.upgraded
+		custom_tooltip = tec_replicant_path.30050.a.upgraded.tooltip
+		icon = {
+			icon = GFX_situation_approach_influence
+			icon_background = GFX_situation_approach_bg_tec_blue
+			text = tec_icon_text_good_outcome
+		}
+		hidden_effect = {
+			set_situation_flag = situation_tec_replicant_path_t2_picked
+			owner = {
+				set_country_flag = tec_replicant_upgraded
+			}
+		}
+	}
+}
+situation_event = {
+	id = tec_replicant_path.30051
+	title = "tec_replicant_path.30051.name"
+	desc = {
+		text = "tec_replicant_path.30051.desc.base"
+		trigger = {
+			exists = owner
+			owner = {
+				NOR = {
+					has_country_flag = tec_replicant_combined
+					has_country_flag = tec_replicant_upgraded
+				}
+			}
+		}
+	}
+	desc = {
+		text = "tec_replicant_path.30051.desc.combined"
+		trigger = {
+			exists = owner
+			owner = {
+				has_country_flag = tec_replicant_combined
+			}
+		}
+	}
+	desc = {
+		text = "tec_replicant_path.30051.desc.upgraded"
+		trigger = {
+			exists = owner
+			owner = {
+				has_country_flag = tec_replicant_upgraded
+			}
+		}
+	}
+
+	picture = GFX_evt_genetic_modification
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	option = {
+		name = tec_replicant_path.30051.a.standard
+		custom_tooltip = tec_replicant_path.30051.a.standard.tooltip
+		icon = {
+			icon = GFX_situation_approach_pop
+			icon_background = GFX_situation_approach_bg_tec_blue
+			text = tec_icon_text_good_outcome
+		}
+		trigger = {
+			exists = owner
+			owner = {
+				NOR = {
+					has_country_flag = tec_replicant_combined
+					has_country_flag = tec_replicant_upgraded
+				}
+			}
+		}
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+	option = {
+		name = tec_replicant_path.30051.a.combined
+		custom_tooltip = tec_replicant_path.30051.a.combined.tooltip
+		icon = {
+			icon = GFX_situation_approach_this_is_fine
+			icon_background = GFX_situation_approach_bg_tec_blue
+			text = tec_icon_text_good_outcome
+		}
+		trigger = {
+			exists = owner
+			owner = {
+				has_country_flag = tec_replicant_combined
+			}
+		}
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+	option = {
+		name = tec_replicant_path.30051.a.upgraded
+		custom_tooltip = tec_replicant_path.30051.a.upgraded.tooltip
+		icon = {
+			icon = GFX_situation_approach_influence
+			icon_background = GFX_situation_approach_bg_tec_blue
+			text = tec_icon_text_good_outcome
+		}
+		trigger = {
+			exists = owner
+			owner = {
+				has_country_flag = tec_replicant_upgraded
+			}
+		}
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+	option = {
+		name = tec_replicant_path.30051.b.reroll
+		custom_tooltip = tec_replicant_path.30051.b.reroll.tooltip
+		icon = {
+			icon = GFX_situation_approach_shrug
+			icon_background = GFX_situation_approach_bg_yellow
+			text = tec_icon_text_good_outcome
+		}
+		hidden_effect = {
+			owner = {
+				remove_country_flag = tec_replicant_combined
+				remove_country_flag = tec_replicant_upgraded
+			}
+			situation_event = {
+				id = tec_replicant_path.30050
+			}
+		}
+	}
+}
+situation_event = { # 75% - Results
+	id = tec_replicant_path.30075
+	title = "tec_replicant_path.30075.name"
+	desc = {
+		text = "tec_replicant_path.30075.desc.base"
+		trigger = {
+			exists = owner
+			owner = {
+				NOR = {
+					has_country_flag = tec_replicant_combined
+					has_country_flag = tec_replicant_upgraded
+				}
+			}
+		}
+	}
+	desc = {
+		text = "tec_replicant_path.30075.desc.combined"
+		trigger = {
+			exists = owner
+			owner = {
+				has_country_flag = tec_replicant_combined
+			}
+		}
+	}
+	desc = {
+		text = "tec_replicant_path.30075.desc.upgraded"
+		trigger = {
+			exists = owner
+			owner = {
+				has_country_flag = tec_replicant_upgraded
+			}
+		}
+	}
+
+	picture = GFX_evt_machine_sapience
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+
+	option = {
+		name = tec_replicant_path.30075.a
+		custom_tooltip = tec_replicant_path.30075.a.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_ai
+			icon_background = GFX_situation_approach_bg_tec_blue
+			text = tec_icon_text_good_outcome
+		}
+	}
+}
 
 # Halfway empire situation events
 
@@ -12905,27 +13397,48 @@ country_event = { # Biosynths after ending project
 	is_triggered_only = yes
 
 	immediate = {
-		tec_create_replicant_species = yes
+		hidden_effect = { # Path rewards
+			# Path finished
+			set_country_flag = tec_replicant_path_finished
+			# Create replicants
+			tec_create_replicant_species = yes
+			# lets change the cybernetic fallback moduled don't we?
+				if = {
+					limit = {
+						has_country_flag = tec_cybernetic_submodule_lifespan
+					}
+					remove_country_flag = tec_cybernetic_submodule_lifespan
+					set_country_flag = tec_cybernetic_submodule_knowledge
+				}
+			# /
+			# Flags
+			set_country_flag = tec_replicant_assimilation
+			remove_country_flag = tec_cybernetic_t1_assimilation
+			remove_country_flag = tec_cybernetic_t2_assimilation
+		}	
 	}
 
 	option = {
 		name = "tec_replicant_path.305.a"
 		custom_tooltip = SYNTH_ASSIMILATION_CITIZENSHIP_ENABLED
-		hidden_effect = {
+		hidden_effect = {	
+			# Notification
 			every_country = {
 				limit = {
 					is_ai = no
-					NOT = {
-						is_same_value = root 
+					NOR = {
+						is_same_value = root
+						# TO DO policy for muting other empire things 
+						has_country_flag = tec_mute_empire_announces
 					}
 					has_communications = root
 				}
 				country_event = {
-					id = tec_replicant_path.302
+					id = tec_replicant_path.30501
 					days = 5 
 				}
 				country_event = {
-					id = tec_replicant_path.303
+					id = tec_replicant_path.30502
 					days = 10 
 				}
 			}
@@ -12937,7 +13450,11 @@ country_event = { # Biosynths after ending project
 		every_country = {
 			limit = {
 				is_ai = no
-				NOT = { is_same_value = root }
+				NOR = {
+					is_same_value = root
+					# TO DO policy for muting other empire things 
+					has_country_flag = tec_mute_empire_announces
+				}
 				has_communications = root
 			}
 			country_event = { id = utopia.2555 days = 5 }
@@ -12992,18 +13509,14 @@ country_event = { # Biosynths after ending project
 				country_event = { id = utopia.25571 days = 15 }
 			}
 		}
-		add_modifier = {
-			modifier = modifier_tec_free_modification
-			days = -1
-		}
 	}
 }
 
 # T2 Notification to other empires
 country_event = { # Notification for Other Nations
-	id = tec_replicant_path.302
-	title = tec_replicant_path.302.name
-	desc = tec_replicant_path.302.desc
+	id = tec_replicant_path.30501
+	title = tec_replicant_path.30501.name
+	desc = tec_replicant_path.30501.desc
 
 	desc = {
 		text = utopia.2555.2.desc
@@ -13059,9 +13572,9 @@ country_event = { # Notification for Other Nations
 	}
 }
 country_event = { # Diplomatic Announcement
-	id = tec_replicant_path.303
+	id = tec_replicant_path.30502
 	title = TRANSMISSION
-	desc = "tec_replicant_path.303.desc"
+	desc = "tec_replicant_path.30502.desc"
 
 	diplomatic = yes
 
@@ -13073,13 +13586,13 @@ country_event = { # Diplomatic Announcement
 	}
 
 	option = {
-		name = tec_replicant_path.303.a
+		name = tec_replicant_path.30502.a
 		trigger = {
 			NOT = { is_at_war_with = from }
 		}
 	}
 	option = {
-		name = tec_replicant_path.303.b
+		name = tec_replicant_path.30502.b
 		trigger = {
 			NOT = { is_at_war_with = from }
 		}
@@ -13095,14 +13608,14 @@ country_event = { # Diplomatic Announcement
 	}
 
 	option = {
-		name = tec_replicant_path.303.c
+		name = tec_replicant_path.30502.c
 		trigger = {
 			is_at_war_with = from
 		}
 	}
 
 	option = {
-		name = tec_replicant_path.303.d
+		name = tec_replicant_path.30502.d
 		trigger = {
 			has_valid_civic = civic_machine_terminator
 		}
@@ -13353,7 +13866,7 @@ country_event = { # Biosynths SYNTHETICS after ending project
 # ------------------------------------------------------------ tec_cyberpsionic_path.xxx
 namespace = tec_cyberpsionic_path
 
-# Post-rework
+# T3 picked
 country_event = {	# Provides special project
 	id = tec_cyberpsionic_path.300
 	title = "tec_cyberpsionic_path.300.name"
@@ -13365,99 +13878,783 @@ country_event = {	# Provides special project
 
 	option = {
 		name = "tec_cyberpsionic_path.300.a"
-		hidden_effect = {
-			hidden_effect = {
-				save_event_target_as = flesh_weak_owner
-			}
-			capital_scope = {
-				enable_special_project = {
-					name = TEC_CYBERPSIONIC_TRAIT_PROJECT
-					location = this
-					owner = root
+		custom_tooltip = "tec_cyberpsionic_path.300.a.tooltip"
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_tec_purple
+			text = set_situation_approach_icon_text
+		}
+		hidden_effect = { 
+			save_event_target_as = tec_target_country
+			event_target:tec_target_country = {
+				start_situation = {
+					type = situation_tec_cyberpsionic_path_t2
+					target = event_target:tec_target_country.capital_scope
+					effect = {
+						save_event_target_as = new_situation
+						set_situation_approach = situation_approach_tec_cyberpsionic_path_t2_neutral
+						set_situation_locked = no
+					}
 				}
+			}
+			event_target:new_situation = {
+				set_situation_locked = no
+			}
+		}
+		allow = {
+			has_technology = tech_neuro_quantum_links
+			has_technology = tech_psionic_theory
+		}
+	}
+
+	option = {
+		name = "tec_cyberpsionic_path.300.b"
+		custom_tooltip = "tec_cyberpsionic_path.300.b.tooltip"
+		icon = {
+			icon = GFX_situation_approach_research
+			icon_background = GFX_situation_approach_bg_red
+			text = set_situation_approach_icon_text
+		}
+		trigger = {
+			NOR = {
+				has_technology = tech_neuro_quantum_links
+				has_technology = tech_psionic_theory
+			}
+		}
+		hidden_effect = { 
+			save_event_target_as = tec_target_country
+			event_target:tec_target_country = {
+				start_situation = {
+					type = situation_tec_cyberpsionic_path_t2
+					target = event_target:tec_target_country.capital_scope
+					effect = {
+						save_event_target_as = new_situation
+						set_situation_approach = situation_approach_tec_cyberpsionic_path_t2_notech
+						set_situation_locked = no
+					}
+				}
+			}
+			event_target:new_situation = {
+				set_situation_locked = no
 			}
 		}
 	}
 }
 
+# T3 situation
+	# Note
+		# 10 Discovering our potential
+		# 20 Tools of improvement - gives the side projects
+		# 30 Material creativity
+		# 50 Anomalous combination
+		# 60 Infusion applications - gives the projects
+	# /
+situation_event = { # 10%
+	id = tec_cyberpsionic_path.30010
+	title = "tec_cyberpsionic_path.30010.name"
+	desc = "tec_cyberpsionic_path.30010.desc"
+
+	picture = GFX_evt_scientific_experiments
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+
+	option = {
+		name = tec_cyberpsionic_path.30010.a
+		custom_tooltip = tec_cyberpsionic_path.30010.a.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_green
+			text = set_situation_approach_icon_text
+		}
+		hidden_effect = {
+			set_situation_flag = situation_tec_cyberpsionic_path_t2_unlock_approachs
+		}
+		set_situation_approach = situation_approach_tec_cyberpsionic_path_t2_slow
+	}
+	option = {
+		name = tec_cyberpsionic_path.30010.b
+		custom_tooltip = tec_cyberpsionic_path.30010.b.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_red
+			text = set_situation_approach_icon_text
+		}
+		hidden_effect = {
+			set_situation_flag = situation_tec_cyberpsionic_path_t2_unlock_approachs
+		}
+		set_situation_approach = situation_approach_tec_cyberpsionic_path_t2_fast
+	}
+}
+
+situation_event = { # 20% - gives side projects
+	id = tec_cyberpsionic_path.30020
+	title = "tec_cyberpsionic_path.30020.name"
+	desc = "tec_cyberpsionic_path.30020.desc"
+
+	picture = GFX_evt_scientific_experiments
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+
+	option = {
+		name = tec_cyberpsionic_path.30020.a
+		custom_tooltip = tec_cyberpsionic_path.30020.a.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_green
+			text = tec_icon_text_good_outcome
+		}
+		hidden_effect = {
+			owner = {
+				save_event_target_as = tec_cyberpsionic_owner
+			}
+			event_target:tec_cyberpsionic_owner = {
+				begin_event_chain = {
+					event_chain = tec_cyberpsionic_election_chain
+				}
+				capital_scope = {
+					enable_special_project = {
+						name = TEC_CYBERPSIONIC_ELECTION_A
+						location = this
+						owner = event_target:tec_cyberpsionic_owner
+					}
+					enable_special_project = {
+						name = TEC_CYBERPSIONIC_ELECTION_B
+						location = this
+						owner = event_target:tec_cyberpsionic_owner
+					}
+					enable_special_project = {
+						name = TEC_CYBERPSIONIC_ELECTION_C
+						location = this
+						owner = event_target:tec_cyberpsionic_owner
+					}
+				}
+			}
+		}
+	}
+}
+# 3 Traits
+country_event = {	# power
+	id = tec_cyberpsionic_path.30021
+	title = "tec_cyberpsionic_path.30021.name"
+	desc = {
+		text = tec_cyberpsionic_path.30021.desc
+	}
+	picture = GFX_evt_cybernetics
+	show_sound = event_the_flesh_is_weak
+
+	is_triggered_only = yes
+
+	option = {
+		name = "tec_cyberpsionic_path.30021.a"
+		custom_tooltip = tec_cyberpsionic_path.30021.a.tooltip
+		hidden_effect = {
+			set_country_flag = tec_announced_psionic_traits
+		}
+	}
+	after = {
+		hidden_effect = {
+			if = {
+				limit = {
+					has_completed_event_chain_counter = {
+						event_chain = tec_cyberpsionic_election_chain
+						counter = tec_cyberpsionic_projects_completed
+					}
+				}
+				end_event_chain = tec_cyberpsionic_election_chain
+			}
+		}
+	}
+}
+country_event = {	# equilibrium
+	id = tec_cyberpsionic_path.30022
+	title = "tec_cyberpsionic_path.30022.name"
+	desc = {
+		text = tec_cyberpsionic_path.30022.desc
+	}
+	picture = GFX_evt_cybernetics
+	show_sound = event_the_flesh_is_weak
+
+	is_triggered_only = yes
+
+	option = {
+		name = "tec_cyberpsionic_path.30022.a"
+		custom_tooltip = tec_cyberpsionic_path.30022.a.tooltip
+		hidden_effect = {
+			set_country_flag = tec_announced_psionic_traits
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			if = {
+				limit = {
+					has_completed_event_chain_counter = {
+						event_chain = tec_cyberpsionic_election_chain
+						counter = tec_cyberpsionic_projects_completed
+					}
+				}
+				end_event_chain = tec_cyberpsionic_election_chain
+			}
+		}
+	}
+}
+country_event = {	# control
+	id = tec_cyberpsionic_path.30023
+	title = "tec_cyberpsionic_path.30023.name"
+	desc = {
+		text = tec_cyberpsionic_path.30023.desc
+	}
+	picture = GFX_evt_cybernetics
+	show_sound = event_the_flesh_is_weak
+
+	is_triggered_only = yes
+
+	option = {
+		name = "tec_cyberpsionic_path.30023.a"
+		custom_tooltip = tec_cyberpsionic_path.30023.a.tooltip
+		hidden_effect = {
+			set_country_flag = tec_announced_psionic_traits
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			if = {
+				limit = {
+					has_completed_event_chain_counter = {
+						event_chain = tec_cyberpsionic_election_chain
+						counter = tec_cyberpsionic_projects_completed
+					}
+				}
+				end_event_chain = tec_cyberpsionic_election_chain
+			}
+		}
+	}
+}
+
+situation_event = { # 30%
+	id = tec_cyberpsionic_path.30030
+	title = "tec_cyberpsionic_path.30030.name"
+	desc = "tec_cyberpsionic_path.30030.desc"
+
+	picture = GFX_evt_scientific_experiments
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+
+	option = {
+		name = tec_cyberpsionic_path.30030.a
+		custom_tooltip = tec_cyberpsionic_path.30030.a.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_green
+			text = tec_icon_text_neutral_outcome
+		}
+	}
+}
+
+situation_event = { # 50% - gives zro tech if not researched
+	id = tec_cyberpsionic_path.30050
+	title = "tec_cyberpsionic_path.30050.name"
+	desc = {
+		text = "tec_cyberpsionic_path.30050.desc"
+		trigger = {
+			exists = owner
+			owner = {
+				has_technology = tech_mine_zro
+			}
+		}
+	}
+	desc = {
+		text = "tec_cyberpsionic_path.30050.desc.nozro"
+		trigger = {
+			exists = owner
+			owner = {
+				NOT = {
+					has_technology = tech_mine_zro
+				}
+			}
+		}
+	}
+
+	picture = GFX_evt_scientific_experiments
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+
+	option = {	# Has zro
+		name = tec_cyberpsionic_path.30050.a
+		custom_tooltip = tec_cyberpsionic_path.30050.a.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_green
+			text = tec_icon_text_neutral_outcome
+		}
+		trigger = {
+			exists = owner
+			owner = {
+				has_technology = tech_mine_zro
+			}
+		}
+	}
+	option = {	# NOT Has zro
+		name = tec_cyberpsionic_path.30050.b
+		custom_tooltip = tec_cyberpsionic_path.30050.b.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_green
+			text = tec_icon_text_neutral_outcome
+		}
+		trigger = {
+			exists = owner
+			owner = {
+				NOT = {
+					has_technology = tech_mine_zro
+				}
+			}
+		}
+		hidden_effect = {
+			# Keeps the current approaches
+				if = {
+					limit = {
+						current_situation_approach = situation_approach_tec_cyberpsionic_path_t2_slow
+					}
+					set_situation_flag = situation_tec_cyberpsionic_path_t2_had_slow
+				}
+				if = {
+					limit = {
+						current_situation_approach = situation_approach_tec_cyberpsionic_path_t2_fast
+					}
+					set_situation_flag = situation_tec_cyberpsionic_path_t2_had_fast
+				}
+			# /
+			# Adds zro guaranteed
+				set_situation_flag = situation_tec_cyberpsionic_path_t2_nozro
+				owner = {
+					set_country_flag = situation_tec_cyberpsionic_path_t2_nozro
+					if = {
+						limit = {
+							NOT = {
+								has_tech_option = tech_mine_zro
+							}
+						}
+						add_research_option = tech_mine_zro
+					}
+				}
+			# /
+		}
+	}
+}
+country_event = { # < - on tech increased country event triggers situation event
+	id = tec_cyberpsionic_path.30051
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_country_flag = situation_tec_cyberpsionic_path_t2_nozro
+		has_technology = tech_mine_zro
+	}
+
+	immediate = {
+		random_situation = {
+			limit = {
+				is_situation_type = situation_tec_cyberpsionic_path_t2
+			}
+			situation_event = {
+				id = tec_cyberpsionic_path.30052
+			}
+		}
+	}
+}
+situation_event = { # 52%
+	id = tec_cyberpsionic_path.30052
+	title = "tec_cyberpsionic_path.30052.name"
+	desc = "tec_cyberpsionic_path.30052.desc"
+
+	picture = GFX_evt_scientific_experiments
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+
+	option = {	# Amazing
+		name = tec_cyberpsionic_path.30052.a
+		custom_tooltip = tec_cyberpsionic_path.30052.a.tooltip
+		icon = {
+			icon = GFX_situation_approach_this_is_fine
+			icon_background = GFX_situation_approach_bg_tec_purple
+			text = tec_icon_text_good_outcome
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					has_situation_flag = situation_tec_cyberpsionic_path_t2_had_slow
+				}
+				remove_situation_flag = situation_tec_cyberpsionic_path_t2_had_slow
+				set_situation_approach = situation_approach_tec_cyberpsionic_path_t2_slow
+			}
+			if = {
+				limit = {
+					has_situation_flag = situation_tec_cyberpsionic_path_t2_had_fast
+				}
+				remove_situation_flag = situation_tec_cyberpsionic_path_t2_had_fast
+				set_situation_approach = situation_approach_tec_cyberpsionic_path_t2_fast
+			}
+			remove_situation_flag = situation_tec_cyberpsionic_path_t2_nozro
+			owner = {
+				remove_country_flag = situation_tec_cyberpsionic_path_t2_nozro
+			}
+		}
+	}
+}
+
+situation_event = { # 60% - gives infusion projects
+	id = tec_cyberpsionic_path.30060
+	title = "tec_cyberpsionic_path.30060.name"
+	desc = "tec_cyberpsionic_path.30060.desc"
+
+	picture = GFX_evt_baol_datacrystals
+	show_sound = event_the_great_awakening
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+
+	option = {
+		name = tec_cyberpsionic_path.30060.a
+		custom_tooltip = tec_cyberpsionic_path.30060.a.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_green
+			text = tec_icon_text_good_outcome
+		}
+		owner = {
+			hidden_effect = {
+				save_event_target_as = tec_cyberpsionic_owner
+			}
+			event_target:tec_cyberpsionic_owner = {
+				begin_event_chain = {
+					event_chain = tec_cyberpsionic_zro_chain
+				}
+				capital_scope = {
+					enable_special_project = {
+						name = TEC_CYBERPSIONIC_ZRO_A
+						location = this
+						owner = event_target:tec_cyberpsionic_owner
+					}
+					enable_special_project = {
+						name = TEC_CYBERPSIONIC_ZRO_B
+						location = this
+						owner = event_target:tec_cyberpsionic_owner
+					}
+					enable_special_project = {
+						name = TEC_CYBERPSIONIC_ZRO_C
+						location = this
+						owner = event_target:tec_cyberpsionic_owner
+					}
+				}
+			}
+		}
+	}
+}
+# Discover traits
+# Special project 1 : Main tech
+country_event = {
+	id = tec_cyberpsionic_path.30061
+	title = "tec_cyberpsionic_path.30061.name"
+	desc = "tec_cyberpsionic_path.30061.desc"
+
+	picture = GFX_evt_baol_datacrystals
+	show_sound = event_the_flesh_is_weak
+
+	is_triggered_only = yes
+
+	option = {
+		name = "tec_cyberpsionic_path.30061.a"
+		custom_tooltip = "tec_cyberpsionic_path.30061.a.tooltip"
+	}
+
+	after = {
+		hidden_effect = {
+			if = {
+				limit = {
+					has_completed_event_chain_counter = {
+						event_chain = tec_cyberpsionic_zro_chain
+						counter = tec_cyberpsionic_zro_projects_completed
+					}
+				}
+				end_event_chain = tec_cyberpsionic_zro_chain
+				country_event = {
+					id = tec_cyberpsionic_path.30065
+					days = 1
+				}
+			}
+		}
+	}
+}
+# Special project 2: Main traits
+country_event = {
+	id = tec_cyberpsionic_path.30062
+	title = "tec_cyberpsionic_path.30062.name"
+	desc = "tec_cyberpsionic_path.30062.desc"
+
+	picture = GFX_evt_baol_datacrystals
+	show_sound = event_the_flesh_is_weak
+
+	is_triggered_only = yes
+
+	option = {
+		name = "tec_cyberpsionic_path.30062.a"
+		custom_tooltip = "tec_cyberpsionic_path.30062.a.tooltip"
+	}
+
+	after = {
+		hidden_effect = {
+			if = {
+				limit = {
+					has_completed_event_chain_counter = {
+						event_chain = tec_cyberpsionic_zro_chain
+						counter = tec_cyberpsionic_zro_projects_completed
+					}
+				}
+				end_event_chain = tec_cyberpsionic_zro_chain
+				country_event = {
+					id = tec_cyberpsionic_path.30065
+					days = 1
+				}
+			}
+		}
+	}
+}
+# Special project 3: Shroud extraction
+country_event = {
+	id = tec_cyberpsionic_path.30063
+	title = "tec_cyberpsionic_path.30063.name"
+	desc = "tec_cyberpsionic_path.30063.desc"
+
+	picture = GFX_evt_matter_decompressor
+	show_sound = event_the_flesh_is_weak
+
+	is_triggered_only = yes
+
+	option = {
+		name = "tec_cyberpsionic_path.30063.a"
+		custom_tooltip = "tec_cyberpsionic_path.30063.a.tooltip"
+	}
+
+	after = {
+		hidden_effect = {
+			if = {
+				limit = {
+					has_completed_event_chain_counter = {
+						event_chain = tec_cyberpsionic_zro_chain
+						counter = tec_cyberpsionic_zro_projects_completed
+					}
+				}
+				end_event_chain = tec_cyberpsionic_zro_chain
+				country_event = {
+					id = tec_cyberpsionic_path.30065
+					days = 1
+				}
+			}
+		}
+	}
+}
+#Ending
+country_event = {
+	id = tec_cyberpsionic_path.30065
+	title = "tec_cyberpsionic_path.30065.name"
+	desc = "tec_cyberpsionic_path.30065.desc"
+
+	picture = GFX_evt_zro_4
+	show_sound = event_the_flesh_is_weak
+
+	is_triggered_only = yes
+
+	option = {
+		name = "tec_cyberpsionic_path.30065.a"
+		custom_tooltip = "tec_cyberpsionic_path.30065.a.tooltip"
+	}
+}
+
+situation_event = { # 80%
+	id = tec_cyberpsionic_path.30080
+	title = "tec_cyberpsionic_path.30080.name"
+	desc = "tec_cyberpsionic_path.30080.desc"
+
+	picture = GFX_evt_scientific_experiments
+	is_triggered_only = yes
+	situation = this
+	location = target
+
+	immediate = {
+		hidden_effect = {
+			set_situation_locked = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			set_situation_locked = no
+		}
+	}
+
+	option = {
+		name = tec_cyberpsionic_path.30080.a
+		custom_tooltip = tec_cyberpsionic_path.30080.a.tooltip
+		icon = {
+			icon = GFX_situation_approach_tec_cyb
+			icon_background = GFX_situation_approach_bg_green
+			text = tec_icon_text_neutral_outcome
+		}
+	}
+}
+
+# Halfway empire situation events
+
+# Random situation events
+
+
 # Upon completion, gives the trait and adds the special projects; also notifies the other empires
 country_event = {
-	id = tec_cyberpsionic_path.301
-	title = "tec_cyberpsionic_path.301.name"
-	desc = "tec_cyberpsionic_path.301.desc"
+	id = tec_cyberpsionic_path.305
+	title = "tec_cyberpsionic_path.305.name"
+	desc = "tec_cyberpsionic_path.305.desc"
 	picture = GFX_evt_cybernetics
 	show_sound = event_the_great_awakening
 
 	is_triggered_only = yes
 
+	immediate = {
+		hidden_effect = { # Path rewards
+			# Path finished
+			set_country_flag = tec_cyberpsionic_path_finished
+			# Cyberpsionic trait
+			tec_create_cyberpsionic_species = yes
+			every_owned_leader = {
+				add_leader_traits_after_modification = yes
+				remove_leader_traits_after_modification = yes
+			}
+			every_pool_leader = {
+				add_leader_traits_after_modification = yes
+				remove_leader_traits_after_modification = yes
+			}
+			# Features
+			has_country_flag = tec_u_cp_equilibrium
+			has_country_flag = tec_u_cp_control
+			has_country_flag = tec_u_cp_power
+			has_country_flag = tec_u_cp_cyborg_traits
+			has_country_flag = tec_u_cp_robot_traits
+			has_country_flag = tec_u_cp_buildings
+			# Flags
+			set_country_flag = tec_cyberpsionic_assimilation
+			remove_country_flag = tec_cybernetic_t1_assimilation
+			remove_country_flag = tec_cybernetic_t2_assimilation
+			# Psionic traits
+			set_country_flag = tec_announced_psionic_traits
+		}	
+	}
+
 	option = {
-		name = "tec_cyberpsionic_path.301.a"
-		custom_tooltip = tec_cyberpsionic_path.301.a.tooltip
+		name = "tec_cyberpsionic_path.305.a"
+		custom_tooltip = tec_cyberpsionic_path.305.a.tooltip
 		hidden_effect = {
 			every_country = {
 				limit = {
 					is_ai = no
+					NOR = {
+						is_same_value = root
+						# TO DO policy for muting other empire things 
+						has_country_flag = tec_mute_empire_announces
+					}
 					has_communications = root
-					NOT = { is_same_value = root }
 				}
 				country_event = {
-					id = tec_cyberpsionic_path.302 
+					id = tec_cyberpsionic_path.30501 
 					days = 5
 				}
 			}
-			
-			hidden_effect = {
-				set_country_flag = tec_announced_psionic_traits
-			}
-			country_event = { id = tec_cyberpsionic_path.30101 days = 5 } # Selection traits
 		}
 	}
 }
-
-country_event = {
-	id = tec_cyberpsionic_path.30101
-	title = "tec_cyberpsionic_path.30101.name"
-	desc = "tec_cyberpsionic_path.30101.desc"
-	picture = GFX_evt_cybernetics
-	show_sound = event_the_great_awakening
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_cyberpsionic_path.30101.a"
-		custom_tooltip = tec_cyberpsionic_path.30101.a.tooltip
-		hidden_effect = {
-			save_event_target_as = tec_cyberpsi_owner
-			begin_event_chain = {
-				event_chain = tec_cyberpsionic_election_chain
-			}
-			capital_scope = {
-				enable_special_project = {
-					name = TEC_CYBERPSIONIC_ELECTION_A
-					location = this
-					owner = root
-				}
-				enable_special_project = {
-					name = TEC_CYBERPSIONIC_ELECTION_B
-					location = this
-					owner = root
-				}
-				enable_special_project = {
-					name = TEC_CYBERPSIONIC_ELECTION_C
-					location = this
-					owner = root
-				}
-			}
-		}
-	}
-}
-
 	# B2 Notification for Other Nations
 country_event = {
-	id = tec_cyberpsionic_path.302
-	title = "tec_cyberpsionic_path.302.name"
+	id = tec_cyberpsionic_path.30501
+	title = "tec_cyberpsionic_path.30501.name"
 	desc = {
-		text = tec_cyberpsionic_path.302.desc
+		text = tec_cyberpsionic_path.30501.desc
 	}
 	picture = GFX_evt_cybernetics
 	show_sound = event_the_great_awakening
@@ -13465,11 +14662,11 @@ country_event = {
 	is_triggered_only = yes
 
 	option = {
-		name = "tec_cyberpsionic_path.302.a"
+		name = "tec_cyberpsionic_path.30501.a"
 	}
 
 	option = {
-		name = "tec_cyberpsionic_path.302.b"
+		name = "tec_cyberpsionic_path.30501.b"
 		trigger = {
 			OR = {
 				has_ascension_perk = ap_tec_psionic_ascendance
@@ -13484,7 +14681,7 @@ country_event = {
 	}
 
 	option = {
-		name = "tec_cyberpsionic_path.302.c"
+		name = "tec_cyberpsionic_path.30501.c"
 		trigger = {
 			OR = {
 				has_civic = civic_machine_terminator
@@ -13494,7 +14691,7 @@ country_event = {
 		}
 	}
 	option = {
-		name = "tec_cyberpsionic_path.302.e"
+		name = "tec_cyberpsionic_path.30501.e"
 		trigger = {
 			is_machine_empire = yes
 			NOR = {
@@ -13507,354 +14704,37 @@ country_event = {
 	
 }
 
+# ==============================================
+# ==============================================
+# ==============================================
+# Old events - reformulate ---------------------
+# Picks one of the three main upgrades
+country_event = {
+	id = tec_cyberpsionic_path.306
+	title = "tec_cyberpsionic_path.306.name"
+	desc = "tec_cyberpsionic_path.306.desc"
+	picture = GFX_evt_cybernetics
+	show_sound = event_the_great_awakening
+
+	is_triggered_only = yes
+
+	option = {
+		name = "tec_cyberpsionic_path.306.a"
+		custom_tooltip = tec_cyberpsionic_path.306.a.tooltip
+		
+	}
+}
+
 # Starts the first trait thing
-# 3 Traits
-country_event = {	# power
-	id = tec_cyberpsionic_path.30011
-	title = "tec_cyberpsionic_path.30011.name"
-	desc = {
-		text = tec_cyberpsionic_path.30011.desc
-	}
-	picture = GFX_evt_cybernetics
-	show_sound = event_the_flesh_is_weak
 
-	is_triggered_only = yes
 
-	option = {
-		name = "tec_cyberpsionic_path.30011.a"
-		custom_tooltip = tec_cyberpsionic_path.30011.a.tooltip
-		hidden_effect = {
-			set_country_flag = tec_announced_psionic_traits
-		}
-	}
-	after = {
-		hidden_effect = {
-			if = {
-				limit = {
-					has_completed_event_chain_counter = {
-						event_chain = tec_cyberpsionic_election_chain
-						counter = tec_cyberpsionic_projects_completed
-					}
-				}
-				#country_event = {
-				#	id = tec_cyberpsionic_path.30101
-				#	days = 2
-				#}
-				end_event_chain = tec_cyberpsionic_election_chain
-			}
-		}
-	}
-}
 
-country_event = {	# equilibrium
-	id = tec_cyberpsionic_path.30012
-	title = "tec_cyberpsionic_path.30012.name"
-	desc = {
-		text = tec_cyberpsionic_path.30012.desc
-	}
-	picture = GFX_evt_cybernetics
-	show_sound = event_the_flesh_is_weak
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_cyberpsionic_path.30012.a"
-		custom_tooltip = tec_cyberpsionic_path.30012.a.tooltip
-		hidden_effect = {
-			set_country_flag = tec_announced_psionic_traits
-		}
-	}
-
-	after = {
-		hidden_effect = {
-			if = {
-				limit = {
-					has_completed_event_chain_counter = {
-						event_chain = tec_cyberpsionic_election_chain
-						counter = tec_cyberpsionic_projects_completed
-					}
-				}
-				#country_event = {
-				#	id = tec_cyberpsionic_path.30101
-				#	days = 2
-				#}
-				end_event_chain = tec_cyberpsionic_election_chain
-			}
-		}
-	}
-}
-
-country_event = {	# control
-	id = tec_cyberpsionic_path.30013
-	title = "tec_cyberpsionic_path.30013.name"
-	desc = {
-		text = tec_cyberpsionic_path.30013.desc
-	}
-	picture = GFX_evt_cybernetics
-	show_sound = event_the_flesh_is_weak
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_cyberpsionic_path.30013.a"
-		custom_tooltip = tec_cyberpsionic_path.30013.a.tooltip
-		hidden_effect = {
-			set_country_flag = tec_announced_psionic_traits
-		}
-	}
-
-	after = {
-		hidden_effect = {
-			if = {
-				limit = {
-					has_completed_event_chain_counter = {
-						event_chain = tec_cyberpsionic_election_chain
-						counter = tec_cyberpsionic_projects_completed
-					}
-				}
-				#country_event = {
-				#	id = tec_cyberpsionic_path.30101
-				#	days = 2
-				#}
-				end_event_chain = tec_cyberpsionic_election_chain
-			}
-		}
-	}
-}
-
-# After reaching the shroud being cyberpsionic
-	# Note - changes if you have the zro tech or not, if you don't gives the option
-country_event = {	# Provides special project
-	id = tec_cyberpsionic_path.30015
-	title = "tec_cyberpsionic_path.30015.name"
-	desc = {
-		text = tec_cyberpsionic_path.30015.desc
-		trigger = {
-			has_technology = tech_mine_zro
-		}
-	}
-	desc = {
-		text = tec_cyberpsionic_path.30015.b.desc
-		trigger = {
-			NOT = {
-				has_technology = tech_mine_zro
-			}
-		}
-	}
-	picture = GFX_evt_zro_4
-	show_sound = event_the_great_awakening
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_cyberpsionic_path.30015.a"
-		trigger = {
-			hidden_trigger = {
-				has_technology = tech_mine_zro
-			}
-		}
-		hidden_effect = {
-			country_event = {
-				id = tec_cyberpsionic_path.30016
-				days = 7
-			}
-		}
-	}
-	option = {
-		name = "tec_cyberpsionic_path.30015.b"
-		custom_tooltip = tec_cyberpsionic_path.30015.b.tooltip
-		trigger = {
-			hidden_trigger = {
-				NOT = {
-					has_technology = tech_mine_zro
-				}
-			}
-		}
-		hidden_effect = {
-			add_research_option = tech_mine_zro
-			set_country_flag = tec_cyberpsi_zro_gate
-		}
-	}
-}
-
-# Project to analyze zro
-country_event = {	# Provides special project
-	id = tec_cyberpsionic_path.30016
-	title = "tec_cyberpsionic_path.30016.name"
-	desc = "tec_cyberpsionic_path.30016.desc"
-
-	picture = GFX_evt_baol_datacrystals
-	show_sound = event_the_great_awakening
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_cyberpsionic_path.30016.a"
-		hidden_effect = {
-			hidden_effect = {
-				save_event_target_as = tec_cyberpsi_owner
-			}
-			begin_event_chain = {
-				event_chain = tec_cyberpsionic_zro_chain
-			}
-			capital_scope = {
-				enable_special_project = {
-					name = TEC_CYBERPSIONIC_ZRO_A
-					location = this
-					owner = root
-				}
-			}
-		}
-	}
-}
-
-# On tech researched gate
-country_event = {
-	id = tec_cyberpsionic_path.30017
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_country_flag = tec_cyberpsi_zro_gate
-		has_technology = tech_mine_zro
-	}
-
-	immediate = {
-		remove_country_flag = tec_cyberpsi_zro_gate
-		country_event = {
-			id = tec_cyberpsionic_path.30016
-			days = 7
-		}
-	}
-}
-
-# Discover traits
-# tec_cyberpsionic_path.30020
-# Special project 1 : Main tech
-country_event = {
-	id = tec_cyberpsionic_path.30021
-	title = "tec_cyberpsionic_path.30021.name"
-	desc = "tec_cyberpsionic_path.30021.desc"
-
-	picture = GFX_evt_baol_datacrystals
-	show_sound = event_the_flesh_is_weak
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_cyberpsionic_path.30021.a"
-		custom_tooltip = "tec_cyberpsionic_path.30021.a.tooltip"
-	}
-
-	after = {
-		hidden_effect = {
-			if = {
-				limit = {
-					has_completed_event_chain_counter = {
-						event_chain = tec_cyberpsionic_zro_chain
-						counter = tec_cyberpsionic_zro_projects_completed
-					}
-				}
-				end_event_chain = tec_cyberpsionic_zro_chain
-				country_event = {
-					id = tec_cyberpsionic_path.30025
-					days = 1
-				}
-			}
-		}
-	}
-}
-# Special project 2: Main traits
-country_event = {
-	id = tec_cyberpsionic_path.30022
-	title = "tec_cyberpsionic_path.30022.name"
-	desc = "tec_cyberpsionic_path.30022.desc"
-
-	picture = GFX_evt_baol_datacrystals
-	show_sound = event_the_flesh_is_weak
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_cyberpsionic_path.30022.a"
-		custom_tooltip = "tec_cyberpsionic_path.30022.a.tooltip"
-	}
-
-	after = {
-		hidden_effect = {
-			if = {
-				limit = {
-					has_completed_event_chain_counter = {
-						event_chain = tec_cyberpsionic_zro_chain
-						counter = tec_cyberpsionic_zro_projects_completed
-					}
-				}
-				end_event_chain = tec_cyberpsionic_zro_chain
-				country_event = {
-					id = tec_cyberpsionic_path.30025
-					days = 1
-				}
-			}
-		}
-	}
-}
-# Special project 3: Shroud extraction
-country_event = {
-	id = tec_cyberpsionic_path.30023
-	title = "tec_cyberpsionic_path.30023.name"
-	desc = "tec_cyberpsionic_path.30023.desc"
-
-	picture = GFX_evt_matter_decompressor
-	show_sound = event_the_flesh_is_weak
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_cyberpsionic_path.30023.a"
-		custom_tooltip = "tec_cyberpsionic_path.30023.a.tooltip"
-	}
-
-	after = {
-		hidden_effect = {
-			if = {
-				limit = {
-					has_completed_event_chain_counter = {
-						event_chain = tec_cyberpsionic_zro_chain
-						counter = tec_cyberpsionic_zro_projects_completed
-					}
-				}
-				end_event_chain = tec_cyberpsionic_zro_chain
-				country_event = {
-					id = tec_cyberpsionic_path.30025
-					days = 1
-				}
-			}
-		}
-	}
-}
-
-#Ending
-country_event = {
-	id = tec_cyberpsionic_path.30025
-	title = "tec_cyberpsionic_path.30025.name"
-	desc = "tec_cyberpsionic_path.30025.desc"
-
-	picture = GFX_evt_zro_4
-	show_sound = event_the_flesh_is_weak
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_cyberpsionic_path.30025.a"
-		custom_tooltip = "tec_cyberpsionic_path.30025.a.tooltip"
-	}
-}
-
+# EXTRACTORS - reformulate ---------------------
 # Danger notification when the empire extract too much
 country_event = {
-	id = tec_cyberpsionic_path.30050
-	title = "tec_cyberpsionic_path.30050.name"
-	desc = "tec_cyberpsionic_path.30050.desc"
+	id = tec_cyberpsionic_path.31050
+	title = "tec_cyberpsionic_path.31050.name"
+	desc = "tec_cyberpsionic_path.31050.desc"
 
 	picture = GFX_evt_surreal_visions
 	show_sound = event_red_alert
@@ -13862,14 +14742,14 @@ country_event = {
 	is_triggered_only = yes
 
 	option = {
-		name = "tec_cyberpsionic_path.30050.a"
+		name = "tec_cyberpsionic_path.31050.a"
 	}
 }
 # First shroud incursion
 country_event = {
-	id = tec_cyberpsionic_path.30051
-	title = "tec_cyberpsionic_path.30051.name"
-	desc = "tec_cyberpsionic_path.30051.desc"
+	id = tec_cyberpsionic_path.31051
+	title = "tec_cyberpsionic_path.31051.name"
+	desc = "tec_cyberpsionic_path.31051.desc"
 	location = event_target:tec_incursion_target_planet
 
 	picture = GFX_evt_vortex
@@ -13889,7 +14769,7 @@ country_event = {
 		}
 	}
 	option = {
-		name = "tec_cyberpsionic_path.30051.a"
+		name = "tec_cyberpsionic_path.31051.a"
 	}
 }
 # Post-first shroud incursions
@@ -13897,12 +14777,12 @@ country_event = {
 
 # SHroud incursion handler
 country_event = {
-	id = tec_cyberpsionic_path.30055
+	id = tec_cyberpsionic_path.31055
 	hide_window = yes
 	is_triggered_only = yes
 
 	trigger = {
-		has_country_flag = tec_u_cp_dimensional_extraction
+		has_country_flag = tec_u_cp_buildings
 		any_owned_planet = {
 			OR = {
 				has_building = building_tec_cyberpsionic_extractor_2
@@ -13963,7 +14843,7 @@ country_event = {
 					}
 				}
 				country_event = {
-					id = tec_cyberpsionic_path.30056
+					id = tec_cyberpsionic_path.31056
 					days = 1
 					random = 120
 				}
@@ -13979,7 +14859,7 @@ country_event = {
 
 # Spawns the entity
 country_event = {
-	id = tec_cyberpsionic_path.30056
+	id = tec_cyberpsionic_path.31056
 	hide_window = yes
 
 	is_triggered_only = yes
@@ -14008,7 +14888,7 @@ country_event = {
 			}
 			set_country_flag = tec_first_aggro_incursion_done
 			country_event = {
-				id = tec_cyberpsionic_path.30051
+				id = tec_cyberpsionic_path.31051
 			}
 		}
 		else = {
@@ -14166,7 +15046,7 @@ country_event = {
 
 # Remove Shroud System Effect
 country_event = {
-	id = tec_cyberpsionic_path.30057
+	id = tec_cyberpsionic_path.31057
 	hide_window = yes
 
 	is_triggered_only = yes
@@ -14187,8 +15067,10 @@ country_event = {
 		}
 	}
 }
-
-
+# EXTRACTORS - reformulate ---------------------
+# ==============================================
+# ==============================================
+# ==============================================
 
 # Bio-Psi: Purity of form
 # ------------------------------------------------------------ tec_biopsionic_path.xxx
@@ -14342,8 +15224,12 @@ country_event = {
 			every_country = {
 				limit = {
 					is_ai = no
+					NOR = {
+						is_same_value = root
+						# TO DO policy for muting other empire things 
+						has_country_flag = tec_mute_empire_announces
+					}
 					has_communications = root
-					NOT = { is_same_value = root }
 				}
 				country_event = { id = tec_biopsionic_path.302 }
 			}
