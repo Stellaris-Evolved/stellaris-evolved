@@ -213,6 +213,10 @@ can_release_vassal_from_species = {
 can_species_be_assembled = {
 	is_sapient = yes
 	tec_can_assemble_species_due_to_purity_assembly_policy = yes
+	has_population_control = {
+		type = no
+		country = root.owner
+	}
 	OR = {
 		AND = { # Evolved - Robots/Machine units/Synths rule - can only be assembled with regular assembly
 			is_robotic = yes
@@ -236,8 +240,36 @@ can_species_be_assembled = {
 		}
 		AND = { # Evolved - Regular Organic rule - As closer as vanilla as possible
 			is_organic_species = yes
-			# Moved up to take priority over hive in special cases
-			if = { # Clone army thing
+			tec_is_bioservant_species = no
+			else_if = {
+				limit = {
+					root.owner = { is_hive_empire = yes }
+				}
+				AND = {
+					has_trait = trait_hive_mind
+				}
+			}
+			else_if = {	# Self-replicating pop - only assembles itself
+				limit = {
+					tec_is_self_replicating_species = yes	# This includes budding/tiyanki
+				}
+				root = {
+					any_owned_species = {
+						is_exact_same_species = prevprev
+					}
+				}
+				# Note: this must be placed above hive rule
+			}
+			else_if = {	
+				# Cyborg
+				limit = {
+					root.owner = {
+						tec_allows_machine_assembly_for_cyborg = yes
+					}
+				}
+				tec_is_cyborg_species = yes
+			}
+			else_if = { # Clone army thing
 				limit = {	# Made the triggers for a future clone army revamp
 					tec_is_clone_origin_species = yes
 				}
@@ -280,45 +312,6 @@ can_species_be_assembled = {
 					}
 				} 
 			# /
-			else_if = {	# Self-replicating pop - only assembles itself
-				limit = {
-					tec_is_self_replicating_species = yes	# This includes budding/tiyanki
-				}
-				root = {
-					any_owned_species = {
-						is_exact_same_species = prevprev
-					}
-				}
-				# Note: this must be placed above hive rule
-			}
-			else_if = {	# Hives can only assemble drones with spawning pools/queens only breed their own types
-				limit = {
-					root.owner = { is_hive_empire = yes }
-				}
-				AND = {
-					has_trait = trait_hive_mind
-				}
-				# Stellaris Evolved
-				root = {
-					tec_can_assemble_organic_hive_species = yes
-				}
-			}
-			else_if = {	
-				limit = {
-					root.owner = {
-						tec_allows_machine_assembly_for_cyborg = yes
-					}
-				}
-				tec_is_cyborg_species = yes
-			}
-			else_if = {
-				limit = {
-					root = {
-						tec_has_bioservant_buildings = yes
-					}
-				}
-				tec_is_bioservant_species = yes
-			}
 			else = {	# Regular assembly
 				root = {
 					OR = {
@@ -335,10 +328,12 @@ can_species_be_assembled = {
 				}
 			}
 		}
-	}
-	has_population_control = {
-		type = no
-		country = root.owner
+		AND = {
+			tec_is_bioservant_species = yes
+			OR = {
+				tec_has_bioservant_buildings = yes
+			}
+		}
 	}
 }
 
