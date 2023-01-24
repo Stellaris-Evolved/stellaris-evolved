@@ -71,7 +71,7 @@ district_hab_housing = {
 			triggered_planet_modifier = {
 				potential = {
 					planet = {
-						has_planet_flag = advanced_habitat
+						tec_is_upgraded_habitat = yes
 					}
 				}
 				planet_housing_add = 2
@@ -79,7 +79,7 @@ district_hab_housing = {
 			triggered_planet_modifier = {
 				potential = {
 					planet = {
-						has_planet_flag = advanced_habitat_2
+						tec_is_fully_upgraded_habitat = yes
 					}
 				}
 				planet_housing_add = 3
@@ -92,7 +92,7 @@ district_hab_housing = {
 			trigger = ""
 		}
 		
-		inline_script = districts/inline_evolved_artifice_2_modifiers
+		inline_script = districts/effects/inline_evolved_tec_artifice_2
 
 		# /
 		# Origins
@@ -114,68 +114,15 @@ district_hab_housing = {
 				trigger = ""
 			}
 			inline_script = {
-				script = jobs/inline_evolved_maintenance_drone
+				script = districts/effects/inline_evolved_tech_housing_2_gestalt
 				count = 1
-				mult = 1
-				display = no_desc
-				trigger = "
-					owner = {
-						has_technology = tech_housing_2
-					}
-				"
+				trigger = ""
 			}
-		# /
-		# Hive
-			# Bio/Lithospheric harmony
-				inline_script = {
-					script = jobs/inline_evolved_farmer
-					regular_count = 0
-					regular_aquatic_count = 0
-					hive_count = 1
-					hive_aquatic_count = 1
-					machine_count = 0
-					mult = 1
-					display = with_desc
-					trigger = "
-						owner = {
-							is_lithoid_empire = no
-							has_valid_civic = civic_tec_hive_menial
-						}
-					"
-				}
+			
+			inline_script = districts/effects/inline_evolved_tec_hive_menial
 
-				inline_script = {
-					script = jobs/inline_evolved_miner
-					regular_count = 0
-					regular_aquatic_count = 0
-					hive_count = 1
-					hive_aquatic_count = 1
-					machine_count = 0
-					mult = 1
-					display = with_desc
-					trigger = "
-						owner = {
-							is_lithoid_empire = yes
-							has_valid_civic = civic_tec_hive_menial
-						}
-					"
-				}
+			inline_script = districts/effects/inline_evolved_tec_machine_menial
 
-				inline_script = {
-					script = jobs/inline_evolved_technician
-					regular_count = 0
-					hive_count = 0
-					machine_count = 1
-					machine_aquatic_count = 1
-					mult = 1
-					display = with_desc
-					trigger = "
-						owner = {
-							has_valid_civic = civic_tec_machine_menial
-						}
-					"
-				}
-			# /
 		# /
 	# /
 }
@@ -219,17 +166,9 @@ district_hab_industrial = {
 		upkeep = {
 			energy = @hab_maintenance
 		}
-		upkeep = {
-			trigger = {
-				exists = owner
-				owner = {
-					has_edict = industrial_maintenance
-				}
-			}
-			energy = 2
-		}
 
-		inline_script = districts/inline_evolved_unleashed_industrialization_resources
+		inline_script = districts/resources/inline_evolved_tec_unleashed_industrialization_resources
+		inline_script = districts/resources/inline_evolved_industrial_maintenance_upkeep
 	}
 
 	# Indication
@@ -240,7 +179,21 @@ district_hab_industrial = {
 		text = tec_planet_spec_change_jobs_district
 	}
 	
-	inline_script = districts/inline_evolved_industrial_districts_modifiers
+	# Standard
+		planet_modifier = {
+			planet_housing_add = 2
+		}
+	# /
+
+	# Traditions
+		inline_script = districts/effects/inline_evolved_tec_artifice_final_1
+	# /
+	# Civics
+		inline_script = districts/effects/inline_evolved_tec_unleashed_industrialization
+	# /
+	# Edicts
+		inline_script = districts/effects/inline_evolved_industrial_maintenance
+	# /
 
 	inline_script = {
 		script = districts/inline_evolved_industrial_split_jobs
@@ -283,63 +236,30 @@ district_tec_hab_food = {
 		}
 
 		# Base production
-			produces = {
-				food = 1
-				multiplier = value:tec_automated_district_production|BASE|6|BASE_VALUE|tec_habitat_base_production|ECO_CAT|planet_farmers|RESOURCE|food|REQUISITON|has_produce_requisitorium|REQUISITION_AMOUNT|@requisitorium_food_reduction|
+			inline_script = {
+				script = districts/resources/inline_evolved_tec_automation_food
+				trigger = ""
+				base = "6|BASE_VALUE|tec_habitat_base_production"
 			}
 		# /
-		# Resource production civic
-			produces = {
-				trigger = {
-					exists = owner
-					owner = {
-						tec_district_generate_basic_resources = yes
-					}
-				}
-				food = 2
-			}
-		# /	
-	}
-	overlord_resources = {
-		category = planet_requisitioned_food
-		produces = {
-			trigger = {
-				planet = {
-					has_planet_flag = has_produce_requisitorium
-				}
-			}
-			food = @requisitorium_food_overlord
+		inline_script = {
+			script = districts/resources/inline_evolved_tec_generate_basic_resources
+			resource = food
 		}
 	}
+	# overlord_resources = {
+	# 	category = planet_requisitioned_food
+	# 	produces = {
+	# 		trigger = {
+	# 			planet = {
+	# 				has_planet_flag = has_produce_requisitorium
+	# 			}
+	# 		}
+	# 		food = @requisitorium_food_overlord
+	# 	}
+	# }
 
-	# Indications
-	triggered_desc = {
-		trigger = {
-			planet = {
-				NOT = {
-					has_planet_flag = advanced_habitat_2
-				}
-			}
-		}
-		text = tec_upgradeable_district_habitat
-	}
-	triggered_desc = {
-		text = tec_building_affect_district_habitat
-	}
-
-	# Modifiers
-		# Standard
-			triggered_planet_modifier = {
-				potential = {
-					always = yes
-				}
-				modifier = {
-					planet_housing_add = 1
-				}
-				mult = value:tec_habitat_district_housing
-			}
-		# /
-	# /
+	inline_script = districts/inline_evolved_habitat_scaling_district
 
 	# Jobs
 		inline_script = {
@@ -352,7 +272,7 @@ district_tec_hab_food = {
 			mult = 1
 			display = with_desc
 			trigger = "
-				has_planet_flag = advanced_habitat
+				tec_is_upgraded_habitat = yes
 			"
 		}
 		inline_script = {
@@ -364,7 +284,7 @@ district_tec_hab_food = {
 			machine_count = 1
 			display = no_desc
 			trigger = "
-				has_planet_flag = advanced_habitat_2
+				tec_is_fully_upgraded_habitat = yes
 			"
 		}
 		inline_script = {
@@ -374,7 +294,7 @@ district_tec_hab_food = {
 			mult = 1
 			display = with_desc
 			trigger = "
-				has_planet_flag = advanced_habitat_2
+				tec_is_fully_upgraded_habitat = yes
 			"
 		}
 	# /
@@ -422,63 +342,30 @@ district_hab_energy = {
 		}
 
 		# New production
-			produces = {
-				energy = 1
-				multiplier = value:tec_automated_district_production|BASE|6|BASE_VALUE|tec_habitat_base_production|ECO_CAT|planet_technician|RESOURCE|energy|REQUISITON|has_energy_requisitorium|REQUISITION_AMOUNT|@requisitorium_energy_reduction|
+			inline_script = {
+				script = districts/resources/inline_evolved_tec_automation_energy
+				trigger = ""
+				base = "6|BASE_VALUE|tec_habitat_base_production"
 			}
 		# /
-		# Resource production civic
-			produces = {
-				trigger = {
-					exists = owner
-					owner = {
-						tec_district_generate_basic_resources = yes
-					}
-				}
-				energy = 2
-			}
-		# /	
+		inline_script = {
+			script = districts/resources/inline_evolved_tec_generate_basic_resources
+			resource = energy
+		}	
 	}
-	overlord_resources = {
-		category = planet_requisitioned_energy
-		produces = {
-			trigger = {
-				planet = {
-					has_planet_flag = has_energy_requisitorium
-				}
-			}
-			energy = @requisitorium_energy_overlord
-		}
-	}
+	# overlord_resources = {
+	# 	category = planet_requisitioned_energy
+	# 	produces = {
+	# 		trigger = {
+	# 			planet = {
+	# 				has_planet_flag = has_energy_requisitorium
+	# 			}
+	# 		}
+	# 		energy = @requisitorium_energy_overlord
+	# 	}
+	# }
 
-	# Indications
-	triggered_desc = {
-		trigger = {
-			planet = {
-				NOT = {
-					has_planet_flag = advanced_habitat_2
-				}
-			}
-		}
-		text = tec_upgradeable_district_habitat
-	}
-	triggered_desc = {
-		text = tec_building_affect_district_habitat
-	}
-
-	# Modifiers
-		# Standard
-			triggered_planet_modifier = {
-				potential = {
-					always = yes
-				}
-				modifier = {
-					planet_housing_add = 1
-				}
-				mult = value:tec_habitat_district_housing
-			}
-		# /
-	# /
+	inline_script = districts/inline_evolved_habitat_scaling_district
 
 	# Jobs
 		inline_script = {
@@ -490,7 +377,7 @@ district_hab_energy = {
 			mult = 1
 			display = with_desc
 			trigger = "
-				has_planet_flag = advanced_habitat
+				tec_is_upgraded_habitat = yes
 			"
 		}
 		inline_script = {
@@ -502,7 +389,7 @@ district_hab_energy = {
 			mult = 1
 			display = no_desc
 			trigger = "
-				has_planet_flag = advanced_habitat_2
+				tec_is_fully_upgraded_habitat = yes
 			"
 		}
 		inline_script = {
@@ -511,7 +398,7 @@ district_hab_energy = {
 			mult = 1
 			display = with_desc
 			trigger = "
-				has_planet_flag = advanced_habitat_2
+				tec_is_fully_upgraded_habitat = yes
 			"
 		}
 	# /		
@@ -549,63 +436,30 @@ district_hab_mining = {
 		}
 
 		# New production
-			produces = {
-				minerals = 1
-				multiplier = value:tec_automated_district_production|BASE|6|BASE_VALUE|tec_habitat_base_production|ECO_CAT|planet_miners|RESOURCE|minerals|REQUISITON|has_material_requisitorium|REQUISITION_AMOUNT|@requisitorium_minerals_reduction|
+			inline_script = {
+				script = districts/resources/inline_evolved_tec_automation_minerals
+				trigger = ""
+				base = "6|BASE_VALUE|tec_habitat_base_production"
 			}
 		# /
-		# Resource production civic
-			produces = {
-				trigger = {
-					exists = owner
-					owner = {
-						tec_district_generate_basic_resources = yes
-					}
-				}
-				minerals = 2
-			}
-		# /	
-	}
-	overlord_resources = {
-		category = planet_requisitioned_minerals
-		produces = {
-			trigger = {
-				planet = {
-					has_planet_flag = has_material_requisitorium
-				}
-			}
-			minerals = @requisitorium_minerals_overlord
+		inline_script = {
+			script = districts/resources/inline_evolved_tec_generate_basic_resources
+			resource = minerals
 		}
 	}
+	# overlord_resources = {
+	# 	category = planet_requisitioned_minerals
+	# 	produces = {
+	# 		trigger = {
+	# 			planet = {
+	# 				has_planet_flag = has_material_requisitorium
+	# 			}
+	# 		}
+	# 		minerals = @requisitorium_minerals_overlord
+	# 	}
+	# }
 
-	# Indications
-	triggered_desc = {
-		trigger = {
-			planet = {
-				NOT = {
-					has_planet_flag = advanced_habitat_2
-				}
-			}
-		}
-		text = tec_upgradeable_district_habitat
-	}
-	triggered_desc = {
-		text = tec_building_affect_district_habitat
-	}
-
-	# Modifiers
-			# Standard
-			triggered_planet_modifier = {
-				potential = {
-					always = yes
-				}
-				modifier = {
-					planet_housing_add = 1
-				}
-				mult = value:tec_habitat_district_housing
-			}
-		# /
-	# /
+	inline_script = districts/inline_evolved_habitat_scaling_district
 
 	# Jobs
 		inline_script = {
@@ -618,7 +472,7 @@ district_hab_mining = {
 			mult = 1
 			display = with_desc
 			trigger = "
-				has_planet_flag = advanced_habitat
+				tec_is_upgraded_habitat = yes
 			"
 		}
 		inline_script = {
@@ -631,7 +485,7 @@ district_hab_mining = {
 			mult = 1
 			display = no_desc
 			trigger = "
-				has_planet_flag = advanced_habitat_2
+				tec_is_fully_upgraded_habitat = yes
 			"
 		}
 		inline_script = {
@@ -641,7 +495,7 @@ district_hab_mining = {
 			mult = 1
 			display = with_desc
 			trigger = "
-				has_planet_flag = advanced_habitat_2
+				tec_is_fully_upgraded_habitat = yes
 			"
 		}
 	# /
@@ -681,49 +535,21 @@ district_hab_science = {
 		# New production
 			produces = {
 				physics_research = 1
-				multiplier = value:tec_automated_district_production|BASE|4|BASE_VALUE|tec_habitat_base_production|ECO_CAT|planet_researchers|RESOURCE|physics_research|
+				multiplier = value:tec_automated_production|BASE|4|BASE_VALUE|tec_habitat_base_production|ECO_CAT|planet_researchers|RESOURCE|physics_research|
 			}
 
 			produces = {
 				society_research = 1
-				multiplier = value:tec_automated_district_production|BASE|4|BASE_VALUE|tec_habitat_base_production|ECO_CAT|planet_researchers|RESOURCE|society_research|
+				multiplier = value:tec_automated_production|BASE|4|BASE_VALUE|tec_habitat_base_production|ECO_CAT|planet_researchers|RESOURCE|society_research|
 			}
 
 			produces = {
 				engineering_research = 1
-				multiplier = value:tec_automated_district_production|BASE|4|BASE_VALUE|tec_habitat_base_production|ECO_CAT|planet_researchers|RESOURCE|engineering_research|
+				multiplier = value:tec_automated_production|BASE|4|BASE_VALUE|tec_habitat_base_production|ECO_CAT|planet_researchers|RESOURCE|engineering_research|
 			}
 		# /	
 	}
-
-	# Indications
-	triggered_desc = {
-		trigger = {
-			planet = {
-				NOT = {
-					has_planet_flag = advanced_habitat_2
-				}
-			}
-		}
-		text = tec_upgradeable_district_habitat
-	}
-	triggered_desc = {
-		text = tec_building_affect_district_habitat
-	}
-
-	# Modifiers
-			# Standard
-			triggered_planet_modifier = {
-				potential = {
-					always = yes
-				}
-				modifier = {
-					planet_housing_add = 1
-				}
-				mult = value:tec_habitat_district_housing
-			}
-		# /
-	# /
+	inline_script = districts/inline_evolved_habitat_scaling_district
 
 	# Jobs
 		inline_script = {
@@ -732,7 +558,7 @@ district_hab_science = {
 			mult = 1
 			display = with_desc
 			trigger = "
-				has_planet_flag = advanced_habitat
+				tec_is_upgraded_habitat = yes
 			"
 		}
 		inline_script = {
@@ -741,7 +567,7 @@ district_hab_science = {
 			mult = 1
 			display = no_desc
 			trigger = "
-				has_planet_flag = advanced_habitat_2
+				tec_is_fully_upgraded_habitat = yes
 			"
 		}
 	# /
@@ -756,10 +582,7 @@ district_hab_commercial = {
 
 		exists = from
 		from = {
-			OR = {
-				is_regular_empire = yes
-				tec_is_trade_gestalt = yes
-			}
+			tec_uses_trade_value = yes
 		}
 		tec_is_arcology_habitat = no
 	}
@@ -769,10 +592,7 @@ district_hab_commercial = {
 
 		exists = owner
 		owner = {
-			OR = {
-				is_regular_empire = yes
-				tec_is_trade_gestalt = yes
-			}
+			tec_uses_trade_value = yes
 		}
 		tec_is_arcology_habitat = no
 	}
@@ -811,29 +631,32 @@ district_hab_commercial = {
 			trigger = ""
 		}
 		inline_script = {
-			script = jobs/inline_evolved_clerk
+			script = districts/effects/inline_evolved_mercantile_trickle_up_economics
 			count = 1
-			mult = 1
-			display = no_desc
+			trigger = ""
+		}
+		
+		inline_script = {
+			script = districts/effects/inline_evolved_mercantile_commercial_enterprise
 			trigger = "
-				owner = {
-					has_active_tradition = tr_mercantile_trickle_up_economics
+				planet = {
+					tec_is_upgraded_habitat = yes
 				}
 			"
-		}
-		inline_script = {
-			script = jobs/inline_evolved_job
-			job = merchant
 			count = 1
-			mult = 1
-			display = with_desc
-			trigger = "
+		}
+
+		triggered_desc = {
+			trigger = {
 				exists = owner
+				planet = {
+					NOT = { tec_is_upgraded_habitat = yes }
+				}
 				owner = {
-					is_regular_empire = yes
 					has_active_tradition = tr_mercantile_commercial_enterprise
 				}
-			"
+			}
+			text = tec_mercantile_commercial_enterprise_needs_t2_hab
 		}
 
 		# machine traders
@@ -852,18 +675,25 @@ district_hab_commercial = {
 		}
 
 		inline_script = {
-			script = jobs/inline_evolved_job
-			job = tec_trade_drone
-			count = 1
-			mult = 1
-			display = no_desc
+			script = districts/effects/inline_evolved_tec_mercantile_commercial_enterprise_gestalt
 			trigger = "
-				exists = owner
-				owner = {
-					tec_is_trade_gestalt = yes
-					has_active_tradition = tr_mercantile_commercial_enterprise_gestalt
+				planet = {
+					tec_is_upgraded_habitat = yes
 				}
 			"
+			count = 1
+		}
+
+		triggered_desc = {
+			trigger = {
+				planet = {
+					NOT = { tec_is_upgraded_habitat = yes }
+				}
+				owner = {
+					has_active_tradition = tr_mercantile_commercial_enterprise
+				}
+			}
+			text = tec_mercantile_commercial_enterprise_needs_t2_hab
 		}
 	# /
 }

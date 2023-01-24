@@ -12,7 +12,7 @@ country_event = {	# Change ruler to the appropiate portrait - gamestart
 	is_triggered_only = yes
 
 	trigger = {
-		tec_aiauth_empire = yes
+		tec_is_aiauth_empire = yes
 	}
 
 	immediate = {
@@ -180,7 +180,7 @@ country_event = {	# Saves and Restores ruler on ruler death
 	hide_window = yes
 
 	trigger = {
-		tec_aiauth_empire = yes
+		tec_is_aiauth_empire = yes
 		from = {
 			leader_class = ruler
 		}
@@ -205,7 +205,7 @@ country_event = {	# Saves leader when the aiauth is removed - PRE
 	hide_window = yes
 
 	trigger = {
-		tec_aiauth_empire = yes
+		tec_is_aiauth_empire = yes
 	}
 
 	immediate = {
@@ -227,7 +227,7 @@ country_event = {	# Restores or creates leader when the aiauth is added - POST
 	hide_window = yes
 
 	trigger = {
-		tec_aiauth_empire = yes
+		tec_is_aiauth_empire = yes
 		exists = ruler
 		ruler = {
 			NOT = {
@@ -312,7 +312,7 @@ country_event = {	# Manages the traits per year
 	hide_window = yes
 
 	trigger = {
-		tec_aiauth_empire = yes
+		tec_is_aiauth_empire = yes
 	}
 
 	immediate = {
@@ -398,7 +398,7 @@ country_event = {	# Recalculates
 	hide_window = yes
 
 	trigger = {
-		tec_aiauth_empire = yes
+		tec_is_aiauth_empire = yes
 	}
 
 	immediate = {
@@ -1802,153 +1802,6 @@ country_event = {
 
 # Trait pickers
 
-
-
-
-# Life seeded events
-# ------------------------------------------------------------
-namespace = tec_gaiaseeded
-pop_event = {
-	id = tec_gaiaseeded.1
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		OR = {
-			AND = {
-				has_trait = @trait_tec_natural_sync
-				from = {
-					tec_is_perfect_planet = no
-				}
-			}
-			AND = {
-				has_trait = @trait_tec_natural_sync_neutral
-				from = {
-					tec_is_neutral_planet = no
-				}
-			}
-			AND = {
-				OR = {
-					has_trait = @trait_tec_natural_sync_bad
-				}
-				from = {
-					tec_is_perfect_planet = yes
-					tec_is_neutral_planet = yes
-				}
-			}
-		}
-	}
-
-	immediate = {
-		# Organic void dwellers
-		if = {
-			limit = {
-				has_trait = trait_pc_gaia_preference
-				OR = {
-					has_trait = @trait_tec_natural_sync
-					has_trait = @trait_tec_natural_sync_neutral
-					has_trait = @trait_tec_natural_sync_bad
-				}
-			}
-			# Good
-			if = {
-				limit = {
-					NOT = {
-						has_trait = @trait_tec_natural_sync
-					}
-					from = {
-						tec_is_perfect_planet = yes
-					}
-				}
-				modify_species = {
-					species = this
-					remove_trait = @trait_tec_natural_sync_bad
-				}
-				modify_species = {
-					species = this
-					remove_trait = @trait_tec_natural_sync_neutral
-				}
-				modify_species = {
-					species = this
-					add_trait = @trait_tec_natural_sync
-				}
-			}
-			# Neutral
-			else_if = {
-				limit = {
-					NOT = {
-						has_trait = @trait_tec_natural_sync_bad
-					}
-					from = {
-						tec_is_neutral_planet = yes
-					}
-				}
-				modify_species = {
-					species = this
-					remove_trait = @trait_tec_natural_sync_bad
-				}
-				modify_species = {
-					species = this
-					add_trait = @trait_tec_natural_sync_neutral
-				}
-				modify_species = {
-					species = this
-					remove_trait = @trait_tec_natural_sync
-				}
-			}
-			# Bad
-			else_if = {
-				limit = {
-					NOT = {
-						has_trait = @trait_tec_natural_sync_bad
-					}
-					from = {
-						tec_is_perfect_planet = no
-						tec_is_neutral_planet = no
-					}
-				}
-				modify_species = {
-					species = this
-					add_trait = @trait_tec_natural_sync_bad
-				}
-				modify_species = {
-					species = this
-					remove_trait = @trait_tec_natural_sync_neutral
-				}
-				modify_species = {
-					species = this
-					remove_trait = @trait_tec_natural_sync
-				}
-			}
-		}
-		# if species dont have gaia preference and the natural sync, removes natural sync
-		if = {
-			limit = {
-				NOT = {
-					has_trait = trait_pc_gaia_preference
-				}
-				OR = {
-					has_trait = @trait_tec_natural_sync
-					has_trait = @trait_tec_natural_sync_neutral
-					has_trait = @trait_tec_natural_sync_bad
-				}
-			}
-			modify_species = {
-				species = this
-				remove_trait = @trait_tec_natural_sync_bad
-			}
-			modify_species = {
-				species = this
-				remove_trait = @trait_tec_natural_sync_neutral
-			}
-			modify_species = {
-				species = this
-				remove_trait = @trait_tec_natural_sync
-			}
-		}
-	}
-}
 
 # Dread armies - reanimators
 # ------------------------------------------------------------
@@ -3787,79 +3640,6 @@ country_event = {
 	}
 }
 
-# Automation Civics
-# ------------------------------------------------------------
-namespace = tec_automation
-
-# Initial calc - Procedural calc when tech is researched
-country_event = { # DEPRECATED
-	id = tec_automation.10
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		OR = {
-			tec_is_automated_empire = yes					# Automation
-		}
-		#NOT = {
-		#	has_country_flag = tec_automation_checker_cd
-		#}
-	}
-
-	immediate = {
-		#set_timed_country_flag = {
-		#	flag = tec_automation_checker_cd
-		#	days = 180
-		#}
-		every_owned_planet = {
-			limit = {
-				uses_district_set = standard
-			}
-			export_modifier_to_variable = {	# Global job production
-				modifier = planet_jobs_produces_mult
-				variable = tec_planet_jobs_produces_mult
-			}
-			tec_recalc_energy_planet_modifiers = yes
-			tec_recalc_minerals_planet_modifiers = yes
-			tec_recalc_food_planet_modifiers = yes
-			clear_variable = tec_planet_jobs_produces_mult
-		}
-	}
-}
-
-# Reiterative calc on planet
-planet_event = { # DEPRECATED
-	id = tec_automation.11
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		OR = {
-			uses_district_set = standard
-		}
-		owner = {
-			OR = {
-				tec_is_automated_empire = yes					# Automation
-			}
-		}
-		#NOT = {
-		#	has_country_flag = tec_automation_checker_cd
-		#}
-	}
-
-	immediate = {
-		export_modifier_to_variable = {	# Global job production
-			modifier = planet_jobs_produces_mult
-			variable = tec_planet_jobs_produces_mult
-		}
-		tec_recalc_energy_planet_modifiers = yes
-		tec_recalc_minerals_planet_modifiers = yes
-		tec_recalc_food_planet_modifiers = yes
-		clear_variable = tec_planet_jobs_produces_mult
-	}
-}
-
-
 # Envoy Civics
 # ------------------------------------------------------------
 namespace = tec_envoy
@@ -5001,7 +4781,10 @@ planet_event = {
 	trigger = {
 		has_planet_flag = tec_servitor_snatcher_candidate
 		has_branch_office = yes
-		has_building = building_tec_machinecorp_carebots_2
+		has_holding = {
+			holding = building_tec_machinecorp_carebots_2
+			owner = branch_office_owner
+		}
 		# double check just in case
 		branch_office_owner = {
 			is_gestalt = yes
@@ -5051,7 +4834,7 @@ planet_event = {
 										}
 										prev = {
 											# For avoiding messy errors or op habitability
-											tec_is_vanilla_habitable_regular_planet = yes
+											tec_is_habitable_regular_planet = yes
 										}
 										NOT = {
 											ideal_planet_class = prev

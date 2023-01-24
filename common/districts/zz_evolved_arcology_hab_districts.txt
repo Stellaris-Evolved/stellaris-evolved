@@ -30,7 +30,7 @@
 # /
 
 @tec_arc_hab_cost = 750
-@tec_arc_hab_cost_sr = 25
+@tec_arc_hab_cost_sr = 50
 @tec_arc_hab_maintenance = 5
 @tec_arc_hab_maintenance_sr = 1
 
@@ -82,7 +82,7 @@ district_tec_hab_arcology_housing = {
 				trigger = ""
 			}
 			
-			inline_script = districts/inline_evolved_artifice_2_modifiers
+			inline_script = districts/effects/inline_evolved_tec_artifice_2
 		# /
 	# /
 
@@ -105,15 +105,9 @@ district_tec_hab_arcology_housing = {
 				trigger = ""
 			}
 			inline_script = {
-				script = jobs/inline_evolved_maintenance_drone
-				count = 1
-				mult = 1
-				display = no_desc
-				trigger = "
-					owner = {
-						has_technology = tech_housing_2
-					}
-				"
+				script = districts/effects/inline_evolved_tech_housing_2_gestalt
+				count = 2
+				trigger = ""
 			}
 		# /
 	# /
@@ -128,10 +122,7 @@ district_tec_hab_arcology_trade = {
 		tec_is_arcology_habitat = yes
 		exists = from
 		from = {
-			OR = {
-				is_regular_empire = yes
-				tec_is_trade_gestalt = yes
-			}
+			tec_uses_trade_value = yes
 		}
 	}
 
@@ -139,25 +130,25 @@ district_tec_hab_arcology_trade = {
 		tec_is_arcology_habitat = yes
 		exists = owner
 		owner = {
-			OR = {
-				is_regular_empire = yes
-				tec_is_trade_gestalt = yes
-			}
+			tec_uses_trade_value = yes
 		}
 	}
 
 	conversion_ratio = 1
 	convert_to = {
 		district_hab_commercial
+		district_tec_hab_arcology_housing
 	}
 
 	resources = {
 		category = planet_districts
 		cost = {
 			minerals = @tec_arc_hab_cost
+			rare_crystals = @tec_arc_hab_cost_sr
 		}
 		upkeep = {
 			energy = @tec_arc_hab_maintenance
+			rare_crystals = @tec_arc_hab_maintenance_sr
 		}
 	}
 
@@ -172,24 +163,19 @@ district_tec_hab_arcology_trade = {
 		# Regular
 			inline_script = {
 				script = jobs/inline_evolved_clerk
-				count = 5
+				count = 4
 				mult = 1
 				display = with_desc
 				trigger = ""
 			}
 			
 			inline_script = {
-				script = jobs/inline_evolved_clerk
+				script = districts/effects/inline_evolved_mercantile_trickle_up_economics
 				count = 1
-				mult = 1
-				display = no_desc
-				trigger = "
-					owner = {
-						has_active_tradition = tr_mercantile_trickle_up_economics
-					}
-				"
+				trigger = ""
 			}
 
+			
 			inline_script = {
 				script = jobs/inline_evolved_job
 				job = merchant
@@ -200,26 +186,31 @@ district_tec_hab_arcology_trade = {
 					exists = owner
 					owner = {
 						is_regular_empire = yes
-						has_active_tradition = tr_mercantile_commercial_enterprise
 					}
 				"
+			}
+
+			inline_script = {
+				script = districts/effects/inline_evolved_mercantile_commercial_enterprise
+				trigger = ""
+				count = 1
 			}
 		# /
 		# Gestalt
 			inline_script = {
 				script = jobs/inline_evolved_maintenance_drone
+				count = 3
+				mult = 1
+				display = with_desc
+				trigger = ""
+			}
+
+			inline_script = {
+				script = jobs/inline_evolved_job
+				job = tec_trade_drone
 				count = 2
 				mult = 1
 				display = with_desc
-				trigger = ""
-			}
-
-			inline_script = {
-				script = jobs/inline_evolved_job
-				job = tec_trade_drone
-				count = 3
-				mult = 1
-				display = with_desc
 				trigger = "
 					exists = owner
 					owner = {
@@ -229,98 +220,14 @@ district_tec_hab_arcology_trade = {
 			}
 
 			inline_script = {
-				script = jobs/inline_evolved_job
-				job = tec_trade_drone
+				script = districts/effects/inline_evolved_tec_mercantile_commercial_enterprise_gestalt
+				trigger = ""
 				count = 1
-				mult = 1
-				display = no_desc
-				trigger = "
-					exists = owner
-					owner = {
-						tec_is_trade_gestalt = yes
-						has_active_tradition = tr_mercantile_commercial_enterprise_gestalt
-					}
-				"
 			}
 		# /
 	# /
 }
 
-district_tec_hab_arcology_maintenance = {
-	icon = district_hab_energy
-	base_buildtime = 600
-	is_capped_by_modifier = no
-
-	show_on_uncolonized = {
-		tec_is_arcology_habitat = yes
-		exists = from
-		from = {
-			NOR = {
-				is_regular_empire = yes
-				tec_is_trade_gestalt = yes
-			}
-		}
-	}
-
-	potential = {
-		tec_is_arcology_habitat = yes
-		exists = owner
-		owner = {
-			NOR = {
-				is_regular_empire = yes
-				tec_is_trade_gestalt = yes
-			}
-		}
-	}
-
-	conversion_ratio = 1
-	convert_to = {
-		district_hab_commercial
-	}
-
-	resources = {
-		category = planet_districts
-		cost = {
-			minerals = @tec_arc_hab_cost
-		}
-		# New production
-			produces = {
-				energy = 1
-				multiplier = value:tec_automated_district_production|BASE|10|ECO_CAT|planet_technician|RESOURCE|energy|REQUISITON|has_energy_requisitorium|REQUISITION_AMOUNT|@requisitorium_energy_reduction|
-			}
-		# /
-	}
-
-	# Modifiers
-		# Standard
-			planet_modifier = {
-				planet_housing_add = 5
-			}
-		# /
-	# /
-	# Jobs
-		# Gestalt
-			inline_script = {
-				script = jobs/inline_evolved_maintenance_drone
-				count = 3
-				mult = 1
-				display = with_desc
-				trigger = ""
-			}
-
-			inline_script = {
-				script = jobs/inline_evolved_technician
-				regular_count = 2
-				hive_count = 2
-				machine_count = 2
-				machine_aquatic_count = 2
-				mult = 1
-				display = with_desc
-				trigger = ""
-			}
-		# /
-	# /
-}
 
 # --------------- Production
 district_tec_hab_arcology_foundry = {
@@ -356,14 +263,17 @@ district_tec_hab_arcology_foundry = {
 		produces = {
 			alloys = 5
 		}
+		inline_script = districts/resources/inline_evolved_industrial_maintenance_upkeep
 	}
 
-	# Modifiers
-		# Standard
-			planet_modifier = {
-				planet_housing_add = 5
-			}
-		# /
+	# Standard
+		planet_modifier = {
+			planet_housing_add = 5
+		}
+	# /
+	
+	# Edicts
+		inline_script = districts/effects/inline_evolved_industrial_maintenance
 	# /
 	# Jobs
 		inline_script = {
@@ -409,14 +319,17 @@ district_tec_hab_arcology_industry = {
 		produces = {
 			consumer_goods = 5
 		}
+		inline_script = districts/resources/inline_evolved_industrial_maintenance_upkeep
 	}
 
-	# Modifiers
-		# Standard
-			planet_modifier = {
-				planet_housing_add = 5
-			}
-		# /
+	# Standard
+		planet_modifier = {
+			planet_housing_add = 5
+		}
+	# /
+	
+	# Edicts
+		inline_script = districts/effects/inline_evolved_industrial_maintenance
 	# /
 	# Jobs
 		inline_script = {
@@ -462,17 +375,17 @@ district_tec_hab_arcology_research = {
 		# New production
 			produces = {
 				physics_research = 1
-				multiplier = value:tec_automated_district_production|BASE|4|BASE_VALUE|tec_habitat_base_production|ECO_CAT|planet_researchers|RESOURCE|physics_research|
+				multiplier = value:tec_automated_production|BASE|4|BASE_VALUE|tec_habitat_base_production|ECO_CAT|planet_researchers|RESOURCE|physics_research|
 			}
 
 			produces = {
 				society_research = 1
-				multiplier = value:tec_automated_district_production|BASE|4|BASE_VALUE|tec_habitat_base_production|ECO_CAT|planet_researchers|RESOURCE|society_research|
+				multiplier = value:tec_automated_production|BASE|4|BASE_VALUE|tec_habitat_base_production|ECO_CAT|planet_researchers|RESOURCE|society_research|
 			}
 
 			produces = {
 				engineering_research = 1
-				multiplier = value:tec_automated_district_production|BASE|4|BASE_VALUE|tec_habitat_base_production|ECO_CAT|planet_researchers|RESOURCE|engineering_research|
+				multiplier = value:tec_automated_production|BASE|4|BASE_VALUE|tec_habitat_base_production|ECO_CAT|planet_researchers|RESOURCE|engineering_research|
 			}
 		# /	
 	}
@@ -486,12 +399,14 @@ district_tec_hab_arcology_research = {
 	# /
 	# Jobs
 		inline_script = {
-			script = jobs/inline_evolved_researcher
+			script = jobs/inline_evolved_researcher_split
 			count = 5
+			count_half = 2
 			mult = 1
 			display = with_desc
 			trigger = ""
 		}
+		
 	# /
 }
 
@@ -523,7 +438,7 @@ district_tec_hab_arcology_administration = {
 
 		produces = {
 			unity = 1
-			multiplier = value:tec_automated_district_production|BASE|8|ECO_CAT|planet_administrators|RESOURCE|unity|
+			multiplier = value:tec_automated_production|BASE|8|ECO_CAT|planet_administrators|RESOURCE|unity|
 		}
 	}
 	
@@ -545,52 +460,37 @@ district_tec_hab_arcology_administration = {
 	# Jobs
 		# Regular
 			inline_script = {
-				script = jobs/inline_evolved_bureaucrat
+				script = jobs/inline_evolved_admin_split
 				count = 5
+				count_half = 2
+				megacorp_count = 3
+				megacorp_count_half = 1
 				mult = 1
 				display = with_desc
-				trigger = "
-					owner = {
-						is_spiritualist = no
-						has_make_spiritualist_perk = no
-					}
-				"
+				trigger = ""
 			}
 			inline_script = {
-				script = jobs/inline_evolved_priest
-				count = 5
-				mult = 1
-				display = with_desc
-				trigger = "
-					owner = {
-						OR = {
-							is_spiritualist = yes
-							has_make_spiritualist_perk = yes
-						}
-					}
-				"
-			}
-
-			inline_script = {
-				script = jobs/inline_evolved_priest
+				script = jobs/inline_evolved_admin_split
 				count = -2
+				count_half = -1
+				megacorp_count = -1
+				megacorp_count_half = 0
 				mult = 1
 				display = no_desc
 				trigger = "
-					owner = {
-						tec_is_spiritualist_secondary_cult = yes
-					}
+					owner = { tec_is_death_cult = yes }
 				"
 			}
-	
 			inline_script = {
-				script = jobs/inline_evolved_priest_swaps
+				script = jobs/inline_evolved_job
+				job = mortal_initiate
 				count = 2
 				mult = 1
 				display = with_desc
 				trigger = "
+					exists = owner
 					owner = {
-						tec_is_spiritualist_secondary_cult = yes
+						tec_is_death_cult = yes
 					}
 				"
 			}
@@ -640,6 +540,7 @@ district_tec_hab_arcology_leisure = {
 	convert_to = {
 		district_hab_cultural
 		district_orders_demesne
+		district_tec_hab_arcology_leisure
 	}
 
 	resources = {
@@ -746,6 +647,87 @@ district_tec_hab_arcology_leisure = {
 						has_valid_civic = civic_machine_servitor
 					}
 				"
+			}
+		# /
+	# /
+}
+
+
+district_tec_hab_arcology_maintenance = {
+	icon = district_hab_energy
+	base_buildtime = 600
+	is_capped_by_modifier = no
+
+	show_on_uncolonized = {
+		tec_is_arcology_habitat = yes
+		exists = from
+		from = {
+			tec_uses_trade_value = yes
+		}
+	}
+
+	potential = {
+		tec_is_arcology_habitat = yes
+		exists = owner
+		owner = {
+			tec_uses_trade_value = yes
+		}
+	}
+
+	conversion_ratio = 1
+	convert_to = {
+		district_tec_hab_arcology_leisure
+		district_hab_cultural
+		district_orders_demesne
+	}
+
+	resources = {
+		category = planet_districts
+		cost = {
+			minerals = @tec_arc_hab_cost
+		}
+		# New production
+			produces = {
+				energy = 1
+				multiplier = value:tec_automated_production|BASE|10|ECO_CAT|planet_technician|RESOURCE|energy|REQUISITON|has_energy_requisitorium|REQUISITION_AMOUNT|@requisitorium_energy_reduction|
+			}
+		# /
+	}
+
+	# Modifiers
+		# Standard
+			planet_modifier = {
+				planet_housing_add = 5
+			}
+		# /
+	# /
+	# Jobs
+		# Gestalt
+			inline_script = {
+				script = jobs/inline_evolved_job
+				job = tec_spareparts_drone
+				count = 1
+				mult = 1
+				display = with_desc
+				trigger = ""
+			}
+			inline_script = {
+				script = jobs/inline_evolved_maintenance_drone
+				count = 2
+				mult = 1
+				display = with_desc
+				trigger = ""
+			}
+
+			inline_script = {
+				script = jobs/inline_evolved_technician
+				regular_count = 2
+				hive_count = 2
+				machine_count = 2
+				machine_aquatic_count = 2
+				mult = 1
+				display = with_desc
+				trigger = ""
 			}
 		# /
 	# /

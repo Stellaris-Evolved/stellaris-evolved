@@ -33,12 +33,14 @@ can_generate_leader_from_pop = {
 		root = { is_machine_empire = yes }
 		root = { is_mechanical_empire = yes }
 	}
+	# Evolved
 	OR = {
 		NOT = {
 			has_trait = @trait_tec_bioservant
 		}
 		root = { has_technology = tech_tec_bioservant_3 }
 	}
+	# /
 	OR = {
 		is_same_species = root
 		root = {
@@ -49,7 +51,22 @@ can_generate_leader_from_pop = {
 		}
 	}
 	# Evolved
-	NOT = { has_trait = @trait_tec_se_subspecies }
+	if = {
+		limit = {
+			has_trait = @trait_tec_se_subspecies
+		}
+		OR = {
+			is_same_species = root
+			root = {
+				OR = {
+					has_country_flag = tec_gene_elder_cured
+					has_country_flag = tec_replicant_elder_cured
+					has_country_flag = tec_biopsionic_elder_cured
+				}
+			}
+		}
+	}
+	# /
 }
 
 #Root = country
@@ -79,7 +96,22 @@ can_generate_leader_from_species = {
 		}
 		has_citizenship_type = { type = citizenship_full country = root }
 		# Evolved
-		NOT = { has_trait = @trait_tec_se_subspecies }
+			if = {
+				limit = {
+					has_trait = @trait_tec_se_subspecies
+				}
+				OR = {
+					is_same_species = root
+					root = {
+						OR = {
+							has_country_flag = tec_gene_elder_cured
+							has_country_flag = tec_replicant_elder_cured
+							has_country_flag = tec_biopsionic_elder_cured
+						}
+					}
+				}
+			}
+		# /
 	}
 }
 
@@ -178,10 +210,13 @@ can_release_vassal_from_species = {
 # Checks if a pop can be assembled
 # This = Species
 # Root = Planet
-# Note: Reviewed and optimized by Roadd@02/12/21
 can_species_be_assembled = {
 	is_sapient = yes
 	tec_can_assemble_species_due_to_purity_assembly_policy = yes
+	has_population_control = {
+		type = no
+		country = root.owner
+	}
 	OR = {
 		AND = { # Evolved - Robots/Machine units/Synths rule - can only be assembled with regular assembly
 			is_robotic = yes
@@ -205,11 +240,36 @@ can_species_be_assembled = {
 		}
 		AND = { # Evolved - Regular Organic rule - As closer as vanilla as possible
 			is_organic_species = yes
-			NOT = {
-				is_archetype = BIOSERVANT
+			tec_is_bioservant_species = no
+			else_if = {
+				limit = {
+					root.owner = { is_hive_empire = yes }
+				}
+				AND = {
+					has_trait = trait_hive_mind
+				}
 			}
-			# Moved up to take priority over hive in special cases
-			if = { # Clone army thing
+			else_if = {	# Self-replicating pop - only assembles itself
+				limit = {
+					tec_is_self_replicating_species = yes	# This includes budding/tiyanki
+				}
+				root = {
+					any_owned_species = {
+						is_exact_same_species = prevprev
+					}
+				}
+				# Note: this must be placed above hive rule
+			}
+			else_if = {	
+				# Cyborg
+				limit = {
+					root.owner = {
+						tec_allows_machine_assembly_for_cyborg = yes
+					}
+				}
+				tec_is_cyborg_species = yes
+			}
+			else_if = { # Clone army thing
 				limit = {	# Made the triggers for a future clone army revamp
 					tec_is_clone_origin_species = yes
 				}
@@ -252,51 +312,6 @@ can_species_be_assembled = {
 					}
 				} 
 			# /
-			else_if = {	# Self-replicating pop - only assembles itself
-				limit = {
-					tec_is_self_replicating_species = yes	# This includes budding/tiyanki
-				}
-				root = {
-					any_owned_species = {
-						is_exact_same_species = prevprev
-					}
-					tec_blocks_organic_assembly = no
-				}
-				# Note: this must be placed above hive rule
-			}
-			else_if = {	# Hives can only assemble drones with spawning pools/queens only breed their own types
-				limit = {
-					root.owner = { is_hive_empire = yes }
-				}
-				AND = {
-					has_trait = trait_hive_mind
-				}
-				# Stellaris Evolved
-				root = {
-					tec_can_assemble_organic_hive_species = yes
-				}
-			}
-			else_if = {	# Cyborgs - this will not be present in evolved
-				limit = {
-					root.owner = {
-						tec_allows_machine_assembly_for_cyborg = yes
-					}
-				}
-				tec_is_cyborg_species = yes
-			}
-			else_if = {	# Zombies
-				limit = {
-					root.owner = { has_civic = civic_permanent_employment }
-				}
-				root = {
-					has_building = building_posthumous_employment_center
-				}
-			}
-			#else_if = {
-			#	limit = {
-			#		root = { has_modifier = tiyanki_trophy }
-			#	}
-			#}
 			else = {	# Regular assembly
 				root = {
 					OR = {
@@ -304,43 +319,21 @@ can_species_be_assembled = {
 						tec_has_genetic_buildings = yes
 						has_modifier = tiyanki_trophy
 						owner = { has_modifier = syamelles_curse }
+						AND = {
+							has_building = building_posthumous_employment_center
+							owner = { has_civic = civic_permanent_employment }
+						}
 						has_planet_flag = can_organic_assemble_flag #for mod compatibility
 					}
-					tec_blocks_organic_assembly = no
 				}
 			}
 		}
-		AND = {	# Evolved - Bioservants rule - Can be assembled with bioservant facilities present
-			has_global_flag = stellarisevolved
-			is_archetype = BIOSERVANT
+		AND = {
+			tec_is_bioservant_species = yes
 			root = {
-				check_modifier_value = {
-					modifier = planet_pop_assembly_organic_add
-					value > 0
-				}
 				tec_has_bioservant_buildings = yes
 			}
 		}
-		AND = {	# Evolved - Replicants rule - Just made if assembly is present, op nanocomposition
-			has_global_flag = stellarisevolved
-			is_archetype = REPLICANT
-			root = {
-				OR = {
-					check_modifier_value = {
-						modifier = planet_pop_assembly_organic_add
-						value > 0
-					}
-					check_modifier_value = {
-						modifier = planet_pop_assembly_add
-						value > 0
-					}
-				}
-			}
-		}
-	}
-	has_population_control = {
-		type = no
-		country = root.owner
 	}
 }
 
@@ -348,13 +341,12 @@ can_species_be_assembled = {
 # Checks if a pop can procreate
 # This = Species
 # Root = Planet
-can_species_procreate = {
+can_species_procreate = {	# Aka can_species_grow_on_planet
 	is_sapient = yes
 	NOR = {
 		has_trait = trait_machine_unit
 		has_trait = trait_mechanical
 		has_trait = trait_tec_sterile
-	#	has_trait = trait_tec_enigmatic_elder
 	}
 	NAND = {
 		root = { has_modifier = slave_colony }
@@ -375,24 +367,35 @@ can_species_procreate = {
 	}
 	NOT = { has_species_flag = nivlac_no_procreation }
 	# Evolved
-	if = { # Apathic servitors control the population of non trophies pretty well
-		limit = {
-			root.owner = {
-				has_valid_civic = civic_machine_servitor
-				has_ethic = ethic_gestalt_apathy
-			}
-			NOT = {
-				has_species_flag = tec_original_biotrophy_@root.owner 
-			}
-		}
-		NOT = {
-			root = {
-				any_owned_species = {
+		if = { # Apathic servitors control the population of non trophies pretty well
+			limit = {
+				root.owner = {
+					has_valid_civic = civic_machine_servitor
+					has_ethic = ethic_gestalt_apathy
+				}
+				NOT = {
 					has_species_flag = tec_original_biotrophy_@root.owner 
 				}
 			}
+			NOT = {
+				root = {
+					any_owned_species = {
+						has_species_flag = tec_original_biotrophy_@root.owner 
+					}
+				}
+			}
 		}
-	}
+		if = { # Upgraded replicants CAN'T grow
+			limit = {
+				root.owner = {
+					has_country_flag = tec_replicant_upgraded
+				}
+			}
+			NOT = {
+				has_trait = trait_tec_replicant_standard
+			}
+		}
+	# /
 }
 
 # ------------------------- Unedited - for review
@@ -454,10 +457,7 @@ can_build_branch_offices = {
 			}
 			custom_tooltip = {
 				fail_text = BRANCH_OFFICE_NOT_MEGACORP
-				OR = {
-					is_megacorp = yes
-					has_civic = civic_galactic_sovereign_megacorp
-				}
+				has_corporate_government = yes
 			}
 		}
 		else_if = {
@@ -570,8 +570,7 @@ can_build_branch_office_on_planet = {
 			root = {	# Roadd @02/12/21
 				is_subject = yes
 				OR = {
-					is_megacorp = yes
-					has_civic = civic_galactic_sovereign_megacorp
+					has_corporate_government = yes
 					# Stellaris Evolved
 					tec_is_symbiotic_gestalt = yes
 				}
@@ -590,8 +589,7 @@ can_build_branch_office_on_planet = {
 						is_same_value = root.overlord
 					}
 					OR = {
-						is_megacorp = yes
-						has_civic = civic_galactic_sovereign_megacorp
+						has_corporate_government = yes
 						# Stellaris Evolved
 						tec_is_symbiotic_gestalt = yes
 					}
@@ -624,8 +622,7 @@ can_build_branch_office_on_planet = {
 						is_subject = yes
 						overlord = {
 							NOR = {
-								is_megacorp = yes
-								has_civic = civic_galactic_sovereign_megacorp
+								has_corporate_government = yes
 								# Stellaris Evolved
 								tec_is_symbiotic_gestalt = yes
 							}
@@ -641,8 +638,7 @@ can_build_branch_office_on_planet = {
 					is_subject = yes
 					overlord = {
 						OR = {
-							is_megacorp = yes
-							has_civic = civic_galactic_sovereign_megacorp
+							has_corporate_government = yes
 							# Stellaris Evolved
 							tec_is_symbiotic_gestalt = yes
 						}
@@ -665,7 +661,9 @@ can_build_branch_office_on_planet = {
 		fail_text = BRANCH_OFFICE_TEC_NOT_RELATION
 		exists = owner
 		OR = {
-			root = { is_megacorp = yes }
+			root = { 
+				has_corporate_government = yes
+			}
 			root = {
 				has_valid_civic = civic_tec_machine_traders
 				tec_is_symbiotic_machine = yes
@@ -754,12 +752,8 @@ can_build_branch_office_on_planet = {
 is_criminal_syndicate_rule = {
 	OR = {
 		AND = {
-			OR = {
-				is_megacorp = yes
-				has_valid_civic = civic_galactic_sovereign_megacorp
-			}
+			has_corporate_government = yes
 			has_valid_civic = civic_criminal_heritage
-			tec_is_parasite_hivemind = no
 		}
 		tec_is_parasite_hivemind = yes
 	}

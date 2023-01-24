@@ -1,0 +1,389 @@
+### -------------------------------
+##	COMPATIBILITY SCRIPTED TRIGGERS
+### -------------------------------
+
+has_stellaris_evolved = {
+	always = yes
+}
+
+# Submods/patches
+has_stellaris_evolved_giga = {
+	always = no
+}
+
+has_stellaris_evolved_pd = {
+	always = no
+}
+
+
+# PSE compatibility
+pse_species_is_psionic = { #species scope
+	species = {
+		OR = {
+			# Vanilla
+			has_trait = trait_latent_psionic
+			has_trait = trait_psionic
+			# Evolved
+			tec_is_any_psionic_species = yes
+		}
+	}
+}
+
+pse_leader_is_psionic = { #use at leader scope
+	OR = {
+		has_trait = leader_trait_admiral_psionic
+		has_trait = leader_trait_general_psionic
+		has_trait = leader_trait_governor_psionic
+		has_trait = leader_trait_scientist_psionic
+		has_trait = leader_trait_ruler_psionic
+		has_trait = leader_trait_admiral_chosen
+		has_trait = leader_trait_general_chosen
+		has_trait = leader_trait_governor_chosen
+		has_trait = leader_trait_scientist_chosen
+		has_trait = leader_trait_ruler_chosen
+
+		# Evolved
+		tec_is_psionic_leader = yes
+	}
+}
+
+
+
+# BSW2 COMPATIBILITY
+
+# checks whether an empire may research tesla weapons : requires machine or synthetically-ascended empire
+ESC_TRIGGER_may_research_tesla_weapons = {
+	OR = {
+		has_country_flag = ESC_COUNTRY_FLAG_mod_allow_tesla_weapons
+		is_machine_empire = yes
+		NOT = { host_has_dlc = "Utopia" }
+		AND = {
+			host_has_dlc = "Utopia"
+			OR = {
+				has_ascension_perk = ap_synthetic_evolution
+				#evolved
+					has_ascension_perk = ap_tec_replicant
+				# /
+			}
+		}
+	}
+}
+
+# checks whether an empire may research cybernetically-augmented amoeba : requires machine or cybernetic empire
+ESC_TRIGGER_may_research_cybernetic_amoeba = {
+	OR = {
+		has_country_flag = ESC_COUNTRY_FLAG_mod_allow_cybernetic_amoeba
+		is_machine_empire = yes
+		NOT = { host_has_dlc = "Utopia" }
+		AND = {
+			host_has_dlc = "Utopia"
+			tec_has_cybernetic_ascension_path = yes
+		}
+	}
+}
+
+# checks whether a machine empire can do special project to research psionics
+ESC_TRIGGER_can_do_machine_psionics_special_project = {
+	is_machine_empire = yes
+	any_owned_pop = {
+		is_being_purged = no
+		is_enslaved = no
+		OR = {
+			has_trait = trait_psionic
+			has_trait = trait_latent_psionic
+			# Evolved
+				tec_is_any_psionic_species = yes
+			# /	
+		}
+	}
+}
+
+# checks whether an empire may research basic psionic weapons : must know about psionics
+ESC_TRIGGER_may_research_psionic_weapons_basic = {
+	OR = {
+		has_technology = tech_psionic_theory
+		is_hive_empire = yes # hive minds are canonically psionic
+		has_country_flag = ESC_COUNTRY_FLAG_machine_psionics
+		has_ascension_perk = @MRE_psi_machine_ap
+		has_country_flag = ESC_COUNTRY_FLAG_mod_allow_basic_psionic_weapons
+	}
+}
+
+# checks whether an empire may research advanced psionic weapons : must be psionically ascended
+ESC_TRIGGER_may_research_psionic_weapons_advanced = {
+	OR = {
+		has_country_flag = ESC_COUNTRY_FLAG_mod_allow_advanced_psionic_weapons
+		has_ascension_perk = @FQ_Ompnipresence
+		has_ascension_perk = @MRE_psi_machine_ap
+		AND = {
+			NOT = { host_has_dlc = "Utopia" }
+			is_gestalt = no
+		}
+		AND = {
+			host_has_dlc = "Utopia"
+			tec_has_psionic_ascension_path = yes
+		}
+	}
+}
+
+
+# checks whether an empire may research advanced nanite weapons : must be machine or cybernetic
+ESC_TRIGGER_may_research_nanite_weapons_advanced = {
+	# NOT = { has_global_flag = ESC_GLOBAL_FLAG_nanite_technology_fobidden }
+	OR = {
+		has_country_flag = ESC_COUNTRY_FLAG_mod_allow_advanced_nanite_weapons
+		is_machine_empire = yes
+		NOT = { host_has_dlc = "Utopia" }
+		AND = {
+			host_has_dlc = "Utopia"
+			tec_has_cybernetic_ascension_path = yes
+		}
+	}
+}
+
+
+# Other E&C / Bug branch comps
+is_anthropocentric = {
+	is_industrialist = yes
+}
+
+is_ecocentric = {
+	is_ecologist = yes
+}
+
+is_competitive = {
+	is_capitalism = yes
+}
+
+is_cooperative = {
+	is_socialism = yes
+}
+
+# Modded capital trigger
+
+# Modded capital triggers
+
+# ACOT
+has_enigmatic_capital = {
+	if = {
+		limit = { owner = { is_hive_empire = yes } }
+		custom_tooltip = {
+			fail_text = "requires_building_fe_capital_hive"
+			OR = {
+				has_building = building_imperial_hive_capital
+				# Evolved
+				has_building = building_tec_cyberhive_imperial_capital
+				has_building = building_tec_biohive_imperial_capital
+				# ACOT
+				has_building = @building_dm_ancient_hive_cluster
+				has_building = @building_ae_ancient_hive_cluster
+				has_building = @building_phanon_tower
+				# AOT
+				has_building = @building_stellarite_hive_cluster
+				has_building = @building_phanon_hive_cluster
+				# galacot
+				has_building = @building_dm_galactic_hive_capital
+				has_building = @building_ae_galactic_hive_capital
+				has_building = @building_stellarite_galactic_hive_capital
+			}
+		}
+	}
+	else_if = {
+		limit = { owner = { is_machine_empire = yes } }
+		custom_tooltip = {
+			fail_text = "requires_building_fe_capital_machine"
+			OR = {
+				has_building = building_imperial_machine_capital
+				# Evolved
+				has_building = building_tec_old_machine_imperial_capital
+				# ACOT
+				has_building = @building_dm_ancient_control_center 
+				has_building = @building_ae_ancient_control_center
+				has_building = @building_phanon_tower
+				# AOT
+				has_building = @building_stellarite_control_center
+				has_building = @building_phanon_control_center
+				# galacot
+				has_building = @building_dm_galactic_machine_capital
+				has_building = @building_ae_galactic_machine_capital
+				has_building = @building_stellarite_galactic_machine_capital
+				# Twinks Eternal
+				has_building = @building_eternal_nexus_ai
+			}
+		}
+	}
+	else = {
+		custom_tooltip = {
+			fail_text = "requires_building_fe_capital"
+			OR = {
+				has_building = building_imperial_capital
+				# Evolved
+				has_building = building_tec_scifi_imperial_capital
+				# has_building = @building_tec_exo_imperial_capital
+				# has_building = @building_tec_bio_imperial_capital
+				# has_building = @building_tec_kohn_imperial_capital
+				# ACOT
+				has_building = @building_dm_ancient_palace
+				has_building = @building_ae_ancient_palace
+				has_building = @building_phanon_tower
+				# AOT
+				has_building = @building_stellarite_palace
+				has_building = @building_phanon_palace
+				# Twinks Atlantean
+				has_building = @building_ancient_palace_at
+				# Twinks Kaldorei
+				has_building = @building_nightelf_palace
+				# Twinks Eternal
+				has_building = @building_eternal_palace
+				# galacot
+				has_building = @building_dm_galactic_capital
+				has_building = @building_ae_galactic_capital
+				has_building = @building_stellarite_galactic_capital
+				has_building = @building_dm_galactic_hive_capital
+				has_building = @building_ae_galactic_hive_capital
+				has_building = @building_stellarite_galactic_hive_capital
+				has_building = @building_dm_galactic_machine_capital
+				has_building = @building_ae_galactic_machine_capital
+				has_building = @building_stellarite_galactic_machine_capital
+			}
+		}
+	}	
+}
+
+has_ascended_capital = {
+	if = {
+		limit = { owner = { is_hive_empire = yes } }
+		custom_tooltip = {
+			fail_text = "requires_building_fe_capital_hive"
+			OR = {
+				has_building = building_imperial_hive_capital
+				# Evolved
+				has_building = building_tec_cyberhive_imperial_capital
+				has_building = building_tec_biohive_imperial_capital
+				# ACOT
+				has_building = @building_ae_ancient_hive_cluster
+				has_building = @building_phanon_tower
+				# AOT
+				has_building = @building_stellarite_hive_cluster
+				has_building = @building_phanon_hive_cluster
+				# galacot
+				has_building = @building_ae_galactic_hive_capital
+				has_building = @building_stellarite_galactic_hive_capital
+			}
+		}
+	}
+	else_if = {
+		limit = { owner = { is_machine_empire = yes } }
+		custom_tooltip = {
+			fail_text = "requires_building_fe_capital_machine"
+			OR = {
+				has_building = building_imperial_machine_capital
+				# Evolved
+				has_building = building_tec_old_machine_imperial_capital
+				# ACOT
+				has_building = @building_ae_ancient_control_center
+				has_building = @building_phanon_tower
+				# AOT
+				has_building = @building_stellarite_control_center
+				has_building = @building_phanon_control_center
+				# galacot
+				has_building = @building_ae_galactic_machine_capital
+				has_building = @building_stellarite_galactic_machine_capital
+				# Twinks Eternal
+				has_building = @building_eternal_nexus_ai
+			}
+		}
+	}
+	else = {
+		custom_tooltip = {
+			fail_text = "requires_building_fe_capital"
+			OR = {
+				has_building = building_imperial_capital
+				# Evolved
+				has_building = building_tec_scifi_imperial_capital
+				# has_building = @building_tec_exo_imperial_capital
+				# has_building = @building_tec_bio_imperial_capital
+				# has_building = @building_tec_kohn_imperial_capital
+				# ACOT
+				has_building = @building_ae_ancient_palace
+				has_building = @building_phanon_tower
+				# AOT
+				has_building = @building_stellarite_palace
+				has_building = @building_phanon_palace
+				# Twinks Atlantean
+				has_building = @building_ancient_palace_at
+				# Twinks Kaldorei
+				has_building = @building_nightelf_palace
+				# Twinks Eternal
+				has_building = @building_eternal_palace
+				# galacot
+				has_building = @building_ae_galactic_capital
+				has_building = @building_stellarite_galactic_capital
+				has_building = @building_ae_galactic_hive_capital
+				has_building = @building_stellarite_galactic_hive_capital
+				has_building = @building_ae_galactic_machine_capital
+				has_building = @building_stellarite_galactic_machine_capital
+			}
+		}
+	}	
+}
+
+# AOT/Twinks/galacot/Eternals
+has_stellarite_capital = {
+	if = {
+		limit = { owner = { is_hive_empire = yes } }
+		custom_tooltip = {
+			fail_text = "requires_building_stellarite_capital_hive"
+			OR = {
+				has_building = building_imperial_hive_capital
+				# Evolved
+				has_building = building_tec_cyberhive_imperial_capital
+				has_building = building_tec_biohive_imperial_capital
+				# ACOT
+				has_building = @building_phanon_tower
+				# AOT
+				has_building = @building_stellarite_hive_cluster
+				# GALACOT
+				has_building = @building_stellarite_galactic_hive_capital
+			}
+		}
+	}
+	else_if = {
+		limit = { owner = { is_machine_empire = yes } }
+		custom_tooltip = {
+			fail_text = "requires_building_stellarite_capital_machine"
+			OR = {
+				has_building = building_imperial_machine_capital
+				# Evolved
+				has_building = building_tec_old_machine_imperial_capital
+				# ACOT
+				has_building = @building_phanon_tower
+				# AOT
+				has_building = @building_stellarite_control_center
+				# GALACOT
+				has_building = @building_stellarite_galactic_machine_capital
+			}
+		}
+	}
+	else = {
+		custom_tooltip = {
+			fail_text = "requires_building_stellarite_capital"
+			OR = {
+				has_building = building_imperial_capital
+				# Evolved
+				has_building = building_tec_scifi_imperial_capital
+				# has_building = @building_tec_exo_imperial_capital
+				# has_building = @building_tec_bio_imperial_capital
+				# has_building = @building_tec_kohn_imperial_capital
+				# ACOT
+				has_building = @building_phanon_tower
+				# AOT
+				has_building = @building_stellarite_palace
+				# GALACOT
+				has_building = @building_stellarite_galactic_capital
+				has_building = @building_stellarite_galactic_hive_capital
+				has_building = @building_stellarite_galactic_machine_capital
+			}
+		}
+	}
+}
