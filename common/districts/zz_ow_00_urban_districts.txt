@@ -31,6 +31,107 @@
 @base_cost = 300
 @city_cost = 500
 
+district_crashed_slaver_ship = {
+	is_capped_by_modifier = yes
+	can_demolish = no
+	exempt_from_ai_planet_specialization = yes
+
+	show_on_uncolonized = {
+		always = no
+	}
+
+	potential = {
+		exists = owner
+		has_deposit = d_crashed_slaver_ship
+	}
+
+	allow = {
+		NOT = { has_modifier = resort_colony }
+		NOT = { has_modifier = slave_colony }
+	}
+
+	conversion_ratio = 1
+	convert_to = {
+		district_city
+		district_arcology_housing
+		district_rw_city
+		district_nexus
+		district_hive
+	}
+
+	resources = {
+		category = planet_districts_cities
+		upkeep = {
+			energy = 2
+		}
+	}
+
+	# Modifiers
+		# Standard
+			planet_modifier = {
+				planet_housing_add = 4
+				planet_max_buildings_add = 0.75
+			}
+		# /
+		inline_script = {
+			script = districts/inline_evolved_habitation_housing_modifiers
+			count = 1
+			trigger = ""
+		}
+		inline_script = districts/effects/inline_evolved_tec_artifice_2
+
+		# Civics
+			inline_script = districts/effects/inline_evolved_agrarian_idyll_city
+			inline_script = districts/effects/inline_evolved_tec_eco_keepers_city
+			inline_script = districts/effects/inline_evolved_tec_tribalism_city
+			inline_script = districts/effects/inline_evolved_tec_social_prosperity
+			inline_script = districts/effects/inline_evolved_tec_consumerism
+		# /
+	# /
+
+	# Jobs
+		# Base
+			inline_script = {
+				script = jobs/inline_evolved_job
+				count = 1
+				mult = 1
+				display = with_desc
+				job = broken_shackles_scavenger
+				trigger = "
+					exists = owner
+					owner = {
+						NOT = { has_country_flag = origin_broken_shackles_crashed_slaver_ship_depleted }
+					}
+				"
+			}
+			inline_script = {
+				script = jobs/inline_evolved_clerk
+				count = 1
+				mult = 1
+				display = with_desc
+				trigger = "
+					owner = { has_country_flag = origin_broken_shackles_crashed_slaver_ship_depleted }
+				"
+			}
+
+			# Traditions
+				inline_script = {
+					script = districts/effects/inline_evolved_mercantile_trickle_up_economics
+					count = 1
+					trigger = ""
+				}
+			# /
+		# /
+		# Socialguards
+		# /
+	# /
+	inline_script = {
+		script = districts/compat/inline_evolved_starnet_housing_district
+		count = 1
+	}
+}
+
+
 # --------------- Habitation
 district_city = {
 	base_buildtime = 480
@@ -51,7 +152,10 @@ district_city = {
 				owner = {
 					OR = {
 						is_regular_empire = yes
-						is_country_type = primitive
+						AND = {
+							is_country_type = primitive
+							is_hive_empire = no
+						}
 					}
 				}
 			}

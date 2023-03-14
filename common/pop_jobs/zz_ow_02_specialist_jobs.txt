@@ -161,6 +161,69 @@ researcher = {
 	}
 }
 
+xeno_zoo_keeper = {
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_xeno_zoo
+	clothes_texture_index = 3
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+
+	resources = {
+		category = planet_researchers
+		produces = {
+			society_research = 10
+		}
+		upkeep = {
+			consumer_goods = 1
+		}
+	}
+
+	triggered_planet_modifier = {
+		planet_amenities_add = 1
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+		mult = value:zoo_keeper_output
+	}
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = value:job_weights_research_modifier|JOB|xeno_zoo_keeper|
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			has_living_standard = { type = living_standard_academic_privilege }
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.5
+			has_job = xeno_zoo_keeper
+		}
+		modifier = {
+			factor = 0.8
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+	}
+}
+
+
 priest = {
 	category = specialist
 	condition_string = SPECIALIST_JOB_TRIGGER
@@ -893,6 +956,88 @@ bureaucrat = {
 		modifier = {
 			factor = 0.1
 			can_take_servant_job = yes
+		}
+	}
+}
+
+unifier = {
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_capital
+	clothes_texture_index = 3
+	icon = overlord_propagandist
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+
+	resources = {
+		category = planet_administrators
+		produces = {
+			unity = 4
+		}
+		upkeep = {
+			consumer_goods = 1
+		}
+		upkeep = {
+			trigger = {
+				is_lithoid_empire = no
+			}
+			food = 2
+		}
+		upkeep = {
+			trigger = {
+				is_lithoid_empire = yes
+			}
+			minerals = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
+		}
+		planet_amenities_add = 3
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	inline_script = jobs/effects/type/inline_evolved_administrator_effect
+
+	inline_script = jobs/effects/type/inline_evolved_bureaucrat_effect
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = value:job_weights_modifier|JOB|unifier|RESOURCE|unity|
+		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.5
+			has_job = unifier
+		}
+		modifier = {
+			factor = 2
+			exists = planet
+			planet = {
+				any_owned_pop = {
+					NOT = { has_job = unifier }
+				}
+			}
 		}
 	}
 }
@@ -2304,6 +2449,112 @@ knight = {
 		}
 		modifier = {
 			mult = value:job_weights_research_modifier|JOB|researcher|
+		}
+	}
+}
+
+
+archaeoengineers = {
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_archaeostudies_faculty
+	clothes_texture_index = 3
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+
+	resources = {
+		category = planet_researchers
+		produces = {
+			physics_research = 3
+			engineering_research = 3
+			society_research = 3
+            minor_artifacts = 0.15
+		}
+		produces = {
+            trigger = {
+                planet = {
+                    is_artificial = no
+                    OR = {
+                        tec_is_relic_world = yes
+                        has_deposit = d_former_relic_world
+                    }
+                }
+            }
+            society_research = 2
+            minor_artifacts = 0.25
+            # Moved from 0.3 to 0.25
+        }
+        produces = {
+            trigger = {
+                planet = {
+                    is_artificial = yes
+                    OR = {
+                        tec_is_relic_world = yes
+                        has_deposit = d_former_relic_world
+                    }
+                }
+            }
+            physics_research = 1
+            engineering_research = 1
+            minor_artifacts = 0.25
+            # Moved from 0.3 to 0.25
+        }
+		upkeep = {
+            consumer_goods = 3
+        }
+		inline_script = {
+			script = jobs/resources/inline_evolved_science_requisition_resources
+			consumer_goods = 1
+			energy = 0
+			mult = 1
+		}
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_research
+		inline_script = {
+			script = jobs/resources/inline_evolved_science_requisition_overlord_resources
+			research = 1
+			mult = 1
+		}
+	}
+
+	inline_script = jobs/effects/type/inline_evolved_researcher_effect
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = value:job_weights_research_modifier|JOB|archaeoengineers|
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			has_living_standard = { type = living_standard_academic_privilege }
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.5
+			has_job = archaeoengineers
+		}
+		modifier = {
+			factor = 0.8
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
 		}
 	}
 }
