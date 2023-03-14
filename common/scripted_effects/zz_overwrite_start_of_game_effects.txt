@@ -38,9 +38,10 @@ generate_start_buildings_and_districts = {
 	optimize_memory
 	if = {
 		limit = {
-			NOT = {
-				owner = {
-					has_origin = origin_shattered_ring 
+			owner = {
+				NOR = {
+					has_origin = origin_shattered_ring
+					has_origin = origin_broken_shackles
 				}
 			}
 		}
@@ -87,8 +88,26 @@ generate_start_buildings_and_districts = {
 			# total - 24 jobs
 
 			# 3 jobs
-			add_district_and_planet_size_if_needed_effect = {
-				district = district_city
+			if = {
+				limit = { NOT = { owner = { has_origin = origin_payback } } }
+				add_district_and_planet_size_if_needed_effect = {
+					district = district_city
+				}
+			}
+
+			if = {
+				limit = {
+					owner = {
+						has_origin = origin_payback
+						has_valid_civic = civic_agrarian_idyll
+					}
+				}
+				add_district_and_planet_size_if_needed_effect = {
+					district = district_city
+				}
+				add_district_and_planet_size_if_needed_effect = {
+					district = district_farming
+				}
 			}
 
 			if = {
@@ -143,15 +162,23 @@ generate_start_buildings_and_districts = {
 						}
 					}
 				}
-				while = {
-					count = 2
+				add_district_and_planet_size_if_needed_effect = {
+					district = district_farming
+				}
+				if = {
+					limit = {
+						NOT = { owner = { has_origin = origin_payback } }
+					}
 					add_district_and_planet_size_if_needed_effect = {
 						district = district_farming
 					}
 				}
 				if = {
 					limit = {
-						owner = { has_origin = origin_default }
+						owner = {
+							has_origin = origin_default
+							is_eager_explorer_empire = no
+						}
 					}
 					add_district_and_planet_size_if_needed_effect = {
 						district = district_farming
@@ -159,15 +186,23 @@ generate_start_buildings_and_districts = {
 				}
 			}
 			else = {
-				while = {
-					count = 2
+				add_district_and_planet_size_if_needed_effect = {
+					district = district_mining
+				}
+				if = {
+					limit = {
+						NOT = { owner = { has_origin = origin_payback } }
+					}
 					add_district_and_planet_size_if_needed_effect = {
 						district = district_mining
 					}
 				}
 				if = {
 					limit = {
-						owner = { has_origin = origin_default }
+						owner = {
+							has_origin = origin_default
+							is_eager_explorer_empire = no
+						}
 					}
 					add_district_and_planet_size_if_needed_effect = {
 						district = district_mining
@@ -176,8 +211,13 @@ generate_start_buildings_and_districts = {
 			}
 
 			# 4 jobs
-			while = {
-				count = 2
+			add_district_and_planet_size_if_needed_effect = {
+				district = district_mining
+			}
+			if = {
+				limit = {
+					NOT = { owner = { has_origin = origin_payback } }
+				}
 				add_district_and_planet_size_if_needed_effect = {
 					district = district_mining
 				}
@@ -189,8 +229,13 @@ generate_start_buildings_and_districts = {
 			}
 
 			# 4 jobs
-			while = {
-				count = 2
+			add_district_and_planet_size_if_needed_effect = {
+				district = district_industrial
+			}
+			if = {
+				limit = {
+					NOT = { owner = { has_origin = origin_payback } }
+				}
 				add_district_and_planet_size_if_needed_effect = {
 					district = district_industrial
 				}
@@ -198,7 +243,12 @@ generate_start_buildings_and_districts = {
 
 			# 2 jobs
 			if = {
-				limit = { owner = { is_megacorp = no } }
+				limit = {
+					owner = {
+						is_megacorp = no
+						NOT = { has_origin = origin_payback }
+					}
+				}
 				add_district_and_planet_size_if_needed_effect = {
 					district = district_generator
 				}
@@ -207,7 +257,10 @@ generate_start_buildings_and_districts = {
 			# 2 jobs
 			if = {
 				limit = {
-					owner = { has_origin = origin_default }
+					owner = {
+						has_origin = origin_default
+						is_eager_explorer_empire = no
+					}
 				}
 				add_district_and_planet_size_if_needed_effect = {
 					district = district_generator
@@ -267,28 +320,34 @@ generate_start_buildings_and_districts = {
 			if = {
 				limit = {
 					owner = {
-						tec_is_reanimator_empire = yes
+						is_low_tech_start = no
 					}
 				}
-				add_building = building_dread_encampment
-				solar_system = {
-					while = {
-						count = 2
-						random_system_planet = {
-							limit = {
-								has_deposit_for = shipclass_research_station
-								NOT = {
-									has_deposit = d_engineering_6
+				if = {
+					limit = {
+						owner = {
+							tec_is_reanimator_empire = no
+						}
+					}
+					add_building = building_research_lab_1
+				}
+				else = {
+					add_building = building_dread_encampment
+	
+					solar_system = { #Necromancers do not give engineering. So make sure there's some readily-accessible engineering
+						while = {
+							count = 2
+							random_system_planet = {
+								limit = {
+									has_deposit_for = shipclass_research_station
+									NOT = { has_deposit = d_engineering_6 }
 								}
+								clear_deposits = yes
+								add_deposit = d_engineering_6
 							}
-							clear_deposits = yes
-							add_deposit = d_engineering_6
 						}
 					}
 				}
-			}
-			else = {
-				add_building = building_research_lab_1
 			}
 			# 1 job
 			if = {
@@ -303,6 +362,9 @@ generate_start_buildings_and_districts = {
 			if = {
 				limit = {
 					owner = {
+						NOT = {
+							has_origin = origin_payback
+						}
 						has_valid_civic = civic_environmentalist
 					}
 				}
@@ -423,7 +485,10 @@ generate_start_buildings_and_districts = {
 				}
 				if = {
 					limit = {
-						owner = { has_origin = origin_default }
+						owner = {
+							has_origin = origin_default
+							is_eager_explorer_empire = no
+						}
 					}
 					add_district_and_planet_size_if_needed_effect = {
 						district = district_farming
@@ -439,7 +504,10 @@ generate_start_buildings_and_districts = {
 				}
 				if = {
 					limit = {
-						owner = { has_origin = origin_default }
+						owner = {
+							has_origin = origin_default
+							is_eager_explorer_empire = no
+						}
 					}
 					add_district_and_planet_size_if_needed_effect = {
 						district = district_mining
@@ -494,7 +562,10 @@ generate_start_buildings_and_districts = {
 			# 3 jobs
 			if = {
 				limit = {
-					owner = { has_origin = origin_default }
+					owner = {
+						has_origin = origin_default
+						is_eager_explorer_empire = no
+					}
 				}
 				add_district_and_planet_size_if_needed_effect = {
 					district = district_generator
@@ -567,10 +638,16 @@ generate_start_buildings_and_districts = {
 					add_building = building_tec_cyberhive_node
 				}
 			}
-			
 
 			# 2 jobs
-			add_building = building_research_lab_1
+			if = {
+				limit = {
+					owner = {
+						is_low_tech_start = no
+					}
+				}
+				add_building = building_research_lab_1
+			}
 
 			# 1 job
 			if = {
@@ -670,7 +747,14 @@ generate_start_buildings_and_districts = {
 			}
 
 			# 2 jobs
-			add_building = building_research_lab_1
+			if = {
+				limit = {
+					owner = {
+						is_low_tech_start = no
+					}
+				}
+				add_building = building_research_lab_1
+			}
 
 			if = {
 				limit = { owner = { NOT = { has_origin = origin_machine } }}
@@ -683,7 +767,10 @@ generate_start_buildings_and_districts = {
 				# 2 jobs
 				if = {
 					limit = {
-						owner = { has_origin = origin_default }
+						owner = {
+							has_origin = origin_default
+							is_eager_explorer_empire = no
+						}
 					}
 					add_district_and_planet_size_if_needed_effect = {
 						district = district_mining
@@ -701,7 +788,10 @@ generate_start_buildings_and_districts = {
 				# 2 jobs
 				if = {
 					limit = {
-						owner = { has_origin = origin_default }
+						owner = {
+							has_origin = origin_default
+							is_eager_explorer_empire = no
+						}
 					}
 					add_district_and_planet_size_if_needed_effect = {
 						district = district_generator
@@ -885,8 +975,7 @@ generate_start_buildings_and_districts = {
 		}
 	}
 
-	
-	if = { # Shattered ring
+	if = {	# Shattered ring
 		limit = {
 			owner = {
 				has_origin = origin_shattered_ring
@@ -1120,7 +1209,14 @@ generate_start_buildings_and_districts = {
 			add_building = building_hive_node
 
 			# 2 jobs
-			add_building = building_research_lab_1
+			if = {
+				limit = {
+					owner = {
+						is_low_tech_start = no
+					}
+				}
+				add_building = building_research_lab_1
+			}
 
 			# 1 job
 			if = {
@@ -1187,7 +1283,14 @@ generate_start_buildings_and_districts = {
 			}
 
 			# 2 jobs
-			add_building = building_research_lab_1
+			if = {
+				limit = {
+					owner = {
+						is_low_tech_start = no
+					}
+				}
+				add_building = building_research_lab_1
+			}
 
 			#Servitors
 			if = {
@@ -1247,7 +1350,55 @@ generate_start_buildings_and_districts = {
 		}
 	}
 
-	if = {
+	if = {	# Broken Shackles
+		limit = {
+			owner = {
+				has_origin = origin_broken_shackles
+			}
+		}
+		while = {
+			count = 6
+			add_district_and_planet_size_if_needed_effect = {
+				district = district_crashed_slaver_ship
+			}
+		}
+		add_building = building_low_tech_farm
+		add_building = building_low_tech_scrap_refinery
+		add_building = building_low_tech_admin_hub
+		add_building = building_low_tech_power_plant
+		add_building = building_low_tech_capital
+		add_building = building_low_tech_research_lab
+	}
+
+	if = {	# Payback
+		limit = {
+			owner = {
+				has_origin = origin_payback
+			}
+		}
+		# We want a clean slate building-wise, but to keep the districts.
+		remove_all_buildings = yes
+		add_planet_devastation = 33
+		add_modifier = {
+			modifier = payback_debris_field
+		}
+		add_modifier = {
+			modifier = payback_unified_purpose
+			days = 7200
+		}
+		while = {
+			count = 6
+			add_deposit = d_ship_debris_payback_blocker
+		}
+		# 3 jobs
+		add_building = building_capital
+		add_building = building_clinic
+		add_building = building_research_lab_1
+		add_building = building_mineral_purification_plant
+		add_building = building_energy_grid
+	}
+
+	if = {	# Relentless
 		limit = {
 			owner = {
 				is_relentless_industrialist_empire = yes
@@ -1255,6 +1406,23 @@ generate_start_buildings_and_districts = {
 			free_building_slots > 0
 		}
 		add_building = building_coordinated_fulfillment_center_1
+	}
+
+	if = {	# Archaeotech review balance
+		limit = {
+			owner = {
+				has_origin = origin_remnants
+				has_ancrel = yes
+			}
+		}
+		owner = {
+			give_technology = {
+				tech = tech_archaeostudies
+				message = no
+			}
+		}
+		remove_building = building_research_lab_1
+		add_building = building_archaeostudies_faculty
 	}
 
 	# Additional resources based on empire type and possible subspecies
@@ -1824,6 +1992,7 @@ generate_start_pops = {
 		limit = {
 			owner = {
 				is_megacorp = yes
+				has_reduced_pop_origin = no
 			}
 		}
 		while = {
@@ -1837,14 +2006,57 @@ generate_start_pops = {
 
 	if = {
 		limit = {
+			owner = { has_origin = origin_broken_shackles }
+			num_pops < 6
+		}
+
+		while = {
+			limit = { num_pops < 6 }
+			create_pop = {
+				species = owner_main_species
+				ethos = random
+			}
+		}
+	}
+
+	if = {
+		limit = {
 			owner = {
-				is_regular_empire = yes 
+				owner = {
+					is_regular_empire = yes
+					has_reduced_pop_origin = no
+				}
 			}
 		}
 		while = {
 			limit = {
 				num_pops < 28 
 			}
+			create_pop = {
+				species = owner_main_species
+				ethos = random
+			}
+		}
+	}
+	if = {
+		limit = {
+			owner = { has_origin = origin_payback }
+			num_pops < 18
+		}
+		while = {
+			limit = { num_pops < 18 }
+			create_pop = {
+				species = owner_main_species
+				ethos = random
+			}
+		}
+	}
+	if = {
+		limit = {
+			owner = { has_origin = origin_fear_of_the_dark }
+		}
+		while = {
+			count = 20
 			create_pop = {
 				species = owner_main_species
 				ethos = random
@@ -1877,6 +2089,22 @@ generate_start_pops = {
 			create_pop = {
 				species = owner_main_species
 				ethos = random
+			}
+		}
+	}
+	if = {
+		limit = {
+			owner = {
+				is_eager_explorer_empire = yes
+			}
+		}
+		while = {
+			count = 10
+			random_owned_pop = {
+				limit = {
+					is_same_species = root.owner.species
+				}
+				kill_pop = yes
 			}
 		}
 	}
@@ -3285,15 +3513,16 @@ void_dweller_home_planet_setup = {
 						limit = {
 							has_citizenship_type = {
 								type = citizenship_assimilation
+								country = owner 
 							}
 						}
 						set_citizenship_type = {
-							country = root.owner
 							type = citizenship_full_machine
+							country = root.owner
 						}
 						set_living_standard = {
-							country = root.owner
 							type = living_standard_hive_mind
+							country = root.owner
 						}
 					}
 					every_owned_pop = {
@@ -3611,15 +3840,16 @@ void_dweller_home_planet_setup = {
 						limit = {
 							has_citizenship_type = {
 								type = citizenship_assimilation
+								country = owner
 							}
 						}
 						set_citizenship_type = {
-							country = root.owner
 							type = citizenship_full_machine
+							country = root.owner
 						}
 						set_living_standard = {
-							country = root.owner
 							type = living_standard_hive_mind
+							country = root.owner
 						}
 					}
 					every_owned_pop = {

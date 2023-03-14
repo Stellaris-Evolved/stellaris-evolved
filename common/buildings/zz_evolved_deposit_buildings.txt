@@ -298,19 +298,34 @@ building_betharian_power_plant = {
 
 building_xeno_zoo = {
 	base_buildtime = @b1_time
+	base_cap_amount = 1
 	position_priority = 40		# Planet Feature
-	is_capped_by_modifier = yes
 
-	category = resource
+	category = amenity
+
+	prerequisites = {
+		"tech_alien_life_studies"
+	}
 
 	potential = {
 		exists = owner
 		owner = {
 			is_regular_empire = yes
 		}
-		check_modifier_value = {
-			modifier = building_xeno_zoo_max
-			value >=1
+		planet = {
+			OR = {
+				has_deposit = d_alien_pets_deposit
+				AND = {
+					exists = owner
+					owner = { has_policy_flag = pre_sapients_protect }
+					any_owned_pop = {
+						is_sapient = no
+					}
+				}
+				any_owned_pop = {
+					is_livestock = yes
+				}
+			}
 		}
 	}
 
@@ -322,16 +337,38 @@ building_xeno_zoo = {
 					is_regular_empire = no
 				}
 			}
-			check_modifier_value = {
-				modifier = building_xeno_zoo_max
-				value < 1
-			}
+			planet = {
+				NOR = {
+					has_deposit = d_alien_pets_deposit
+					AND = {
+						exists = owner
+						owner = { has_policy_flag = pre_sapients_protect }
+						any_owned_pop = {
+							is_sapient = no
+						}
+					}
+					any_owned_pop = {
+						is_livestock = yes
+					}
+				}
+			}			
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
 		}
 	}
 
 	planet_modifier = {
 		job_entertainer_add = 1
-		job_culture_worker_add = 2
+		job_xeno_zoo_keeper_add = 1
+	}
+	triggered_desc = {
+		text = job_xeno_zoo_keeper_effect_desc
 	}
 
 	triggered_planet_modifier = {
@@ -346,19 +383,13 @@ building_xeno_zoo = {
 			job_entertainer_add = -1
 		}
 	}
-
-	resources = {
-		category = planet_buildings
-		inline_script = {
-			script = buildings/resources/inline_evolved_resource_cost
-			tier = 1
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { NOT = { has_valid_civic = civic_warrior_culture } }
 		}
+		text = job_entertainer_effect_desc
 	}
-
-	prerequisites = {
-		"tech_alien_life_studies"
-	}
-
 	triggered_desc = {
 		trigger = {
 			exists = owner
@@ -367,17 +398,93 @@ building_xeno_zoo = {
 		text = job_duelist_effect_desc
 	}
 
-	triggered_desc = {
-		trigger = {
+	triggered_planet_modifier = {
+		potential = {
+			planet = {
+				any_owned_pop = {
+					is_livestock = yes
+				}
+			}
 			exists = owner
-			owner = { NOT = { has_valid_civic = civic_warrior_culture } }
+			owner = {
+				NOT = { has_valid_civic = civic_warrior_culture }
+			}
 		}
-		text = job_entertainer_effect_desc
+		modifier = {
+			job_livestock_zoo_animal_add = 3
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			planet = {
+				any_owned_pop = {
+					is_livestock = no
+				}
+			}
+			exists = owner
+			owner = {
+				has_valid_civic = civic_warrior_culture
+			}
+		}
+		modifier = {
+			job_livestock_zoo_beast_add = 3
+		}
 	}
 
 	triggered_desc = {
-		text = job_culture_worker_effect_desc
+		trigger = {
+			planet = {
+				any_owned_pop = {
+					is_sapient = no
+				}
+			}
+			exists = owner
+			owner = { NOT = { has_valid_civic = civic_warrior_culture } }
+		}
+		text = job_xeno_zoo_animal_effect_desc
 	}
+
+	triggered_desc = {
+		trigger = {
+			planet = {
+				any_owned_pop = {
+					is_livestock = yes
+				}
+			}
+			exists = owner
+			owner = { NOT = { has_valid_civic = civic_warrior_culture } }
+		}
+		text = job_livestock_zoo_animal_effect_desc
+	}
+
+	triggered_desc = {
+		trigger = {
+			planet = {
+				any_owned_pop = {
+					is_sapient = no
+				}
+			}
+			exists = owner
+			owner = { has_valid_civic = civic_warrior_culture }
+		}
+		text = job_xeno_zoo_beast_effect_desc
+	}
+
+	triggered_desc = {
+		trigger = {
+			planet = {
+				any_owned_pop = {
+					is_livestock = yes
+				}
+			}
+			exists = owner
+			owner = { has_valid_civic = civic_warrior_culture }
+		}
+		text = job_livestock_zoo_beast_effect_desc
+	}
+
+
 }
 
 # ------- Evolved mimics

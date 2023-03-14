@@ -1,12 +1,104 @@
 # See traditions/README.txt for format
 
 # - - - - - - - - - - - - - - - - - - - - - 
+# ANCIENT RELICS ASCENSION PERKS
+# - - - - - - - - - - - - - - - - - - - - - 
+ap_archaeoengineers = {
+	potential = {
+		host_has_dlc = "Ancient Relics Story Pack"
+		NOT = { has_ascension_perk = ap_archaeoengineers }
+	}
+
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_technology_tech_archaeostudies"
+			has_technology = tech_archaeostudies
+		}
+	}
+
+	on_enabled = {
+		custom_tooltip = ap_archaeoengineers_tooltip
+		hidden_effect = {
+			country_event = { id = ancrel.9925 }
+		}
+		every_system = {
+			limit = {
+				is_owned_by = root
+				has_modifier = zroni_storm
+				starbase = {
+					count_starbase_buildings = { 
+						type = zroni_storm_caster 
+						include_being_constructed = no 
+						count = 1 
+					}
+				}
+				any_ship_in_system = {
+					is_ship_class = shipclass_starbase
+					NOT = { has_component = "STARBASE_AURA_ZRONI_STORM" }
+				}
+			}
+			system_event = {
+				id = ancrel.9901
+			}
+		}
+	}
+
+	modifier = {
+		weapon_archaeotech_weapon_damage_mult = 0.33
+	}
+
+	ai_weight = {
+		factor = 4.5
+		modifier = {
+			factor = 2
+			has_ethic = ethic_materialist
+		}
+		modifier = {
+			factor = 3
+			has_ethic = ethic_fanatic_materialist
+		}
+		modifier = {
+			factor = 5
+			count_archaeological_site = {
+				count > 3
+				limit = { 
+					is_owned_by = root
+					is_site_completed = yes
+				}
+			}
+		}
+		modifier = {
+			factor = 2
+			resource_stockpile_compare = {
+				resource = minor_artifacts
+				value > 1000
+			}
+		}
+		modifier = {
+			factor = 2
+			is_xenophile = yes
+		}
+		modifier = {
+			factor = 0
+			is_xenophobe = yes
+		}
+		modifier = {
+			factor = 0.25
+			is_spiritualist = yes
+		}
+	}
+}
+
+# - - - - - - - - - - - - - - - - - - - - - 
 # NEMESIS ASCENSION PERKS
 # - - - - - - - - - - - - - - - - - - - - - 
 ap_become_the_crisis = {
 	potential = {
 		has_nemesis = yes
-		NOT = { has_ascension_perk = ap_become_the_crisis }
+		NOR = {
+			has_ascension_perk = ap_become_the_crisis
+			has_origin = origin_slavers
+		}
 	}
 
 	possible = {
@@ -80,10 +172,9 @@ ap_become_the_crisis = {
 	}
 }
 
-#################
+# - - - - - - - - - - - - - - - - - - - - - 
 # OVERLORD ASCENSION PERKS
-#################
-
+# - - - - - - - - - - - - - - - - - - - - - 
 ap_lord_of_war = {
 	potential = {
 		host_has_dlc = "Overlord"
@@ -132,7 +223,6 @@ ap_lord_of_war = {
 # - - - - - - - - - - - - - - - - - - - - - 
 # AQUATICS ASCENSION PERKS
 # - - - - - - - - - - - - - - - - - - - - - 
-
 ap_hydrocentric = {
 	potential = {
 		has_aquatics = yes
@@ -197,7 +287,6 @@ ap_hydrocentric = {
 # - - - - - - - - - - - - - - - - - - - - - 
 # APOCALYPSE ASCENSION PERKS
 # - - - - - - - - - - - - - - - - - - - - - 
-
 ap_enigmatic_engineering = {
 	potential = {
 		host_has_dlc = "Apocalypse"
@@ -227,10 +316,42 @@ ap_enigmatic_engineering = {
 	modifier = {
 		intel_encryption_add = 2
 	}
-	#	ship_sensor_range_add = 2
-	#	ship_hyperlane_range_add = 4
-	#	country_base_minor_artifacts_produces_add = 0.1
-	
+
+	tradition_swap = {
+		name = ap_enigmatic_engineering_cloaking
+		inherit_effects = no
+		inherit_icon = yes
+		trigger = {
+			has_first_contact_dlc = yes
+		}
+
+		possible = {
+			custom_tooltip = {
+				fail_text = "requires_ascension_perks_1"
+				num_ascension_perks > 0
+			}
+			custom_tooltip = {
+				fail_text = tec_crisis_cant_pick_ap
+				OR = {
+					is_crisis_faction = no
+					is_fallen_empire = no		# Avoid MCcheese
+				}
+			}
+		}
+
+		on_enabled = {
+			custom_tooltip = "no_rev_engineering"
+		}
+
+		modifier = {
+			ship_cloaking_strength_add = 2
+			intel_encryption_add = 2
+		}
+
+		weight = {
+			factor = 1
+		}
+	}
 
 	ai_weight = {
 		#Bad ap
@@ -243,6 +364,10 @@ ap_enigmatic_engineering = {
 			factor = 0 #3
 			has_ethic = ethic_fanatic_materialist
 		}
+		modifier = {
+			factor = 10
+			has_origin = origin_slavers
+		}
 	}
 }
 
@@ -252,7 +377,10 @@ ap_nihilistic_acquisition = {
 		NOT = {
 			has_ascension_perk = ap_nihilistic_acquisition
 		}
-		NOT = { has_valid_civic = civic_barbaric_despoilers }
+		NOR = {
+			has_valid_civic = civic_barbaric_despoilers
+			has_origin = origin_slavers
+		}
 	}
 
 	on_enabled = {
@@ -358,11 +486,9 @@ ap_colossus = {
 	}
 }
 
-
 # - - - - - - - - - - - - - - - - - - - - - 
 # GENERIC ASCENSION PERKS
 # - - - - - - - - - - - - - - - - - - - - - 
-
 ap_galactic_force_projection = {
 	possible = {
 		custom_tooltip = {
@@ -1203,7 +1329,6 @@ ap_shared_destiny = {
 # - - - - - - - - - - - - - - - - - - - - - 
 # UTOPIA ASCENSION PERKS
 # - - - - - - - - - - - - - - - - - - - - - 
-
 ap_voidborn = {
 	potential = {
 		host_has_dlc = "Utopia"
@@ -1541,7 +1666,6 @@ ap_galactic_wonders_utopia_and_megacorp = {
 # - - - - - - - - - - - - - - - - - - - - - 
 # Terraforming ASCENSION PERKS
 # - - - - - - - - - - - - - - - - - - - - - 
-
 ap_world_shaper = {
 	possible = {
 		custom_tooltip = {
@@ -1865,8 +1989,6 @@ ap_hive_worlds = {
 # - - - - - - - - - - - - - - - - - - - - - 
 # MEGACORP ASCENSION PERKS
 # - - - - - - - - - - - - - - - - - - - - - 
-
-
 ap_universal_transactions = {
 	potential = {
 		host_has_dlc = "Megacorp"
@@ -1891,11 +2013,9 @@ ap_universal_transactions = {
 	}
 }
 
-
 # - - - - - - - - - - - - - - - - - - - - - 
 # TOXIC ASCENSION PERKS
 # - - - - - - - - - - - - - - - - - - - - - 
-
 ap_detox = {
 	potential = {
 		host_has_dlc = "Toxoids Species Pack"
@@ -1920,12 +2040,9 @@ ap_detox = {
 	}
 }
 
-
-
 # - - - - - - - - - - - - - - - - - - - - - 
 # COMMON MODIFIED
 # - - - - - - - - - - - - - - - - - - - - - 
-
 ap_arcology_project = {
 	potential = {
 		host_has_dlc = "Megacorp"
@@ -2092,7 +2209,6 @@ ap_mastery_of_nature = {
 		}
 	}
 }
-
 
 ap_xeno_compatibility = {
 	potential = {

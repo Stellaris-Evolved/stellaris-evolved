@@ -255,26 +255,16 @@ xenoist = {
 		}
 	}
 	
-	demand = {
-		title = "FACTION_OUTRAGED_GC"
-		unfulfilled_title = "FACTION_OUTRAGED_GC"
-		desc = "FACTION_OUTRAGED_GC_DESC"
-
-		fulfilled_effect = -20
-		unfulfilled_effect = 0
-
-		potential = {
-			exists = owner
-			owner = {
-				has_country_flag = faction_xenophile_outraged_gc
-			}
-		}
-
-		trigger = {
-			owner = {
-				has_country_flag = faction_xenophile_outraged_gc
-			}
-		}
+	# DEMAND: Faction Outraged (by a GalCom Resolution)
+	inline_script = {
+		script = pop_faction_types/demand_faction_outraged
+		FLAG = galcom_resolution_passed_anti_xenoist
+	}
+	
+	# DEMAND: Faction Pleased (by a GalCom Resolution)
+	inline_script = {
+		script = pop_faction_types/demand_faction_pleased
+		FLAG = galcom_resolution_passed_pro_xenoist
 	}
 
 	# Evolved: List of demands
@@ -530,6 +520,7 @@ xenoist = {
 								tec_is_default_country = yes
 								is_country_type = fallen_empire
 								is_country_type = awakened_fallen_empire
+								is_country_type = primitive
 							}
 						}
 					}
@@ -587,6 +578,34 @@ xenoist = {
 					}
 				}
 			}
+
+			demand = { # Alien Zoo (for conservation)
+				title = "XENOIST_XENOLOGICAL_CONSERVATION"
+				unfulfilled_title = "XENOIST_NO_XENOLOGICAL_CONSERVATION"
+				desc = "XENOIST_XENOLOGICAL_CONSERVATION_DESC"
+
+				fulfilled_effect = 5
+				unfulfilled_effect = -0.001
+
+				potential = {
+					exists = owner
+					owner = {
+						has_technology = tech_alien_life_studies
+						NOT = { has_valid_civic = civic_warrior_culture }
+					}
+				}
+
+				trigger = {
+					owner = {
+						count_owned_planet = {
+							limit = {
+								has_building = building_xeno_zoo
+							}
+							count > 0
+						}
+					}
+				}
+			}
 		# /
 
 		# Neut
@@ -608,7 +627,10 @@ xenoist = {
 				
 				trigger = {
 					owner = {
-						has_policy_flag = interference_passive
+						OR = {
+							has_policy_flag = interference_not_allowed
+							has_policy_flag = interference_subtle
+						}
 					}
 				}
 			}
@@ -716,8 +738,8 @@ xenoist = {
 									is_same_species = root.owner
 								}
 								has_citizenship_type = {
-									country = prev 
-									type = citizenship_slavery 
+									type = citizenship_slavery
+									country = prev
 								}
 							}
 						}
@@ -787,7 +809,10 @@ xenoist = {
 
 				potential = {
 					exists = owner
-					owner = { has_country_flag = encountered_first_primitive }
+					owner = {
+						has_country_flag = encountered_first_primitive
+						NOT = { has_origin = origin_necrophage }
+					}
 				}
 
 				trigger = {
