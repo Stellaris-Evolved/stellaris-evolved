@@ -9,6 +9,7 @@ EconomicCategoryKey: TypeAlias = str
 EconomicCategory: TypeAlias = tuple[str, TemplateKey]
 EconomicCategories: TypeAlias = dict[EconomicCategoryKey, EconomicCategory]
 ResourcesConfig: TypeAlias = dict[ResourceStr, str]
+DistrictsAndBuildings: TypeAlias = dict[str, tuple[str, TemplateKey]]
 
 PRODUCES_ADD = 'produces_add'
 PRODUCES_MULT = 'produces_mult'
@@ -27,6 +28,8 @@ class TemplateConfig(TypedDict):
     resource_produces: TemplateStr | None
     resource_upkeep: TemplateStr | None
     resource_cost: TemplateStr | None
+    build_speed: TemplateStr | None
+    max_add: TemplateStr | None
 
 
 Templates = dict[TemplateKey, TemplateConfig]
@@ -35,6 +38,7 @@ Templates = dict[TemplateKey, TemplateConfig]
 class LanguageConfig(TypedDict):
     templates: Templates
     economic_categories: EconomicCategories
+    districts_and_buildings: DistrictsAndBuildings
 
 
 class Config(TypedDict):

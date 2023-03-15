@@ -45,7 +45,11 @@ clerk = {
 		weight = @clerk_job_weight
 		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
 		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
-
+		modifier = {
+			factor = 0.25
+			is_enslaved = yes
+			can_take_servant_job = no
+		}
 		modifier = {
 			factor = 2
 			OR = {
@@ -57,101 +61,30 @@ clerk = {
 			can_take_servant_job = no
 		}
 		modifier = {
-			factor = 0.25
-			is_enslaved = yes
-			can_take_servant_job = no
-			NOR = {
-				tec_boost_25_trade = yes
-			}
-		}
-		
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
 			factor = 10
 			OR = {
 				is_non_sapient_robot = yes
 				is_shackled_robot = yes
+				is_non_sapient_bioservant = yes
+				is_shackled_bioservant = yes
 			}
 			can_take_servant_job = no
 			can_fill_specialist_job = no
 		}
-
-		# AI takes out clerk jobs to favor other resources if conditions are met
 		modifier = {
-			factor = 2
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+
+		modifier = {
+			factor = 1.1
 			exists = owner
-			owner = {
-				is_ai = yes
-			}
-			planet = {
-				free_amenities < 0
-			}
+			owner = { is_megacorp = yes }
 		}
 		modifier = {
 			factor = 0.5
 			exists = owner
-			owner = {
-				is_ai = yes
-				OR = {
-					has_monthly_income = {
-						resource = minerals
-						value < 200
-					}
-					has_monthly_income = {
-						resource = food
-						value < 200
-					}
-					has_monthly_income = {
-						resource = energy
-						value < 200
-					}
-				}
-			}
-		}
-		modifier = {
-			factor = 0.1
-			exists = owner
-			owner = {
-				is_ai = yes
-				OR = {
-					has_monthly_income = {
-						resource = minerals
-						value < 50
-					}
-					has_monthly_income = {
-						resource = food
-						value < 50
-					}
-					has_monthly_income = {
-						resource = energy
-						value < 50
-					}
-				}
-			}
-		}
-		modifier = {
-			factor = 0.01
-			exists = owner
-			owner = {
-				is_ai = yes
-				OR = {
-					has_monthly_income = {
-						resource = minerals
-						value < 0
-					}
-					has_monthly_income = {
-						resource = food
-						value < 0
-					}
-					has_monthly_income = {
-						resource = energy
-						value < 0
-					}
-				}
-			}
+			owner = { is_fallen_empire = yes }
 		}
 	}
 }
@@ -399,11 +332,6 @@ crystal_miner = {
 			can_take_servant_job = no
 			NOT = { has_slavery_type = { type = slavery_indentured } }
 		}
-
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
 	
 		# Crafted pops modifier
 		modifier = {
@@ -413,6 +341,11 @@ crystal_miner = {
 		modifier = {
 			factor = 200
 			tec_is_crafted_nonsapient_pop = yes
+		}
+
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
 		}
 	}
 }
@@ -457,12 +390,6 @@ gas_extractor = {
 			can_take_servant_job = no
 			NOT = { has_slavery_type = { type = slavery_indentured } }
 		}
-
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-
 		# Crafted pops modifier
 		modifier = {
 			factor = 2
@@ -472,6 +399,12 @@ gas_extractor = {
 			factor = 200
 			tec_is_crafted_nonsapient_pop = yes
 		}
+
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+
 	}
 }
 
@@ -516,11 +449,6 @@ mote_harvester = {
 			NOT = { has_slavery_type = { type = slavery_indentured } }
 		}
 
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-
 		# Crafted pops modifier
 		modifier = {
 			factor = 2
@@ -529,6 +457,11 @@ mote_harvester = {
 		modifier = {
 			factor = 200
 			tec_is_crafted_nonsapient_pop = yes
+		}
+
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
 		}
 	}
 }
@@ -794,7 +727,8 @@ preacher = {
 			always = yes
 		}
 		trade_value_add = 1
-		mult = value:tec_hired_job_trade_value
+		mult = modifier:tec_hired_job_trade_add
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
 	}
 
 	triggered_planet_modifier = {
@@ -802,7 +736,8 @@ preacher = {
 			always = yes
 		}
 		planet_amenities_add = 3
-		mult = value:tec_hired_job_ammenities_mult
+		mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
 	
 	inline_script = jobs/effects/type/inline_evolved_administrator_effect
@@ -1007,46 +942,6 @@ scrap_miner = {
 	}
 }
 
-ranger = {
-	category = worker
-	condition_string = WORKER_JOB_TRIGGER
-	building_icon = holding_park_ranger_lodge
-	clothes_texture_index = 1
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_worker_job
-
-	resources = {
-		category = planet_culture_workers
-		produces = {
-			society_research = 2
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		planet_amenities_add = 3
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
-	}
-
-	weight = {
-		weight = @worker_job_weight
-		mult = value:job_weights_modifier|JOB|culture_worker|RESOURCE|society_research|
-		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
-		modifier = {
-			factor = 1.5
-			has_job = ranger
-		}
-	}
-}
 
 angler = {
 	category = worker
@@ -1174,6 +1069,47 @@ angler = {
 					value >= 0
 				}
 			}
+		}
+	}
+}
+
+ranger = {
+	category = worker
+	condition_string = WORKER_JOB_TRIGGER
+	building_icon = holding_park_ranger_lodge
+	clothes_texture_index = 1
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_worker_job
+
+	resources = {
+		category = planet_culture_workers
+		produces = {
+			society_research = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
+		}
+		planet_amenities_add = 3
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	weight = {
+		weight = @worker_job_weight
+		mult = value:job_weights_modifier|JOB|culture_worker|RESOURCE|society_research|
+		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+		modifier = {
+			factor = 1.5
+			has_job = ranger
 		}
 	}
 }
