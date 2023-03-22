@@ -426,20 +426,6 @@ ap_enigmatic_engineering = {
 			has_first_contact_dlc = yes
 		}
 
-		possible = {
-			custom_tooltip = {
-				fail_text = "requires_ascension_perks_1"
-				num_ascension_perks > 0
-			}
-			custom_tooltip = {
-				fail_text = tec_crisis_cant_pick_ap
-				OR = {
-					is_crisis_faction = no
-					is_fallen_empire = no		# Avoid MCcheese
-				}
-			}
-		}
-
 		on_enabled = {
 			custom_tooltip = "no_rev_engineering"
 		}
@@ -551,7 +537,7 @@ ap_nihilistic_acquisition = {
 		}
 		modifier = {
 			factor = 0
-			is_genocidal = yes
+			is_homicidal = yes
 		}
 	}
 }
@@ -589,7 +575,7 @@ ap_colossus = {
 		weight = @tec_high_ap_weight
 		modifier = {
 			add = 50
-			is_genocidal = yes
+			is_homicidal = yes
 		}
 		
 		modifier = {
@@ -815,13 +801,10 @@ ap_interstellar_dominion = {
 		modifier = {
 			add = 5
 			any_neighbor_country = {
-				is_rival = prev
+				root = {
+					is_rival = prev
+				}
 			}
-		}
-
-		modifier = {
-			add = 5 # early expaqnsion if start align
-			years_passed < 25
 		}
 
 		# Disablers
@@ -871,8 +854,8 @@ ap_grasp_the_void = {
 	}
 
 	on_enabled = {
-		custom_tooltip = "ap_grasp_the_void_tech_effect"
 		custom_tooltip = tec_ap_grasp_the_void_bonus_effects	
+		custom_tooltip = "ap_grasp_the_void_tech_effect"
 		custom_tooltip = tec_ap_starbases_2_steps
 		if = {
 			limit = {
@@ -884,6 +867,12 @@ ap_grasp_the_void = {
 		}
 	}
 	modifier = {
+		starbase_energy_production_modules_energy_produces_add = 2
+		starbase_minerals_production_modules_minerals_produces_add = 2
+		starbase_food_production_modules_food_produces_add = 2
+		starbase_physics_research_modules_physics_research_produces_add = 2
+		starbase_society_research_modules_society_research_produces_add = 2
+		starbase_engineering_research_modules_engineering_research_produces_add = 2
 		station_gatherers_produces_mult = 0.5
 		ship_speed_mult = 0.15
 	}
@@ -893,15 +882,18 @@ ap_grasp_the_void = {
 		weight = @tec_high_ap_weight
 		modifier = {
 			add = 2
-			tec_is_engineer_empire = yes
+			OR = {
+				tec_is_engineer_empire = yes
+				has_valid_civic = civic_tec_computerized_extraction
+			}
 		}
 		modifier = {
 			add = 2
-			has_ethic = ethic_industrialist
+			has_ethic = ethic_industrial
 		}
 		modifier = {
 			add = 4
-			has_ethic = ethic_fanatic_industrialist
+			has_ethic = ethic_fanatic_industrial
 		}
 		modifier = {
 			add = 2
@@ -916,7 +908,9 @@ ap_grasp_the_void = {
 			years_passed > 40
 			NOT = {
 				any_neighbor_country = {
-					is_rival = prev
+					root = {
+						is_rival = prev
+					}
 				}
 			}
 		}
@@ -1432,7 +1426,7 @@ ap_transcendent_learning = {
 	}
 
 	ai_weight = {
-		factor = @tec_situational_ap_weight
+		weight = @tec_situational_ap_weight
 		modifier = {
 			add = 10
 			OR = {
@@ -1476,12 +1470,24 @@ ap_transcendent_learning = {
 			add = 4
 			has_ethic = ethic_fanatic_elitist
 		}
-		modifier = {
-			add = 2 
-			is_machine_empire = eys
-		}
 		# disablers
 		inline_script = ascension_perks/weights/inline_evolved_force_main_path
+		modifier = {
+			factor = 0 
+			NOR = {
+				tec_produces_unity_from_governors = yes
+				tec_produces_research_from_governors = yes
+				tec_produces_unity_from_scientists = yes
+				tec_produces_scaled_unity_from_scientists = yes
+				tec_produces_research_from_scientists = yes
+				tec_produces_scaled_research_from_scientists = yes
+				tec_produces_unity_from_admirals = yes
+				tec_produces_scaled_unity_from_admirals = yes
+				tec_produces_research_from_admirals = yes
+				tec_produces_scaled_research_from_admirals = yes
+				has_origin = origin_progenitor_hive
+			}
+		}
 	}
 }
 
@@ -1515,7 +1521,7 @@ ap_shared_destiny = {
 		weight = @tec_situational_ap_weight
 		complex_trigger_modifier = {
 			trigger = count_subject
-			parameter = { limit = { always = yes } }
+			parameters = { limit = { always = yes } }
 			mult = 5
 			mode = add
 		}
@@ -2513,7 +2519,7 @@ ap_arcology_project = {
 		}
 		modifier = {
 			add = -5
-			tec_is_terraforming_empire = yes
+			tec_is_terraformer_empire = yes
 		}
 		modifier = {
 			add = 4
@@ -2538,7 +2544,7 @@ ap_arcology_project = {
 
 		modifier = {
 			add = -5 # proxy for origins giving perfect planets
-			capital = {
+			capital_scope = {
 				tec_is_perfect_planet = yes
 			}
 		}
@@ -2625,7 +2631,7 @@ ap_mastery_of_nature = {
 		}
 		modifier = {
 			add = 5
-			tec_is_terraforming_empire = yes
+			tec_is_terraformer_empire = yes
 		}
 		modifier = {
 			add = 5
@@ -2634,8 +2640,8 @@ ap_mastery_of_nature = {
 
 		modifier = {
 			add = 5 # proxy for origins with perfect planets
-			is_green = no
-			capital = {
+			is_ecologist = no
+			capital_scope = {
 				tec_is_perfect_planet = yes
 			}
 		}
