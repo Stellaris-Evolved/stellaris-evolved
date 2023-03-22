@@ -1,0 +1,1275 @@
+#root = starbase
+#from = player
+
+# Weights in the ai_design part are multiplied with the base weight of 00_starbase_buildings.txt and 00_starbase_modules.txt
+# Then, a random number between that value and and extra 50% of that it is ADDED to it
+# F.e. 100 base weight multiplies with 2.00 = 200. Then we take a random number between 0 and 100 (50% of 200) and ADD it to 200. 235 then, for example
+# This is done for ALL starbase modules and buildings in the list every time an evaluation is made
+# And the building or module with the highest value will be chosen to being built
+# The implication of that is that you can not balance the weights TOO FAR from each other - otherwise some modules will never be chosen, unless they are the only thing on the evaluation
+# Due to the progression of the game and the unlocking of tech, though, it is often the case that there will only be 1 item on the list at any given time anyway
+
+# How the AI/game selects which type to use:
+# First of all, it will try to find one which fulfils both the potential trigger and has a positive weight_modifier
+# If this succeeds, the starbase already has a type.
+# If it fails, it will go through each starbase type that fulfils the potential trigger. Then it will check the ratio it has built (total of this type / total upgraded starbases) compared to the desired ratio. If it is set to desire a minimum value and owns less than that, it multiplies its ratio desire by * 100. Then it build according to that type's template.
+
+# Shipyard
+sshipyard = {
+	potential = {
+		has_starbase_size > starbase_outpost
+	}
+
+	weight_modifier = {
+		base = 0
+		add = value:tec_num_starbase_modules_of_type|TYPE|shipyard|FACTOR|100|
+		modifier = {
+			add = 1000
+			owner = {
+				is_ai = yes 
+				NOT = {
+					any_owned_starbase = {
+						has_starbase_module = shipyard
+					}
+				}
+			}
+		}
+	}
+
+	ai_design = {
+		min = {
+			base = 1
+		}
+
+		ratio = {
+			base = 0.20
+			modifier = {
+				add = 0.10
+				exists = owner
+				owner = {
+					has_ethic = ethic_militarist
+				}
+			}
+			modifier = {
+				add = 0.05
+				exists = owner
+				owner = {
+					has_ethic = ethic_fanatic_militarist
+				}
+			}
+		}
+
+		# token followed by priority
+		buildings = {
+			crew_quarters = {
+				base = 1.00
+			}
+
+			fleet_academy = {
+				base = 0.25
+			}
+
+			# Only here
+			titan_yards = {
+				base = 0.01
+			}
+
+			colossus_yards = {
+				base = 0.01
+			}
+
+			# Special
+			dragon_hatchery = {
+				base = 1.00
+				modifier = {
+					add = 10
+					solar_system = {
+						any_system_planet = {
+							is_capital = yes
+						}
+					}
+				}
+			}
+
+			irassian_naval_yards = {
+				base = 3.00
+			}
+
+			salvager_workshop = {
+				base = 5
+			}
+
+			inline_script = starbase/design/inline_evolved_buildings_important
+		}
+		} # inline somehow eats a }
+		
+		modules = {
+			shipyard = {
+				base = 1.00
+			}
+
+			anchorage = {
+				base = 0.50
+			}
+
+			hangar_bay = {
+				base = 0
+			}
+		}
+	}
+}
+
+
+# Anchorage
+sanchorage = {
+	potential = {
+		has_starbase_size > starbase_outpost
+	}
+
+	weight_modifier = {
+		base = 0
+		add = value:tec_num_starbase_modules_of_type|TYPE|anchorage|FACTOR|100|
+		modifier = {
+			add = 500
+			exists = owner
+			owner = {
+				used_naval_capacity_percent > 1
+			}
+		}
+	}
+
+	ai_design = {
+		min = {
+			base = 0
+		}
+
+		ratio = {
+			base = 0.65
+			modifier = {
+				add = 0.05
+				exists = owner
+				owner = {
+					has_ethic = ethic_militarist
+				}
+			}
+			modifier = {
+				add = 0.02
+				exists = owner
+				owner = {
+					has_ethic = ethic_fanatic_militarist
+				}
+			}
+		}
+
+
+
+		# token followed by priority
+		buildings = {
+			naval_logistics_office = {
+				base = 6.5
+			}
+
+			fleet_academy = {
+				base = 0.05
+			}
+
+			defense_grid = {
+				base = 0.05
+				modifier = {
+					add = 10
+					solar_system = {
+						any_system_planet = {
+							is_capital = yes
+						}
+					}
+				}
+			}
+			
+			communications_jammer = {
+				base = 0.05
+			}
+
+			inline_script = starbase/design/inline_evolved_buildings_important
+		}
+		} # inline somehow eats a }
+
+		modules = {
+			anchorage = {
+				base = 1.00
+			}
+		}
+	}
+}
+
+# Trading Hub
+strading_hub = {
+	potential = {
+		has_starbase_size > starbase_outpost
+		exists = owner
+		owner = { 
+			is_gestalt = no
+		}
+	}
+
+	weight_modifier = {
+		base = 0
+		add = value:tec_num_starbase_modules_of_type|TYPE|trading_hub|FACTOR|100|
+	}
+
+	ai_design = {
+		min = {
+			base = 0
+		}
+
+		ratio = {
+			base = 0.10
+			modifier = {
+				add = 0.05
+				exists = owner
+				owner = {
+					OR = {
+						has_ethic = ethic_xenophile
+						has_ethic = ethic_capitalism
+					}
+					is_megacorp = no
+				}
+			}
+			modifier = {
+				add = 0.10
+				exists = owner
+				owner = {
+					OR = {
+						is_megacorp = yes
+						has_ethic = ethic_fanatic_xenophile
+						has_ethic = ethic_fanatic_capitalism
+					}
+				}
+			}
+		}	
+
+		# token followed by priority
+		buildings = {
+			offworld_trading_company = {
+				base = 1.00
+			}		
+
+			defense_grid = {
+				base = 0.05
+				modifier = {
+					add = 10
+					solar_system = {
+						any_system_planet = {
+							is_capital = yes
+						}
+					}
+				}
+			}
+			
+			communications_jammer = {
+				base = 0.05
+			}
+
+			inline_script = starbase/design/inline_evolved_buildings_important
+		}
+
+		} # inline somehow eats a }
+
+		modules = {
+			trading_hub = {
+				base = 1.0
+			}
+		}
+	}
+}
+
+# Fortress System
+sfortress = {
+	potential = {
+		has_starbase_size > starbase_outpost
+		exists = owner
+		OR = {
+			owner = { is_ai = no }
+			AND = {
+				solar_system = { is_bottleneck_system = yes }
+				closest_system = {
+					min_steps = 0
+					max_steps = 2
+					limit = {
+						exists = owner
+						owner = {
+							is_country_type = default
+							NOR = {
+								is_same_value = root.owner
+								is_in_federation_with = root.owner
+								has_association_status = root.owner
+								has_defensive_pact = root.owner
+								has_non_aggression_pact = root.owner
+								has_overlord = root.owner
+								AND = {
+									has_subject = root.owner
+									has_loyalty > 0
+								}
+							}
+						}
+					}
+					exists = this
+				}
+			}
+		}
+	}
+
+	ai_use_defense_platforms = yes #AI will not build defense platforms otherwise, except in the capital system
+
+	weight_modifier = {
+		base = 0
+		add = value:tec_num_starbase_modules_of_type|TYPE|gun_battery|FACTOR|75|
+		add = value:tec_num_starbase_modules_of_type|TYPE|tec_starbase_m_xxl_cannons|FACTOR|75|
+		add = value:tec_num_starbase_modules_of_type|TYPE|missile_battery|FACTOR|75|
+		add = value:tec_num_starbase_modules_of_type|TYPE|tec_starbase_m_xxl_missiles|FACTOR|75|
+		add = value:tec_num_starbase_modules_of_type|TYPE|hangar_bay|FACTOR|75|
+		add = value:tec_num_starbase_modules_of_type|TYPE|tec_starbase_m_xxl_hangars|FACTOR|75|
+		add = value:tec_num_starbase_modules_of_type|TYPE|tec_starbase_m_interceptor|FACTOR|75|
+		add = value:tec_num_starbase_modules_of_type|TYPE|tec_starbase_m_xxl_hypergun|FACTOR|150|		
+		add = value:tec_num_starbase_modules_of_type|TYPE|archaeo_rampart|FACTOR|100|	
+		modifier = {
+			add = 150
+			solar_system = { is_bottleneck_system = yes }
+			closest_system = {
+				max_steps = 2
+				limit = {
+					exists = owner
+					owner = {
+						OR = {
+							is_rival = root
+							is_hostile_to = root
+							is_hostile = root
+						}
+					}
+				}
+				exists = this
+			}
+		}
+	}
+
+	ai_design = {
+		min = {
+			base = 0
+		}
+
+		ratio = {
+			base = 0.10
+			modifier = {
+				add = 0.5
+				exists = owner
+				owner = {
+					has_ethic = ethic_pacifist
+				}
+			}
+			modifier = {
+				add = 0.10
+				exists = owner
+				owner = {
+					has_ethic = ethic_fanatic_pacifist
+				}
+			}
+			modifier = {
+				add = 0.10
+				exists = owner
+				owner = {
+					has_ascension_perk = ap_eternal_vigilance
+				}
+			}
+		}
+
+		# token followed by priority
+		buildings = {
+			target_uplink_computer = {
+				base = 1.00
+			}
+
+			command_center = {
+				base = 1.00
+			}
+
+			defense_grid = {
+				base = 1.00
+			}
+
+			communications_jammer = {
+				base = 0.90
+			}
+
+			mercenary_garrison = {
+				base = 10
+			}
+
+			offspring_outlook = {
+				base = 10
+			}
+
+			archaeo_overcharger = {
+				base = 10
+			}
+
+			zroni_storm_caster = {
+				base = 1.5
+				modifier = {
+					factor = 0
+					exists = owner
+					owner = {
+						has_monthly_income = { 
+							resource = sr_zro 
+							value < 2
+						}
+					}
+				}
+			}
+
+			inline_script = starbase/design/inline_evolved_buildings_important
+		}
+		
+		} # inline somehow eats a }
+
+		modules = {
+			hangar_bay = {
+				base = 0.80
+				modifier = {
+					factor = 3
+					owner = {
+						is_preferred_weapons = weapon_type_strike_craft
+					}
+				}
+			}
+
+			missile_battery = {
+				base = 1.00
+				modifier = {
+					factor = 3
+					owner = {
+						is_preferred_weapons = weapon_type_explosive
+					}
+				}
+			}
+
+			gun_battery = {
+				base = 1.00
+			}
+
+			tec_starbase_m_interceptor = {
+				base = 0.5
+			}
+
+			tec_starbase_m_xxl_hangars = {
+				base = 0.80
+				modifier = {
+					factor = 3
+					owner = {
+						is_preferred_weapons = weapon_type_strike_craft
+					}
+				}
+			}
+
+			tec_starbase_m_xxl_missiles = {
+				base = 1.00
+				modifier = {
+					factor = 3
+					owner = {
+						is_preferred_weapons = weapon_type_explosive
+					}
+				}
+			}
+
+			tec_starbase_m_xxl_cannons = {
+				base = 1.00
+				modifier = {
+					factor = 3
+					owner = {
+						OR = {
+							is_preferred_weapons = weapon_type_energy
+							is_preferred_weapons = weapon_type_kinetic
+						}
+					}
+				}
+			}
+
+			tec_starbase_m_xxl_hypergun = {
+				base = 3
+			}
+
+			archaeo_rampart = {
+				base = 1.25
+				modifier = {
+					factor = 3
+					NOT = { has_starbase_module = archaeo_rampart }
+				}
+			}
+		}
+	}
+}
+
+# Trading Hub - Gestalts
+strading_hub_gestalt = {
+	potential = {
+		has_starbase_size > starbase_outpost
+		exists = owner
+		owner = { 
+			tec_is_trade_gestalt = yes
+		}
+	}
+
+	weight_modifier = {
+		base = 0
+		add = value:tec_num_starbase_modules_of_type|TYPE|trading_hub|FACTOR|100|		
+	}
+
+	ai_design = {
+		min = {
+			base = 0
+		}
+
+		ratio = {
+			base = 0.10
+		}
+
+
+
+		# token followed by priority
+		buildings = {
+			offworld_trading_company = {
+				base = 1.00
+			}		
+
+			defense_grid = {
+				base = 0.05
+				modifier = {
+					add = 10
+					solar_system = {
+						any_system_planet = {
+							is_capital = yes
+						}
+					}
+				}
+			}
+			
+			communications_jammer = {
+				base = 0.05
+			}
+
+
+			inline_script = starbase/design/inline_evolved_buildings_important
+		}
+
+		} # inline somehow eats a }
+
+		modules = {
+			trading_hub = {
+				base = 1.0
+			}
+		}
+	}
+}
+
+sdetection_array = {
+	potential = {
+		has_first_contact_dlc = yes
+		has_starbase_size > starbase_outpost
+		exists = owner
+		owner = {
+			has_technology = tech_detection_array
+		}
+		exists = sector
+		sector = {
+			any_system_within_border = {
+				starbase = {
+					NOT = {
+						is_starbase_type = sdetection_array
+					}
+				}
+			}
+		}
+		solar_system = {
+			is_capital_system = no
+		}
+		OR = {
+			AND = {
+				owner = { is_ai = no }
+				has_starbase_module = detection_array
+			}
+			# Either this is near the capital system
+			AND = {
+				owner = { is_ai = yes }
+				sector = {
+					any_system_within_border = {
+						is_capital_system = yes
+					}
+				}
+			}
+			# Or is a border system
+			AND = {
+				owner = { is_ai = yes }
+				closest_system = {
+					min_steps = 0
+					max_steps = 4
+					limit = {
+						exists = owner
+						owner = {
+							is_country_type = default
+							NOR = {
+								is_same_value = root.owner
+								is_in_federation_with = root.owner
+								has_association_status = root.owner
+								has_defensive_pact = root.owner
+								has_non_aggression_pact = root.owner
+								has_overlord = root.owner
+								AND = {
+									has_subject = root.owner
+									has_loyalty > 0
+								}
+							}
+						}
+					}
+					exists = this
+				}
+			}
+		}
+	}
+
+	ai_use_defense_platforms = yes #AI will not build defense platforms otherwise, except in the capital system
+
+	weight_modifier = {
+		base = 0
+		add = value:tec_num_starbase_modules_of_type|TYPE|detection_array|FACTOR|100|		
+		
+		modifier = {
+			add = 1000
+			owner = {
+				is_ai = yes
+				NOT = {
+					any_owned_starbase = {
+						has_starbase_module = detection_array
+					}
+				}
+			}
+		}
+	}
+
+	ai_design = {
+		min = {
+			base = 1
+		}
+
+		ratio = {
+			base = 0.10
+			modifier = {
+				add = 0.10
+				exists = owner
+				owner = {
+					has_ethic = ethic_pacifist
+				}
+			}
+			modifier = {
+				add = 0.20
+				exists = owner
+				owner = {
+					has_ethic = ethic_fanatic_pacifist
+				}
+			}
+			modifier = {
+				add = 0.10
+				exists = owner
+				owner = {
+					has_ethic = ethic_xenophobe
+				}
+			}
+			modifier = {
+				add = 0.20
+				exists = owner
+				owner = {
+					has_ethic = ethic_fanatic_xenophobe
+				}
+			}
+		}
+
+		# token followed by priority
+		buildings = {
+			listening_post = {
+				base = 1.00
+				modifier = {
+					factor = 6
+					exists = owner
+					owner = {
+						has_technology = tech_unusual_senses
+					}
+				}
+				modifier = {
+					factor = 2
+					exists = owner
+					owner = {
+						has_civic = civic_hive_subspace_ephapse
+					}
+				}
+			}
+
+			dark_matter_detector = {
+				base = 10.00
+			}
+
+			target_uplink_computer = {
+				base = 1.00
+			}
+
+			defense_grid = {
+				base = 1.00
+			}
+
+			inline_script = starbase/design/inline_evolved_buildings_important
+		}
+		
+		} # inline somehow eats a }
+
+		modules = {
+			detection_array = {
+				base = 1.00
+			}
+		}
+	}
+}
+
+### ORBITAL RINGS
+
+sorbital_ring = { # generic
+	potential = { is_orbital_ring = yes }
+	weight_modifier = { base = 10 }
+	ai_design = {
+		min = {
+			base = 0
+		}
+		modules = {
+			orbital_ring_habitation = {
+				base = 20.00
+				modifier = {
+					factor = 2
+					planet = {
+						num_free_districts = { type = any value <= 2 }
+					}
+				}
+			}
+
+			orbital_ring_shipyard = {
+				base = 0.0 # Generally better to use normal starbases for this
+			}
+
+			orbital_ring_anchorage = {
+				base = 0.0 # Generally better to use normal starbases for this
+			}
+
+			orbital_ring_gun_battery = {
+				base = 0.0
+			}
+
+			orbital_ring_missile_battery = {
+				base = 0.0
+			}
+
+			orbital_ring_hangar_bay = {
+				base = 0.0
+			}
+		}
+
+		# token followed by priority
+		buildings = {
+			ring_synapse_hub = {
+				base = 1.00
+			}
+
+			ring_maintenance_hub = {
+				base = 1.00
+			}
+
+			ring_bureaucracy_hub = {
+				base = 0
+				modifier = {
+					add = 3
+					planet = {
+						OR = {
+							has_unity_designation = yes
+							has_building = building_sensorium_1
+							has_building = building_autochthon_monument
+							has_building = building_corporate_monument
+							has_building = building_galactic_memorial_1
+							has_building = building_simulation_1
+						}
+					}
+				}
+			}
+
+			ring_minerals_hub = {
+				base = 0
+				modifier = {
+					add = 3
+					planet = {
+						OR = {
+							has_mining_designation = yes
+							has_building = building_mineral_purification_plant
+							has_building = building_mineral_purification_hub
+						}
+					}
+				}
+			}
+
+			ring_energy_hub = {
+				base = 0
+				modifier = {
+					add = 3
+					planet = {
+						OR = {
+							has_generator_designation = yes
+							has_building = building_energy_grid
+							has_building = building_energy_nexus
+						}
+					}
+				}
+			}
+
+			ring_food_hub = {
+				base = 0
+				modifier = {
+					add = 3
+					planet = {
+						OR = {
+							has_farming_designation = yes
+							has_building = building_food_processing_facility
+							has_building = building_food_processing_center
+						}
+					}
+				}
+			}
+
+			ring_consumer_goods_hub = {
+				base = 0
+				modifier = {
+					add = 3
+					planet = {
+						OR = {
+							has_factory_designation = yes
+							has_industrial_designation = yes
+							has_building = building_factory_1
+							has_building = building_factory_2
+							has_building = building_factory_3
+						}
+					}
+				}
+			}
+
+			ring_alloys_hub = {
+				base = 0
+				modifier = {
+					add = 3
+					planet = {
+						OR = {
+							has_foundry_designation = yes
+							has_industrial_designation = yes
+							has_building = building_foundry_1
+							has_building = building_foundry_2
+							has_building = building_foundry_3
+						}
+					}
+				}
+			}
+
+			ring_trade_hub = {
+				base = 1
+				modifier = {
+					add = 2
+					planet = {
+						OR = {
+							has_trade_designation = yes
+							has_building = building_galactic_stock_exchange
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# Shipyard
+sorbital_shipyard = {
+	potential = {
+		is_orbital_ring = yes
+		has_starbase_module = orbital_ring_shipyard
+	}
+
+	weight_modifier = {
+		base = 0
+		add = value:tec_num_starbase_modules_of_type|TYPE|orbital_ring_shipyard|FACTOR|100|		
+		
+		modifier = {
+			add = 1000
+			owner = {
+				is_ai = yes
+				NOR = {
+					any_owned_megastructure = {
+						OR = {
+							is_megastructure_type = mega_shipyard_1
+							is_megastructure_type = mega_shipyard_2
+							is_megastructure_type = mega_shipyard_3
+							is_megastructure_type = mega_shipyard_restored
+						}
+					}
+					any_owned_starbase = {
+						has_starbase_module = shipyard
+						has_starbase_module = orbital_ring_shipyard
+					}
+				}
+			}
+		}
+	}
+
+	ai_design = {
+		min = {
+			base = 0
+		}
+
+		# token followed by priority
+		buildings = {
+			crew_quarters = {
+				base = 1.00
+			}
+
+			defense_grid = {
+				base = 0.05
+				modifier = {
+					add = 10
+					solar_system = {
+						any_system_planet = {
+							is_capital = yes
+						}
+					}
+				}
+			}
+			
+			communications_jammer = {
+				base = 0.05
+			}
+
+
+			inline_script = starbase/design/inline_evolved_buildings_important
+		}
+
+		} # inline somehow eats a }
+
+		modules = {
+			orbital_ring_shipyard = {
+				base = 1.00
+			}
+		}
+	}
+}
+
+# Anchorage
+sorbital_anchorage = {
+	potential = {
+		is_orbital_ring = yes
+		has_starbase_module = orbital_ring_anchorage
+	}
+
+	weight_modifier = {
+		base = 0
+		add = value:tec_num_starbase_modules_of_type|TYPE|orbital_ring_anchorage|FACTOR|100|		
+		
+	}
+
+	ai_design = {
+		min = {
+			base = 0
+		}
+
+		ratio = {
+			base = 0
+		}
+
+		# token followed by priority
+		buildings = {
+			naval_logistics_office = {
+				base = 10.00
+			}
+
+			defense_grid = {
+				base = 0.05
+				modifier = {
+					add = 10
+					solar_system = {
+						any_system_planet = {
+							is_capital = yes
+						}
+					}
+				}
+			}
+			
+			communications_jammer = {
+				base = 0.05
+			}
+
+			inline_script = starbase/design/inline_evolved_buildings_important
+		}
+		
+		} # inline somehow eats a }
+
+		modules = {
+			orbital_ring_anchorage = {
+				base = 1.00
+			}
+
+			orbital_ring_habitation = {
+				base = 0
+				modifier = {
+					add = 1
+					planet = {
+						num_free_districts = { type = any value <= 2 }
+					}
+				}
+			}
+		}
+	}
+}
+
+# Fortress System
+sorbital_fortress = {
+	potential = {
+		is_orbital_ring = yes
+		OR = {
+			has_starbase_module = orbital_ring_gun_battery
+			has_starbase_module = orbital_ring_missile_battery
+			has_starbase_module = orbital_ring_hangar_bay
+		}
+	}
+
+	ai_use_defense_platforms = yes #AI will not build defense platforms otherwise, except in the capital system
+
+	weight_modifier = {
+		base = 0
+		add = value:tec_num_starbase_modules_of_type|TYPE|orbital_ring_gun_battery|FACTOR|75|		
+		add = value:tec_num_starbase_modules_of_type|TYPE|orbital_ring_missile_battery|FACTOR|75|	
+		add = value:tec_num_starbase_modules_of_type|TYPE|orbital_ring_hangar_bay|FACTOR|75|	
+	}
+
+	ai_design = {
+		min = {
+			base = 0
+		}
+
+		ratio = {
+			base = 0
+		}
+
+		# token followed by priority
+		buildings = {
+			target_uplink_computer = {
+				base = 2.00
+			}
+
+			command_center = {
+				base = 2.00
+			}
+
+			defense_grid = {
+				base = 1.00
+			}
+
+			communications_jammer = {
+				base = 0.90
+			}
+
+			disruption_field = {
+				base = 0.90
+			}
+		}
+
+		modules = {
+			orbital_ring_hangar_bay = {
+				base = 1.00
+				modifier = {
+					factor = 3
+					owner = {
+						is_preferred_weapons = weapon_type_strike_craft
+					}
+				}
+			}
+
+			orbital_ring_missile_battery = {
+				base = 1.00
+				modifier = {
+					factor = 3
+					owner = {
+						is_preferred_weapons = weapon_type_explosive
+					}
+				}
+			}
+
+			orbital_ring_gun_battery = {
+				base = 1.00
+				modifier = {
+					factor = 3
+					owner = {
+						OR = {
+							is_preferred_weapons = weapon_type_energy
+							is_preferred_weapons = weapon_type_kinetic
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+sorbital_habitation = {
+	potential = {
+		is_orbital_ring = yes
+		has_starbase_module = orbital_ring_habitation
+	}
+
+	weight_modifier = {
+		base = 0
+		add = value:tec_num_starbase_modules_of_type|TYPE|orbital_ring_habitation|FACTOR|75|	
+	}
+
+	ai_design = {
+		min = {
+			base = 1
+		}
+
+		ratio = {
+			base = 0.50
+			modifier = {
+				add = 0.25
+				exists = owner
+				owner = {
+					is_pacifist = yes
+				}
+			}
+		}
+
+		# token followed by priority
+		buildings = {
+			ring_synapse_hub = {
+				base = 1.00
+			}
+
+			ring_maintenance_hub = {
+				base = 1.00
+			}
+
+			ring_bureaucracy_hub = {
+				base = 0
+				modifier = {
+					add = 3
+					planet = {
+						OR = {
+							has_designation = col_bureau
+							has_designation = col_bureau_spiritualist
+							has_building = building_sensorium_1
+							has_building = building_autochthon_monument
+							has_building = building_corporate_monument
+							has_building = building_galactic_memorial_1
+							has_building = building_simulation_1
+						}
+					}
+				}
+			}
+
+			ring_minerals_hub = {
+				base = 0
+				modifier = {
+					add = 3
+					planet = {
+						OR = {
+							has_designation = col_mining
+							has_building = building_mineral_purification_plant
+							has_building = building_mineral_purification_hub
+						}
+					}
+				}
+			}
+
+			ring_energy_hub = {
+				base = 0
+				modifier = {
+					add = 3
+					planet = {
+						OR = {
+							has_designation = col_generator
+							has_building = building_energy_grid
+							has_building = building_energy_nexus
+						}
+					}
+				}
+			}
+
+			ring_food_hub = {
+				base = 0
+				modifier = {
+					add = 3
+					planet = {
+						OR = {
+							has_designation = col_farming
+							has_building = building_food_processing_facility
+							has_building = building_food_processing_center
+						}
+					}
+				}
+			}
+
+			ring_consumer_goods_hub = {
+				base = 0
+				modifier = {
+					add = 3
+					planet = {
+						OR = {
+							has_designation = col_industrial
+							has_designation = col_factory
+							has_building = building_factory_1
+							has_building = building_factory_2
+							has_building = building_factory_3
+						}
+					}
+				}
+			}
+
+			ring_alloys_hub = {
+				base = 0
+				modifier = {
+					add = 3
+					planet = {
+						OR = {
+							has_designation = col_industrial
+							has_designation = col_foundry
+							has_building = building_foundry_1
+							has_building = building_foundry_2
+							has_building = building_foundry_3
+						}
+					}
+				}
+			}
+
+			ring_trade_hub = {
+				base = 1
+				modifier = {
+					add = 2
+					planet = {
+						OR = {
+							has_designation = col_city
+							has_building = building_galactic_stock_exchange
+						}
+					}
+				}
+			}
+		}
+
+		modules = {
+			orbital_ring_habitation = {
+				base = 20.00
+			}
+		}
+	}
+}

@@ -20,7 +20,7 @@ building_luxury_residence = {
 	potential = {
 		OR = {
 			uses_habitat_capitals = no
-			has_planet_flag = advanced_habitat
+			tec_is_upgraded_habitat = yes
 		}
 		NOT = { has_modifier = slave_colony }
 		exists = owner
@@ -29,6 +29,7 @@ building_luxury_residence = {
 			NOT = { has_valid_civic = civic_shared_burden }
 		}
 		NOT = { has_building = building_low_tech_capital }
+		hidden_trigger = { is_ai = no }
 	}
 
 	destroy_trigger = {
@@ -41,6 +42,10 @@ building_luxury_residence = {
 				owner = {
 					is_ai = yes
 				}
+			}
+			AND = {
+				uses_habitat_capitals = yes
+				tec_is_upgraded_habitat = no
 			}
 			owner = { is_regular_empire = no }
 			owner = { has_valid_civic = civic_shared_burden }
@@ -89,19 +94,21 @@ building_paradise_dome = {
 	}
 
 	potential = {
-		has_building = building_luxury_residence
+		owner = {
+			is_regular_empire = yes
+			NOT = { has_valid_civic = civic_shared_burden }
+		}
 		OR = {
-			NOT = {
-				uses_habitat_capitals = yes
-			}
+			uses_habitat_capitals = no
 			AND = {
-				has_planet_flag = advanced_habitat
+				tec_is_upgraded_habitat = yes
 				exists = owner
 				owner = {
 					has_ascension_perk = ap_voidborn
 				}
 			}
 		}
+		hidden_trigger = { owner = { is_ai = no } }
 	}
 
 	allow = {
@@ -113,6 +120,16 @@ building_paradise_dome = {
 		OR = {
 			owner = { is_regular_empire = no }
 			owner = { has_valid_civic = civic_shared_burden }
+			AND = {
+				uses_habitat_capitals = yes
+				NAND = {
+					tec_is_upgraded_habitat = yes
+					exists = owner
+					owner = {
+						has_ascension_perk = ap_voidborn
+					}
+				}
+			}
 			has_modifier = slave_colony
 		}
 	}
@@ -182,7 +199,7 @@ building_communal_housing = {
 	potential = {
 		OR = {
 			uses_habitat_capitals = no
-			has_planet_flag = advanced_habitat
+			tec_is_upgraded_habitat = yes
 		}
 		NOT = { has_modifier = slave_colony }
 		exists = owner
@@ -190,6 +207,8 @@ building_communal_housing = {
 			is_regular_empire = yes
 			has_valid_civic = civic_shared_burden
 		}
+
+		hidden_trigger = { owner = { is_ai = no } }
 	}
 
 	#allow = {
@@ -206,7 +225,7 @@ building_communal_housing = {
 			}
 			AND = {
 				uses_habitat_capitals = yes
-				NOT = { has_planet_flag = advanced_habitat }
+				tec_is_upgraded_habitat = no
 			}
 			NOT = {
 				owner = {
@@ -261,17 +280,23 @@ building_communal_housing_large = {
 	}
 
 	potential = {
-		has_building = building_communal_housing
+		exists = owner
+		owner = {
+			is_regular_empire = yes
+			has_valid_civic = civic_shared_burden
+		}
+		NOT = { has_modifier = slave_colony }
 		OR = {
 			uses_habitat_capitals = no
 			AND = {
-				has_planet_flag = advanced_habitat
+				tec_is_upgraded_habitat = yes
 				exists = owner
 				owner = {
 					has_ascension_perk = ap_voidborn
 				}
 			}
 		}
+		hidden_trigger = { owner = { is_ai = no } }
 	}
 
 	allow = {
@@ -280,7 +305,25 @@ building_communal_housing_large = {
 
 	destroy_trigger = {
 		exists = owner
-		has_modifier = slave_colony
+		OR = {
+			AND = {
+				uses_habitat_capitals = yes
+				NAND = {
+					tec_is_upgraded_habitat = yes
+					exists = owner
+					owner = {
+						has_ascension_perk = ap_voidborn
+					}
+				}
+			}
+			NOT = {
+				owner = {
+					is_regular_empire = yes
+					has_valid_civic = civic_shared_burden
+				}
+			}
+			has_modifier = slave_colony
+		}
 	}
 
 	convert_to = {
@@ -329,14 +372,13 @@ building_holo_theatres = {
 	potential = {
 		NOT = {	has_modifier = slave_colony	}
 		owner = { is_regular_empire = yes }
-		OR = {
-			owner = {
-				NOT = { is_ai = yes }
+		if = {
+			limit = {
+				owner = { is_ai = yes }
 			}
-			AND = {
-				NOT = { has_available_jobs = entertainer }
-				NOT = { has_forbidden_jobs = entertainer }
-			}
+			
+			NOT = { has_available_jobs = entertainer }
+			NOT = { has_forbidden_jobs = entertainer }
 		}
 		NOT = { has_building = building_low_tech_capital }
 	}
