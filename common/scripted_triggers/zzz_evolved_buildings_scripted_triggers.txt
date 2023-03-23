@@ -1507,104 +1507,7 @@
 	}
 
  # ------- Rules
-	tec_ai_allow_assembly_building = {
-		always = yes
-		if = {
-			limit = {
-				exists = owner
-				owner = { is_ai = yes }
-			}
-			owner = {
-				if = {
-					limit = {
-						is_machine_empire = yes # machine empires make robots, always
-					}
-					always = $ROBOTS|no$
-				}
-				else_if = {
-					limit = {
-						OR = {
-							tec_has_master_cloner = yes 
-							tec_has_psionic_ascension_path = yes
-						}
-						# sanity check to not block ai from using other assembly 
-						# in case somehow they do not have this type unlocked
-						has_technology = tech_cloning
-					}
-					always = $CLONES|no$
-				}
-				else_if = {
-					limit = {
-						OR = {
-							tec_is_bioservant_empire = yes
-							tec_has_master_bioengineer = yes
-						}
-						# sanity check to not block ai from using other assembly 
-						# in case somehow they do not have this type unlocked
-						has_technology = tech_tec_bioservant
-					}
-					always = $BIO|no$
-				}
-				else_if = {
-					limit = {
-						OR = {
-							tec_allows_machine_assembly_for_cyborg = yes 
-							tec_has_synthetic_ascension_path = yes
-							tec_is_machine_cult = yes
-						}
-						# sanity check to not block ai from using other assembly 
-						# in case somehow they do not have this type unlocked
-						has_technology = tech_robotic_workers
-					}
-					always = $ROBOTS|no$
-				}
-				else_if = {
-					limit = {
-						has_global_flag = tec_desired_assembly_distributed
-						OR = {
-							always = $CLONES|no$
-							always = $ROBOTS|no$
-							always = $BIO|no$
-						}
-					}
-					[[!ROBOTS] NOT = { ]
-						OR = {
-							has_country_flag = tec_desires_to_build_robots	
-						}
-					[[!ROBOTS] } ]
-					[[!BIO] NOT = { ]
-						has_country_flag = tec_desires_to_build_bio	
-					[[!BIO] } ]
-					[[!CLONES] NOT = { ]
-						OR = {
-							has_country_flag = tec_desires_to_be_pure		
-							has_country_flag = tec_desires_to_build_clones
-						}
-					[[!CLONES] } ]
-				}
-				else = {
-					always = yes
-				}
-			}
-		}
-	}
-
-	tec_destroy_assembly_buildings = {
-		if = {
-			limit = {
-				exists = owner
-				owner = { is_ai = yes }
-			}
-			AND = {
-				free_district_slots = 0
-				free_housing <= 0
-				free_jobs <= 0
-			}
-		}
-		else = {
-			always = no
-		}
-	}
+	
 
 	tec_invalidates_assembly_buildings = {
 		OR = {
@@ -1746,5 +1649,26 @@ tec_planet_allows_automation = {
 		NOT = {
 			has_planet_flag = tec_automation_mechanic_off
 		}
+	}
+}
+
+# Planet scope
+tec_has_orbital_building = {
+	if = {
+		limit = {
+			exists = orbital_defence
+		}
+		orbital_defence = {
+			exists = starbase
+			starbase = {
+				NOR = {
+					has_starbase_building = $building$
+					is_starbase_building_building = $building$
+				}
+			}
+		}
+	}
+	else = {
+		always = no
 	}
 }

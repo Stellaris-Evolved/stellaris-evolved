@@ -28,35 +28,22 @@ building_precinct_house = {
 	}
 
 	allow = {
-		OR = {
-			owner = { is_ai = no }
-			AND = {
-				owner = { is_ai = yes }
-				planet_crime > 15
-				NOT = {
-					has_modifier = crime_lord_deal
-				}
-				NOR = {
-					AND = {
-						has_building = building_precinct_house
-						owner = { has_technology = tech_colonial_centralization }
-					}
-					has_building = building_hall_judgment
-					num_buildings = { type = building_precinct_house value = 3 }
-				}
-			}
-		}
+		tec_ai_allow_crime_building = yes
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			NOT = {	owner = { is_regular_empire = yes } }
-			AND = {
-				owner = { is_ai = yes } #Players dont like random buildings blowing up
-				planet = { has_building = building_hall_judgment }
-			} #This way the AI gets to reclaim its building slots that it sunk into this expense
+			owner = { is_regular_empire = no } 
+			has_modifier = slave_colony
+			tec_ai_destroy_crime_building = {
+				crime = -50
+			}
 		}
+	}
+
+	convert_to = {
+		building_sentinel_posts
 	}
 
 	resources = {
@@ -101,7 +88,17 @@ building_hall_judgment = {
 
 	destroy_trigger = {
 		exists = owner
-		owner = { is_regular_empire = no }
+		OR = {
+			owner = { is_regular_empire = no } 
+			has_modifier = slave_colony
+			tec_ai_destroy_crime_building = {
+				crime = -100
+			}
+		}
+	}
+
+	convert_to = {
+		building_sentinel_posts_2
 	}
 
 	resources = {
@@ -147,16 +144,33 @@ building_sentinel_posts = {
 		is_gestalt = yes
 	}
 
+	upgrades = {
+		building_sentinel_posts_2
+	}
+
 	potential = {
 		exists = owner
 		owner = { is_gestalt = yes }
 	}
 
+	allow = {
+		tec_ai_allow_crime_building = yes
+	}
+
+
 	destroy_trigger = {
 		exists = owner
-		NOT = {
-			owner = { is_gestalt = yes }
+		OR = {
+			owner = { is_gestalt = no } 
+			has_modifier = slave_colony
+			tec_ai_destroy_crime_building = {
+				crime = -50
+			}
 		}
+	}
+
+	convert_to = {
+		building_precinct_house
 	}
 
 	resources = {
@@ -179,6 +193,7 @@ building_sentinel_posts = {
 
 building_sentinel_posts_2 = {
 	base_buildtime = @b2_time
+	can_build = no
 	position_priority = 300		# Crime
 
 	category = government
@@ -197,7 +212,17 @@ building_sentinel_posts_2 = {
 
 	destroy_trigger = {
 		exists = owner
-		owner = { is_gestalt = no }
+		OR = {
+			owner = { is_gestalt = no } 
+			has_modifier = slave_colony
+			tec_ai_destroy_crime_building = {
+				crime = -100
+			}
+		}
+	}
+
+	convert_to = {
+		building_hall_judgment
 	}
 
 	resources = {
@@ -256,29 +281,8 @@ building_embassy = {
 
 	allow = {
 		has_upgraded_capital = yes
-		if = {
-			limit = {
-				exists = orbital_defence
-			}
-			orbital_defence = {
-				exists = starbase
-				starbase = {
-					NOR = {
-						has_starbase_building = ring_embassy_complex
-						is_starbase_building_building = ring_embassy_complex
-					}
-				}
-			}
-		}
-	}
-
-	destroy_trigger = {
-		OR = {
-			AND = {
-				exists = owner
-				owner = { is_regular_empire = no }
-			}
-			planet = { is_capital = no }
+		tec_has_orbital_building = {
+			building = ring_embassy_complex
 		}
 	}
 
@@ -327,29 +331,8 @@ building_grand_embassy = {
 
 	allow = {
 		has_major_upgraded_capital = yes
-		if = {
-			limit = {
-				exists = orbital_defence
-			}
-			orbital_defence = {
-				exists = starbase
-				starbase = {
-					NOR = {
-						has_starbase_building = ring_embassy_complex
-						is_starbase_building_building = ring_embassy_complex
-					}
-				}
-			}
-		}
-	}
-
-	destroy_trigger = {
-		OR = {
-			AND = {
-				exists = owner
-				owner = { is_regular_empire = no }
-			}
-			planet = { is_capital = no }
+		tec_has_orbital_building = {
+			building = ring_embassy_complex
 		}
 	}
 
@@ -523,17 +506,13 @@ building_gaiaseeders_4 = {
 
 	destroy_trigger = {
 		OR = {
-			AND = {
-				tec_planet_allows_gaiaseeders = no
-				tec_is_gaia_world = no
-			}
+			tec_planet_allows_gaiaseeders = no
 			NOT = { exists = owner }
-			owner = {	
+			owner = {
 				tec_is_idyllic_bloom_empire = no
 			}
 		}
 	}
-
 	resources = {
 		category = planet_buildings
 		cost = {
@@ -564,24 +543,7 @@ building_noble_estates = {
 		building_noble_estates_2
 	}
 
-	allow = {
-		has_upgraded_capital = yes
-		if = {
-			limit = {
-				exists = orbital_defence
-			}
-			orbital_defence = {
-				exists = starbase
-				starbase = {
-					NOR = {
-						has_starbase_building = ring_noble_estates
-						is_starbase_building_building = ring_noble_estates
-					}
-				}
-			}
-		}
-	}
-
+	
 	potential = {
 		exists = owner
 		owner = {
@@ -590,20 +552,16 @@ building_noble_estates = {
 		NOT = { has_modifier = slave_colony }
 	}
 
-	destroy_trigger = {
-		exists = owner
-		owner = {
-			NOT = {
-				has_valid_civic = civic_aristocratic_elite
-			}
+	allow = {
+		has_upgraded_capital = yes
+		tec_has_orbital_building = {
+			building = ring_noble_estates
 		}
 	}
 
 	convert_to = {
 		building_tec_castro_1
 	}
-
-
 
 	resources = {
 		category = planet_buildings
@@ -654,28 +612,8 @@ building_noble_estates_2 = {
 
 	allow = {
 		has_upgraded_capital = yes
-		if = {
-			limit = {
-				exists = orbital_defence
-			}
-			orbital_defence = {
-				exists = starbase
-				starbase = {
-					NOR = {
-						has_starbase_building = ring_slave_processing_facility
-						is_starbase_building_building = ring_slave_processing_facility
-					}
-				}
-			}
-		}
-	}
-
-	destroy_trigger = {
-		exists = owner
-		owner = {
-			NOT = {
-				has_valid_civic = civic_aristocratic_elite
-			}
+		tec_has_orbital_building = {
+			building = ring_noble_estates
 		}
 	}
 
@@ -733,15 +671,6 @@ building_tec_castro_1 = {
 		exists = owner
 		owner = {
 			has_valid_civic = civic_feudal_realm
-		}
-	}
-
-	destroy_trigger = {
-		exists = owner
-		owner = {
-			NOT = {
-				has_valid_civic = civic_feudal_realm
-			}
 		}
 	}
 
@@ -805,15 +734,6 @@ building_tec_castro_2 = {
 
 	allow = {
 		has_major_upgraded_capital = yes
-	}
-
-	destroy_trigger = {
-		exists = owner
-		owner = {
-			NOT = {
-				has_valid_civic = civic_feudal_realm
-			}
-		}
 	}
 
 	convert_to = {
@@ -922,10 +842,11 @@ building_order_keep = {
 	}
 
 	resources = {
-		cost = {
-			minerals = 1000
-		}
 		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 3
+		}
 	}
 
 	triggered_desc = {
@@ -1019,29 +940,8 @@ building_psi_corps = {
 
 	allow = {
 		has_major_upgraded_capital = yes
-		if = {
-			limit = {
-				exists = orbital_defence
-			}
-			orbital_defence = {
-				exists = starbase
-				starbase = {
-					NOR = {
-						has_starbase_building = ring_psi_corps
-						is_starbase_building_building = ring_psi_corps
-					}
-				}
-			}
-		}
-	}
-
-	destroy_trigger = {
-		exists = owner
-		owner = {
-			NOR = {
-				has_tradition = tr_psionics_psi_corps
-				has_country_flag = tec_unlock_psi_corps
-			}
+		tec_has_orbital_building = {
+			building = ring_psi_corps
 		}
 	}
 
@@ -1063,7 +963,6 @@ building_psi_corps = {
 	}
 
 }
-
 
 
 # OTHER
@@ -1088,15 +987,6 @@ building_slave_processing = {
 
 	allow = {
 		has_upgraded_capital = yes
-	}
-
-	destroy_trigger = { # destroys if true
-		exists = owner
-		OR = {
-			owner = { is_regular_empire = no }
-			NOT = { owner = { has_policy_flag = slavery_allowed } }
-			has_modifier = resort_colony
-		}
 	}
 
 	resources = {
