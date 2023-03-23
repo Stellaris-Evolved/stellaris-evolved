@@ -29,27 +29,11 @@ building_institute = {
 		owner = {
 			is_regular_empire = yes 
 		}
+		tec_ai_destroy_research_boosting_building = no
 	}
 
 	allow = {
 		has_major_upgraded_capital = yes
-	}
-
-	destroy_trigger = {
-		exists = owner
-		OR = {
-			OR = {
-				has_modifier = resort_colony
-				has_modifier = slave_colony
-				has_modifier = crucible_colony
-			}
-			owner = {
-				is_gestalt = yes
-			}
-			owner = {
-				is_regular_empire = no
-			}
-		}
 	}
 
 	convert_to = {
@@ -68,6 +52,20 @@ building_institute = {
 			tier = 2
 			rare = exotic_gases
 		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = "
+				OR = {
+					has_research_designation = yes
+					check_variable_arithmetic = {
+						which = value:research_combined_value
+						value >= 4
+					}
+				}
+			"
+			building = building_institute
+		}		
 	}
 
 	planet_modifier = {
@@ -125,30 +123,11 @@ building_supercomputer = {
 			has_modifier = slave_colony
 			has_modifier = crucible_colony
 		}
+		tec_ai_destroy_research_boosting_building = no
 	}
 
 	allow = {
 		has_major_upgraded_capital = yes
-	}
-
-	destroy_trigger = {
-		exists = owner
-		OR = {
-			OR = {
-				has_modifier = resort_colony
-				has_modifier = slave_colony
-				has_modifier = crucible_colony
-			}
-			owner = {
-				OR = {
-					is_gestalt = no
-					tec_is_biohive = yes
-				}
-			}
-			owner = {
-				is_regular_empire = yes
-			}
-		}
 	}
 
 	convert_to = {
@@ -168,6 +147,20 @@ building_supercomputer = {
 			tier = 2
 			rare = exotic_gases
 		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = "
+				OR = {
+					has_research_designation = yes
+					check_variable_arithmetic = {
+						which = value:research_combined_value
+						value >= 4
+					}
+				}
+			"
+			building = building_supercomputer
+		}	
 	}
 
 	planet_modifier = {
@@ -208,6 +201,115 @@ building_supercomputer = {
 	}
 }
 
+# --------------- New hive art
+#building_tec_hive_supercomputer
+
+# --------------- Biohives
+building_tec_biohive_brain = {
+	base_buildtime = @b2_time
+	base_cap_amount = 1
+	icon = building_institute
+	position_priority = 30		# Unique
+
+	category = research
+
+	prerequisites = {
+		"tech_global_research_initiative"
+	}
+	show_tech_unlock_if = {
+		tec_is_biohive = yes
+	}
+
+	potential = {
+		exists = owner
+		owner = {
+			tec_is_biohive = yes
+		}
+		NOR = {
+			has_modifier = resort_colony
+			has_modifier = slave_colony
+			has_modifier = crucible_colony
+		}
+		tec_ai_destroy_research_boosting_building = no
+	}
+
+	allow = {
+		has_major_upgraded_capital = yes
+	}
+
+	convert_to = {
+		building_institute
+		building_supercomputer
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 2
+			rare = exotic_gases
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = "
+				OR = {
+					has_research_designation = yes
+					check_variable_arithmetic = {
+						which = value:research_combined_value
+						value >= 4
+					}
+				}
+			"
+			building = building_tec_biohive_brain
+		}	
+	}
+
+	planet_modifier = {
+		planet_researchers_produces_mult = 0.15
+	}
+
+	inline_script = buildings/effects/inline_evolved_invention_final_1
+
+	inline_script = {
+		script = jobs/inline_evolved_researcher
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = ""
+	}
+
+	ai_resource_production = {
+		trigger = {
+			planet_resource_compare = {
+				resource = physics_research
+				value >= 20
+			}
+		}
+		physics_research = 3
+		society_research = 3
+		engineering_research = 3
+	}
+	ai_resource_production = {
+		trigger = {
+			planet_resource_compare = {
+				resource = physics_research
+				value >= 40
+			}
+		}
+		physics_research = 3
+		society_research = 3
+		engineering_research = 3
+	}
+}
+
+# ------------- ARCHAEOTECH -----------------
+
 building_archaeostudies_faculty = {
 	base_buildtime = @b2_time
 
@@ -228,15 +330,7 @@ building_archaeostudies_faculty = {
 			has_modifier = crucible_colony
 		}
 		exists = owner
-	}
-
-	destroy_trigger = {
-		exists = owner
-		OR = {
-			has_modifier = resort_colony
-			has_modifier = slave_colony
-			has_modifier = crucible_colony
-		}
+		tec_ai_destroy_archaeostudies_faculty = no
 	}
 
 	allow = {
@@ -251,6 +345,18 @@ building_archaeostudies_faculty = {
 		}
 		cost = {
 			minor_artifacts = 50
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = "
+				OR = {
+					tec_is_relic_world = yes
+					has_deposit = d_central_spire
+					has_deposit = d_former_relic_world
+				}
+			"
+			building = building_archaeostudies_faculty
 		}
 	}
 
@@ -280,9 +386,10 @@ building_archaeostudies_faculty = {
 		potential = { 
 			planet = { 
 				OR = {
-                    tec_is_relic_world = yes
-                    has_deposit = d_former_relic_world
-                } 
+					tec_is_relic_world = yes
+					has_deposit = d_central_spire
+					has_deposit = d_former_relic_world
+				} 
 			} 
 		}
 		category_archaeostudies_research_speed_mult = 0.5
@@ -309,19 +416,11 @@ building_vultaum_reality_computer = {
 			has_modifier = slave_colony
 			has_modifier = crucible_colony
 		}
+		tec_ai_destroy_research_boosting_building = no
 	}
 
 	allow = {
 		has_major_upgraded_capital = yes
-	}
-
-	destroy_trigger = {
-		exists = owner
-		OR = {
-			has_modifier = resort_colony
-			has_modifier = slave_colony
-			has_modifier = crucible_colony
-		}
 	}
 
 	resources = {
@@ -332,6 +431,20 @@ building_vultaum_reality_computer = {
 		}
 		cost = {
 			minor_artifacts = 30
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = "
+				OR = {
+					has_research_designation = yes
+					check_variable_arithmetic = {
+						which = value:research_combined_value
+						value >= 4
+					}
+				}
+			"
+			building = building_vultaum_reality_computer
 		}
 	}
 
@@ -370,116 +483,6 @@ building_vultaum_reality_computer = {
 	}
 }
 
-
-# --------------- New hive art
-#building_tec_hive_supercomputer
-
-# --------------- Biohives
-building_tec_biohive_brain = {
-	base_buildtime = @b2_time
-	base_cap_amount = 1
-	icon = building_institute
-	position_priority = 30		# Unique
-
-	category = research
-
-	prerequisites = {
-		"tech_global_research_initiative"
-	}
-	show_tech_unlock_if = {
-		tec_is_biohive = yes
-	}
-
-	potential = {
-		exists = owner
-		owner = {
-			tec_is_biohive = yes
-		}
-		NOR = {
-			has_modifier = resort_colony
-			has_modifier = slave_colony
-			has_modifier = crucible_colony
-		}
-	}
-
-	allow = {
-		has_major_upgraded_capital = yes
-	}
-
-	destroy_trigger = {
-		exists = owner
-		OR = {
-			OR = {
-				has_modifier = resort_colony
-				has_modifier = slave_colony
-				has_modifier = crucible_colony
-			}
-			owner = {
-				OR = {
-					is_gestalt = no
-					tec_is_biohive = no
-				}
-			}
-		}
-	}
-
-	convert_to = {
-		building_institute
-		building_supercomputer
-	}
-
-	resources = {
-		category = planet_buildings
-		inline_script = {
-			script = buildings/resources/inline_evolved_resource_cost
-			tier = 2
-		}
-
-		inline_script = {
-			script = buildings/resources/inline_evolved_rare_resource_cost
-			tier = 2
-			rare = exotic_gases
-		}
-	}
-
-	planet_modifier = {
-		planet_researchers_produces_mult = 0.15
-	}
-
-	inline_script = buildings/effects/inline_evolved_invention_final_1
-
-	inline_script = {
-		script = jobs/inline_evolved_researcher
-		count = 1
-		mult = 1
-		display = with_desc
-		trigger = ""
-	}
-
-	ai_resource_production = {
-		trigger = {
-			planet_resource_compare = {
-				resource = physics_research
-				value >= 20
-			}
-		}
-		physics_research = 3
-		society_research = 3
-		engineering_research = 3
-	}
-	ai_resource_production = {
-		trigger = {
-			planet_resource_compare = {
-				resource = physics_research
-				value >= 40
-			}
-		}
-		physics_research = 3
-		society_research = 3
-		engineering_research = 3
-	}
-}
-
 # LABS
 # -----------------------------------------
 # --------------- Standard
@@ -511,20 +514,6 @@ building_research_lab_1 = {
 		exists = owner
 		owner = {
 			tec_is_biohive = no
-		}
-	}
-
-	destroy_trigger = {
-		exists = owner
-		OR = {
-			OR = {
-				has_modifier = resort_colony
-				has_modifier = slave_colony
-				has_modifier = crucible_colony
-			}
-			owner = {
-				tec_is_biohive = yes
-			}
 		}
 	}
 
@@ -601,20 +590,6 @@ building_research_lab_2 = {
 		has_upgraded_capital = yes
 	}
 
-	destroy_trigger = {
-		exists = owner
-		OR = {
-			OR = {
-				has_modifier = resort_colony
-				has_modifier = slave_colony
-				has_modifier = crucible_colony
-			}
-			owner = {
-				tec_is_biohive = yes
-			}
-		}
-	}
-
 	convert_to = {
 		building_tec_biohive_research_lab_2
 	}
@@ -688,20 +663,6 @@ building_research_lab_3 = {
 
 	allow = {
 		has_major_upgraded_capital = yes
-	}
-
-	destroy_trigger = {
-		exists = owner
-		OR = {
-			OR = {
-				has_modifier = resort_colony
-				has_modifier = slave_colony
-				has_modifier = crucible_colony
-			}
-			owner = {
-				tec_is_biohive = yes
-			}
-		}
 	}
 
 	convert_to = {
@@ -814,20 +775,6 @@ building_tec_biohive_research_lab_1 = {
 		}
 	}
 
-	destroy_trigger = {
-		exists = owner
-		OR = {
-			OR = {
-				has_modifier = resort_colony
-				has_modifier = slave_colony
-				has_modifier = crucible_colony
-			}
-			owner = {
-				tec_is_biohive = no
-			}
-		}
-	}
-
 	convert_to = {
 		building_research_lab_1
 	}
@@ -890,20 +837,6 @@ building_tec_biohive_research_lab_2 = {
 
 	allow = {
 		has_upgraded_capital = yes
-	}
-
-	destroy_trigger = {
-		exists = owner
-		OR = {
-			OR = {
-				has_modifier = resort_colony
-				has_modifier = slave_colony
-				has_modifier = crucible_colony
-			}
-			owner = {
-				tec_is_biohive = no
-			}
-		}
 	}
 
 	convert_to = {
@@ -972,20 +905,6 @@ building_tec_biohive_research_lab_3 = {
 		has_major_upgraded_capital = yes
 	}
 
-	destroy_trigger = {
-		exists = owner
-		OR = {
-			OR = {
-				has_modifier = resort_colony
-				has_modifier = slave_colony
-				has_modifier = crucible_colony
-			}
-			owner = {
-				tec_is_biohive = no
-			}
-		}
-	}
-
 	convert_to = {
 		building_research_lab_3
 	}
@@ -1030,276 +949,5 @@ building_tec_biohive_research_lab_3 = {
 		physics_research = 3
 		society_research = 3
 		engineering_research = 3
-	}
-}
-
-# ------------- ARCHAEOTECH -----------------
-building_archaeostudies_faculty = {
-	base_buildtime = @b2_time
-	position_priority = 31		# Unique
-
-	category = research
-
-	empire_limit = {
-	 	base = 1
-	}
-
-	prerequisites = {
-		"tech_archaeostudies"
-	}
-
-	potential = {
-		NOR = {
-			has_modifier = resort_colony
-			has_modifier = slave_colony
-			has_modifier = crucible_colony
-		}
-		exists = owner
-	}
-
-	allow = {
-		has_upgraded_capital = yes
-	}
-
-	destroy_trigger = {
-		exists = owner
-		OR = {
-			has_modifier = resort_colony
-			has_modifier = slave_colony
-			has_modifier = crucible_colony
-		}
-	}
-
-	resources = {
-		category = planet_buildings
-		cost = {
-			minerals = @b2_minerals
-			minor_artifacts = 50
-		}
-		upkeep = {
-			energy = 20
-		}
-	}
-
-	triggered_desc = {
-		text = building_archaeostudies_faculty_relic_effect
-	}
-
-	country_modifier = {
-		category_archaeostudies_research_speed_mult = 1.0
-	}
-	triggered_country_modifier = {
-		potential = {
-			planet = {
-				OR = {
-					tec_is_relic_world = yes
-					has_planet_flag = tec_relic_megastructure
-					has_planet_flag = tec_archaeotech_world
-				}
-			}
-		}
-		category_archaeostudies_research_speed_mult = 0.5
-	}
-
-	# Regular empire
-		triggered_planet_modifier = {
-			potential = {
-				exists = owner
-				owner = { is_gestalt = no }
-			}
-			modifier = {
-				job_archaeoengineers_add = 3
-			}
-		}
-		triggered_planet_modifier = {
-			potential = {
-				exists = owner
-				owner = { 
-					is_gestalt = no
-					has_ascension_perk = ap_archaeoengineers
-				}
-			}
-			modifier = {
-				job_archaeoengineers_add = 2
-			}
-		}
-		triggered_desc = {
-			trigger = {
-				exists = owner
-				owner = { is_gestalt = no }
-			}
-			text = job_archaeoengineers_effect_desc
-		}
-	# /
-
-	# Hive
-		triggered_planet_modifier = {
-			potential = {
-				exists = owner
-				owner = { is_hive_empire = yes }
-			}
-			modifier = {
-				job_archaeo_drone_add = 3
-			}
-		}
-		triggered_planet_modifier = {
-			potential = {
-				exists = owner
-				owner = {
-					is_hive_empire = yes
-					has_ascension_perk = ap_archaeoengineers
-				}
-			}
-			modifier = {
-				job_archaeo_drone_add = 2
-			}
-		}
-		triggered_desc = {
-			trigger = {
-				exists = owner
-				owner = { is_hive_empire = yes }
-			}
-			text = job_archaeo_drone_effect_desc
-		}
-	# /
-
-	# Machine
-		triggered_planet_modifier = {
-			potential = {
-				exists = owner
-				owner = { is_machine_empire = yes }
-			}
-			modifier = {
-				job_archaeo_unit_add = 3
-			}
-		}
-		triggered_planet_modifier = {
-			potential = {
-				exists = owner
-				owner = {
-					is_machine_empire = yes
-					has_ascension_perk = ap_archaeoengineers
-				}
-			}
-			modifier = {
-				job_archaeo_unit_add = 2
-			}
-		}
-		triggered_desc = {
-			trigger = {
-				exists = owner
-				owner = { is_machine_empire = yes }
-			}
-			text = job_archaeo_unit_effect_desc
-		}
-	# /
-}
-
-building_vultaum_reality_computer = {
-	base_buildtime = @b2_time
-	base_cap_amount = 1
-	position_priority = 31		# Unique
-
-	category = research
-
-	prerequisites = {
-		"tech_secrets_vultaum"
-	}
-
-	potential = {
-		exists = owner
-		NOR = {
-			has_modifier = resort_colony
-			has_modifier = slave_colony
-			has_modifier = crucible_colony
-		}
-	}
-
-	allow = {
-		has_major_upgraded_capital = yes
-	}
-
-	destroy_trigger = {
-		exists = owner
-		OR = {
-			has_modifier = resort_colony
-			has_modifier = slave_colony
-			has_modifier = crucible_colony
-		}
-	}
-
-	resources = {
-		category = planet_buildings
-		cost = {
-			minerals = @b2_minerals
-			minor_artifacts = 30
-		}
-		upkeep = {
-			energy = @b2_upkeep
-		}
-	}
-
-	planet_modifier = {
-		planet_researchers_physics_research_produces_add = 1
-		planet_researchers_produces_mult = 0.1
-	}
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_ascension_perk = ap_archaeoengineers }
-		}
-		planet_researchers_physics_research_produces_add = 1
-		planet_researchers_produces_mult = 0.05
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_gestalt = no }
-		}
-		modifier = {
-			job_head_researcher_add = 1
-		}
-	}
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_gestalt = no }
-		}
-		text = job_head_researcher_effect_desc
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_hive_empire = yes }
-		}
-		modifier = {
-			job_brain_drone_add = 1
-		}
-	}
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_hive_empire = yes }
-		}
-		text = job_brain_drone_effect_desc
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_machine_empire = yes }
-		}
-		modifier = {
-			job_calculator_add = 1
-		}
-	}
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_machine_empire = yes }
-		}
-		text = job_calculator_effect_desc
 	}
 }

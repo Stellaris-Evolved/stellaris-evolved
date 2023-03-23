@@ -30,31 +30,27 @@ building_luxury_residence = {
 			NOT = { has_valid_civic = civic_shared_burden }
 		}
 		NOT = { has_building = building_low_tech_capital }
-		hidden_trigger = {
-			owner = {
-				is_ai = no
-			}
-		}
+	}
+	
+	allow = {
+		tec_ai_allow_housing_building = yes
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			AND = {
-				free_building_slots = 0
-				free_jobs < 1
-				free_housing > 10
-				owner = {
-					is_ai = yes
+			NOR = {
+				uses_habitat_capitals = no
+				tec_is_upgraded_habitat = yes
+			}
+			has_modifier = slave_colony
+			owner = {
+				OR = {
+					is_regular_empire = no
+					has_valid_civic = civic_shared_burden
 				}
 			}
-			AND = {
-				uses_habitat_capitals = yes
-				tec_is_upgraded_habitat = no
-			}
-			owner = { is_regular_empire = no }
-			owner = { has_valid_civic = civic_shared_burden }
-			has_modifier = slave_colony
+			tec_ai_destroy_housing_building = yes
 		}
 	}
 
@@ -113,7 +109,7 @@ building_paradise_dome = {
 				}
 			}
 		}
-		hidden_trigger = { owner = { is_ai = no } }
+		tec_ai_destroy_housing_building = no
 	}
 
 	allow = {
@@ -123,11 +119,9 @@ building_paradise_dome = {
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			owner = { is_regular_empire = no }
-			owner = { has_valid_civic = civic_shared_burden }
-			AND = {
-				uses_habitat_capitals = yes
-				NAND = {
+			NOR = {
+				uses_habitat_capitals = no
+				AND = {
 					tec_is_upgraded_habitat = yes
 					exists = owner
 					owner = {
@@ -136,9 +130,16 @@ building_paradise_dome = {
 				}
 			}
 			has_modifier = slave_colony
+			owner = {
+				OR = {
+					is_regular_empire = no
+					has_valid_civic = civic_shared_burden
+				}
+			}
+			tec_ai_destroy_housing_building = yes
 		}
 	}
-	
+
 	convert_to = {
 		building_organic_paradise
 		building_drone_megastorage
@@ -212,33 +213,27 @@ building_communal_housing = {
 			is_regular_empire = yes
 			has_valid_civic = civic_shared_burden
 		}
-
-		hidden_trigger = { owner = { is_ai = no } }
 	}
 
-	#allow = {
-	#}
+	allow = { 
+		tec_ai_allow_housing_building = yes
+	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			AND = {
-				owner = { is_ai = yes }
-				free_building_slots = 0
-				free_jobs < 1
-				free_housing > 10
-			}
-			AND = {
-				uses_habitat_capitals = yes
-				tec_is_upgraded_habitat = no
-			}
-			NOT = {
-				owner = {
-					is_regular_empire = yes
-					has_valid_civic = civic_shared_burden
-				}
+			NOR = {
+				uses_habitat_capitals = no
+				tec_is_upgraded_habitat = yes
 			}
 			has_modifier = slave_colony
+			owner = {
+				OR = {
+					is_regular_empire = no
+					NOT = { has_valid_civic = civic_shared_burden }
+				}
+			}
+			tec_ai_destroy_housing_building = yes
 		}
 	}
 
@@ -301,7 +296,7 @@ building_communal_housing_large = {
 				}
 			}
 		}
-		hidden_trigger = { owner = { is_ai = no } }
+		tec_ai_destroy_housing_building = no
 	}
 
 	allow = {
@@ -311,9 +306,9 @@ building_communal_housing_large = {
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			AND = {
-				uses_habitat_capitals = yes
-				NAND = {
+			NOR = {
+				uses_habitat_capitals = no
+				AND = {
 					tec_is_upgraded_habitat = yes
 					exists = owner
 					owner = {
@@ -321,13 +316,14 @@ building_communal_housing_large = {
 					}
 				}
 			}
-			NOT = {
-				owner = {
-					is_regular_empire = yes
-					has_valid_civic = civic_shared_burden
+			has_modifier = slave_colony
+			owner = {
+				OR = {
+					is_regular_empire = no
+					NOT = { has_valid_civic = civic_shared_burden }
 				}
 			}
-			has_modifier = slave_colony
+			tec_ai_destroy_housing_building = yes
 		}
 	}
 
@@ -377,15 +373,11 @@ building_holo_theatres = {
 	potential = {
 		NOT = {	has_modifier = slave_colony	}
 		owner = { is_regular_empire = yes }
-		if = {
-			limit = {
-				owner = { is_ai = yes }
-			}
-			
-			NOT = { has_available_jobs = entertainer }
-			NOT = { has_forbidden_jobs = entertainer }
-		}
 		NOT = { has_building = building_low_tech_capital }
+	}
+
+	allow = {
+		tec_ai_allow_amentity_building = yes
 	}
 
 	destroy_trigger = {
@@ -393,7 +385,14 @@ building_holo_theatres = {
 		OR = {
 			owner = { is_regular_empire = no }
 			has_modifier = slave_colony
+			tec_ai_destroy_amentity_building = {
+				amenities = 25
+			}
 		}
+	}
+
+	convert_to = {
+		building_tec_gestalt_parts_1
 	}
 
 	resources = {
@@ -437,9 +436,15 @@ building_hyper_entertainment_forum = {
 		OR = {
 			owner = { is_regular_empire = no }
 			has_modifier = slave_colony
+			tec_ai_destroy_amentity_building = {
+				amenities = 50
+			}
 		}
 	}
 
+	convert_to = {
+		building_tec_gestalt_parts_2
+	}
 	
 	resources = {
 		category = planet_buildings
@@ -498,6 +503,10 @@ building_commercial_zone = {
 			owner = { is_regular_empire = no }
 			has_modifier = slave_colony
 		}
+	}
+
+	convert_to = {
+		building_tec_trade_machine_1
 	}
 
 	resources = {
@@ -559,9 +568,7 @@ building_commercial_megaplex = {
 	}
 
 	potential = {
-		exists = owner
-		owner = { is_regular_empire = yes }
-		NOT = { has_modifier = slave_colony }
+		has_building = building_commercial_zone
 	}
 
 	destroy_trigger = {
@@ -570,6 +577,9 @@ building_commercial_megaplex = {
 			owner = { is_regular_empire = no }
 			has_modifier = slave_colony
 		}
+	}
+	convert_to = {
+		building_tec_trade_machine_2
 	}
 	
 	resources = {
@@ -667,6 +677,21 @@ building_tec_commercial_flagship = {
 		NOT = { has_modifier = slave_colony }
 	}
 
+
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = { is_regular_empire = no }
+			owner = {
+				NOT = {
+					has_valid_civic = civic_tec_corporate_flagshipbureau
+				}
+			}
+			has_modifier = slave_colony
+		}
+	}
+	
+	
 	destroy_trigger = {
 		exists = owner
 		OR = {
@@ -744,35 +769,15 @@ building_galactic_stock_exchange = {
 	}
 
 	potential = {
+		exists = owner
+		owner = { is_regular_empire = yes }
 		NOT = { has_modifier = resort_colony }
 		NOT = { has_modifier = slave_colony }
 	}
 	
 	allow = {
 		has_major_upgraded_capital = yes
-		if = {
-			limit = {
-				exists = orbital_defence
-			}
-			orbital_defence = {
-				exists = starbase
-				starbase = {
-					NOR = {
-						has_starbase_building = ring_galactic_stock_exchange
-						is_starbase_building_building = ring_galactic_stock_exchange
-					}
-				}
-			}
-		}
-	}
-	
-	destroy_trigger = {
-		exists = owner
-		OR = {
-			owner = { is_regular_empire = no }
-			has_modifier = slave_colony
-			has_modifier = resort_colony
-		}
+		tec_has_orbital_building = { building = ring_galactic_stock_exchange }
 	}
 
 	convert_to = {
@@ -859,25 +864,17 @@ building_drone_storage = {
 		owner = { is_machine_empire = yes }
 	}
 
+	allow = {
+		tec_ai_allow_housing_building = yes
+	}
+
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			AND = {
-				free_building_slots = 0
-				free_jobs < 1
-				free_housing > 10
-				owner = {
-					is_ai = yes
-				}
-			}
-			NOR = {
-				owner = { is_machine_empire = yes }
-			}
+			tec_ai_destroy_housing_building = yes
+			owner = { is_machine_empire = no }
 		}
 	}
-
-	#allow = {
-	#}
 
 	convert_to = {
 		building_luxury_residence
@@ -913,15 +910,20 @@ building_drone_megastorage = {
 		"tech_micro_replicators"
 	}
 
-	allow = {
-		has_upgraded_capital = yes
-	}
 	potential = {
 		has_building = building_drone_storage
 	}
+	
+	allow = {
+		has_upgraded_capital = yes
+	}
+
 	destroy_trigger = {
 		exists = owner
-		owner = { is_machine_empire = no }
+		OR = {
+			tec_ai_destroy_housing_building = yes
+			owner = { is_machine_empire = no }
+		}
 	}
 
 	convert_to = {
@@ -968,12 +970,17 @@ building_hive_warren = {
 		owner = { is_hive_empire = yes }
 	}
 
-	#allow = {
-	#}
+	allow = {
+		tec_ai_allow_housing_building = yes
+	}
+
 
 	destroy_trigger = {
 		exists = owner
-		owner = { is_hive_empire = no }
+		OR = {
+			tec_ai_destroy_housing_building = yes
+			owner = { is_hive_empire = no }
+		}
 	}
 
 	convert_to = {
@@ -1007,6 +1014,10 @@ building_expanded_warren = {
 		"tech_housing_2"
 	}
 
+	show_tech_unlock_if = {
+		is_hive_empire = yes
+	}
+
 	potential = {
 		has_building = building_luxury_residence
 	}
@@ -1015,13 +1026,12 @@ building_expanded_warren = {
 		has_upgraded_capital = yes
 	}
 
-	show_tech_unlock_if = {
-		is_hive_empire = yes
-	}
-
 	destroy_trigger = {
 		exists = owner
-		owner = { is_hive_empire = no }
+		OR = {
+			tec_ai_destroy_housing_building = yes
+			owner = { is_hive_empire = no }
+		}
 	}
 
 	convert_to = {
@@ -1062,50 +1072,6 @@ building_tec_gestalt_parts_1 = {
 
 	category = amenity
 
-	potential = {
-		NOT = {	has_modifier = slave_colony	}
-		owner = {
-			OR = {
-				is_machine_empire = yes
-				tec_is_cyberhive = yes
-			}
-		}
-	}
-
-	#allow = {
-	#}
-
-	destroy_trigger = {
-		exists = owner
-		OR = {
-			owner = {
-				NOR = {
-					is_machine_empire = yes
-					tec_is_cyberhive = yes
-				}
-			}
-			has_modifier = slave_colony
-			AND = {
-				free_building_slots = 0
-				owner = { is_ai = yes }
-				OR = {
-					free_amenities > 30
-					AND = {
-						count_owned_pop = { limit = { is_sapient = yes }count < 75 }
-					}
-				}
-			}
-		}
-	}
-
-	resources = {
-		category = planet_buildings
-		inline_script = {
-			script = buildings/resources/inline_evolved_resource_cost
-			tier = 2
-		}
-	}
-
 	upgrades = {
 		"building_tec_gestalt_parts_2"
 	}
@@ -1121,6 +1087,48 @@ building_tec_gestalt_parts_1 = {
 		}
 	}
 
+	potential = {
+		NOT = {	has_modifier = slave_colony	}
+		owner = {
+			OR = {
+				is_machine_empire = yes
+				tec_is_cyberhive = yes
+			}
+		}
+	}
+
+	allow = {
+		tec_ai_allow_amentity_building = yes
+	}
+
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = {
+				NOR = {
+					is_machine_empire = yes
+					tec_is_cyberhive = yes
+				}
+			}
+			has_modifier = slave_colony
+			tec_ai_destroy_amentity_building = {
+				amenities = 25
+			}
+		}
+	}
+
+	convert_to = {
+		building_holo_theatres
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
+		}
+	}
+
 	inline_script = {
 		script = jobs/inline_evolved_job
 		job = tec_spareparts_drone
@@ -1129,25 +1137,6 @@ building_tec_gestalt_parts_1 = {
 		display = with_desc
 		trigger = ""
 	}
-
-	ai_weight = {
-		weight = 0
-		modifier = {
-			weight = 50
-			free_amenities < 5
-			OR = {
-				free_jobs < 3 #makes it come before any free_jobs = 0 building checks. This makes the build a high priority building.
-				NOT = { has_building = building_tec_gestalt_parts_1 }
-				NOT = { has_building = building_tec_gestalt_parts_2 }
-			}
-		}
-		modifier = {
-			factor = 0
-			OR = {
-				free_amenities > 20
-			}
-		}
-	}
 }
 
 building_tec_gestalt_parts_2 = {
@@ -1155,14 +1144,19 @@ building_tec_gestalt_parts_2 = {
 	can_build = no
 
 	category = amenity
+	
+	prerequisites = {
+		"tech_galactic_administration"
+	}
+
+	show_tech_unlock_if = {
+		owner = {
+			tec_is_cyberhive = yes
+			is_machine_empire = yes
+		}
+	}
 
 	potential = {
-		owner = {
-			OR = {
-				is_machine_empire = yes
-				tec_is_cyberhive = yes
-			}
-		}
 		has_building = building_tec_gestalt_parts_1
 	}
 
@@ -1180,17 +1174,14 @@ building_tec_gestalt_parts_2 = {
 				}
 			}
 			has_modifier = slave_colony
-			AND = {
-				free_building_slots = 0
-				owner = { is_ai = yes }
-				OR = {
-					free_amenities > 60
-					AND = {
-						count_owned_pop = { limit = { is_sapient = yes }count < 75 }
-					}
-				}
+			tec_ai_destroy_amentity_building = {
+				amenities = 50
 			}
 		}
+	}
+
+	convert_to = {
+		building_hyper_entertainment_forum
 	}
 
 	resources = {
@@ -1203,18 +1194,7 @@ building_tec_gestalt_parts_2 = {
 		inline_script = {
 			script = buildings/resources/inline_evolved_rare_resource_cost
 			tier = 2
-			rare = rare_crystals
-		}
-	}
-
-	prerequisites = {
-		"tech_galactic_administration"
-	}
-
-	show_tech_unlock_if = {
-		owner = {
-			tec_is_cyberhive = yes
-			is_machine_empire = yes
+			rare = exotic_gases
 		}
 	}
 
@@ -1225,32 +1205,6 @@ building_tec_gestalt_parts_2 = {
 		mult = 1
 		display = with_desc
 		trigger = ""
-	}
-
-	ai_weight = {
-		weight = 0
-		modifier = {
-			weight = 5
-			owner = {
-				OR = {
-					AND = {
-						is_machine_empire = yes
-						has_monthly_income = {
-							resource = alloys
-							value >= 12
-						}
-					}
-					AND = {
-						tec_is_cyberhive = yes
-						has_monthly_income = {
-							resource = consumer_goods
-							value >= 12
-						}
-					}
-				}
-			}
-			buildings_has_exotic_gases = yes
-		}
 	}
 }
 
@@ -1279,9 +1233,6 @@ building_tec_trade_machine_1 = {
 			tec_is_trade_gestalt = yes
 		}
 	}
-	
-	#allow = {
-	#}
 	
 	upgrades = {
 		"building_tec_trade_machine_2"

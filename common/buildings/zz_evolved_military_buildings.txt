@@ -23,40 +23,12 @@ building_military_academy = {
 	potential = {
 		exists = owner
 		owner = { NOT = { tec_is_reanimator_empire = yes } }
+		
+		tec_ai_destroy_milacademy_building = yes
 	}
 
 	allow = {
 		has_upgraded_capital = yes
-		if = {
-			limit = {
-				exists = owner
-				owner = { is_ai = yes }
-			}
-			OR = {
-				has_building = building_stronghold
-				has_building = building_fortress
-				has_building = building_tec_bastion
-			}
-		}
-	}
-
-	destroy_trigger = {
-		exists = owner
-		owner = {
-			OR = {
-				tec_is_reanimator_empire = yes
-				AND = {
-					is_ai = yes
-					prev = {
-						NOR = {
-							has_building = building_stronghold
-							has_building = building_fortress
-							has_building = building_tec_bastion
-						}
-					}
-				}
-			}
-		}
 	}
 
 	convert_to = {
@@ -120,6 +92,11 @@ building_dread_encampment = {
 			script = buildings/resources/inline_evolved_resource_cost
 			tier = 2
 		}
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_dread_encampment
+		}
 	}	
 
 	army_modifier = {
@@ -136,13 +113,6 @@ building_dread_encampment = {
 	}
 
 	inline_script = buildings/effects/inline_evolved_tec_mortgage_edict
-		
-	triggered_desc = {
-		trigger = {
-			always = yes
-		}
-		text = job_necromancer_effect_desc
-	}
 }
 
 # ARMY
@@ -179,16 +149,7 @@ building_stronghold = {
 				tec_is_biohive = yes
 			}
 		}
-	}
-
-	destroy_trigger = {
-		exists = owner
-		owner = {
-			OR = {
-				has_valid_civic = civic_reanimated_armies
-				tec_is_biohive = yes
-			}
-		}
+		tec_ai_destroy_fortress_building = no
 	}
 
 	convert_to = {
@@ -249,16 +210,7 @@ building_fortress = {
 				tec_is_biohive = yes
 			}
 		}
-	}
-
-	destroy_trigger = {
-		exists = owner
-		owner = {
-			OR = {
-				has_valid_civic = civic_reanimated_armies
-				tec_is_biohive = yes
-			}
-		}
+		tec_ai_destroy_fortress_building = no
 	}
 
 	allow = {
@@ -323,16 +275,7 @@ building_tec_bastion = {
 				tec_is_biohive = yes
 			}
 		}
-	}
-
-	destroy_trigger = {
-		exists = owner
-		owner = {
-			OR = {
-				has_valid_civic = civic_reanimated_armies
-				tec_is_biohive = yes
-			}
-		}
+		tec_ai_destroy_fortress_building = no
 	}
 
 	allow = {
@@ -405,20 +348,7 @@ building_tec_dread_stronghold = {
 		owner = {
 			has_valid_civic = civic_reanimated_armies
 		}
-	}
-
-	destroy_trigger = {
-		exists = owner
-		owner = {
-			is_ai = yes
-			used_naval_capacity_percent < 0.6
-			is_at_war = no # don't destroy while at war
-		}
-		OR = {
-			num_buildings = { type = building_stronghold value > 1 }
-			has_building = building_fortress
-		}
-		free_building_slots = 0
+		tec_ai_destroy_fortress_building = no
 	}
 
 	convert_to = {
@@ -494,21 +424,11 @@ building_tec_dread_fortress = {
 		owner = {
 			has_valid_civic = civic_reanimated_armies
 		}
+		tec_ai_destroy_fortress_building = no
 	}
 	
 	allow = {
 		has_upgraded_capital = yes
-	}
-	
-	destroy_trigger = {
-		exists = owner
-		owner = {
-			is_ai = yes
-			used_naval_capacity_percent < 0.4
-			is_at_war = no # don't destroy while at war
-		}
-		num_buildings = { type = building_tec_dread_fortress value > 1 }
-		free_building_slots = 0
 	}
 
 	convert_to = {
@@ -586,23 +506,12 @@ building_tec_dread_bastion = {
 			has_valid_civic = civic_reanimated_armies
 			tec_is_biohive = no
 		}
+		tec_ai_destroy_fortress_building = no
 	}
 	
 	allow = {
 		has_upgraded_capital = yes
 	}
-	
-	destroy_trigger = {
-		exists = owner
-		owner = {
-			is_ai = yes
-			used_naval_capacity_percent < 0.4
-			is_at_war = no # don't destroy while at war
-		}
-		num_buildings = { type = building_tec_dread_bastion value > 1 }
-		free_building_slots = 0
-	}
-
 	
 	convert_to = {
 		building_fortress
@@ -682,6 +591,7 @@ building_tec_naval_academy = {
 		owner = {
 			is_gestalt = no
 		}
+		tec_ai_destroy_fortress_building = no
 	}
 
 	allow = {
@@ -741,6 +651,7 @@ building_tec_naval_academy_2 = {
 		owner = {
 			is_gestalt = no
 		}
+		tec_ai_destroy_fortress_building = no
 	}
 
 	allow = {
@@ -807,6 +718,7 @@ building_tec_naval_gestalt = {
 			is_gestalt = yes
 			tec_is_biohive = no
 		}
+		tec_ai_destroy_fortress_building = no
 	}
 
 	allow = {
@@ -870,6 +782,7 @@ building_tec_naval_gestalt_2 = {
 			is_gestalt = yes
 			tec_is_biohive = no
 		}
+		tec_ai_destroy_fortress_building = no
 	}
 
 	allow = {
@@ -924,19 +837,8 @@ building_planetary_shield_generator = {
 	allow = {
 		has_upgraded_capital = yes
 		hidden_trigger = { owner = { is_ai = no } }
-		if = {
-			limit = {
-				exists = orbital_defence
-			}
-			orbital_defence = {
-				exists = starbase
-				starbase = {
-					NOR = {
-						has_starbase_building = ring_orbital_shield_generator
-						is_starbase_building_building = ring_orbital_shield_generator
-					}
-				}
-			}
+		tec_has_orbital_building = {
+			building = ring_orbital_shield_generator
 		}
 	}
 	
