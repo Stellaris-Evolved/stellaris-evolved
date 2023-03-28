@@ -1,0 +1,1 @@
+# This is a compatibility folder for Scripted Trigger Undercoat
