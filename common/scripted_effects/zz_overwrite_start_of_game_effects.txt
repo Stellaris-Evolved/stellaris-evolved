@@ -2737,20 +2737,29 @@ void_dweller_home_planet_setup = {
 		if = {
 			limit = { owner = { has_valid_civic = civic_machine_servitor } }
 			last_created_species = {
-				set_species_flag = tec_original_biotrophy_@root.owner
-				set_citizenship_type = {
-					country = root.owner
-					type = citizenship_organic_trophy
-				}
-				set_living_standard = {
-					country = root.owner
-					type = living_standard_organic_trophy
+				modify_species = {
+					species = this
+					change_scoped_species = no
+					ideal_planet_class = pc_habitat
+					add_traits_at_start_of_list = trait_void_dweller_1
+					effect = {
+						set_species_flag = tec_original_biotrophy_@root.owner
+						tec_save_last_species = yes
+						set_citizenship_type = {
+							country = root.owner
+							type = citizenship_organic_trophy
+						}
+						set_living_standard = {
+							country = root.owner
+							type = living_standard_organic_trophy
+						}
+					}
 				}
 			}
 			while = {
 				count = 4
 				create_pop = {
-					species = last_created_species
+					species = event_target:tec_last_created_species
 					ethos = random
 				}
 				last_created_pop = {
@@ -2763,21 +2772,14 @@ void_dweller_home_planet_setup = {
 		if = {
 			limit = { owner = { has_valid_civic = civic_machine_assimilator } }
 			last_created_species = {
-				set_species_flag = cyborg_assimilated@root.owner
-				set_citizenship_type = {
-					country = root.owner
-					type = citizenship_full_machine
-				}
-				set_living_standard = {
-					country = root.owner
-					type = living_standard_hive_mind
-				}
 				modify_species = {
 					species = this
 					change_scoped_species = no
 					ideal_planet_class = pc_habitat
+					add_traits_at_start_of_list = trait_void_dweller_1
 					effect = {
-						save_event_target_as = tec_last_created_species
+						set_species_flag = cyborg_assimilated@root.owner
+						tec_save_last_species = yes
 						set_citizenship_type = {
 							country = root.owner
 							type = citizenship_full_machine
@@ -3086,6 +3088,13 @@ void_dweller_home_planet_setup = {
 		every_system_planet = {
 			limit = { has_planet_flag = mining_planet }
 			create_mining_station = { owner = event_target:void_dweller_owner }
+		}
+	}
+	# Cache triggers
+	owner = { 
+		every_owned_planet = {
+			tec_cache_planet_triggers = yes
+			tec_cache_capital_triggers = yes
 		}
 	}
 }
