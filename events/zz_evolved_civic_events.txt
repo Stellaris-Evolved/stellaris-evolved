@@ -5803,139 +5803,58 @@ planet_event = {
 		remove_planet_flag = tec_vault_manage_volatile_motes
 		remove_planet_flag = tec_vault_manage_minor_artifacts
 	}
-	
-	option = {
-		name = "tec_hoarders.1.minerals"
-		hidden_effect = {
-			set_planet_flag = tec_vault_manage_minerals
-			if = {
-				limit = { NOT = { is_variable_set = tec_minerals_stockpile } }
-				set_variable = {
-					which = tec_minerals_stockpile
-					value = 0
-				}
-			}
-			planet_event = {
-				id = tec_hoarders.2
-			}
-		}
-	}
 
-	option = {
-		name = "tec_hoarders.1.food"
-		hidden_effect = {
-			set_planet_flag = tec_vault_manage_food
-			if = {
-				limit = { NOT = { is_variable_set = tec_food_stockpile } }
-				set_variable = {
-					which = tec_food_stockpile
-					value = 0
-				}
-			}
-			planet_event = {
-				id = tec_hoarders.2
-			}
-		}
-	}
-
-	option = {
-		name = "tec_hoarders.1.alloys"
-		hidden_effect = {
-			set_planet_flag = tec_vault_manage_alloys
-			if = {
-				limit = { NOT = { is_variable_set = tec_alloys_stockpile } }
-				set_variable = {
-					which = tec_alloys_stockpile
-					value = 0
-				}
-			}
-			planet_event = {
-				id = tec_hoarders.2
-			}
-		}
-	}
-
-	option = {
-		name = "tec_hoarders.1.consumer_goods"
-		hidden_effect = {
-			set_planet_flag = tec_vault_manage_consumer_goods
-			if = {
-				limit = { NOT = { is_variable_set = tec_consumer_goods_stockpile } }
-				set_variable = {
-					which = tec_consumer_goods_stockpile
-					value = 0
-				}
-			}
-			planet_event = {
-				id = tec_hoarders.2
-			}
-		}
-	}
-
-	option = {
-		name = "tec_hoarders.1.rare_crystals"
-		hidden_effect = {
-			set_planet_flag = tec_vault_manage_rare_crystals
-			if = {
-				limit = { NOT = { is_variable_set = tec_rare_crystals_stockpile } }
-				set_variable = {
-					which = tec_rare_crystals_stockpile
-					value = 0
-				}
-			}
-			planet_event = {
-				id = tec_hoarders.2
-			}
-		}
-	}
-
-	option = {
-		name = "tec_hoarders.1.exotic_gases"
-		hidden_effect = {
-			set_planet_flag = tec_vault_manage_exotic_gases
-			if = {
-				limit = { NOT = { is_variable_set = tec_exotic_gases_stockpile } }
-				set_variable = {
-					which = tec_exotic_gases_stockpile
-					value = 0
-				}
-			}
-			planet_event = {
-				id = tec_hoarders.2
-			}
-		}
+	inline_script = {
+		script = events/inline_evolved_tec_hoarder_manage_option
+		resource = minerals 
 	}
 	
-	option = {
-		name = "tec_hoarders.1.volatile_motes"
-		hidden_effect = {
-			set_planet_flag = tec_vault_manage_volatile_motes
-			if = {
-				limit = { NOT = { is_variable_set = tec_volatile_motes_stockpile } }
-				set_variable = {
-					which = tec_volatile_motes_stockpile
-					value = 0
-				}
-			}
-			planet_event = {
-				id = tec_hoarders.2
-			}
-		}
+	inline_script = {
+		script = events/inline_evolved_tec_hoarder_manage_option
+		resource = food 
 	}
+
+	inline_script = {
+		script = events/inline_evolved_tec_hoarder_manage_option
+		resource = alloys 
+	}
+
+	inline_script = {
+		script = events/inline_evolved_tec_hoarder_manage_option
+		resource = consumer_goods
+	}
+
+	inline_script = {
+		script = events/inline_evolved_tec_hoarder_manage_option
+		resource = rare_crystals 
+	}
+
+	inline_script = {
+		script = events/inline_evolved_tec_hoarder_manage_option
+		resource = exotic_gases 
+	}
+
+	inline_script = {
+		script = events/inline_evolved_tec_hoarder_manage_option
+		resource = volatile_motes 
+	}
+
+	inline_script = {
+		script = events/inline_evolved_tec_hoarder_manage_option
+		resource = minor_artifacts 
+	}
+
 	option = {
-		name = "tec_hoarders.1.minor_artifacts"
+		name = "tec_hoarders.1.withdraw"
 		hidden_effect = {
-			set_planet_flag = tec_vault_manage_minor_artifacts
-			if = {
-				limit = { NOT = { is_variable_set = tec_minor_artifacts_stockpile } }
-				set_variable = {
-					which = tec_minor_artifacts_stockpile
-					value = 0
-				}
-			}
-			planet_event = {
-				id = tec_hoarders.2
-			}
+			tec_hoarders_withdraw_resource = { RESOURCE = minerals }
+			tec_hoarders_withdraw_resource = { RESOURCE = food }
+			tec_hoarders_withdraw_resource = { RESOURCE = alloys }
+			tec_hoarders_withdraw_resource = { RESOURCE = consumer_goods }
+			tec_hoarders_withdraw_resource = { RESOURCE = rare_crystals }
+			tec_hoarders_withdraw_resource = { RESOURCE = exotic_gases }
+			tec_hoarders_withdraw_resource = { RESOURCE = volatile_motes }
+			tec_hoarders_withdraw_resource = { RESOURCE = minor_artifacts }
 		}
 	}
 
@@ -5951,129 +5870,89 @@ planet_event = {
 	picture = GFX_evt_metropolis
 
 	is_triggered_only = yes
+
+	option = {
+		name = "tec_hoarders.2.max"
+		hidden_effect = {
+			change_variable = {
+				which = tec_stockpile_change
+				value = value:tec_hoarders_max_that_can_be_deposited
+			}
+			planet_event = {
+				id = tec_hoarders.2
+			}
+		}
+		allow = {
+			custom_tooltip = {
+				fail_text = tec_hoarders.2.not_enough_resources
+				check_variable_arithmetic = {
+					which = value:tec_hoarders_after_deposit_balance|DEPOSIT|0|
+					value >= 0
+				}
+			}
+			custom_tooltip = {
+				fail_text = tec_hoarders.2.not_enough_vault_cap
+				check_variable_arithmetic = {
+					which = value:tec_hoarders_after_deposit_remaining_capacity|DEPOSIT|0|
+					value >= 0
+				}
+			}
+			owner = {
+				tec_is_hoarder_empire = yes
+			}
+		}
+	}
 	
-	option = {
-		name = "tec_hoarders.2.10000"
-		hidden_effect = {
-			change_variable = {
-				which = tec_stockpile_change
-				value = 10000
-			}
-			planet_event = {
-				id = tec_hoarders.2
-			}
-		}
-		allow = {
-			custom_tooltip = {
-				fail_text = tec_hoarders.2.not_enough_resources
-				check_variable_arithmetic = {
-					which = value:tec_hoarders_after_deposit_balance|DEPOSIT|10000|
-					value >= 0
-				}
-			}
-			custom_tooltip = {
-				fail_text = tec_hoarders.2.not_enough_vault_cap
-				check_variable_arithmetic = {
-					which = value:tec_hoarders_after_deposit_remaining_capacity|DEPOSIT|10000|
-					value >= 0
-				}
-			}
-		}
+	inline_script = {
+		script = events/inline_evolved_tec_hoarder_deposit_option
+		count = 10000
+	}
+
+	inline_script = {
+		script = events/inline_evolved_tec_hoarder_deposit_option
+		count = 1000
+	}
+
+	inline_script = {
+		script = events/inline_evolved_tec_hoarder_deposit_option
+		count = 500
+	}
+
+	inline_script = {
+		script = events/inline_evolved_tec_hoarder_deposit_option
+		count = 100
+	}
+
+	inline_script = {
+		script = events/inline_evolved_tec_hoarder_withdraw_option
+		count = 100
+	}
+
+	inline_script = {
+		script = events/inline_evolved_tec_hoarder_withdraw_option
+		count = 500
+	}
+
+	inline_script = {
+		script = events/inline_evolved_tec_hoarder_withdraw_option
+		count = 1000
+	}
+
+	inline_script = {
+		script = events/inline_evolved_tec_hoarder_withdraw_option
+		count = 10000
 	}
 
 	option = {
-		name = "tec_hoarders.2.1000"
+		name = "tec_hoarders.2.withdraw"
 		hidden_effect = {
-			change_variable = {
+			set_variable = {
 				which = tec_stockpile_change
-				value = 1000
+				value = value:tec_hoarder_get_vault_stockpile
 			}
-			planet_event = {
-				id = tec_hoarders.2
-			}
-		}
-		allow = {
-			custom_tooltip = {
-				fail_text = tec_hoarders.2.not_enough_resources
-				check_variable_arithmetic = {
-					which = value:tec_hoarders_after_deposit_balance|DEPOSIT|1000|
-					value >= 0
-				}
-			}
-			custom_tooltip = {
-				fail_text = tec_hoarders.2.not_enough_vault_cap
-				check_variable_arithmetic = {
-					which = value:tec_hoarders_after_deposit_remaining_capacity|DEPOSIT|1000|
-					value >= 0
-				}
-			}
-		}
-	}
-
-	option = {
-		name = "tec_hoarders.2.500"
-		hidden_effect = {
-			change_variable = {
+			multiply_variable = {
 				which = tec_stockpile_change
-				value = 500
-			}
-			planet_event = {
-				id = tec_hoarders.2
-			}
-		}
-		allow = {
-			custom_tooltip = {
-				fail_text = tec_hoarders.2.not_enough_resources
-				check_variable_arithmetic = {
-					which = value:tec_hoarders_after_deposit_balance|DEPOSIT|500|
-					value >= 0
-				}
-			}
-			custom_tooltip = {
-				fail_text = tec_hoarders.2.not_enough_vault_cap
-				check_variable_arithmetic = {
-					which = value:tec_hoarders_after_deposit_remaining_capacity|DEPOSIT|500|
-					value >= 0
-				}
-			}
-		}
-	}
-
-	option = {
-		name = "tec_hoarders.2.100"
-		hidden_effect = {
-			change_variable = {
-				which = tec_stockpile_change
-				value = 100
-			}
-			planet_event = {
-				id = tec_hoarders.2
-			}
-		}
-		allow = {
-			custom_tooltip = {
-				fail_text = tec_hoarders.2.not_enough_resources
-				check_variable_arithmetic = {
-					which = value:tec_hoarders_after_deposit_balance|DEPOSIT|100|
-					value >= 0
-				}
-			}
-			custom_tooltip = {
-				fail_text = tec_hoarders.2.not_enough_vault_cap
-				check_variable_arithmetic = {
-					which = value:tec_hoarders_after_deposit_remaining_capacity|DEPOSIT|100|
-					value >= 0
-				}
-			}
-		}
-	}
-
-	option = {
-		name = "tec_hoarders.2.n100"
-		hidden_effect = {
-			change_variable = {
-				which = tec_stockpile_change
-				value = -100
+				value = -1
 			}
 			planet_event = {
 				id = tec_hoarders.2
@@ -6083,74 +5962,8 @@ planet_event = {
 			custom_tooltip = {
 				fail_text = tec_hoarders.2.not_enough_stockpile
 				check_variable_arithmetic = {
-					which = value:tec_hoarders_after_withdraw_balance|WITHDRAW|100|
-					value >= 0
-				}
-			}
-		}
-	}
-
-	option = {
-		name = "tec_hoarders.2.n500"
-		hidden_effect = {
-			change_variable = {
-				which = tec_stockpile_change
-				value = -500
-			}
-			planet_event = {
-				id = tec_hoarders.2
-			}
-		}
-		allow = {
-			custom_tooltip = {
-				fail_text = tec_hoarders.2.not_enough_stockpile
-				check_variable_arithmetic = {
-					which = value:tec_hoarders_after_withdraw_balance|WITHDRAW|500|
-					value >= 0
-				}
-			}
-		}
-	}
-
-	option = {
-		name = "tec_hoarders.2.n1000"
-		hidden_effect = {
-			change_variable = {
-				which = tec_stockpile_change
-				value = -1000
-			}
-			planet_event = {
-				id = tec_hoarders.2
-			}
-		}
-		allow = {
-			custom_tooltip = {
-				fail_text = tec_hoarders.2.not_enough_stockpile
-				check_variable_arithmetic = {
-					which = value:tec_hoarders_after_withdraw_balance|WITHDRAW|1000|
-					value >= 0
-				}
-			}
-		}
-	}
-
-	option = {
-		name = "tec_hoarders.2.n10000"
-		hidden_effect = {
-			change_variable = {
-				which = tec_stockpile_change
-				value = -10000
-			}
-			planet_event = {
-				id = tec_hoarders.2
-			}
-		}
-		allow = {
-			custom_tooltip = {
-				fail_text = tec_hoarders.2.not_enough_stockpile
-				check_variable_arithmetic = {
-					which = value:tec_hoarders_after_withdraw_balance|WITHDRAW|10000|
-					value >= 0
+					which = value:tec_hoarder_get_vault_stockpile
+					value > 0
 				}
 			}
 		}
@@ -6172,142 +5985,14 @@ planet_event = {
 	option = {
 		name = "tec_hoarders.2.complete"
 		hidden_effect = {
-			if = {
-				limit = {
-					has_planet_flag = tec_vault_manage_minerals
-				}
-				event_target:tec_hoarders_managed_planet = {
-					change_variable = {
-						which = tec_minerals_stockpile
-						value = tec_stockpile_change
-					}
-					owner = {
-						add_resource = {
-							minerals = -1
-							mult = prev.tec_stockpile_change
-						}
-					}
-				}
-			}
-			else_if = {
-				limit = {
-					has_planet_flag = tec_vault_manage_food
-				}
-				event_target:tec_hoarders_managed_planet = {
-					change_variable = {
-						which = tec_food_stockpile
-						value = tec_stockpile_change
-					}
-					owner = {
-						add_resource = {
-							food = -1
-							mult = prev.tec_stockpile_change
-						}
-					}
-				}
-			}
-			else_if = {
-				limit = {
-					has_planet_flag = tec_vault_manage_alloys
-				}
-				event_target:tec_hoarders_managed_planet = {
-					change_variable = {
-						which = tec_alloys_stockpile
-						value = tec_stockpile_change
-					}
-					owner = {
-						add_resource = {
-							alloys = -1
-							mult = prev.tec_stockpile_change
-						}
-					}
-				}
-			}
-			else_if = {
-				limit = {
-					has_planet_flag = tec_vault_manage_consumer_goods
-				}
-				event_target:tec_hoarders_managed_planet = {
-					change_variable = {
-						which = tec_consumer_goods_stockpile
-						value = tec_stockpile_change
-					}
-					owner = {
-						add_resource = {
-							consumer_goods = -1
-							mult = prev.tec_stockpile_change
-						}
-					}
-				}
-			}
-			else_if = {
-				limit = {
-					has_planet_flag = tec_vault_manage_rare_crystals
-				}
-				event_target:tec_hoarders_managed_planet = {
-					change_variable = {
-						which = tec_rare_crystals_stockpile
-						value = tec_stockpile_change
-					}
-					owner = {
-						add_resource = {
-							rare_crystals = -1
-							mult = prev.tec_stockpile_change
-						}
-					}
-				}
-			}
-			else_if = {
-				limit = {
-					has_planet_flag = tec_vault_manage_exotic_gases
-				}
-				event_target:tec_hoarders_managed_planet = {
-					change_variable = {
-						which = tec_exotic_gases_stockpile
-						value = tec_stockpile_change
-					}
-					owner = {
-						add_resource = {
-							exotic_gases = -1
-							mult = prev.tec_stockpile_change
-						}
-					}
-				}
-			}
-			else_if = {
-				limit = {
-					has_planet_flag = tec_vault_manage_volatile_motes
-				}
-				event_target:tec_hoarders_managed_planet = {
-					change_variable = {
-						which = tec_volatile_motes_stockpile
-						value = tec_stockpile_change
-					}
-					owner = {
-						add_resource = {
-							volatile_motes = -1
-							mult = prev.tec_stockpile_change
-						}
-					}
-				}
-			}
-			else_if = {
-				limit = {
-					has_planet_flag = tec_vault_manage_minor_artifacts
-				}
-				event_target:tec_hoarders_managed_planet = {
-					change_variable = {
-						which = tec_minor_artifacts_stockpile
-						value = tec_stockpile_change
-					}
-					owner = {
-						add_resource = {
-							minor_artifacts = -1
-							mult = prev.tec_stockpile_change
-						}
-					}
-				}
-			}
+			tec_hoarders_manage_resource = { RESOURCE = minerals }
+			tec_hoarders_manage_resource = { RESOURCE = food }
+			tec_hoarders_manage_resource = { RESOURCE = alloys }
+			tec_hoarders_manage_resource = { RESOURCE = consumer_goods }
+			tec_hoarders_manage_resource = { RESOURCE = rare_crystals }
+			tec_hoarders_manage_resource = { RESOURCE = exotic_gases }
+			tec_hoarders_manage_resource = { RESOURCE = volatile_motes }
+			tec_hoarders_manage_resource = { RESOURCE = minor_artifacts }
 			set_variable = {
 				which = tec_stockpile_change
 				value = 0
