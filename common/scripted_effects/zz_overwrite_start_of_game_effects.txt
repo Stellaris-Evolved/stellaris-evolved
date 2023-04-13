@@ -1825,54 +1825,7 @@ generate_start_buildings_and_districts = {
 
 	# Additional resources based on empire type and possible subspecies
 	owner = {
-		if = {
-			limit = {
-				is_machine_empire = yes
-			}
-			if = {
-				limit = {
-					OR = {
-						has_valid_civic = civic_machine_servitor
-						has_valid_civic = civic_machine_assimilator
-					}
-				}
-				if = {
-					limit = { has_country_flag = lithoid_subspecies }
-					add_resource = { minerals = 100	}
-					add_resource = { energy = 100 }
-				}
-				else = {
-					add_resource = { food = 100	}
-					add_resource = { energy = 100 }
-				}
-			}
-			else = {
-				add_resource = { energy = 200 }
-			}
-		}
-		else = {
-			if = {
-				limit = { is_lithoid_empire = no }
-				if = {
-					limit = { has_country_flag = lithoid_subspecies }
-					add_resource = { food = 100	}
-					add_resource = { minerals = 100 }
-				}
-				else = {
-					add_resource = { food = 200 }
-				}
-			}
-			else = {
-				if = {
-					limit = { has_country_flag = non_lithoid_subspecies }
-					add_resource = { food = 100	}
-					add_resource = { minerals = 100 }
-				}
-				else = {
-					add_resource = { minerals = 200 }
-				}
-			}
-		}
+		give_starting_resources_effect = yes
 	}
 }
 
@@ -2689,6 +2642,7 @@ generate_start_pops = {
 
 void_dweller_home_planet_setup = {
 	owner = {
+		give_starting_resources_effect = yes
 		save_event_target_as = void_dweller_owner
 		give_technology = {
 			tech = tech_habitat_1
@@ -2737,20 +2691,29 @@ void_dweller_home_planet_setup = {
 		if = {
 			limit = { owner = { has_valid_civic = civic_machine_servitor } }
 			last_created_species = {
-				set_species_flag = tec_original_biotrophy_@root.owner
-				set_citizenship_type = {
-					country = root.owner
-					type = citizenship_organic_trophy
-				}
-				set_living_standard = {
-					country = root.owner
-					type = living_standard_organic_trophy
+				modify_species = {
+					species = this
+					change_scoped_species = no
+					ideal_planet_class = pc_habitat
+					add_traits_at_start_of_list = trait_void_dweller_1
+					effect = {
+						set_species_flag = tec_original_biotrophy_@root.owner
+						tec_save_last_species = yes
+						set_citizenship_type = {
+							country = root.owner
+							type = citizenship_organic_trophy
+						}
+						set_living_standard = {
+							country = root.owner
+							type = living_standard_organic_trophy
+						}
+					}
 				}
 			}
 			while = {
 				count = 4
 				create_pop = {
-					species = last_created_species
+					species = event_target:tec_last_created_species
 					ethos = random
 				}
 				last_created_pop = {
@@ -2763,21 +2726,14 @@ void_dweller_home_planet_setup = {
 		if = {
 			limit = { owner = { has_valid_civic = civic_machine_assimilator } }
 			last_created_species = {
-				set_species_flag = cyborg_assimilated@root.owner
-				set_citizenship_type = {
-					country = root.owner
-					type = citizenship_full_machine
-				}
-				set_living_standard = {
-					country = root.owner
-					type = living_standard_hive_mind
-				}
 				modify_species = {
 					species = this
 					change_scoped_species = no
 					ideal_planet_class = pc_habitat
+					add_traits_at_start_of_list = trait_void_dweller_1
 					effect = {
-						save_event_target_as = tec_last_created_species
+						set_species_flag = cyborg_assimilated@root.owner
+						tec_save_last_species = yes
 						set_citizenship_type = {
 							country = root.owner
 							type = citizenship_full_machine
@@ -3087,6 +3043,305 @@ void_dweller_home_planet_setup = {
 			limit = { has_planet_flag = mining_planet }
 			create_mining_station = { owner = event_target:void_dweller_owner }
 		}
+	}
+	# Cache triggers
+	owner = { 
+		every_owned_planet = {
+			tec_cache_planet_triggers = yes
+			tec_cache_capital_triggers = yes
+		}
+	}
+}
+
+give_starting_resources_effect = {
+	optimize_memory
+	if = {
+		limit = {
+			is_catalytic_empire = yes
+		}
+		add_resource = { food = 100	}
+	}
+	if = {
+		limit = {
+			tec_is_quantum_alloys_empire = yes
+		}
+		add_resource = { energy = 100	}
+	}
+	if = {
+		limit = {
+			is_machine_empire = yes
+		}
+		if = {
+			limit = {
+				OR = {
+					has_valid_civic = civic_machine_servitor
+					has_valid_civic = civic_machine_assimilator
+				}
+			}
+			if = {
+				limit = { has_country_flag = lithoid_subspecies }
+				add_resource = { minerals = 100	}
+				add_resource = { energy = 100 }
+			}
+			else = {
+				add_resource = { food = 100	}
+				add_resource = { energy = 100 }
+			}
+		}
+		else = {
+			add_resource = { energy = 200 }
+		}
+	}
+	else = {
+		if = {
+			limit = { is_lithoid_empire = no }
+			if = {
+				limit = {
+					OR = {
+						has_country_flag = lithoid_subspecies
+						has_origin = origin_broken_shackles
+					}
+				}
+				add_resource = { food = 100	}
+				add_resource = { minerals = 100 }
+			}
+			else = {
+				add_resource = { food = 200 }
+			}
+		}
+		else = {
+			if = {
+				limit = {
+					OR = {
+						has_country_flag = non_lithoid_subspecies
+						has_origin = origin_broken_shackles
+					}
+				}
+				add_resource = { food = 100	}
+				add_resource = { minerals = 100 }
+			}
+			else = {
+				add_resource = { minerals = 200 }
+			}
+		}
+	}
+}
+
+generate_home_planet_final_pass = {
+	optimize_memory
+	# Adjust life-seeded colonies
+	if = {
+		limit = {
+			owner = {
+				has_origin = origin_life_seeded
+			}
+		}
+
+		owner = {
+			# Nuke other colonies gained from advanced empire, etc
+			every_owned_planet = {
+				limit = { is_capital = no }
+				remove_all_buildings = yes
+				destroy_colony = yes
+			}
+			if = {
+				limit = { 
+					NOR = { 
+						has_valid_civic = civic_permanent_employment 
+						has_valid_civic = civic_machine_servitor
+						has_valid_civic = civic_machine_assimilator
+					} 
+				}
+				change_dominant_species = { species = last_created_species change_all = yes }
+			}
+			if = {
+				limit = { 
+					OR = { 
+						has_valid_civic = civic_machine_servitor
+						has_valid_civic = civic_machine_assimilator
+					} 
+				}
+				last_created_species = {
+					modify_species = {
+						species = this
+						ideal_planet_class = pc_gaia
+					}
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			owner = {
+				OR = {
+					has_origin = origin_shattered_ring
+					has_origin = origin_machine
+				}
+			}
+		}
+		owner = {
+			capital_scope = {
+				system_star = {
+					set_deposit = d_energy_10
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			owner = {
+				has_origin = origin_tree_of_life
+			}
+		}
+		owner = {
+			capital_scope = {
+				add_deposit = d_tree_of_life_home
+			}
+		}
+	}
+	if = {
+		limit = {
+			owner = {
+				has_origin = origin_lithoid
+			}
+		}
+		owner = {
+			capital_scope = {
+				add_deposit = d_lithoid_crater
+				add_deposit = d_buried_lithoids
+				add_deposit = d_buried_lithoids
+				add_deposit = d_buried_lithoids
+				add_deposit = d_buried_lithoids
+				add_modifier = { modifier = lithoid_crater }
+			}
+		}
+	}
+	if = {
+		limit = {
+			owner = {
+				has_origin = origin_lost_colony
+			}
+		}
+		owner = {
+			capital_scope = {
+				add_modifier = { modifier = colonial_spirit_mod }
+			}
+		}
+	}
+	if = {
+		limit = {
+			owner = {
+				has_origin = origin_broken_shackles
+			}
+		}
+		owner = {
+			capital_scope = {
+				add_modifier = { modifier = free_at_last_broken_shackles days = 7200 }
+				add_modifier = { modifier = culture_shock_broken_shackles days = 3600 }
+			}
+		}
+	}
+	if = {
+		limit = {
+			owner = {
+				has_origin = origin_progenitor_hive
+			}
+		}
+		owner = {
+			capital_scope = {
+				add_deposit = d_progenitor
+			}
+		}
+	}
+	if = {
+		limit = {
+			owner = {
+				has_origin = origin_default
+			}
+		}
+		owner = {
+			if = {
+				limit = {
+					is_gestalt = no
+				}
+				capital_scope = {
+					add_modifier = { modifier = prosp_uni_mod days = 7200 }
+				}
+			}
+			else = {
+				capital_scope = {
+					add_modifier = { modifier = prosp_uni_mod_gestalt days = 7200 }
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			owner = {
+				has_origin = origin_machine
+			}
+		}
+		owner = {
+			capital_scope = {
+				add_deposit = d_machine_minerals
+				solar_system = {
+					every_system_planet = {
+						limit = {
+							colonizable_planet = no
+							is_star = no
+						}
+						clear_deposits = yes
+					}
+					every_system_planet = {
+						limit = {
+							is_asteroid = yes
+						}
+						remove_planet = yes
+					}
+					every_system_planet = {
+						limit = {
+							colonizable_planet = no
+							is_star = no
+							is_asteroid = no
+							NOT = { is_planet_class = pc_gas_giant }
+						}
+						change_pc = pc_broken
+					}
+					every_system_planet = {
+						limit = {
+							colonizable_planet = no
+							is_star = no
+							is_planet_class = pc_gas_giant
+						}
+						change_pc = pc_molten
+						add_modifier = { modifier = chthonian_planet }
+						every_moon = {
+							limit = {
+								colonizable_planet = no
+							}
+							remove_planet = yes
+						}
+						while = {
+							limit = {
+								planet_size >= 20
+							}
+							change_planet_size = -6
+						}
+					}
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			owner = {
+				any_owned_pop = {
+					has_trait = trait_exotic_metabolism
+				}
+			}
+		}
+
+		add_deposit = d_exotic_mountain
 	}
 }
 
@@ -3670,20 +3925,7 @@ tec_start_hab_zombies_effect = {
 					}
 					is_robotic_species = no
 				}
-				modify_species = {
-					species = this
-					add_trait = trait_zombie
-					add_traits_at_start_of_list = yes
-				}
-				if = {
-					limit = {
-						has_trait = trait_syncretic_proles
-					}
-					modify_species = {
-						species = this
-						remove_trait = trait_syncretic_proles
-					}
-				}
+				make_pop_zombie = yes
 			}
 		}
 	}
@@ -4022,20 +4264,7 @@ tec_start_handle_zombies = {
 				}
 				is_robotic_species = no
 			}
-			modify_species = {
-				species = this
-				add_trait = trait_zombie
-				add_traits_at_start_of_list = yes
-			}
-			if = {
-				limit = {
-					has_trait = trait_syncretic_proles
-				}
-				modify_species = {
-					species = this
-					remove_trait = trait_syncretic_proles
-				}
-			}
+			make_pop_zombie = yes
 		}
 	}
 }
