@@ -1,4865 +1,3 @@
-namespace = tec_tradition
-
-
-# 100 Outreach
-# 200 Control
-# 300 Artifice
-# 400 Balance
-# 500 Might
-# 600 Statecraft
-# 700 Invention
-
-# 1000+ AP events
-# Saving
-country_event = {
-	id = tec_tradition.11
-	hide_window = yes
-	
-	is_triggered_only = yes
-
-	trigger = {
-		always = no
-	}
-}
-
-# ----------- DISCOVERY ---------------
-country_event = {	# Discovery
-	id = tec_tradition.21
-	title = "tec_tradition.21.name"
-	desc = "tec_tradition.21.desc"
-	picture = GFX_evt_rare_tech_cache
-	show_sound = event_mystic_reveal
-	is_triggered_only = yes
-
-	trigger = {
-		always = no
-	}
-
-	option = {
-		name = EXCELLENT
-		add_random_research_option = {
-			add_progress = 33
-		}
-	}
-	option = {
-		name = EXCELLENT
-		add_random_research_option = {
-			add_progress = 33
-		}
-	}
-	option = {
-		name = EXCELLENT
-		add_random_research_option = {
-			add_progress = 33
-		}
-	}
-}
-
-# ----------- OUTREACH ---------------
-# Undiscovered Wonders - on colonization (moved to expansion)
-planet_event = {
-	id = tec_tradition.110
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		owner = {
-			OR = {
-				has_tradition = tr_expansion_galactic_ambition
-				has_active_tradition = tr_expansion_galactic_ambition_vd
-			}
-		}
-		NOT = {
-			has_planet_flag = tec_discovered_wonder
-		}
-	}
-
-	immediate = {
-		set_planet_flag = tec_discovered_wonder
-		if = {
-			limit = {
-				owner = {
-					NOT = {
-						has_origin = origin_void_dwellers
-					}
-				}
-				is_artificial = no
-			}
-			while = {
-				count = 2
-				add_random_non_blocker_deposit = yes
-				create_message = {
-					type = MESSAGE_TYPE_PLANET_PROSPECTED
-					localization = MESSAGE_PLANET_PROSPECTED
-					days = 30
-					target = this
-					variable = {
-						type = name
-						localization = PLANET
-						scope = this
-					}
-					variable = {
-						type = name
-						localization = DEPOSIT
-						scope = last_added_deposit
-					}
-				}
-			}
-		}
-		if = {
-			limit = {
-				owner = {
-					has_origin = origin_void_dwellers
-				}
-				uses_habitat_capitals = yes
-			}
-			set_planet_flag = tec_discovered_wonder
-			if = {
-				limit = {
-					has_planet_flag = mining_habitat
-				}
-				add_deposit = d_tec_engineered_mining
-			}
-			else_if = {
-				limit = {
-					has_planet_flag = energy_habitat
-				}
-				add_deposit = d_tec_engineered_generator
-			}
-			else_if = {
-				limit = {
-					has_planet_flag = tec_food_habitat
-				}
-				add_deposit = d_tec_engineered_food
-			}
-			else_if = {
-				limit = {
-					NOR = {
-						has_planet_flag = mining_habitat
-						has_planet_flag = energy_habitat
-						has_planet_flag = tec_food_habitat	
-					}
-				}
-				random_list = {
-					10 = {
-						add_deposit = d_tec_engineered_mining
-					}
-					10 = {
-						add_deposit = d_tec_engineered_generator
-					}
-					10 = {
-						add_deposit = d_tec_engineered_food
-					}
-				}
-			}
-			create_message = {
-				type = MESSAGE_TYPE_PLANET_PROSPECTED
-				localization = MESSAGE_PLANET_PROSPECTED
-				days = 30
-				target = this
-				variable = {
-					type = name
-					localization = PLANET
-					scope = this
-				}
-				variable = {
-					type = name
-					localization = DEPOSIT
-					scope = last_added_deposit
-				}
-			}
-		}
-	}
-}
-
-# Preprinted modules - on colonization
-planet_event = {
-	id = tec_tradition.120
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		owner = {
-			has_tradition = tr_tec_outreach_final_1
-		}
-		NOT = {
-			has_modifier = pm_tec_outreach_colony_bonus
-		}
-		#NOT = {		# Reworked
-		#	has_deposit	= d_tec_energy_reserves
-		#}
-	}
-
-	immediate = {
-		if = {
-			limit = {
-				uses_district_set = standard
-			}
-			if = {
-				limit = {
-					exists = owner
-					owner = {
-						is_hive_empire = yes
-					}
-				}
-				add_district = district_hive
-			}
-			else_if = {
-				limit = {
-					exists = owner
-					owner = {
-						is_machine_empire = yes
-					}
-				}
-				add_district = district_nexus
-			}
-			else = {
-				add_district = district_city
-			}
-			add_modifier = {
-				modifier = pm_tec_outreach_colony_bonus
-				years = 5
-			}
-		}
-		else_if = {
-			limit = {
-				uses_district_set = habitat
-			}
-			add_district = district_hab_housing
-			add_modifier = {
-				modifier = pm_tec_outreach_colony_bonus
-				years = 5
-			}
-		}
-		else_if = {
-			limit = {
-				uses_district_set = elysium_phase_2
-			}
-			add_district = district_tec_elysium_arcology
-			add_modifier = {
-				modifier = pm_tec_outreach_colony_bonus
-				years = 5
-			}
-		}
-		else_if = {
-			limit = {
-				uses_district_set = tec_protoworld
-			}
-			add_district = district_tec_proto_city
-			add_modifier = {
-				modifier = pm_tec_outreach_colony_bonus
-				years = 5
-			}
-		}
-		else = {
-			add_district = district_city
-		}
-	}
-}
-
-# tr_tec_outreach_2 on ship creation
-ship_event = {
-	id = tec_tradition.130
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		exists = owner
-		owner = {
-			has_active_tradition = tr_tec_outreach_2
-		}
-		OR = {
-			is_ship_class = shipclass_colonizer
-			is_ship_class = shipclass_constructor
-		}
-	}
-
-	immediate = {
-		add_modifier = {
-			modifier = tec_gotta_go_fast_colonizer
-			days = -1
-		}
-	}
-}
-
-# tr_tec_outreach_final_2 on colonization
-planet_event = {
-	id = tec_tradition.140
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		owner = {
-			has_tradition = tr_tec_outreach_final_2
-		}
-	}
-
-	immediate = {
-		if = {
-			limit = {
-				NOT = {
-					has_building = building_tec_outreach_platform
-				}
-			}
-			add_building = building_tec_outreach_platform
-		}
-	}
-}
-
-# ----------- BALANCE ---------------
-# Forging a Path - Yearly
-country_event = {
-	id = tec_tradition.410
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_tradition = tr_tec_balance_4
-	}
-
-	immediate = {
-		every_owned_leader = {
-			limit = {
-				OR = {
-					leader_class = admiral
-					leader_class = general
-				}
-				has_level < 5
-			}
-			add_experience = 20
-		}
-		every_owned_leader = {
-			limit = {
-				OR = {
-					leader_class = ruler
-					leader_class = governor
-				}
-				has_level < 5
-			}
-			add_experience = 30
-		}
-		every_owned_leader = {
-			limit = {
-				leader_class = scientist
-				has_level < 5
-			}
-			add_experience = 40
-		}
-	}
-}
-
-# ----------- MIGHT ---------------
-# Power overwhelming - on_fleet_destroyed_perp
-# This = owner of fleet 1 (combatant)
-# From = owner of fleet 2 (destroyed)
-# FromFrom = fleet 1
-# FromFromFrom = fleet 2
-country_event = {
-	id = tec_tradition.510
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_tradition = tr_tec_might_4
-	}
-
-	immediate = {
-	#	if = {
-	#		# anticheese
-	#		limit = {
-	#			fromfromfrom = {
-	#				num_ships < 10
-	#				num_ships > 5
-	#			}
-	#		}
-	#		this.owner = {
-	#			add_resource = {
-	#				influence = 5
-	#			}
-	#		}
-	#	}
-	#	if = {
-	#		limit = {
-	#			fromfromfrom = {
-	#				num_ships < 20
-	#				num_ships >= 10
-	#			}
-	#		}
-	#		this.owner = {
-	#			add_resource = {
-	#				influence = 10
-	#			}
-	#		}
-	#	}
-	#	if = {
-	#		limit = {
-	#			fromfromfrom = {
-	#				num_ships >= 20
-	#			}
-	#		}
-	#		this.owner = {
-	#			add_resource = {
-	#				influence = 20
-	#			}
-	#		}
-	#	}
-		if = {
-			limit = {
-				fromfromfrom = {
-					any_controlled_ship = {
-						OR = {
-							is_ship_size = juggernaut
-							is_ship_size = colossus
-						}
-					}
-				}
-			}
-			this.owner = {
-				add_resource = {
-					influence = 100
-				}
-			}
-			break = yes
-		}
-		if = {
-			limit = {
-				fromfromfrom = {
-					num_ships > 1
-					any_controlled_ship = {
-						is_ship_size = titan
-					}
-				}
-			}
-			this.owner = {
-				add_resource = {
-					influence = 40
-				}
-			}
-			break = yes
-		}
-		if = {
-			limit = {
-				fromfromfrom = {
-					num_ships > 2
-					any_controlled_ship = {
-						is_ship_size = battleship
-					}
-				}
-			}
-			this.owner = {
-				add_resource = {
-					influence = 30
-				}
-			}
-			break = yes
-		}
-		if = {
-			limit = {
-				fromfromfrom = {
-					num_ships > 2
-					any_controlled_ship = {
-						is_ship_size = cruiser
-					}
-				}
-			}
-			this.owner = {
-				add_resource = {
-					influence = 20
-				}
-			}
-			break = yes
-		}
-		if = {
-			limit = {
-				fromfromfrom = {
-					num_ships > 2
-					any_controlled_ship = {
-						is_ship_size = destroyer
-					}
-				}
-			}
-			this.owner = {
-				add_resource = {
-					influence = 10
-				}
-			}
-			break = yes
-		}
-		if = {
-			limit = {
-				fromfromfrom = {
-					num_ships > 2
-					any_controlled_ship = {
-						is_ship_size = corvette
-					}
-				}
-			}
-			this.owner = {
-				add_resource = {
-					influence = 5
-				}
-			}
-			break = yes
-		}
-	}
-}
-
-# tr_tec_might_final_1:0 "Galactic War Engineering" - moved to finisher
-country_event = {
-	id = tec_tradition.520
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_tradition = tr_tec_might_finish
-	}
-
-	immediate = {
-		if = {
-			limit = {
-				has_technology = tech_juggernaut
-				has_technology = tech_titans
-			}
-			random_list = {
-				10 = {
-					give_technology = {
-						tech = tech_repeatable_improved_shield_output
-					}
-				}
-
-				10 = {
-					give_technology = {
-						tech = tech_repeatable_weapon_type_energy_damage
-					}
-				}
-
-				10 = {
-					give_technology = {
-						tech = tech_repeatable_improved_armor_output
-					}
-				}
-
-				10 = {
-					give_technology = {
-						tech = tech_repeatable_weapon_type_explosive_damage
-					}
-				}
-
-				10 = {
-					give_technology = {
-						tech = tech_repeatable_weapon_type_kinetic_damage
-					}
-				}
-
-				10 = {
-					give_technology = {
-						tech = tech_repeatable_weapon_type_kinetic_damage
-					}
-				}
-			
-			}
-		}
-
-		else_if = {
-			limit = {
-				has_technology = tech_juggernaut
-				NOT = {
-					has_technology = tech_titans
-				}
-			}
-			add_research_option = tech_titans
-		}
-
-		else_if = {
-			limit = {
-				has_technology = tech_titans
-				NOT = {
-					has_technology = tech_juggernaut
-				}
-			}
-			add_research_option = tech_juggernaut
-		}
-
-		else_if = {
-			limit = {
-				NOR = {
-					has_technology = tech_juggernaut
-					has_technology = tech_titans
-				}
-				has_technology = tech_battleships
-			}
-			random_list = {
-				10 = {
-					add_research_option = tech_titans
-				}
-				10 = {
-					add_research_option = tech_juggernaut
-				}
-			}
-		}
-
-		else_if = {
-			limit = {
-				NOT = {
-					has_technology = tech_battleships
-				}
-				has_technology = tech_cruisers
-			}
-			add_research_option = tech_battleships
-		}
-
-		else_if = {
-			limit = {
-				NOT = {
-					has_technology = tech_cruisers
-				}
-				has_technology = tech_destroyers
-			}
-			add_research_option = tech_cruisers
-		}
-
-		else_if = {
-			limit = {
-				NOT = {
-					has_technology = tech_destroyers
-				}
-				has_technology = tech_corvettes
-			}
-			add_research_option = tech_destroyers
-		}
-
-	}
-}
-
-# tr_tec_might_final_1:0 "Galactic War Engineering" - new effect
-ship_event = {
-	id = tec_tradition.525
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		exists = owner
-		owner = {
-			has_tradition = tr_tec_might_final_1
-		}
-		is_ship_class = shipclass_military
-		NOT = {
-			is_ship_size = transport
-		}
-	}
-
-	immediate = {
-		if = {
-			limit = {
-				exists = owner
-				is_ship_size = corvette
-			}
-			owner = {
-				add_resource = {
-					engineering_research = 20
-				}
-			}
-		}
-		else_if = {
-			limit = {
-				exists = owner
-				is_ship_size = destroyer
-			}
-			owner = {
-				add_resource = {
-					engineering_research = 30
-				}
-			}
-		}
-		else_if = {
-			limit = {
-				exists = owner
-				is_ship_size = cruiser
-			}
-			owner = {
-				add_resource = {
-					engineering_research = 50
-				}
-			}
-		}
-		else_if = {
-			limit = {
-				exists = owner
-				is_ship_size = battleship
-			}
-			owner = {
-				add_resource = {
-					engineering_research = 100
-				}
-			}
-		}
-		else_if = {
-			limit = {
-				exists = owner
-				is_ship_size = titan
-			}
-			owner = {
-				add_resource = {
-					engineering_research = 200
-				}
-			}
-		}
-		else_if = {
-			limit = {
-				exists = owner
-				is_ship_size = juggernaut
-			}
-			owner = {
-				add_resource = {
-					engineering_research = 500
-				}
-			}
-		}
-		else = {
-			owner = {
-				add_resource = {
-					engineering_research = 25
-				}
-			}
-		}
-	}
-}
-
-# A war is beginning, executed for every country in the war.
-# Root = Country
-# From = War
-#on_war_beginning = {
-
-#tr_tec_might_final_2:0 "The Art of War"
-country_event = {
-	id = tec_tradition.530
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		root = {
-			has_tradition = tr_tec_might_final_2
-		}
-	}
-
-	immediate = {
-		root = {
-			if = {
-				limit = {
-					is_at_war = yes
-				}
-				remove_modifier = modifier_tec_art_of_war_war
-				remove_modifier = modifier_tec_art_of_war_unity
-				add_modifier = {
-					modifier = modifier_tec_art_of_war_war
-					days = -1
-				}
-			}
-			else = {
-				remove_modifier = modifier_tec_art_of_war_unity
-				remove_modifier = modifier_tec_art_of_war_war
-				add_modifier = {
-					modifier = modifier_tec_art_of_war_unity
-					days = -1
-				}
-			}
-		}
-	}
-}
-
-# A war has ended
-# Root = Loser
-# From = Main Winner
-#on_war_ended = {
-# war ended
-country_event = {
-	id = tec_tradition.531
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		OR = {
-			root = {	# root is unnecesary but i put it just in case...
-				has_tradition = tr_tec_might_final_2
-			}
-			from = {	# root is unnecesary but i put it just in case...
-				has_tradition = tr_tec_might_final_2
-			}
-		}
-	}
-
-	immediate = {
-		root = {
-			if = {
-				limit = {
-					has_tradition = tr_tec_might_final_2
-					is_at_war = yes
-					NOT = {
-						has_modifier = modifier_tec_art_of_war_war
-					}
-				}
-				remove_modifier = modifier_tec_art_of_war_unity
-				add_modifier = {
-					modifier = modifier_tec_art_of_war_war
-					days = -1
-				}
-			}
-			if = {
-				limit = {
-					has_tradition = tr_tec_might_final_2
-					is_at_war = no
-					NOT = {
-						has_modifier = modifier_tec_art_of_war_unity
-					}
-				}
-				remove_modifier = modifier_tec_art_of_war_war
-				add_modifier = {
-					modifier = modifier_tec_art_of_war_unity
-					days = -1
-				}
-			}
-		}
-
-		from = {
-			if = {
-				limit = {
-					has_tradition = tr_tec_might_final_2
-					is_at_war = yes
-					NOT = {
-						has_modifier = modifier_tec_art_of_war_war
-					}
-				}
-				remove_modifier = modifier_tec_art_of_war_unity
-				add_modifier = {
-					modifier = modifier_tec_art_of_war_war
-					days = -1
-				}
-			}
-			if = {
-				limit = {
-					has_tradition = tr_tec_might_final_2
-					is_at_war = no
-					NOT = {
-						has_modifier = modifier_tec_art_of_war_unity
-					}
-				}
-				remove_modifier = modifier_tec_art_of_war_war
-				add_modifier = {
-					modifier = modifier_tec_art_of_war_unity
-					days = -1
-				}
-			}
-		}
-	}
-}
-
-# ----------- Discovery ---------------
-# tr_discovery_finish
-# on tech researched
-country_event = {
-	id = tec_tradition.705
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		OR = {
-			has_tradition = tr_discovery_finish
-			has_active_tradition = tr_discovery_federations_finish
-		}
-		NOT = {
-			has_country_flag = tec_discovery_finisher_cd
-		}
-	}
-
-	immediate = {
-		change_variable = {
-			which = tec_discovery_finisher
-			value = 1
-		}
-		if = {
-			limit = {
-				check_variable = {
-					which = tec_discovery_finisher
-					value >= 5
-				}
-			}
-			change_variable = {
-				which = tec_discovery_finisher_roll
-				value = 10
-			}
-			random = {
-				chance = tec_discovery_finisher_roll
-				set_timed_country_flag = {
-					flag = tec_discovery_finisher_cd
-					days = 1
-				}
-				add_random_research_option = {
-					add_progress = 0.25
-					ignore_prereqs = no
-				}
-				set_variable = {
-					which = tec_discovery_finisher
-					value = 0
-				}
-				set_variable = {
-					which = tec_discovery_finisher_roll
-					value = 0
-				}
-			}
-		}
-	}
-}
-
-# ----------- Invention ---------------
-# tr_tec_invention_3:0 "Uncovering Possibilities"
-# on tech researched
-country_event = {
-	id = tec_tradition.710
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_tradition = tr_tec_invention_3
-	}
-
-	immediate = {
-		random_list = {
-			10 = {
-				add_monthly_resource_mult = {
-					resource = energy
-					value = 0.2
-				}
-			}
-			10 = {
-				add_monthly_resource_mult = {
-					resource = minerals
-					value = 0.2
-				}
-			}
-			10 = {
-				add_monthly_resource_mult = {
-					resource = food
-					value = 0.2
-				}
-			}
-		}
-	}
-}
-
-#tr_tec_invention_4:0 "Nuclear Geniality"
-country_event = {
-	id = tec_tradition.720
-	is_triggered_only = yes
-	hide_window = yes
-
-	trigger = {
-		has_tradition = tr_tec_invention_4
-	}
-
-	immediate = {
-		FROM = {
-			if = {
-				limit = { leader_class = scientist }
-				random_list = {
-					20 = {
-						add_trait = leader_trait_spark_of_genius
-					}
-					20 = {
-						add_trait = leader_trait_maniacal
-					}
-					60 = {
-						break = yes
-					}
-				}
-			}
-		}
-	}
-}
-
-# tr_tec_invention_final_2:0 "Chained Reaction"
-# on tech researched
-country_event = {
-	id = tec_tradition.730
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_tradition = tr_tec_invention_final_2
-	}
-
-	immediate = {
-		random_list = {
-			10 = {
-				add_monthly_resource_mult = {
-					resource = society_research
-					value = 1
-					min = 50
-					max = 1000
-				}
-			}
-			10 = {
-				add_monthly_resource_mult = {
-					resource = physics_research
-					value = 1
-					min = 50
-					max = 1000
-				}
-			}
-			10 = {
-				add_monthly_resource_mult = {
-					resource = engineering_research
-					value = 1
-					min = 50
-					max = 1000
-				}
-			}
-		}
-	}
-}
-
-#tr_tec_invention_final_3:0 "Relativistic Knowledge"
-# Initial
-country_event = {
-	id = tec_tradition.740
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_tradition = tr_tec_invention_final_3
-	}
-
-	immediate = {
-		add_modifier = {
-			modifier = modifier_tec_relativistic_knowledge
-			days = -1
-		}
-	}
-}
-
-# on tech researched
-country_event = {
-	id = tec_tradition.741
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_tradition = tr_tec_invention_final_3
-	}
-
-	immediate = {
-		if = {
-			limit = {
-				has_modifier = modifier_tec_relativistic_knowledge
-			}
-			remove_modifier = modifier_tec_relativistic_knowledge
-			add_modifier = {
-				modifier = modifier_tec_relativistic_knowledge_1
-				days = -1
-			}
-			break = yes
-		}
-		else_if = {
-			limit = {
-				has_modifier = modifier_tec_relativistic_knowledge_1
-			}
-			remove_modifier = modifier_tec_relativistic_knowledge_1
-			add_modifier = {
-				modifier = modifier_tec_relativistic_knowledge_2
-				days = -1
-			}
-			break = yes
-		}
-		else_if = {
-			limit = {
-				has_modifier = modifier_tec_relativistic_knowledge_2
-			}
-			remove_modifier = modifier_tec_relativistic_knowledge_2
-			add_modifier = {
-				modifier = modifier_tec_relativistic_knowledge_3
-				days = -1
-			}
-			break = yes
-		}
-		else_if = {
-			limit = {
-				has_modifier = modifier_tec_relativistic_knowledge_3
-			}
-			remove_modifier = modifier_tec_relativistic_knowledge_3
-			add_modifier = {
-				modifier = modifier_tec_relativistic_knowledge_4
-				days = -1
-			}
-			break = yes
-		}
-		else_if = {
-			limit = {
-				has_modifier = modifier_tec_relativistic_knowledge_4
-			}
-			remove_modifier = modifier_tec_relativistic_knowledge_4
-			add_modifier = {
-				modifier = modifier_tec_relativistic_knowledge_5
-				days = -1
-			}
-			break = yes
-		}
-		else_if = {
-			limit = {
-				has_modifier = modifier_tec_relativistic_knowledge_5
-			}
-			remove_modifier = modifier_tec_relativistic_knowledge_5
-			add_modifier = {
-				modifier = modifier_tec_relativistic_knowledge_6
-				days = -1
-			}
-			break = yes
-		}
-		else_if = {
-			limit = {
-				has_modifier = modifier_tec_relativistic_knowledge_6
-			}
-			remove_modifier = modifier_tec_relativistic_knowledge_6
-			add_modifier = {
-				modifier = modifier_tec_relativistic_knowledge_7
-				days = -1
-			}
-			break = yes
-		}
-		else_if = {
-			limit = {
-				has_modifier = modifier_tec_relativistic_knowledge_7
-			}
-			remove_modifier = modifier_tec_relativistic_knowledge_7
-			add_modifier = {
-				modifier = modifier_tec_relativistic_knowledge_2
-				days = -1
-			}
-			break = yes
-		}
-	}
-}
-
-# ----------- AP EVENTS ---------------
-# Technological ascendancy - Hidden modifier upon unlock
-country_event = {
-	id = tec_tradition.1010
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_ascension_perk = ap_technological_ascendancy
-	}
-
-	immediate = {
-		add_modifier = {
-			modifier = tec_technoascendancy_base
-			days = -1
-		}
-	}
-}
-
-# Technological ascendancy - Each year it checks changes
-country_event = {
-	id = tec_tradition.1011
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_ascension_perk = ap_technological_ascendancy
-	}
-
-	immediate = {
-		if = {	#FAILSAFE
-			limit = {
-				years_passed < 10
-				NOT = {
-					has_modifier = tec_technoascendancy_base
-				}
-			}
-			add_modifier = {
-				modifier = tec_technoascendancy_base
-				days = -1
-			}
-		}
-		else_if = {
-			limit = {
-				years_passed >= 10
-				years_passed < 20
-			}
-			add_modifier = {
-				modifier = tec_technoascendancy_1
-				days = -1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_technoascendancy_base
-					has_modifier = tec_technoascendancy_1
-				}
-				remove_modifier = tec_technoascendancy_base
-			}
-		}
-		else_if = {
-			limit = {
-				years_passed >= 20
-				years_passed < 30
-			}
-			add_modifier = {
-				modifier = tec_technoascendancy_2
-				days = -1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_technoascendancy_1
-					has_modifier = tec_technoascendancy_2
-				}
-				remove_modifier = tec_technoascendancy_base
-				remove_modifier = tec_technoascendancy_1
-			}
-		}
-		else_if = {
-			limit = {
-				years_passed >= 30
-				years_passed < 40
-			}
-			add_modifier = {
-				modifier = tec_technoascendancy_3
-				days = -1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_technoascendancy_2
-					has_modifier = tec_technoascendancy_3
-				}
-				remove_modifier = tec_technoascendancy_base
-				remove_modifier = tec_technoascendancy_1
-				remove_modifier = tec_technoascendancy_2
-			}
-		}
-		else_if = {
-			limit = {
-				years_passed >= 40
-				years_passed < 50
-			}
-			add_modifier = {
-				modifier = tec_technoascendancy_4
-				days = -1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_technoascendancy_3
-					has_modifier = tec_technoascendancy_4
-				}
-				remove_modifier = tec_technoascendancy_base
-				remove_modifier = tec_technoascendancy_1
-				remove_modifier = tec_technoascendancy_2
-				remove_modifier = tec_technoascendancy_3
-			}
-		}
-		else_if = {
-			limit = {
-				years_passed >= 50
-			}
-			add_modifier = {
-				modifier = tec_technoascendancy_5
-				days = -1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_technoascendancy_4
-					has_modifier = tec_technoascendancy_5
-				}
-				remove_modifier = tec_technoascendancy_base
-				remove_modifier = tec_technoascendancy_1
-				remove_modifier = tec_technoascendancy_2
-				remove_modifier = tec_technoascendancy_3
-				remove_modifier = tec_technoascendancy_4
-			}
-		}
-	}
-}
-
-# One vision - - NOPE
-country_event = {
-	id = tec_tradition.1020
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_ascension_perk = ap_one_vision
-	}
-
-	immediate = {
-		add_modifier = {
-			modifier = tec_onevision_base
-			days = -1
-		}
-	}
-}
-
-# One Vision - Each year it checks changes
-country_event = {
-	id = tec_tradition.1021
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_ascension_perk = ap_one_vision
-	}
-
-	immediate = {
-		if = {	#FAILSAFE
-			limit = {
-				years_passed < 10
-				NOT = {
-					has_modifier = tec_onevision_base
-				}
-			}
-			add_modifier = {
-				modifier = tec_onevision_base
-				days = -1
-			}
-		}
-		else_if = {
-			limit = {
-				years_passed >= 10
-				years_passed < 20
-			}
-			add_modifier = {
-				modifier = tec_onevision_1
-				days = -1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_onevision_base
-					has_modifier = tec_onevision_1
-				}
-				remove_modifier = tec_onevision_base
-			}
-		}
-		else_if = {
-			limit = {
-				years_passed >= 20
-				years_passed < 30
-			}
-			add_modifier = {
-				modifier = tec_onevision_2
-				days = -1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_onevision_1
-					has_modifier = tec_onevision_2
-				}
-				remove_modifier = tec_onevision_base
-				remove_modifier = tec_onevision_1
-			}
-		}
-		else_if = {
-			limit = {
-				years_passed >= 30
-				years_passed < 40
-			}
-			add_modifier = {
-				modifier = tec_onevision_3
-				days = -1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_onevision_2
-					has_modifier = tec_onevision_3
-				}
-				remove_modifier = tec_onevision_base
-				remove_modifier = tec_onevision_1
-				remove_modifier = tec_onevision_2
-			}
-		}
-		else_if = {
-			limit = {
-				years_passed >= 40
-				years_passed < 50
-			}
-			add_modifier = {
-				modifier = tec_onevision_4
-				days = -1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_onevision_3
-					has_modifier = tec_onevision_4
-				}
-				remove_modifier = tec_onevision_base
-				remove_modifier = tec_onevision_1
-				remove_modifier = tec_onevision_2
-				remove_modifier = tec_onevision_3
-			}
-		}
-		else_if = {
-			limit = {
-				years_passed >= 50
-			}
-			add_modifier = {
-				modifier = tec_onevision_5
-				days = -1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_onevision_4
-					has_modifier = tec_onevision_5
-				}
-				remove_modifier = tec_onevision_base
-				remove_modifier = tec_onevision_1
-				remove_modifier = tec_onevision_2
-				remove_modifier = tec_onevision_3
-				remove_modifier = tec_onevision_4
-			}
-		}
-	}
-}
-
-# One Mind - Hidden modifier upon unlock - NOPE
-country_event = {
-	id = tec_tradition.1030
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_ascension_perk = ap_one_vision
-	}
-
-	immediate = {
-		add_modifier = {
-			modifier = tec_onevision_base
-			days = -1
-		}
-	}
-}
-
-# One Mind - Each year it checks changes
-country_event = {
-	id = tec_tradition.1031
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_ascension_perk = ap_tec_one_mind
-	}
-
-	immediate = {
-		if = {	#FAILSAFE
-			limit = {
-				years_passed < 10
-				NOT = {
-					has_modifier = tec_onemind_base
-				}
-			}
-			add_modifier = {
-				modifier = tec_onemind_base
-				days = -1
-			}
-		}
-		else_if = {
-			limit = {
-				years_passed >= 10
-				years_passed < 20
-			}
-			add_modifier = {
-				modifier = tec_onemind_1
-				days = -1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_onemind_base
-					has_modifier = tec_onemind_1
-				}
-				remove_modifier = tec_onemind_base
-			}
-		}
-		else_if = {
-			limit = {
-				years_passed >= 20
-				years_passed < 30
-			}
-			add_modifier = {
-				modifier = tec_onemind_2
-				days = -1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_onemind_1
-					has_modifier = tec_onemind_2
-				}
-				remove_modifier = tec_onemind_base
-				remove_modifier = tec_onemind_1
-			}
-		}
-		else_if = {
-			limit = {
-				years_passed >= 30
-				years_passed < 40
-			}
-			add_modifier = {
-				modifier = tec_onemind_3
-				days = -1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_onemind_2
-					has_modifier = tec_onemind_3
-				}
-				remove_modifier = tec_onemind_base
-				remove_modifier = tec_onemind_1
-				remove_modifier = tec_onemind_2
-			}
-		}
-		else_if = {
-			limit = {
-				years_passed >= 40
-				years_passed < 50
-			}
-			add_modifier = {
-				modifier = tec_onemind_4
-				days = -1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_onemind_3
-					has_modifier = tec_onemind_4
-				}
-				remove_modifier = tec_onemind_base
-				remove_modifier = tec_onemind_1
-				remove_modifier = tec_onemind_2
-				remove_modifier = tec_onemind_3
-			}
-		}
-		else_if = {
-			limit = {
-				years_passed >= 50
-			}
-			add_modifier = {
-				modifier = tec_onemind_5
-				days = -1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_onemind_4
-					has_modifier = tec_onemind_5
-				}
-				remove_modifier = tec_onemind_base
-				remove_modifier = tec_onemind_1
-				remove_modifier = tec_onemind_2
-				remove_modifier = tec_onemind_3
-				remove_modifier = tec_onemind_4
-			}
-		}
-	}
-}
-
-# Influential Knowledge - - NOPE
-country_event = {
-	id = tec_tradition.1040
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_ascension_perk = ap_tec_influential
-	}
-
-	immediate = {
-		add_modifier = {
-			modifier = tec_influential_base
-			days = -1
-		}
-	}
-}
-
-# Influential Knowledge - Each year it checks changes
-country_event = {
-	id = tec_tradition.1041
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_ascension_perk = ap_tec_influential
-	}
-
-	immediate = {
-		if = {	#FAILSAFE
-			limit = {
-				years_passed < 10
-				NOT = {
-					has_modifier = tec_influential_base
-				}
-			}
-			add_modifier = {
-				modifier = tec_influential_base
-				days = -1
-			}
-		}
-		else_if = {
-			limit = {
-				years_passed >= 10
-				years_passed < 20
-			}
-			add_modifier = {
-				modifier = tec_influential_1
-				days = -1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_influential_base
-				}
-				remove_modifier = tec_influential_base
-			}
-		}
-		else_if = {
-			limit = {
-				years_passed >= 20
-				years_passed < 30
-			}
-			add_modifier = {
-				modifier = tec_influential_2
-				days = -1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_influential_base
-				}
-				remove_modifier = tec_influential_base
-			}
-			if = {
-				limit = {
-					has_modifier = tec_influential_1
-				}
-				remove_modifier = tec_influential_1
-			}
-		}
-		else_if = {
-			limit = {
-				years_passed >= 30
-				years_passed < 40
-			}
-			add_modifier = {
-				modifier = tec_influential_3
-				days = -1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_influential_base
-				}
-				remove_modifier = tec_influential_base
-			}
-			if = {
-				limit = {
-					has_modifier = tec_influential_1
-				}
-				remove_modifier = tec_influential_1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_influential_2
-				}
-				remove_modifier = tec_influential_2
-			}
-		}
-		else_if = {
-			limit = {
-				years_passed >= 40
-				years_passed < 50
-			}
-			add_modifier = {
-				modifier = tec_influential_4
-				days = -1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_influential_base
-				}
-				remove_modifier = tec_influential_base
-			}
-			if = {
-				limit = {
-					has_modifier = tec_influential_1
-				}
-				remove_modifier = tec_influential_1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_influential_2
-				}
-				remove_modifier = tec_influential_2
-			}
-			if = {
-				limit = {
-					has_modifier = tec_influential_3
-				}
-				remove_modifier = tec_influential_3
-			}
-		}
-		else_if = {
-			limit = {
-				years_passed >= 50
-			}
-			add_modifier = {
-				modifier = tec_influential_5
-				days = -1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_influential_base
-				}
-				remove_modifier = tec_influential_base
-			}
-			if = {
-				limit = {
-					has_modifier = tec_influential_1
-				}
-				remove_modifier = tec_influential_1
-			}
-			if = {
-				limit = {
-					has_modifier = tec_influential_2
-				}
-				remove_modifier = tec_influential_2
-			}
-			if = {
-				limit = {
-					has_modifier = tec_influential_3
-				}
-				remove_modifier = tec_influential_3
-			}
-			if = {
-				limit = {
-					has_modifier = tec_influential_4
-				}
-				remove_modifier = tec_influential_4
-			}
-		}
-	}
-}
-
-# Finisher Announces 
-country_event = {	# protoworlds
-	id = tec_tradition.10001
-	title = "tec_tradition.10001.name"
-	desc = "tec_tradition.10001.desc"
-	picture = GFX_evt_barren_dig_site
-	show_sound = event_mystic_reveal
-	is_triggered_only = yes
-
-	option = {
-		name = EXCELLENT
-		custom_tooltip = tec_tradition.10001.a.tooltip
-	}
-}
-	
-country_event = {	# Elysiums
-	id = tec_tradition.10003
-	title = "tec_tradition.10003.name"
-	desc = "tec_tradition.10003.desc"
-	picture = GFX_evt_ringworld
-	show_sound = event_mystic_reveal
-	is_triggered_only = yes
-
-	option = {
-		name = EXCELLENT
-		custom_tooltip = tec_tradition.10003.a.tooltip
-		add_research_option = tech_elysium_ring
-	}
-}
-
-country_event = {	# Statecraft
-	id = tec_tradition.10006
-	title = "tec_tradition.10006.name"
-	desc = "tec_tradition.10006.desc"
-	picture = GFX_evt_news_room
-	show_sound = event_mystic_reveal
-	is_triggered_only = yes
-
-	option = {
-		name = EXCELLENT
-		custom_tooltip = tec_tradition.10006.a.tooltip
-	}
-}
-
-country_event = {	# Breakthroughs
-	id = tec_tradition.10007
-	title = "tec_tradition.10007.name"
-	desc = "tec_tradition.10007.desc"
-	picture = GFX_evt_intelligence_report
-	show_sound = event_mystic_reveal
-	is_triggered_only = yes
-
-	trigger = {
-		OR = {
-			tec_is_default_country = yes
-			# These are just in case
-			is_country_type = default_exocolonist
-			is_country_type = default_exocolonist_ai
-		}
-	}
-
-	option = {
-		name = EXCELLENT
-		custom_tooltip = tec_tradition.10007.a.tooltip
-	}
-
-	after = {
-		hidden_effect = {
-			country_event = {
-				id = tec_bt.1
-			}
-		}
-	}
-}
-
-# 
-
-# ----------- BREAKTHROUGHS ---------------	ON TEST
-namespace = tec_bt
-# Controller	- 	Activated via AP, tradition finisher or whatever+
-# Storing everything on global event country so its more trackable than global flags
-
-country_event = {	# Triggers the distribution - TEST VERSION
-	id = tec_bt.1
-	hide_window = yes
-	is_triggered_only = yes
-
-	immediate = {
-		# Draws a random tech
-		random_list = {
-			10 = {	# BT 101
-				modifier = {
-					factor = 0
-					event_target:global_event_country = {
-						has_country_flag = tec_unlocked_bt_101
-					}
-				}
-				modifier = {
-					factor = 1
-					event_target:global_event_country = {
-						NOT = {
-							has_country_flag = tec_unlocked_bt_101
-						}
-					}
-				}
-				event_target:global_event_country = {
-					set_country_flag = tec_unlocked_bt_101
-					set_timed_country_flag = {
-						flag = tec_close_spread_off_bt_101
-						years = 15
-					}
-					set_timed_country_flag = {
-						flag = tec_mid_spread_off_bt_101
-						years = 25
-					}
-					set_timed_country_flag = {
-						flag = tec_high_spread_off_bt_101
-						years = 50
-					}
-				}
-				add_research_option = tech_tec_bt_101_test
-			}
-			10 = {	# BT 102
-				modifier = {
-					factor = 0
-					event_target:global_event_country = {
-						has_country_flag = tec_unlocked_bt_102
-					}
-				}
-				modifier = {
-					factor = 1
-					event_target:global_event_country = {
-						NOT = {
-							has_country_flag = tec_unlocked_bt_102
-						}
-					}
-				}
-				event_target:global_event_country = {
-					set_country_flag = tec_unlocked_bt_102
-					set_timed_country_flag = {
-						flag = tec_close_spread_off_bt_102
-						years = 15
-					}
-					set_timed_country_flag = {
-						flag = tec_mid_spread_off_bt_102
-						years = 25
-					}
-					set_timed_country_flag = {
-						flag = tec_high_spread_off_bt_102
-						years = 50
-					}
-				}
-				add_research_option = tech_tec_bt_102_test
-			}
-			10 = {	# BT 103
-				modifier = {
-					factor = 0
-					event_target:global_event_country = {
-						has_country_flag = tec_unlocked_bt_103
-					}
-				}
-				modifier = {
-					factor = 1
-					event_target:global_event_country = {
-						NOT = {
-							has_country_flag = tec_unlocked_bt_103
-						}
-					}
-				}
-				event_target:global_event_country = {
-					set_country_flag = tec_unlocked_bt_103
-					set_timed_country_flag = {
-						flag = tec_close_spread_off_bt_103
-						years = 15
-					}
-					set_timed_country_flag = {
-						flag = tec_mid_spread_off_bt_103
-						years = 25
-					}
-					set_timed_country_flag = {
-						flag = tec_high_spread_off_bt_103
-						years = 50
-					}
-				}
-				add_research_option = tech_tec_bt_103_test
-			}
-			10 = {	# BT 104
-				modifier = {
-					factor = 0
-					event_target:global_event_country = {
-						has_country_flag = tec_unlocked_bt_104
-					}
-				}
-				modifier = {
-					factor = 1
-					event_target:global_event_country = {
-						NOT = {
-							has_country_flag = tec_unlocked_bt_104
-						}
-					}
-				}
-				event_target:global_event_country = {
-					set_country_flag = tec_unlocked_bt_104
-					set_timed_country_flag = {
-						flag = tec_close_spread_off_bt_104
-						years = 15
-					}
-					set_timed_country_flag = {
-						flag = tec_mid_spread_off_bt_104
-						years = 25
-					}
-					set_timed_country_flag = {
-						flag = tec_high_spread_off_bt_104
-						years = 50
-					}
-				}
-				add_research_option = tech_tec_bt_104_test
-			}
-			10 = {	# BT 105
-				modifier = {
-					factor = 0
-					event_target:global_event_country = {
-						has_country_flag = tec_unlocked_bt_105
-					}
-				}
-				modifier = {
-					factor = 1
-					event_target:global_event_country = {
-						NOT = {
-							has_country_flag = tec_unlocked_bt_105
-						}
-					}
-				}
-				event_target:global_event_country = {
-					set_country_flag = tec_unlocked_bt_105
-					set_timed_country_flag = {
-						flag = tec_close_spread_off_bt_105
-						years = 15
-					}
-					set_timed_country_flag = {
-						flag = tec_mid_spread_off_bt_105
-						years = 25
-					}
-					set_timed_country_flag = {
-						flag = tec_high_spread_off_bt_105
-						years = 50
-					}
-				}
-				add_research_option = tech_tec_bt_105_test
-			}
-		}
-
-		# If no one ever had a breakthrough, first announcement
-		if = {
-			limit = {
-				event_target:global_event_country = {
-					NOT = {
-						has_country_flag = tec_bt_mechanic_on
-					}
-				}
-			}
-			event_target:global_event_country = {
-				set_country_flag = tec_bt_mechanic_on
-			}
-			every_playable_country = {
-				# Announcement event go here
-				limit = {
-					NOT = {	is_same_value = root }
-				}
-				country_event = {
-					id = tec_bt.10
-					days = 60
-					random = 30
-				}
-			}
-		}
-	}
-}
-country_event = {	# Common announcement
-	id = tec_bt.10
-	title = "tec_bt.10.name"
-	desc = "tec_bt.10.desc"
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_bt.10.a"
-		trigger = {
-			NOR = {
-				is_at_war_with = from
-				is_rival = from
-			}
-		}
-	}
-	option = {
-		name = "tec_bt.10.b"
-		trigger = {
-			OR = {
-				has_ethic = ethic_materialist
-				has_ethic = ethic_fanatic_materialist
-				has_civic = civic_tec_occultist
-			}
-		}
-	}
-	option = {
-		name = "tec_bt.10.c"
-		trigger = {
-			OR = {
-				has_ethic = ethic_xenophobe
-				has_ethic = ethic_fanatic_xenophobe
-				has_ethic = ethic_gestalt_apathy
-			}
-		}
-	}
-	option = {
-		name = "tec_bt.10.d"
-		trigger = {
-			OR = {
-				has_civic = civic_fanatic_purifiers
-				has_civic = civic_hive_devouring_swarm
-				has_civic = civic_fanatic_purifiers
-			}
-		}
-	}
-}
-country_event = {	# Distribution event (to avoid multiple inter-country callings)
-	id = tec_bt.500
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		event_target:global_event_country = {
-			has_country_flag = tec_bt_mechanic_on
-		}
-	}
-
-	immediate = {
-		if = {	# 101
-			limit = {
-				event_target:global_event_country = {
-					has_country_flag = tec_unlocked_bt_101
-				}
-				OR = {
-					NOT = {
-						exists = event_target:tec_bt_101_og
-					}
-					event_target:tec_bt_101_og = {
-						NOT = {
-							has_ascension_perk = ap_enigmatic_engineering
-						}
-					}
-				}
-				NOR = {
-					has_technology = tech_tec_bt_101_test
-					is_researching_technology = tech_tec_bt_101_test
-					has_tech_option = tech_tec_bt_101_test
-				}
-			}
-			country_event = {
-				id = tec_bt.5101
-			}
-		}
-		if = {	# 102
-			limit = {
-				event_target:global_event_country = {
-					has_country_flag = tec_unlocked_bt_102
-				}
-				OR = {
-					NOT = {
-						exists = event_target:tec_bt_102_og
-					}
-					event_target:tec_bt_102_og = {
-						NOT = {
-							has_ascension_perk = ap_enigmatic_engineering
-						}
-					}
-				}
-				NOR = {
-					has_technology = tech_tec_bt_102_test
-					is_researching_technology = tech_tec_bt_102_test
-					has_tech_option = tech_tec_bt_102_test
-				}
-			}
-			country_event = {
-				id = tec_bt.5102
-			}
-		}
-		if = {	# 103
-			limit = {
-				event_target:global_event_country = {
-					has_country_flag = tec_unlocked_bt_103
-				}
-				OR = {
-					NOT = {
-						exists = event_target:tec_bt_103_og
-					}
-					event_target:tec_bt_103_og = {
-						NOT = {
-							has_ascension_perk = ap_enigmatic_engineering
-						}
-					}
-				}
-				NOR = {
-					has_technology = tech_tec_bt_103_test
-					is_researching_technology = tech_tec_bt_103_test
-					has_tech_option = tech_tec_bt_103_test
-				}
-			}
-			country_event = {
-				id = tec_bt.5103
-			}
-		}
-		if = {	# 104
-			limit = {
-				event_target:global_event_country = {
-					has_country_flag = tec_unlocked_bt_104
-				}
-				OR = {
-					NOT = {
-						exists = event_target:tec_bt_104_og
-					}
-					event_target:tec_bt_104_og = {
-						NOT = {
-							has_ascension_perk = ap_enigmatic_engineering
-						}
-					}
-				}
-				NOR = {
-					has_technology = tech_tec_bt_104_test
-					is_researching_technology = tech_tec_bt_104_test
-					has_tech_option = tech_tec_bt_104_test
-				}
-			}
-			country_event = {
-				id = tec_bt.5104
-			}
-		}
-		if = {	# 105
-			limit = {
-				event_target:global_event_country = {
-					has_country_flag = tec_unlocked_bt_105
-				}
-				OR = {
-					NOT = {
-						exists = event_target:tec_bt_105_og
-					}
-					event_target:tec_bt_105_og = {
-						NOT = {
-							has_ascension_perk = ap_enigmatic_engineering
-						}
-					}
-				}
-				NOR = {
-					has_technology = tech_tec_bt_105_test
-					is_researching_technology = tech_tec_bt_105_test
-					has_tech_option = tech_tec_bt_105_test
-				}
-			}
-			country_event = {
-				id = tec_bt.5105
-			}
-		}
-	}
-}
-
-
-	# hidden control events
-	# ----------------------------------------- bt 101
-country_event = {	# Bt 101 researched, only first time
-	id = tec_bt.2101
-	hide_window = yes
-	is_triggered_only = yes
-	fire_only_once = yes
-
-	trigger = {
-		has_technology = tech_tec_bt_101_test
-	}
-
-	immediate = {
-		save_global_event_target_as = tec_bt_101_og
-		event_target:global_event_country = {	# store leader
-			create_leader = {
-				species = root
-				class = scientist
-				name = "[root.GetName]" #tec_bt_101_og_name
-				skill = 1
-				traits = {
-					trait = leader_trait_tec_debug_immortal
-				}
-			}
-			last_created_leader = {
-				set_name = "[root.GetName]"
-				save_global_event_target_as = tec_bt_101_og_backup
-			}
-		}
-		country_event = {
-			id = tec_bt.3101
-			days = 1
-			random = 1
-		}
-		every_playable_country = {
-			limit = {
-				OR = {
-					has_established_contact = root
-					AND = {
-						has_communications = root
-						root = {
-							is_primitive = no
-						}
-					}
-				}
-				NOT = { is_same_value = root }
-			}
-			country_event = {
-				id = tec_bt.4101
-				days = 1
-				random = 1
-			}
-		}
-	}
-}
-country_event = {	# Self announcement
-	id = tec_bt.3101
-	title = "tec_bt.3101.name"
-	desc = "tec_bt.3101.desc"
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_bt.3101.a"
-		custom_tooltip = tec_bt.3101.a.tooltip
-	}
-}
-country_event = {	# Common announcement
-	id = tec_bt.4101
-	title = "tec_bt.4101.name"
-	desc = "tec_bt.4101.desc"
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_bt.4101.a"
-		trigger = {
-			NOR = {
-				is_at_war_with = from
-				is_rival = from
-			}
-		}
-	}
-	option = {
-		name = "tec_bt.4101.b"
-		trigger = {
-			opinion_level = {
-				who = from
-				level > neutral
-			}
-			NOR = {
-				is_at_war_with = from
-				is_rival = from
-			}
-		}
-	}
-	option = {
-		name = "tec_bt.4101.c"
-		trigger = {
-			OR = {
-				is_in_federation_with = from
-				has_research_agreement = from
-			}
-			NOR = {
-				is_at_war_with = from
-				is_rival = from
-			}
-		}
-	}
-	option = {
-		name = "tec_bt.4101.d"
-		trigger = {
-			OR = {
-				is_at_war_with = from
-				is_rival = from
-				opinion_level = {
-					who = from
-					level < neutral
-				}
-			}
-		}
-	}
-}
-country_event = {	# Bt 101 each 5 years, controlled by bt.500
-	id = tec_bt.5101
-	hide_window = yes
-	is_triggered_only = yes
-
-	immediate = {
-		if = {
-			limit = { # Only for close friends
-				event_target:global_event_country = {
-					has_country_flag = tec_close_spread_off_bt_101
-				}
-				NOR = {
-					has_technology = tech_tec_bt_101_test
-					is_researching_technology = tech_tec_bt_101_test
-					has_tech_option = tech_tec_bt_101_test
-				}
-				OR = {
-					has_established_contact = event_target:tec_bt_101_og
-					has_communications = event_target:tec_bt_101_og
-					AND = {
-						NOT = {
-							exists = event_target:tec_bt_101_og
-						}
-						any_playable_country = {
-							OR = {
-								has_technology = tech_tec_bt_101_test
-								is_researching_technology = tech_tec_bt_101_test
-								has_tech_option = tech_tec_bt_101_test
-							}
-						}
-					}
-				}
-				NOT = { is_same_value = event_target:tec_bt_101_og }
-				is_neighbor_of = event_target:tec_bt_101_og
-				opinion_level = {
-					who = event_target:tec_bt_101_og
-					level > good
-				}
-				OR = {
-					has_research_agreement = event_target:tec_bt_101_og
-					is_in_federation_with = event_target:tec_bt_101_og
-					AND = {
-						is_galactic_community_member = yes
-						event_target:tec_bt_101_og = {
-							is_galactic_community_member = yes
-						}
-					}
-				}
-			}
-			set_country_flag = tec_bt_close_spread_candidate_101
-		}
-		
-		else_if = {	# Only for friendos/fed/galcom if enforced
-			limit = {
-				event_target:global_event_country = {
-					NOT = {
-						has_country_flag = tec_close_spread_off_bt_101
-					}
-					has_country_flag = tec_mid_spread_off_bt_101
-				}
-				NOR = {
-					has_technology = tech_tec_bt_101_test
-					is_researching_technology = tech_tec_bt_101_test
-					has_tech_option = tech_tec_bt_101_test
-				}
-				OR = {
-					has_established_contact = event_target:tec_bt_101_og
-					has_communications = event_target:tec_bt_101_og
-					AND = {
-						NOT = {
-							exists = event_target:tec_bt_101_og
-						}
-						any_playable_country = {
-							OR = {
-								has_technology = tech_tec_bt_101_test
-								is_researching_technology = tech_tec_bt_101_test
-								has_tech_option = tech_tec_bt_101_test
-							}
-						}
-					}
-				}
-				NOT = { is_same_value = event_target:tec_bt_101_og }
-				OR = {
-					AND = {
-						opinion_level = {
-							who = event_target:tec_bt_101_og 
-							level > good
-						}
-					}
-					has_research_agreement = event_target:tec_bt_101_og
-					is_in_federation_with = event_target:tec_bt_101_og
-					AND = {
-						is_galactic_community_member = yes
-						event_target:tec_bt_101_og = {
-							is_galactic_community_member = yes
-						}
-						has_global_flag = tec_galcom_force_spread_true
-					}
-				}
-			}
-			set_country_flag = tec_bt_mid_spread_candidate_101
-		}
-		else_if = { # Near everyone has access now
-			limit = {
-				event_target:global_event_country = {
-					NOT = {
-						has_country_flag = tec_mid_spread_off_bt_101
-					}
-					has_country_flag = tec_high_spread_off_bt_101
-				}
-				NOR = {
-					has_technology = tech_tec_bt_101_test
-					is_researching_technology = tech_tec_bt_101_test
-					has_tech_option = tech_tec_bt_101_test
-				}
-				OR = {
-					has_established_contact = event_target:tec_bt_101_og
-					has_communications = event_target:tec_bt_101_og
-					AND = {
-						NOT = {
-							exists = event_target:tec_bt_101_og
-						}
-						any_playable_country = {
-							OR = {
-								has_technology = tech_tec_bt_101_test
-								is_researching_technology = tech_tec_bt_101_test
-								has_tech_option = tech_tec_bt_101_test
-							}
-						}
-					}
-				}
-				NOT = { is_same_value = event_target:tec_bt_101_og }
-			}
-			set_country_flag = tec_bt_high_spread_candidate_101
-		}
-	}
-
-
-}
-country_event = {	# On tech increased chance calc
-	id = tec_bt.6101
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		NOR = {
-			has_technology = tech_tec_bt_101_test
-			is_researching_technology = tech_tec_bt_101_test
-			has_tech_option = tech_tec_bt_101_test
-		}
-		OR = {
-			has_country_flag = tec_bt_close_spread_candidate_101
-			has_country_flag = tec_bt_mid_spread_candidate_101
-			has_country_flag = tec_bt_high_spread_candidate_101
-		}
-	}
-
-	immediate = {
-		if = {
-			limit = {
-				has_country_flag = tec_bt_close_spread_candidate_101
-			}
-			random = {
-				chance = 33
-				if = {
-					limit = {
-						exists = event_target:tec_bt_101_og
-					}
-					country_event = {
-						id = tec_bt.7101
-						days = 30
-						random = 30
-					}
-				}
-				else_if = {
-					limit = {
-						NOT = {
-							exists = event_target:tec_bt_101_og
-						}
-					}
-					country_event = {
-						id = tec_bt.8101
-						days = 30
-						random = 30
-					}
-				}
-			}
-		}
-		else_if = {
-			limit = {
-				has_country_flag = tec_bt_mid_spread_candidate_101
-			}
-			random = {
-				chance = 33
-				if = {
-					limit = {
-						exists = event_target:tec_bt_101_og
-					}
-					country_event = {
-						id = tec_bt.7101
-						days = 30
-						random = 30
-					}
-				}
-				else_if = {
-					limit = {
-						NOT = {
-							exists = event_target:tec_bt_101_og
-						}
-					}
-					country_event = {
-						id = tec_bt.8101
-						days = 30
-						random = 30
-					}
-				}
-			}
-		}
-		else_if = {
-			limit = {
-				has_country_flag = tec_bt_high_spread_candidate_101
-			}
-			random = {
-				chance = 15
-				if = {
-					limit = {
-						exists = event_target:tec_bt_101_og
-					}
-					country_event = {
-						id = tec_bt.7101
-						days = 30
-						random = 30
-					}
-				}
-				else_if = {
-					limit = {
-						NOT = {
-							exists = event_target:tec_bt_101_og
-						}
-					}
-					country_event = {
-						id = tec_bt.8101
-						days = 30
-						random = 30
-					}
-				}
-			}
-		}
-	}
-}
-country_event = {	# Country still exists
-	id = tec_bt.7101
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-	is_triggered_only = yes
-
-	title = "tec_bt.7101.name"
-	desc = {
-		text = "tec_bt.7101.friendly.desc"
-		trigger = {
-			has_country_flag = tec_bt_close_spread_candidate_101
-		}
-	}
-	desc = {
-		text = "tec_bt.7101.semifriendly.desc"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_close_spread_candidate_101
-			}
-			has_country_flag = tec_bt_mid_spread_candidate_101
-		}
-	}
-	desc = {
-		text = "tec_bt.7101.neutral.desc"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_mid_spread_candidate_101
-			}
-			has_country_flag = tec_bt_high_spread_candidate_101
-		}
-	}
-
-	option = {
-		name = "tec_bt.7101.a"
-		custom_tooltip = "tec_bt.7101.tooltip"
-		trigger = {
-			has_country_flag = tec_bt_close_spread_candidate_101
-		}
-	}
-
-	option = {
-		name = "tec_bt.7101.b"
-		custom_tooltip = "tec_bt.7101.tooltip"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_close_spread_candidate_101
-			}
-			has_country_flag = tec_bt_mid_spread_candidate_101
-		}
-	}
-
-	option = {
-		name = "tec_bt.7101.c"
-		custom_tooltip = "tec_bt.7101.tooltip"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_mid_spread_candidate_101
-			}
-			has_country_flag = tec_bt_high_spread_candidate_101
-		}
-	}
-
-	after = {
-		hidden_effect = {
-			add_research_option = tech_tec_bt_101_test
-		}
-	}
-}
-country_event = {	# Country no longer exists
-	id = tec_bt.8101
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-	is_triggered_only = yes
-
-	title = "tec_bt.8101.name"
-	desc = {
-		text = "tec_bt.8101.friendly.desc"
-		trigger = {
-			has_country_flag = tec_bt_close_spread_candidate_101
-		}
-	}
-	desc = {
-		text = "tec_bt.8101.semifriendly.desc"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_close_spread_candidate_101
-			}
-			has_country_flag = tec_bt_mid_spread_candidate_101
-		}
-	}
-	desc = {
-		text = "tec_bt.8101.neutral.desc"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_mid_spread_candidate_101
-			}
-			has_country_flag = tec_bt_high_spread_candidate_101
-		}
-	}
-
-	option = {
-		name = "tec_bt.8101.a"
-		custom_tooltip = "tec_bt.7101.tooltip"
-		trigger = {
-			has_country_flag = tec_bt_close_spread_candidate_101
-		}
-	}
-
-	option = {
-		name = "tec_bt.8101.b"
-		custom_tooltip = "tec_bt.7101.tooltip"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_close_spread_candidate_101
-			}
-			has_country_flag = tec_bt_mid_spread_candidate_101
-		}
-	}
-
-	option = {
-		name = "tec_bt.8101.c"
-		custom_tooltip = "tec_bt.7101.tooltip"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_mid_spread_candidate_101
-			}
-			has_country_flag = tec_bt_high_spread_candidate_101
-		}
-	}
-
-	after = {
-		hidden_effect = {
-			add_research_option = tech_tec_bt_101_test
-		}
-		# cleanup
-		if = {
-			limit = {
-				has_country_flag = tec_bt_close_spread_candidate_101
-			}
-			remove_country_flag = tec_bt_close_spread_candidate_101
-		}
-		if = {
-			limit = {
-				has_country_flag = tec_bt_mid_spread_candidate_101
-			}
-			remove_country_flag = tec_bt_mid_spread_candidate_101
-		}
-		if = {
-			limit = {
-				has_country_flag = tec_bt_high_spread_candidate_101
-			}
-			remove_country_flag = tec_bt_high_spread_candidate_101
-		}
-	}
-}
-
-	# ----------------------------------------- bt 102
-country_event = {	# Bt 102 researched, only first time
-	id = tec_bt.2102
-	hide_window = yes
-	is_triggered_only = yes
-	fire_only_once = yes
-
-	trigger = {
-		has_technology = tech_tec_bt_102_test
-	}
-
-	immediate = {
-		save_global_event_target_as = tec_bt_102_og
-		event_target:global_event_country = {	# store leader
-			create_leader = {
-				species = root
-				class = scientist
-				name = "[root.GetName]" #tec_bt_102_og_name
-				skill = 1
-				traits = {
-					trait = leader_trait_tec_debug_immortal
-				}
-			}
-			last_created_leader = {
-				set_name = "[root.GetName]"
-				save_global_event_target_as = tec_bt_102_og_backup
-			}
-		}
-		country_event = {
-			id = tec_bt.3102
-			days = 1
-			random = 1
-		}
-		every_playable_country = {
-			limit = {
-				OR = {
-					has_established_contact = root
-					AND = {
-						has_communications = root
-						root = {
-							is_primitive = no
-						}
-					}
-				}
-				NOT = { is_same_value = root }
-			}
-			country_event = {
-				id = tec_bt.4102
-				days = 1
-				random = 1
-			}
-		}
-	}
-}
-country_event = {	# Self announcement
-	id = tec_bt.3102
-	title = "tec_bt.3102.name"
-	desc = "tec_bt.3102.desc"
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_bt.3102.a"
-		custom_tooltip = tec_bt.3102.a.tooltip
-	}
-}
-country_event = {	# Common announcement
-	id = tec_bt.4102
-	title = "tec_bt.4102.name"
-	desc = "tec_bt.4102.desc"
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_bt.4102.a"
-		trigger = {
-			NOR = {
-				is_at_war_with = from
-				is_rival = from
-			}
-		}
-	}
-	option = {
-		name = "tec_bt.4102.b"
-		trigger = {
-			opinion_level = {
-				who = from
-				level > neutral
-			}
-			NOR = {
-				is_at_war_with = from
-				is_rival = from
-			}
-		}
-	}
-	option = {
-		name = "tec_bt.4102.c"
-		trigger = {
-			OR = {
-				is_in_federation_with = from
-				has_research_agreement = from
-			}
-			NOR = {
-				is_at_war_with = from
-				is_rival = from
-			}
-		}
-	}
-	option = {
-		name = "tec_bt.4102.d"
-		trigger = {
-			OR = {
-				is_at_war_with = from
-				is_rival = from
-				opinion_level = {
-					who = from
-					level < neutral
-				}
-			}
-		}
-	}
-}
-country_event = {	# Bt 102 each 5 years, controlled by bt.500
-	id = tec_bt.5102
-	hide_window = yes
-	is_triggered_only = yes
-
-	immediate = {
-		if = {
-			limit = { # Only for close friends
-				event_target:global_event_country = {
-					has_country_flag = tec_close_spread_off_bt_102
-				}
-				NOR = {
-					has_technology = tech_tec_bt_102_test
-					is_researching_technology = tech_tec_bt_102_test
-					has_tech_option = tech_tec_bt_102_test
-				}
-				OR = {
-					has_established_contact = event_target:tec_bt_102_og
-					has_communications = event_target:tec_bt_102_og
-					AND = {
-						NOT = {
-							exists = event_target:tec_bt_102_og
-						}
-						any_playable_country = {
-							OR = {
-								has_technology = tech_tec_bt_102_test
-								is_researching_technology = tech_tec_bt_102_test
-								has_tech_option = tech_tec_bt_102_test
-							}
-						}
-					}
-				}
-				NOT = { is_same_value = event_target:tec_bt_102_og }
-				is_neighbor_of = event_target:tec_bt_102_og
-				opinion_level = {
-					who = event_target:tec_bt_102_og
-					level > good
-				}
-				OR = {
-					has_research_agreement = event_target:tec_bt_102_og
-					is_in_federation_with = event_target:tec_bt_102_og
-					AND = {
-						is_galactic_community_member = yes
-						event_target:tec_bt_102_og = {
-							is_galactic_community_member = yes
-						}
-					}
-				}
-			}
-			set_country_flag = tec_bt_close_spread_candidate_102
-		}
-		
-		else_if = {	# Only for friendos/fed/galcom if enforced
-			limit = {
-				event_target:global_event_country = {
-					NOT = {
-						has_country_flag = tec_close_spread_off_bt_102
-					}
-					has_country_flag = tec_mid_spread_off_bt_102
-				}
-				NOR = {
-					has_technology = tech_tec_bt_102_test
-					is_researching_technology = tech_tec_bt_102_test
-					has_tech_option = tech_tec_bt_102_test
-				}
-				OR = {
-					has_established_contact = event_target:tec_bt_102_og
-					has_communications = event_target:tec_bt_102_og
-					AND = {
-						NOT = {
-							exists = event_target:tec_bt_102_og
-						}
-						any_playable_country = {
-							OR = {
-								has_technology = tech_tec_bt_102_test
-								is_researching_technology = tech_tec_bt_102_test
-								has_tech_option = tech_tec_bt_102_test
-							}
-						}
-					}
-				}
-				NOT = { is_same_value = event_target:tec_bt_102_og }
-				OR = {
-					AND = {
-						opinion_level = {
-							who = event_target:tec_bt_102_og 
-							level > good
-						}
-					}
-					has_research_agreement = event_target:tec_bt_102_og
-					is_in_federation_with = event_target:tec_bt_102_og
-					AND = {
-						is_galactic_community_member = yes
-						event_target:tec_bt_102_og = {
-							is_galactic_community_member = yes
-						}
-						has_global_flag = tec_galcom_force_spread_true
-					}
-				}
-			}
-			set_country_flag = tec_bt_mid_spread_candidate_102
-		}
-		else_if = { # Near everyone has access now
-			limit = {
-				event_target:global_event_country = {
-					NOT = {
-						has_country_flag = tec_mid_spread_off_bt_102
-					}
-					has_country_flag = tec_high_spread_off_bt_102
-				}
-				NOR = {
-					has_technology = tech_tec_bt_102_test
-					is_researching_technology = tech_tec_bt_102_test
-					has_tech_option = tech_tec_bt_102_test
-				}
-				OR = {
-					has_established_contact = event_target:tec_bt_102_og
-					has_communications = event_target:tec_bt_102_og
-					AND = {
-						NOT = {
-							exists = event_target:tec_bt_102_og
-						}
-						any_playable_country = {
-							OR = {
-								has_technology = tech_tec_bt_102_test
-								is_researching_technology = tech_tec_bt_102_test
-								has_tech_option = tech_tec_bt_102_test
-							}
-						}
-					}
-				}
-				NOT = { is_same_value = event_target:tec_bt_102_og }
-			}
-			set_country_flag = tec_bt_high_spread_candidate_102
-		}
-	}
-
-
-}
-country_event = {	# On tech increased chance calc
-	id = tec_bt.6102
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		NOR = {
-			has_technology = tech_tec_bt_102_test
-			is_researching_technology = tech_tec_bt_102_test
-			has_tech_option = tech_tec_bt_102_test
-		}
-		OR = {
-			has_country_flag = tec_bt_close_spread_candidate_102
-			has_country_flag = tec_bt_mid_spread_candidate_102
-			has_country_flag = tec_bt_high_spread_candidate_102
-		}
-	}
-
-	immediate = {
-		if = {
-			limit = {
-				has_country_flag = tec_bt_close_spread_candidate_102
-			}
-			random = {
-				chance = 33
-				if = {
-					limit = {
-						exists = event_target:tec_bt_102_og
-					}
-					country_event = {
-						id = tec_bt.7102
-						days = 30
-						random = 30
-					}
-				}
-				else_if = {
-					limit = {
-						NOT = {
-							exists = event_target:tec_bt_102_og
-						}
-					}
-					country_event = {
-						id = tec_bt.8102
-						days = 30
-						random = 30
-					}
-				}
-			}
-		}
-		else_if = {
-			limit = {
-				has_country_flag = tec_bt_mid_spread_candidate_102
-			}
-			random = {
-				chance = 33
-				if = {
-					limit = {
-						exists = event_target:tec_bt_102_og
-					}
-					country_event = {
-						id = tec_bt.7102
-						days = 30
-						random = 30
-					}
-				}
-				else_if = {
-					limit = {
-						NOT = {
-							exists = event_target:tec_bt_102_og
-						}
-					}
-					country_event = {
-						id = tec_bt.8102
-						days = 30
-						random = 30
-					}
-				}
-			}
-		}
-		else_if = {
-			limit = {
-				has_country_flag = tec_bt_high_spread_candidate_102
-			}
-			random = {
-				chance = 15
-				if = {
-					limit = {
-						exists = event_target:tec_bt_102_og
-					}
-					country_event = {
-						id = tec_bt.7102
-						days = 30
-						random = 30
-					}
-				}
-				else_if = {
-					limit = {
-						NOT = {
-							exists = event_target:tec_bt_102_og
-						}
-					}
-					country_event = {
-						id = tec_bt.8102
-						days = 30
-						random = 30
-					}
-				}
-			}
-		}
-	}
-}
-country_event = {	# Country still exists
-	id = tec_bt.7102
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-	is_triggered_only = yes
-
-	title = "tec_bt.7102.name"
-	desc = {
-		text = "tec_bt.7102.friendly.desc"
-		trigger = {
-			has_country_flag = tec_bt_close_spread_candidate_102
-		}
-	}
-	desc = {
-		text = "tec_bt.7102.semifriendly.desc"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_close_spread_candidate_102
-			}
-			has_country_flag = tec_bt_mid_spread_candidate_102
-		}
-	}
-	desc = {
-		text = "tec_bt.7102.neutral.desc"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_mid_spread_candidate_102
-			}
-			has_country_flag = tec_bt_high_spread_candidate_102
-		}
-	}
-
-	option = {
-		name = "tec_bt.7102.a"
-		custom_tooltip = "tec_bt.7102.tooltip"
-		trigger = {
-			has_country_flag = tec_bt_close_spread_candidate_102
-		}
-	}
-
-	option = {
-		name = "tec_bt.7102.b"
-		custom_tooltip = "tec_bt.7102.tooltip"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_close_spread_candidate_102
-			}
-			has_country_flag = tec_bt_mid_spread_candidate_102
-		}
-	}
-
-	option = {
-		name = "tec_bt.7102.c"
-		custom_tooltip = "tec_bt.7102.tooltip"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_mid_spread_candidate_102
-			}
-			has_country_flag = tec_bt_high_spread_candidate_102
-		}
-	}
-
-	after = {
-		hidden_effect = {
-			add_research_option = tech_tec_bt_102_test
-		}
-	}
-}
-country_event = {	# Country no longer exists
-	id = tec_bt.8102
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-	is_triggered_only = yes
-
-	title = "tec_bt.8102.name"
-	desc = {
-		text = "tec_bt.8102.friendly.desc"
-		trigger = {
-			has_country_flag = tec_bt_close_spread_candidate_102
-		}
-	}
-	desc = {
-		text = "tec_bt.8102.semifriendly.desc"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_close_spread_candidate_102
-			}
-			has_country_flag = tec_bt_mid_spread_candidate_102
-		}
-	}
-	desc = {
-		text = "tec_bt.8102.neutral.desc"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_mid_spread_candidate_102
-			}
-			has_country_flag = tec_bt_high_spread_candidate_102
-		}
-	}
-
-	option = {
-		name = "tec_bt.8102.a"
-		custom_tooltip = "tec_bt.7102.tooltip"
-		trigger = {
-			has_country_flag = tec_bt_close_spread_candidate_102
-		}
-	}
-
-	option = {
-		name = "tec_bt.8102.b"
-		custom_tooltip = "tec_bt.7102.tooltip"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_close_spread_candidate_102
-			}
-			has_country_flag = tec_bt_mid_spread_candidate_102
-		}
-	}
-
-	option = {
-		name = "tec_bt.8102.c"
-		custom_tooltip = "tec_bt.7102.tooltip"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_mid_spread_candidate_102
-			}
-			has_country_flag = tec_bt_high_spread_candidate_102
-		}
-	}
-
-	after = {
-		hidden_effect = {
-			add_research_option = tech_tec_bt_102_test
-		}
-		# cleanup
-		if = {
-			limit = {
-				has_country_flag = tec_bt_close_spread_candidate_102
-			}
-			remove_country_flag = tec_bt_close_spread_candidate_102
-		}
-		if = {
-			limit = {
-				has_country_flag = tec_bt_mid_spread_candidate_102
-			}
-			remove_country_flag = tec_bt_mid_spread_candidate_102
-		}
-		if = {
-			limit = {
-				has_country_flag = tec_bt_high_spread_candidate_102
-			}
-			remove_country_flag = tec_bt_high_spread_candidate_102
-		}
-	}
-}
-
-	# ----------------------------------------- bt 103
-country_event = {	# Bt 103 researched, only first time
-	id = tec_bt.2103
-	hide_window = yes
-	is_triggered_only = yes
-	fire_only_once = yes
-
-	trigger = {
-		has_technology = tech_tec_bt_103_test
-	}
-
-	immediate = {
-		save_global_event_target_as = tec_bt_103_og
-		event_target:global_event_country = {	# store leader
-			create_leader = {
-				species = root
-				class = scientist
-				name = "[root.GetName]" #tec_bt_103_og_name
-				skill = 1
-				traits = {
-					trait = leader_trait_tec_debug_immortal
-				}
-			}
-			last_created_leader = {
-				set_name = "[root.GetName]"
-				save_global_event_target_as = tec_bt_103_og_backup
-			}
-		}
-		country_event = {
-			id = tec_bt.3103
-			days = 1
-			random = 1
-		}
-		every_playable_country = {
-			limit = {
-				OR = {
-					has_established_contact = root
-					AND = {
-						has_communications = root
-						root = {
-							is_primitive = no
-						}
-					}
-				}
-				NOT = { is_same_value = root }
-			}
-			country_event = {
-				id = tec_bt.4103
-				days = 1
-				random = 1
-			}
-		}
-	}
-}
-country_event = {	# Self announcement
-	id = tec_bt.3103
-	title = "tec_bt.3103.name"
-	desc = "tec_bt.3103.desc"
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_bt.3103.a"
-		custom_tooltip = tec_bt.3103.a.tooltip
-	}
-}
-country_event = {	# Common announcement
-	id = tec_bt.4103
-	title = "tec_bt.4103.name"
-	desc = "tec_bt.4103.desc"
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_bt.4103.a"
-		trigger = {
-			NOR = {
-				is_at_war_with = from
-				is_rival = from
-			}
-		}
-	}
-	option = {
-		name = "tec_bt.4103.b"
-		trigger = {
-			opinion_level = {
-				who = from
-				level > neutral
-			}
-			NOR = {
-				is_at_war_with = from
-				is_rival = from
-			}
-		}
-	}
-	option = {
-		name = "tec_bt.4103.c"
-		trigger = {
-			OR = {
-				is_in_federation_with = from
-				has_research_agreement = from
-			}
-			NOR = {
-				is_at_war_with = from
-				is_rival = from
-			}
-		}
-	}
-	option = {
-		name = "tec_bt.4103.d"
-		trigger = {
-			OR = {
-				is_at_war_with = from
-				is_rival = from
-				opinion_level = {
-					who = from
-					level < neutral
-				}
-			}
-		}
-	}
-}
-country_event = {	# Bt 103 each 5 years, controlled by bt.500
-	id = tec_bt.5103
-	hide_window = yes
-	is_triggered_only = yes
-
-	immediate = {
-		if = {
-			limit = { # Only for close friends
-				event_target:global_event_country = {
-					has_country_flag = tec_close_spread_off_bt_103
-				}
-				NOR = {
-					has_technology = tech_tec_bt_103_test
-					is_researching_technology = tech_tec_bt_103_test
-					has_tech_option = tech_tec_bt_103_test
-				}
-				OR = {
-					has_established_contact = event_target:tec_bt_103_og
-					has_communications = event_target:tec_bt_103_og
-					AND = {
-						NOT = {
-							exists = event_target:tec_bt_103_og
-						}
-						any_playable_country = {
-							OR = {
-								has_technology = tech_tec_bt_103_test
-								is_researching_technology = tech_tec_bt_103_test
-								has_tech_option = tech_tec_bt_103_test
-							}
-						}
-					}
-				}
-				NOT = { is_same_value = event_target:tec_bt_103_og }
-				is_neighbor_of = event_target:tec_bt_103_og
-				opinion_level = {
-					who = event_target:tec_bt_103_og
-					level > good
-				}
-				OR = {
-					has_research_agreement = event_target:tec_bt_103_og
-					is_in_federation_with = event_target:tec_bt_103_og
-					AND = {
-						is_galactic_community_member = yes
-						event_target:tec_bt_103_og = {
-							is_galactic_community_member = yes
-						}
-					}
-				}
-			}
-			set_country_flag = tec_bt_close_spread_candidate_103
-		}
-		
-		else_if = {	# Only for friendos/fed/galcom if enforced
-			limit = {
-				event_target:global_event_country = {
-					NOT = {
-						has_country_flag = tec_close_spread_off_bt_103
-					}
-					has_country_flag = tec_mid_spread_off_bt_103
-				}
-				NOR = {
-					has_technology = tech_tec_bt_103_test
-					is_researching_technology = tech_tec_bt_103_test
-					has_tech_option = tech_tec_bt_103_test
-				}
-				OR = {
-					has_established_contact = event_target:tec_bt_103_og
-					has_communications = event_target:tec_bt_103_og
-					AND = {
-						NOT = {
-							exists = event_target:tec_bt_103_og
-						}
-						any_playable_country = {
-							OR = {
-								has_technology = tech_tec_bt_103_test
-								is_researching_technology = tech_tec_bt_103_test
-								has_tech_option = tech_tec_bt_103_test
-							}
-						}
-					}
-				}
-				NOT = { is_same_value = event_target:tec_bt_103_og }
-				OR = {
-					AND = {
-						opinion_level = {
-							who = event_target:tec_bt_103_og 
-							level > good
-						}
-					}
-					has_research_agreement = event_target:tec_bt_103_og
-					is_in_federation_with = event_target:tec_bt_103_og
-					AND = {
-						is_galactic_community_member = yes
-						event_target:tec_bt_103_og = {
-							is_galactic_community_member = yes
-						}
-						has_global_flag = tec_galcom_force_spread_true
-					}
-				}
-			}
-			set_country_flag = tec_bt_mid_spread_candidate_103
-		}
-		else_if = { # Near everyone has access now
-			limit = {
-				event_target:global_event_country = {
-					NOT = {
-						has_country_flag = tec_mid_spread_off_bt_103
-					}
-					has_country_flag = tec_high_spread_off_bt_103
-				}
-				NOR = {
-					has_technology = tech_tec_bt_103_test
-					is_researching_technology = tech_tec_bt_103_test
-					has_tech_option = tech_tec_bt_103_test
-				}
-				OR = {
-					has_established_contact = event_target:tec_bt_103_og
-					has_communications = event_target:tec_bt_103_og
-					AND = {
-						NOT = {
-							exists = event_target:tec_bt_103_og
-						}
-						any_playable_country = {
-							OR = {
-								has_technology = tech_tec_bt_103_test
-								is_researching_technology = tech_tec_bt_103_test
-								has_tech_option = tech_tec_bt_103_test
-							}
-						}
-					}
-				}
-				NOT = { is_same_value = event_target:tec_bt_103_og }
-			}
-			set_country_flag = tec_bt_high_spread_candidate_103
-		}
-	}
-}
-country_event = {	# On tech increased chance calc
-	id = tec_bt.6103
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		NOR = {
-			has_technology = tech_tec_bt_103_test
-			is_researching_technology = tech_tec_bt_103_test
-			has_tech_option = tech_tec_bt_103_test
-		}
-		OR = {
-			has_country_flag = tec_bt_close_spread_candidate_103
-			has_country_flag = tec_bt_mid_spread_candidate_103
-			has_country_flag = tec_bt_high_spread_candidate_103
-		}
-	}
-
-	immediate = {
-		if = {
-			limit = {
-				has_country_flag = tec_bt_close_spread_candidate_103
-			}
-			random = {
-				chance = 33
-				if = {
-					limit = {
-						exists = event_target:tec_bt_103_og
-					}
-					country_event = {
-						id = tec_bt.7103
-						days = 30
-						random = 30
-					}
-				}
-				else_if = {
-					limit = {
-						NOT = {
-							exists = event_target:tec_bt_103_og
-						}
-					}
-					country_event = {
-						id = tec_bt.8103
-						days = 30
-						random = 30
-					}
-				}
-			}
-		}
-		else_if = {
-			limit = {
-				has_country_flag = tec_bt_mid_spread_candidate_103
-			}
-			random = {
-				chance = 33
-				if = {
-					limit = {
-						exists = event_target:tec_bt_103_og
-					}
-					country_event = {
-						id = tec_bt.7103
-						days = 30
-						random = 30
-					}
-				}
-				else_if = {
-					limit = {
-						NOT = {
-							exists = event_target:tec_bt_103_og
-						}
-					}
-					country_event = {
-						id = tec_bt.8103
-						days = 30
-						random = 30
-					}
-				}
-			}
-		}
-		else_if = {
-			limit = {
-				has_country_flag = tec_bt_high_spread_candidate_103
-			}
-			random = {
-				chance = 15
-				if = {
-					limit = {
-						exists = event_target:tec_bt_103_og
-					}
-					country_event = {
-						id = tec_bt.7103
-						days = 30
-						random = 30
-					}
-				}
-				else_if = {
-					limit = {
-						NOT = {
-							exists = event_target:tec_bt_103_og
-						}
-					}
-					country_event = {
-						id = tec_bt.8103
-						days = 30
-						random = 30
-					}
-				}
-			}
-		}
-	}
-}
-country_event = {	# Country still exists
-	id = tec_bt.7103
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-	is_triggered_only = yes
-
-	title = "tec_bt.7103.name"
-	desc = {
-		text = "tec_bt.7103.friendly.desc"
-		trigger = {
-			has_country_flag = tec_bt_close_spread_candidate_103
-		}
-	}
-	desc = {
-		text = "tec_bt.7103.semifriendly.desc"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_close_spread_candidate_103
-			}
-			has_country_flag = tec_bt_mid_spread_candidate_103
-		}
-	}
-	desc = {
-		text = "tec_bt.7103.neutral.desc"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_mid_spread_candidate_103
-			}
-			has_country_flag = tec_bt_high_spread_candidate_103
-		}
-	}
-
-	option = {
-		name = "tec_bt.7103.a"
-		custom_tooltip = "tec_bt.7103.tooltip"
-		trigger = {
-			has_country_flag = tec_bt_close_spread_candidate_103
-		}
-	}
-
-	option = {
-		name = "tec_bt.7103.b"
-		custom_tooltip = "tec_bt.7103.tooltip"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_close_spread_candidate_103
-			}
-			has_country_flag = tec_bt_mid_spread_candidate_103
-		}
-	}
-
-	option = {
-		name = "tec_bt.7103.c"
-		custom_tooltip = "tec_bt.7103.tooltip"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_mid_spread_candidate_103
-			}
-			has_country_flag = tec_bt_high_spread_candidate_103
-		}
-	}
-
-	after = {
-		hidden_effect = {
-			add_research_option = tech_tec_bt_103_test
-		}
-	}
-}
-country_event = {	# Country no longer exists
-	id = tec_bt.8103
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-	is_triggered_only = yes
-
-	title = "tec_bt.8103.name"
-	desc = {
-		text = "tec_bt.8103.friendly.desc"
-		trigger = {
-			has_country_flag = tec_bt_close_spread_candidate_103
-		}
-	}
-	desc = {
-		text = "tec_bt.8103.semifriendly.desc"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_close_spread_candidate_103
-			}
-			has_country_flag = tec_bt_mid_spread_candidate_103
-		}
-	}
-	desc = {
-		text = "tec_bt.8103.neutral.desc"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_mid_spread_candidate_103
-			}
-			has_country_flag = tec_bt_high_spread_candidate_103
-		}
-	}
-
-	option = {
-		name = "tec_bt.8103.a"
-		custom_tooltip = "tec_bt.7103.tooltip"
-		trigger = {
-			has_country_flag = tec_bt_close_spread_candidate_103
-		}
-	}
-
-	option = {
-		name = "tec_bt.8103.b"
-		custom_tooltip = "tec_bt.7103.tooltip"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_close_spread_candidate_103
-			}
-			has_country_flag = tec_bt_mid_spread_candidate_103
-		}
-	}
-
-	option = {
-		name = "tec_bt.8103.c"
-		custom_tooltip = "tec_bt.7103.tooltip"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_mid_spread_candidate_103
-			}
-			has_country_flag = tec_bt_high_spread_candidate_103
-		}
-	}
-
-	after = {
-		hidden_effect = {
-			add_research_option = tech_tec_bt_103_test
-		}
-		# cleanup
-		if = {
-			limit = {
-				has_country_flag = tec_bt_close_spread_candidate_103
-			}
-			remove_country_flag = tec_bt_close_spread_candidate_103
-		}
-		if = {
-			limit = {
-				has_country_flag = tec_bt_mid_spread_candidate_103
-			}
-			remove_country_flag = tec_bt_mid_spread_candidate_103
-		}
-		if = {
-			limit = {
-				has_country_flag = tec_bt_high_spread_candidate_103
-			}
-			remove_country_flag = tec_bt_high_spread_candidate_103
-		}
-	}
-}
-
-	# ----------------------------------------- bt 104
-country_event = {	# Bt 104 researched, only first time
-	id = tec_bt.2104
-	hide_window = yes
-	is_triggered_only = yes
-	fire_only_once = yes
-
-	trigger = {
-		has_technology = tech_tec_bt_104_test
-	}
-
-	immediate = {
-		save_global_event_target_as = tec_bt_104_og
-		event_target:global_event_country = {	# store leader
-			create_leader = {
-				species = root
-				class = scientist
-				name = "[root.GetName]" #tec_bt_104_og_name
-				skill = 1
-				traits = {
-					trait = leader_trait_tec_debug_immortal
-				}
-			}
-			last_created_leader = {
-				set_name = "[root.GetName]"
-				save_global_event_target_as = tec_bt_104_og_backup
-			}
-		}
-		country_event = {
-			id = tec_bt.3104
-			days = 1
-			random = 1
-		}
-		every_playable_country = {
-			limit = {
-				OR = {
-					has_established_contact = root
-					AND = {
-						has_communications = root
-						root = {
-							is_primitive = no
-						}
-					}
-				}
-				NOT = { is_same_value = root }
-			}
-			country_event = {
-				id = tec_bt.4104
-				days = 1
-				random = 1
-			}
-		}
-	}
-}
-country_event = {	# Self announcement
-	id = tec_bt.3104
-	title = "tec_bt.3104.name"
-	desc = "tec_bt.3104.desc"
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_bt.3104.a"
-		custom_tooltip = tec_bt.3104.a.tooltip
-	}
-}
-country_event = {	# Common announcement
-	id = tec_bt.4104
-	title = "tec_bt.4104.name"
-	desc = "tec_bt.4104.desc"
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_bt.4104.a"
-		trigger = {
-			NOR = {
-				is_at_war_with = from
-				is_rival = from
-			}
-		}
-	}
-	option = {
-		name = "tec_bt.4104.b"
-		trigger = {
-			opinion_level = {
-				who = from
-				level > neutral
-			}
-			NOR = {
-				is_at_war_with = from
-				is_rival = from
-			}
-		}
-	}
-	option = {
-		name = "tec_bt.4104.c"
-		trigger = {
-			OR = {
-				is_in_federation_with = from
-				has_research_agreement = from
-			}
-			NOR = {
-				is_at_war_with = from
-				is_rival = from
-			}
-		}
-	}
-	option = {
-		name = "tec_bt.4104.d"
-		trigger = {
-			OR = {
-				is_at_war_with = from
-				is_rival = from
-				opinion_level = {
-					who = from
-					level < neutral
-				}
-			}
-		}
-	}
-}
-country_event = {	# Bt 104 each 5 years, controlled by bt.500
-	id = tec_bt.5104
-	hide_window = yes
-	is_triggered_only = yes
-
-	immediate = {
-		if = {
-			limit = { # Only for close friends
-				event_target:global_event_country = {
-					has_country_flag = tec_close_spread_off_bt_104
-				}
-				NOR = {
-					has_technology = tech_tec_bt_104_test
-					is_researching_technology = tech_tec_bt_104_test
-					has_tech_option = tech_tec_bt_104_test
-				}
-				OR = {
-					has_established_contact = event_target:tec_bt_104_og
-					has_communications = event_target:tec_bt_104_og
-					AND = {
-						NOT = {
-							exists = event_target:tec_bt_104_og
-						}
-						any_playable_country = {
-							OR = {
-								has_technology = tech_tec_bt_104_test
-								is_researching_technology = tech_tec_bt_104_test
-								has_tech_option = tech_tec_bt_104_test
-							}
-						}
-					}
-				}
-				NOT = { is_same_value = event_target:tec_bt_104_og }
-				is_neighbor_of = event_target:tec_bt_104_og
-				opinion_level = {
-					who = event_target:tec_bt_104_og
-					level > good
-				}
-				OR = {
-					has_research_agreement = event_target:tec_bt_104_og
-					is_in_federation_with = event_target:tec_bt_104_og
-					AND = {
-						is_galactic_community_member = yes
-						event_target:tec_bt_104_og = {
-							is_galactic_community_member = yes
-						}
-					}
-				}
-			}
-			set_country_flag = tec_bt_close_spread_candidate_104
-		}
-		
-		else_if = {	# Only for friendos/fed/galcom if enforced
-			limit = {
-				event_target:global_event_country = {
-					NOT = {
-						has_country_flag = tec_close_spread_off_bt_104
-					}
-					has_country_flag = tec_mid_spread_off_bt_104
-				}
-				NOR = {
-					has_technology = tech_tec_bt_104_test
-					is_researching_technology = tech_tec_bt_104_test
-					has_tech_option = tech_tec_bt_104_test
-				}
-				OR = {
-					has_established_contact = event_target:tec_bt_104_og
-					has_communications = event_target:tec_bt_104_og
-					AND = {
-						NOT = {
-							exists = event_target:tec_bt_104_og
-						}
-						any_playable_country = {
-							OR = {
-								has_technology = tech_tec_bt_104_test
-								is_researching_technology = tech_tec_bt_104_test
-								has_tech_option = tech_tec_bt_104_test
-							}
-						}
-					}
-				}
-				NOT = { is_same_value = event_target:tec_bt_104_og }
-				OR = {
-					AND = {
-						opinion_level = {
-							who = event_target:tec_bt_104_og 
-							level > good
-						}
-					}
-					has_research_agreement = event_target:tec_bt_104_og
-					is_in_federation_with = event_target:tec_bt_104_og
-					AND = {
-						is_galactic_community_member = yes
-						event_target:tec_bt_104_og = {
-							is_galactic_community_member = yes
-						}
-						has_global_flag = tec_galcom_force_spread_true
-					}
-				}
-			}
-			set_country_flag = tec_bt_mid_spread_candidate_104
-		}
-		else_if = { # Near everyone has access now
-			limit = {
-				event_target:global_event_country = {
-					NOT = {
-						has_country_flag = tec_mid_spread_off_bt_104
-					}
-					has_country_flag = tec_high_spread_off_bt_104
-				}
-				NOR = {
-					has_technology = tech_tec_bt_104_test
-					is_researching_technology = tech_tec_bt_104_test
-					has_tech_option = tech_tec_bt_104_test
-				}
-				OR = {
-					has_established_contact = event_target:tec_bt_104_og
-					has_communications = event_target:tec_bt_104_og
-					AND = {
-						NOT = {
-							exists = event_target:tec_bt_104_og
-						}
-						any_playable_country = {
-							OR = {
-								has_technology = tech_tec_bt_104_test
-								is_researching_technology = tech_tec_bt_104_test
-								has_tech_option = tech_tec_bt_104_test
-							}
-						}
-					}
-				}
-				NOT = { is_same_value = event_target:tec_bt_104_og }
-			}
-			set_country_flag = tec_bt_high_spread_candidate_104
-		}
-	}
-}
-country_event = {	# On tech increased chance calc
-	id = tec_bt.6104
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		NOR = {
-			has_technology = tech_tec_bt_104_test
-			is_researching_technology = tech_tec_bt_104_test
-			has_tech_option = tech_tec_bt_104_test
-		}
-		OR = {
-			has_country_flag = tec_bt_close_spread_candidate_104
-			has_country_flag = tec_bt_mid_spread_candidate_104
-			has_country_flag = tec_bt_high_spread_candidate_104
-		}
-	}
-
-	immediate = {
-		if = {
-			limit = {
-				has_country_flag = tec_bt_close_spread_candidate_104
-			}
-			random = {
-				chance = 33
-				if = {
-					limit = {
-						exists = event_target:tec_bt_104_og
-					}
-					country_event = {
-						id = tec_bt.7104
-						days = 30
-						random = 30
-					}
-				}
-				else_if = {
-					limit = {
-						NOT = {
-							exists = event_target:tec_bt_104_og
-						}
-					}
-					country_event = {
-						id = tec_bt.8104
-						days = 30
-						random = 30
-					}
-				}
-			}
-		}
-		else_if = {
-			limit = {
-				has_country_flag = tec_bt_mid_spread_candidate_104
-			}
-			random = {
-				chance = 33
-				if = {
-					limit = {
-						exists = event_target:tec_bt_104_og
-					}
-					country_event = {
-						id = tec_bt.7104
-						days = 30
-						random = 30
-					}
-				}
-				else_if = {
-					limit = {
-						NOT = {
-							exists = event_target:tec_bt_104_og
-						}
-					}
-					country_event = {
-						id = tec_bt.8104
-						days = 30
-						random = 30
-					}
-				}
-			}
-		}
-		else_if = {
-			limit = {
-				has_country_flag = tec_bt_high_spread_candidate_104
-			}
-			random = {
-				chance = 15
-				if = {
-					limit = {
-						exists = event_target:tec_bt_104_og
-					}
-					country_event = {
-						id = tec_bt.7104
-						days = 30
-						random = 30
-					}
-				}
-				else_if = {
-					limit = {
-						NOT = {
-							exists = event_target:tec_bt_104_og
-						}
-					}
-					country_event = {
-						id = tec_bt.8104
-						days = 30
-						random = 30
-					}
-				}
-			}
-		}
-	}
-}
-country_event = {	# Country still exists
-	id = tec_bt.7104
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-	is_triggered_only = yes
-
-	title = "tec_bt.7104.name"
-	desc = {
-		text = "tec_bt.7104.friendly.desc"
-		trigger = {
-			has_country_flag = tec_bt_close_spread_candidate_104
-		}
-	}
-	desc = {
-		text = "tec_bt.7104.semifriendly.desc"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_close_spread_candidate_104
-			}
-			has_country_flag = tec_bt_mid_spread_candidate_104
-		}
-	}
-	desc = {
-		text = "tec_bt.7104.neutral.desc"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_mid_spread_candidate_104
-			}
-			has_country_flag = tec_bt_high_spread_candidate_104
-		}
-	}
-
-	option = {
-		name = "tec_bt.7104.a"
-		custom_tooltip = "tec_bt.7104.tooltip"
-		trigger = {
-			has_country_flag = tec_bt_close_spread_candidate_104
-		}
-	}
-
-	option = {
-		name = "tec_bt.7104.b"
-		custom_tooltip = "tec_bt.7104.tooltip"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_close_spread_candidate_104
-			}
-			has_country_flag = tec_bt_mid_spread_candidate_104
-		}
-	}
-
-	option = {
-		name = "tec_bt.7104.c"
-		custom_tooltip = "tec_bt.7104.tooltip"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_mid_spread_candidate_104
-			}
-			has_country_flag = tec_bt_high_spread_candidate_104
-		}
-	}
-
-	after = {
-		hidden_effect = {
-			add_research_option = tech_tec_bt_104_test
-		}
-	}
-}
-country_event = {	# Country no longer exists
-	id = tec_bt.8104
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-	is_triggered_only = yes
-
-	title = "tec_bt.8104.name"
-	desc = {
-		text = "tec_bt.8104.friendly.desc"
-		trigger = {
-			has_country_flag = tec_bt_close_spread_candidate_104
-		}
-	}
-	desc = {
-		text = "tec_bt.8104.semifriendly.desc"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_close_spread_candidate_104
-			}
-			has_country_flag = tec_bt_mid_spread_candidate_104
-		}
-	}
-	desc = {
-		text = "tec_bt.8104.neutral.desc"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_mid_spread_candidate_104
-			}
-			has_country_flag = tec_bt_high_spread_candidate_104
-		}
-	}
-
-	option = {
-		name = "tec_bt.8104.a"
-		custom_tooltip = "tec_bt.7104.tooltip"
-		trigger = {
-			has_country_flag = tec_bt_close_spread_candidate_104
-		}
-	}
-
-	option = {
-		name = "tec_bt.8104.b"
-		custom_tooltip = "tec_bt.7104.tooltip"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_close_spread_candidate_104
-			}
-			has_country_flag = tec_bt_mid_spread_candidate_104
-		}
-	}
-
-	option = {
-		name = "tec_bt.8104.c"
-		custom_tooltip = "tec_bt.7104.tooltip"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_mid_spread_candidate_104
-			}
-			has_country_flag = tec_bt_high_spread_candidate_104
-		}
-	}
-
-	after = {
-		hidden_effect = {
-			add_research_option = tech_tec_bt_104_test
-		}
-		# cleanup
-		if = {
-			limit = {
-				has_country_flag = tec_bt_close_spread_candidate_104
-			}
-			remove_country_flag = tec_bt_close_spread_candidate_104
-		}
-		if = {
-			limit = {
-				has_country_flag = tec_bt_mid_spread_candidate_104
-			}
-			remove_country_flag = tec_bt_mid_spread_candidate_104
-		}
-		if = {
-			limit = {
-				has_country_flag = tec_bt_high_spread_candidate_104
-			}
-			remove_country_flag = tec_bt_high_spread_candidate_104
-		}
-	}
-}
-
-	# ----------------------------------------- bt 105
-country_event = {	# Bt 105 researched, only first time
-	id = tec_bt.2105
-	hide_window = yes
-	is_triggered_only = yes
-	fire_only_once = yes
-
-	trigger = {
-		has_technology = tech_tec_bt_105_test
-	}
-
-	immediate = {
-		save_global_event_target_as = tec_bt_105_og
-		event_target:global_event_country = {	# store leader
-			create_leader = {
-				species = root
-				class = scientist
-				name = "[root.GetName]" #tec_bt_105_og_name
-				skill = 1
-				traits = {
-					trait = leader_trait_tec_debug_immortal
-				}
-			}
-			last_created_leader = {
-				set_name = "[root.GetName]"
-				save_global_event_target_as = tec_bt_105_og_backup
-			}
-		}
-		country_event = {
-			id = tec_bt.3105
-			days = 1
-			random = 1
-		}
-		every_playable_country = {
-			limit = {
-				OR = {
-					has_established_contact = root
-					AND = {
-						has_communications = root
-						root = {
-							is_primitive = no
-						}
-					}
-				}
-				NOT = { is_same_value = root }
-			}
-			country_event = {
-				id = tec_bt.4105
-				days = 1
-				random = 1
-			}
-		}
-	}
-}
-country_event = {	# Self announcement
-	id = tec_bt.3105
-	title = "tec_bt.3105.name"
-	desc = "tec_bt.3105.desc"
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_bt.3105.a"
-		custom_tooltip = tec_bt.3105.a.tooltip
-	}
-}
-country_event = {	# Common announcement
-	id = tec_bt.4105
-	title = "tec_bt.4105.name"
-	desc = "tec_bt.4105.desc"
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_bt.4105.a"
-		trigger = {
-			NOR = {
-				is_at_war_with = from
-				is_rival = from
-			}
-		}
-	}
-	option = {
-		name = "tec_bt.4105.b"
-		trigger = {
-			opinion_level = {
-				who = from
-				level > neutral
-			}
-			NOR = {
-				is_at_war_with = from
-				is_rival = from
-			}
-		}
-	}
-	option = {
-		name = "tec_bt.4105.c"
-		trigger = {
-			OR = {
-				is_in_federation_with = from
-				has_research_agreement = from
-			}
-			NOR = {
-				is_at_war_with = from
-				is_rival = from
-			}
-		}
-	}
-	option = {
-		name = "tec_bt.4105.d"
-		trigger = {
-			OR = {
-				is_at_war_with = from
-				is_rival = from
-				opinion_level = {
-					who = from
-					level < neutral
-				}
-			}
-		}
-	}
-}
-country_event = {	# Bt 105 each 5 years, controlled by bt.500
-	id = tec_bt.5105
-	hide_window = yes
-	is_triggered_only = yes
-
-	immediate = {
-		if = {
-			limit = { # Only for close friends
-				event_target:global_event_country = {
-					has_country_flag = tec_close_spread_off_bt_105
-				}
-				NOR = {
-					has_technology = tech_tec_bt_105_test
-					is_researching_technology = tech_tec_bt_105_test
-					has_tech_option = tech_tec_bt_105_test
-				}
-				OR = {
-					has_established_contact = event_target:tec_bt_105_og
-					has_communications = event_target:tec_bt_105_og
-					AND = {
-						NOT = {
-							exists = event_target:tec_bt_105_og
-						}
-						any_playable_country = {
-							OR = {
-								has_technology = tech_tec_bt_105_test
-								is_researching_technology = tech_tec_bt_105_test
-								has_tech_option = tech_tec_bt_105_test
-							}
-						}
-					}
-				}
-				NOT = { is_same_value = event_target:tec_bt_105_og }
-				is_neighbor_of = event_target:tec_bt_105_og
-				opinion_level = {
-					who = event_target:tec_bt_105_og
-					level > good
-				}
-				OR = {
-					has_research_agreement = event_target:tec_bt_105_og
-					is_in_federation_with = event_target:tec_bt_105_og
-					AND = {
-						is_galactic_community_member = yes
-						event_target:tec_bt_105_og = {
-							is_galactic_community_member = yes
-						}
-					}
-				}
-			}
-			set_country_flag = tec_bt_close_spread_candidate_105
-		}
-		
-		else_if = {	# Only for friendos/fed/galcom if enforced
-			limit = {
-				event_target:global_event_country = {
-					NOT = {
-						has_country_flag = tec_close_spread_off_bt_105
-					}
-					has_country_flag = tec_mid_spread_off_bt_105
-				}
-				NOR = {
-					has_technology = tech_tec_bt_105_test
-					is_researching_technology = tech_tec_bt_105_test
-					has_tech_option = tech_tec_bt_105_test
-				}
-				OR = {
-					has_established_contact = event_target:tec_bt_105_og
-					has_communications = event_target:tec_bt_105_og
-					AND = {
-						NOT = {
-							exists = event_target:tec_bt_105_og
-						}
-						any_playable_country = {
-							OR = {
-								has_technology = tech_tec_bt_105_test
-								is_researching_technology = tech_tec_bt_105_test
-								has_tech_option = tech_tec_bt_105_test
-							}
-						}
-					}
-				}
-				NOT = { is_same_value = event_target:tec_bt_105_og }
-				OR = {
-					AND = {
-						opinion_level = {
-							who = event_target:tec_bt_105_og 
-							level > good
-						}
-					}
-					has_research_agreement = event_target:tec_bt_105_og
-					is_in_federation_with = event_target:tec_bt_105_og
-					AND = {
-						is_galactic_community_member = yes
-						event_target:tec_bt_105_og = {
-							is_galactic_community_member = yes
-						}
-						has_global_flag = tec_galcom_force_spread_true
-					}
-				}
-			}
-			set_country_flag = tec_bt_mid_spread_candidate_105
-		}
-		else_if = { # Near everyone has access now
-			limit = {
-				event_target:global_event_country = {
-					NOT = {
-						has_country_flag = tec_mid_spread_off_bt_105
-					}
-					has_country_flag = tec_high_spread_off_bt_105
-				}
-				NOR = {
-					has_technology = tech_tec_bt_105_test
-					is_researching_technology = tech_tec_bt_105_test
-					has_tech_option = tech_tec_bt_105_test
-				}
-				OR = {
-					has_established_contact = event_target:tec_bt_105_og
-					has_communications = event_target:tec_bt_105_og
-					AND = {
-						NOT = {
-							exists = event_target:tec_bt_105_og
-						}
-						any_playable_country = {
-							OR = {
-								has_technology = tech_tec_bt_105_test
-								is_researching_technology = tech_tec_bt_105_test
-								has_tech_option = tech_tec_bt_105_test
-							}
-						}
-					}
-				}
-				NOT = { is_same_value = event_target:tec_bt_105_og }
-			}
-			set_country_flag = tec_bt_high_spread_candidate_105
-		}
-	}
-}
-country_event = {	# On tech increased chance calc
-	id = tec_bt.6105
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		NOR = {
-			has_technology = tech_tec_bt_105_test
-			is_researching_technology = tech_tec_bt_105_test
-			has_tech_option = tech_tec_bt_105_test
-		}
-		OR = {
-			has_country_flag = tec_bt_close_spread_candidate_105
-			has_country_flag = tec_bt_mid_spread_candidate_105
-			has_country_flag = tec_bt_high_spread_candidate_105
-		}
-	}
-
-	immediate = {
-		if = {
-			limit = {
-				has_country_flag = tec_bt_close_spread_candidate_105
-			}
-			random = {
-				chance = 33
-				if = {
-					limit = {
-						exists = event_target:tec_bt_105_og
-					}
-					country_event = {
-						id = tec_bt.7105
-						days = 30
-						random = 30
-					}
-				}
-				else_if = {
-					limit = {
-						NOT = {
-							exists = event_target:tec_bt_105_og
-						}
-					}
-					country_event = {
-						id = tec_bt.8105
-						days = 30
-						random = 30
-					}
-				}
-			}
-		}
-		else_if = {
-			limit = {
-				has_country_flag = tec_bt_mid_spread_candidate_105
-			}
-			random = {
-				chance = 33
-				if = {
-					limit = {
-						exists = event_target:tec_bt_105_og
-					}
-					country_event = {
-						id = tec_bt.7105
-						days = 30
-						random = 30
-					}
-				}
-				else_if = {
-					limit = {
-						NOT = {
-							exists = event_target:tec_bt_105_og
-						}
-					}
-					country_event = {
-						id = tec_bt.8105
-						days = 30
-						random = 30
-					}
-				}
-			}
-		}
-		else_if = {
-			limit = {
-				has_country_flag = tec_bt_high_spread_candidate_105
-			}
-			random = {
-				chance = 15
-				if = {
-					limit = {
-						exists = event_target:tec_bt_105_og
-					}
-					country_event = {
-						id = tec_bt.7105
-						days = 30
-						random = 30
-					}
-				}
-				else_if = {
-					limit = {
-						NOT = {
-							exists = event_target:tec_bt_105_og
-						}
-					}
-					country_event = {
-						id = tec_bt.8105
-						days = 30
-						random = 30
-					}
-				}
-			}
-		}
-	}
-}
-country_event = {	# Country still exists
-	id = tec_bt.7105
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-	is_triggered_only = yes
-
-	title = "tec_bt.7105.name"
-	desc = {
-		text = "tec_bt.7105.friendly.desc"
-		trigger = {
-			has_country_flag = tec_bt_close_spread_candidate_105
-		}
-	}
-	desc = {
-		text = "tec_bt.7105.semifriendly.desc"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_close_spread_candidate_105
-			}
-			has_country_flag = tec_bt_mid_spread_candidate_105
-		}
-	}
-	desc = {
-		text = "tec_bt.7105.neutral.desc"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_mid_spread_candidate_105
-			}
-			has_country_flag = tec_bt_high_spread_candidate_105
-		}
-	}
-
-	option = {
-		name = "tec_bt.7105.a"
-		custom_tooltip = "tec_bt.7105.tooltip"
-		trigger = {
-			has_country_flag = tec_bt_close_spread_candidate_105
-		}
-	}
-
-	option = {
-		name = "tec_bt.7105.b"
-		custom_tooltip = "tec_bt.7105.tooltip"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_close_spread_candidate_105
-			}
-			has_country_flag = tec_bt_mid_spread_candidate_105
-		}
-	}
-
-	option = {
-		name = "tec_bt.7105.c"
-		custom_tooltip = "tec_bt.7105.tooltip"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_mid_spread_candidate_105
-			}
-			has_country_flag = tec_bt_high_spread_candidate_105
-		}
-	}
-
-	after = {
-		hidden_effect = {
-			add_research_option = tech_tec_bt_105_test
-		}
-	}
-}
-country_event = {	# Country no longer exists
-	id = tec_bt.8105
-	picture = GFX_evt_psionics
-	show_sound = event_the_great_awakening
-	is_triggered_only = yes
-
-	title = "tec_bt.8105.name"
-	desc = {
-		text = "tec_bt.8105.friendly.desc"
-		trigger = {
-			has_country_flag = tec_bt_close_spread_candidate_105
-		}
-	}
-	desc = {
-		text = "tec_bt.8105.semifriendly.desc"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_close_spread_candidate_105
-			}
-			has_country_flag = tec_bt_mid_spread_candidate_105
-		}
-	}
-	desc = {
-		text = "tec_bt.8105.neutral.desc"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_mid_spread_candidate_105
-			}
-			has_country_flag = tec_bt_high_spread_candidate_105
-		}
-	}
-
-	option = {
-		name = "tec_bt.8105.a"
-		custom_tooltip = "tec_bt.7105.tooltip"
-		trigger = {
-			has_country_flag = tec_bt_close_spread_candidate_105
-		}
-	}
-
-	option = {
-		name = "tec_bt.8105.b"
-		custom_tooltip = "tec_bt.7105.tooltip"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_close_spread_candidate_105
-			}
-			has_country_flag = tec_bt_mid_spread_candidate_105
-		}
-	}
-
-	option = {
-		name = "tec_bt.8105.c"
-		custom_tooltip = "tec_bt.7105.tooltip"
-		trigger = {
-			NOT = {
-				has_country_flag = tec_bt_mid_spread_candidate_105
-			}
-			has_country_flag = tec_bt_high_spread_candidate_105
-		}
-	}
-
-	after = {
-		hidden_effect = {
-			add_research_option = tech_tec_bt_105_test
-		}
-		# cleanup
-		if = {
-			limit = {
-				has_country_flag = tec_bt_close_spread_candidate_105
-			}
-			remove_country_flag = tec_bt_close_spread_candidate_105
-		}
-		if = {
-			limit = {
-				has_country_flag = tec_bt_mid_spread_candidate_105
-			}
-			remove_country_flag = tec_bt_mid_spread_candidate_105
-		}
-		if = {
-			limit = {
-				has_country_flag = tec_bt_high_spread_candidate_105
-			}
-			remove_country_flag = tec_bt_high_spread_candidate_105
-		}
-	}
-}
-
-
 #########################################################################################################
 ###################################	A S C E N S I O N	E V E N T S ###################################
 #########################################################################################################
@@ -5079,6 +217,7 @@ country_event = { # T1 Situation Completed
 			# PATH FLAG
 			set_country_flag = tec_gene_malleability
 			set_country_flag = tec_gene_path_unlocked_tradition_1
+			# Announcement
 			if = {
 				limit = {
 					NOT = {
@@ -5086,22 +225,29 @@ country_event = { # T1 Situation Completed
 					}
 				}
 				set_country_flag = tec_comm_1st_step
-				every_country = {
-					limit = {
-						is_ai = no
-						NOR = {
-							is_same_value = root
-							# TO DO policy for muting other empire things 
-							has_country_flag = tec_mute_empire_announces
-						}
-						has_communications = root
-						root = {
-							is_primitive = no
+				if = {
+					limit = {	# Prevents FE and alike from triggering the announce
+						NOT = {
+							has_country_flag = tec_advanced_ascension
 						}
 					}
-					country_event = {
-						id = tec_gene_path.10501
-						days = 5 
+					every_country = {
+						limit = {
+							is_ai = no
+							NOR = {
+								is_same_value = root
+								# TO DO policy for muting other empire things 
+								has_country_flag = tec_mute_empire_announces
+							}
+							has_communications = root
+							root = {
+								is_primitive = no
+							}
+						}
+						country_event = {
+							id = tec_gene_path.10501
+							days = 5 
+						}
 					}
 				}
 			}
@@ -6240,35 +1386,57 @@ country_event = { # T2A Situation finished
 		name = "tec_gene_path.305.a"
 		custom_tooltip = "tec_gene_path.305.a.tooltip"
 		hidden_effect = {
-			save_event_target_as = tec_gene_t3_owner
-			set_country_flag = tec_genetics_t2_completed
+			# Path finished
+			set_country_flag = tec_gene_path_finished
+			# Alter species
+				# Note: species_mod instead of speceis for changing your main species only
+			tec_create_genetic_perfection_species = yes
+			# TO DO create specific leader ascension trait handler
+			every_owned_leader = {
+				add_leader_traits_after_modification = yes
+				remove_leader_traits_after_modification = yes
+			}
+			every_pool_leader = {
+				add_leader_traits_after_modification = yes
+				remove_leader_traits_after_modification = yes
+			}
+			# Flags
 			set_country_flag = tec_genetic_assimilation
-			tec_create_genetic_perfection_species_mod = yes
 		}
 	}
 
 	after = {
-		every_country = {
-			limit = {
-				is_ai = no
-				NOR = {
-					is_same_value = root
-					# TO DO policy for muting other empire things 
-					has_country_flag = tec_mute_empire_announces
+		hidden_effect = {
+			# Announcement
+			if = {
+				limit = {	# Prevents FE and alike from triggering the announce
+					NOT = {
+						has_country_flag = tec_advanced_ascension
+					}
 				}
-				has_communications = root
-				root = {
-					is_primitive = no
+				every_country = {
+					limit = {
+						is_ai = no
+						NOR = {
+							is_same_value = root
+							# TO DO policy for muting other empire things 
+							has_country_flag = tec_mute_empire_announces
+						}
+						has_communications = root
+						root = {
+							is_primitive = no
+						}
+					}
+					country_event = {
+						id = tec_gene_path.30501
+						days = 15
+					}
 				}
 			}
-			country_event = {
-				id = tec_gene_path.30501
-				days = 15
+			add_modifier = {
+				modifier = modifier_tec_free_modification
+				days = -1
 			}
-		}
-		add_modifier = {
-			modifier = modifier_tec_free_modification
-			days = -1
 		}
 	}
 }
@@ -6847,15 +2015,26 @@ country_event = { # T1 Situation finished - No Hivemind
 
 	immediate = {
 		hidden_effect = {
+			# First step finished
 			set_country_flag = tec_cybernetic_path_unlocked_tradition_1
+			set_country_flag = tec_cybernetic_t1_assimilation
 			set_country_flag = cyborg_empire
+			# Create cyborgs
 			if = {
 				limit = {
 					is_machine_empire = no
 				}
 				tec_create_cybernetic_species = yes
 			}
-			set_country_flag = tec_cybernetic_t1_assimilation
+			# TO DO create specific leader ascension trait handler
+			every_owned_leader = {
+				add_leader_traits_after_modification = yes
+				remove_leader_traits_after_modification = yes
+			}
+			every_pool_leader = {
+				add_leader_traits_after_modification = yes
+				remove_leader_traits_after_modification = yes
+			}
 			# Fear of the Dark Separatists - Outraged
 				if = {
 					limit = {
@@ -6884,22 +2063,30 @@ country_event = { # T1 Situation finished - No Hivemind
 				}
 			}
 			else = {
-				every_country = {
-					limit = {
-						is_ai = no
-						NOR = {
-							is_same_value = root
-							# TO DO policy for muting other empire things 
-							has_country_flag = tec_mute_empire_announces
-						}
-						has_communications = root
-						root = {
-							is_primitive = no
+				# Announcement
+				if = {
+					limit = {	# Prevents FE and alike from triggering the announce
+						NOT = {
+							has_country_flag = tec_advanced_ascension
 						}
 					}
-					country_event = {
-						id = tec_cybernetic_path.10510
-						days = 5 
+					every_country = {
+						limit = {
+							is_ai = no
+							NOR = {
+								is_same_value = root
+								# TO DO policy for muting other empire things 
+								has_country_flag = tec_mute_empire_announces
+							}
+							has_communications = root
+							root = {
+								is_primitive = no
+							}
+						}
+						country_event = {
+							id = tec_cybernetic_path.10510
+							days = 5 
+						}
 					}
 				}
 			}
@@ -7021,29 +2208,38 @@ country_event = { # T1 Project finished - Hivemind (change of auth)
 	}
 
 	after = {
-		every_country = {
-			limit = {
-				is_ai = no
-				NOR = {
-					is_same_value = root
-					# TO DO policy for muting other empire things 
-					has_country_flag = tec_mute_empire_announces
+		hidden_effect = {
+			# Announcement
+			if = {
+				limit = {	# Prevents FE and alike from triggering the announce
+					NOT = {
+						has_country_flag = tec_advanced_ascension
+					}
 				}
-				has_communications = root
-				root = {
-					is_primitive = no
+				every_country = {
+					limit = {
+						is_ai = no
+						NOR = {
+							is_same_value = root
+							# TO DO policy for muting other empire things 
+							has_country_flag = tec_mute_empire_announces
+						}
+						has_communications = root
+						root = {
+							is_primitive = no
+						}
+					}
+					set_timed_country_flag = {
+						flag = tec_hive_changed_to_cyberhive
+						years = 1
+					}
+					country_event = {
+						id = tec_cybernetic_path.10510
+						days = 5 
+					}
 				}
-			}
-			set_timed_country_flag = {
-				flag = tec_hive_changed_to_cyberhive
-				years = 1
-			}
-			country_event = {
-				id = tec_cybernetic_path.10510
-				days = 5 
 			}
 		}
-
 	}
 }
 
@@ -8208,16 +3404,30 @@ country_event = {
 		name = "tec_cybernetic_path.310.a"
 		custom_tooltip = "tec_cybernetic_path.310.a.tooltip"
 		hidden_effect = {
-			every_owned_species = {
-				limit = {
-					has_trait = trait_cybernetic
-					tec_has_stapled_trait = no
-				}
-				tec_create_advanced_cybernetic_species_ap = yes
+			#every_owned_species = {	# Left this here in case the zombie issue resurfaces
+			#	limit = {
+			#		has_trait = trait_cybernetic
+			#		tec_has_stapled_trait = no
+			#	}
+			#	tec_create_advanced_cybernetic_species_ap = yes
+			#}
+
+			# Path finished
+			set_country_flag = tec_cybernetic_t2_path_finished
+			# Alter species
+			tec_create_advanced_cybernetic_species = yes
+			# TO DO create specific leader ascension trait handler
+			every_owned_leader = {
+				add_leader_traits_after_modification = yes
+				remove_leader_traits_after_modification = yes
 			}
+			every_pool_leader = {
+				add_leader_traits_after_modification = yes
+				remove_leader_traits_after_modification = yes
+			}
+			# Flags
 			set_country_flag = tec_allow_t2_cybernetics
 			set_country_flag = tec_cybernetic_t2_assimilation
-			set_country_flag = tec_cybernetics_t2_completed
 		}
 	}
 }
@@ -9225,7 +4435,6 @@ situation_event = { # Bad 2 cont - Rebels attack planet
 	}
 }
 
-
 # Situation finished
 country_event = { # Synthetic Evolution
 	id = tec_synth_path.105
@@ -9249,97 +4458,115 @@ country_event = { # Synthetic Evolution
 			text = tec_icon_text_good_outcome
 		}
 		hidden_effect = {
-			# Access to the tradition path
+			# Initial finished
 			set_country_flag = tec_synth_path_unlocked_tradition_1
-			# Synths
+			# Alter species
 			tec_create_synth_species = yes
+			# TO DO create specific leader ascension trait handler
+			every_owned_leader = {
+				add_leader_traits_after_modification = yes
+				remove_leader_traits_after_modification = yes
+			}
+			every_pool_leader = {
+				add_leader_traits_after_modification = yes
+				remove_leader_traits_after_modification = yes
+			}
+			# Flags
 			set_country_flag = tec_synthetic_assimilation
+				# Avoid cybogs not being assimilable
+			remove_country_flag = tec_cybernetic_t1_assimilation
+			remove_country_flag = tec_cybernetic_t2_assimilation
+			# Features
 			add_modifier = {
 				modifier = modifier_tec_free_modification
 				days = -1
 			}
-			# Avoid cybogs not being assimilable
-			remove_country_flag = tec_cybernetic_t1_assimilation
-			remove_country_flag = tec_cybernetic_t2_assimilation
-
-			observer_event = { id = observer.4 }
-			every_country = {
-				limit = {
-					is_ai = no
-					NOR = {
-						is_same_value = root
-						# TO DO policy for muting other empire things 
-						has_country_flag = tec_mute_empire_announces
-					}
-					has_communications = root
-					root = {
-						is_primitive = no
-					}
-				}
-				country_event = { id = utopia.2555 days = 5 }
-				country_event = { id = utopia.2556 days = 10 }
-			}
+			# Announcement
 			if = {
-				limit = {
-					any_country = {
-						OR = {
-							is_country_type = fallen_empire
-							is_country_type = awakened_fallen_empire
+				limit = {	# Prevents FE and alike from triggering the announce
+					NOT = {
+						has_country_flag = tec_advanced_ascension
+					}
+				}
+				observer_event = { id = observer.4 }
+				every_country = {
+					limit = {
+						is_ai = no
+						NOR = {
+							is_same_value = root
+							# TO DO policy for muting other empire things 
+							has_country_flag = tec_mute_empire_announces
 						}
-						has_ethic = ethic_fanatic_spiritualist
 						has_communications = root
 						root = {
 							is_primitive = no
 						}
-						NOT = { is_same_value = root }
+					}
+					country_event = { id = utopia.2555 days = 5 }
+					country_event = { id = utopia.2556 days = 10 }
+				}
+				if = {
+					limit = {
+						any_country = {
+							OR = {
+								is_country_type = fallen_empire
+								is_country_type = awakened_fallen_empire
+							}
+							has_ethic = ethic_fanatic_spiritualist
+							has_communications = root
+							root = {
+								is_primitive = no
+							}
+							NOT = { is_same_value = root }
+						}
+					}
+					random_country = {
+						limit = {
+							OR = {
+								is_country_type = fallen_empire
+								is_country_type = awakened_fallen_empire
+							}
+							has_ethic = ethic_fanatic_spiritualist
+							has_communications = root
+							root = {
+								is_primitive = no
+							}
+							NOT = { is_same_value = root }
+						}
+						country_event = { id = utopia.2557 days = 15 }
 					}
 				}
-				random_country = {
-					limit = {
-						OR = {
-							is_country_type = fallen_empire
-							is_country_type = awakened_fallen_empire
+				else = {
+					random_country = {
+						limit = {
+							tec_is_default_country = yes
+							has_ethic = ethic_fanatic_spiritualist
+							NOT = {
+								has_valid_civic = civic_tec_machine_cult
+							}
+							has_communications = root
+							root = {
+								is_primitive = no
+							}
+							NOT = { is_same_value = root }
 						}
-						has_ethic = ethic_fanatic_spiritualist
-						has_communications = root
-						root = {
-							is_primitive = no
-						}
-						NOT = { is_same_value = root }
+						country_event = { id = utopia.2557 days = 15 }
 					}
-					country_event = { id = utopia.2557 days = 15 }
-				}
-			}
-			else = {
-				random_country = {
-					limit = {
-						tec_is_default_country = yes
-						has_ethic = ethic_fanatic_spiritualist
-						NOT = {
+					random_country = {
+						limit = {
+							tec_is_default_country = yes
+							is_spiritualist = yes
 							has_valid_civic = civic_tec_machine_cult
+							has_communications = root
+							root = {
+								is_primitive = no
+							}
+							NOT = { is_same_value = root }
 						}
-						has_communications = root
-						root = {
-							is_primitive = no
-						}
-						NOT = { is_same_value = root }
+						country_event = { id = utopia.25571 days = 15 }
 					}
-					country_event = { id = utopia.2557 days = 15 }
 				}
-				random_country = {
-					limit = {
-						tec_is_default_country = yes
-						is_spiritualist = yes
-						has_valid_civic = civic_tec_machine_cult
-						has_communications = root
-						root = {
-							is_primitive = no
-						}
-						NOT = { is_same_value = root }
-					}
-					country_event = { id = utopia.25571 days = 15 }
-				}
-			}
+			}	
 			# Fear of the Dark Separatists - Outraged
 				if = {
 					limit = {
@@ -10620,8 +5847,66 @@ country_event = { # T1A Situation completed
 	is_triggered_only = yes
 
 	immediate = {
-		#tec_create_latent_psionic_species = yes
+		hidden_effect = {
+			# Initial Finished
+			set_country_flag = tec_psionic_path_unlocked_tradition_1
+			# Alter species
+			tec_create_latent_psionic_species = yes
+			# TO DO create specific leader ascension trait handler
+			every_owned_leader = {
+				add_leader_traits_after_modification = yes
+				remove_leader_traits_after_modification = yes
+			}
+			every_pool_leader = {
+				add_leader_traits_after_modification = yes
+				remove_leader_traits_after_modification = yes
+			}
+			# Features
+			# Fear of the Dark Separatists - Scared
+				if = {
+					limit = {
+						any_planet_within_border = {
+							has_planet_flag = fotd_seperatist_planet@root
+							owner = {
+								has_country_flag = fotd_seperatist_country@root
+							}
+						}
+					}
+					country_event = { id = origin.6105 days = 5 random = 2 }
+				}
+			# /
+			# Announcement
+			if = {
+				limit = {	# Prevents FE and alike from triggering the announce
+					NOT = {
+						has_country_flag = tec_advanced_ascension
+					}
+				}
+				observer_event = { id = observer.5 }
+				every_country = {
+					limit = {
+						is_ai = no
+						has_communications = root
+						root = {
+							is_primitive = no
+						}
+						NOR = {
+							is_same_value = root
+							# TO DO policy for muting other empire things 
+							has_country_flag = tec_mute_empire_announces
+						}
+					}
+					country_event = {
+						id = tec_psionic_path.10501
+						days = 5
+						random = 2
+					}
+				}
+			}
+		}
 		# Old code
+		if = {
+			limit = { always = no }
 			every_owned_pop = {
 				limit = {
 					is_same_species = root
@@ -10658,29 +5943,37 @@ country_event = { # T1A Situation completed
 						country_event = { id = origin.6105 days = 5 random = 2 }
 					}
 				# /
-				observer_event = { id = observer.5 }
-				every_country = {
-					limit = {
-						is_ai = no
-						has_communications = root
-						root = {
-							is_primitive = no
-						}
-						NOR = {
-							is_same_value = root
-							# TO DO policy for muting other empire things 
-							has_country_flag = tec_mute_empire_announces
+				# Announcement
+				if = {
+					limit = {	# Prevents FE and alike from triggering the announce
+						NOT = {
+							has_country_flag = tec_advanced_ascension
 						}
 					}
-					country_event = {
-						id = tec_psionic_path.10501
-						days = 5
-						random = 2
+					observer_event = { id = observer.5 }
+					every_country = {
+						limit = {
+							is_ai = no
+							has_communications = root
+							root = {
+								is_primitive = no
+							}
+							NOR = {
+								is_same_value = root
+								# TO DO policy for muting other empire things 
+								has_country_flag = tec_mute_empire_announces
+							}
+						}
+						country_event = {
+							id = tec_psionic_path.10501
+							days = 5
+							random = 2
+						}
 					}
 				}
 			}
+		}	
 		# /
-
 	}
 
 	option = {
@@ -10830,36 +6123,33 @@ country_event = { # T2 picked - og utopia.2650
 	is_triggered_only = yes
 
 	immediate = {
-		every_owned_pop = {
-			limit = {
-				is_same_species = root
-				has_trait = trait_latent_psionic
+		hidden_effect = {
+			# "Path" finished
+			#set_country_flag = tec_psionic_assimilation
+			# Moved to ap 2
+			# Alter species
+			tec_create_psionic_species = yes
+			# TO DO create specific leader ascension trait handler
+			every_owned_leader = {
+				add_leader_traits_after_modification = yes
+				remove_leader_traits_after_modification = yes
 			}
-			species = {
-				save_event_target_as = psionic_species
+			every_pool_leader = {
+				add_leader_traits_after_modification = yes
+				remove_leader_traits_after_modification = yes
 			}
-			modify_species = {
-				species = this
-				remove_trait = trait_latent_psionic
-				add_trait = trait_psionic
-				effect = {
+		}
+
+		if = {	# Old effect
+			limit = { always = no}
+			every_owned_pop = {
+				limit = {
+					is_same_species = root
+					has_trait = trait_latent_psionic
+				}
+				species = {
 					save_event_target_as = psionic_species
 				}
-			}
-		}
-		change_dominant_species = {
-			species = event_target:psionic_species 
-			change_all = yes 
-		}
-		if = {	# Anti edge cases
-			limit = {
-				owner_main_species = {
-					NOT = {
-						has_trait = trait_psionic
-					}
-				}
-			}
-			owner_main_species = {
 				modify_species = {
 					species = this
 					remove_trait = trait_latent_psionic
@@ -10867,35 +6157,58 @@ country_event = { # T2 picked - og utopia.2650
 					effect = {
 						save_event_target_as = psionic_species
 					}
-				}		
-			}
-			every_owned_pop = {
-				limit = {
-					is_same_species = owner_main_species
 				}
-				change_species = event_target:psionic_species
-			}
-			every_envoy = {
-				limit = {
-					is_same_species = owner_main_species
-				}
-				change_species = event_target:psionic_species 
-			}
-			every_pool_leader = {
-				limit = {
-					is_same_species = owner_main_species
-				}
-				change_species = event_target:psionic_species 
-			}
-			every_owned_leader = {
-				limit = {
-					is_same_species = owner_main_species
-				}
-				change_species = event_target:psionic_species 
 			}
 			change_dominant_species = {
 				species = event_target:psionic_species 
 				change_all = yes 
+			}
+			if = {	# Anti edge cases
+				limit = {
+					owner_main_species = {
+						NOT = {
+							has_trait = trait_psionic
+						}
+					}
+				}
+				owner_main_species = {
+					modify_species = {
+						species = this
+						remove_trait = trait_latent_psionic
+						add_trait = trait_psionic
+						effect = {
+							save_event_target_as = psionic_species
+						}
+					}		
+				}
+				every_owned_pop = {
+					limit = {
+						is_same_species = owner_main_species
+					}
+					change_species = event_target:psionic_species
+				}
+				every_envoy = {
+					limit = {
+						is_same_species = owner_main_species
+					}
+					change_species = event_target:psionic_species 
+				}
+				every_pool_leader = {
+					limit = {
+						is_same_species = owner_main_species
+					}
+					change_species = event_target:psionic_species 
+				}
+				every_owned_leader = {
+					limit = {
+						is_same_species = owner_main_species
+					}
+					change_species = event_target:psionic_species 
+				}
+				change_dominant_species = {
+					species = event_target:psionic_species 
+					change_all = yes 
+				}
 			}
 		}
 	}
@@ -10985,20 +6298,6 @@ country_event = { # T2 picked - og utopia.2650
 					}
 				}
 			}
-			# Old code - This is moved to the t2
-				#observer_event = { id = observer.6 }
-				#every_country = {
-				#	limit = {
-				#		is_ai = no
-				#		has_communications = root
-				#		root = {
-				#			is_primitive = no
-				#		}
-				#		NOT = { is_same_value = root }
-				#	}
-				#	country_event = { id = tec_psionic_path.201 }
-				#}
-			# /
 		}
 	}
 }
@@ -13594,8 +8893,12 @@ country_event = { # Biosynths after ending project
 		hidden_effect = { # Path rewards
 			# Path finished
 			set_country_flag = tec_replicant_path_finished
-			# Create replicants
+			# Alter species
 			tec_create_replicant_species = yes
+			# Flags
+			set_country_flag = tec_replicant_assimilation
+			remove_country_flag = tec_cybernetic_t1_assimilation
+			remove_country_flag = tec_cybernetic_t2_assimilation
 			# lets change the cybernetic fallback moduled don't we?
 				if = {
 					limit = {
@@ -13605,10 +8908,6 @@ country_event = { # Biosynths after ending project
 					set_country_flag = tec_cybernetic_submodule_knowledge
 				}
 			# /
-			# Flags
-			set_country_flag = tec_replicant_assimilation
-			remove_country_flag = tec_cybernetic_t1_assimilation
-			remove_country_flag = tec_cybernetic_t2_assimilation
 		}	
 	}
 
@@ -13616,27 +8915,34 @@ country_event = { # Biosynths after ending project
 		name = "tec_replicant_path.305.a"
 		custom_tooltip = SYNTH_ASSIMILATION_CITIZENSHIP_ENABLED
 		hidden_effect = {	
-			# Notification
-			every_country = {
-				limit = {
-					is_ai = no
-					NOR = {
-						is_same_value = root
-						# TO DO policy for muting other empire things 
-						has_country_flag = tec_mute_empire_announces
-					}
-					has_communications = root
-					root = {
-						is_primitive = no
+			# Announcement
+			if = {
+				limit = {	# Prevents FE and alike from triggering the announce
+					NOT = {
+						has_country_flag = tec_advanced_ascension
 					}
 				}
-				country_event = {
-					id = tec_replicant_path.30501
-					days = 5 
-				}
-				country_event = {
-					id = tec_replicant_path.30502
-					days = 10 
+				every_country = {
+					limit = {
+						is_ai = no
+						NOR = {
+							is_same_value = root
+							# TO DO policy for muting other empire things 
+							has_country_flag = tec_mute_empire_announces
+						}
+						has_communications = root
+						root = {
+							is_primitive = no
+						}
+					}
+					country_event = {
+						id = tec_replicant_path.30501
+						days = 5 
+					}
+					country_event = {
+						id = tec_replicant_path.30502
+						days = 10 
+					}
 				}
 			}
 		}
@@ -14892,8 +10198,9 @@ country_event = {
 		hidden_effect = { # Path rewards
 			# Path finished
 			set_country_flag = tec_cyberpsionic_path_finished
-			# Cyberpsionic trait
+			# Alter species
 			tec_create_cyberpsionic_species = yes
+			# TO DO create specific leader ascension trait handler
 			every_owned_leader = {
 				add_leader_traits_after_modification = yes
 				remove_leader_traits_after_modification = yes
@@ -14922,22 +10229,30 @@ country_event = {
 		name = "tec_cyberpsionic_path.305.a"
 		custom_tooltip = tec_cyberpsionic_path.305.a.tooltip
 		hidden_effect = {
-			every_country = {
-				limit = {
-					is_ai = no
-					NOR = {
-						is_same_value = root
-						# TO DO policy for muting other empire things 
-						has_country_flag = tec_mute_empire_announces
-					}
-					has_communications = root
-					root = {
-						is_primitive = no
+			# Announcement
+			if = {
+				limit = {	# Prevents FE and alike from triggering the announce
+					NOT = {
+						has_country_flag = tec_advanced_ascension
 					}
 				}
-				country_event = {
-					id = tec_cyberpsionic_path.30501 
-					days = 5
+				every_country = {
+					limit = {
+						is_ai = no
+						NOR = {
+							is_same_value = root
+							# TO DO policy for muting other empire things 
+							has_country_flag = tec_mute_empire_announces
+						}
+						has_communications = root
+						root = {
+							is_primitive = no
+						}
+					}
+					country_event = {
+						id = tec_cyberpsionic_path.30501 
+						days = 5
+					}
 				}
 			}
 		}
@@ -15076,6 +10391,7 @@ country_event = {
 	is_triggered_only = yes
 
 	trigger = {
+		always = no
 		has_country_flag = tec_cyberpsionic_buildings
 		any_owned_planet = {
 			OR = {
@@ -15700,25 +11016,44 @@ country_event = {
 
 	immediate = {
 		hidden_effect = {
-			tec_create_biopsionic_species = yes
+			# Path finished ... or not?
 			set_country_flag = tec_biopsionic_assimilation
-			every_country = {
-				limit = {
-					is_ai = no
-					NOR = {
-						is_same_value = root
-						# TO DO policy for muting other empire things 
-						has_country_flag = tec_mute_empire_announces
-					}
-					has_communications = root
-					root = {
-						is_primitive = no
+			# Alter species
+			tec_create_biopsionic_species = yes
+			# TO DO create specific leader ascension trait handler
+			every_owned_leader = {
+				add_leader_traits_after_modification = yes
+				remove_leader_traits_after_modification = yes
+			}
+			every_pool_leader = {
+				add_leader_traits_after_modification = yes
+				remove_leader_traits_after_modification = yes
+			}
+			# Announcement
+			if = {
+				limit = {	# Prevents FE and alike from triggering the announce
+					NOT = {
+						has_country_flag = tec_advanced_ascension
 					}
 				}
-				country_event = {
-					id = tec_biopsionic_path.30052
-					days = 5
-					random = 5
+				every_country = {
+					limit = {
+						is_ai = no
+						NOR = {
+							is_same_value = root
+							# TO DO policy for muting other empire things 
+							has_country_flag = tec_mute_empire_announces
+						}
+						has_communications = root
+						root = {
+							is_primitive = no
+						}
+					}
+					country_event = {
+						id = tec_biopsionic_path.30052
+						days = 5
+						random = 5
+					}
 				}
 			}
 		}
@@ -16040,6 +11375,7 @@ country_event = { # 100% - Finish
 		}
 		hidden_effect = {
 			owner = {
+				# Path finished, at last
 				set_country_flag = tec_biopsionic_path_finished
 			}
 		}
