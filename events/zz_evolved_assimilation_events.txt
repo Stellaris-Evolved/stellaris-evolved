@@ -9,11 +9,32 @@
 
 
 # Assimilator events
-
-
 namespace = tec_assimilation
 
-# Metamorphosis event for assimilator hives
+# ------------------------------------------------- Dominant species
+# This = Country
+# From = Species ( Post Modification )
+country_event = {
+	id = tec_assimilation.10
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = { from = { is_same_species = root } }
+
+	immediate = {
+		ordered_owned_species = {
+			limit = { is_same_species = root }
+			position = 0
+			order_by = trigger:num_pops
+			save_event_target_as = tec_new_dominant_species
+		}
+		change_dominant_species = {	species = event_target:tec_new_dominant_species }
+	}
+}
+
+# ------------------------------------------------- Pseudoassimilation
+# --------------- Metamorphosis event for assimilator hives
 planet_event = {
 	id = tec_assimilation.100
 	hide_window = yes
@@ -171,11 +192,10 @@ planet_event = {
 	}
 }
 
-# Metamorphosis event for organic bioascended hives
+# --------------- Metamorphosis event for organic bioascended hives
 # tec_assimilation 150
 
-
-# Splicing event for ascension perk regular empires and regular hives
+# --------------- Splicing event for ascension perk regular empires and regular hives
 planet_event = {
 	id = tec_assimilation.200
 	hide_window = yes
@@ -333,7 +353,7 @@ planet_event = {
 	}
 }
 
-# Encaser event for machines and cyberhives
+# --------------- Encaser event for machines and cyberhives
 planet_event = {
 	id = tec_assimilation.300
 	hide_window = yes
@@ -513,7 +533,7 @@ planet_event = {
 	}
 }
 
-# Composer event for composer machines
+# --------------- Composer event for composer machines
 planet_event = {
 	id = tec_assimilation.400
 	hide_window = yes
@@ -829,6 +849,7 @@ planet_event = {
 	}
 }
 
+# ------------------------------------------------- Purge
 # Necrophage Purge
 
 # on_pop_purged
@@ -935,6 +956,7 @@ planet_event = {
 	}
 }
 
+# ------------------------------------------------- Assimilation
  # New assimilation system
 # Assimilate Pops on Yearly Pulse event = {	id = action.64 	OVERWRITE
 # Assimilate Pops planet_event = { 	id = action.65	OVERWRITE
@@ -1511,6 +1533,10 @@ planet_event = {
 
 	immediate = {
 		log = "tec_assimilation.6401: [This.GetName]"
+		set_timed_planet_flag = {
+			flag = tec_executed_assimilation_step_1
+			months = 1
+		}
 		random_list = {
 			1 = {
 				set_variable = {
@@ -1532,24 +1558,21 @@ planet_event = {
 			}
 		}
 		# Added this in case we want to add extra assimilation values
-		if = {
-			limit = {
-				check_variable = {
-					which = owner.tec_assimilation_counter_extra
-					value = 0
-				}
-			}
-			set_variable = {
-				which = owner.tec_assimilation_counter_extra
-				value = 0
-			}
-		}
-		else = {
-			change_variable = {
-				which = tec_assimilation_counter
-				value = owner.tec_assimilation_counter_extra
-			}
-		}
+			#if = {
+			#	limit = {
+			#		owner = {
+			#			check_variable = {
+			#				which = tec_assimilation_counter_extra
+			#				value > 0
+			#			}
+			#		}
+			#	}
+			#	change_variable = {
+			#		which = tec_assimilation_counter
+			#		value = owner.tec_assimilation_counter_extra
+			#	}
+			#}
+		# /
 		if = {
 			limit = { owner = { has_tradition = tr_cybernetics_assimilator_inevitable_assimilation } }
 			change_variable = {
@@ -1568,7 +1591,7 @@ planet_event = {
 					}
 				}
 				check_variable = {
-					which = assimilation_counter
+					which = tec_assimilation_counter
 					value > 0
 				}
 			}
@@ -1578,8 +1601,9 @@ planet_event = {
 	}
 }
 
+# ------------------------------------------------- Deprecated
 # Assimilate Pops - Crafted species - deprecated
-planet_event = {
+ planet_event = {
 	id = tec_assimilation.6402
 	hide_window = yes
 	is_triggered_only = yes
@@ -1877,12 +1901,12 @@ planet_event = {
 			value = 0
 		}
 	}
-}
+ }
 
-# BACKUP - PREVIOUS ITERATION - HANDLE WITH CARE
-# Can cause chemical burns
-# Can induce dementia
-# Untying the complicated event composition can led to unexpected results
+ # BACKUP - PREVIOUS ITERATION - HANDLE WITH CARE
+ # Can cause chemical burns
+ # Can induce dementia
+ # Untying the complicated event composition can led to unexpected results
  # Assimilate Pops on Yearly Pulse
  event = {
 	id = tec_assimilation.6499

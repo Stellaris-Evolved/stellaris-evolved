@@ -687,9 +687,18 @@
 
 # Assimilation Effect
 # ------------------------------------------------------------
+	# this = planet
 	tec_pop_assimilation_effect = {
 		optimize_memory
 		
+		if = {
+			limit = { has_global_flag = tec_supertest }
+			set_timed_planet_flag = {
+				flag = tec_executed_assimilation_step_3
+				months = 1
+			}
+		}
+
 		random_owned_pop = {
 			limit = {
 				has_citizenship_type = {
@@ -698,7 +707,7 @@
 				}
 			}
 			if = {	# Randomize the fail chance TO DO
-				limit = { 
+				limit = {
 					species = {
 						NOR = {
 							has_trait = trait_mechanical
@@ -708,39 +717,39 @@
 						OR = {
 							has_living_standard = {
 								type = living_standard_tec_assimilation_cybernetic_t2_total
-								country = owner
+								country = prev.owner
 							}
 							has_living_standard = {
 								type = living_standard_tec_assimilation_synthetic_total
-								country = owner
+								country = prev.owner
 							}
 							has_living_standard = {
 								type = living_standard_tec_assimilation_synthetic_total_machine
-								country = owner
+								country = prev.owner
 							}
 							has_living_standard = {
 								type = living_standard_tec_assimilation_genetic_total
-								country = owner
+								country = prev.owner
 							}
 							has_living_standard = {
 								type = living_standard_tec_assimilation_biopsionic_total
-								country = owner
+								country = prev.owner
 							}
 							has_living_standard = {
 								type = living_standard_tec_assimilation_replicant_total
-								country = owner
+								country = prev.owner
 							}
 							has_living_standard = {
 								type = living_standard_tec_assimilation_biological_total
-								country = owner
+								country = prev.owner
 							}
 							has_living_standard = {
 								type = living_standard_tec_assimilation_bionic_total
-								country = owner
+								country = prev.owner
 							}
 							has_living_standard = {
 								type = living_standard_tec_assimilation_ethereal_total
-								country = owner
+								country = prev.owner
 							}
 						}
 					}
@@ -754,20 +763,50 @@
 						has_pop_flag = tec_assimilation_fail
 					}
 					species = {
-						NOT = {
-							has_species_flag = assimilation_species_of_empire_@owner
+						OR = {
+							has_species_flag = tec_assimilation_total
+							has_species_flag = tec_assimilation_unify_robot
+							has_species_flag = tec_assimilation_unify_bioservants
+							has_species_flag = tec_assimilation_cybernetic_t2_digitalization
+							has_species_flag = tec_assimilation_cybernetic_t2_merge_robot
+							has_species_flag = tec_assimilation_synthetic_digitalization
+							has_species_flag = tec_assimilation_psionic_ascend
+							has_species_flag = tec_assimilation_biological_decompose
+							has_species_flag = tec_assimilation_ethereal_energy_script
 						}
 					}
 				}
 				if = {
+					limit = { has_global_flag = tec_supertest }
+					prev = {
+						set_timed_planet_flag = {
+							flag = tec_executed_assimilation_step_alternative
+							months = 1
+						}
+					}
+				}
+				if = {		 # Total assimilation
 					limit = {
 						species = {
 							has_species_flag = tec_assimilation_total
 						}
 					}
-					change_species = prev.owner
+					if = {
+						limit = { has_global_flag = tec_supertest }
+						prev = {
+							set_timed_planet_flag = {
+								flag = tec_executed_assimilation_TOTAL
+								months = 1
+							}
+						}
+					}
+					# Note: Ther is a bug in vanilla with change_species
+					# It creates a pop of the ORIGINAL non modified species which is annoying
+					# seems force setting dominant species makes subspecies not be dominant
+					# made an event for species modification to check the latter modifier one
+					change_species = owner_main_species
 				}
-				else_if = {		# Robots & machines into main robots
+				else_if = {	# Robots & machines into main robots
 					limit = {
 						species = {
 							has_species_flag = tec_assimilation_unify_robot
@@ -904,6 +943,12 @@
 				limit = {
 					has_pop_flag = tec_assimilation_fail
 				}
+				prev = {
+					set_timed_planet_flag = {
+						flag = tec_executed_assimilation_step_fail
+						months = 1
+					}
+				}
 				tec_assimilation_fail_effect = yes
 				prev = {
 					change_variable = {
@@ -913,6 +958,15 @@
 				}
 			}
 			else = {
+				if = {
+					limit = { has_global_flag = tec_supertest }
+					prev = {
+						set_timed_planet_flag = {
+							flag = tec_executed_assimilation_step_conversion
+							months = 1
+						}
+					}
+				}
 				species = { save_event_target_as = assimilating_species }
 				random_galaxy_species = {
 					limit = {
@@ -3122,6 +3176,7 @@ tec_regular_biopsionic_assimilation_script = {
 # T E S T
 # ------------------------------------------------------------
 tec_test_assim_all = {
+	set_global_flag = tec_supertest
 	# effect tec_test_assim_all = yes
 	tec_test_assim_regular_psi = yes
 	tec_test_assim_regular_cyb = yes
@@ -3134,6 +3189,7 @@ tec_test_assim_all = {
 }
 
 tec_test_assim_regular_psi = {
+	set_global_flag = tec_supertest
 	add_building = tec_supertestbuilding
 	# Latent psionic
 		create_species = {
@@ -3198,6 +3254,7 @@ tec_test_assim_regular_psi = {
 }
 
 tec_test_assim_regular_cyb = {
+	set_global_flag = tec_supertest
 	add_building = tec_supertestbuilding
 	# Cyb
 		create_species = {
@@ -3241,6 +3298,7 @@ tec_test_assim_regular_cyb = {
 }
 
 tec_test_assim_cyberpsionics = {
+	set_global_flag = tec_supertest
 	# Cyberlatent
 		create_species = {
 			name = "CYB LP"
@@ -3397,6 +3455,7 @@ tec_test_assim_cyberpsionics = {
 }
 
 tec_test_assim_replicant = {
+	set_global_flag = tec_supertest
 	add_building = tec_supertestbuilding
 	# Replicant
 		create_species = {
@@ -3491,6 +3550,7 @@ tec_test_assim_replicant = {
 }
 
 tec_test_assim_hiv = {
+	set_global_flag = tec_supertest
 	add_building = tec_supertestbuilding
 	# Cyb hiv
 		create_species = {
@@ -3601,6 +3661,7 @@ tec_test_assim_hiv = {
 }
 
 tec_test_assim_robots = {
+	set_global_flag = tec_supertest
 	create_species = {
 		name = "ROBOTS 1"
 		plural = RANDOM
@@ -3623,6 +3684,7 @@ tec_test_assim_robots = {
 }
 
 tec_test_assim_specimens = {
+	set_global_flag = tec_supertest
 	add_building = tec_supertestbuilding
 	create_species = {
 		name = "SPECIMENS 1"
@@ -3684,6 +3746,7 @@ tec_test_assim_specimens = {
 }
 
 tec_test_assim_specimens_2 = {
+	set_global_flag = tec_supertest
 	create_species = {
 		name = "SPECIMENS 1"
 		plural = RANDOM
@@ -3750,6 +3813,7 @@ tec_test_assim_specimens_2 = {
 }
 
 tec_test_assim_hypertest = {
+	set_global_flag = tec_supertest
 	every_owned_species = {	# Emulate the species is assimilated
 		limit = {
 			OR = {
@@ -4039,6 +4103,7 @@ tec_test_assim_hypertest = {
 
 
 tec_test_assim_prevpocalipse = {
+	set_global_flag = tec_supertest
 	owner_main_species = {
 		modify_species = {
 			species = this
@@ -4083,6 +4148,7 @@ tec_test_assim_prevpocalipse = {
 
 
 tec_test_assim_prevpocalipse_2 = {
+	set_global_flag = tec_supertest
 	owner_main_species = {
 		modify_species = {
 			species = this
