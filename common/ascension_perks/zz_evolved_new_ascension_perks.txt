@@ -23,25 +23,8 @@ ap_future_society = {
 	}
 	
 	ai_weight = {
-		#lets give it a try
-		factor = 10
-		# Not available unless started (at least) one ascension path
-		modifier = {
-			factor = 0
-			NOR = {
-				tec_has_genetic_ascension_path = yes
-				tec_has_cybernetic_ascension_path = yes
-				tec_has_psionic_ascension_path = yes
-				has_ascension_perk = ap_synthetic_age
-				has_ascension_perk = ap_tec_hive_psionic_1
-			}
-		}
-		modifier = {
-			factor = 0
-			NOT = {
-				has_technology = tech_galactic_administration
-			}
-		}
+		weight = @tec_force_ap_weight 
+		inline_script = ascension_perks/weights/inline_evolved_force_main_path
 	}
 }
 
@@ -104,50 +87,24 @@ ap_tec_one_mind = {
 	}
 
 	ai_weight = {
-		# Ais MUST take this asap
-		factor = 5000
+		weight = @tec_base_ap_weight
+
+		# Disable base weight if has a perk of this style
+		inline_script = ascension_perks/weights/inline_evolved_has_base_perk
+		# additional weights
+		inline_script = ascension_perks/weights/inline_evolved_amenity_ap_weights
 		modifier = {
-			factor = 2
+			add = 5
 			has_ethic = ethic_gestalt_introspective
 		}
 		modifier = {
-			factor = 3
+			add = 5
 			has_ethic = ethic_gestalt_apathy
 		}
-		# Not available unless started (at least) one ascension path, to avoid double perks
-		modifier = {
-			factor = 0
-			num_ascension_perks = 1
-			NOR = {
-				tec_has_genetic_ascension_path = yes
-				tec_has_cybernetic_ascension_path = yes
-				tec_has_psionic_ascension_path = yes
-				has_ascension_perk = ap_synthetic_age
-				has_ascension_perk = ap_tec_hive_psionic_1
-				has_ascension_perk = ap_synthetic_age
-			}
-		}
-		# Basic line aps
-		modifier = {
-			factor = 0
-			num_ascension_perks < 6
-			NOR = {
-				tec_has_genetic_ascension_path = yes
-				tec_has_cybernetic_ascension_path = yes
-				tec_has_psionic_ascension_path = yes
-				has_ascension_perk = ap_synthetic_age
-				has_ascension_perk = ap_tec_hive_psionic_1
-				has_ascension_perk = ap_synthetic_age
-				has_galactic_wonders = yes
-				has_ascension_perk = ap_master_builders
-			}
-			OR = {
-				has_ascension_perk = ap_one_vision
-			#	has_ascension_perk = ap_tec_one_mind
-				has_ascension_perk = ap_technological_ascendancy
-				has_ascension_perk = ap_tec_influential
-			}
-		}
+
+		# disablers
+		inline_script = ascension_perks/weights/inline_evolved_force_main_path
+		
 	}
 }
 
@@ -218,58 +175,95 @@ ap_tec_influential = {
 	}
 
 	ai_weight = {
-		# Ais MUST take this asap
-		factor = 5000
+		weight = @tec_base_ap_weight
+
+		# Disable base weight if has a perk of this style
+		inline_script = ascension_perks/weights/inline_evolved_has_base_perk
+		# additional weights
+		modifier = { # megacorps are hungry for influence
+			add = 5
+			is_megacorp = yes
+		}
+
 		modifier = {
-			factor = 2
+			add = 5 # major influence need
+			OR = {
+				tec_is_symbiotic_gestalt = yes # they are basically megas
+				tec_is_trade_gestalt = yes # trade deals need influence
+				has_valid_civic = civic_tec_corporate_cooperacorp # Super expensive branch offices
+				is_criminal_syndicate = yes # To spread their influence
+			}
+		}
+
+		modifier = {
+			add = 3 # minor influence need
+			OR = {
+				AND = { # need to fix planets and to enhance
+					tec_is_terraformer_empire = yes 
+					any_owned_planet = {
+						OR = {
+							AND = {
+								tec_ai_should_enhance = yes
+								OR = {
+									uses_district_set = standard
+									tec_is_ringworld = yes
+									tec_is_elysium = yes
+									tec_is_ecoworld = yes
+								}
+								tec_can_enhance_planet = yes
+							}
+							
+							tec_ecologists_have_modifiers_to_fix = yes
+						}
+					}
+				}
+				AND = { # need to rengineer and to enhance
+					tec_is_engineer_empire = yes
+					any_owned_planet = {
+						tec_is_space_arcology = yes
+						tec_can_enhance_planet = yes
+						tec_ai_should_reengineer = yes
+					}
+				}
+				has_tradition = tr_politics_adopt # need for politics
+			}
+		}
+
+		modifier = {
+			add = 5
+			has_origin = origin_void_dwellers # hab spam need influence
+		}
+
+		modifier = {
+			add = 5 # Advanced arcologies require influence
+			OR = {
+				has_ascension_perk = ap_tec_sidereal_arcologies
+				has_ascension_perk = ap_universal_transactions
+				has_ascension_perk = ap_arcology_project
+				has_ascension_perk = ap_mastery_of_nature
+				is_ecologist = yes
+			}
+		}
+
+		modifier = {
+			add = 2
 			has_ethic = ethic_authoritarian
 		}
 		modifier = {
-			factor = 3
+			add = 4
 			has_ethic = ethic_fanatic_authoritarian
 		}
 		modifier = {
-			factor = 2
+			add = 2
 			has_ethic = ethic_capitalism
 		}
 		modifier = {
-			factor = 3
+			add = 4
 			has_ethic = ethic_fanatic_capitalism
 		}
-		# Not available unless started (at least) one ascension path, to avoid double perks
-		modifier = {
-			factor = 0
-			num_ascension_perks = 1
-			NOR = {
-				tec_has_genetic_ascension_path = yes
-				tec_has_cybernetic_ascension_path = yes
-				tec_has_psionic_ascension_path = yes
-				has_ascension_perk = ap_synthetic_age
-				has_ascension_perk = ap_tec_hive_psionic_1
-			}
-		}
-		# Basic line aps
-		modifier = {
-			factor = 0
-			num_ascension_perks < 6
-			NOR = {
-				tec_has_genetic_ascension_path = yes
-				tec_has_cybernetic_ascension_path = yes
-				tec_has_psionic_ascension_path = yes
-				has_ascension_perk = ap_synthetic_age
-				has_ascension_perk = ap_tec_hive_psionic_1
-				has_ascension_perk = ap_synthetic_age
-				has_galactic_wonders = yes
-				has_ascension_perk = ap_master_builders
-			}
-			OR = {
-				has_ascension_perk = ap_one_vision
-				has_ascension_perk = ap_tec_one_mind
-				has_ascension_perk = ap_technological_ascendancy
-			#	has_ascension_perk = ap_tec_influential
-				has_ascension_perk = ap_synthetic_age
-			}
-		}
+
+		# disablers
+		inline_script = ascension_perks/weights/inline_evolved_force_main_path
 	}
 }
 
@@ -302,81 +296,94 @@ ap_tec_castling = {
 	}
 
 	ai_weight = {
-		# Ais MUST take this asap
-		factor = 2
+		weight = @tec_situational_ap_weight
+
 		modifier = {
-			factor = 1.5
+			add = 1
 			has_ethic = ethic_militarist
 		}
 		modifier = {
-			factor = 2
+			add = 2
 			has_ethic = ethic_fanatic_militarist
 		}
 		modifier = {
-			factor = 2
+			add = 2
 			has_ethic = ethic_pacifist
 		}
 		modifier = {
-			factor = 4
+			add = 4
 			has_ethic = ethic_fanatic_pacifist
 		}
 		modifier = {
-			factor = 5
+			add = 2
+			has_ethic = ethic_xenophobe
+		}
+		modifier = {
+			add = 4
+			has_ethic = ethic_fanatic_xenophobe
+		}
+		modifier = {
+			add = 2
+			has_ethic = ethic_industrial
+		}
+		modifier = {
+			add = 4
+			has_ethic = ethic_fanatic_industrial
+		}
+		modifier = {
+			add = 10 # need more starbases
+			used_starbase_capacity_percent > 0.8
+		}
+		modifier = {
+			add = 10 # need more naval cap
+			used_naval_capacity_percent > 0.8
+		}
+		modifier= {
+			add = 5
+			tec_is_engineer_empire = yes
+		}
+		modifier = {
+			add = 5
+			tec_has_unyielding_traditions = yes
+		}
+		modifier = {
+			add = 3
+			tec_has_artifice_traditions = yes
+		}
+		modifier = {
+			add = 5
+			OR = {
+				tec_ai_wants_defensive_starbases = yes
+				tec_ai_wants_production_starbases = yes
+			}
+		}
+		modifier = {
+			add = 5
 			years_passed < 50
 			any_neighbor_country = {
 				OR = {
 					is_homicidal = yes
+					is_rival = prev
 					has_country_flag = tec_empire_aggro_skilled
 				}
 			}
 		}
 		modifier = {
-			factor = 10
+			add = 10
 			has_country_flag = tec_empire_aggro_turtle
 		}
 		modifier = {
-			factor = 2
+			add = 2
 			has_country_flag = tec_empire_aggro_neutral
 		}
+	
+		# disablers
+		inline_script = ascension_perks/weights/inline_evolved_force_main_path
 		modifier = {
 			factor = 0
 			has_country_flag = tec_empire_aggro_skilled
 		}
 
-		# Not available unless started (at least) one ascension path, to avoid double perks
-		modifier = {
-			factor = 0
-			num_ascension_perks = 1
-			NOR = {
-				tec_has_genetic_ascension_path = yes
-				tec_has_cybernetic_ascension_path = yes
-				tec_has_psionic_ascension_path = yes
-				has_ascension_perk = ap_synthetic_age
-				has_ascension_perk = ap_tec_hive_psionic_1
-			}
-		}
-		# Basic line aps
-		modifier = {
-			factor = 0.25
-			num_ascension_perks < 6
-			NOR = {
-				tec_has_genetic_ascension_path = yes
-				tec_has_cybernetic_ascension_path = yes
-				tec_has_psionic_ascension_path = yes
-				has_ascension_perk = ap_synthetic_age
-				has_ascension_perk = ap_tec_hive_psionic_1
-				has_ascension_perk = ap_synthetic_age
-				has_galactic_wonders = yes
-				has_ascension_perk = ap_master_builders
-			}
-			OR = {
-				has_ascension_perk = ap_one_vision
-				has_ascension_perk = ap_tec_one_mind
-				has_ascension_perk = ap_technological_ascendancy
-			#	has_ascension_perk = ap_tec_influential
-				has_ascension_perk = ap_synthetic_age
-			}
-		}
 	}
 }
 	# gtv and ev are on vanilla file
@@ -439,52 +446,58 @@ ap_tec_sidereal_arcologies = {
 	}
 
 	ai_weight = {
-		factor = 100 #take me pls
+		weight = @tec_situational_ap_weight
 		modifier = {
-			factor = 2
-			OR = {
-				has_ethic = ethic_pacifist
-				AND = {	# Industrials prefer arcology
-					NOT = {
-						has_origin = origin_void_dwellers
-					}
-					has_ethic = ethic_industrial
+			add = 10
+			any_owned_planet = {
+				AND = {
+					is_planet_class = pc_habitat
+					tec_is_arcology_habitat = no
+					has_planet_flag = advanced_habitat_2
 				}
-				AND = {	# Greens prefer this over arcology project
-					has_origin = origin_void_dwellers
-					has_ethic = ethic_green
-				}
-				
-			}
-		}
-		modifier = {
-			factor = 3
-			OR = {
-				has_ethic = ethic_fanatic_pacifist
-				AND = {	# Industrials prefer arcology
-					NOT = {
-						has_origin = origin_void_dwellers
-					}
-					has_ethic = ethic_fanatic_industrial
-				}
-				AND = {	# Greens prefer this over arcology project
-					has_origin = origin_void_dwellers
-					has_ethic = ethic_fanatic_green
-				}
+				NOT = { has_planet_flag = tec_block_other_specializations }
+				tec_ai_can_sidereal_habitat = yes
 			}
 		}
 		modifier = {
 			factor = 10000
+			has_origin = origin_void_dwellers # force vd to take it
+		}
+
+		modifier = {
+			add = 10
+			has_origin = origin_toxic_knights # upgrade zhe habitat
+		}
+
+		modifier = {
+			add = 2
 			OR = {
-				any_owned_planet = {
-					is_planet_class = pc_habitat
-					OR = {
-						has_planet_flag = advanced_habitat
-						has_planet_flag = advanced_habitat_2
-					}
-				}
-				has_origin = origin_void_dwellers
+				has_ethic = ethic_pacifist
+				has_ethic = ethic_industrial
+				has_ethic = ethic_green				
 			}
+		}
+		modifier = {
+			add = 3
+			OR = {
+				has_ethic = ethic_fanatic_pacifist
+				has_ethic = ethic_fanatic_industrial
+				has_ethic = ethic_fanatic_green	
+			}
+		}
+		modifier = {
+			add = 5 
+			tec_is_engineer_empire = yes
+		}
+		# Disablers
+		inline_script = ascension_perks/weights/inline_evolved_force_main_path
+		modifier = {
+			factor = 0
+			OR = {
+				tec_is_megacity_empire = yes
+				tec_is_urbancorp = yes
+			}
+			NOT = { has_origin = origin_void_dwellers }
 		}
 	}
 }

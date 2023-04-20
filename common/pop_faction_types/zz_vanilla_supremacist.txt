@@ -19,9 +19,11 @@ supremacist = {
 				owner = {
 					has_valid_civic = civic_tec_political_virtue
 				}
-				faction_approval >= 0.5
+				pop_faction = {
+					faction_approval >= 0.5
+				}
 			}
-			unity = 0.25
+			unity = 0.20
 		}
 		produces = {	# Political virtue
 			trigger = {
@@ -29,7 +31,9 @@ supremacist = {
 					has_valid_civic = civic_tec_political_virtue
 					is_xenophobe = yes
 				}
-				faction_approval >= 0.5
+				pop_faction = {
+					faction_approval >= 0.5
+				}
 			}
 			unity = 0.05
 		}
@@ -122,26 +126,17 @@ supremacist = {
 		}
 	}
 	
-	demand = {
-		title = "FACTION_OUTRAGED_GC"
-		unfulfilled_title = "FACTION_OUTRAGED_GC"
-		desc = "FACTION_OUTRAGED_GC_DESC"
 
-		fulfilled_effect = -20
-		unfulfilled_effect = 0
+	# DEMAND: Faction Outraged (by a GalCom Resolution)
+	inline_script = {
+		script = pop_faction_types/demand_faction_outraged
+		FLAG = galcom_resolution_passed_anti_supremacist
+	}
 
-		potential = {
-			exists = owner
-			owner = {
-				has_country_flag = faction_xenophobe_supremacist_outraged_gc
-			}
-		}
-
-		trigger = {
-			owner = {
-				has_country_flag = faction_xenophobe_supremacist_outraged_gc
-			}
-		}
+	# DEMAND: Faction Pleased (by a GalCom Resolution)
+	inline_script = {
+		script = pop_faction_types/demand_faction_pleased
+		FLAG = galcom_resolution_passed_pro_supremacist
 	}
 	
 	# Evolved: List of demands
@@ -348,7 +343,10 @@ supremacist = {
 				
 				trigger = {
 					owner = {
-						has_policy_flag = interference_full
+						OR = {
+							has_policy_flag = interference_active
+							has_policy_flag = interference_aggressive
+						}
 					}
 				}
 			}
@@ -367,7 +365,7 @@ supremacist = {
 						any_owned_species = {
 							NOT = { is_same_species = prev }
 							is_robotic = no
-							tec_is_bioservant = no
+							tec_is_bioservant_species = no
 							is_sapient = yes
 							NOT = {
 								has_citizenship_type = { type = citizenship_purge country = prev }
@@ -384,7 +382,7 @@ supremacist = {
 									is_same_species = prev
 								}
 								is_robotic = no
-								tec_is_bioservant = no
+								tec_is_bioservant_species = no
 								is_sapient = yes
 								has_citizenship_type = { type = citizenship_full country = prev }
 							}

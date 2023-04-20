@@ -3,4 +3,4 @@ tags={
 	"Overhaul"
 }
 name="Stellaris Evolved - GIT"
-supported_version="3.6.1"
+supported_version="3.7.*"

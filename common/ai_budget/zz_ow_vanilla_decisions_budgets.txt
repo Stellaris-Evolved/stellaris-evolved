@@ -1,0 +1,274 @@
+minerals_expenditure_decisions = {
+	resource = minerals
+	type = expenditure
+	category = decisions
+
+	potential = {
+		OR = {
+			tec_ai_should_allocate_ecu_or_relic_budget = yes
+			tec_ai_should_allocate_sidereal_budget = yes
+			tec_ai_should_allocate_ecoworld_budget = yes
+		}
+		# only consider these kinds of decisions when "wealthy"
+		has_resource = {
+			type = minerals
+			amount > 8000
+		}
+	}
+
+	weight = {
+		weight = 0.20
+	}
+
+	desired_min = {
+		base = 1000
+		modifier = {
+			tec_ai_should_allocate_ecu_or_relic_budget = yes
+			min = value:tec_decisions_ecu_cost|BASE|20000|RESOURCE|minerals|
+		}
+		modifier = {
+			tec_ai_should_allocate_sidereal_budget = yes
+			min = value:tec_decisions_ecu_cost|BASE|5000|RESOURCE|minerals|
+		}
+		modifier = {
+			tec_ai_should_allocate_ecoworld_budget = yes
+			min = value:tec_decisions_ecoworld_cost|BASE|7500|RESOURCE|minerals|
+		}
+	}
+	desired_max = {
+		base = 1000
+		modifier = {
+			tec_ai_should_allocate_ecu_or_relic_budget = yes
+			min = value:tec_decisions_ecu_cost|BASE|20000|RESOURCE|minerals|
+		}
+		modifier = {
+			tec_ai_should_allocate_sidereal_budget = yes
+			min = value:tec_decisions_ecu_cost|BASE|5000|RESOURCE|minerals|
+		}
+		modifier = {
+			tec_ai_should_allocate_ecoworld_budget = yes
+			min = value:tec_decisions_ecoworld_cost|BASE|7500|RESOURCE|minerals|
+		}
+	}
+}
+
+
+influence_expenditure_decisions = {
+	resource = influence
+	type = expenditure
+	category = decisions
+
+	potential = {
+		always = yes
+	}
+
+	weight = {
+		weight = 0.20
+		modifier = {
+			add = 0.2
+			OR = {
+				tec_ai_should_allocate_ecu_or_relic_budget = yes
+				tec_ai_should_allocate_sidereal_budget = yes
+				tec_ai_should_allocate_ecoworld_budget = yes
+			}
+		}
+		modifier = {
+			add = 0.2
+			OR = {
+				tec_ai_should_allocate_reengineer_budget = yes
+				tec_ai_should_allocate_ecologist_fix_budget = yes
+				tec_ai_should_allocate_ecologist_enhance_budget = yes
+			}
+		}
+	}
+	desired_min = {
+		base = 1
+		modifier = {
+			tec_ai_should_allocate_ecu_or_relic_budget = yes
+			min = value:tec_decisions_ecu_cost|BASE|200|RESOURCE|influence|
+		}
+		modifier = {
+			tec_ai_should_allocate_sidereal_budget = yes
+			min = value:tec_decisions_ecu_cost|BASE|200|RESOURCE|influence|
+		}
+		modifier = {
+			tec_ai_should_allocate_ecoworld_budget = yes
+			min = value:tec_decisions_ecoworld_cost|BASE|150|RESOURCE|influence|
+		}
+		modifier = {
+			tec_ai_should_allocate_reengineer_budget = yes
+			min = 75
+		}
+		modifier = {
+			tec_ai_should_allocate_ecologist_fix_budget = yes
+			# while it starts at 50, it might scale to 200
+			min = 200
+		}
+		modifier = {
+			tec_ai_should_allocate_ecologist_enhance_budget = yes
+			min = 75
+		}
+	}
+	# this is max decision cost
+	desired_max = {
+		base = 200
+	}
+}
+
+alloys_expenditure_decisions = {
+	resource = alloys
+	type = expenditure
+	category = decisions
+	potential = {
+		OR = {
+			tec_ai_should_allocate_habitat_upgrade_t2_budget = yes
+			tec_ai_should_allocate_habitat_upgrade_t3_budget = yes
+			tec_ai_should_allocate_repair_shattered_ring_budget = yes
+			tec_ai_should_allocate_sidereal_budget = yes
+		}
+
+		# only consider these kinds of decisions when "wealthy" or VD
+		OR = {
+			AND = {
+				exists = owner
+				owner = { has_origin = origin_void_dwellers }
+			}
+			has_resource = {
+				type = alloys
+				amount > 5000
+			}
+		}
+	}
+	weight = {
+		weight = 0.20
+		modifier = {
+			factor = 2.5
+			has_origin = origin_void_dwellers
+		}
+		modifier = {
+			factor = 2
+			has_origin = origin_void_dwellers
+			count_owned_planet = {
+				limit = { 
+					is_planet_class = pc_habitat 
+					has_planet_flag = advanced_habitat
+				}
+				count < 4
+			}
+		}
+		modifier = {
+			factor = 2
+			has_origin = origin_void_dwellers
+			count_owned_planet = {
+				limit = { 
+					is_planet_class = pc_habitat 
+					has_planet_flag = advanced_habitat
+				}
+				count < 6
+			}
+		}
+		modifier = {
+			factor = 4
+			has_origin = origin_void_dwellers
+			mid_game_years_passed > 0
+			count_owned_planet = {
+				limit = { 
+					is_planet_class = pc_habitat 
+					has_planet_flag = advanced_habitat_2
+				}
+				count < 6
+			}
+		}
+		modifier = {
+			factor = 2
+			mid_game_years_passed > 0
+			count_owned_planet = {
+				limit = { 
+					is_planet_class = pc_habitat 
+					NOT = {
+						has_planet_flag = advanced_habitat_2
+					}
+				}
+				count > 2
+			}
+		}
+	}
+	# based on habitat / restore ring
+	desired_max = {
+		base = 2000
+		modifier = {
+			min = 3000
+			tec_ai_should_allocate_habitat_upgrade_t3_budget = yes
+		}
+		modifier = {
+			min = 10000
+			tec_ai_should_allocate_repair_shattered_ring_budget = yes
+		}
+		modifier = {
+			min = value:tec_decisions_ecu_cost|BASE|2500|RESOURCE|alloys|
+			tec_ai_should_allocate_sidereal_budget = yes
+		}
+	}
+}
+
+
+energy_expenditure_decisions = {
+	resource = energy
+	type = expenditure
+	category = decisions
+
+	potential = {
+		has_resource = {
+			type = energy
+			amount > 5000
+		}
+	}
+
+	weight = {
+		weight = 0.20
+		modifier = {
+			add = 0.8
+			OR = {
+				tec_ai_should_allocate_reengineer_budget = yes
+				tec_ai_should_allocate_ecologist_fix_budget = yes
+				tec_ai_should_allocate_ecologist_enhance_budget = yes
+			}
+		}
+	}
+
+	desired_min = {
+		base = 1
+		modifier = {
+			min = 7500
+			tec_ai_should_allocate_reengineer_budget = yes
+		}
+
+		modifier = {
+			min = 20000
+			tec_ai_should_allocate_ecologist_fix_budget = yes
+		}
+
+		modifier = {
+			min = 7500
+			tec_ai_should_allocate_ecologist_enhance_budget = yes
+		}
+	}
+
+	desired_max = {
+		base = 2000 #mastery of nature and market
+		modifier = {
+			min = 7500
+			tec_ai_should_allocate_reengineer_budget = yes
+		}
+
+		modifier = {
+			min = 20000
+			tec_ai_should_allocate_ecologist_fix_budget = yes
+		}
+
+		modifier = {
+			min = 7500
+			tec_ai_should_allocate_ecologist_enhance_budget = yes
+		}
+	}
+}

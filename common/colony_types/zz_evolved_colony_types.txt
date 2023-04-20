@@ -29,79 +29,26 @@ col_ecu_trade = {
 	}
 
 	weight_modifier = {
-		base = 10
 		modifier = {
-			add = 5
+			add = @stickiness
 			has_designation = col_ecu_trade
 		}
-		modifier = {
-			add = 3
-			num_districts = { type = district_tec_arcology_trade value >= 2 }
-		}
-		modifier = {
-			add = 5
-			num_districts = { type = district_tec_arcology_trade value >= 3 }
-		}
-		modifier = {
-			add = 2
-			OR = {
-				num_buildings = { type = building_commercial_zone value >= 2 }
-				num_buildings = { type = building_tec_trade_machine_1 value >= 2 }
+		add = value:housing_districts_value|FACTOR|2|
+		complex_trigger_modifier = {
+			trigger = num_districts
+			parameters = {
+				type = district_tec_arcology_trade
 			}
+			mode = add
+			mult = 10
 		}
-		modifier = {
-			add = 3
-			OR = {
-				num_buildings = { type = building_commercial_zone value >= 3 }
-				num_buildings = { type = building_tec_trade_machine_1 value >= 3 }
+		complex_trigger_modifier = {
+			trigger = num_assigned_jobs
+			parameters = {
+				job = merchant # merchant jobs act as a pretty decent proxy for "this is a trade planet"
 			}
-		}
-		modifier = {
-			add = 4
-			OR = {
-				num_buildings = { type = building_commercial_zone value >= 4 }
-				num_buildings = { type = building_tec_trade_machine_1 value >= 4 }
-			}
-		}
-		modifier = {
-			add = 5
-			OR = {
-				num_buildings = { type = building_commercial_zone value >= 5 }
-				num_buildings = { type = building_tec_trade_machine_1 value >= 5 }
-			}
-		}
-		modifier = {
-			add = 4
-			OR = {
-				num_buildings = { type = building_commercial_megaplex value >= 1 }
-				num_buildings = { type = building_tec_trade_machine_2 value >= 1 }
-			}
-		}
-		modifier = {
-			add = 5
-			OR = {
-				num_buildings = { type = building_commercial_megaplex value >= 2 }
-				num_buildings = { type = building_tec_trade_machine_2 value >= 2 }
-			}
-		}
-		modifier = {
-			add = 10
-			OR = {
-				num_buildings = { type = building_galactic_stock_exchange value = 1 }
-				num_buildings = { type = building_tec_trade_machine_stonks value = 1 }
-			}
-		}
-		modifier = {
-			add = 10
-			OR = {
-				num_districts = { type = district_tec_arcology_trade value >= 4 }
-				OR = {
-					num_buildings = { type = building_commercial_zone value >= 5 }
-					num_buildings = { type = building_commercial_megaplex value >= 5 }
-					num_buildings = { type = building_tec_trade_machine_1 value >= 5 }
-					num_buildings = { type = building_tec_trade_machine_2 value >= 5 }
-				}
-			}
+			mode = add
+			mult = 2
 		}
 	}
 }
@@ -112,11 +59,12 @@ col_tec_habitat_food = {
 
 	potential = {
 		tec_uses_habitat_districts = yes
-		has_planet_flag = tec_food_habitat
+		tec_is_arcology_habitat = no
 	}
-	planet_modifier = {	# ignore this error, it works
-		planet_district_tec_hab_food_build_speed_mult = 0.25
+	planet_modifier = {	
+		planet_building_hydroponics_farm_build_speed_mult = 0.25
 		planet_farmers_produces_mult = 0.1
+		planet_district_tec_hab_food_build_speed_mult = 0.25
 	}
 	inline_script = colony_types/effects/inline_evolved_resolution_greatergood
 	# Evolved
@@ -125,26 +73,24 @@ col_tec_habitat_food = {
 	# /
 
 	weight_modifier = {
-		base = 1000
 		modifier = {
-			factor = 2
-			owner = { has_monthly_income = { resource = food value < 0 } }
-		}
-		modifier = {
-			factor = 3
+			add = @stickiness
 			has_designation = col_tec_habitat_food
 		}
 		modifier = {
-			factor = 3
-			num_districts = { type = district_tec_hab_food value >= 3 }
+			add = 5
+			has_planet_flag = tec_food_habitat
 		}
+		add = value:farming_combined_value|FACTOR|2|
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "production" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "balanced"
+					has_sector_focus = "production"
+				}
 			}
 		}
 	}
@@ -175,14 +121,10 @@ col_tec_ring_mining = {
 
 	weight_modifier = {
 		modifier = {
-			add = 100
+			add = @stickiness
 			has_designation = col_ring_farming
 		}
-		modifier = {
-			add = 200
-			is_capital = no
-			num_districts = { type = district_rw_farming value >= 1 }
-		}
+		add = value:mining_districts_value|FACTOR|3|
 		modifier = {
 			factor = 0
 			exists = sector

@@ -18,208 +18,6 @@
 # If this succeeds, the starbase already has a type.
 # If it fails, it will go through each starbase type that fulfils the potential trigger. Then it will check the ratio it has built (total of this type / total upgraded starbases) compared to the desired ratio. If it is set to desire a minimum value and owns less than that, it multiplies its ratio desire by * 100. Then it build according to that type's template.
 
-
-# Fortress System
-sfortress = {
-	potential = {
-		has_starbase_size > starbase_outpost
-		exists = owner
-		OR = {
-			owner = { is_ai = no }
-			AND = {
-				solar_system = { is_bottleneck_system = yes }
-				closest_system = {
-					min_steps = 0
-					max_steps = 2
-					limit = {
-						exists = owner
-						owner = {
-							tec_is_default_country = yes
-							NOR = {
-								is_same_value = root.owner
-								is_in_federation_with = root.owner
-								has_association_status = root.owner
-								has_defensive_pact = root.owner
-								has_non_aggression_pact = root.owner
-								has_overlord = root.owner
-								AND = {
-									has_subject = root.owner
-									has_loyalty > 0
-								}
-							}
-						}
-					}
-					exists = this
-				}
-			}
-		}
-	}
-
-	ai_use_defense_platforms = yes #AI will not build defense platforms otherwise, except in the capital system
-
-	weight_modifier = {
-		base = 0
-		complex_trigger_modifier = { #+75 for each gun_battery
-			trigger = count_starbase_modules
-			parameters = {
-				type = gun_battery
-			}
-			mode = add
-			mult = 75
-		}
-		complex_trigger_modifier = { #+75 for each tec_starbase_m_xxl_cannons
-			trigger = count_starbase_modules
-			parameters = {
-				type = tec_starbase_m_xxl_cannons
-			}
-			mode = add
-			mult = 75
-		}
-		# - 
-		complex_trigger_modifier = { #+75 for each missile_battery
-			trigger = count_starbase_modules
-			parameters = {
-				type = missile_battery
-			}
-			mode = add
-			mult = 75
-		}
-		complex_trigger_modifier = { #+75 for each tec_starbase_m_xxl_missiles
-			trigger = count_starbase_modules
-			parameters = {
-				type = tec_starbase_m_xxl_missiles
-			}
-			mode = add
-			mult = 75
-		}
-		# - 
-		complex_trigger_modifier = { #+75 for each hangar_bay
-			trigger = count_starbase_modules
-			parameters = {
-				type = hangar_bay
-			}
-			mode = add
-			mult = 75
-		}
-		complex_trigger_modifier = { #+75 for each tec_starbase_m_xxl_hangars
-			trigger = count_starbase_modules
-			parameters = {
-				type = tec_starbase_m_xxl_hangars
-			}
-			mode = add
-			mult = 75
-		}
-		# - 
-		modifier = {
-			add = 50
-			solar_system = { is_bottleneck_system = yes }
-		}
-		modifier = {
-			add = 150
-			solar_system = { is_bottleneck_system = yes }
-			closest_system = {
-				max_steps = 2
-				limit = {
-					exists = owner
-					owner = {
-						OR = {
-							is_rival = root
-							is_hostile_to = root
-							is_hostile = root
-						}
-					}
-				}
-				exists = this
-			}
-		}
-	}
-
-	ai_design = {
-		min = {
-			base = 0
-		}
-
-		ratio = {
-			base = 0.10
-			modifier = {
-				add = 0.10
-				exists = owner
-				owner = {
-					has_ethic = ethic_pacifist
-				}
-			}
-			modifier = {
-				add = 0.10
-				exists = owner
-				owner = {
-					has_ethic = ethic_fanatic_pacifist
-				}
-			}
-		}
-
-		# token followed by priority
-		buildings = {
-			target_uplink_computer = {
-				base = 1.00
-			}
-
-			command_center = {
-				base = 1.00
-			}
-
-			defense_grid = {
-				base = 1.00
-			}
-
-			communications_jammer = {
-				base = 0.90
-			}
-
-			disruption_field = {
-				base = 0.90
-			}
-			
-			ice_mining_station = {
-				base = 3.00
-			}
-
-			dragon_hatchery = {
-				base = 3.00
-			}
-
-			hydroponics_bay = {
-				base = 0.25
-			}
-		}
-
-		modules = {
-			hangar_bay = {
-				base = 0.80
-			}
-
-			missile_battery = {
-				base = 1.00
-			}
-
-			gun_battery = {
-				base = 1.00
-			}
-
-			tec_starbase_m_xxl_hangars = {
-				base = 0.80
-			}
-
-			tec_starbase_m_xxl_missiles = {
-				base = 1.00
-			}
-
-			tec_starbase_m_xxl_cannons = {
-				base = 1.50
-			}
-		}
-	}
-}
-
 tec_sbd_production = {
 	potential = {
 		has_starbase_size > starbase_outpost
@@ -227,50 +25,60 @@ tec_sbd_production = {
 
 	weight_modifier = {
 		base = 0
-		complex_trigger_modifier = { #+100 for each tec_starbase_m_mining
-			trigger = count_starbase_modules
-			parameters = {
-				type = tec_starbase_m_mining
-			}
-			mode = add
-			mult = 100
-		}
-		complex_trigger_modifier = { #+100 for each tec_starbase_m_generator
-			trigger = count_starbase_modules
-			parameters = {
-				type = tec_starbase_m_generator
-			}
-			mode = add
-			mult = 100
-		}
-		complex_trigger_modifier = { #+100 for each tec_starbase_m_food
-			trigger = count_starbase_modules
-			parameters = {
-				type = tec_starbase_m_food
-			}
-			mode = add
-			mult = 100
-		}
+		add = value:tec_num_starbase_modules_of_type|TYPE|tec_starbase_m_mining|FACTOR|100|	
+		add = value:tec_num_starbase_modules_of_type|TYPE|tec_starbase_m_generator|FACTOR|100|	
+		add = value:tec_num_starbase_modules_of_type|TYPE|tec_starbase_m_food|FACTOR|100|	
+
+		# Removed those to avoid excessive weights
+			#modifier = {
+			#	add = 500
+			#	OR = {
+			#		count_starbase_modules = {
+			#			type = tec_starbase_m_mining
+			#			count > 2
+			#		}
+			#		count_starbase_modules = {
+			#			type = tec_starbase_m_generator
+			#			count > 2
+			#		}
+			#		count_starbase_modules = {
+			#			type = tec_starbase_m_food
+			#			count > 2
+			#		}
+			#	}
+			#}
+			#modifier = {
+			#	add = 500 # fix deficits
+			#	exists = owner
+			#	owner = {
+			#		OR = {
+			#			has_monthly_income = { resource = minerals value < 50 }
+			#			has_monthly_income = { resource = energy value < 50 }
+			#			has_monthly_income = { resource = food value < 0 }
+			#		}
+			#	}
+			#}
+		# /
+
 		modifier = {
-			add = 100
-			OR = {
-				count_starbase_modules = {
-					type = tec_starbase_m_mining
-					count > 2
-				}
-				count_starbase_modules = {
-					type = tec_starbase_m_generator
-					count > 2
-				}
-				count_starbase_modules = {
-					type = tec_starbase_m_food
-					count > 2
+			add = 50 # smol weight in case system is good
+			owner = { is_ai = yes }
+			solar_system = {
+				OR = {
+					tec_is_minerals_production_system = yes
+					tec_is_energy_production_system = yes
+					tec_is_food_production_system = yes
 				}
 			}
-			OR = {
-				has_starbase_building = tec_starbase_b_energygrid
-				has_starbase_building = tec_starbase_b_mininggrid
-				has_starbase_building = hydroponics_bay
+		}
+
+		modifier = {
+			factor = 0.2
+			owner = { is_ai = yes }
+			solar_system = {
+				tec_is_minerals_production_system = no
+				tec_is_food_production_system = no
+				tec_is_energy_production_system = no
 			}
 		}
 	}
@@ -278,52 +86,290 @@ tec_sbd_production = {
 	ai_design = {
 		min = {
 			base = 0
-			factor = 0
 		}
 
 		ratio = {
 			base = 0.33
+			modifier = {
+				add = 0.20
+				exists = owner
+				owner = {
+					has_ascension_perk = ap_grasp_the_void
+				}
+			}
+			modifier = {
+				add = 0.10
+				exists = owner
+				owner = {
+					tec_is_engineer_empire = yes
+				}
+			}
+			modifier = {
+				add = 0.05
+				exists = owner
+				owner = {
+					OR = {
+						has_ethic = ethic_pacifist
+						has_ethic = ethic_industrial
+						has_ethic = ethic_green # they also like space exploitation
+					}
+				}
+			}
+			modifier = {
+				add = 0.10
+				exists = owner
+				owner = {
+					has_ethic = ethic_fanatic_pacifist
+					has_ethic = ethic_fanatic_industrial
+					has_ethic = ethic_fanatic_green # they also like space exploitation
+					has_ethic = ethic_gestalt_preservation
+					has_ethic = ethic_gestalt_disregard
+				}
+			}
 		}
 
 		# token followed by priority
 		buildings = {
-			target_uplink_computer = {
-				base = 1.00
+			tec_starbase_b_energygrid = {
+				base = 3.00
+				modifier = {
+					factor = 3
+					solar_system = {
+						tec_is_energy_production_system = yes
+					}
+				}
+				modifier = {
+					factor = 0
+					NOT = { has_starbase_module = tec_starbase_m_generator }
+				}
 			}
 
 			tec_starbase_b_mininggrid = {
 				base = 3.00
-			}
-
-			tec_starbase_b_energygrid = {
-				base = 3.00
-			}
-
-			ice_mining_station = {
-				base = 3.00
-			}
-
-			dragon_hatchery = {
-				base = 3.00
+				modifier = {
+					factor = 3
+					solar_system = {
+						tec_is_minerals_production_system = yes
+					}
+				}
+				modifier = {
+					factor = 0
+					NOT = { has_starbase_module = tec_starbase_m_mining }
+				}
 			}
 
 			hydroponics_bay = {
-				base = 0.25
+				base = 3.00
+				modifier = {
+					factor = 3
+					solar_system = {
+						tec_is_food_production_system = yes
+					}
+				}
+				modifier = {
+					factor = 0
+					NOT = { has_starbase_module = tec_starbase_m_food }
+				}
 			}
-		}
 
+			defense_grid = {
+				base = 0.05
+				modifier = {
+					add = 10
+					solar_system = {
+						any_system_planet = {
+							is_capital = yes
+						}
+					}
+				}
+			}
+			
+			communications_jammer = {
+				base = 0.05
+			}
+
+			# Generic Important Buildings
+				
+				black_hole_observatory = {
+					base = 2.00
+				}
+
+				deep_space_black_site = {
+					base = 0 
+					modifier = {
+						add = 10
+						solar_system = {
+							any_system_planet = {
+								is_colony = yes
+							}
+						}
+					}
+				}
+
+				curator_think_tank = {
+					base = 2.00
+					modifier = {
+						factor = 5
+						is_starbase_type = tec_sbd_research
+					}
+				}
+
+				art_college = {
+					base = 2.00
+				}
+
+				nebula_refinery = {
+					base = 2.00
+				}
+
+				ice_mining_station = {
+					base = 2.00
+				}
+
+				resource_silo = {
+					base = 5
+				}
+
+				yuht_detection_array = {
+					base = 10
+					modifier = {
+						factor = 0
+						exists = owner
+						owner = {
+							OR = {
+								has_megastructure = spy_orb_1
+								has_megastructure = spy_orb_2
+								has_megastructure = spy_orb_3
+								has_megastructure = spy_orb_4
+							}
+						}
+					}
+					modifier = {
+						factor = 0
+						exists = owner
+						NOT = { 
+							closest_system = {
+								min_steps = 0
+								max_steps = 4
+								limit = {
+									exists = owner
+									owner = {
+										is_country_type = default
+										NOR = {
+											is_same_value = root.owner
+											is_in_federation_with = root.owner
+											has_association_status = root.owner
+											has_defensive_pact = root.owner
+											has_non_aggression_pact = root.owner
+											has_overlord = root.owner
+											AND = {
+												has_subject = root.owner
+												has_loyalty > 0
+											}
+										}
+									}
+								}
+								exists = this
+							}
+						}
+						solar_system = {
+							is_capital_system = no
+						}
+					}
+					modifier = {
+						factor = 0
+						is_starbase_type = sfortress
+					}
+					modifier = {
+						add = 5
+						is_starbase_type = sdetection_array
+					}
+				}
+
+				trader_proxy_office = {
+					base = 10.00
+					modifier = {
+						factor = 0
+						exists = owner
+						owner = {
+							any_owned_starbase = {
+								count_starbase_buildings = {
+									type = trader_proxy_office
+									count > 0
+								}
+							}
+						}
+					}
+				}
+
+				cordyceptic_reanimation_facility = {
+					base = 10
+				}
+
+				cybrex_mining_hub = {
+					base = 2
+					modifier = {
+						factor = 0
+						is_starbase_type = sfortress
+					}
+					modifier = {
+						factor = 5
+						is_starbase_type = tec_sbd_production
+					}
+				}
+			# /
+		}
 		modules = {
 			# Mining
 			tec_starbase_m_generator = {
 				base = 1.00
+				modifier = {
+					factor = 3
+					solar_system = {
+						tec_is_energy_production_system = yes
+					}
+				}
+				modifier = {
+					factor = 3
+					exists = owner
+					owner = {
+						has_monthly_income = { resource = energy value < 50 }
+					}
+				}	
 			}
 
 			tec_starbase_m_mining = {
 				base = 1.00
+				modifier = {
+					factor = 3
+					solar_system = {
+						tec_is_minerals_production_system = yes
+					}
+				}
+				modifier = {
+					factor = 3
+					exists = owner
+					owner = {
+						has_monthly_income = { resource = minerals value < 50 }
+					}
+				}
 			}
 
 			tec_starbase_m_food = {
 				base = 1.00
+				modifier = {
+					factor = 3
+					solar_system = {
+						tec_is_food_production_system = yes
+					}
+				}
+				modifier = {
+					factor = 3
+					exists = owner
+					owner = {
+						has_monthly_income = { resource = food value < 0 }
+					}
+				}
 			}
 		}
 	}
@@ -336,47 +382,306 @@ tec_sbd_research = {
 
 	weight_modifier = {
 		base = 0
-		complex_trigger_modifier = { #+100 for each tec_starbase_m_physics
-			trigger = count_starbase_modules
-			parameters = {
-				type = tec_starbase_m_physics
-			}
-			mode = add
-			mult = 100
-		}
-		complex_trigger_modifier = { #+100 for each tec_starbase_m_society
-			trigger = count_starbase_modules
-			parameters = {
-				type = tec_starbase_m_society
-			}
-			mode = add
-			mult = 100
-		}
-		complex_trigger_modifier = { #+100 for each tec_starbase_m_engineering
-			trigger = count_starbase_modules
-			parameters = {
-				type = tec_starbase_m_engineering
-			}
-			mode = add
-			mult = 100
-		}
+		add = value:tec_num_starbase_modules_of_type|TYPE|tec_starbase_m_physics|FACTOR|100|	
+		add = value:tec_num_starbase_modules_of_type|TYPE|tec_starbase_m_society|FACTOR|100|	
+		add = value:tec_num_starbase_modules_of_type|TYPE|tec_starbase_m_engineering|FACTOR|100|	
+
+		# Removed those to avoid excessive weights
+			#modifier = {
+			#	add = 500
+			#	OR = {
+			#		count_starbase_modules = {
+			#			type = tec_starbase_m_physics
+			#			count > 2
+			#		}
+			#		count_starbase_modules = {
+			#			type = tec_starbase_m_society
+			#			count > 2
+			#		}
+			#		count_starbase_modules = {
+			#			type = tec_starbase_m_engineering
+			#			count > 2
+			#		}
+			#	}
+			#}
+		# /
+		
 		modifier = {
-			add = 100
-			OR = {
-				count_starbase_modules = {
-					type = tec_starbase_m_physics
-					count > 2
-				}
-				count_starbase_modules = {
-					type = tec_starbase_m_society
-					count > 2
-				}
-				count_starbase_modules = {
-					type = tec_starbase_m_engineering
-					count > 2
+			add = 50 # smol weight in case system is good
+			solar_system = {
+				OR = {
+					tec_is_physics_research_system = yes
+					tec_is_society_research_system = yes
+					tec_is_engineering_research_system = yes
+					solar_system = {
+						has_star_flag = enclave
+						any_fleet_in_system = {
+							exists = owner
+							owner = {
+								has_country_flag = curator_enclave_country
+							}
+						}
+					}
 				}
 			}
-			has_starbase_building = tec_starbase_b_research
+		}
+
+		modifier = {
+			factor = 0.2
+			solar_system = {
+				tec_is_physics_research_system = no
+				tec_is_society_research_system = no
+				tec_is_engineering_research_system = no
+				NOT = {
+					solar_system = {
+						has_star_flag = enclave
+						any_fleet_in_system = {
+							exists = owner
+							owner = {
+								has_country_flag = curator_enclave_country
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_design = {
+		min = {
+			base = 0
+			factor = 0
+		}
+
+		ratio = {
+			base = 0
+			modifier = {
+				add = 0.10
+				exists = owner
+				owner = {
+					has_ascension_perk = ap_grasp_the_void
+				}
+			}
+			modifier = {
+				add = 0.05
+				exists = owner
+				owner = {
+					OR = {
+						has_ethic = ethic_materialist
+					}
+				}
+			}
+			modifier = {
+				add = 0.10
+				exists = owner
+				owner = {
+					has_ethic = ethic_materialist
+					has_ethic = ethic_gestalt_extrospective
+				}
+			}
+		}
+
+		# token followed by priority
+		buildings = {
+			tec_starbase_b_research = {
+				base = 3.00
+				modifier = {
+					factor = 3
+					solar_system = {
+						OR = {
+							tec_is_physics_research_system = yes
+							tec_is_society_research_system = yes
+							tec_is_engineering_research_system = yes
+						}
+					}
+				}
+				modifier = {
+					factor = 0
+					NOT = { has_starbase_module = tec_starbase_m_physics }
+					NOT = { has_starbase_module = tec_starbase_m_society }
+					NOT = { has_starbase_module = tec_starbase_m_engineering }
+				}
+			}
+
+			defense_grid = {
+				base = 0.05
+				modifier = {
+					add = 10
+					solar_system = {
+						any_system_planet = {
+							is_capital = yes
+						}
+					}
+				}
+			}
+			
+			communications_jammer = {
+				base = 0.05
+			}
+
+			# Generic Important Buildings
+				
+				black_hole_observatory = {
+					base = 2.00
+				}
+
+				deep_space_black_site = {
+					base = 0 
+					modifier = {
+						add = 10
+						solar_system = {
+							any_system_planet = {
+								is_colony = yes
+							}
+						}
+					}
+				}
+
+				curator_think_tank = {
+					base = 2.00
+					modifier = {
+						factor = 5
+						is_starbase_type = tec_sbd_research
+					}
+				}
+
+				art_college = {
+					base = 2.00
+				}
+
+				nebula_refinery = {
+					base = 2.00
+				}
+
+				ice_mining_station = {
+					base = 2.00
+				}
+
+				resource_silo = {
+					base = 5
+				}
+
+				yuht_detection_array = {
+					base = 10
+					modifier = {
+						factor = 0
+						exists = owner
+						owner = {
+							OR = {
+								has_megastructure = spy_orb_1
+								has_megastructure = spy_orb_2
+								has_megastructure = spy_orb_3
+								has_megastructure = spy_orb_4
+							}
+						}
+					}
+					modifier = {
+						factor = 0
+						exists = owner
+						NOT = { 
+							closest_system = {
+								min_steps = 0
+								max_steps = 4
+								limit = {
+									exists = owner
+									owner = {
+										is_country_type = default
+										NOR = {
+											is_same_value = root.owner
+											is_in_federation_with = root.owner
+											has_association_status = root.owner
+											has_defensive_pact = root.owner
+											has_non_aggression_pact = root.owner
+											has_overlord = root.owner
+											AND = {
+												has_subject = root.owner
+												has_loyalty > 0
+											}
+										}
+									}
+								}
+								exists = this
+							}
+						}
+						solar_system = {
+							is_capital_system = no
+						}
+					}
+					modifier = {
+						factor = 0
+						is_starbase_type = sfortress
+					}
+					modifier = {
+						add = 5
+						is_starbase_type = sdetection_array
+					}
+				}
+
+				trader_proxy_office = {
+					base = 10.00
+					modifier = {
+						factor = 0
+						exists = owner
+						owner = {
+							any_owned_starbase = {
+								count_starbase_buildings = {
+									type = trader_proxy_office
+									count > 0
+								}
+							}
+						}
+					}
+				}
+
+				cordyceptic_reanimation_facility = {
+					base = 10
+				}
+
+				cybrex_mining_hub = {
+					base = 2
+					modifier = {
+						factor = 0
+						is_starbase_type = sfortress
+					}
+					modifier = {
+						factor = 5
+						is_starbase_type = tec_sbd_production
+					}
+				}
+			# /
+		}
+
+		modules = {
+			# Mining
+			tec_starbase_m_physics = {
+				base = 1.00
+				modifier = {
+					factor = 3
+					solar_system = {
+						tec_is_physics_research_system = yes
+					}
+				}
+			}
+
+			tec_starbase_m_society = {
+				base = 1.00
+				modifier = {
+					factor = 3
+					solar_system = {
+						tec_is_society_research_system = yes
+					}
+				}
+			}
+
+			tec_starbase_m_engineering = {
+				base = 1.00
+				modifier = {
+					factor = 3
+					solar_system = {
+						tec_is_engineering_research_system = yes
+					}
+				}
+			}
 		}
 	}
 }

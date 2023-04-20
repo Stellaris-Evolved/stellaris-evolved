@@ -1,13 +1,7 @@
 #root = planet
 
-@small_planet_threshold = 18
-@free_districts_verylow_threshold = 3
-@free_districts_low_threshold = 5
-@free_districts_medium_threshold = 10
-@free_districts_high_threshold = 15
-@built_districts_low_threshold = 3
-@built_districts_medium_threshold = 4
-@built_districts_high_threshold = 8
+@stickiness = 10
+@stickiness_low = 5
 
 # Colony
 col_default = {
@@ -35,7 +29,7 @@ col_default = {
 	# /
 
 	weight_modifier = {
-		base = 10
+		base = 100
 	}
 }
 
@@ -60,7 +54,7 @@ col_default_machine = {
 	inline_script = colony_types/effects/inline_evolved_ringworld
 
 	weight_modifier = {
-		base = 10
+		base = 100
 	}
 }
 
@@ -86,60 +80,50 @@ col_city = {
 		trade_value_mult = 0.20
 	}
 
+	triggered_planet_modifier = {
+		potential = {
+			tec_is_ecoworld = no
+		}
+		modifier = {
+			planet_district_city_build_speed_mult = 0.25
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			tec_is_ecoworld = yes
+		}
+		modifier = {
+			planet_district_tec_eco_arcology_build_speed_mult = 0.25
+		}
+	}
+
 	weight_modifier = {
 		modifier = {
-			add = 1
-			num_free_districts = { type = district_farming value < @free_districts_low_threshold }
-			num_free_districts = { type = district_mining value < @free_districts_low_threshold }
-			num_free_districts = { type = district_generator value < @free_districts_low_threshold }
-			num_free_districts = { type = district_city value >= @free_districts_medium_threshold }
-		}
-		modifier = {
-			add = 3
-			num_free_districts = { type = district_farming value < @free_districts_low_threshold }
-			num_free_districts = { type = district_mining value < @free_districts_low_threshold }
-			num_free_districts = { type = district_generator value < @free_districts_low_threshold }
-			num_free_districts = { type = district_city value >= @free_districts_high_threshold }
-		}
-		modifier = {
-			add = 2
+			add = @stickiness
 			has_designation = col_city
 		}
-		modifier = {
-			add = 5
-			has_modifier = natural_beauty
+		add = value:housing_districts_value
+		complex_trigger_modifier = {
+			trigger = num_assigned_jobs
+			parameters = {
+				job = merchant # merchant jobs act as a pretty decent proxy for "this is a trade planet"
+			}
+			mode = add
+			mult = 2
 		}
-		modifier = {
-			add = 5
-			num_districts = { type = district_city value >= @built_districts_high_threshold }
-		}
-		modifier = {
-			factor = 0.1
-			num_districts = { type = district_city value < @built_districts_low_threshold }
-		}
+		#Evolved
+			complex_trigger_modifier = {
+				trigger = num_assigned_jobs
+				parameters = {
+					job = tec_corpo_bank_director
+				}
+				mode = add
+				mult = 2
+			}
+		#/
 	}
 }
-
-
-# Crucible Planet
-col_crucible = {
-	icon = GFX_colony_type_crucible_world
-
-	potential = {
-		has_modifier = crucible_colony
-	}
-	planet_modifier = {
-		pop_growth_speed = 0.10
-	}
-
-	inline_script = colony_types/effects/inline_evolved_ringworld
-
-	weight_modifier = {
-		base = 1000
-	}
-}
-
-
 
 # Mining Planet
 col_mining = {
@@ -157,9 +141,17 @@ col_mining = {
 	}
 
 	planet_modifier = {
-		planet_district_mining_build_speed_mult = 0.25
+		planet_building_tec_stripmine_1_build_speed_mult = 0.25
 		planet_miners_produces_mult = 0.25
 	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_rural_mining_district_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
+	}
+
 	inline_script = colony_types/effects/inline_evolved_resolution_greatergood
 	# Evolved
 		inline_script = colony_types/effects/inline_evolved_tec_land_of_plenty_mining
@@ -169,26 +161,22 @@ col_mining = {
 
 	weight_modifier = {
 		modifier = {
-			add = 1
-			num_free_districts = { type = district_mining value > @free_districts_low_threshold }
-			num_free_districts = { type = district_farming value < @free_districts_low_threshold }
-			num_free_districts = { type = district_generator value < @free_districts_low_threshold }
-			num_free_districts = { type = district_city value <= @small_planet_threshold }
-			num_free_districts = { type = district_nexus value <= @small_planet_threshold }
-			num_free_districts = { type = district_hive value <= @small_planet_threshold }
-		}
-		modifier = {
-			add = 3
-			num_free_districts = { type = district_mining value > @free_districts_medium_threshold }
-			num_free_districts = { type = district_farming value < @free_districts_low_threshold }
-			num_free_districts = { type = district_generator value < @free_districts_low_threshold }
-			num_free_districts = { type = district_city value <= @small_planet_threshold }
-			num_free_districts = { type = district_nexus value <= @small_planet_threshold }
-			num_free_districts = { type = district_hive value <= @small_planet_threshold }
-		}
-		modifier = {
-			add = 2
+			add = @stickiness
 			has_designation = col_mining
+		}
+		add = value:mining_combined_value|FACTOR|2|
+
+		complex_trigger_modifier = {
+			trigger = num_free_districts
+			parameters = {
+				type = district_mining
+			}
+			mode = add
+		}
+
+		modifier = {
+			add = -10
+			has_modifier = mineral_poor
 		}
 		modifier = {
 			add = 5
@@ -198,23 +186,22 @@ col_mining = {
 				has_modifier = ultra_rich
 				has_modifier = extensive_moon_system
 				has_modifier = asteroid_impacts
+				has_modifier = carbon_world
 			}
 		}
 		modifier = {
-			add = 5
-			num_districts = { type = district_mining value >= @built_districts_medium_threshold }
-		}
-		modifier = {
-			factor = 0
-			num_districts = { type = district_mining value = 0 }
+			add = -10
+			has_modifier = mineral_poor
 		}
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "production" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "production"
+					has_sector_focus = "balanced"
+				}
 			}
 		}
 	}
@@ -238,8 +225,15 @@ col_farming = {
 	}
 
 	planet_modifier = {
-		planet_district_farming_build_speed_mult = 0.25
+		planet_building_hydroponics_farm_build_speed_mult = 0.25
 		planet_farmers_produces_mult = 0.25
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_rural_farming_district_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
 	}
 
 	inline_script = colony_types/effects/inline_evolved_resolution_greatergood
@@ -250,50 +244,38 @@ col_farming = {
 
 	weight_modifier = {
 		modifier = {
-			add = 1
-			num_free_districts = { type = district_mining value < @free_districts_low_threshold }
-			num_free_districts = { type = district_farming value > @free_districts_low_threshold }
-			num_free_districts = { type = district_generator value < @free_districts_low_threshold }
-			num_free_districts = { type = district_city value <= @small_planet_threshold }
-			num_free_districts = { type = district_nexus value <= @small_planet_threshold }
-			num_free_districts = { type = district_hive value <= @small_planet_threshold }
-		}
-		modifier = {
-			add = 3
-			num_free_districts = { type = district_mining value < @free_districts_low_threshold }
-			num_free_districts = { type = district_farming value > @free_districts_medium_threshold }
-			num_free_districts = { type = district_generator value < @free_districts_low_threshold }
-			num_free_districts = { type = district_city value <= @small_planet_threshold }
-			num_free_districts = { type = district_nexus value <= @small_planet_threshold }
-			num_free_districts = { type = district_hive value <= @small_planet_threshold }
-		}
-		modifier = {
-			add = 2
+			add = @stickiness
 			has_designation = col_farming
+		}
+		add = value:farming_combined_value|FACTOR|2|
+		complex_trigger_modifier = {
+			trigger = num_free_districts
+			parameters = {
+				type = district_farming
+			}
+			mode = add
 		}
 		modifier = {
 			add = 5
 			has_modifier = lush_planet
 		}
 		modifier = {
-			factor = 0.1
-			has_modifier = bleak_planet
-		}
-		modifier = {
-			add = 5
-			num_districts = { type = district_farming value >= @built_districts_medium_threshold }
-		}
-		modifier = {
-			factor = 0
-			num_districts = { type = district_farming value = 0 }
+			add = -10
+			OR = {
+				has_modifier = bleak_planet
+				has_modifier = unbalanced_ecosystem
+				has_modifier = irradiated_planet
+			}
 		}
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "production" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "production"
+					has_sector_focus = "balanced"
+				}
 			}
 		}
 	}
@@ -315,8 +297,15 @@ col_generator = {
 	}
 
 	planet_modifier = {
-		planet_district_generator_build_speed_mult = 0.25
+		planet_building_tec_energrid_1_build_speed_mult = 0.25
 		planet_technician_produces_mult = 0.25
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_rural_generator_district_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
 	}
 
 	inline_script = colony_types/effects/inline_evolved_resolution_greatergood
@@ -328,26 +317,17 @@ col_generator = {
 
 	weight_modifier = {
 		modifier = {
-			add = 1
-			num_free_districts = { type = district_mining value < @free_districts_low_threshold }
-			num_free_districts = { type = district_farming value < @free_districts_low_threshold }
-			num_free_districts = { type = district_generator value > @free_districts_low_threshold }
-			num_free_districts = { type = district_city value <= @small_planet_threshold }
-			num_free_districts = { type = district_nexus value <= @small_planet_threshold }
-			num_free_districts = { type = district_hive value <= @small_planet_threshold }
-		}
-		modifier = {
-			add = 3
-			num_free_districts = { type = district_mining value < @free_districts_low_threshold }
-			num_free_districts = { type = district_farming value < @free_districts_low_threshold }
-			num_free_districts = { type = district_generator value > @free_districts_medium_threshold }
-			num_free_districts = { type = district_city value <= @small_planet_threshold }
-			num_free_districts = { type = district_nexus value <= @small_planet_threshold }
-			num_free_districts = { type = district_hive value <= @small_planet_threshold }
-		}
-		modifier = {
-			add = 2
+			add = @stickiness
 			has_designation = col_generator
+		}
+		add = value:generator_combined_value|FACTOR|2|
+
+		complex_trigger_modifier = {
+			trigger = num_free_districts
+			parameters = {
+				type = district_generator
+			}
+			mode = add
 		}
 		modifier = {
 			add = 5
@@ -357,20 +337,27 @@ col_generator = {
 			}
 		}
 		modifier = {
-			add = 5
-				num_districts = { type = district_generator value >= @built_districts_medium_threshold }
+			add = 2
+			tec_has_betharian_deposit = yes
 		}
 		modifier = {
-			factor = 0
-			num_districts = { type = district_generator value = 0 }
+			add = 3
+			tec_has_betharian_deposit = yes
+			owner = { has_technology = tech_mine_betharian }
+		}
+		modifier = {
+			add = -10
+			has_modifier = energy_poor
 		}
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "production" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "production"
+					has_sector_focus = "balanced"
+				}
 			}
 		}
 	}
@@ -398,38 +385,25 @@ col_hive = {
 
 	weight_modifier = {
 		modifier = {
-			add = 1
-			num_free_districts = { type = district_farming value < @free_districts_low_threshold }
-			num_free_districts = { type = district_mining value < @free_districts_low_threshold }
-			num_free_districts = { type = district_generator value < @free_districts_low_threshold }
-			num_free_districts = { type = district_hive value >= @free_districts_medium_threshold }
-		}
-		modifier = {
-			add = 3
-			num_free_districts = { type = district_farming value < @free_districts_low_threshold }
-			num_free_districts = { type = district_mining value < @free_districts_low_threshold }
-			num_free_districts = { type = district_generator value < @free_districts_low_threshold }
-			num_free_districts = { type = district_hive value >= @free_districts_high_threshold }
-		}
-
-		modifier = {
-			add = 2
+			add = @stickiness
 			has_designation = col_hive
 		}
-		modifier = {
-			add = 5
-			has_modifier = natural_beauty
+		add = value:housing_districts_value
+		complex_trigger_modifier = {
+			trigger = num_districts
+			parameters = {
+				type = district_hive
+			}
+			mode = add
+			mult = 2
 		}
-		modifier = {
-			add = 5
-			num_districts = { type = district_hive value >= @built_districts_high_threshold }
-		}
+
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "balanced" }
+				NOT = { has_sector_focus = "balanced" }
 			}
 		}
 	}
@@ -459,32 +433,28 @@ col_nexus = {
 
 	weight_modifier = {
 		modifier = {
-			add = 1
-			num_free_districts = { type = district_farming value < @free_districts_low_threshold }
-			num_free_districts = { type = district_mining value < @free_districts_low_threshold }
-			num_free_districts = { type = district_generator value < @free_districts_low_threshold }
-			num_free_districts = { type = district_nexus value >= @free_districts_medium_threshold }
-		}
-		modifier = {
-			add = 3
-			num_free_districts = { type = district_farming value < @free_districts_low_threshold }
-			num_free_districts = { type = district_mining value < @free_districts_low_threshold }
-			num_free_districts = { type = district_generator value < @free_districts_low_threshold }
-			num_free_districts = { type = district_nexus value >= @free_districts_high_threshold }
-		}
-
-		modifier = {
-			add = 2
+			add = @stickiness
 			has_designation = col_nexus
 		}
+		add = value:housing_districts_value
 		modifier = {
-			add = 5
-			has_modifier = natural_beauty
+			factor = 0
+			exists = sector
+			sector = {
+				has_any_sector_focus = yes
+				NOT = { has_sector_focus = "balanced" }
+			}
 		}
-		modifier = {
-			add = 5
-			num_districts = { type = district_nexus value >= @built_districts_high_threshold }
-		}
+		#modifier = {
+			#add = 5
+			#modifier = {
+			#	add = 5
+			#	check_variable_arithmetic = {
+			#		which = value:housing_districts_value
+			#		value >= @built_districts_high_threshold
+			#	}
+			#}
+		#}
 	}
 }
 
@@ -505,9 +475,31 @@ col_industrial = {
 	}
 
 	planet_modifier = {
-		planet_district_industrial_build_speed_mult = 0.25
 		planet_artisans_upkeep_mult = -0.10
 		planet_metallurgists_upkeep_mult = -0.10
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			tec_is_ecoworld = no
+		}
+		modifier = {
+			planet_district_industrial_build_speed_mult = 0.25
+		}
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_rural_mining_district_build_speed
+		value = 0.15
+		mult = 1
+		trigger = "tec_is_ecoworld = yes"
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_rural_farming_district_build_speed
+		value = 0.15
+		mult = 1
+		trigger = "tec_is_ecoworld = yes"
 	}
 
 	inline_script = colony_types/effects/inline_evolved_ringworld
@@ -516,47 +508,27 @@ col_industrial = {
 
 	weight_modifier = {
 		modifier = {
-			add = 5
+			add = @stickiness
 			has_designation = col_industrial
 		}
+		add = value:industrial_districts_value|FACTOR|3|
+
 		modifier = {
-			add = 5
-			num_districts = { type = district_industrial value >= @built_districts_low_threshold }
-		}
-		modifier = {
-			add = 5
-			num_districts = { type = district_industrial value >= @built_districts_medium_threshold }
-		}
-		modifier = {
-			add = 5
-			num_districts = { type = district_rw_industrial value >= @built_districts_medium_threshold }
-		}
-		modifier = {
-			add = 10
+			add = 15
 			AND = {
-				OR = {
-					has_building = building_factory_1
-					has_building = building_factory_2
-					has_building = building_factory_3
-				}
-				OR = {
-					has_building = building_foundry_1
-					has_building = building_foundry_2
-					has_building = building_foundry_3
-				}
+				tec_has_alloy_buildings = yes
+				tec_has_cg_buildings = yes
 			}
-		}
-		modifier = {
-			factor = 0
-			num_districts = { type = district_industrial value = 0 }
 		}
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "manufacturing" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "manufacturing"
+					has_sector_focus = "balanced"
+				}
 			}
 		}
 	}
@@ -603,8 +575,23 @@ col_foundry = {
 
 	custom_tooltip = col_foundry_custom
 	planet_modifier = {
-		planet_district_industrial_build_speed_mult = 0.25
 		planet_metallurgists_upkeep_mult = -0.20
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			tec_is_ecoworld = no
+		}
+		modifier = {
+			planet_district_industrial_build_speed_mult = 0.25
+		}
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_rural_mining_district_build_speed
+		value = 0.25
+		mult = 1
+		trigger = "tec_is_ecoworld = yes"
 	}
 
 	inline_script = colony_types/effects/inline_evolved_ringworld
@@ -612,75 +599,47 @@ col_foundry = {
 	inline_script = colony_types/effects/inline_evolved_resolution_industry_foundry
 
 	weight_modifier = {
-		base = 1
 		modifier = {
-			add = 1
+			add = @stickiness
+			has_designation = col_foundry
+		}
+		add = value:industrial_districts_value|FACTOR|3|ALLOY_ONLY|yes|
+
+		modifier = {
+			add = 10
+			tec_has_alloy_buildings = yes
+		}
+		modifier = {
+			add = -5
+			tec_has_cg_buildings = yes
+		}
+		modifier = {
+			add = 10
+			check_variable_arithmetic = {
+				which = value:industrial_districts_value|ALLOY_ONLY|yes|
+				value > 0
+			}
+			exists = owner
 			owner = {
 				OR = {
 					country_uses_consumer_goods = no
 					has_monthly_income = { resource = consumer_goods value >= 0 }
 				}
-			}
-			OR = {
-				AND = {
-					owner = {
-						has_monthly_income = { resource = alloys value < 10 }
-						years_passed <= 20
-					}
-				}
-				AND = {
-					owner = {
-						has_monthly_income = { resource = alloys value < 20 }
-						years_passed > 20
-						years_passed < 50
-					}
-				}
-				AND = {
-					owner = {
-						has_monthly_income = { resource = alloys value < 40 }
-						years_passed > 50
-						years_passed < 75
-					}
-				}
-				AND = {
-					owner = {
-						has_monthly_income = { resource = alloys value < 60 }
-						years_passed > 75
-					}
+				resource_revenue_compare = {
+					resource = alloys
+					value < trigger:years_passed
 				}
 			}
-		}
-		modifier = {
-			add = 5
-			has_designation = col_foundry
-		}
-		modifier = {
-			add = 5
-			num_districts = { type = district_industrial value >= @built_districts_medium_threshold }
-		}
-		modifier = {
-			add = 5
-			num_districts = { type = district_rw_industrial value >= @built_districts_low_threshold }
-		}
-		modifier = {
-			add = 5
-			has_building = building_foundry_1
-		}
-		modifier = {
-			add = 10
-			has_building = building_foundry_2
-		}
-		modifier = {
-			add = 10
-			has_building = building_foundry_3
 		}
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "manufacturing" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "manufacturing"
+					has_sector_focus = "balanced"
+				}
 			}
 		}
 	}
@@ -729,76 +688,269 @@ col_factory = {
 
 	custom_tooltip = col_factory_custom
 	planet_modifier = {
-		planet_district_industrial_build_speed_mult = 0.25
 		planet_artisans_upkeep_mult = -0.20
 	}
+
+	triggered_planet_modifier = {
+		potential = {
+			tec_is_ecoworld = no
+		}
+		modifier = {
+			planet_district_industrial_build_speed_mult = 0.25
+		}
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_rural_farming_district_build_speed
+		value = 0.25
+		mult = 1
+		trigger = "tec_is_ecoworld = yes"
+	}
+
 	inline_script = colony_types/effects/inline_evolved_resolution_industry_factory
 
 	weight_modifier = {
-		base = 1
 		modifier = {
-			add = 5
-			owner = { has_monthly_income = { resource = consumer_goods value < 5 } }
-			OR = {
-				AND = {
-					owner = {
-						has_monthly_income = { resource = alloys value > 20 }
-						years_passed <= 20
-					}
-				}
-				AND = {
-					owner = {
-						has_monthly_income = { resource = alloys value > 40 }
-						years_passed > 20
-						years_passed < 50
-					}
-				}
-				AND = {
-					owner = {
-						has_monthly_income = { resource = alloys value > 70 }
-						years_passed > 50
-						years_passed < 75
-					}
-				}
-				AND = {
-					owner = {
-						has_monthly_income = { resource = alloys value > 100 }
-						years_passed > 75
-					}
-				}
-			}
-		}
-		modifier = {
-			add = 5
+			add = @stickiness
 			has_designation = col_factory
 		}
+		add = value:industrial_districts_value|FACTOR|3|CG_ONLY|yes|
+
 		modifier = {
-			add = 5
-			num_districts = { type = district_industrial value >= @built_districts_medium_threshold }
+			add = 10
+			tec_has_cg_buildings = yes
 		}
 		modifier = {
-			add = 5
-			num_districts = { type = district_rw_industrial value >= @built_districts_low_threshold }
-		}
-		modifier = {
-			add = 5
-			has_building = building_factory_1
+			add = -5
+			tec_has_alloy_buildings = yes
 		}
 		modifier = {
 			add = 10
-			has_building = building_factory_2
-		}
-		modifier = {
-			add = 10
-			has_building = building_factory_3
+			check_variable_arithmetic = {
+				which = value:industrial_districts_value|CG_ONLY|yes|
+				value > 0
+			}
+			exists = owner
+			owner = {
+				resource_revenue_compare = {
+					resource = alloys
+					value >= trigger:years_passed
+				}
+				has_monthly_income = { resource = consumer_goods value < 0 }
+			}
 		}
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "manufacturing" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "manufacturing"
+					has_sector_focus = "balanced"
+				}
+			}
+		}
+	}
+}
+
+
+# Administrative Center
+col_bureau = {
+	icon = GFX_colony_type_bureaucratic
+
+	potential = {
+		exists = owner
+		owner = {
+			is_regular_empire = yes
+			is_spiritualist = no
+			has_make_spiritualist_perk = no
+		}
+		NOT = {
+			uses_district_set = habitat
+		}
+		is_special_colony_type = no
+	}
+
+	planet_modifier = {
+		planet_administrators_produces_mult = 0.10
+		planet_administrators_upkeep_mult = -0.10
+	}
+
+	inline_script = colony_types/effects/inline_evolved_ringworld
+
+	inline_script = colony_types/effects/inline_evolved_all_the_priests_1
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_bureau
+		}
+		add = value:unity_combined_value|FACTOR|2|
+		modifier = {
+			factor = 0
+			exists = sector
+			sector = {
+				has_any_sector_focus = yes
+				NOR = {
+					has_sector_focus = "balanced"
+					has_sector_focus = "unity"
+				}
+			}
+		}
+		modifier = {
+			add = 10
+			exists = sector
+			sector = {
+				has_sector_focus = "unity"
+			}
+		}
+	}
+}
+
+col_bureau_spiritualist = {
+	icon = GFX_colony_type_bureaucratic
+
+	potential = {
+		exists = owner
+		owner = {
+			is_regular_empire = yes
+			OR = {
+				is_spiritualist = yes
+				has_make_spiritualist_perk = yes
+			}
+		}
+		NOT = {
+			uses_district_set = habitat
+		}
+		is_special_colony_type = no
+	}
+
+	planet_modifier = {
+		planet_administrators_produces_mult = 0.10
+		planet_administrators_upkeep_mult = -0.10
+	}
+
+	inline_script = colony_types/effects/inline_evolved_ringworld
+
+	inline_script = colony_types/effects/inline_evolved_all_the_priests_1
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_bureau_spiritualist
+		}
+		add = value:unity_combined_value|FACTOR|2|
+		modifier = {
+			factor = 0
+			exists = sector
+			sector = {
+				has_any_sector_focus = yes
+				NOR = {
+					has_sector_focus = "balanced"
+					has_sector_focus = "unity"
+				}
+			}
+		}
+		modifier = {
+			add = 10
+			exists = sector
+			sector = {
+				has_sector_focus = "unity"
+			}
+		}
+	}
+}
+
+col_bureau_hive = {
+	icon = GFX_colony_type_bureaucratic
+
+	potential = {
+		exists = owner
+		owner = { is_hive_empire = yes }
+		NOT = {
+			uses_district_set = habitat
+		}
+		is_special_colony_type = no
+	}
+
+	planet_modifier = {
+		planet_administrators_produces_mult = 0.10
+		planet_administrators_upkeep_mult = -0.10
+	}
+
+	inline_script = colony_types/effects/inline_evolved_ringworld
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_bureau_hive
+		}
+		add = value:unity_combined_value|FACTOR|2|
+		modifier = {
+			factor = 0
+			exists = sector
+			sector = {
+				has_any_sector_focus = yes
+				NOR = {
+					has_sector_focus = "balanced"
+					has_sector_focus = "unity"
+				}
+			}
+		}
+		modifier = {
+			add = 10
+			exists = sector
+			sector = {
+				has_sector_focus = "unity"
+			}
+		}
+	}
+}
+
+col_bureau_machine = {
+	icon = GFX_colony_type_bureaucratic
+
+	potential = {
+		exists = owner
+		owner = {
+			is_machine_empire = yes
+			NOT = { has_valid_civic = civic_machine_servitor }
+		}
+		NOT = {
+			uses_district_set = habitat
+		}
+		is_special_colony_type = no
+	}
+
+	planet_modifier = {
+		planet_administrators_produces_mult = 0.10
+		planet_administrators_upkeep_mult = -0.10
+	}
+
+	inline_script = colony_types/effects/inline_evolved_ringworld
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_bureau_machine
+		}
+		add = value:unity_combined_value|FACTOR|2|
+		modifier = {
+			factor = 0
+			exists = sector
+			sector = {
+				has_any_sector_focus = yes
+				NOR = {
+					has_sector_focus = "balanced"
+					has_sector_focus = "unity"
+				}
+			}
+		}
+		modifier = {
+			add = 10
+			exists = sector
+			sector = {
+				has_sector_focus = "unity"
 			}
 		}
 	}
@@ -820,12 +972,10 @@ col_refinery = {
 	}
 
 	planet_modifier = {
-		planet_refiners_produces_mult = 0.1
-		planet_translucers_produces_mult = 0.1
-		planet_chemists_produces_mult = 0.1
-		planet_building_refinery_build_speed_mult = 0.25
-		planet_building_chemical_plant_build_speed_mult = 0.25
-		planet_building_crystal_plant_build_speed_mult = 0.25
+		planet_refiners_produces_mult = 0.15
+		planet_translucers_produces_mult = 0.15
+		planet_chemists_produces_mult = 0.15
+		planet_sr_miners_produces_mult = 0.15
 	}
 
 	inline_script = colony_types/effects/inline_evolved_ringworld
@@ -833,96 +983,21 @@ col_refinery = {
 	inline_script = colony_types/effects/inline_evolved_resolution_industry_refinery
 
 	weight_modifier = {
-		base = 1
 		modifier = {
-			add = 1
-			num_free_districts = { type = district_mining value <= @free_districts_low_threshold }
-			num_free_districts = { type = district_farming value <= @free_districts_low_threshold }
-			num_free_districts = { type = district_generator value <= @free_districts_low_threshold }
-			OR = {
-				AND = {
-					num_districts = {
-						type = district_city
-						value >= 1
-					}
-					num_free_districts = { type = district_city value <= @free_districts_medium_threshold }
-				}
-				AND = {
-					num_districts = {
-						type = district_nexus
-						value >= 1
-					}
-					num_free_districts = { type = district_nexus value <= @free_districts_medium_threshold }
-				}
-				AND = {
-					num_districts = {
-						type = district_hive
-						value >= 1
-					}
-					num_free_districts = { type = district_hive value <= @free_districts_medium_threshold }
-				}
-			}
-			OR = {
-				owner = { has_monthly_income = { resource = volatile_motes value < 0 } }
-				owner = { has_monthly_income = { resource = exotic_gases value < 0 } }
-				owner = { has_monthly_income = { resource = rare_crystals value < 0 } }
-			}
-		}
-		modifier = {
-			add = 5
+			add = @stickiness
 			has_designation = col_refinery
 		}
-		modifier = {
-			add = 2
-			num_buildings = { type = building_refinery value >= 2 }
-		}
-		modifier = {
-			add = 3
-			num_buildings = { type = building_refinery value >= 3 }
-		}
-		modifier = {
-			add = 4
-			num_buildings = { type = building_refinery value >= 4 }
-		}
-		modifier = {
-			add = 2
-			num_buildings = { type = building_crystal_plant value >= 2 }
-		}
-		modifier = {
-			add = 3
-			num_buildings = { type = building_crystal_plant value >= 3 }
-		}
-		modifier = {
-			add = 4
-			num_buildings = { type = building_crystal_plant value >= 4 }
-		}
-		modifier = {
-			add = 2
-			num_buildings = { type = building_chemical_plant value >= 2 }
-		}
-		modifier = {
-			add = 3
-			num_buildings = { type = building_chemical_plant value >= 3 }
-		}
-		modifier = {
-			add = 4
-			num_buildings = { type = building_chemical_plant value >= 4 }
-		}
-		modifier = {
-			add = 10
-				OR = {
-					num_buildings = { type = building_refinery value >= 5 }
-					num_buildings = { type = building_crystal_plant value >= 5 }
-					num_buildings = { type = building_chemical_plant value >= 5 }
-				}
-		}
+		add = value:refinery_combined_value|FACTOR|2|
+
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "manufacturing" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "manufacturing"
+					has_sector_focus = "balanced"
+				}
 			}
 		}
 	}
@@ -946,84 +1021,46 @@ col_research = {
 	planet_modifier = {
 		planet_building_research_lab_1_build_speed_mult = 0.25
 		planet_researchers_upkeep_mult = -0.2
+	}
 
+	inline_script = {
+		script = modifiers/inline_evolved_rural_generator_district_build_speed
+		value = 0.25
+		mult = 1
+		trigger = "tec_is_ecoworld = yes"
 	}
 
 	weight_modifier = {
-		base = 1
 		modifier = {
-			add = 1
-			OR = {
-				AND = {
-					num_free_districts = { type = district_city value >= @free_districts_high_threshold }
-					num_free_districts = { type = district_mining value <= @free_districts_verylow_threshold }
-					num_free_districts = { type = district_farming value <= @free_districts_verylow_threshold }
-					num_free_districts = { type = district_generator value <= @free_districts_verylow_threshold }
-				}
-				AND = {
-					num_free_districts = { type = district_hive value >= @free_districts_high_threshold }
-					num_free_districts = { type = district_mining value <= @free_districts_verylow_threshold }
-					num_free_districts = { type = district_farming value <= @free_districts_verylow_threshold }
-					num_free_districts = { type = district_generator value <= @free_districts_verylow_threshold }
-				}
-				AND = {
-					num_free_districts = { type = district_nexus value >= @free_districts_high_threshold }
-					num_free_districts = { type = district_mining value <= @free_districts_verylow_threshold }
-					num_free_districts = { type = district_farming value <= @free_districts_verylow_threshold }
-					num_free_districts = { type = district_generator value <= @free_districts_verylow_threshold }
-				}
-			}
-		}
-		modifier = {
-			add = 5
+			add = @stickiness
 			has_designation = col_research
 		}
+		add = value:research_combined_value|FACTOR|2|
+
 		modifier = {
 			add = 5
 			OR = {
 				has_modifier = wild_storms
 				has_modifier = titanic_life
 				has_modifier = atmospheric_hallucinogen
+				has_modifier = liquid_sands
 				has_modifier = dangerous_wildlife
 				has_modifier = unstable_tectonics
+				has_modifier = society_animal_life
+				has_modifier = tamed_nanite_swarm_modifier
 				has_deposit = d_central_spire
+				has_deposit = d_former_relic_world
 			}
-		}
-		modifier = {
-			add = 2
-			num_buildings = { type = building_research_lab_1 value >= 2 }
-		}
-		modifier = {
-			add = 3
-			num_buildings = { type = building_research_lab_1 value >= 3 }
-		}
-		modifier = {
-			add = 4
-			num_buildings = { type = building_research_lab_1 value >= 4 }
-		}
-		modifier = {
-			add = 5
-			num_buildings = { type = building_research_lab_1 value >= 5 }
-		}
-		modifier = {
-			add = 4
-			num_buildings = { type = building_research_lab_2 value >= 1 }
-		}
-		modifier = {
-			add = 5
-			num_buildings = { type = building_research_lab_2 value >= 2 }
-		}
-		modifier = {
-			add = 10
-			num_buildings = { type = building_research_lab_3 value >= 1 }
 		}
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "research" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "research"
+					has_sector_focus = "balanced"
+				}
 			}
 		}
 	}
@@ -1045,36 +1082,30 @@ col_fortress = {
 	}
 
 	planet_modifier = {
-		planet_building_stronghold_build_speed_mult = 0.25
 		planet_orbital_bombardment_damage = -0.10
 		army_defense_damage_mult = 0.20
+	}
+	
+	inline_script = {
+		script = modifiers/inline_evolved_army_building_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_naval_building_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
 	}
 
 	weight_modifier = {
 		modifier = {
-			add = 5
+			add = @stickiness
 			has_designation = col_fortress
 		}
-		modifier = {
-			add = 3
-			num_buildings = { type = building_stronghold value >= 2 }
-		}
-		modifier = {
-			add = 4
-			num_buildings = { type = building_stronghold value >= 3 }
-		}
-		modifier = {
-			add = 5
-			num_buildings = { type = building_stronghold value >= 4 }
-		}
-		modifier = {
-			add = 3
-			num_buildings = { type = building_fortress value >= 1 }
-		}
-		modifier = {
-			add = 5
-			num_buildings = { type = building_fortress value >= 2 }
-		}
+		add = value:stronghold_buildings_value|FACTOR|2|
 		modifier = {
 			factor = 0
 			exists = sector
@@ -1117,7 +1148,7 @@ col_capital = {
 	# /
 
 	weight_modifier = {
-		base = 15000
+		base = 1000
 	}
 }
 
@@ -1145,7 +1176,7 @@ col_capital_hive = {
 	inline_script = colony_types/effects/inline_evolved_ringworld
 
 	weight_modifier = {
-		base = 15000
+		base = 1000
 	}
 }
 
@@ -1173,7 +1204,7 @@ col_capital_machine = {
 	inline_script = colony_types/effects/inline_evolved_ringworld
 
 	weight_modifier = {
-		base = 15000
+		base = 1000
 	}
 }
 
@@ -1183,11 +1214,16 @@ col_habitat = {	# tweaked
 
 	potential = {
 		tec_uses_habitat_districts = yes
-		is_capital = no
+		num_sapient_pops < 5
+	}
+
+	planet_modifier = {
+		planet_stability_add = 5
+		planet_amenities_add = 10
 	}
 
 	weight_modifier = {
-		base = 500
+		base = 4
 	}
 }
 
@@ -1203,9 +1239,28 @@ col_habitat_energy = {	# tweaked
 		}
 	}
 	planet_modifier = {
-		planet_district_hab_energy_build_speed_mult = 0.25
+		planet_building_tec_energrid_1_build_speed_mult = 0.25
 		planet_technician_produces_mult = 0.1
 	}
+
+	triggered_planet_modifier = {
+		potential = {
+			tec_is_arcology_habitat = no
+		}
+		modifier = {
+			planet_district_hab_energy_build_speed_mult = 0.25
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			tec_is_arcology_habitat = yes
+		}
+		modifier = {
+			planet_district_tec_hab_arcology_maintenance_build_speed_mult = 0.25
+		}
+	}
+
 	inline_script = colony_types/effects/inline_evolved_resolution_greatergood
 	# Evolved
 		inline_script = colony_types/effects/inline_evolved_tec_land_of_plenty_generator
@@ -1213,30 +1268,24 @@ col_habitat_energy = {	# tweaked
 	# /
 
 	weight_modifier = {
-		base = 200
 		modifier = {
-			factor = 2
-			owner = { has_monthly_income = { resource = energy value < 0 } }
-		}
-		modifier = {
-			factor = 3
+			add = @stickiness
 			has_designation = col_habitat_energy
 		}
 		modifier = {
-			factor = 3
-			num_districts = { type = district_hab_energy value >= 3 }
-		}
-		modifier = {
-			factor = 5
+			add = 5
 			has_planet_flag = energy_habitat
 		}
+		add = value:generator_combined_value|FACTOR|2|
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "production" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "balanced"
+					has_sector_focus = "production"
+				}
 			}
 		}
 	}
@@ -1256,18 +1305,54 @@ col_habitat_leisure = {	# tweaked
 		}
 	}
 	planet_modifier = {
-		planet_district_hab_cultural_build_speed_mult = 0.25
 		pop_happiness = 0.10
 	}
-	weight_modifier = {
-		base = 200
-		modifier = {
-			factor = 3
-			has_designation = col_habitat_leisure
+
+	triggered_planet_modifier = {
+		potential = {
+			tec_is_arcology_habitat = no
 		}
 		modifier = {
-			factor = 3
-			num_districts = { type = district_hab_cultural value >= 3 }
+			planet_district_hab_cultural_build_speed_mult = 0.25
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			tec_is_arcology_habitat = yes
+		}
+		modifier = {
+			planet_district_tec_hab_arcology_leisure_build_speed_mult = 0.25
+		}
+	}
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_habitat_leisure
+		}
+		complex_trigger_modifier = {
+			trigger = num_districts
+			parameters = {
+				type = district_hab_cultural
+			}
+			mode = add
+			mult = 3
+		}
+		complex_trigger_modifier = {
+			trigger = num_districts
+			parameters = {
+				type = district_tec_hab_arcology_leisure
+			}
+			mode = add
+			mult = 5
+		}
+		modifier = {
+			factor = 0
+			exists = sector
+			sector = {
+				has_any_sector_focus = yes
+			}
 		}
 	}
 }
@@ -1286,26 +1371,55 @@ col_habitat_trade = {	# tweaked
 		}
 	}
 	planet_modifier = {
-		planet_district_hab_commercial_build_speed_mult = 0.25
 		trade_value_mult = 0.20
 	}
+
+	triggered_planet_modifier = {
+		potential = {
+			tec_is_arcology_habitat = no
+		}
+		modifier = {
+			planet_district_hab_commercial_build_speed_mult = 0.25
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			tec_is_arcology_habitat = yes
+		}
+		modifier = {
+			planet_district_tec_hab_arcology_trade_build_speed_mult = 0.25
+		}
+	}
+
 	weight_modifier = {
-		base = 300
 		modifier = {
-			factor = 2
-			owner = { has_monthly_income = { resource = energy value < 0 } }
-		}
-		modifier = {
-			factor = 0.1
-			has_planet_flag = energy_habitat
-		}
-		modifier = {
-			factor = 3
+			add = @stickiness
 			has_designation = col_habitat_trade
 		}
-		modifier = {
-			factor = 3
-			num_districts = { type = district_hab_commercial value >= 3 }
+		complex_trigger_modifier = {
+			trigger = num_assigned_jobs
+			parameters = {
+				job = merchant # merchant jobs act as a pretty decent proxy for "this is a trade planet"
+			}
+			mode = add
+			mult = 2
+		}
+		complex_trigger_modifier = {
+			trigger = num_districts
+			parameters = {
+				type = district_hab_commercial
+			}
+			mode = add
+			mult = 3
+		}
+		complex_trigger_modifier = {
+			trigger = num_districts
+			parameters = {
+				type = district_tec_hab_arcology_trade
+			}
+			mode = add
+			mult = 5
 		}
 	}
 }
@@ -1315,52 +1429,49 @@ col_habitat_research = {	# tweaked
 
 	potential = {
 		tec_uses_habitat_districts = yes
+		NOT = { has_planet_flag = tec_industrial_habitat }
 	}
 	planet_modifier = {
-		planet_district_hab_science_build_speed_mult = 0.25
 		planet_researchers_produces_mult = 0.1
 	}
-	weight_modifier = {
-		base = 300
-		modifier = {
-			factor = 2
-			OR = {
-				owner = { has_monthly_income = { resource = physics_research value < 100 } }
-				owner = { has_monthly_income = { resource = society_research value < 100 } }
-				owner = { has_monthly_income = { resource = engineering_research value < 100 } }
-			}
+
+	triggered_planet_modifier = {
+		potential = {
+			tec_is_arcology_habitat = no
 		}
 		modifier = {
-			factor = 3
+			planet_district_hab_science_build_speed_mult = 0.25
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			tec_is_arcology_habitat = yes
+		}
+		modifier = {
+			planet_district_tec_hab_arcology_research_build_speed_mult = 0.25
+		}
+	}
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
 			has_designation = col_habitat_research
 		}
 		modifier = {
-			factor = 5
+			add = 5
 			has_planet_flag = research_habitat
 		}
-		modifier = {
-			factor = 3
-			num_districts = { type = district_hab_science value >= 3 }
-		}
-		modifier = {
-			factor = 2
-			num_buildings = { type = building_research_lab_1 value >= 2 }
-		}
-		modifier = {
-			factor = 2
-			num_buildings = { type = building_research_lab_2 value >= 2 }
-		}
-		modifier = {
-			factor = 2
-			num_buildings = { type = building_research_lab_3 value >= 2 }
-		}
+		add = value:research_combined_value|FACTOR|2|
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "research" }
-				not = { has_sector_focus = "balanced"}
+				NOR = {
+					has_sector_focus = "balanced"
+					has_sector_focus = "research"
+				}
 			}
 		}
 	}
@@ -1371,12 +1482,15 @@ col_habitat_mining = {		# tweaked
 
 	potential = {
 		tec_uses_habitat_districts = yes
+		tec_is_arcology_habitat = no
 		has_planet_flag = mining_habitat
 	}
 	planet_modifier = {
-		planet_district_hab_mining_build_speed_mult = 0.25
+		planet_building_tec_stripmine_1_build_speed_mult = 0.25
 		planet_miners_produces_mult = 0.1
+		planet_district_hab_mining_build_speed_mult = 0.25
 	}
+
 	inline_script = colony_types/effects/inline_evolved_resolution_greatergood
 
 	# Evolved
@@ -1384,26 +1498,24 @@ col_habitat_mining = {		# tweaked
 		inline_script = colony_types/effects/inline_evolved_tec_planets_t2a_mining
 	# /
 	weight_modifier = {
-		base = 1000
 		modifier = {
-			factor = 2
-			owner = { has_monthly_income = { resource = minerals value < 0 } }
-		}
-		modifier = {
-			factor = 3
+			add = @stickiness
 			has_designation = col_habitat_mining
 		}
 		modifier = {
-			factor = 3
-			num_districts = { type = district_hab_mining value >= 3 }
+			add = 5
+			has_planet_flag = mining_habitat
 		}
+		add = value:mining_combined_value|FACTOR|2|
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "production" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "balanced"
+					has_sector_focus = "production"
+				}
 			}
 		}
 	}
@@ -1416,6 +1528,7 @@ col_habitat_farming = { # Mine better - disabled
 	potential = {
 		always = no
 		uses_district_set = habitat
+		tec_is_arcology_habitat = no
 	}
 	custom_tooltip = col_habitat_farming_custom
 	planet_modifier = {
@@ -1430,26 +1543,25 @@ col_habitat_farming = { # Mine better - disabled
 	# / 
 
 	weight_modifier = {
-		base = 300
 		modifier = {
-			factor = 2
-			owner = { has_monthly_income = { resource = food value < 0 } }
-		}
-		modifier = {
-			factor = 3
+			add = @stickiness
 			has_designation = col_habitat_farming
 		}
+		
 		modifier = {
-			factor = 3
-			num_buildings = { type = building_hydroponics_farm value >= 1 }
+			add = 5
+			has_planet_flag = tec_food_habitat
 		}
+		add = value:farming_combined_value|FACTOR|2|
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "production" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "balanced"
+					has_sector_focus = "production"
+				}
 			}
 		}
 	}
@@ -1465,6 +1577,7 @@ col_habitat_gestalt_farming = {	# Mine better - disabled
 		owner = {
 			is_gestalt = yes
 		}
+		tec_is_arcology_habitat = no
 	}
 	custom_tooltip = col_habitat_farming_gestalt_custom
 	planet_modifier = {
@@ -1479,26 +1592,25 @@ col_habitat_gestalt_farming = {	# Mine better - disabled
 	# / 
 
 	weight_modifier = {
-		base = 300
 		modifier = {
-			factor = 2
-			owner = { has_monthly_income = { resource = food value < 0 } }
-		}
-		modifier = {
-			factor = 3
+			add = @stickiness
 			has_designation = col_habitat_gestalt_farming
 		}
+		
 		modifier = {
-			factor = 3
-			num_buildings = { type = building_hydroponics_farm value >= 1 }
+			add = 5
+			has_planet_flag = tec_food_habitat
 		}
+		add = value:farming_combined_value|FACTOR|2|
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "production" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "balanced"
+					has_sector_focus = "production"
+				}
 			}
 		}
 	}
@@ -1511,9 +1623,22 @@ col_habitat_fortress = {	# tweaked
 		tec_uses_habitat_districts = yes
 	}
 	planet_modifier = {
-		planet_building_stronghold_build_speed_mult = 0.25
 		planet_orbital_bombardment_damage = -0.10
 		army_defense_damage_mult = 0.20
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_army_building_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_naval_building_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
 	}
 
 	triggered_planet_modifier = {
@@ -1527,46 +1652,18 @@ col_habitat_fortress = {	# tweaked
 		pop_defense_armies_add = 1
 	}
 	weight_modifier = {
-		base = 300
 		modifier = {
-			factor = 3
+			add = @stickiness
 			has_designation = col_habitat_fortress
 		}
 		modifier = {
-			factor = 2
+			add = 100
 			OR = {
-				num_buildings = { type = building_stronghold value >= 3 }
-				num_buildings = { type = building_tec_dread_stronghold value >= 3 }
+				has_building = building_order_keep
+				has_building = building_order_castle
 			}
 		}
-		modifier = {
-			factor = 2
-			OR = {
-				num_buildings = { type = building_fortress value >= 2 }
-				num_buildings = { type = building_tec_dread_fortress value >= 2 }
-			}
-		}
-		modifier = {
-			factor = 3
-			OR = {
-				num_buildings = { type = building_stronghold value >= 5 }
-				num_buildings = { type = building_tec_dread_stronghold value >= 5 }
-			}
-		}
-		modifier = {
-			factor = 3
-			OR = {
-				num_buildings = { type = building_fortress value >= 4 }
-				num_buildings = { type = building_tec_dread_fortress value >= 4 }
-			}
-		}
-		modifier = {
-			factor = 3
-			OR = {
-				num_buildings = { type = building_tec_bastion value >= 2 }
-				num_buildings = { type = building_tec_dread_bastion value >= 2 }
-			}
-		}
+		add = value:stronghold_buildings_value|FACTOR|3|
 	}
 }
 
@@ -1577,44 +1674,53 @@ col_habitat_industrial = {	# tweaked
 		tec_uses_habitat_districts = yes
 	}
 	planet_modifier = {
-		planet_district_hab_industrial_build_speed_mult = 0.25
 		planet_metallurgists_upkeep_mult = -0.1
 		planet_artisans_upkeep_mult = -0.1
 	}
+
+	triggered_planet_modifier = {
+		potential = {
+			tec_is_arcology_habitat = no
+		}
+		modifier = {
+			planet_district_hab_industrial_build_speed_mult = 0.25
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			tec_is_arcology_habitat = yes
+		}
+		modifier = {
+			planet_district_tec_hab_arcology_foundry_build_speed_mult = 0.15
+			planet_district_tec_hab_arcology_industry_build_speed_mult = 0.15
+		}
+	}
+
 	inline_script = colony_types/effects/inline_evolved_resolution_industry_industrial
 
 	weight_modifier = {
-		base = 600
 		modifier = {
-			factor = 3
-			AND = {
-				OR = {
-					has_building = building_factory_1
-					has_building = building_factory_2
-					has_building = building_factory_3
-				}
-				OR = {
-					has_building = building_foundry_1
-					has_building = building_foundry_2
-					has_building = building_foundry_3
-				}
-			}
-		}
-		modifier = {
-			factor = 3
+			add = @stickiness
 			has_designation = col_habitat_industrial
 		}
+		add = value:industrial_districts_value|FACTOR|3|
 		modifier = {
-			factor = 0
-			num_districts = { type = district_hab_industrial value = 0 }
+			add = 15
+			AND = {
+				tec_has_alloy_buildings = yes
+				tec_has_cg_buildings = yes
+			}
 		}
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "manufacturing" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "manufacturing"
+					has_sector_focus = "balanced"
+				}
 			}
 		}
 	}
@@ -1651,52 +1757,67 @@ col_habitat_foundry = {		# tweaked
 	}
 	custom_tooltip = col_habitat_foundry_custom
 	planet_modifier = {
-		planet_district_hab_industrial_build_speed_mult = 0.25
 		planet_metallurgists_upkeep_mult = -0.2
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			tec_is_arcology_habitat = no
+		}
+		modifier = {
+			planet_district_hab_industrial_build_speed_mult = 0.25
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			tec_is_arcology_habitat = yes
+		}
+		modifier = {
+			planet_district_tec_hab_arcology_foundry_build_speed_mult = 0.25
+		}
 	}
 
 	inline_script = colony_types/effects/inline_evolved_resolution_industry_foundry
 
 	weight_modifier = {
-		base = 300
 		modifier = {
-			factor = 2
-			owner = { has_monthly_income = { resource = alloys value < 10 } }
-		}
-		modifier = {
-			factor = 3
+			add = @stickiness
 			has_designation = col_habitat_foundry
 		}
+		add = value:industrial_districts_value|FACTOR|3|ALLOY_ONLY|yes|
 		modifier = {
-			add = 2
-			has_building = building_foundry_1
+			add = 10
+			tec_has_alloy_buildings = yes
 		}
 		modifier = {
-			add = 4
-			has_building = building_foundry_2
+			add = -5
+			tec_has_cg_buildings = yes
 		}
 		modifier = {
-			add = 4
-			has_building = building_foundry_3
-		}
-		modifier = {
-			factor = 0
-			num_buildings = { type = building_foundry_1 value = 0 }
-			num_buildings = { type = building_foundry_2 value = 0 }
-			num_buildings = { type = building_foundry_3 value = 0 }
-			NOT = { num_districts = { type = district_hab_industrial value >= 3 } }
-		}
-		modifier = {
-			factor = 3
-			num_districts = { type = district_hab_industrial value >= 3 }
+			add = 10
+			check_variable_arithmetic = {
+				which = value:industrial_districts_value|ALLOY_ONLY|yes|
+				value > 0
+			}
+			exists = owner
+			owner = {
+				resource_revenue_compare = {
+					resource = alloys
+					value >= trigger:years_passed
+				}
+				has_monthly_income = { resource = consumer_goods value < 0 }
+			}
 		}
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "manufacturing" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "manufacturing"
+					has_sector_focus = "balanced"
+				}
 			}
 		}
 	}
@@ -1736,56 +1857,257 @@ col_habitat_factory = {		# tweaked
 	}
 	custom_tooltip = col_habitat_factory_custom
 	planet_modifier = {
-		planet_district_hab_industrial_build_speed_mult = 0.25
 		planet_artisans_upkeep_mult = -0.2
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			tec_is_arcology_habitat = no
+		}
+		modifier = {
+			planet_district_hab_industrial_build_speed_mult = 0.25
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			tec_is_arcology_habitat = yes
+		}
+		modifier = {
+			planet_district_tec_hab_arcology_industry_build_speed_mult = 0.25
+		}
 	}
 
 	inline_script = colony_types/effects/inline_evolved_resolution_industry_factory
 
 	weight_modifier = {
-		base = 500
 		modifier = {
-			factor = 2
-			owner = { has_monthly_income = { resource = consumer_goods value < 5 } }
-		}
-		modifier = {
-			factor = 3
+			add = @stickiness
 			has_designation = col_habitat_factory
 		}
+		add = value:industrial_districts_value|FACTOR|3|CG_ONLY|yes|
 		modifier = {
-			add = 2
-			has_building = building_factory_1
+			add = -5
+			tec_has_alloy_buildings = yes
 		}
 		modifier = {
-			add = 4
-			has_building = building_factory_2
+			add = 10
+			tec_has_cg_buildings = yes
 		}
 		modifier = {
-			add = 4
-			has_building = building_factory_3
-		}
-		modifier = {
-			factor = 0
-			num_buildings = { type = building_factory_1 value = 0 }
-			num_buildings = { type = building_factory_2 value = 0 }
-			num_buildings = { type = building_factory_3 value = 0 }
-			NOT = { num_districts = { type = district_hab_industrial value >= 3 } }
-		}
-		modifier = {
-			factor = 3
-			num_districts = { type = district_hab_industrial value >= 3 }
+			add = 10
+			check_variable_arithmetic = {
+				which = value:industrial_districts_value|CG_ONLY|yes|
+				value > 0
+			}
+			exists = owner
+			owner = {
+				resource_revenue_compare = {
+					resource = alloys
+					value >= trigger:years_passed
+				}
+				has_monthly_income = { resource = consumer_goods value < 0 }
+			}
 		}
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "manufacturing" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "manufacturing"
+					has_sector_focus = "balanced"
+				}
 			}
 		}
 	}
 }
+
+
+col_habitat_bureau = {
+	icon = GFX_colony_type_hab_bureaucratic
+
+	potential = {
+		owner = {
+			is_regular_empire = yes
+			is_spiritualist = no
+			has_make_spiritualist_perk = no
+		}
+		uses_district_set = habitat
+		is_special_colony_type = no
+	}
+
+	planet_modifier = {
+		planet_administrators_produces_mult = 0.10
+		planet_administrators_upkeep_mult = -0.10
+	}
+
+	inline_script = colony_types/effects/inline_evolved_all_the_priests_1
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_habitat_bureau
+		}
+		add = value:unity_combined_value|FACTOR|2|
+		modifier = {
+			add = 10
+			exists = sector
+			sector = {
+				has_sector_focus = "unity"
+			}
+		}
+		modifier = {
+			factor = 0
+			exists = sector
+			sector = {
+				has_any_sector_focus = yes
+				NOR = {
+					has_sector_focus = "balanced"
+					has_sector_focus = "unity"
+				}
+			}
+		}
+	}
+}
+
+col_habitat_bureau_spiritualist = {
+	icon = GFX_colony_type_hab_bureaucratic
+
+	potential = {
+		exists = owner
+		owner = {
+			is_regular_empire = yes
+			is_spiritualist = yes
+		}
+		uses_district_set = habitat
+		is_special_colony_type = no
+	}
+
+	planet_modifier = {
+		planet_administrators_produces_mult = 0.10
+		planet_administrators_upkeep_mult = -0.10
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner.federation
+			owner.federation = { has_federation_perk = all_the_priests_1 }
+		}
+		job_priest_per_pop = 0.04
+	}
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_habitat_bureau_spiritualist
+		}
+		add = value:unity_combined_value|FACTOR|2|
+		modifier = {
+			add = 10
+			exists = sector
+			sector = {
+				has_sector_focus = "unity"
+			}
+		}
+		modifier = {
+			factor = 0
+			exists = sector
+			sector = {
+				has_any_sector_focus = yes
+				NOR = {
+					has_sector_focus = "balanced"
+					has_sector_focus = "unity"
+				}
+			}
+		}
+	}
+}
+
+col_habitat_bureau_hive = {
+	icon = GFX_colony_type_hab_bureaucratic
+
+	potential = {
+		exists = owner
+		owner = { is_hive_empire = yes }
+		uses_district_set = habitat
+		is_special_colony_type = no
+	}
+
+	planet_modifier = {
+		planet_administrators_produces_mult = 0.10
+		planet_administrators_upkeep_mult = -0.10
+	}
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_habitat_bureau_hive
+		}
+		add = value:unity_combined_value|FACTOR|2|
+		modifier = {
+			add = 10
+			exists = sector
+			sector = {
+				has_sector_focus = "unity"
+			}
+		}
+		modifier = {
+			factor = 0
+			exists = sector
+			sector = {
+				has_any_sector_focus = yes
+				NOR = {
+					has_sector_focus = "balanced"
+					has_sector_focus = "unity"
+				}
+			}
+		}
+	}
+}
+
+col_habitat_bureau_machine = {
+	icon = GFX_colony_type_hab_bureaucratic
+
+	potential = {
+		exists = owner
+		owner = { is_machine_empire = yes }
+		uses_district_set = habitat
+		is_special_colony_type = no
+	}
+
+	planet_modifier = {
+		planet_administrators_produces_mult = 0.10
+		planet_administrators_upkeep_mult = -0.10
+	}
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_habitat_bureau_machine
+		}
+		add = value:unity_combined_value|FACTOR|2|
+		modifier = {
+			add = 10
+			exists = sector
+			sector = {
+				has_sector_focus = "unity"
+			}
+		}
+		modifier = {
+			factor = 0
+			exists = sector
+			sector = {
+				has_any_sector_focus = yes
+				NOR = {
+					has_sector_focus = "balanced"
+					has_sector_focus = "unity"
+				}
+			}
+		}
+	}
+}
+
 
 col_habitat_refinery = {	# tweaked
 	icon = GFX_colony_type_habitat_refinery
@@ -1794,119 +2116,20 @@ col_habitat_refinery = {	# tweaked
 		tec_uses_habitat_districts = yes
 	}
 	planet_modifier = {
-		planet_building_refinery_build_speed_mult = 0.25
-		planet_building_chemical_plant_build_speed_mult = 0.25
-		planet_building_crystal_plant_build_speed_mult = 0.25
-		planet_refiners_produces_mult = 0.1
-		planet_translucers_produces_mult = 0.1
-		planet_chemists_produces_mult = 0.1
+		planet_refiners_produces_mult = 0.15
+		planet_translucers_produces_mult = 0.15
+		planet_chemists_produces_mult = 0.15
+		planet_sr_miners_produces_mult = 0.15
 	}
 
 	inline_script = colony_types/effects/inline_evolved_resolution_industry_refinery
 
 	weight_modifier = {
-		base = 500
 		modifier = {
-			factor = 0.01
-			is_capital = yes
-		}
-		modifier = {
-			factor = 0
-			NOR = {
-				OR = {
-					has_building = building_refinery
-					has_building = building_refinery_2
-					has_building = building_refinery_3
-				}
-				OR = {
-					has_building = building_crystal_plant
-					has_building = building_crystal_plant_2
-					has_building = building_crystal_plant_3
-				}
-				OR = {
-					has_building = building_chemical_plant
-					has_building = building_chemical_plant_2
-					has_building = building_chemical_plant_3
-				}
-			}
-		}
-		modifier = {
-			factor = 2
-			owner = {
-				OR = {
-					has_monthly_income = { resource = volatile_motes value < 0 }
-					has_monthly_income = { resource = exotic_gases value < 0 }
-					has_monthly_income = { resource = rare_crystals value < 0 }
-				}
-			}
-		}
-		modifier = {
-			factor = 3
+			add = @stickiness
 			has_designation = col_habitat_refinery
 		}
-		modifier = {
-			factor = 2
-			OR = {
-				num_buildings = { type = building_refinery value >= 2 }
-				num_buildings = { type = building_refinery_2 value >= 1 }
-				num_buildings = { type = building_refinery_3 value >= 1 }
-			}
-		}
-		modifier = {
-			factor = 3
-			OR = {
-				num_buildings = { type = building_refinery value >= 3 }
-				num_buildings = { type = building_refinery_2 value >= 2 }
-				num_buildings = { type = building_refinery_3 value >= 1 }
-			}
-		}
-		modifier = {
-			factor = 2
-			OR = {
-				num_buildings = { type = building_crystal_plant value >= 2 }
-				num_buildings = { type = building_crystal_plant_2 value >= 1 }
-				num_buildings = { type = building_crystal_plant_3 value >= 1 }
-			}
-		}
-		modifier = {
-			factor = 3
-			OR = {
-				num_buildings = { type = building_crystal_plant value >= 3 }
-				num_buildings = { type = building_crystal_plant_2 value >= 2 }
-				num_buildings = { type = building_crystal_plant_3 value >= 1 }
-			}
-		}
-		modifier = {
-			factor = 2
-			OR = {
-				num_buildings = { type = building_chemical_plant value >= 2 }
-				num_buildings = { type = building_chemical_plant_2 value >= 1 }
-				num_buildings = { type = building_chemical_plant_3 value >= 1 }
-			}
-		}
-		modifier = {
-			factor = 3
-			OR = {
-				num_buildings = { type = building_chemical_plant value >= 3 }
-				num_buildings = { type = building_chemical_plant_2 value >= 2 }
-				num_buildings = { type = building_chemical_plant_3 value >= 1 }
-			}
-		}
-		modifier = {
-			factor = 5
-			OR = {
-				num_buildings = { type = building_refinery value >= 4 }
-				num_buildings = { type = building_refinery_2 value >= 3 }
-				num_buildings = { type = building_refinery_3 value >= 2 }
-				num_buildings = { type = building_crystal_plant value >= 4 }
-				num_buildings = { type = building_crystal_plant_2 value >= 3 }
-				num_buildings = { type = building_crystal_plant_3 value >= 2 }
-				num_buildings = { type = building_chemical_plant value >= 4 }
-				num_buildings = { type = building_chemical_plant_2 value >= 3 }
-				num_buildings = { type = building_chemical_plant_3 value >= 2 }
-				
-			}
-		}
+		add = value:refinery_combined_value|FACTOR|2|
 		modifier = {
 			factor = 0
 			exists = sector
@@ -1937,55 +2160,34 @@ col_rural_gestalt = {
 	}
 
 	planet_modifier = {
-		planet_district_farming_build_speed_mult = 0.25
-		planet_district_mining_build_speed_mult = 0.25
-		planet_district_generator_build_speed_mult = 0.25
 		planet_jobs_simple_drone_produces_mult = 0.10
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_rural_generator_district_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_rural_mining_district_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
+	}
+
+	
+	inline_script = {
+		script = modifiers/inline_evolved_rural_farming_district_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
 	}
 
 	weight_modifier = {
 		modifier = {
-			add = 1
-			OR = {
-				AND = {
-					num_free_districts = { type = district_mining value <= @free_districts_low_threshold }
-					num_free_districts = { type = district_farming value <= @free_districts_low_threshold }
-					num_free_districts = { type = district_generator value <= @free_districts_low_threshold }
-					num_free_districts = { type = district_hive value < @free_districts_high_threshold }
-				}
-				AND = {
-					num_free_districts = { type = district_farming value > @free_districts_low_threshold }
-					num_free_districts = { type = district_generator value > @free_districts_low_threshold }
-					num_free_districts = { type = district_hive value < @free_districts_high_threshold }
-				}
-				AND = {
-					num_free_districts = { type = district_mining value > @free_districts_low_threshold }
-					num_free_districts = { type = district_generator value > @free_districts_low_threshold }
-					num_free_districts = { type = district_hive value < @free_districts_high_threshold }
-				}
-				AND = {
-					num_free_districts = { type = district_mining value > @free_districts_low_threshold }
-					num_free_districts = { type = district_farming value > @free_districts_low_threshold }
-					num_free_districts = { type = district_hive value < @free_districts_high_threshold }
-				}
-			}
-		}
-		modifier = {
-			add = 1
-			num_districts = { type = district_mining value > @built_districts_low_threshold }
-			num_districts = { type = district_farming value > @built_districts_low_threshold }
-			num_districts = { type = district_generator value > @built_districts_low_threshold }
-			num_districts = { type = district_hive value <= @built_districts_medium_threshold }
-		}
-		modifier = {
-			add = 3
-			num_districts = { type = district_mining value > @built_districts_medium_threshold }
-			num_districts = { type = district_farming value > @built_districts_medium_threshold }
-			num_districts = { type = district_generator value > @built_districts_medium_threshold }
-			num_districts = { type = district_hive value <= @built_districts_high_threshold }
-		}
-		modifier = {
-			add = 1
+			add = @stickiness_low
 			has_designation = col_rural_gestalt
 		}
 		modifier = {
@@ -1993,8 +2195,10 @@ col_rural_gestalt = {
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "production" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "production"
+					has_sector_focus = "balanced"
+				}
 			}
 		}
 	}
@@ -2017,10 +2221,29 @@ col_rural = {
 	}
 
 	planet_modifier = {
-		planet_district_farming_build_speed_mult = 0.25
-		planet_district_generator_build_speed_mult = 0.25
-		planet_district_mining_build_speed_mult = 0.25
 		planet_jobs_worker_produces_mult = 0.10
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_rural_generator_district_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_rural_mining_district_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
+	}
+
+	
+	inline_script = {
+		script = modifiers/inline_evolved_rural_farming_district_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
 	}
 
 	# Evolved
@@ -2029,47 +2252,7 @@ col_rural = {
 
 	weight_modifier = {
 		modifier = {
-			add = 1
-			OR = {
-				AND = {
-					num_free_districts = { type = district_mining value <= @free_districts_low_threshold }
-					num_free_districts = { type = district_farming value <= @free_districts_low_threshold }
-					num_free_districts = { type = district_generator value <= @free_districts_low_threshold }
-					num_free_districts = { type = district_city value < @free_districts_high_threshold }
-				}
-				AND = {
-					num_free_districts = { type = district_farming value > @free_districts_low_threshold }
-					num_free_districts = { type = district_generator value > @free_districts_low_threshold }
-					num_free_districts = { type = district_city value < @free_districts_high_threshold }
-				}
-				AND = {
-					num_free_districts = { type = district_mining value > @free_districts_low_threshold }
-					num_free_districts = { type = district_generator value > @free_districts_low_threshold }
-					num_free_districts = { type = district_city value < @free_districts_high_threshold }
-				}
-				AND = {
-					num_free_districts = { type = district_mining value > @free_districts_low_threshold }
-					num_free_districts = { type = district_farming value > @free_districts_low_threshold }
-					num_free_districts = { type = district_city value < @free_districts_high_threshold }
-				}
-			}
-		}
-		modifier = {
-			add = 1
-			num_districts = { type = district_mining value > @built_districts_low_threshold }
-			num_districts = { type = district_farming value > @built_districts_low_threshold }
-			num_districts = { type = district_generator value > @built_districts_low_threshold }
-			num_districts = { type = district_city value <= @built_districts_medium_threshold }
-		}
-		modifier = {
-			add = 3
-			num_districts = { type = district_mining value > @built_districts_medium_threshold }
-			num_districts = { type = district_farming value > @built_districts_medium_threshold }
-			num_districts = { type = district_generator value > @built_districts_medium_threshold }
-			num_districts = { type = district_city value <= @built_districts_high_threshold }
-		}
-		modifier = {
-			add = 1
+			add = @stickiness_low
 			has_designation = col_rural
 		}
 		modifier = {
@@ -2077,135 +2260,15 @@ col_rural = {
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "production" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "production"
+					has_sector_focus = "balanced"
+				}
 			}
 		}
 	}
 }
 
-# Fallen Empire Capital
-col_fe_capital = {
-	icon = GFX_colony_type_capital
-
-	potential = {
-		is_capital = yes
-		exists = owner
-		owner = { is_fallen_empire = yes }
-	}
-
-	planet_modifier = {
-		planet_stability_add = 10
-	}
-
-	weight_modifier = {
-		base = 1000
-	}
-}
-
-# Fallen Empire Colony
-col_fe_colony = {
-	icon = GFX_colony_type_normal_colony
-
-	potential = {
-		is_capital = no
-		exists = owner
-		owner = { is_fallen_empire = yes }
-	}
-
-	planet_modifier = {
-		planet_stability_add = 5
-	}
-
-	weight_modifier = {
-		base = 1000
-	}
-}
-
-# Resort World
-col_resort = {
-	icon = GFX_colony_type_resort
-
-	potential = {
-		has_modifier = resort_colony
-	}
-
-	planet_modifier = {
-		planet_housing_add = 10
-	}
-
-	weight_modifier = {
-		base = 1000
-	}
-}
-
-# Penal Colony
-col_penal = {
-	icon = GFX_colony_type_penal
-
-	potential = {
-		has_modifier = penal_colony
-	}
-
-	weight_modifier = {
-		base = 1000
-	}
-}
-
-# Primitive World
-col_primitive = {
-	icon = GFX_colony_type_primitive
-
-	potential = {
-		exists = owner
-		owner = { is_country_type = primitive }
-	}
-
-	weight_modifier = {
-		base = 1000
-	}
-}
-
-# Infested World
-col_infested = {
-	icon = GFX_colony_type_dying
-
-	potential = {
-		exists = owner
-		owner = { is_country_type = swarm }
-	}
-
-	weight_modifier = {
-		base = 1000
-	}
-}
-
-# Contingency World
-col_contingency = {
-	icon = GFX_colony_type_dying
-
-	potential = {
-		exists = owner
-		owner = { is_country_type = ai_empire }
-	}
-
-	weight_modifier = {
-		base = 1000
-	}
-}
-
-# Slave-Breeding Colony
-col_slave = {
-	icon = GFX_colony_type_workers
-
-	potential = {
-		has_modifier = slave_colony
-	}
-
-	weight_modifier = {
-		base = 1000
-	}
-}
 
 # Ringworld Mixed
 col_ring_mix = {
@@ -2224,10 +2287,14 @@ col_ring_mix = {
 	}
 
 	weight_modifier = {
-		base = 1
 		modifier = {
-			factor = 500
-			num_pops < 15
+			add = @stickiness
+			has_designation = col_ring_mix
+		}
+
+		modifier = {
+			add = 10
+			num_sapient_pops < 15
 		}
 	}
 }
@@ -2250,27 +2317,19 @@ col_ring_research = {
 
 	weight_modifier = {
 		modifier = {
-			add = 50
-			owner = { has_monthly_income = { resource = physics_research value < 200 } }
-			owner = { has_monthly_income = { resource = society_research value < 200 } }
-			owner = { has_monthly_income = { resource = engineering_research value < 200 } }
-		}
-		modifier = {
-			add = 100
+			add = @stickiness
 			has_designation = col_ring_research
 		}
-		modifier = {
-			add = 200
-			is_capital = no
-			num_districts = { type = district_rw_science value >= 1 }
-		}
+		add = value:research_combined_value|FACTOR|3|
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "research" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "balanced"
+					has_sector_focus = "research"
+				}
 			}
 		}
 	}
@@ -2300,21 +2359,19 @@ col_ring_farming = {
 
 	weight_modifier = {
 		modifier = {
-			add = 100
+			add = @stickiness
 			has_designation = col_ring_farming
 		}
-		modifier = {
-			add = 200
-			is_capital = no
-			num_districts = { type = district_rw_farming value >= 1 }
-		}
+		add = value:farming_combined_value|FACTOR|2|
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "production" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "balanced"
+					has_sector_focus = "production"
+				}
 			}
 		}
 	}
@@ -2343,13 +2400,24 @@ col_ring_trade = {
 
 	weight_modifier = {
 		modifier = {
-			add = 100
+			add = @stickiness
 			has_designation = col_ring_trade
 		}
-		modifier = {
-			add = 200
-			is_capital = no
-			num_districts = { type = district_rw_commercial value >= 1 }
+		complex_trigger_modifier = {
+			trigger = num_districts
+			parameters = {
+				type = district_rw_commercial
+			}
+			mode = add
+			mult = 10
+		}
+		complex_trigger_modifier = {
+			trigger = num_districts
+			parameters = {
+				type = district_tec_rw_trade
+			}
+			mode = add
+			mult = 10
 		}
 	}
 }
@@ -2378,13 +2446,13 @@ col_ring_generator = {
 
 	weight_modifier = {
 		modifier = {
-			add = 100
+			add = @stickiness
 			has_designation = col_ring_generator
 		}
+		add = value:generator_combined_value|FACTOR|2|
 		modifier = {
-			add = 200
+			add = value:generator_districts_value|FACTOR|75|
 			is_capital = no
-			num_districts = { type = district_rw_generator value >= 1 }
 		}
 		modifier = {
 			factor = 0
@@ -2412,7 +2480,17 @@ col_ecu_mix = {				# tweaked
 	}
 
 	weight_modifier = {
-		base = 10
+		modifier = {
+			add = @stickiness
+			has_designation = col_ecu_mix
+		}
+		modifier = {
+			add = 20
+			num_districts = {
+				type = any
+				value > 10
+			}
+		}
 	}
 }
 
@@ -2436,7 +2514,8 @@ col_ecu_industrial = {
 	}
 
 	planet_modifier = {
-		planet_district_industrial_build_speed_mult = 0.25
+		planet_district_arcology_civilian_industry_build_speed_mult = 0.25
+		planet_district_arcology_arms_industry_build_speed_mult = 0.25
 		planet_artisans_upkeep_mult = -0.10
 		planet_metallurgists_upkeep_mult = -0.10
 	}
@@ -2445,52 +2524,27 @@ col_ecu_industrial = {
 
 	weight_modifier = {
 		modifier = {
-			add = 5
+			add = @stickiness
 			has_designation = col_ecu_industrial
 		}
+		add = value:industrial_districts_value|FACTOR|3|
 		modifier = {
-			add = 5
-			num_districts = { type = district_arcology_arms_industry value >= @built_districts_low_threshold }
+			add = 8
+			tec_has_cg_buildings = yes
 		}
 		modifier = {
-			add = 5
-			num_districts = { type = district_arcology_arms_industry value >= @built_districts_medium_threshold }
-		}
-		modifier = {
-			add = 5
-			num_districts = { type = district_arcology_civilian_industry value >= @built_districts_low_threshold }
-		}
-		modifier = {
-			add = 5
-			num_districts = { type = district_arcology_civilian_industry value >= @built_districts_medium_threshold }
-		}
-		modifier = {
-			add = 10
-			AND = {
-				OR = {
-					has_building = building_factory_1
-					has_building = building_factory_2
-					has_building = building_factory_3
-				}
-				OR = {
-					has_building = building_foundry_1
-					has_building = building_foundry_2
-					has_building = building_foundry_3
-				}
-			}
-		}
-		modifier = {
-			factor = 0
-			num_districts = { type = district_arcology_civilian_industry value = 0 }
-			num_districts = { type = district_arcology_arms_industry value = 0 }
+			add = 8
+			tec_has_alloy_buildings = yes
 		}
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "manufacturing" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "manufacturing"
+					has_sector_focus = "balanced"
+				}
 			}
 		}
 	}
@@ -2540,41 +2594,35 @@ col_ecu_foundry = {			# tweaked
 	inline_script = colony_types/effects/inline_evolved_resolution_industry_foundry
 
 	weight_modifier = {
-		base = 10
 		modifier = {
-			add = 5
-			owner = { has_monthly_income = { resource = alloys value < 100 } }
-		}
-		modifier = {
-			add = 5
+			add = @stickiness
 			has_designation = col_ecu_foundry
 		}
+		add = value:industrial_districts_value|FACTOR|2|ALLOY_ONLY|yes|
 		modifier = {
-			add = 3
-			num_districts = { type = district_arcology_arms_industry value >= 2 }
+			add = -3
+			tec_has_cg_buildings = yes
 		}
 		modifier = {
-			add = 5
-			num_districts = { type = district_arcology_arms_industry value >= 3 }
+			add = 8
+			tec_has_alloy_buildings = yes
 		}
 		modifier = {
-			add = 2
-			has_building = building_foundry_1
-		}
-		modifier = {
-			add = 4
-			has_building = building_foundry_2
-		}
-		modifier = {
-			add = 4
-			has_building = building_foundry_3
-		}
-		modifier = {
-			factor = 0
-			NOR = {
-				has_building = building_foundry_1
-				has_building = building_foundry_2
-				has_building = building_foundry_3
+			add = 10
+			check_variable_arithmetic = {
+				which = value:industrial_districts_value|ALLOY_ONLY|yes|
+				value > 0
+			}
+			exists = owner
+			owner = {
+				OR = {
+					country_uses_consumer_goods = no
+					has_monthly_income = { resource = consumer_goods value >= 0 }
+				}
+				resource_revenue_compare = {
+					resource = alloys
+					value < trigger:years_passed
+				}
 			}
 		}
 		modifier = {
@@ -2582,8 +2630,10 @@ col_ecu_foundry = {			# tweaked
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "manufacturing" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "manufacturing"
+					has_sector_focus = "balanced"
+				}
 			}
 		}
 	}
@@ -2640,50 +2690,28 @@ col_ecu_factory = {			# tweaked
 	inline_script = colony_types/effects/inline_evolved_resolution_industry_factory
 
 	weight_modifier = {
-		base = 10
 		modifier = {
-			add = 5
-			owner = { has_monthly_income = { resource = consumer_goods value < 5 } }
-		}
-		modifier = {
-			add = 5
+			add = @stickiness
 			has_designation = col_ecu_factory
 		}
+		add = value:industrial_districts_value|FACTOR|2|CG_ONLY|yes|
 		modifier = {
-			add = 2
-			num_districts = { type = district_arcology_civilian_industry value >= 2 }
+			add = 8
+			tec_has_cg_buildings = yes
 		}
 		modifier = {
-			add = 3
-			num_districts = { type = district_arcology_civilian_industry value >= 3 }
-		}
-		modifier = {
-			add = 2
-			has_building = building_factory_1
-		}
-		modifier = {
-			add = 4
-			has_building = building_factory_2
-		}
-		modifier = {
-			add = 4
-			has_building = building_factory_3
-		}
-		modifier = {
-			factor = 0
-			NOR = {
-				has_building = building_factory_1
-				has_building = building_factory_2
-				has_building = building_factory_3
-			}
+			add = -3
+			tec_has_alloy_buildings = yes
 		}
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "manufacturing" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "manufacturing"
+					has_sector_focus = "balanced"
+				}
 			}
 		}
 	}
@@ -2707,56 +2735,25 @@ col_ecu_research = {
 
 	planet_modifier = {
 		planet_building_research_lab_1_build_speed_mult = 0.25
+		planet_district_tec_arcology_research_build_speed_mult = 0.25
 		planet_researchers_upkeep_mult = -0.2
 	}
 
 	weight_modifier = {
-		base = 10
 		modifier = {
-			add = 5
-			owner = { has_monthly_income = { resource = physics_research value < 200 } }
-			owner = { has_monthly_income = { resource = society_research value < 200 } }
-			owner = { has_monthly_income = { resource = engineering_research value < 200 } }
-		}
-		modifier = {
-			add = 5
+			add = @stickiness
 			has_designation = col_ecu_research
 		}
-		modifier = {
-			add = 1
-			num_buildings = { type = building_research_lab_1 value >= 2 }
-		}
-		modifier = {
-			add = 2
-			num_buildings = { type = building_research_lab_1 value >= 3 }
-		}
-		modifier = {
-			add = 3
-			num_buildings = { type = building_research_lab_1 value >= 4 }
-		}
-		modifier = {
-			add = 4
-			num_buildings = { type = building_research_lab_1 value >= 5 }
-		}
-		modifier = {
-			add = 3
-			num_buildings = { type = building_research_lab_2 value >= 1 }
-		}
-		modifier = {
-			add = 4
-			num_buildings = { type = building_research_lab_2 value >= 2 }
-		}
-		modifier = {
-			add = 5
-			num_buildings = { type = building_research_lab_3 value >= 1 }
-		}
+		add = value:research_combined_value|FACTOR|3|
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "research" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "balanced"
+					has_sector_focus = "research"
+				}
 			}
 		}
 	}
@@ -2777,8 +2774,14 @@ col_mac = {
 	}
 
 	weight_modifier = {
-		base = 10
-
+		modifier = {
+			add = @stickiness_low
+			has_designation = col_mac
+		}
+		modifier = {
+			add = 10
+			num_sapient_pops < 10
+		}
 	}
 }
 
@@ -2798,40 +2801,46 @@ col_mac_foundry = {
 	inline_script = colony_types/effects/inline_evolved_resolution_industry_foundry
 
 	weight_modifier = {
-		base = 10
 		modifier = {
-			add = 5
-			owner = { has_monthly_income = { resource = alloys value < 100 } }
-		}
-		modifier = {
-			add = 5
+			add = @stickiness
 			has_designation = col_mac_foundry
 		}
+		add = value:industrial_districts_value|FACTOR|3|ALLOY_ONLY|yes|
 		modifier = {
-			add = 2
-			has_building = building_foundry_1
+			add = -5
+			tec_has_cg_buildings = yes
 		}
 		modifier = {
-			add = 4
-			has_building = building_foundry_2
+			add = 10
+			tec_has_alloy_buildings = yes
 		}
 		modifier = {
-			add = 5
-			num_districts = { type = district_industrial value >= @built_districts_medium_threshold }
-		}
-		modifier = {
-			factor = 0
-			NOT = { num_districts = { type = district_industrial value >= @built_districts_medium_threshold } }
-			num_buildings = { type = building_foundry_1 value = 0 }
-			num_buildings = { type = building_foundry_2 value = 0 }
+			add = 10
+			check_variable_arithmetic = {
+				which = value:industrial_districts_value|ALLOY_ONLY|yes|
+				value > 0
+			}
+			exists = owner
+			owner = {
+				OR = {
+					country_uses_consumer_goods = no
+					has_monthly_income = { resource = consumer_goods value >= 0 }
+				}
+				resource_revenue_compare = {
+					resource = alloys
+					value < trigger:years_passed
+				}
+			}
 		}
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "manufacturing" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "manufacturing"
+					has_sector_focus = "balanced"
+				}
 			}
 		}
 	}
@@ -2857,40 +2866,43 @@ col_mac_factory = {
 	inline_script = colony_types/effects/inline_evolved_resolution_industry_factory
 
 	weight_modifier = {
-		base = 10
 		modifier = {
-			add = 5
-			owner = { has_monthly_income = { resource = consumer_goods value < 100 } }
-		}
-		modifier = {
-			add = 5
+			add = @stickiness
 			has_designation = col_mac_factory
 		}
+		add = value:industrial_districts_value|FACTOR|3|CG_ONLY|yes|
 		modifier = {
-			add = 2
-			has_building = building_factory_1
+			add = 10
+			tec_has_cg_buildings = yes
 		}
 		modifier = {
-			add = 4
-			has_building = building_factory_2
+			add = -5
+			tec_has_alloy_buildings = yes
 		}
 		modifier = {
-			add = 5
-			num_districts = { type = district_industrial value >= @built_districts_medium_threshold }
-		}
-		modifier = {
-			factor = 0
-			NOT = { num_districts = { type = district_industrial value >= @built_districts_medium_threshold } }
-			num_buildings = { type = building_factory_1 value = 0 }
-			num_buildings = { type = building_factory_2 value = 0 }
+			add = 10
+			check_variable_arithmetic = {
+				which = value:industrial_districts_value|CG_ONLY|yes|
+				value > 0
+			}
+			exists = owner
+			owner = {
+				resource_revenue_compare = {
+					resource = alloys
+					value >= trigger:years_passed
+				}
+				has_monthly_income = { resource = consumer_goods value < 0 }
+			}
 		}
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "manufacturing" }
-				not = { has_sector_focus = "balanced" }
+				NOR = {
+					has_sector_focus = "manufacturing"
+					has_sector_focus = "balanced"
+				}
 			}
 		}
 	}
@@ -2912,7 +2924,21 @@ col_hiv = {
 	}
 
 	weight_modifier = {
-		base = 10
+		modifier = {
+			add = @stickiness_low
+			has_designation = col_hiv
+		}
+		modifier = {
+			factor = 0
+			exists = sector
+			sector = {
+				has_any_sector_focus = yes
+				NOR = {
+					has_sector_focus = "production"
+					has_sector_focus = "balanced"
+				}
+			}
+		}
 	}
 }
 
@@ -2931,479 +2957,43 @@ col_hiv_foundry = {
 	inline_script = colony_types/effects/inline_evolved_resolution_industry_foundry
 
 	weight_modifier = {
-		base = 10
 		modifier = {
-			add = 5
-			owner = { has_monthly_income = { resource = alloys value < 100 } }
-		}
-		modifier = {
-			add = 5
+			add = @stickiness
 			has_designation = col_hiv_foundry
 		}
+		add = value:industrial_districts_value|FACTOR|3|ALLOY_ONLY|yes|
 		modifier = {
-			add = 2
-			has_building = building_foundry_1
+			add = 10
+			tec_has_cg_buildings = yes
 		}
 		modifier = {
-			add = 4
-			has_building = building_foundry_2
+			add = -5
+			tec_has_alloy_buildings = yes
 		}
 		modifier = {
-			add = 5
-			num_districts = { type = district_industrial value >= @built_districts_medium_threshold }
-		}
-		modifier = {
-			factor = 0
-			NOT = { num_districts = { type = district_industrial value >= @built_districts_medium_threshold } }
-			num_buildings = { type = building_foundry_1 value = 0 }
-			num_buildings = { type = building_foundry_2 value = 0 }
-		}
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				not = { has_sector_focus = "manufacturing" }
-				not = { has_sector_focus = "balanced" }
+			add = 10
+			check_variable_arithmetic = {
+				which = value:industrial_districts_value|ALLOY_ONLY|yes|
+				value > 0
 			}
-		}
-	}
-}
-
-# Administrative Center
-col_bureau = {
-	icon = GFX_colony_type_bureaucratic
-
-	potential = {
-		exists = owner
-		owner = {
-			is_regular_empire = yes
-			is_spiritualist = no
-		}
-		NOT = {
-			uses_district_set = habitat
-		}
-		is_special_colony_type = no
-	}
-
-	planet_modifier = {
-		planet_administrators_produces_mult = 0.10
-		planet_administrators_upkeep_mult = -0.10
-	}
-
-	inline_script = colony_types/effects/inline_evolved_ringworld
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner.federation
-			owner.federation = { has_federation_perk = all_the_priests_1 }
-		}
-		job_priest_per_pop = 0.04
-	}
-
-	weight_modifier = {
-		base = 10
-		modifier = {
-			add = 5
-			has_designation = col_bureau
-		}
-		modifier = {
-			add = 3
-			OR = {
-				num_buildings = { type = building_bureaucratic_1 value >= 2 }
-				num_buildings = { type = building_tec_aiauth_1 value >= 2 }
-				num_districts = { type = district_arcology_administrative value >= 2 }
-			}
-		}
-		modifier = {
-			add = 4
-			OR = {
-				num_buildings = { type = building_bureaucratic_1 value >= 3 }
-				num_buildings = { type = building_tec_aiauth_1 value >= 3 }
-				num_districts = { type = district_arcology_administrative value >= 3 }
-			}
-		}
-		modifier = {
-			add = 5
-			OR = {
-				num_buildings = { type = building_bureaucratic_1 value >= 4 }
-				num_buildings = { type = building_tec_aiauth_1 value >= 4 }
-				num_districts = { type = district_arcology_administrative value >= 4 }
-			}
-		}
-		modifier = {
-			add = 6
-			OR = {
-				num_buildings = { type = building_bureaucratic_1 value >= 5 }
-				num_buildings = { type = building_tec_aiauth_1 value >= 5 }
-				num_districts = { type = district_arcology_administrative value >= 5 }
-			}
-		}
-		modifier = {
-			add = 5
-			OR = {
-				num_buildings = { type = building_bureaucratic_2 value >= 1 }
-				num_buildings = { type = building_tec_aiauth_2 value >= 2 }
-				num_districts = { type = district_arcology_administrative value >= 5 }
-			}
-		}
-		modifier = {
-			add = 6
-			OR = {
-				num_buildings = { type = building_bureaucratic_2 value >= 2 }
-				num_buildings = { type = building_tec_aiauth_2 value >= 2 }
-				num_districts = { type = district_arcology_administrative value >= 5 }
-			}
-		}
-		modifier = {
-			add = 6
-			OR = {
-				num_buildings = { type = building_bureaucratic_3 value >= 1 }
-				num_buildings = { type = building_tec_aiauth_3 value >= 1 }
-				num_districts = { type = district_arcology_administrative value >= 5 }
-			}
-		}
-		modifier = {
-			add = 7
-			OR = {
-				num_buildings = { type = building_bureaucratic_3 value >= 2 }
-				num_buildings = { type = building_tec_aiauth_3 value >= 2 }
-				num_districts = { type = district_arcology_administrative value >= 5 }
-			}
-		}
-		modifier = {
-			factor = 0
-			if = {
-				limit = {
-					owner = {
-						tec_is_aiauth_empire = yes
-					}
+			exists = owner
+			owner = {
+				resource_revenue_compare = {
+					resource = alloys
+					value < trigger:years_passed
 				}
-				num_buildings = { type = building_tec_aiauth_1 value = 0 }
-				num_buildings = { type = building_tec_aiauth_2 value = 0 }
-				num_buildings = { type = building_tec_aiauth_3 value = 0 }
-				num_districts = { type = district_arcology_administrative value = 0 }
 			}
-			else = {
-				num_buildings = { type = building_bureaucratic_1 value = 0 }
-				num_buildings = { type = building_bureaucratic_2 value = 0 }
-				num_buildings = { type = building_bureaucratic_3 value = 0 }
-				num_districts = { type = district_arcology_administrative value = 0 }
-			}
+
 		}
 		modifier = {
 			factor = 0
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "unity" }
-				not = { has_sector_focus = "balanced" }
-			}
-		}
-		modifier = {
-			add = 1
-			exists = sector
-			sector = {
-				has_sector_focus = "unity"
-			}
-		}
-	}
-}
-
-col_bureau_spiritualist = {
-	icon = GFX_colony_type_bureaucratic
-
-	potential = {
-		exists = owner
-		owner = {
-			is_regular_empire = yes
-			is_spiritualist = yes
-		}
-		NOT = {
-			uses_district_set = habitat
-		}
-		is_special_colony_type = no
-	}
-
-	planet_modifier = {
-		planet_administrators_produces_mult = 0.10
-		planet_administrators_upkeep_mult = -0.10
-	}
-
-	inline_script = colony_types/effects/inline_evolved_ringworld
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner.federation
-			owner.federation = { has_federation_perk = all_the_priests_1 }
-		}
-		job_priest_per_pop = 0.04
-	}
-
-	weight_modifier = {
-		base = 10
-		modifier = {
-			add = 5
-			has_designation = col_bureau_spiritualist
-		}
-		modifier = {
-			add = 3
-			OR = {
-				num_buildings = { type = building_temple value >= 2 }
-				num_buildings = { type = building_sacrificial_temple_1 value >= 2 }
-				num_districts = { type = district_arcology_religious value >= 2 }
-			}
-		}
-		modifier = {
-			add = 4
-			OR = {
-				num_buildings = { type = building_temple value >= 3 }
-				num_buildings = { type = building_sacrificial_temple_1 value >= 3 }
-				num_districts = { type = district_arcology_religious value >= 3 }
-			}
-		}
-		modifier = {
-			add = 5
-			OR = {
-				num_buildings = { type = building_temple value >= 4 }
-				num_buildings = { type = building_sacrificial_temple_1 value >= 4 }
-				num_districts = { type = district_arcology_religious value >= 4 }
-			}
-		}
-		modifier = {
-			add = 6
-			OR = {
-				num_buildings = { type = building_temple value >= 5 }
-				num_buildings = { type = building_sacrificial_temple_1 value >= 5 }
-				num_districts = { type = district_arcology_religious value >= 5 }
-			}
-		}
-		modifier = {
-			add = 5
-			OR = {
-				num_buildings = { type = building_holotemple value >= 1 }
-				num_buildings = { type = building_sacrificial_temple_2 value >= 1 }
-				num_districts = { type = district_arcology_religious value >= 5 }
-			}
-		}
-		modifier = {
-			add = 6
-			OR = {
-				num_buildings = { type = building_holotemple value >= 2 }
-				num_buildings = { type = building_sacrificial_temple_2 value >= 2 }
-			}
-		}
-		modifier = {
-			add = 6
-			OR = {
-				num_buildings = { type = building_sacred_nexus value >= 1 }
-				num_buildings = { type = building_sacrificial_temple_3 value >= 1 }
-			}
-		}
-		modifier = {
-			add = 7
-			OR = {
-				num_buildings = { type = building_sacred_nexus value >= 2 }
-				num_buildings = { type = building_sacrificial_temple_3 value >= 2 }
-			}
-		}
-		modifier = {
-			factor = 0
-			AND = {
-				num_buildings = { type = building_temple value = 0 }
-				num_buildings = { type = building_sacrificial_temple_1 value = 0 }
-				num_buildings = { type = building_holotemple value = 0 }
-				num_buildings = { type = building_sacrificial_temple_2 value = 0 }
-				num_buildings = { type = building_sacred_nexus value = 0 }
-				num_buildings = { type = building_sacrificial_temple_3 value = 0 }
-				num_districts = { type = district_arcology_religious value = 0 }
-			}
-		}
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				not = { has_sector_focus = "unity" }
-				not = { has_sector_focus = "balanced" }
-			}
-		}
-		modifier = {
-			add = 1
-			exists = sector
-			sector = {
-				has_sector_focus = "unity"
-			}
-		}
-	}
-}
-
-col_bureau_hive = {
-	icon = GFX_colony_type_bureaucratic
-
-	potential = {
-		exists = owner
-		owner = { is_hive_empire = yes }
-		NOT = {
-			uses_district_set = habitat
-		}
-		is_special_colony_type = no
-	}
-
-	planet_modifier = {
-		planet_administrators_produces_mult = 0.10
-		planet_administrators_upkeep_mult = -0.10
-	}
-
-	inline_script = colony_types/effects/inline_evolved_ringworld
-
-	weight_modifier = {
-		base = 10
-		modifier = {
-			add = 5
-			has_designation = col_bureau_hive
-		}
-		modifier = {
-			add = 3
-			num_buildings = { type = building_hive_node value >= 2 }
-		}
-		modifier = {
-			add = 4
-			num_buildings = { type = building_hive_node value >= 3 }
-		}
-		modifier = {
-			add = 5
-			num_buildings = { type = building_hive_node value >= 4 }
-		}
-		modifier = {
-			add = 6
-			num_buildings = { type = building_hive_node value >= 5 }
-		}
-		modifier = {
-			add = 5
-			num_buildings = { type = building_hive_cluster value >= 1 }
-		}
-		modifier = {
-			add = 6
-				num_buildings = { type = building_hive_cluster value >= 2 }
-		}
-		modifier = {
-			add = 6
-			num_buildings = { type = building_hive_confluence value >= 1 }
-		}
-		modifier = {
-			add = 7
-			num_buildings = { type = building_hive_confluence value >= 2 }
-		}
-		modifier = {
-			factor = 0
-			AND = {
-				num_buildings = { type = building_hive_node value = 0 }
-				num_buildings = { type = building_hive_cluster value = 0 }
-				num_buildings = { type = building_hive_confluence value = 0 }
-			}
-		}
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				not = { has_sector_focus = "unity" }
-				not = { has_sector_focus = "balanced" }
-			}
-		}
-		modifier = {
-			add = 1
-			exists = sector
-			sector = {
-				has_sector_focus = "unity"
-			}
-		}
-	}
-}
-
-col_bureau_machine = {
-	icon = GFX_colony_type_bureaucratic
-
-	potential = {
-		exists = owner
-		owner = {
-			is_machine_empire = yes
-			NOT = { has_valid_civic = civic_machine_servitor }
-		}
-		NOT = {
-			uses_district_set = habitat
-		}
-		is_special_colony_type = no
-	}
-
-	planet_modifier = {
-		planet_administrators_produces_mult = 0.10
-		planet_administrators_upkeep_mult = -0.10
-	}
-
-	inline_script = colony_types/effects/inline_evolved_ringworld
-
-	weight_modifier = {
-		base = 10
-		modifier = {
-			add = 5
-			has_designation = col_bureau_machine
-		}
-		modifier = {
-			add = 3
-			num_buildings = { type = building_uplink_node value >= 2 }
-		}
-		modifier = {
-			add = 4
-			num_buildings = { type = building_uplink_node value >= 3 }
-		}
-		modifier = {
-			add = 5
-			num_buildings = { type = building_uplink_node value >= 4 }
-		}
-		modifier = {
-			add = 6
-			num_buildings = { type = building_uplink_node value >= 5 }
-		}
-		modifier = {
-			add = 5
-			num_buildings = { type = building_network_junction value >= 1 }
-		}
-		modifier = {
-			add = 6
-			num_buildings = { type = building_network_junction value >= 2 }
-		}
-		modifier = {
-			add = 6
-			num_buildings = { type = building_system_conflux value >= 1 }
-		}
-		modifier = {
-			add = 7
-				num_buildings = { type = building_system_conflux value >= 2 }
-		}
-		modifier = {
-			factor = 0
-			AND = {
-				num_buildings = { type = building_bureaucratic_2 value = 0 }
-				num_buildings = { type = building_network_junction value = 0 }
-				num_buildings = { type = building_system_conflux value = 0 }
-			}
-		}
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				not = { has_sector_focus = "unity" }
-				not = { has_sector_focus = "balanced" }
-			}
-		}
-		modifier = {
-			add = 1
-			exists = sector
-			sector = {
-				has_sector_focus = "unity"
+				NOR = {
+					has_sector_focus = "manufacturing"
+					has_sector_focus = "balanced"
+				}
 			}
 		}
 	}
@@ -3429,53 +3019,16 @@ col_trophy_machine = {
 	inline_script = colony_types/effects/inline_evolved_ringworld
 
 	weight_modifier = {
-		base = 10
 		modifier = {
-			add = 5
+			add = @stickiness
 			has_designation = col_trophy_machine
 		}
+		add = value:unity_combined_value|FACTOR|3|RS_ONLY|yes|
 		modifier = {
-			add = 3
-			OR = {
-				num_buildings = { type = building_organic_sanctuary value >= 2 }
-				num_districts = { type = district_arcology_organic_housing value >= 2 }
-			}
-		}
-		modifier = {
-			add = 4
-			OR = {
-				num_buildings = { type = building_organic_sanctuary value >= 3 }
-				num_districts = { type = district_arcology_organic_housing value >= 3 }
-			}
-		}
-		modifier = {
-			add = 5
-			OR = {
-				num_buildings = { type = building_organic_sanctuary value >= 4 }
-				num_districts = { type = district_arcology_organic_housing value >= 4 }
-			}
-		}
-		modifier = {
-			add = 6
-			OR = {
-				num_buildings = { type = building_organic_sanctuary value >= 5 }
-				num_districts = { type = district_arcology_organic_housing value >= 5 }
-			}
-		}
-		modifier = {
-			add = 5
-			num_buildings = { type = building_organic_paradise value >= 1 }
-		}
-		modifier = {
-			add = 6
-			num_buildings = { type = building_organic_paradise value >= 2 }
-		}
-		modifier = {
-			factor = 0
-			AND = {
-				num_buildings = { type = building_organic_sanctuary value = 0 }
-				num_buildings = { type = building_organic_paradise value = 0 }
-				num_districts = { type = district_arcology_organic_housing value = 0 }
+			add = 10
+			exists = sector
+			sector = {
+				has_sector_focus = "unity"
 			}
 		}
 		modifier = {
@@ -3483,418 +3036,29 @@ col_trophy_machine = {
 			exists = sector
 			sector = {
 				has_any_sector_focus = yes
-				not = { has_sector_focus = "unity" }
-				not = { has_sector_focus = "balanced" }
-			}
-		}
-		modifier = {
-			add = 1
-			exists = sector
-			sector = {
-				has_sector_focus = "unity"
-			}
-		}
-	}
-}
-
-col_habitat_bureau = {
-	icon = GFX_colony_type_hab_bureaucratic
-
-	potential = {
-		owner = {
-			is_regular_empire = yes
-			is_spiritualist = no
-		}
-		uses_district_set = habitat
-		is_special_colony_type = no
-	}
-
-	planet_modifier = {
-		planet_administrators_produces_mult = 0.10
-		planet_administrators_upkeep_mult = -0.10
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner.federation
-			owner.federation = { has_federation_perk = all_the_priests_1 }
-		}
-		job_priest_per_pop = 0.04
-	}
-
-	weight_modifier = {
-		base = 10
-		modifier = {
-			add = 5
-			has_designation = col_habitat_bureau
-		}
-		modifier = {
-			add = 3
-			OR = {
-				num_buildings = { type = building_bureaucratic_1 value >= 2 }
-				num_buildings = { type = building_tec_aiauth_1 value >= 2 }
-			}
-		}
-		modifier = {
-			add = 4
-			OR = {
-				num_buildings = { type = building_bureaucratic_1 value >= 3 }
-				num_buildings = { type = building_tec_aiauth_1 value >= 3 }
-			}
-		}
-		modifier = {
-			add = 5
-			OR = {
-				num_buildings = { type = building_bureaucratic_1 value >= 4 }
-				num_buildings = { type = building_tec_aiauth_1 value >= 4 }
-			}
-		}
-		modifier = {
-			add = 6
-			OR = {
-				num_buildings = { type = building_bureaucratic_1 value >= 4 }
-				num_buildings = { type = building_tec_aiauth_1 value >= 4 }
-			}
-		}
-		modifier = {
-			add = 5
-			OR = {
-				num_buildings = { type = building_bureaucratic_2 value >= 1 }
-				num_buildings = { type = building_tec_aiauth_2 value >= 1 }
-			}
-		}
-		modifier = {
-			add = 6
-			OR = {
-				num_buildings = { type = building_bureaucratic_1 value >= 2 }
-				num_buildings = { type = building_tec_aiauth_1 value >= 2 }
-			}
-		}
-		modifier = {
-			add = 6
-			OR = {
-				num_buildings = { type = building_bureaucratic_3 value >= 1 }
-				num_buildings = { type = building_tec_aiauth_3 value >= 1 }
-			}
-		}
-		modifier = {
-			add = 7
-			OR = {
-				num_buildings = { type = building_bureaucratic_3 value >= 2 }
-				num_buildings = { type = building_tec_aiauth_3 value >= 2 }
-			}
-		}
-		modifier = {
-			factor = 0
-			if = {
-				limit = {
-					owner = {
-						tec_is_aiauth_empire = yes
-					}
+				NOR = {
+					has_sector_focus = "balanced"
+					has_sector_focus = "unity"
 				}
-				num_buildings = { type = building_tec_aiauth_1 value = 0 }
-				num_buildings = { type = building_tec_aiauth_2 value = 0 }
-				num_buildings = { type = building_tec_aiauth_3 value = 0 }
-			}
-			else = {
-				num_buildings = { type = building_bureaucratic_1 value = 0 }
-				num_buildings = { type = building_bureaucratic_2 value = 0 }
-				num_buildings = { type = building_bureaucratic_3 value = 0 }
-			}
-		}
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				not = { has_sector_focus = "unity" }
-				not = { has_sector_focus = "balanced" }
-			}
-		}
-		modifier = {
-			exists = sector
-			add = 1
-			sector = {
-				has_sector_focus = "unity"
 			}
 		}
 	}
 }
 
-col_habitat_bureau_spiritualist = {
-	icon = GFX_colony_type_hab_bureaucratic
+# Crucible Planet
+col_crucible = {
+	icon = GFX_colony_type_crucible_world
 
 	potential = {
-		exists = owner
-		owner = {
-			is_regular_empire = yes
-			is_spiritualist = yes
-		}
-		uses_district_set = habitat
-		is_special_colony_type = no
+		has_modifier = crucible_colony
 	}
-
 	planet_modifier = {
-		planet_administrators_produces_mult = 0.10
-		planet_administrators_upkeep_mult = -0.10
+		pop_growth_speed = 0.10
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner.federation
-			owner.federation = { has_federation_perk = all_the_priests_1 }
-		}
-		job_priest_per_pop = 0.04
-	}
+	inline_script = colony_types/effects/inline_evolved_ringworld
 
 	weight_modifier = {
-		base = 10
-		modifier = {
-			add = 5
-			has_designation = col_habitat_bureau_spiritualist
-		}
-		modifier = {
-			add = 3
-			OR = {
-				num_buildings = { type = building_temple value >= 2 }
-				num_buildings = { type = building_sacrificial_temple_1 value >= 2 }
-			}
-		}
-		modifier = {
-			add = 4
-			OR = {
-				num_buildings = { type = building_temple value >= 3 }
-				num_buildings = { type = building_sacrificial_temple_1 value >= 3 }
-			}
-		}
-		modifier = {
-			add = 5
-			OR = {
-				num_buildings = { type = building_temple value >= 4 }
-				num_buildings = { type = building_sacrificial_temple_1 value >= 4 }
-			}
-		}
-		modifier = {
-			add = 6
-			OR = {
-				num_buildings = { type = building_temple value >= 5 }
-				num_buildings = { type = building_sacrificial_temple_1 value >= 5 }
-			}
-		}
-		modifier = {
-			add = 5
-			OR = {
-				num_buildings = { type = building_holotemple value >= 1 }
-				num_buildings = { type = building_sacrificial_temple_2 value >= 1 }
-			}
-		}
-		modifier = {
-			add = 6
-			OR = {
-				num_buildings = { type = building_holotemple value >= 2 }
-				num_buildings = { type = building_sacrificial_temple_2 value >= 2 }
-			}
-		}
-		modifier = {
-			add = 6
-			OR = {
-				num_buildings = { type = building_sacred_nexus value >= 1 }
-				num_buildings = { type = building_sacrificial_temple_3 value >= 1 }
-			}
-		}
-		modifier = {
-			add = 7
-			OR = {
-				num_buildings = { type = building_sacred_nexus value >= 2 }
-				num_buildings = { type = building_sacrificial_temple_3 value >= 2 }
-			}
-		}
-		modifier = {
-			factor = 0
-			AND = {
-				num_buildings = { type = building_temple value = 0 }
-				num_buildings = { type = building_sacrificial_temple_1 value = 0 }
-				num_buildings = { type = building_holotemple value = 0 }
-				num_buildings = { type = building_sacrificial_temple_2 value = 0 }
-				num_buildings = { type = building_sacred_nexus value = 0 }
-				num_buildings = { type = building_sacrificial_temple_3 value = 0 }
-			}
-		}
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				not = { has_sector_focus = "unity" }
-				not = { has_sector_focus = "balanced" }
-			}
-		}
-		modifier = {
-			add = 1
-			exists = sector
-			sector = {
-				has_sector_focus = "unity"
-			}
-		}
-	}
-}
-
-col_habitat_bureau_hive = {
-	icon = GFX_colony_type_hab_bureaucratic
-
-	potential = {
-		exists = owner
-		owner = { is_hive_empire = yes }
-		uses_district_set = habitat
-		is_special_colony_type = no
-	}
-
-	planet_modifier = {
-		planet_administrators_produces_mult = 0.10
-		planet_administrators_upkeep_mult = -0.10
-	}
-
-	weight_modifier = {
-		base = 10
-		modifier = {
-			add = 5
-			has_designation = col_habitat_bureau_hive
-		}
-		modifier = {
-			add = 3
-			num_buildings = { type = building_hive_node value >= 2 }
-		}
-		modifier = {
-			add = 4
-			num_buildings = { type = building_hive_node value >= 3 }
-		}
-		modifier = {
-			add = 5
-			num_buildings = { type = building_hive_node value >= 4 }
-		}
-		modifier = {
-			add = 6
-			num_buildings = { type = building_hive_node value >= 5 }
-		}
-		modifier = {
-			add = 5
-			num_buildings = { type = building_hive_cluster value >= 1 }
-		}
-		modifier = {
-			add = 6
-				num_buildings = { type = building_hive_cluster value >= 2 }
-		}
-		modifier = {
-			add = 6
-			num_buildings = { type = building_hive_confluence value >= 1 }
-		}
-		modifier = {
-			add = 7
-			num_buildings = { type = building_hive_confluence value >= 2 }
-		}
-		modifier = {
-			factor = 0
-			AND = {
-				num_buildings = { type = building_hive_node value = 0 }
-				num_buildings = { type = building_hive_cluster value = 0 }
-				num_buildings = { type = building_hive_confluence value = 0 }
-			}
-		}
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				not = { has_sector_focus = "unity" }
-				not = { has_sector_focus = "balanced" }
-			}
-		}
-		modifier = {
-			add = 1
-			exists = sector
-			sector = {
-				has_sector_focus = "unity"
-			}
-		}
-	}
-}
-
-col_habitat_bureau_machine = {
-	icon = GFX_colony_type_hab_bureaucratic
-
-	potential = {
-		exists = owner
-		owner = { is_machine_empire = yes }
-		uses_district_set = habitat
-		is_special_colony_type = no
-	}
-
-	planet_modifier = {
-		planet_administrators_produces_mult = 0.10
-		planet_administrators_upkeep_mult = -0.10
-	}
-
-	weight_modifier = {
-		base = 10
-		modifier = {
-			add = 5
-			has_designation = col_habitat_bureau_machine
-		}
-		modifier = {
-			add = 3
-			num_buildings = { type = building_uplink_node value >= 2 }
-		}
-		modifier = {
-			add = 4
-			num_buildings = { type = building_uplink_node value >= 3 }
-		}
-		modifier = {
-			add = 5
-			num_buildings = { type = building_uplink_node value >= 4 }
-		}
-		modifier = {
-			add = 6
-			num_buildings = { type = building_uplink_node value >= 5 }
-		}
-		modifier = {
-			add = 5
-			num_buildings = { type = building_network_junction value >= 1 }
-		}
-		modifier = {
-			add = 6
-			num_buildings = { type = building_network_junction value >= 2 }
-		}
-		modifier = {
-			add = 6
-			num_buildings = { type = building_system_conflux value >= 1 }
-		}
-		modifier = {
-			add = 7
-				num_buildings = { type = building_system_conflux value >= 2 }
-		}
-		modifier = {
-			factor = 0
-			AND = {
-				num_buildings = { type = building_bureaucratic_2 value = 0 }
-				num_buildings = { type = building_network_junction value = 0 }
-				num_buildings = { type = building_system_conflux value = 0 }
-			}
-		}
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				not = { has_sector_focus = "unity" }
-				not = { has_sector_focus = "balanced" }
-			}
-		}
-		modifier = {
-			add = 1
-			exists = sector
-			sector = {
-				has_sector_focus = "unity"
-			}
-		}
+		base = 1000
 	}
 }

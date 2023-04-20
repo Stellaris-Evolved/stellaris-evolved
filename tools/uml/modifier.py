@@ -112,3 +112,21 @@ def generate_modifiers(writer: Writer, config: LanguageConfig, resources: list[R
                                 writer, economic_category, modifier_type,
                                 template[key], economic_category_loc, args, resource
                             )
+
+
+def generate_buildings_loc(writer: Writer, config: LanguageConfig):
+    for key, (loc, template_key) in config['districts_and_buildings'].items():
+        template = config['templates'][template_key]
+        with writer.with_spacer():
+            writer.write_localization(
+                f"mod_planet_{key}_build_speed_mult",
+                template['build_speed'].format(
+                    building=loc
+                ),
+            )
+            writer.write_localization(
+                f"mod_{key}_max",
+                template['max_add'].format(
+                    building=loc
+                ),
+            )

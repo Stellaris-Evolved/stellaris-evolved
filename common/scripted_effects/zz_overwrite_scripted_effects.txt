@@ -695,6 +695,23 @@ add_random_leader_trait = {
 					}
 				}
 				5 = {
+					modifier = {
+						factor = 0
+						OR = {
+							is_researching_area = engineering
+							is_researching_area = physics
+						}
+					}
+					if = {
+						limit = {
+							NOT = { has_trait = leader_trait_expertise_archaeostudies }
+						}
+						add_trait = leader_trait_expertise_archaeostudies
+						set_timed_leader_flag = { flag = gained_leader_trait_expertise_archaeostudies days = 7 }
+						set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					}
+				}
+				5 = {
 					if = {
 						limit = {
 							NOT = { has_trait = leader_trait_expertise_military_theory }
@@ -857,6 +874,24 @@ add_random_leader_trait = {
 						add_trait = leader_trait_trickster
 						set_timed_leader_flag = { flag = gained_leader_trait_trickster days = 7 }
 						set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					}
+					modifier = {
+						factor = 0
+						has_first_contact_dlc = yes
+					}
+				}
+				5 = {
+					if = {
+						limit = {
+							NOT = { has_trait = leader_trait_trickster_fircon }
+						}
+						add_trait = leader_trait_trickster_fircon
+						set_timed_leader_flag = { flag = gained_leader_trait_trickster_fircon days = 7 }
+						set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					}
+					modifier = {
+						factor = 0
+						has_first_contact_dlc = no
 					}
 				}
 				5 = {
@@ -2236,6 +2271,23 @@ add_random_positive_leader_trait = {
 					}
 				}
 				5 = {
+					modifier = {
+						factor = 0
+						OR = {
+							is_researching_area = engineering
+							is_researching_area = physics
+						}
+					}
+					if = {
+						limit = {
+							NOT = { has_trait = leader_trait_expertise_archaeostudies }
+						}
+						add_trait = leader_trait_expertise_archaeostudies
+						set_timed_leader_flag = { flag = gained_leader_trait_expertise_archaeostudies days = 7 }
+						set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					}
+				}
+				5 = {
 					if = {
 						limit = {
 							NOT = { has_trait = leader_trait_expertise_military_theory }
@@ -2320,6 +2372,24 @@ add_random_positive_leader_trait = {
 						add_trait = leader_trait_trickster
 						set_timed_leader_flag = { flag = gained_leader_trait_trickster days = 7 }
 						set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					}
+					modifier = {
+						factor = 0
+						has_first_contact_dlc = yes
+					}
+				}
+				5 = {
+					if = {
+						limit = {
+							NOT = { has_trait = leader_trait_trickster_fircon }
+						}
+						add_trait = leader_trait_trickster_fircon
+						set_timed_leader_flag = { flag = gained_leader_trait_trickster_fircon days = 7 }
+						set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					}
+					modifier = {
+						factor = 0
+						has_first_contact_dlc = no
 					}
 				}
 				5 = {
@@ -3568,6 +3638,15 @@ add_leader_traits_after_modification = {
 		limit = {
 			species = {
 				has_trait = trait_cybernetic
+			}
+			exists = owner
+			owner = {
+				if = {
+					limit = {
+						tec_has_cybernetic_ascension_path_exception = yes
+					}
+					tec_has_cybernetic_ascension_path = yes
+				}
 			}
 		}
 		if = {
@@ -4859,181 +4938,6 @@ remove_leader_traits_after_modification = {
 	}
 }
 
-
-# Given a species, create a mod with trait_cybernetic and apply to all pops, leaders
-# and armies that have the original species and the same owner as the scope object.
-# Scope: Something that has a species and an owner
-create_cybernetic_species_mod = {
-	species = {
-		create_species = {
-			is_mod = yes
-			name = this
-			plural = this
-			class = this
-			portrait = this
-			traits = this
-			can_be_modified = this
-			homeworld = this
-			namelist = this
-			gender = this
-			traits = {
-				ideal_planet_class = this
-				trait = trait_cybernetic
-			}
-		}
-		save_event_target_as = changing_species
-	}
-
-	owner = {
-		every_owned_pop = {
-			limit = { is_exact_same_species = event_target:changing_species }
-			change_species = last_created_species
-		}
-		every_owned_leader = {
-			limit = { is_exact_same_species = event_target:changing_species }
-			change_species = last_created_species
-		}
-		every_pool_leader = {
-			limit = { is_exact_same_species = event_target:changing_species }
-			change_species = last_created_species
-		}
-		every_envoy = {
-			limit = { is_exact_same_species = event_target:changing_species }
-			change_species = last_created_species
-		}
-		every_owned_army = {
-			limit = {
-				exists = species
-				is_exact_same_species = event_target:changing_species
-			}
-			change_species = last_created_species
-		}
-		every_controlled_ship = {
-			limit = {
-				is_ship_class = shipclass_colonizer
-				is_exact_same_species = event_target:changing_species
-			}
-			change_species = last_created_species
-		}
-	}
-}
-
-# For the future
-tec_create_advanced_cybernetic_species_mod = {
-	species = {
-		create_species = {
-			is_mod = yes
-			name = this
-			plural = this
-			class = this
-			portrait = this
-			traits = this
-			can_be_modified = this
-			homeworld = this
-			namelist = this
-			gender = this
-			traits = {
-				ideal_planet_class = this
-				trait = @trait_tec_advanced_cyborg
-			}
-		}
-		save_event_target_as = changing_species
-	}
-
-	owner = {
-		every_owned_pop = {
-			limit = { is_exact_same_species = event_target:changing_species }
-			change_species = last_created_species
-		}
-		every_owned_leader = {
-			limit = { is_exact_same_species = event_target:changing_species }
-			change_species = last_created_species
-		}
-		every_pool_leader = {
-			limit = { is_exact_same_species = event_target:changing_species }
-			change_species = last_created_species
-		}
-		every_envoy = {
-			limit = { is_exact_same_species = event_target:changing_species }
-			change_species = last_created_species
-		}
-		every_owned_army = {
-			limit = {
-				exists = species
-				is_exact_same_species = event_target:changing_species
-			}
-			change_species = last_created_species
-		}
-		every_controlled_ship = {
-			limit = {
-				is_ship_class = shipclass_colonizer
-				is_exact_same_species = event_target:changing_species
-			}
-			change_species = last_created_species
-		}
-	}
-}
-
-
-tec_old_create_adv_cybernetic_species_mod = {
-	species = {
-		create_species = {
-			is_mod = yes
-			name = this
-			plural = this
-			class = this
-			portrait = this
-			traits = this
-			can_be_modified = this
-			homeworld = this
-			namelist = this
-			gender = this
-			traits = {
-				ideal_planet_class = this
-				trait = trait_cybernetic
-			}
-		}
-		save_event_target_as = changing_species
-	}
-
-	owner = {
-		every_owned_pop = {
-			limit = { is_exact_same_species = event_target:changing_species }
-			change_species = last_created_species
-		}
-		every_owned_leader = {
-			limit = { is_exact_same_species = event_target:changing_species }
-			change_species = last_created_species
-		}
-		every_pool_leader = {
-			limit = { is_exact_same_species = event_target:changing_species }
-			change_species = last_created_species
-		}
-		every_envoy = {
-			limit = { is_exact_same_species = event_target:changing_species }
-			change_species = last_created_species
-		}
-		every_owned_army = {
-			limit = {
-				exists = species
-				is_exact_same_species = event_target:changing_species
-			}
-			change_species = last_created_species
-		}
-		every_controlled_ship = {
-			limit = {
-				is_ship_class = shipclass_colonizer
-				is_exact_same_species = event_target:changing_species
-			}
-			change_species = last_created_species
-		}
-	}
-}
-
-
-
-
-
 # FIRST CONTACT EXOCOLONIST TWEAK
 # first_contact scope. Putting here so it's easy to find again
 set_first_contact_starting_stage = {
@@ -5129,207 +5033,54 @@ set_first_contact_starting_stage = {
 }
 
 
-generate_home_planet_final_pass = {
-	optimize_memory
-	# Adjust life-seeded colonies
+# 3.7
+set_merchant_government_effect = {
 	if = {
 		limit = {
-			owner = {
-				has_origin = origin_life_seeded
-			}
+			has_technology = tech_galactic_administration
+			has_ascension_perk = ap_future_society
 		}
+		change_government = {
+			authority = auth_oligarchic
+			cooldown = no
+			remove_invalid_civics = yes
+			civics = { civic = civic_merchant_guilds civic = civic_tec_corporate_politics civic = random civic = random civic = random }
+		}
+	}
+	else_if = {
+		limit = {
+			has_technology = tech_galactic_administration
+		}
+		change_government = {
+			authority = auth_oligarchic
+			cooldown = no
+			remove_invalid_civics = yes
+			civics = { civic = civic_merchant_guilds civic = civic_tec_corporate_politics civic = random civic = random }
+		}
+	}
+	else = {
+		change_government = {
+			authority = auth_oligarchic
+			cooldown = no
+			remove_invalid_civics = yes
+			civics = { civic = civic_merchant_guilds civic = civic_tec_corporate_politics civic = random }
+		}
+	}
+}
 
-		owner = {
-			# Nuke other colonies gained from advanced empire, etc
-			every_owned_planet = {
-				limit = { is_capital = no }
-				remove_all_buildings = yes
-				destroy_colony = yes
-			}
-			if = {
-				limit = { 
-					NOR = { 
-						has_valid_civic = civic_permanent_employment 
-						has_valid_civic = civic_machine_servitor
-						has_valid_civic = civic_machine_assimilator
-					} 
-				}
-				change_dominant_species = { species = last_created_species change_all = yes }
-			}
-			if = {
-				limit = { 
-					OR = { 
-						has_valid_civic = civic_machine_servitor
-						has_valid_civic = civic_machine_assimilator
-					} 
-				}
-				last_created_species = {
-					modify_species = {
-						species = this
-						ideal_planet_class = pc_gaia
-					}
-				}
-			}
-		}
-	}
+impose_ideology_effect = {
+	copy_ethos_and_authority = root
+	tec_remove_sovereign_type_civic_effect = yes
 	if = {
 		limit = {
-			owner = {
-				OR = {
-					has_origin = origin_shattered_ring
-					has_origin = origin_machine
-				}
-			}
+			root = { is_megacorp = yes }
+			is_megacorp = yes
 		}
-		owner = {
-			capital_scope = {
-				system_star = {
-					set_deposit = d_energy_10
-				}
-			}
-		}
+		set_merchant_government_effect = yes
 	}
-	if = {
-		limit = {
-			owner = {
-				has_origin = origin_tree_of_life
-			}
-		}
-		owner = {
-			capital_scope = {
-				add_deposit = d_tree_of_life_home
-			}
-		}
-	}
-	if = {
-		limit = {
-			owner = {
-				has_origin = origin_lithoid
-			}
-		}
-		owner = {
-			capital_scope = {
-				add_deposit = d_lithoid_crater
-				add_deposit = d_buried_lithoids
-				add_deposit = d_buried_lithoids
-				add_deposit = d_buried_lithoids
-				add_deposit = d_buried_lithoids
-				add_modifier = { modifier = lithoid_crater }
-			}
-		}
-	}
-	if = {
-		limit = {
-			owner = {
-				has_origin = origin_lost_colony
-			}
-		}
-		owner = {
-			capital_scope = {
-				add_modifier = { modifier = colonial_spirit_mod }
-			}
-		}
-	}
-	if = {
-		limit = {
-			owner = {
-				has_origin = origin_progenitor_hive
-			}
-		}
-		owner = {
-			capital_scope = {
-				add_deposit = d_progenitor
-			}
-		}
-	}
-	if = {
-		limit = {
-			owner = {
-				has_origin = origin_default
-			}
-		}
-		owner = {
-			if = {
-				limit = {
-					is_gestalt = no
-				}
-				capital_scope = {
-					add_modifier = { modifier = prosp_uni_mod days = 7200 }
-				}
-			}
-			else = {
-				capital_scope = {
-					add_modifier = { modifier = prosp_uni_mod_gestalt days = 7200 }
-				}
-			}
-		}
-	}
-	if = {
-		limit = {
-			owner = {
-				has_origin = origin_machine
-			}
-		}
-		owner = {
-			capital_scope = {
-				add_deposit = d_machine_minerals
-				solar_system = {
-					every_system_planet = {
-						limit = {
-							colonizable_planet = no
-							is_star = no
-						}
-						clear_deposits = yes
-					}
-					every_system_planet = {
-						limit = {
-							is_asteroid = yes
-						}
-						remove_planet = yes
-					}
-					every_system_planet = {
-						limit = {
-							colonizable_planet = no
-							is_star = no
-							is_asteroid = no
-							NOT = { is_planet_class = pc_gas_giant }
-						}
-						change_pc = pc_broken
-					}
-					every_system_planet = {
-						limit = {
-							colonizable_planet = no
-							is_star = no
-							is_planet_class = pc_gas_giant
-						}
-						change_pc = pc_molten
-						add_modifier = { modifier = chthonian_planet }
-						every_moon = {
-							limit = {
-								colonizable_planet = no
-							}
-							remove_planet = yes
-						}
-						while = {
-							limit = {
-								planet_size >= 20
-							}
-							change_planet_size = -6
-						}
-					}
-				}
-			}
-		}
-	}
-	if = {
-		limit = {
-			owner = {
-				any_owned_pop = {
-					has_trait = trait_exotic_metabolism
-				}
-			}
-		}
-
-		add_deposit = d_exotic_mountain
+	add_modifier = { modifier = recently_liberated days = 7300 }
+	add_opinion_modifier = { modifier = opinion_liberated_us who = root }
+	root = {
+		add_opinion_modifier = { modifier = opinion_we_liberated who = from }
 	}
 }

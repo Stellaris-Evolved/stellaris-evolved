@@ -263,6 +263,10 @@ diplomatic_stance = {
 			}
 			modifier = {
 				factor = 1.3
+				has_valid_civic = civic_machine_exploration_protocol
+			}
+			modifier = {
+				factor = 1.3
 				has_ethic = ethic_fanatic_pacifist
 			}
 			modifier = {
@@ -712,15 +716,19 @@ diplomatic_stance = {
 	}
 
 	option = {
-		name = "diplo_stance_primitive"
+		name = "diplo_stance_ignorant"
 		icon = "GFX_diplomatic_stance_isolationist"
 
 		potential = {
 			is_country_type = primitive
+			current_awareness_level < medium
+			capital_scope = {
+				NOT = { has_modifier = culture_shock_diplomacy }
+			}
 		}
 
 		policy_flags = {
-			diplo_stance_primitive
+			diplo_stance_ignorant
 		}
 
 		modifier = {
@@ -730,6 +738,131 @@ diplomatic_stance = {
 			weight = 1
 		}
 	}
+
+	option = {
+		name = "diplo_stance_questioning"
+		icon = "GFX_diplomatic_stance_expansionist"
+
+		potential = {
+			is_country_type = primitive
+			current_awareness_level = medium
+			capital_scope = {
+				NOT = { has_modifier = culture_shock_diplomacy }
+			}
+		}
+
+		policy_flags = {
+			diplo_stance_questioning
+		}
+
+		modifier = {
+		}
+
+		ai_weight = {
+			weight = 1
+		}
+	}
+
+	option = {
+		name = "diplo_stance_eager"
+		icon = "GFX_diplomatic_stance_cooperative"
+
+		potential = {
+			is_country_type = primitive
+			current_awareness_level >= high
+			is_xenophile = yes
+			capital_scope = {
+				NOT = { has_modifier = culture_shock_diplomacy }
+			}
+		}
+
+		policy_flags = {
+			diplo_stance_eager
+		}
+
+		modifier = {
+		}
+
+		ai_weight = {
+			weight = 1
+		}
+	}
+
+	option = {
+		name = "diplo_stance_fearful"
+		icon = "GFX_diplomatic_stance_withdrawn"
+
+		potential = {
+			is_country_type = primitive
+			current_awareness_level >= high
+			is_xenophobe = yes
+			capital_scope = {
+				NOT = { has_modifier = culture_shock_diplomacy }
+			}
+		}
+
+		policy_flags = {
+			diplo_stance_fearful
+		}
+
+		modifier = {
+		}
+
+		ai_weight = {
+			weight = 1
+		}
+	}
+
+	option = {
+		name = "diplo_stance_uncertain"
+		icon = "GFX_diplomatic_stance_isolationist"
+
+		potential = {
+			is_country_type = primitive
+			current_awareness_level >= high
+			is_xenophile = no
+			is_xenophobe = no
+			capital_scope = {
+				NOT = { has_modifier = culture_shock_diplomacy }
+			}
+		}
+
+		policy_flags = {
+			diplo_stance_uncertain
+		}
+
+		modifier = {
+		}
+
+		ai_weight = {
+			weight = 1
+		}
+	}
+
+	option = {
+		name = "diplo_stance_culture_shock"
+		icon = "GFX_diplomatic_stance_belligerent"
+
+		potential = {
+			is_country_type = primitive
+			capital_scope = {
+				has_modifier = culture_shock_diplomacy
+			}
+		}
+
+		policy_flags = {
+			diplo_stance_culture_shock
+		}
+
+		modifier = {
+			diplo_action_acceptance_add = -100
+		}
+
+		ai_weight = {
+			weight = 100
+		}
+	}
+
 	option = {
 		name = "diplo_stance_evangelist"
 		icon = "GFX_diplomatic_stance_isolationist"
@@ -1149,6 +1282,7 @@ first_contact_protocol = {
 		valid = {
 			is_homicidal = no
 			is_xenophobe = no
+			NOT = { has_origin = origin_payback }
 		}
 
 		AI_weight = {
@@ -1189,6 +1323,10 @@ first_contact_protocol = {
 			modifier = {
 				factor = 1.5
 				always = yes #Liu Cixin is right
+			}
+			modifier = {
+				factor = 2
+				has_origin = origin_payback
 			}
 		}
 	}
@@ -2042,8 +2180,9 @@ orbital_bombardment = {
 				factor = 0.1
 				is_galactic_community_member = yes
 				OR = {
-					is_active_resolution = "resolution_galacticstudies_ethical_guideline_refactoring"
-					is_active_resolution = "resolution_galacticstudies_extradimensional_experimentation"
+					is_active_resolution = "resolution_rulesofwar_independent_tribunals"
+					is_active_resolution = "resolution_rulesofwar_last_resort_doctrine"
+					is_active_resolution = "resolution_rulesofwar_demobilization_initiative"
 				}
 			}
 		}
@@ -2102,7 +2241,10 @@ border_policy = {
 		}
 
 		potential = {
-			tec_is_default_country = yes
+			OR = {
+				tec_is_default_country = yes
+				is_primitive = yes
+			}
 		}
 
 		valid = {
@@ -2124,7 +2266,7 @@ border_policy = {
 		modifier = {}
 
 		valid = {
-			always = yes
+			is_primitive = no
 		}
 
 		AI_weight = {
@@ -2740,7 +2882,12 @@ tec_drone_overclock = {
 		policy_flags = {
 			tec_mid_overclock
 		}
-		modifier = {}
+		modifier = {
+			pop_category_drones_physics_research_produces_add = 0.5
+			pop_category_drones_society_research_produces_add = 0.5
+			pop_category_drones_engineering_research_produces_add = 0.5
+			pop_category_drones_energy_upkeep_add = 0.25
+		}
 
 		AI_weight = {
 			factor = 2
@@ -2779,7 +2926,12 @@ tec_drone_overclock = {
 			tec_max_overclock
 		}
 		
-		modifier = {}
+		modifier = {
+			pop_category_drones_physics_research_produces_add = 1
+			pop_category_drones_society_research_produces_add = 1
+			pop_category_drones_engineering_research_produces_add = 1
+			pop_category_drones_energy_upkeep_add = 0.5
+		}
 
 		AI_weight = {
 			factor = 2
@@ -2818,7 +2970,10 @@ tec_drone_overclock = {
 		policy_flags = {
 			tec_low_overclock_hive
 		}
-		modifier = {}
+		modifier = {
+			planet_jobs_complex_and_simple_drone_produces_mult = 0.05
+			pop_category_drones_energy_upkeep_add = 0.25
+		}
 
 		AI_weight = {
 			factor = 2
@@ -2856,7 +3011,10 @@ tec_drone_overclock = {
 		policy_flags = {
 			tec_mid_overclock_hive
 		}
-		modifier = {}
+		modifier = {
+			planet_jobs_complex_and_simple_drone_produces_mult = 0.10
+			pop_category_drones_energy_upkeep_add = 0.5
+		}
 
 		AI_weight = {
 			factor = 2
@@ -2895,7 +3053,10 @@ tec_drone_overclock = {
 			tec_max_overclock_hive
 		}
 		
-		modifier = {}
+		modifier = {
+			planet_jobs_complex_and_simple_drone_produces_mult = 0.20
+			pop_category_drones_energy_upkeep_add = 1
+		}
 
 		AI_weight = {
 			factor = 2
@@ -3852,6 +4013,10 @@ purge = {
 				fail_text = is_not_a_signatory_vassal_fail
 				NOT = { any_agreement = { agreement_preset = preset_signatory } }
 			}
+			custom_tooltip = {
+				fail_text = is_broken_shackles_origin
+				NOT = { has_origin = origin_broken_shackles }
+			}
 			OR = {
 				has_ethic = ethic_gestalt_consciousness
 				has_ethic = ethic_xenophobe
@@ -4058,20 +4223,70 @@ interference = {
 	}
 
 	option = {
-		name = "interference_passive"
+		name = "interference_not_allowed"
 
 		policy_flags = {
-			interference_passive
+			interference_not_allowed
 		}
 
 		on_enabled = {
-			hidden_effect = { set_country_flag = encountered_first_primitive }
+			hidden_effect = { 
+				set_country_flag = encountered_first_primitive
+			}
 		}
 
 		in_breach_of = {
 			{
 				key = resolution_galacticstudies_advanced_xenostudies
 			}
+			{
+				key = resolution_pre_ftl_stances_equal_standing
+			}
+			{
+				key = resolution_pre_ftl_stances_exploitation
+			}
+		}
+
+		valid = {
+			OR = {
+				custom_tooltip = {
+					text = is_a_signatory_vassal
+					any_agreement = { agreement_preset = preset_signatory }
+				}
+				is_active_resolution = resolution_pre_ftl_stances_non_interference
+				NOR = {
+					has_ethic = "ethic_fanatic_xenophobe"
+					has_valid_civic = "civic_fanatic_purifiers"
+					has_valid_civic = "civic_hive_devouring_swarm"
+					has_valid_civic = "civic_machine_terminator"
+				}
+			}
+		}
+
+		AI_weight = {
+			modifier = {
+				factor = 0.1
+				is_galactic_community_member = yes
+				OR = {
+					is_active_resolution = "resolution_galacticstudies_advanced_xenostudies"
+					is_active_resolution = "resolution_galacticstudies_ethical_guideline_refactoring"
+					is_active_resolution = "resolution_galacticstudies_extradimensional_experimentation"
+					is_active_resolution = "resolution_pre_ftl_stances_equal_standing"
+					is_active_resolution = "resolution_pre_ftl_stances_exploitation"
+				}
+			}
+		}
+	}
+
+	option = {
+		name = "interference_subtle"
+
+		policy_flags = {
+			interference_subtle
+		}
+
+		on_enabled = {
+			hidden_effect = { set_country_flag = encountered_first_primitive }
 		}
 
 		valid = {
@@ -4091,12 +4306,15 @@ interference = {
 
 		AI_weight = {
 			modifier = {
-				factor = 0.1
-				is_galactic_community_member = yes
-				OR = {
-					is_active_resolution = "resolution_galacticstudies_advanced_xenostudies"
-					is_active_resolution = "resolution_galacticstudies_ethical_guideline_refactoring"
-					is_active_resolution = "resolution_galacticstudies_extradimensional_experimentation"
+				factor = 2
+				has_valid_ai_personality = yes
+				has_ai_personality_behaviour = infiltrator
+			}
+			modifier = {
+				factor = 0
+				has_valid_ai_personality = yes
+				NOT = {
+					has_ai_personality_behaviour = infiltrator
 				}
 			}
 		}
@@ -4108,7 +4326,12 @@ interference = {
 		policy_flags = {
 			interference_active
 		}
-		modifier = {}
+		
+		in_breach_of = {
+			{
+				key = resolution_pre_ftl_stances_non_interference
+			}
+		}
 
 		on_enabled = {
 			hidden_effect = { set_country_flag = encountered_first_primitive }
@@ -4141,22 +4364,31 @@ interference = {
 					has_ai_personality_behaviour = infiltrator
 					has_ai_personality_behaviour = dominator
 				}
-				NOT = {
-					is_galactic_community_member = yes
-					OR = {
-						is_active_resolution = "resolution_galacticstudies_advanced_xenostudies"
-						is_active_resolution = "resolution_galacticstudies_ethical_guideline_refactoring"
-						is_active_resolution = "resolution_galacticstudies_extradimensional_experimentation"
-					}
+			}
+			modifier = {
+				factor = 0.1
+				is_galactic_community_member = yes
+				OR = {
+					is_active_resolution = "resolution_galacticstudies_advanced_xenostudies"
+					is_active_resolution = "resolution_galacticstudies_ethical_guideline_refactoring"
+					is_active_resolution = "resolution_galacticstudies_extradimensional_experimentation"
+					is_active_resolution = "resolution_pre_ftl_stances_non_interference"
 				}
 			}
 		}
 	}
 	option = {
-		name = "interference_full"
+		name = "interference_aggressive"
 
-		potential = {
+		in_breach_of = {
+			{
+				key = resolution_pre_ftl_stances_non_interference
+			}
+			{
+				key = resolution_pre_ftl_stances_equal_standing
+			}
 		}
+
 		valid = {
 			custom_tooltip = {
 				success_text = is_not_a_signatory_vassal_success
@@ -4166,29 +4398,28 @@ interference = {
 			NOR = {
 				has_ethic = "ethic_pacifist"
 				has_ethic = "ethic_fanatic_pacifist"
+				has_ethic = "ethic_xenophile"
+				has_ethic = "ethic_fanatic_xenophile"
+				has_valid_civic = civic_machine_exploration_protocol
 			}
 		}
 		on_enabled = {
 			hidden_effect = { set_country_flag = encountered_first_primitive }
 		}
 		policy_flags = {
-			interference_full
+			interference_aggressive
 		}
 		modifier = {}
 		AI_weight = {
 			modifier = {
 				factor = 3
 				has_valid_ai_personality = yes
-				OR = {
-					has_ai_personality_behaviour = infiltrator
-					has_ai_personality_behaviour = dominator
-				}
+				has_ai_personality_behaviour = dominator
 			}
 			modifier = {
 				factor = 0
 				has_valid_ai_personality = yes
-				NOR = {
-					has_ai_personality_behaviour = infiltrator
+				NOT = {
 					has_ai_personality_behaviour = dominator
 				}
 			}
@@ -4197,6 +4428,14 @@ interference = {
 				OR = {
 					has_ethic = "ethic_pacifist"
 					has_ethic = "ethic_fanatic_pacifist"
+				}
+			}
+			modifier = {
+				factor = 0.1
+				is_galactic_community_member = yes
+				OR = {
+					is_active_resolution = "resolution_pre_ftl_stances_non_interference"
+					is_active_resolution = "resolution_pre_ftl_stances_equal_standing"
 				}
 			}
 		}
@@ -4209,6 +4448,7 @@ enlightenment = {
 		has_met_primitives = yes
 	}
 
+	
 	option = {
 		name = "enlightenment_not_allowed"
 
@@ -4216,9 +4456,28 @@ enlightenment = {
 			enlightenment_not_allowed
 		}
 
-		on_enabled = {
-			# custom_tooltip = "policy_allow_slavery_effect_disable"
+		AI_weight = {
+			weight = 1
 		}
+	}
+
+	option = {
+		name = "enlightenment_covert_only"
+
+		policy_flags = {
+			enlightenment_covert_only
+		}
+
+		valid = {
+			NOT = { has_policy_flag = interference_not_allowed }
+			NOR = {
+				has_ethic = "ethic_fanatic_xenophobe"
+				has_valid_civic = "civic_fanatic_purifiers"
+				has_valid_civic = "civic_hive_devouring_swarm"
+				has_valid_civic = "civic_machine_terminator"
+			}
+		}
+		
 		AI_weight = {
 			weight = 1
 		}
@@ -4233,6 +4492,7 @@ enlightenment = {
 		modifier = {}
 
 		valid = {
+			NOT = { has_policy_flag = interference_not_allowed }
 			NOR = {
 				has_ethic = "ethic_fanatic_xenophobe"
 				has_valid_civic = "civic_fanatic_purifiers"
@@ -4511,6 +4771,10 @@ slavery = {
 				success_text = is_not_a_signatory_vassal_success
 				fail_text = is_not_a_signatory_vassal_fail
 				NOT = { any_agreement = { agreement_preset = preset_signatory } }
+			}
+			custom_tooltip = {
+				fail_text = is_broken_shackles_origin
+				NOT = { has_origin = origin_broken_shackles }
 			}
 			OR = {
 				has_ethic = ethic_authoritarian
@@ -5426,7 +5690,7 @@ bioservant_intelligence_policy = {
 			hidden_effect = {
 				every_owned_species = {
 					limit = {
-						tec_is_bioservant = yes
+						tec_is_bioservant_species = yes
 					}
 					set_citizenship_type = {
 						type = citizenship_full
@@ -5467,7 +5731,7 @@ bioservant_intelligence_policy = {
 			hidden_effect = {
 				every_owned_species = {
 					limit = {
-						tec_is_bioservant = yes
+						tec_is_bioservant_species = yes
 					}
 					set_citizenship_type = {
 						type = citizenship_robot_servitude
@@ -5562,7 +5826,7 @@ bioservant_pop_policy = {
 			hidden_effect = {
 				every_owned_species = {
 					limit = {
-						tec_is_bioservant = yes
+						tec_is_bioservant_species = yes
 					}
 					set_citizenship_type = {
 						type = citizenship_purge
@@ -5903,6 +6167,7 @@ bureaucracy = {
 # Healthcare group: Unlocked by 
 healthcare = {
 	potential = {
+		always = no
 		is_regular_empire = yes
 		NOT = { has_ethic = ethic_gestalt_consciousness }
 	}
@@ -6989,7 +7254,7 @@ dronemaintenance_introspective_policy = {
 		}
 
 		AI_weight = {
-			factor = 2
+			weight = 1
 		}
 	}
 
@@ -6999,6 +7264,7 @@ dronemaintenance_introspective_policy = {
 
 		potential = {
 			has_ethic = ethic_gestalt_consciousness
+			tec_is_trade_gestalt = no
 		}
 
 		modifier = {
@@ -7007,7 +7273,76 @@ dronemaintenance_introspective_policy = {
 		}
 
 		AI_weight = {
-			factor = 2
+			weight = 1
+			modifier = {
+				add = -1
+				owner_species = {
+					OR = {
+						has_trait = trait_repugnant
+						has_trait = trait_robot_uncanny
+					}
+				}
+			}
+			modifier = {
+				add = 1
+				owner_species = {
+					OR = {
+						has_trait = trait_charismatic
+						has_trait = trait_crafted_smiles
+						has_trait = trait_robot_domestic_protocols
+						has_trait = trait_robot_emotion_emulators
+					}
+					
+				}
+			}
+			modifier = {
+				add = 1
+				years_passed > 50
+			}
+		}
+	}
+
+	option = {
+		name = "shifted_maintenance_introspective"
+
+		potential = {
+			has_ethic = ethic_gestalt_consciousness
+			tec_is_trade_gestalt = yes
+		}
+
+		modifier = {
+			pop_amenities_usage_no_happiness_add = 0.25
+			planet_stability_add = 5
+			pop_job_trade_mult = 0.05
+		}
+
+		AI_weight = {
+			weight = 2
+			modifier = {
+				add = -1
+				owner_species = {
+					OR = {
+						has_trait = trait_repugnant
+						has_trait = trait_robot_uncanny
+					}
+				}
+			}
+			modifier = {
+				add = 1
+				owner_species = {
+					OR = {
+						has_trait = trait_charismatic
+						has_trait = trait_crafted_smiles
+						has_trait = trait_robot_domestic_protocols
+						has_trait = trait_robot_emotion_emulators
+					}
+					
+				}
+			}
+			modifier = {
+				add = 1
+				years_passed > 50
+			}
 		}
 	}
 
@@ -7016,6 +7351,7 @@ dronemaintenance_introspective_policy = {
 
 		potential = {
 			has_ethic = ethic_gestalt_consciousness
+			tec_is_trade_gestalt = no
 		}
 
 		modifier = {
@@ -7024,7 +7360,84 @@ dronemaintenance_introspective_policy = {
 		}
 
 		AI_weight = {
-			factor = 2
+			weight = 1
+			modifier = {
+				add = -1
+				owner_species = {
+					OR = {
+						has_trait = trait_repugnant
+						has_trait = trait_robot_uncanny
+					}
+				}
+			}
+			modifier = {
+				add = 1
+				owner_species = {
+					OR = {
+						has_trait = trait_charismatic
+						has_trait = trait_crafted_smiles
+						has_trait = trait_robot_domestic_protocols
+						has_trait = trait_robot_emotion_emulators
+					}
+					
+				}
+			}
+			modifier = {
+				add = 1
+				years_passed > 50
+			}
+			modifier = {
+				add = 1
+				years_passed > 100
+			}
+		}
+	}
+
+	option = {
+		name = "intensified_maintenance_introspective"
+
+		potential = {
+			has_ethic = ethic_gestalt_consciousness
+			tec_is_trade_gestalt = yes
+		}
+
+		modifier = {
+			pop_amenities_usage_no_happiness_add = 0.5
+			planet_stability_add = 10
+			pop_job_trade_mult = 0.1
+		}
+
+		AI_weight = {
+			weight = 2
+			modifier = {
+				add = -1
+				owner_species = {
+					OR = {
+						has_trait = trait_repugnant
+						has_trait = trait_robot_uncanny
+					}
+				}
+			}
+			modifier = {
+				add = 1
+				owner_species = {
+					OR = {
+						has_trait = trait_charismatic
+						has_trait = trait_crafted_smiles
+						has_trait = trait_robot_domestic_protocols
+						has_trait = trait_robot_emotion_emulators
+					}
+					
+				}
+			}
+			modifier = {
+				add = 1
+				years_passed > 50
+			}
+			modifier = {
+				add = 1
+				years_passed > 100
+			}
 		}
 	}
 
@@ -7296,10 +7709,7 @@ religious_cult_policy_slider = {
 religious_cult_policy = {
 	potential = {
 		is_regular_empire = yes
-		or = {
-			has_ethic = ethic_fanatic_spiritualist
-			has_ethic = ethic_spiritualist
-		}
+		is_spiritualist = yes
 	}
 
 	option = {
@@ -7311,10 +7721,6 @@ religious_cult_policy = {
 		
 		valid = {
 			tec_is_default_country = yes
-			or = {
-				has_ethic = ethic_fanatic_spiritualist
-				has_ethic = ethic_spiritualist
-			}
 		}
 		
 		AI_weight = {
@@ -7322,457 +7728,149 @@ religious_cult_policy = {
 		}
 	}
 
-	option = {
-		name = "fertility_religious_cult"
-		
-		policy_flags = {
-			fertility_religious_cult
-		}
-		
-		potential = {
-			has_ethic = ethic_spiritualist
-			NOT = { has_ethic = ethic_fanatic_spiritualist }
-		}
-		
-		valid = {
-			tec_is_default_country = yes
-			has_ethic = ethic_spiritualist
-			NOR = {
-				has_policy_flag = "prosperity_religious_cult"
-				has_policy_flag = "war_religious_cult"
-				has_policy_flag = "machine_religious_cult"
-				has_policy_flag = "gaia_religious_cult"
-				has_policy_flag = "knowledge_religious_cult"
-			}
-		}
-		
-		modifier = {
-				pop_growth_speed = 0.025
-				planet_jobs_food_produces_mult = 0.05	
-				planet_pops_consumer_goods_upkeep_mult = 0.075
-				pop_ethic_green_attraction_mult = 0.05
-				pop_ethic_pacifist_attraction_mult = 0.05
-		}
-		
-		AI_weight = {
-			factor = 0	
-		}
+	inline_script = {
+		script = policies/inline_evolved_cult_option
+		name = fertility
+		flag = fertility
+		trigger = "
+			is_lithoid_empire = no
+		"
+		modifier = "fertility_cult_modifier"
 	}
-	
-	option = {
-		name = "fertility_fanatic_religious_cult"
-		
-		policy_flags = {
-			fertility_fanatic_religious_cult
-		}
-		
-		potential = {
-			has_ethic = ethic_fanatic_spiritualist
-			NOT = { has_ethic = ethic_spiritualist }
-		}
-		
-		valid = {
-			tec_is_default_country = yes
-			has_ethic = ethic_fanatic_spiritualist
-			NOR = {
-				has_policy_flag = "prosperity_fanatic_religious_cult"
-				has_policy_flag = "war_fanatic_religious_cult"
-				has_policy_flag = "machine_fanatic_religious_cult"
-				has_policy_flag = "gaia_religious_cult"
-				has_policy_flag = "knowledge_religious_cult"
-			}
-		}
-		
-		modifier = {
-				pop_growth_speed = 0.05
-				planet_jobs_food_produces_mult = 0.1	
-				planet_pops_consumer_goods_upkeep_mult = 0.15
-				pop_ethic_green_attraction_mult = 0.1
-				pop_ethic_pacifist_attraction_mult = 0.1
-		}
-		
-		AI_weight = {
-			factor = 0	
-		}
+
+	inline_script = {
+		script = policies/inline_evolved_cult_option
+		name = fertility_lithoid
+		flag = fertility
+		trigger = "
+			is_lithoid_empire = yes
+			species = { NOT = { has_trait = trait_tec_lithoid_sedimentary } }
+		"
+		modifier = "fertility_lithoid_cult_modifier"
 	}
-	
-	option = {
-		name = "prosperity_religious_cult"
-		
-		policy_flags = {
-			prosperity_religious_cult
-		}
-		
-		potential = {
-			has_ethic = ethic_spiritualist
-			NOT = { has_ethic = ethic_fanatic_spiritualist }
-		}
-		
-		valid = {
-			tec_is_default_country = yes
-			NOR = {
-				has_policy_flag = "fertility_religious_cult"
-				has_policy_flag = "war_religious_cult"
-				has_policy_flag = "machine_religious_cult"
-				has_policy_flag = "gaia_religious_cult"
-				has_policy_flag = "knowledge_religious_cult"
-			}
-		}
-		
-		modifier = {
-				planet_metallurgists_produces_mult = 0.025
-				planet_artisans_produces_mult = 0.025
-				country_minerals_produces_mult = -0.075
-				pop_ethic_industrial_attraction_mult = 0.1
-		}
-		
-		AI_weight = {
-			factor = 0	
-		}
+
+	inline_script = {
+		script = policies/inline_evolved_cult_option
+		name = fertility_sedimentary
+		flag = fertility
+		trigger = "
+			is_lithoid_empire = yes
+			species = { has_trait = trait_tec_lithoid_sedimentary }
+		"
+		modifier = "fertility_lithoid_cult_modifier"
 	}
-	
-	option = {
-		name = "prosperity_fanatic_religious_cult"
-		
-		policy_flags = {
-			prosperity_fanatic_religious_cult
-		}
-		
-		potential = {
-			has_ethic = ethic_fanatic_spiritualist
-			NOT = { has_ethic = ethic_spiritualist }
-		}
-		
-		valid = {
-			
-			tec_is_default_country = yes
-			NOR = {
-				has_policy_flag = "fertility_fanatic_religious_cult"
-				has_policy_flag = "war_fanatic_religious_cult"
-				has_policy_flag = "machine_fanatic_religious_cult"
-				has_policy_flag = "gaia_religious_cult"
-				has_policy_flag = "knowledge_religious_cult"
-			}
-		}
-		
-		modifier = {
-				planet_metallurgists_produces_mult = 0.05
-				planet_artisans_produces_mult = 0.05
-				country_minerals_produces_mult = -0.15
-				pop_ethic_industrial_attraction_mult = 0.2
-		}
-		
-		AI_weight = {
-			factor = 0	
-		}
+
+
+	inline_script = {
+		script = policies/inline_evolved_cult_option
+		name = prosperity
+		flag = prosperity
+		trigger = ""
+		modifier = "prosperity_cult_modifier"
 	}
-	
-	option = {
-		name = "war_religious_cult"
-		
-		policy_flags = {
-			war_religious_cult
-		}
-		
-		potential = {
-			has_ethic = ethic_spiritualist
-			NOT = { has_ethic = ethic_fanatic_spiritualist }
-		}
-		
-		valid = {
-			tec_is_default_country = yes
-			NOR = {
-				has_policy_flag = "fertility_religious_cult"
-				has_policy_flag = "prosperity_religious_cult"
-				has_policy_flag = "machine_religious_cult"
-				has_policy_flag = "gaia_religious_cult"
-				has_policy_flag = "knowledge_religious_cult"
-			}
-		}
-		
-		modifier = {
-				starbase_shipyard_build_speed_mult = 0.025
-				ship_fire_rate_mult = 0.025
-				ships_upkeep_mult = 0.05
-				pop_ethic_militarist_attraction_mult = 0.1
-		}
-		
-		AI_weight = {
-			factor = 0	
-		}
+
+	inline_script = {
+		script = policies/inline_evolved_cult_option
+		name = war
+		flag = war
+		trigger = ""
+		modifier = "war_cult_modifier"
 	}
-	
-	
-	
-		option = {
-		name = "war_fanatic_religious_cult"
-		
-		policy_flags = {
-			war_fanatic_religious_cult
-		}
-		
-		potential = {
-			has_ethic = ethic_fanatic_spiritualist
-			NOT = { has_ethic = ethic_spiritualist }
-		}
-		
-		valid = {
-			tec_is_default_country = yes
-			NOR = {
-				has_policy_flag = "fertility_fanatic_religious_cult"
-				has_policy_flag = "prosperity_fanatic_religious_cult"
-				has_policy_flag = "machine_fanatic_religious_cult"
-				has_policy_flag = "gaia_religious_cult"
-				has_policy_flag = "knowledge_religious_cult"
-			}
-		}
-		
-		modifier = {
-				starbase_shipyard_build_speed_mult = 0.05
-				ship_fire_rate_mult = 0.05
-				ships_upkeep_mult = 0.10
-				pop_ethic_militarist_attraction_mult = 0.2
-		}
-		
-		AI_weight = {
-			factor = 0	
-		}
-	}
+
 
  # New civics	
 	#machine cult	
-	option = {
-		name = "machine_religious_cult"
-		
-		policy_flags = {
-			machine_religious_cult
-		}
-		
-		potential = {
-			has_valid_civic = civic_tec_machine_cult
-			has_ethic = ethic_spiritualist
-			NOT = { has_ethic = ethic_fanatic_spiritualist }
-		}
-		
-		valid = {
-			has_valid_civic = civic_tec_machine_cult
-			tec_is_default_country = yes
-			NOR = {
-				has_policy_flag = "fertility_religious_cult"
-				has_policy_flag = "prosperity_religious_cult"
-				has_policy_flag = "war_religious_cult"
-				has_policy_flag = "gaia_religious_cult"
-				has_policy_flag = "knowledge_religious_cult"
-			}
-		}
-		
-		
-		modifier = {
-			planet_pop_assembly_mult = 0.05
-			pop_growth_speed = -0.05
-			planet_pops_robotics_upkeep_mult = -0.05
-			pop_ethic_industrial_attraction_mult = 0.1
-		}
-	
-		AI_weight = {
-			factor = 0	
-		}
-	}
-	
 
-	
-	option = {
-		name = "machine_fanatic_religious_cult"
-		
-		policy_flags = {
-			machine_fanatic_religious_cult
-		}
-		
-		potential = {
-			has_valid_civic = civic_tec_machine_cult
-			has_ethic = ethic_fanatic_spiritualist
-			NOT = { has_ethic = ethic_spiritualist }
-		}
-		
-		valid = {
-			has_valid_civic = civic_tec_machine_cult
-			tec_is_default_country = yes
-			NOR = {
-				has_policy_flag = "fertility_fanatic_religious_cult"
-				has_policy_flag = "prosperity_fanatic_religious_cult"
-				has_policy_flag = "war_fanatic_religious_cult"
-				has_policy_flag = "gaia_religious_cult"
-				has_policy_flag = "knowledge_religious_cult"
-			}
-		}
-		
-		
-		modifier = {
-			planet_pop_assembly_mult = 0.1
-			pop_growth_speed = -0.1
-			planet_pops_robotics_upkeep_mult = -0.1
-			pop_ethic_industrial_attraction_mult = 0.2
-		}
-	
-		AI_weight = {
-			factor = 0	
-		}
+	inline_script = {
+		script = policies/inline_evolved_cult_option
+		name = machine
+		flag = machine
+		trigger = "
+			tec_is_machine_cult = yes
+			tec_allows_machine_assembly_for_cyborg = no
+		"
+		modifier = "machine_cult_modifier"
+	}
+
+	inline_script = {
+		script = policies/inline_evolved_cult_option
+		name = machine_cyborg
+		flag = machine
+		trigger = "
+			tec_is_machine_cult = yes
+			tec_allows_machine_assembly_for_cyborg = yes
+		"
+		modifier = "machine_cyborg_cult_modifier"
 	}
 
 	#scientology
-	option = {
-		name = "knowledge_cult"
-		
-		policy_flags = {
-			knowledge_religious_cult
-		}
-		
-		potential = {
+	inline_script = {
+		script = policies/inline_evolved_cult_option
+		name = knowledge
+		flag = knowledge
+		trigger = "
 			tec_is_occult_cult = yes
-			has_ethic = ethic_spiritualist
-			NOT = { has_ethic = ethic_fanatic_spiritualist }
-		}
-		
-		valid = {
-			tec_is_occult_cult = yes
-			tec_is_default_country = yes
-			NOR = {
-				has_policy_flag = "fertility_religious_cult"
-				has_policy_flag = "prosperity_religious_cult"
-				has_policy_flag = "war_religious_cult"
-				has_policy_flag = "gaia_religious_cult"
-				has_policy_flag = "machine_religious_cult"
-			}
-		}
-		
-		modifier = {
-			all_technology_research_speed = 0.025
-			num_tech_alternatives_add = 1
-			country_unity_produces_mult = -0.05
-			pop_ethic_materialist_attraction_mult = 0.1
-		}
-	
-		AI_weight = {
-			factor = 0	
-		}
-	}
-	
-	
-	
-	option = {
-		name = "knowledge_fanatic_religious_cult"
-		
-		policy_flags = {
-			knowledge_fanatic_religious_cult
-		}
-		
-		potential = {
-			tec_is_occult_cult = yes
-			has_ethic = ethic_fanatic_spiritualist
-			NOT = { has_ethic = ethic_spiritualist }
-		}
-		
-		valid = {
-			tec_is_occult_cult = yes
-			tec_is_default_country = yes
-			NOR = {
-				has_policy_flag = "fertility_fanatic_religious_cult"
-				has_policy_flag = "prosperity_fanatic_religious_cult"
-				has_policy_flag = "war_fanatic_religious_cult"
-				has_policy_flag = "gaia_religious_cult"
-				has_policy_flag = "machine_religious_cult"
-			}
-		}
-		
-		
-		modifier = {
-			all_technology_research_speed = 0.05
-			num_tech_alternatives_add = 2
-			country_unity_produces_mult = -0.1
-			pop_ethic_materialist_attraction_mult = 0.2
-		}
-	
-		AI_weight = {
-			factor = 0	
-		}
+		"
+		modifier = "knowledge_cult_modifier"
 	}
 
 	#gaia
-	option = {
-		name = "gaia_cult"
-		
-		policy_flags = {
-			gaia_religious_cult
-		}
-		
-		potential = {
+	inline_script = {
+		script = policies/inline_evolved_cult_option
+		name = gaia
+		flag = gaia
+		trigger = "
 			has_origin = origin_life_seeded
-			has_ethic = ethic_spiritualist
-			NOT = { has_ethic = ethic_fanatic_spiritualist }
-		}
-		
-		valid = {
-			has_origin = origin_life_seeded
-			tec_is_default_country = yes
-			NOR = {
-				has_policy_flag = "fertility_religious_cult"
-				has_policy_flag = "prosperity_religious_cult"
-				has_policy_flag = "war_religious_cult"
-				has_policy_flag = "knowledge_religious_cult"
-				has_policy_flag = "machine_religious_cult"
-			}
-		}
-		
-		modifier = {
-			pop_happiness = 0.025
-			country_food_produces_mult = 0.1
-			pop_environment_tolerance = -0.05
-		}
-	
-		AI_weight = {
-			factor = 0	
-		}
-	}
-	
-	
-	
-	option = {
-		name = "gaia_fanatic_religious_cult"
-		
-		policy_flags = {
-			gaia_fanatic_religious_cult
-		}
-		
-		potential = {
-			has_origin = origin_life_seeded
-			has_ethic = ethic_fanatic_spiritualist
-			NOT = { has_ethic = ethic_spiritualist }
-		}
-		
-		valid = {
-			has_origin = origin_life_seeded
-			tec_is_default_country = yes
-			NOR = {
-				has_policy_flag = "fertility_fanatic_religious_cult"
-				has_policy_flag = "prosperity_fanatic_religious_cult"
-				has_policy_flag = "war_fanatic_religious_cult"
-				has_policy_flag = "knowledge_religious_cult"
-				has_policy_flag = "machine_religious_cult"
-			}
-		}
-		
-		
-		modifier = {
-			pop_happiness = 0.05
-			country_food_produces_mult = 0.2
-			pop_environment_tolerance = -0.1
-		}
-	
-		AI_weight = {
-			factor = 0	
-		}
+			is_lithoid_empire = no
+		"
+		modifier = "gaia_cult_modifier"
 	}
 
+	inline_script = {
+		script = policies/inline_evolved_cult_option
+		name = gaia_lithoid
+		flag = gaia
+		trigger = "
+			has_origin = origin_life_seeded
+			is_lithoid_empire = yes
+		"
+		modifier = "gaia_lithoid_cult_modifier"
+	}
+
+	# Money
+
+	inline_script = {
+		script = policies/inline_evolved_cult_option
+		name = money
+		flag = money
+		trigger = "
+			tec_is_wealth_cult = yes
+		"
+		modifier = "wealth_cult_modifier"
+	}
+
+	# Death
+
+	inline_script = {
+		script = policies/inline_evolved_cult_option
+		name = death
+		flag = death
+		trigger = "
+			tec_is_death_cult = yes
+			is_lithoid_empire = no
+		"
+		modifier = "death_cult_modifier"
+	}
+	inline_script = {
+		script = policies/inline_evolved_cult_option
+		name = death_lithoid
+		flag = death
+		trigger = "
+			tec_is_death_cult = yes
+			is_lithoid_empire = yes
+		"
+		modifier = "death_lithoid_cult_modifier"
+	}
 }
 
 # Archivists -------------------------------------------------------------------

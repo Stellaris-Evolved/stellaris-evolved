@@ -1,0 +1,882 @@
+tec_ai_should_reengineer = {
+	OR = {
+		num_pops > 25
+		is_capital = yes
+		AND = {
+			exists = owner
+			owner = { has_origin = origin_void_dwellers }
+			tec_is_habitat = yes
+			has_planet_flag = advanced_habitat
+		}
+	}
+}
+
+tec_ai_should_enhance = {
+	OR = {
+		num_pops > 25
+		is_capital = yes
+	}
+}
+
+
+tec_ai_wants_defensive_starbases = {
+	OR = {
+		is_homicidal = yes
+		has_valid_civic = civic_inwards_perfection
+		has_valid_civic = civic_tec_secured_domain
+		# hive
+		has_valid_civic = civic_tec_hive_eyesinthesky
+		has_valid_civic = civic_tec_hive_territorial
+		# Machine
+		has_valid_civic = civic_tec_machine_voidfirewall
+		has_valid_civic = civic_tec_machine_territorial
+	}
+}
+
+tec_ai_wants_production_starbases = {
+	OR = {
+		tec_is_trade_gestalt = yes
+		has_valid_civic = civic_tec_corporate_navaltraders
+	}
+}
+
+tec_ai_can_sidereal_habitat = {
+	OR = {
+		num_pops >= 50
+		is_capital = yes
+	}
+	free_district_slots = 0
+}
+
+tec_ai_can_ecu = {
+	OR = {
+		num_pops >= 70
+		is_capital = yes
+	}
+}
+
+# Ai budgets specific
+
+tec_ai_should_allocate_ecu_or_relic_budget = {
+	OR = {
+		# Relic
+		AND = {
+			has_technology = tech_housing_2
+			any_owned_planet = {
+				tec_arcology_project_relic_potential = yes
+				tec_arcology_project_relic_allow = yes
+			}
+		}
+		# Ecu
+		AND = {
+			has_ascension_perk = ap_arcology_project
+			any_owned_planet = {
+				tec_arcology_project_potential = yes
+				tec_arcology_project_allow = yes
+				tec_ai_can_ecu = yes
+			}
+		}
+	}
+}
+
+tec_ai_should_allocate_sidereal_budget = {
+	AND = {
+		has_ascension_perk = ap_tec_sidereal_arcologies
+		any_owned_planet = {
+			AND = {
+				is_planet_class = pc_habitat
+				tec_is_arcology_habitat = no
+				OR = {
+					has_planet_flag = advanced_habitat_2
+					has_planet_flag = payback_habitat
+				}
+			}
+			NOT = { has_planet_flag = tec_block_other_specializations }
+			tec_ai_can_sidereal_habitat = yes
+		}
+	}
+}
+
+tec_ai_should_allocate_ecoworld_budget = {
+	NOR = {
+		has_ethic = ethic_fanatic_industrial
+		has_valid_civic = civic_hive_devouring_swarm
+	}
+	OR = {
+		is_ecologist = yes
+		has_ascension_perk = ap_mastery_of_nature
+	}
+	any_owned_planet = {
+		tec_ecoworld_project_potential = yes
+		tec_ecoworld_project_allow = yes
+		tec_ai_can_ecu = yes
+	}
+}
+
+tec_ai_should_allocate_habitat_upgrade_t2_budget = {
+	has_technology = tech_habitat_2
+	any_owned_planet = {
+		is_planet_class = pc_habitat
+		NOR = { 
+			has_planet_flag = advanced_habitat 
+			has_planet_flag = payback_habitat
+		}
+	}
+}
+
+tec_ai_should_allocate_habitat_upgrade_t3_budget = {
+	has_technology = tech_habitat_3
+	any_owned_planet = {
+		is_planet_class = pc_habitat
+		NOR = { 
+			has_planet_flag = advanced_habitat_2
+			has_planet_flag = payback_habitat
+		}
+	}
+}
+
+tec_ai_should_allocate_repair_shattered_ring_budget = {
+	has_technology = tech_mega_engineering
+	any_owned_planet = {
+		is_planet_class = pc_shattered_ring_habitable
+		num_uncleared_blockers < 1
+	}
+}
+
+tec_ai_should_allocate_reengineer_budget = {
+	tec_is_engineer_empire = yes
+	any_owned_planet = {
+		tec_is_space_arcology = yes
+		# Exception - Shattered rings can't be upgraded
+			NOT = {
+				uses_district_set = shattered_ring_world
+			}
+		# /
+		tec_can_enhance_planet = yes
+		tec_ai_should_reengineer = yes
+		if = {
+			limit = {
+				tec_is_habitat = yes
+			}
+			free_district_slots = 0 
+		}
+	}
+}
+
+tec_ai_should_allocate_ecologist_fix_budget = {
+	tec_is_terraformer_empire = yes
+	any_owned_planet = {
+		tec_ecologists_have_modifiers_to_fix = yes
+		tec_ai_should_enhance = yes
+	}
+}
+
+tec_ai_should_allocate_ecologist_enhance_budget = {
+	tec_is_terraformer_empire = yes
+	any_owned_planet = {
+		OR = {
+			uses_district_set = standard
+			tec_is_ringworld = yes
+			tec_is_elysium = yes
+			tec_is_ecoworld = yes
+		}
+		tec_can_enhance_planet = yes
+		tec_ai_should_enhance = yes
+		num_uncleared_blockers = 0
+	}
+}
+
+tec_ai_should_allocate_ringworld_blocker_1_budget = {
+	has_technology = tech_housing_2
+	any_owned_planet = {
+		# removed planet check since maybe giga patch would add it to giga rings too
+		has_deposit = d_tec_rw_minor_structural_damage
+	}
+}
+
+tec_ai_should_allocate_ringworld_blocker_2_budget = {
+	has_technology = tech_mega_engineering
+	any_owned_planet = {
+		# removed planet check since maybe giga patch would add it to giga rings too
+		NOT = {
+			has_deposit = d_tec_rw_minor_structural_damage
+		}
+		has_deposit = d_tec_rw_minor_structural_damage
+	}
+}
+
+# Buildings
+
+tec_ai_allow_assembly_building = {
+	always = yes
+	if = {
+		limit = {
+			exists = owner
+			owner = { is_ai = yes }
+		}
+		owner = {
+			if = {
+				limit = {
+					is_machine_empire = yes # machine empires make robots, always
+				}
+				always = $ROBOTS|no$
+			}
+			else_if = {
+				limit = {
+					OR = {
+						tec_has_master_cloner = yes 
+						tec_has_psionic_ascension_path = yes
+					}
+					# sanity check to not block ai from using other assembly 
+					# in case somehow they do not have this type unlocked
+					has_technology = tech_cloning
+				}
+				always = $CLONES|no$
+			}
+			else_if = {
+				limit = {
+					OR = {
+						tec_is_bioservant_empire = yes
+						tec_has_master_bioengineer = yes
+					}
+					# sanity check to not block ai from using other assembly 
+					# in case somehow they do not have this type unlocked
+					has_technology = tech_tec_bioservant
+				}
+				always = $BIO|no$
+			}
+			else_if = {
+				limit = {
+					OR = {
+						tec_allows_machine_assembly_for_cyborg = yes 
+						tec_has_synthetic_ascension_path = yes
+						tec_is_machine_cult = yes
+					}
+					# sanity check to not block ai from using other assembly 
+					# in case somehow they do not have this type unlocked
+					has_technology = tech_robotic_workers
+				}
+				always = $ROBOTS|no$
+			}
+			else_if = {
+				limit = {
+					has_global_flag = tec_desired_assembly_distributed
+					OR = {
+						always = $CLONES|no$
+						always = $ROBOTS|no$
+						always = $BIO|no$
+					}
+				}
+				[[!ROBOTS] NOT = { ]
+					OR = {
+						has_country_flag = tec_desires_to_build_robots	
+					}
+				[[!ROBOTS] } ]
+				[[!BIO] NOT = { ]
+					has_country_flag = tec_desires_to_build_bio	
+				[[!BIO] } ]
+				[[!CLONES] NOT = { ]
+					OR = {
+						has_country_flag = tec_desires_to_be_pure		
+						has_country_flag = tec_desires_to_build_clones
+					}
+				[[!CLONES] } ]
+			}
+			else = {
+				always = yes
+			}
+		}
+	}
+}
+
+tec_ai_destroy_assembly_buildings = {
+	if = {
+		limit = {
+			exists = owner
+			owner = { is_ai = yes }
+		}
+		AND = {
+			free_district_slots = 0
+			free_housing <= 0
+			free_jobs <= 0
+		}
+	}
+	else = {
+		always = no
+	}
+}
+
+tec_ai_destroy_housing_building = {
+	if = {
+		limit = {
+			owner = { is_ai = yes }
+		}
+		AND = {
+			free_building_slots = 0
+			free_jobs < 1
+			free_housing > 10
+		}
+	}
+	else = {
+		always = no
+	}
+}
+
+tec_ai_allow_housing_building = {
+	if = {
+		limit = {
+			owner = { is_ai = yes }
+		}
+		AND = {
+			free_district_slots = 0
+			OR = {
+				free_jobs > 2
+				free_building_slots > 2
+			}
+			free_housing < 0
+		}
+	}
+	else = {
+		always = yes
+	}
+}
+
+tec_ai_destroy_amentity_building = {
+	if = {
+		limit = {
+			owner = { is_ai = yes }
+		}
+		free_amenities > $amenities$
+	}
+	else = {
+		always = no
+	}
+}
+
+tec_ai_allow_amentity_building = {
+	if = {
+		limit = {
+			owner = { is_ai = yes }
+		}
+		free_amenities < -8
+	}
+	else = {
+		always = yes
+	}
+}
+
+tec_ai_destroy_crime_building = {
+	if = {
+		limit = {
+			owner = { is_ai = yes }
+		}
+		OR = {
+			has_modifier = crime_lord_deal
+			planet_crime < $crime$
+		}
+	}
+	else = {
+		always = no
+	}
+}
+
+tec_ai_allow_crime_building = {
+	if = {
+		limit = {
+			owner = { is_ai = yes }
+		}
+		planet_crime > 40
+		NOR = {
+			has_modifier = crime_lord_deal
+			has_modifier = pm_tec_gestalt_crime
+		}
+	}
+	else = {
+		always = yes
+	}
+}
+
+tec_ai_destroy_industry_building = {
+	if = {
+		limit = {
+			owner = { is_ai = yes }
+		}
+		has_any_industry_district = no
+	}
+	else = {
+		always = no
+	}
+}
+
+tec_ai_destroy_refinery_boosting_building = {
+	if = {
+		limit = {
+			owner = { is_ai = yes }
+		}
+		tec_has_any_sr_building_or_district = no
+	}
+	else = {
+		always = no
+	}
+}
+
+tec_ai_allow_refinery_building = {
+	if = {
+		limit = {
+			owner = { is_ai = yes }
+		}
+		OR = {
+			has_refinery_designation = yes
+			AND = {
+				is_capital = no
+				owner = {
+					has_monthly_income = {
+						resource = $resource$
+						value < 5
+					}
+				}
+			}
+			AND = {
+				is_capital = yes
+				owner = {
+					has_monthly_income = {
+						resource = $resource$
+						value < 0
+					}
+				}
+			}
+		}
+	}
+	else = {
+		always = yes
+	}
+}
+
+tec_ai_destroy_milacademy_building = {
+	if = {
+		limit = {
+			owner = { is_ai = yes }
+		}
+		check_variable_arithmetic = {
+			which = value:stronghold_buildings_value
+			value <= 0
+		}
+	}
+	else = {
+		always = no
+	}
+}
+
+tec_ai_destroy_fortress_building = {
+	if = {
+		limit = {
+			owner = { is_ai = yes }
+		}
+		has_fortress_designation = no
+		owner = { 
+			used_naval_capacity_percent < 0.6
+			is_at_war = no 
+		}
+		check_variable_arithmetic = {
+			which = value:stronghold_buildings_value
+			value > 2
+		}
+		free_building_slots = 0
+	}
+	else = {
+		always = no
+	}
+}
+
+tec_ai_destroy_archaeostudies_faculty = { # basically relocate to relic worthy planet
+	if = {
+		limit = {
+			owner = { is_ai = yes }
+		}
+		owner = {
+			any_owned_planet = {
+				OR = {
+					tec_is_relic_world = yes
+					has_deposit = d_central_spire
+					has_deposit = d_former_relic_world
+				}
+			}
+		}
+		NOR = {
+			tec_is_relic_world = yes
+			has_deposit = d_central_spire
+			has_deposit = d_former_relic_world
+		}
+	}
+	else = {
+		always = no
+	}
+}
+
+tec_ai_destroy_research_boosting_building = {
+	if = {
+		limit = {
+			owner = { is_ai = yes }
+		}
+		has_research_designation = no
+		check_variable_arithmetic = {
+			which = value:research_combined_value
+			value <= 0
+		}
+	}
+	else = {
+		always = no
+	}
+}
+
+tec_ai_destroy_energy_boosting_building = {
+	if = {
+		limit = {
+			owner = {
+				is_ai = yes
+			}
+		}
+		has_any_generator_district_or_building = no
+	}
+	else = {
+		always = no
+	}
+}
+
+tec_ai_allow_energy_building = {
+	if = {
+		limit = {
+			owner = {
+				is_ai = yes
+			}
+		}
+		OR = {
+			has_generator_designation = yes
+			AND = {
+				check_variable_arithmetic = {
+					which = value:generator_districts_value|FREE|yes|
+					value < 1 
+				}
+				OR = {
+					AND = {
+						owner = {
+							has_monthly_income = {
+								resource = energy
+								value < 0
+							}
+						}
+						has_planet_flag = energy_habitat
+						has_planet_flag = tec_energy_planet_2
+					}
+					has_planet_flag = tec_energy_planet_3
+					has_planet_flag = tec_energy_planet_4
+				}
+			}
+			owner = {
+				has_monthly_income = {
+					resource = energy
+					value < -20
+				}
+			}
+		}
+	}
+	else = {
+		always = yes
+	}
+}
+
+tec_ai_destroy_energy_building = {
+	if = {
+		limit = {
+			owner = {
+				is_ai = yes
+			}
+		}
+		has_generator_designation = no
+		NOR = {
+			has_planet_flag = energy_habitat
+			has_planet_flag = tec_energy_planet_2
+			has_planet_flag = tec_energy_planet_3
+			has_planet_flag = tec_energy_planet_4
+		}
+		owner = { # out of emergiency
+			has_monthly_income = {
+				resource = energy
+				value > 50
+			}
+		}
+	}
+	else = {
+		always = no
+	}
+}
+
+tec_ai_destroy_minerals_boosting_building = {
+	if = {
+		limit = {
+			owner = {
+				is_ai = yes
+			}
+		}
+		has_any_mining_district = no
+	}
+	else = {
+		always = no
+	}
+}
+
+
+tec_ai_allow_minerals_building = {
+	if = {
+		limit = {
+			owner = {
+				is_ai = yes
+			}
+		}
+		OR = {
+			has_mining_designation = yes
+			AND = {
+				check_variable_arithmetic = {
+					which = value:mining_districts_value|FREE|yes|
+					value < 1 
+				}
+				OR = {
+					AND = {
+						owner = {
+							has_monthly_income = {
+								resource = minerals
+								value < 0
+							}
+						}
+						has_planet_flag = mining_habitat
+						has_planet_flag = tec_mineral_planet_2
+					}
+					has_planet_flag = tec_mineral_planet_3
+					has_planet_flag = tec_mineral_planet_4
+				}
+			}
+			owner = {
+				has_monthly_income = {
+					resource = minerals
+					value < -20
+				}
+			}
+		}
+	}
+	else = {
+		always = yes
+	}
+}
+
+tec_ai_destroy_minerals_building = {
+	if = {
+		limit = {
+			owner = {
+				is_ai = yes
+			}
+		}
+		has_mining_designation = no
+		NOR = {
+			has_planet_flag = mining_habitat
+			has_planet_flag = tec_mineral_planet_2
+			has_planet_flag = tec_mineral_planet_3
+			has_planet_flag = tec_mineral_planet_4
+		}
+		owner = { # out of emergiency
+			has_monthly_income = {
+				resource = minerals
+				value > 50
+			}
+		}
+	}
+	else = {
+		always = no
+	}
+}
+
+tec_ai_destroy_food_boosting_building = {
+	if = {
+		limit = {
+			owner = {
+				is_ai = yes
+			}
+		}
+		OR = {
+			owner = { country_uses_food = no }
+			has_any_farming_district_or_buildings = no
+		}
+	}
+	else = {
+		always = no
+	}
+}
+
+tec_ai_allow_food_building = {
+	if = {
+		limit = {
+			owner = {
+				is_ai = yes
+			}
+		}
+		OR = {
+			has_farming_designation = yes
+			AND = {
+				check_variable_arithmetic = {
+					which = value:farming_districts_value|FREE|yes|
+					value < 1 
+				}
+				OR = {
+					AND = {
+						owner = {
+							has_monthly_income = {
+								resource = food
+								value < 0
+							}
+						}
+						has_planet_flag = tec_food_habitat
+						has_planet_flag = tec_food_planet_2
+					}
+					has_planet_flag = tec_food_planet_3
+					has_planet_flag = tec_food_planet_4
+				}
+			}
+			owner = {
+				has_monthly_income = {
+					resource = food
+					value < -20
+				}
+			}
+		}
+	}
+	else = {
+		always = yes
+	}
+}
+
+tec_ai_destroy_food_building = {
+	if = {
+		limit = {
+			owner = {
+				is_ai = yes
+			}
+		}
+		has_farming_designation = no
+		NOR = {
+			has_planet_flag = tec_food_habitat
+			has_planet_flag = tec_food_planet_2
+			has_planet_flag = tec_food_planet_3
+			has_planet_flag = tec_food_planet_4
+		}
+		owner = { # out of emergiency
+			has_monthly_income = {
+				resource = food
+				value > 30
+			}
+		}
+	}
+	else = {
+		always = no
+	}
+}
+
+tec_ai_allow_silo_building = {
+	if = {
+		limit = {
+			owner = {
+				is_ai = yes
+			}
+		}
+		NOR = {
+			has_active_building = building_resource_silo
+			has_active_building = building_tec_resource_silo_2
+			has_active_building = building_tec_resource_silo_3
+		}
+		OR = {
+			owner = {
+				is_machine_empire = yes
+				has_active_tradition = tr_domination_modular_depot
+			}
+			is_active_resolution = "resolution_greatergood_balance_in_the_middle"
+			is_active_resolution = "resolution_greatergood_universal_prosperity_mandate"
+			owner = {
+				has_ascension_perk = ap_arcology_project
+				NOT = { has_technology = tech_mega_engineering }
+			}
+		}
+	}
+	else = {
+		always = yes
+	}
+}
+
+tec_ai_needs_housing_district_housing = {
+	free_housing < 1
+	OR = {
+		free_building_slots > 0
+		free_jobs > 2
+	}
+}
+
+tec_ai_needs_housing_district_building_slots = {
+	free_building_slots < 1
+	free_district_slots > 1
+}
+
+# Starbase
+tec_ai_allow_crew_quarters_starbase_building = {
+	if = {
+		limit = { owner = { is_ai = yes } }
+		OR = {
+			is_starbase_type = sshipyard
+			is_starbase_type = sorbital_shipyard
+			is_starbase_type = sfortress
+		}
+	}
+	else = {
+		always = yes
+	}
+}
+
+tec_ai_allow_food_starbase_building = {
+	if = {
+		limit = { owner = { is_ai = yes } }
+		has_starbase_module = tec_starbase_m_food
+	}
+	else = {
+		always = yes
+	}
+}
+
+tec_ai_allow_energy_starbase_building = {
+	if = {
+		limit = { owner = { is_ai = yes } }
+		has_starbase_module = tec_starbase_m_generator
+	}
+	else = {
+		always = yes
+	}
+}
+
+tec_ai_allow_minerals_starbase_building = {
+	if = {
+		limit = { owner = { is_ai = yes } }
+		has_starbase_module = tec_starbase_m_mining
+	}
+	else = {
+		always = yes
+	}
+}
+
+tec_ai_allow_research_starbase_building = {
+	if = {
+		limit = { owner = { is_ai = yes } }
+		OR = {
+			has_starbase_module = tec_starbase_m_physics
+			has_starbase_module = tec_starbase_m_society
+			has_starbase_module = tec_starbase_m_engineering
+		}
+	}
+	else = {
+		always = yes
+	}
+}

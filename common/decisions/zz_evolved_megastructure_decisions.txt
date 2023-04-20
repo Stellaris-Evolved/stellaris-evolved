@@ -39,7 +39,10 @@ decision_upgrade_habitat = {
 
 	potential = {
 		is_planet_class = pc_habitat
-		NOT = { has_planet_flag = advanced_habitat }
+		NOR = {
+			has_planet_flag = advanced_habitat
+			has_planet_flag = payback_habitat
+		}
 		exists = owner
 		owner = {
 			has_technology = tech_habitat_2
@@ -75,7 +78,7 @@ decision_upgrade_habitat = {
 	}
 
 	ai_weight = {
-		weight = 1
+		weight = 1000
 	}
 }
 
@@ -111,7 +114,10 @@ decision_upgrade_habitat_2 = {
 	potential = {
 		is_planet_class = pc_habitat
 		has_planet_flag = advanced_habitat
-		NOT = { has_planet_flag = advanced_habitat_2 }
+		NOR = {
+			has_planet_flag = advanced_habitat_2
+			has_planet_flag = payback_habitat
+		}
 		exists = owner
 		owner = {
 			has_technology = tech_habitat_3
@@ -136,7 +142,7 @@ decision_upgrade_habitat_2 = {
 	}
 
 	ai_weight = {
-		weight = 1
+		weight = 1000
 	}
 }
 
@@ -163,23 +169,29 @@ decision_tec_hab_arcology_civil = {
 		owner = {
 			has_ascension_perk = ap_tec_sidereal_arcologies
 		}
+		
 	}
 
 	allow = {
 		custom_tooltip = {
 			fail_text = decision_tec_hab_arcology_level
-			has_planet_flag = advanced_habitat_2
+			OR = {
+				has_planet_flag = advanced_habitat_2
+				has_planet_flag = payback_habitat
+			}
 		}
 		custom_tooltip = {
 			fail_text = decision_tec_hab_arcology_districts
 			free_district_slots = 0
 		}
+		NOT = { has_planet_flag = tec_block_other_specializations }
 	}
 
 	effect = {
 		# Make habitat
 		custom_tooltip = decision_tec_hab_arcology_civil_effects
 		hidden_effect = {
+			remove_planet_flag = tec_block_other_specializations
 			# Faction flags
 			owner = {
 				set_timed_country_flag = {
@@ -201,8 +213,22 @@ decision_tec_hab_arcology_civil = {
 		}
 	}
 
+	on_queued = {
+		set_planet_flag = tec_block_other_specializations
+	}
+
+	on_unqueued = {
+		remove_planet_flag = tec_block_other_specializations
+	}
+
 	ai_weight = {
 		weight = 100
+		add = value:research_combined_value|FACTOR|2|
+		add = value:unity_combined_value|FACTOR|2|
+		modifier = {
+			factor = 0
+			tec_ai_can_sidereal_habitat = no
+		}
 	}
 }
 
@@ -233,18 +259,23 @@ decision_tec_hab_arcology_industrial = {
 	allow = {
 		custom_tooltip = {
 			fail_text = decision_tec_hab_arcology_level
-			has_planet_flag = advanced_habitat_2
+			OR = {
+				has_planet_flag = advanced_habitat_2
+				has_planet_flag = payback_habitat
+			}
 		}
 		custom_tooltip = {
 			fail_text = decision_tec_hab_arcology_districts
 			free_district_slots = 0
 		}
+		NOT = { has_planet_flag = tec_block_other_specializations }
 	}
 
 	effect = {
 		# Make habitat
 		custom_tooltip = decision_tec_hab_arcology_industrial_effects
 		hidden_effect = {
+			remove_planet_flag = tec_block_other_specializations
 			# Faction flags
 			owner = {
 				set_timed_country_flag = {
@@ -273,8 +304,25 @@ decision_tec_hab_arcology_industrial = {
 		}
 	}
 
+	on_queued = {
+		set_planet_flag = tec_block_other_specializations
+	}
+
+	on_unqueued = {
+		remove_planet_flag = tec_block_other_specializations
+	}
+
 	ai_weight = {
 		weight = 100
+		add = value:industrial_districts_value|FACTOR|4|
+		modifier = {
+			factor = 0
+			tec_ai_can_sidereal_habitat = no
+		}
+		modifier = {
+			factor = 0
+			has_planet_flag = payback_habitat # force the other one for research on MSI hab
+		}
 	}
 }
 
@@ -382,9 +430,14 @@ decision_tec_menial_ely = {
 		}
 	}
 
+	allow = {
+		NOT = { has_planet_flag = tec_block_other_specializations }
+	}
+
 	effect = {
 		custom_tooltip = decision_tec_menial_ely_effects
 		hidden_effect = {
+			remove_planet_flag = tec_block_other_specializations
 			remove_planet_flag = tec_civ_elysium
 			remove_planet_flag = tec_mil_elysium
 		#	remove_planet_flag = tec_research_elysium
@@ -393,6 +446,14 @@ decision_tec_menial_ely = {
 	}
 	ai_weight = {
 		weight = 0
+	}
+
+	on_queued = {
+		set_planet_flag = tec_block_other_specializations
+	}
+
+	on_unqueued = {
+		remove_planet_flag = tec_block_other_specializations
 	}
 }
 
@@ -416,10 +477,17 @@ decision_tec_civ_ely = {
 		}
 	}
 
+	
+	allow = {
+		NOT = { has_planet_flag = tec_block_other_specializations }
+	}
+
+
 
 	effect = {
 		custom_tooltip = decision_tec_civ_ely_effects
 		hidden_effect = {
+			remove_planet_flag = tec_block_other_specializations
 			remove_planet_flag = tec_mil_elysium
 		#	remove_planet_flag = tec_research_elysium
 		#	remove_planet_flag = tec_resort_elysium
@@ -430,6 +498,14 @@ decision_tec_civ_ely = {
 	}
 	ai_weight = {
 		weight = 0
+	}
+
+	on_queued = {
+		set_planet_flag = tec_block_other_specializations
+	}
+
+	on_unqueued = {
+		remove_planet_flag = tec_block_other_specializations
 	}
 }
 
@@ -453,10 +529,16 @@ decision_tec_mil_ely = {
 		}
 	}
 
+	
+	allow = {
+		NOT = { has_planet_flag = tec_block_other_specializations }
+	}
+
 
 	effect = {
 		custom_tooltip = decision_tec_mil_ely_effects
 		hidden_effect = {
+			remove_planet_flag = tec_block_other_specializations
 			remove_planet_flag = tec_civ_elysium
 		#	remove_planet_flag = tec_research_elysium
 		#	remove_planet_flag = tec_resort_elysium
@@ -467,6 +549,14 @@ decision_tec_mil_ely = {
 	}
 	ai_weight = {
 		weight = 0
+	}
+
+	on_queued = {
+		set_planet_flag = tec_block_other_specializations
+	}
+
+	on_unqueued = {
+		remove_planet_flag = tec_block_other_specializations
 	}
 }
 
@@ -498,9 +588,16 @@ decision_tec_basic_ring = {
 		tec_is_precursor_ringworld = no
 	}
 
+	
+	allow = {
+		NOT = { has_planet_flag = tec_block_other_specializations }
+	}
+
+
 	effect = {
 		custom_tooltip = decision_tec_basic_ring_effects
 		hidden_effect = {
+			remove_planet_flag = tec_block_other_specializations
 			remove_planet_flag = tec_rw_spec_science
 			remove_planet_flag = tec_rw_spec_industry
 				remove_planet_flag = tec_rw_spec_cg			# - subspec
@@ -508,6 +605,15 @@ decision_tec_basic_ring = {
 			remove_planet_flag = tec_rw_spec_admin
 		}
 	}
+
+	on_queued = {
+		set_planet_flag = tec_block_other_specializations
+	}
+
+	on_unqueued = {
+		remove_planet_flag = tec_block_other_specializations
+	}
+
 	ai_weight = {
 		weight = 0
 	}
@@ -536,10 +642,16 @@ decision_tec_science_ring = {
 		tec_is_science_ringworld = no
 		tec_is_precursor_ringworld = no
 	}
+	
+	allow = {
+		NOT = { has_planet_flag = tec_block_other_specializations }
+	}
+
 
 	effect = {
 		custom_tooltip = decision_tec_science_ring_effects
 		hidden_effect = {
+			remove_planet_flag = tec_block_other_specializations
 			set_planet_flag = tec_rw_spec_science
 
 			#anticheese
@@ -550,6 +662,15 @@ decision_tec_science_ring = {
 		}
 		
 	}
+
+	on_queued = {
+		set_planet_flag = tec_block_other_specializations
+	}
+
+	on_unqueued = {
+		remove_planet_flag = tec_block_other_specializations
+	}
+
 	ai_weight = {
 		weight = 0
 	}
@@ -578,11 +699,15 @@ decision_tec_fabrication_ring = {
 		tec_is_industry_ringworld = no
 		tec_is_precursor_ringworld = no
 	}
-
+	
+	allow = {
+		NOT = { has_planet_flag = tec_block_other_specializations }
+	}
 
 	effect = {
 		custom_tooltip = decision_tec_industry_ring_effects
 		hidden_effect = {
+			remove_planet_flag = tec_block_other_specializations
 			set_planet_flag = tec_rw_spec_industry
 				set_planet_flag = tec_rw_spec_naval			# - subspec
 			#anticheese
@@ -591,6 +716,15 @@ decision_tec_fabrication_ring = {
 		}
 		
 	}
+
+	on_queued = {
+		set_planet_flag = tec_block_other_specializations
+	}
+
+	on_unqueued = {
+		remove_planet_flag = tec_block_other_specializations
+	}
+
 	ai_weight = {
 		weight = 0
 	}
@@ -625,10 +759,14 @@ decision_tec_cgnaval_ring = {
 		}
 	}
 
+	allow = {
+		NOT = { has_planet_flag = tec_block_other_specializations }
+	}
 
 	effect = {
 		custom_tooltip = decision_tec_cgnaval_ring_effects
 		hidden_effect = {
+			remove_planet_flag = tec_block_other_specializations
 			if = {
 				limit = {
 					has_planet_flag = tec_rw_spec_naval
@@ -648,6 +786,14 @@ decision_tec_cgnaval_ring = {
 		}
 		
 	}
+	on_queued = {
+		set_planet_flag = tec_block_other_specializations
+	}
+
+	on_unqueued = {
+		remove_planet_flag = tec_block_other_specializations
+	}
+
 	ai_weight = {
 		weight = 0
 	}
@@ -677,9 +823,14 @@ decision_tec_administration_ring = {
 		tec_is_precursor_ringworld = no
 	}
 
+	allow = {
+		NOT = { has_planet_flag = tec_block_other_specializations }
+	}
+
 	effect = {
 		custom_tooltip = decision_tec_admin_ring_effects
 		hidden_effect = {
+			remove_planet_flag = tec_block_other_specializations
 			set_planet_flag = tec_rw_spec_admin
 
 			#anticheese
@@ -687,6 +838,13 @@ decision_tec_administration_ring = {
 			remove_planet_flag = tec_rw_spec_science
 		}
 		
+	}
+	on_queued = {
+		set_planet_flag = tec_block_other_specializations
+	}
+
+	on_unqueued = {
+		remove_planet_flag = tec_block_other_specializations
 	}
 	ai_weight = {
 		weight = 0
@@ -716,10 +874,15 @@ decision_tec_precursor_ring = {
 		tec_uses_ringworld_districts = yes
 		tec_is_unspecced_ringworld = yes
 	}
+	
+	allow = {
+		NOT = { has_planet_flag = tec_block_other_specializations }
+	}
 
 	effect = {
 		custom_tooltip = decision_tec_precursor_ring_effects
 		hidden_effect = {
+			remove_planet_flag = tec_block_other_specializations
 			set_planet_flag = tec_rw_spec_precursor
 
 			#anticheese
@@ -728,6 +891,13 @@ decision_tec_precursor_ring = {
 			remove_planet_flag = tec_rw_spec_science
 		}
 		
+	}
+	on_queued = {
+		set_planet_flag = tec_block_other_specializations
+	}
+
+	on_unqueued = {
+		remove_planet_flag = tec_block_other_specializations
 	}
 	ai_weight = {
 		weight = 0

@@ -7,21 +7,6 @@
 
 namespace = origin
 
-# Void Dweller Production Bonus (Pop Added)
-pop_event = {
-	id = origin.1
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		always = no
-	}
-}
-
-
-# MEMESIS REVIEW SCION
-
 # Scion Setup
 # origin.5
 
@@ -81,8 +66,6 @@ pop_event = {
 # origin.54
 
 # Common Ground/Hegemon Setup
-
-# Common Ground/Hegemon Setup
 country_event = {
 	id = origin.55
 	hide_window = yes
@@ -95,6 +78,7 @@ country_event = {
 		add_tradition = tr_diplomacy_adopt
 		add_tradition = tr_diplomacy_the_federation
 
+		# Choose member capitals from amongst guaranteed habitable planets
 		if = {
 			limit = { num_guaranteed_colonies >= 2 }
 			capital_scope = {
@@ -235,9 +219,7 @@ country_event = {
 			}
 		}
 
-
-
-		# First Member
+		# Create first member
 		event_target:fed_planet_1 = {
 			solar_system = { generate_home_system_resources = yes }
 			create_species = {
@@ -246,19 +228,30 @@ country_event = {
 				portrait = random
 				traits = random
 				homeworld = this
-				can_be_modified = yes
-				gender = this
 				effect = {
 					save_event_target_as = fed_planet_1_species
 				}
 			}
+			# Common Ground
 			if = {
-				limit = { root = { has_origin = origin_common_ground } }
-				create_common_ground_member_1 = yes
+				limit = {
+					root = { has_origin = origin_common_ground }
+				}
+				create_common_ground_member = {
+					NUM = 1
+				}
 			}
+			# Hegemon
 			if = {
-				limit = { root = { has_origin = origin_hegemon } }
-				create_hegemon_member_1 = yes
+				limit = {
+					root = {
+						has_origin = origin_hegemon
+						NOT = { has_ethic = ethic_xenophobe }
+					}
+				}
+				create_hegemon_member = {
+					NUM = 1
+				}
 			}
 			create_colony = {
 				owner = event_target:fed_member_1
@@ -287,7 +280,7 @@ country_event = {
 			}
 		}
 
-		# Second Member
+		# Create second member
 		event_target:fed_planet_2 = {
 			solar_system = { generate_home_system_resources = yes }
 			create_species = {
@@ -296,19 +289,28 @@ country_event = {
 				portrait = random
 				traits = random
 				homeworld = this
-				can_be_modified = yes
-				gender = this
 				effect = {
 					save_event_target_as = fed_planet_2_species
 				}
 			}
+			# Common Ground
 			if = {
-				limit = { root = { has_origin = origin_common_ground } }
-				create_common_ground_member_2 = yes
+				limit = {
+					root = { has_origin = origin_common_ground }
+				}
+				create_common_ground_member = { NUM = 2 }
 			}
+			# Hegemon
 			if = {
-				limit = { root = { has_origin = origin_hegemon } }
-				create_hegemon_member_2 = yes
+				limit = {
+					root = {
+						has_origin = origin_hegemon
+						NOT = { has_ethic = ethic_xenophobe }
+					}
+				}
+				create_hegemon_member = {
+					NUM = 2
+				}
 			}
 			create_colony = {
 				owner = event_target:fed_member_2
@@ -336,20 +338,29 @@ country_event = {
 				}
 			}
 		}
+
+		# Finish setting up member empires
 		event_target:fed_member_1 = {
 			create_starting_leaders = yes
-			country_event = { id = game_start.9 }
+			country_event = { id = game_start.9 } # create starter set of ships
 			country_event = { id = game_start.33 days = 1 } # needs delay for system ownership to settle
-			join_alliance = { who = root override_requirements = yes }
+			join_alliance = {
+				who = root
+				override_requirements = yes
+			}
 			set_name = random # Fixes some naming issues
 		}
 		event_target:fed_member_2 = {
 			create_starting_leaders = yes
 			country_event = { id = game_start.9 }
 			country_event = { id = game_start.33 days = 1 } # needs delay for system ownership to settle
-			join_alliance = { who = root override_requirements = yes }
+			join_alliance = {
+				who = root
+				override_requirements = yes
+			}
 			set_name = random # Fixes some naming issues
 		}
+		# Set Intel levels, Opinion, and Federation laws
 		if = {
 			limit = { has_origin = origin_common_ground }
 			event_target:fed_member_1 = {
@@ -473,6 +484,14 @@ country_event = {
 					amount = 40
 					who = event_target:fed_member_2
 				}
+				set_closed_borders = {
+					who = root
+					status = no
+				}
+				set_closed_borders = {
+					who = event_target:fed_member_2
+					status = no
+				}
 			}
 			event_target:fed_member_2 = {
 				add_intel = {
@@ -483,19 +502,35 @@ country_event = {
 					amount = 40
 					who = event_target:fed_member_1
 				}
+				set_closed_borders = {
+					who = root
+					status = no
+				}
+				set_closed_borders = {
+					who = event_target:fed_member_1
+					status = no
+				}
 			}
 			add_intel = {
 				amount = 40
 				who = event_target:fed_member_1
 			}
+			set_closed_borders = {
+				who = event_target:fed_member_1
+				status = no
+			}
 			add_intel = {
 				amount = 40
 				who = event_target:fed_member_2
 			}
+			set_closed_borders = {
+				who = event_target:fed_member_2
+				status = no
+			}
 		}
-		set_federation_leader = root
 	}
 	after = {
+		# Evolved fix thingies
 		event_target:fed_member_1 = {
 			if = {
 				limit = {
@@ -526,7 +561,36 @@ country_event = {
 				}
 			}
 		}
-		
+		event_target:fed_member_2 = {
+			if = {
+				limit = {
+					OR = {
+						has_valid_civic = civic_fanatic_purifiers
+						has_valid_civic = civic_tec_corporate_megakillers
+					}
+				}
+				if = {
+					limit = {
+						has_valid_civic = civic_fanatic_purifiers
+					}
+					force_remove_civic = civic_fanatic_purifiers
+					change_government = {
+						cooldown = no
+						civics = random
+					}
+				}
+				if = {
+					limit = {
+						has_valid_civic = civic_tec_corporate_megakillers
+					}
+					force_remove_civic = civic_tec_corporate_megakillers
+					change_government = {
+						cooldown = no
+						civics = random
+					}
+				}
+			}
+		}	
 	}
 }
 
@@ -646,6 +710,7 @@ planet_event = {
 					owner = { num_owned_planets = 1 }
 				}
 				set_planet_flag = doomsday_lost_everything
+				owner = { set_country_flag = silence_destroy_event }
 			}
 			else_if = {
 				limit = {
@@ -708,8 +773,8 @@ planet_event = {
 				}
 			}
 		}
-		remove_modifier = doomsday_5
 		every_owned_pop = { kill_pop = yes }
+		remove_modifier = doomsday_5
 		destroy_colony = yes
 		change_pc = pc_shattered
 		clear_deposits = yes
@@ -786,3 +851,46 @@ planet_event = {
 
 # Lost Colony Setup
 # origin.100
+
+# Broken Shackles Setup
+#country_event = {
+#	id = origin.110
+
+# Broken Shackles - crashed ship depleted
+#country_event = {
+#	id = origin.111
+	
+# Spawn Broken Shackles for Payback
+#country_event = {
+#	id = origin.112
+
+# Spawn Payback for Broken Shackles
+#country_event = {
+#	id = origin.113
+
+
+#Generate Planetary Blockers
+
+# country_event = { # Cleared empty, moved to `generate_start_buildings_and_districts`
+# 	id = origin.5081
+# 	hide_window = yes
+# 	is_triggered_only = yes
+
+# 	trigger = {
+# 		has_origin = origin_broken_shackles
+# 	}
+
+# 	immediate = {
+# 		capital_scope = {
+# 			clear_blockers = yes
+# 			add_deposit = d_crashed_slaver_ship
+# 			add_deposit = random_blocker
+# 			add_deposit = random_blocker
+# 			add_deposit = random_blocker
+# 			while = {
+# 				count = 5
+# 				add_deposit = d_ship_debris_broken_shackles_blocker
+# 			}
+# 		}
+# 	}
+# }

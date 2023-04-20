@@ -160,8 +160,7 @@ trait_intelligent = {
 	opposites = {
 		"trait_erudite" "trait_tec_gene_brain" 									# bio
 		"trait_tec_replicant_brain" 											# replicant
-		"trait_tec_cyborg_brain"												# cyborgs
-		#"trait_tec_psionic_mind"												# psionics
+		"trait_tec_cyborg_brain"										# psionics
 
 		"trait_nerve_stapled"													# No happ
 		"trait_tec_dumb"														# -%
@@ -611,7 +610,6 @@ trait_traditional = {
 	opposites = {
 		"trait_quarrelsome" 
 		"trait_tec_cyborg_intralink"
-		"trait_tec_psionic_unity"
 	}
 	# Modifiers
 	modifier = {
@@ -648,7 +646,6 @@ trait_quarrelsome = {
 	opposites = {
 		"trait_traditional" 
 		"trait_tec_cyborg_intralink"
-		"trait_tec_psionic_unity"
 	}
 	# Modifiers
 	modifier = {
@@ -1358,10 +1355,13 @@ trait_cybernetic = {
 		"trait_tec_rudimentary_cyborg"
 		"trait_tec_advanced_cyborg"
 		"trait_tec_cyberpsionic"
-
+		"trait_tec_bionic_main"
+		"trait_tec_replicant_standard"
 	}
 	# Modifiers
 	modifier = {
+		tec_pop_upkeep_base_add = -0.5
+		pop_category_normal_resources_energy_upkeep_add = 0.5
 		pop_environment_tolerance = 0.2
 		trait_tec_cybernetic_tooltip = 1
 	}
@@ -1769,7 +1769,11 @@ trait_lithoid_scintillating = {
 		"trait_drake_scaled"
 	}
 	# Modifiers
-	custom_tooltip = TRAIT_LITHOID_SCINTILLATING_EFFECT
+	# custom_tooltip = TRAIT_LITHOID_SCINTILLATING_EFFECT
+	modifier = {
+		pop_category_normal_resources_rare_crystals_produces_add = @lithoid_trait_resource_production
+		planet_livestock_rare_crystals_produces_add = @[lithoid_trait_resource_production * 2]
+	}
 	# Modification
 	species_possible_remove = {
 		can_remove_beneficial_genetic_traits = yes
@@ -1797,7 +1801,11 @@ trait_lithoid_gaseous_byproducts = {
 		"trait_drake_scaled"
 	}
 	# Modifiers
-	custom_tooltip = TRAIT_LITHOID_GASEOUS_BYPRODUCTS_EFFECT
+	# custom_tooltip = TRAIT_LITHOID_GASEOUS_BYPRODUCTS_EFFECT
+	modifier = {
+		pop_category_normal_resources_exotic_gases_produces_add = @lithoid_trait_resource_production
+		planet_livestock_exotic_gases_produces_add = @[lithoid_trait_resource_production * 2]
+	}
 	# Modification
 	species_possible_remove = {
 		can_remove_beneficial_genetic_traits = yes
@@ -1825,7 +1833,11 @@ trait_lithoid_volatile_excretions = {
 		"trait_drake_scaled"		
 	}
 	# Modifiers
-	custom_tooltip = TRAIT_LITHOID_VOLATILE_EXCRETIONS_EFFECT
+	# custom_tooltip = TRAIT_LITHOID_VOLATILE_EXCRETIONS_EFFECT
+	modifier = {
+		pop_category_normal_resources_volatile_motes_produces_add = @lithoid_trait_resource_production
+		planet_livestock_volatile_motes_produces_add = @[lithoid_trait_resource_production * 2]
+	}
 	# Modification
 	species_possible_remove = {
 		can_remove_beneficial_genetic_traits = yes
@@ -1857,13 +1869,13 @@ trait_void_dweller_1 = {	# LEM
 	species_potential_add = {
 		exists = from
 		from = {
-			OR = {
-				AND = {
-					has_origin = origin_void_dwellers
+			AND = {
+				has_origin = origin_void_dwellers
+				OR = {
 					has_tradition = tr_genetics_resequencing
+					#has_country_flag = can_modify_organic_portraits
+					tec_has_advanced_genemodding = yes
 				}
-				has_country_flag = can_modify_organic_portraits
-				tec_has_advanced_genemodding = yes
 			}
 		}
 	}
@@ -2040,11 +2052,17 @@ trait_plantoid_budding = {
 		"trait_clone_soldier_infertile"
 		"trait_clone_soldier_infertile_full_potential"
 		
-		"trait_lithoid_budding" "trait_tec_lithoid_sedimentary" "trait_advanced_budding" "trait_tiyanki" "trait_tec_replicant_budding"
+		"trait_lithoid_budding" "trait_tec_lithoid_sedimentary" "trait_advanced_budding" "trait_tiyanki"
 	}
 	# Modifiers
 	custom_tooltip = TRAIT_PLANTOID_BUDDING_EFFECT
 	# Organic Pop Assembly set by plantoid_budding_rate in \pop_categories\ and 00_scripted_variables
+	triggered_pop_modifier = {
+		potential = {
+			can_assemble_budding_pop = yes
+		}
+		tec_planet_pop_assembly_organic_add_per_pop = @plantoid_budding_rate
+	}
 	# Modification
 	species_possible_remove = {
 		can_remove_beneficial_genetic_traits = yes
@@ -2084,6 +2102,12 @@ trait_lithoid_budding = {
 	# Modifiers
 	custom_tooltip = TRAIT_LITHOID_BUDDING_EFFECT
 	# Organic Pop Assembly set by plantoid_budding_rate in \pop_categories\ and 00_scripted_variables
+	triggered_pop_modifier = {
+		potential = {
+			can_assemble_budding_pop = yes
+		}
+		tec_planet_pop_assembly_organic_add_per_pop = @plantoid_budding_rate
+	}
 	# Modification
 	species_possible_remove = {
 		can_remove_beneficial_genetic_traits = yes
@@ -2206,10 +2230,11 @@ trait_zombie = {
 		"trait_nerve_stapled" 
 	}
 	# Modifiers
-	custom_tooltip = TRAIT_ZOMBIE_EFFECT
+	custom_tooltip_with_modifiers = TRAIT_ZOMBIE_EFFECT
 	modifier = {
 		planet_jobs_produces_mult = -0.25
 		planet_pops_upkeep_mult = -1
+		tec_pop_upkeep_base_add = -10
 	}
 	# Modification
 	species_potential_add = {

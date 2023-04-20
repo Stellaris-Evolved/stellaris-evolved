@@ -1,0 +1,964 @@
+# - - - - - - - - - - - - - - - - - - - - - 
+# On_action Events OVERWRITE
+# - - - - - - - - - - - - - - - - - - - - - 
+
+namespace = action
+
+# Market Founder event (resolution accepted)
+# via resolution_galactic_market_form = {} | this = Resolution proposer country
+country_event = {
+	id = action.96
+	title = action.96.name
+	desc = {
+		text = action.96.desc
+		trigger = {
+			NOR = {
+				is_xenophobe = yes
+				has_ethic = ethic_gestalt_apathy
+			}
+		}
+	}
+	desc = {
+		text = action.96.desc.phobe
+		trigger = {
+			OR = {
+				is_xenophobe = yes
+				has_ethic = ethic_gestalt_apathy
+			}
+		}
+	}
+	picture = GFX_evt_financial_instruments
+	show_sound = event_galactic_market
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_global_flag = ongoing_market_nomination
+		set_country_flag = market_nomination_eligible
+		event_target:global_event_country = {
+			country_event = { id = action.98 days = @galactic_market_nomination_period }
+		}
+		begin_event_chain = {
+			event_chain = market_founding_chain
+			target = this
+		}
+		every_playable_country = {
+			limit = {
+				NOT = { is_same_value = root }
+				is_galactic_community_member = yes
+			}
+			country_event = { id = action.97 } # inform all other concerned countries
+		}
+	}
+
+	option = {
+		name = action.96.a
+		trigger = { is_megacorp = yes }	# Evolved
+	}
+
+	option = {
+		name = action.96.b
+		trigger = { NOT = { is_megacorp = yes } }	# Evolved
+	}
+
+	after = {
+		custom_tooltip = enable_decision_market_nomination
+		# Notification
+		tooltip = {
+			begin_event_chain = {
+				event_chain = market_founding_chain
+				target = this
+			}
+		}
+	}
+}
+
+# Market Nomination started (notification event)
+# this = every GalCom member except the resolution proposer
+country_event = {
+	id = action.97
+	title = action.97.name
+	desc = {
+		text = action.97.desc
+		trigger = {
+			NOR = {
+				has_ethic = ethic_gestalt_apathy
+				is_xenophobe = yes
+				is_megacorp = yes	# Evolved
+			}
+		}
+	}
+	desc = {
+		text = action.97.desc.phobe
+		trigger = {
+			OR = {
+				is_xenophobe = yes
+				has_ethic = ethic_gestalt_apathy
+			}
+		}
+	}
+	desc = {
+		text = action.97.desc.corp
+		trigger = { is_megacorp = yes }	# Evolved
+	}
+	picture = GFX_evt_financial_instruments
+	show_sound = event_galactic_market
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = market_nomination_eligible
+		begin_event_chain = {
+			event_chain = market_founding_chain
+			target = this
+		}
+	}
+
+	option = {
+		name = action.96.a
+		trigger = {
+			is_megacorp = yes	# Evolved
+		}
+		custom_tooltip = enable_decision_market_nomination
+	}
+
+	option = {
+		name = action.96.b
+		trigger = {
+			NOT = {
+				is_megacorp = yes	# Evolved
+			}
+		}
+		custom_tooltip = enable_decision_market_nomination
+	}
+
+	after = {
+		tooltip = {
+			begin_event_chain = {
+				event_chain = market_founding_chain
+				target = this
+			}
+		}
+	}
+}
+
+# Appoint a host for the Galactic Market
+# this = global country | from = proposing country
+country_event = {
+	id = action.98
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		remove_global_flag = ongoing_market_nomination
+		# If at least one planet was nominated, choose a host planet...
+		if = {
+			limit = {
+				any_galaxy_planet = {
+					is_market_nominee_planet = yes
+					exists = owner
+					owner = {
+						tec_is_default_country = yes
+						has_country_flag = market_nomination_eligible # i.e. they are or were a GalCom member
+					}
+				}
+			}
+			every_playable_country = {
+				limit = { has_event_chain = market_founding_chain }
+				end_event_chain = market_founding_chain
+			}
+			choose_galactic_market_host = yes
+			# Start the process of informing the new founder
+			event_target:market_founder = {
+				country_event = { id = action.99 }
+			}
+		}
+		# ... else inform the galaxy that nominations were not forthcoming, and reset.
+		else = {
+			from = {
+				country_event = { id = action.1000 } # Our effort failed
+			}
+			every_playable_country = {
+				limit = {
+					NOT = {
+						is_same_value = from
+					}
+					has_event_chain = market_founding_chain
+				}
+				country_event = { id = action.1005 } # The attempt failed
+			}
+		}
+	}
+}
+
+# Market did not form (proposing country)
+# this = proposing country
+# action.1000
+
+# Market did not form (other GalCom countries)
+# this = country
+country_event = {
+	id = action.1005
+	title = action.1000.name
+	desc = {
+		text = action.1005.desc
+		trigger = {
+			NOR = {
+				is_xenophobe = yes
+				has_ethic = ethic_gestalt_apathy
+			}
+		}
+	}
+	desc = {
+		text = action.1005.desc.phobe
+		trigger = {
+			OR = {
+				is_xenophobe = yes
+				has_ethic = ethic_gestalt_apathy
+			}
+		}
+	}
+	picture = GFX_evt_financial_instruments
+	show_sound = event_galactic_market
+	is_triggered_only = yes
+
+	immediate = {
+		end_event_chain = market_founding_chain
+	}
+
+	option = {
+		name = {
+			text = UNFORTUNATE
+			trigger = {
+				NOR = {
+					is_xenophobe = yes
+					has_ethic = ethic_gestalt_apathy
+				}
+			}
+		}
+		name = {
+			text = action.1005.a.phobe
+			trigger = {
+				OR = {
+					is_xenophobe = yes
+					has_ethic = ethic_gestalt_apathy
+				}
+			}
+		}
+		tooltip = {
+			end_event_chain = market_founding_chain
+		}
+	}
+}
+
+# Market forms; founder selected (gateway event)
+# this = new host country
+# action.99
+
+# Market forms (notifying the new host)
+# this = new host country
+country_event = {
+	id = action.104
+	title = action.99.name
+	desc = {
+		text = action.99.desc
+		trigger = {
+			always = yes
+		}
+	}
+	picture = GFX_evt_financial_instruments
+	location = event_target:galactic_market_station
+	show_sound = event_galactic_market
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = has_market_access
+		enable_galactic_market = yes
+		enable_on_market = energy
+		enable_on_market = minerals
+		enable_on_market = food
+		enable_on_market = consumer_goods
+		enable_on_market = alloys
+		if = {
+			limit = {
+				any_country = {
+					is_galactic_community_member = yes
+					resource_income_compare = {
+						resource = volatile_motes
+						value > 0
+					}
+				}
+			}
+			enable_on_market = volatile_motes
+		}
+		if = {
+			limit = {
+				any_country = {
+					is_galactic_community_member = yes
+					resource_income_compare = {
+						resource = rare_crystals
+						value > 0
+					}
+				}
+			}
+			enable_on_market = rare_crystals
+		}
+		if = {
+			limit = {
+				any_country = {
+					is_galactic_community_member = yes
+					resource_income_compare = {
+						resource = exotic_gases
+						value > 0
+					}
+				}
+			}
+			enable_on_market = exotic_gases
+		}
+		if = {
+			limit = {
+				any_country = {
+					is_galactic_community_member = yes
+					resource_income_compare = {
+						resource = sr_dark_matter
+						value > 0
+					}
+				}
+			}
+			enable_on_market = sr_dark_matter
+		}
+		if = {
+			limit = {
+				any_country = {
+					is_galactic_community_member = yes
+					resource_income_compare = {
+						resource = sr_zro
+						value > 0
+					}
+				}
+			}
+			enable_on_market = sr_zro
+		}
+		if = {
+			limit = {
+				any_country = {
+					is_galactic_community_member = yes
+					resource_income_compare = {
+						resource = sr_living_metal
+						value > 0
+					}
+				}
+			}
+			enable_on_market = sr_living_metal
+		}
+		add_modifier = {
+			modifier = galactic_market_founder
+			days = -1
+		}
+		set_market_leader = yes # Update who owns the market station
+
+		set_timed_global_flag = { flag = resolution_galactic_market_relocated_recently days = 18000 }
+
+		event_target:market_founder_planet.solar_system.star = {
+			create_ambient_object = {
+				type = galactic_market_station
+				location = this
+			}
+			last_created_ambient_object = {
+				save_global_event_target_as = galactic_market_station
+				set_ambient_object_flag = galactic_market_station_flag
+				set_location = {
+					target = event_target:market_founder_planet.solar_system.star
+					angle = random
+					distance = 40
+				}
+			}
+		}
+		every_playable_country = {
+			limit = {
+				is_galactic_community_member = yes
+				NOT = { is_same_value = root }
+			}
+			country_event = { id = action.101 }
+		}
+	}
+
+	option = {
+		name = OK
+		custom_tooltip = established_galactic_market_station
+		tooltip = {
+			end_event_chain = market_founding_chain
+			add_modifier = {
+				modifier = galactic_market_founder
+				days = -1
+			}
+		}
+	}
+}
+
+# Market forms (notification to the wider community)
+country_event = {
+	id = action.101
+	title = action.101.name
+	desc = {
+		text = action.101.desc
+		trigger = {
+			NOR = {
+				is_xenophobe = yes
+				has_ethic = ethic_gestalt_apathy
+			}
+		}
+	}
+	desc = {
+		text = action.101.desc.phobe
+		trigger = {
+			OR = {
+				is_xenophobe = yes
+				has_ethic = ethic_gestalt_apathy
+			}
+		}
+	}
+	picture = GFX_evt_financial_instruments
+	location = event_target:galactic_market_station
+
+	immediate = {
+		set_country_flag = has_market_access
+		enable_galactic_market = yes
+		event_target:galactic_market_station.solar_system = {
+			every_system_planet = {
+				set_surveyed = {
+					surveyed = yes
+					surveyor = root
+				}
+			}
+		}
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = OK
+		tooltip = { end_event_chain = market_founding_chain }
+	}
+}
+
+# Market station lost, is conquered or moved
+# via on_system_lost | this = system's former owner; from = system; fromfrom = new system owner
+# action.102
+
+# Market station moved to our system
+# action.103
+
+# Catch non-standard comms ending up outside the Market, on yearly pulse
+# action.105
+
+# via on_post_communications_established = {}
+# action.110
+
+# Enable market when having comms with market participant
+country_event = {
+	id = action.115
+	title = action.106.name
+	desc = {
+		text = action.106.desc
+		trigger = {
+			NOR = {
+				is_xenophobe = yes
+				has_ethic = ethic_gestalt_apathy
+			}
+		}
+	}
+	desc = {
+		text = action.106.desc.phobe
+		trigger = {
+			OR = {
+				is_xenophobe = yes
+				has_ethic = ethic_gestalt_apathy
+			}
+		}
+	}
+	picture = GFX_evt_financial_instruments
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = has_market_access }
+	}
+
+	immediate = {
+		enable_galactic_market = yes
+		set_country_flag = has_market_access
+	}
+
+	option = {
+		name = OK
+	}
+}
+
+# Enable resources for Galactic Market
+# action.116
+
+# Megastructure completed notification for contacts
+# action.120
+
+# Pop Abducted
+pop_event = {
+	id = action.121
+	title = OK
+	desc = OK
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		create_message = {
+			type = MESSAGE_TYPE_POP_ABDUCTED
+			localization = MESSAGE_POP_ABDUCTED
+			days = 30
+			target = from
+			variable = {
+				type = name
+				localization = SPECIES
+				scope = root.species
+			}
+			variable = {
+				type = name
+				localization = TARGET_PLANET
+				scope = root.planet
+			}
+			variable = {
+				type = name
+				localization = PLANET
+				scope = from
+			}
+		}
+		if = {
+			limit = {
+				exists = from.owner
+			}
+			from.owner = {
+				create_message = {
+					type = MESSAGE_TYPE_POP_ABDUCTED_FROM_US
+					localization = MESSAGE_POP_ABDUCTED_FROM_US
+					days = 30
+					target = from
+					variable = {
+						type = name
+						localization = SPECIES
+						scope = root.species
+					}
+					variable = {
+						type = name
+						localization = ABDUCTER
+						scope = root.planet.owner
+					}
+					variable = {
+						type = name
+						localization = PLANET
+						scope = from
+					}
+				}
+			}
+			#Anticheese - Won't steal pops on regular empires:
+			# Under 30 pops if capital and under 50 devastation
+			# Under 5 pops if colony and under 50 devastation
+			if = {
+				limit = {
+					owner = {
+						tec_is_default_country = yes
+					}
+				}
+				if = {
+					limit = {
+						from = {
+							is_capital = yes
+							planet_devastation < 50
+							num_pops < 30
+						}
+					}
+					from = {
+						create_pop = {
+							species = owner
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						from = {
+							is_capital = no
+							planet_devastation < 50
+							num_pops < 5
+						}
+					}
+					from = {
+						create_pop = {
+							species = owner
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# Last Primitive Pop Abducted (HIDDEN)
+# action.122
+
+# Last Primitive Pop Abducted
+# action.123
+
+# Won War (Imperial Crusade)
+# action.150
+
+# Lost War (Imperial Crusade)
+# action.151
+
+# Loyalists Won Civil War (Emperor)
+# action.152
+
+# Loyalists Won Civil War (Rebels)
+# action.153
+
+# Rebels Won Civil War (Rebels)
+# action.154
+
+# Rebels Won Civil War & Dissolve Empire (Emperor)
+# action.155
+
+## Seize Throne (Usurper)
+# action.156
+
+## Seize Throne (Former Emperor)
+# action.157
+
+# Dissolve Empire (Dissolver)
+# action.158
+
+# Recalculate strategic data for attack/defense ( chokepoints etc. )
+# action.200
+
+# Left a federation
+# action.201
+
+# Hegemony Member's Request to Leave was Rejected
+# action.205
+
+# Federation On Subjects Can Join Law Change
+# action.212
+
+# Federation On Subjects Can NOT Join Law Change
+# action.213
+
+# Federation Member Gains Subject
+# action.214
+
+# Federation Clear Outside Treaties
+# action.215
+
+# Random pulse (set up the delay) - on_five_year_pulse_country
+# action.220
+
+# Random pulse part 2 (fire the on action) - on_five_year_pulse_country
+# action.221
+
+# Random pulse part 3 (fire the on action for negative events) - on_five_year_random_pulse_country
+# action.2211
+
+# Random pulse part 4 - null effect event if fired via espionage operation
+# action.2212
+
+# on_colony_5_year_pulse
+# action.222
+
+# Called when a Starbase changes owner
+# THIS = Ship (Starbase)
+# FROM = Former Owner (Country)
+ship_event = {	# Evolved trade gestalt changes
+	id = action.223
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		exists = starbase
+	}
+
+	immediate = {
+		starbase = {
+			if = {
+				limit = {
+					owner = {
+						is_gestalt = yes
+						tec_is_trade_gestalt = no
+					}
+				}
+				remove_starbase_building = {
+					building = offworld_trading_company
+				}
+				remove_starbase_module = {
+					module = trading_hub
+				}
+			}
+		}
+	}
+}
+
+# This = starbase being destroyed
+# From = fleet that destroyed the starbase
+#starbase_event = {
+#	id = action.225
+
+# From = system
+# FromFrom = country (new owner)
+# This = country (previous owner)
+#country_event = {
+#	id = action.226
+
+# on_released_as_vassal
+# This = released vassal
+# From = overlord
+country_event = {	 # Evolved - kept for some vassal types
+	id = action.229
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_origin_effect = yes
+		tec_remove_sovereign_type_civic_effect = yes
+		tec_remove_vassal_civic_effect = yes
+		# Overlord has 90 Intel on released sectors
+		from = {
+			add_intel = {
+				who = root
+				amount = 80
+			}
+		}
+	}
+}
+
+# Convert sectors released as subjects by megacorps into oligarchies
+country_event = {
+	id = action.230
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_megacorp = yes
+		from = { is_megacorp = yes }
+	}
+
+	immediate = {
+		set_merchant_government_effect = yes
+	}
+}
+
+# on_decade_pulse_country
+# Event for misc error logging of broken gamestates that probably can't be done better in code
+# action.240
+
+# These seems to be mega/gate fixers
+# action.301
+
+# action.300
+
+# Federation president (?
+# action.310
+
+# on_country_released_in_war
+# Root = new country
+# From = country forcing the release
+# FromFrom = country they are released from
+# FromFromFrom = war
+#country_event = {
+#	id = action.320
+
+#on_monthly_pulse_country: give favours for envoys
+#country_event = {
+#	id = action.325
+
+#on_operation_cancelled: if you have the right tradition, they get some intel
+#espionage_operation_event = {
+#	id = action.330
+
+# On research Planetary Unification
+#country_event = {
+#	id = action.400
+
+# Distinguished admiralty events - admirals
+#country_event = {
+#	id = action.405
+
+# Distinguished admiralty events - generals
+#country_event = {
+#	id = action.410
+#	hide_window = yes
+
+# Random pulse (set up the delay) - on_five_year_pulse_country - for overlords
+#country_event = {
+#	id = action.420
+
+# Random pulse part 2 (fire the on action) - on_five_year_pulse_country - for overlords
+#country_event = {
+#	id = action.421
+
+#Yeet the Fleet achievement
+#fleet_event = {
+#	id = action.425
+
+# Into the Unknown Achievement
+#fleet_event = {
+#	id = action.430
+
+	# This = agreement
+# owner = overlord
+# target = subject
+# Fine Print achievement
+#agreement_event = {
+#	id = action.435
+
+	# This = agreement
+# owner = overlord
+# target = subject
+# Force Subjects to join GalCom, on Agreement Change.
+#agreement_event = {
+#	id = action.440
+
+
+	# This = subject
+# From = subject's overlord
+# Force Subjects to join GalCom, on Subjugation
+#country_event = {
+#	id = action.441
+
+# This = agreement
+# owner = overlord
+# target = subject
+# Force Subjects to join Federation, on Agreement Change.
+#agreement_event = {
+#	id = action.442
+
+
+# This = agreement
+# owner = overlord
+# target = subject
+# Force Subjects to join Federation, on Agreement Change.
+#agreement_event = {
+#	id = action.443
+
+# Recalculate divided patronage on government reform if you have Feudal Society or Franchising.
+#country_event = {
+#	id = action.445
+
+# Recalculate divided patronage on taking Shared Destiny AP.
+#country_event = {
+#	id = action.446
+
+# This = agreement
+# owner = overlord
+# target = subject
+#agreement_event = {
+#	id = action.450
+
+#agreement_event = {
+#	id = action.451
+
+# Unlock Memorialist buildings for hive-minds that reform into the civic.
+#country_event = {
+#	id = action.455
+
+
+# Strange Mood achievement
+#country_event = {
+#	id = action.460
+
+# Directive 67 achievement
+#country_event = {
+#	id = action.465
+
+# Destroy People of Earth achievement
+#country_event = {
+#	id = action.470
+
+# Fishing for Trouble
+#country_event = {
+#	id = action.475
+
+# Zombie on my Lawn
+#country_event = {
+#	id = action.480
+
+# With Great Power Achievement
+#planet_event = {
+#	id = action.485
+
+# Could Be Worse Achievement
+#planet_event = {
+#	id = action.490
+
+# Tend the Garden Achievement
+#planet_event = {
+#	id = action.495
+
+#country_event = {
+#	id = action.500
+
+# Ruined orbital ring?
+#starbase_event = {
+#	id = action.503
+
+
+# Random pulse (set up the delay) - on_five_year_pulse_country - for pre-ftl diplo events
+#country_event = {
+#	id = action.620
+
+# Random pulse part 2 (fire the on action) - on_five_year_pulse_country - for pre-ftl diplo events
+#country_event = {
+#	id = action.621
+
+# Random pulse (set up the delay) - on_five_year_pulse_country - for pre-ftl tech events
+#country_event = {
+#	id = action.630
+
+# Random pulse part 2 (fire the on action) - on_five_year_pulse_country - for pre-ftl tech events
+#country_event = {
+#	id = action.631
+
+# Random pulse (set up the delay) - on_bi_yearly_pulse_country - for Payback and Broken Shackles interactions
+#country_event = {
+#	id = action.632
+
+# Random pulse (fire the on action) - on_five_year_pulse_country - for Payback and Broken Shackles interactions
+#country_event = {
+#	id = action.633
+
+# Contact report follow-up (fire the on action) - on_first_contact_started
+#first_contact_event = {
+#	id = action.635
+
+# Root = Country
+# From = War
+#country_event = {
+#	id = action.640
+
+# Galatron activated for the first time - fired from the r_galatron relic - unlocks the CB to steal it
+#country_event = {
+#	id = action.650
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

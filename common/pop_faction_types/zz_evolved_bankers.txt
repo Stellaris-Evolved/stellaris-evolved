@@ -20,9 +20,11 @@ bankers = {
 				owner = {
 					has_valid_civic = civic_tec_political_virtue
 				}
-				faction_approval >= 0.5
+				pop_faction = {
+					faction_approval >= 0.5
+				}
 			}
-			energy = 1
+			energy = 0.5
 		}
 		produces = {	# Political virtue
 			trigger = {
@@ -31,9 +33,11 @@ bankers = {
 					has_valid_civic = civic_tec_political_virtue
 					is_competitive = yes
 				}
-				faction_approval >= 0.5
+				pop_faction = {
+					faction_approval >= 0.5
+				}
 			}
-			energy = 0.2
+			energy = 0.1
 		}
 		produces = {	# Idealistic foundation
 			trigger = {
@@ -112,26 +116,16 @@ bankers = {
 		}
 	}
 	
-	demand = {
-		title = "FACTION_OUTRAGED_GC"
-		unfulfilled_title = "FACTION_OUTRAGED_GC"
-		desc = "FACTION_OUTRAGED_GC_DESC"
+	# DEMAND: Faction Outraged (by a GalCom Resolution)
+	inline_script = {
+		script = pop_faction_types/demand_faction_outraged
+		FLAG = galcom_resolution_passed_anti_competitive
+	}
 
-		fulfilled_effect = -20
-		unfulfilled_effect = 0
-
-		potential = {
-			exists = owner
-			owner = {
-				has_country_flag = faction_capitalism_outraged_gc
-			}
-		}
-
-		trigger = {
-			owner = {
-				has_country_flag = faction_capitalism_outraged_gc
-			}
-		}
+	# DEMAND: Faction Pleased (by a GalCom Resolution)
+	inline_script = {
+		script = pop_faction_types/demand_faction_pleased
+		FLAG = galcom_resolution_passed_pro_competitive
 	}
 
 	# ----------------------- D E M A N D S -----------------------
@@ -342,27 +336,27 @@ bankers = {
 			}
 		# /
 		# Neut
-			demand = {	# NEUT - PRIVATE MEDICINE
-				title = "TEC_FAC_COMP_PRIV_MEDICINE"
-				unfulfilled_title = "TEC_FAC_COMP_NO_PRIV_MEDICINE"
-				desc = "TEC_FAC_COMP_PRIV_MEDICINE_DESC"
-				fulfilled_effect = 5
-				unfulfilled_effect = -5
-				potential = {
-					exists = owner
-					owner = {
-						can_set_policy = {
-							policy = healthcare
-							option = private_healthcare
-						}
-					}
-				}
-				trigger = {
-					owner = {
-						has_policy_flag = private_healthcare
-					}
-				}
-			}
+			#demand = {	# NEUT - PRIVATE MEDICINE
+			#	title = "TEC_FAC_COMP_PRIV_MEDICINE"
+			#	unfulfilled_title = "TEC_FAC_COMP_NO_PRIV_MEDICINE"
+			#	desc = "TEC_FAC_COMP_PRIV_MEDICINE_DESC"
+			#	fulfilled_effect = 5
+			#	unfulfilled_effect = -5
+			#	potential = {
+			#		exists = owner
+			#		owner = {
+			#			can_set_policy = {
+			#				policy = healthcare
+			#				option = private_healthcare
+			#			}
+			#		}
+			#	}
+			#	trigger = {
+			#		owner = {
+			#			has_policy_flag = private_healthcare
+			#		}
+			#	}
+			#}
 			# Economic federation
 			demand = {	# NEU - LEADER OF ECONOMIC FEDERATION
 				title = "TEC_FAC_COMP_LEAD_TRADEFED"
@@ -405,7 +399,7 @@ bankers = {
 										has_living_standard = { type = living_standard_stratified country = prev }
 										has_living_standard = { type = living_standard_academic_privilege country = prev }
 										AND = {	# Decadence is also allowed
-											prevprev = {
+											prev = {
 												is_pleasure_seeker = yes
 											}
 											has_living_standard = { type = living_standard_decadent country = prev }

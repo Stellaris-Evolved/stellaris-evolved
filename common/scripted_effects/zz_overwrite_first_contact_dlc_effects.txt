@@ -1,0 +1,149 @@
+# common\scripted_effects\zz_overwrite_first_contact_dlc_effects.txt
+
+# Used for the security drones in the Payback Arc site
+
+create_payback_debt_collectors_fleet = {
+	event_target:payback_debt_collectors_country = {
+		create_leader = {
+			class = admiral
+			species = event_target:debt_collectors_species
+			name = random
+			skill = 3
+			leader_age_min = 25
+			leader_age_max = 45
+			traits = {
+				trait = random_trait
+				trait = leader_trait_mercenary_warrior
+			}
+		}
+	}
+	create_fleet = {
+		settings = {
+			spawn_debris = no
+		}
+		name = "NAME_Debt_Collectors_Country"
+		effect = {
+			set_owner = event_target:payback_debt_collectors_country
+			set_variable = {
+				which = debt_collectors_ships
+				value = $NUM_DRONES$
+			}
+			multiply_variable = {
+				which = debt_collectors_ships
+				value = root.debt_collectors_visits
+			}
+			while = {
+				count = debt_collectors_ships
+				create_ship = {
+					name = "NAME_Payback_Digsite_Drone"
+					design = "NAME_Payback_Digsite_Drone"
+					graphical_culture = "slaver_01"
+				}
+			}
+			set_location = event_target:payback_capital
+			set_fleet_stance = aggressive
+			set_fleet_bombardment_stance = raiding
+			set_fleet_flag = debt_collectors_raiding_fleet
+			set_aggro_range_measure_from = self
+			set_aggro_range = 150
+			assign_leader = last_created_leader
+
+			auto_move_to_planet = {
+				target = event_target:payback_capital
+				clear_auto_move_on_arrival = no
+			}
+		}
+	}
+}
+
+create_MSI_effect = {
+	create_species = {
+		name = random
+		class = MSI_SLAVER
+		namelist = HUMAN3
+		portrait = random
+		traits = {
+			trait = "trait_pc_nuked_preference"
+			trait = "trait_charismatic"
+			trait = "trait_intelligent"
+			trait = "trait_decadent"
+			trait = "trait_wasteful"
+		}
+		allow_negative_traits = yes
+	}
+
+	create_country = {
+		name = "NAME_MSI_country"
+		adjective = "ADJ_MSI_country"
+		species = last_created_species
+		type = default
+		flag = {
+			icon = {
+				category = "corporate"
+				file = "corporate_07.dds"
+			}
+			background= {
+				category = "backgrounds"
+				file = "pattern_01.dds"
+			}
+			colors={
+				"mist_blue"
+				"bright_purple"
+				"null"
+				"null"
+			}
+		}
+		origin = "origin_slavers"
+		ethos = {
+			ethic = ethic_fanatic_materialist
+			ethic = ethic_authoritarian
+			ethic = ethic_elitist
+			ethic = ethic_capitalism
+		}
+		civics = {
+			civic = civic_indentured_assets
+			civic = civic_public_relations_specialists
+			civic = civic_brand_loyalty
+		}
+		authority = auth_corporate
+		effect = {
+			save_global_event_target_as = MSI_country
+			set_country_flag = MSI
+
+			every_country = {
+				limit = {
+					has_slave_origin = yes
+					NOT = { has_country_flag = slavers_assigned }
+				}
+				set_country_flag = slavers_assigned
+				event_target:MSI_country = { 
+					set_country_flag = slavers_of_@prev
+					set_country_flag = special_intro_for@prev
+					add_opinion_modifier = {
+						who = prev
+						modifier = opinion_former_slaves
+					}
+				}
+				species = { set_species_flag = victims_of_@event_target:MSI_country }
+				set_country_flag = victims_of_@event_target:MSI_country
+				add_opinion_modifier = {
+					who = event_target:MSI_country
+					modifier = opinion_slavers
+				}
+			}
+		}
+	}
+
+	create_colony = {
+		owner = event_target:MSI_country
+	}
+	generate_start_deposits_and_blockers = yes
+	generate_start_buildings_and_districts = yes
+	generate_start_pops = yes
+	event_target:MSI_country = {
+		create_starting_leaders = yes
+		country_event = { id = game_start.9 }
+		owner_species = { set_species_homeworld = prevprev }
+		log = "MSI CREATED"
+	}
+}

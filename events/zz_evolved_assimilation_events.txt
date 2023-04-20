@@ -1,3 +1,5 @@
+# zz_evolved_assimilation_events.txt
+
 # - - - - - - - - - - - - - - - - - - - - - 
 #
 # Based on Necroids Events
@@ -7,11 +9,35 @@
 
 
 # Assimilator events
-
-
 namespace = tec_assimilation
 
-# Metamorphosis event for assimilator hives
+# ------------------------------------------------- Dominant species
+# This = Country
+# From = Species ( Post Modification )
+country_event = {
+	id = tec_assimilation.10
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = { from = { is_same_species = root } }
+
+	immediate = {
+		ordered_owned_species = {
+			limit = {
+				is_same_species = root
+				tec_has_stapled_trait = no
+			}
+			position = 0
+			order_by = trigger:num_pops
+			save_event_target_as = tec_new_dominant_species
+		}
+		change_dominant_species = {	species = event_target:tec_new_dominant_species }
+	}
+}
+
+# ------------------------------------------------- Pseudoassimilation
+# --------------- Metamorphosis event for assimilator hives
 planet_event = {
 	id = tec_assimilation.100
 	hide_window = yes
@@ -169,11 +195,10 @@ planet_event = {
 	}
 }
 
-# Metamorphosis event for organic bioascended hives
+# --------------- Metamorphosis event for organic bioascended hives
 # tec_assimilation 150
 
-
-# Splicing event for ascension perk regular empires and regular hives
+# --------------- Splicing event for ascension perk regular empires and regular hives
 planet_event = {
 	id = tec_assimilation.200
 	hide_window = yes
@@ -331,7 +356,7 @@ planet_event = {
 	}
 }
 
-# Encaser event for machines and cyberhives
+# --------------- Encaser event for machines and cyberhives
 planet_event = {
 	id = tec_assimilation.300
 	hide_window = yes
@@ -511,7 +536,7 @@ planet_event = {
 	}
 }
 
-# Composer event for composer machines
+# --------------- Composer event for composer machines
 planet_event = {
 	id = tec_assimilation.400
 	hide_window = yes
@@ -546,7 +571,7 @@ planet_event = {
 			species = { save_event_target_as = composed_pop_species }
 		}
 		every_owned_pop = {
-			limit = { has_job = tec_composed}
+			limit = { has_job = tec_composed }
 			root = {
 				change_variable = {
 					which = var_composed_pops
@@ -827,6 +852,7 @@ planet_event = {
 	}
 }
 
+# ------------------------------------------------- Purge
 # Necrophage Purge
 
 # on_pop_purged
@@ -933,6 +959,7 @@ planet_event = {
 	}
 }
 
+# ------------------------------------------------- Assimilation
  # New assimilation system
 # Assimilate Pops on Yearly Pulse event = {	id = action.64 	OVERWRITE
 # Assimilate Pops planet_event = { 	id = action.65	OVERWRITE
@@ -944,6 +971,948 @@ planet_event = {
 # Assimilate Pops on Yearly Pulse
 event = {
 	id = tec_assimilation.64
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		any_playable_country = {
+			num_unique_species > 1
+			any_owned_species = {
+				has_citizenship_type = {
+					type = citizenship_assimilation
+					country = prev
+				}
+			}
+		}
+	}
+
+	immediate = {
+		log = "tec_assimilation.64"
+		set_update_modifiers_batch = begin
+		every_playable_country = {
+			limit = {
+				num_unique_species > 1
+				any_owned_species = {
+					has_citizenship_type = {
+						type = citizenship_assimilation
+						country = prev
+					}
+				}
+			}
+			save_event_target_as = tec_assimilator_country
+			log = "tec_assimilation.64.every_playable_country: [tec_assimilator_country.GetRealName]"
+			every_owned_species = {
+				limit = {
+					has_citizenship_type = {
+						type = citizenship_assimilation
+						country = prev
+					}
+				}
+				log = "tec_assimilation.64.every_owned_species: [This.GetName]"
+				if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_remove_hivemind
+							country = prev
+						}
+					}
+					tec_assimilation_remove_hivemind_script = yes
+				}
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_add_hivemind
+							country = prev
+						}
+					}
+					tec_assimilation_add_hivemind_script = yes
+				}
+
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_unify_robots
+							country = prev
+						}
+					}
+					tec_assimilation_unify_robots_script = yes
+				}
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_unify_machines
+							country = prev
+						}
+					}
+					tec_assimilation_unify_machines_script = yes
+				}
+
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_cybernetic_t1
+							country = prev
+						}
+					}
+					tec_assimilation_cybernetic_t1_script = yes
+				}
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_cybernetic_t1_machine
+							country = prev
+						}
+					}
+					tec_assimilation_cybernetic_t1_machine_script = yes
+				}
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_cybernetic_t1_hive
+							country = prev
+						}
+					}
+					tec_assimilation_cybernetic_t1_hive_script = yes
+				}
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_cybernetic_t1_upgrade
+							country = prev
+						}
+					}
+					tec_assimilation_cybernetic_t1_upgrade_script = yes
+				}
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_cybernetic_t1_upgrade_machine
+							country = prev
+						}
+					}
+					tec_assimilation_cybernetic_t1_upgrade_machine_script = yes
+				}
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_cybernetic_t1_upgrade_hive
+							country = prev
+						}
+					}
+					tec_assimilation_cybernetic_t1_upgrade_hive_script = yes
+				}
+
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_cybernetic_t2
+							country = prev
+						}
+					}
+					tec_assimilation_cybernetic_t2_script = yes
+				}
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_cybernetic_t2_machine
+							country = prev
+						}
+					}
+					tec_assimilation_cybernetic_t2_machine_script = yes
+				}
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_cybernetic_t2_hive
+							country = prev
+						}
+					}
+					tec_assimilation_cybernetic_t2_hive_script = yes
+				}
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_cybernetic_t2_upgrade
+							country = prev
+						}
+					}
+					tec_assimilation_cybernetic_t2_upgrade_script = yes
+				}
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_cybernetic_t2_upgrade_machine
+							country = prev
+						}
+					}
+					tec_assimilation_cybernetic_t2_upgrade_machine_script = yes
+				}
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_cybernetic_t2_upgrade_hive
+							country = prev
+						}
+					}
+					tec_assimilation_cybernetic_t2_upgrade_hive_script = yes
+				}
+
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_cybernetic_t2_total
+							country = prev
+						}
+					}
+					tec_assimilation_cybernetic_t2_total_script = yes
+				}
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_cybernetic_t2_digitalization
+							country = prev
+						}
+					}
+					tec_assimilation_cybernetic_t2_digitalization_script = yes
+				}
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_cybernetic_t2_merge_robot
+							country = prev
+						}
+					}
+					tec_assimilation_cybernetic_t2_merge_robot_script = yes
+				}
+
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_synthetic_total
+							country = prev
+						}
+					}
+					tec_assimilation_synthetic_total_script = yes
+				}
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_synthetic_total_machine
+							country = prev
+						}
+					}
+					tec_assimilation_synthetic_total_machine_script = yes
+				}
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_synthetic_digitalization
+							country = prev
+						}
+					}
+					tec_assimilation_synthetic_digitalization_script = yes
+				}
+
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_psionic
+							country = prev
+						}
+					}
+					tec_assimilation_psionic_script = yes
+				}
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_psionic_ascend
+							country = prev
+						}
+					}
+					tec_assimilation_psionic_ascend_script = yes
+				}
+
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_genetic_total
+							country = prev
+						}
+					}
+					tec_assimilation_genetic_total_script = yes
+				}
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_genetic_add
+							country = prev
+						}
+					}
+					tec_assimilation_genetic_add_script = yes
+				}
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_genetic_add_hive
+							country = prev
+						}
+					}
+					tec_assimilation_genetic_add_hive_script = yes
+				}
+
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_biopsionic_total
+							country = prev
+						}
+					}
+					tec_assimilation_biopsionic_total_script = yes
+				}
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_biopsionic_add
+							country = prev
+						}
+					}
+					tec_assimilation_biopsionic_add_script = yes
+				}
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_biopsionic_add_hive
+							country = prev
+						}
+					}
+					tec_assimilation_biopsionic_add_hive_script = yes
+				}
+
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_cyberpsionic
+							country = prev
+						}
+					}
+					tec_assimilation_cyberpsionic_script = yes
+				}
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_cyberpsionic_hive
+							country = prev
+						}
+					}
+					tec_assimilation_cyberpsionic_hive_script = yes
+				}
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_cyberpsionic_upgrade
+							country = prev
+						}
+					}
+					tec_assimilation_cyberpsionic_upgrade_script = yes
+				}
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_cyberpsionic_upgrade_hive
+							country = prev
+						}
+					}
+					tec_assimilation_cyberpsionic_upgrade_hive_script = yes
+				}
+
+				else_if = {
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_replicant_total
+							country = prev
+						}
+					}
+					tec_assimilation_replicant_total_script = yes
+				}
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_replicant_add
+							country = prev
+						}
+					}
+					tec_assimilation_replicant_add_script = yes
+				}
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_replicant_add_hive
+							country = prev
+						}
+					}
+					tec_assimilation_replicant_add_hive_script = yes
+				}
+
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_biological_total
+							country = prev
+						}
+					}
+					tec_assimilation_biological_total_script = yes
+				}
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_biological_add
+							country = prev
+						}
+					}
+					tec_assimilation_biological_add_script = yes
+				}
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_biological_add_hive
+							country = prev
+						}
+					}
+					tec_assimilation_biological_add_hive_script = yes
+				}
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_biological_decompose
+							country = prev
+						}
+					}
+					tec_assimilation_biological_decompose_script = yes
+				}
+
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_psychic
+							country = prev
+						}
+					}
+					tec_assimilation_psychic_script = yes
+				}
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_psychic_hivemind
+							country = prev
+						}
+					}
+					tec_assimilation_psychic_hivemind_script = yes
+				}
+
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_bionic
+							country = prev
+						}
+					}
+					tec_assimilation_bionic_script = yes
+				}
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_bionic_machine
+							country = prev
+						}
+					}
+					tec_assimilation_bionic_machine_script = yes
+				}
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_bionic_hive
+							country = prev
+						}
+					}
+					tec_assimilation_bionic_hive_script = yes
+				}
+
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_bionic_upgrade
+							country = prev
+						}
+					}
+					tec_assimilation_bionic_upgrade_script = yes
+				}
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_bionic_upgrade_machine
+							country = prev
+						}
+					}
+					tec_assimilation_bionic_upgrade_machine_script = yes
+				}
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_bionic_upgrade_hive
+							country = prev
+						}
+					}
+					tec_assimilation_bionic_upgrade_hive_script = yes
+				}
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_bionic_total
+							country = prev
+						}
+					}
+					tec_assimilation_bionic_total_script = yes
+				}
+
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_ethereal_total
+							country = prev
+						}
+					}
+					tec_assimilation_ethereal_total_script = yes
+				}
+				else_if = {	# TO DO
+					limit = {
+						has_living_standard = {
+							type = living_standard_tec_assimilation_ethereal_energy
+							country = prev
+						}
+					}
+					tec_assimilation_ethereal_energy_script = yes
+				}
+				else = {	# Total
+					tec_fallback_assimilation_script = yes
+				}
+			}
+
+			every_owned_planet = {	# REGULAR QUEUE
+				log = "tec_assimilation.6401.every_owned_planet: [This.GetName]"
+				planet_event = {
+					id = tec_assimilation.6401 
+				}
+			}
+			# This is no longer needed - crafted species never fail to assimilate
+			#every_owned_planet = {	# CRAFTED QUEUE
+			#	log = "tec_assimilation.6402.every_owned_planet: [This.GetName]"
+			#	planet_event = {
+			#		id = tec_assimilation.6402
+			#	}
+			#}
+		}
+		set_update_modifiers_batch = end
+	}
+}
+
+# Assimilate Pops
+planet_event = {
+	id = tec_assimilation.6401
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		any_owned_species = {
+			has_citizenship_type = {
+				type = citizenship_assimilation
+				country = root.owner
+			}
+			#NOR = {	# Crafted species uses other event
+			#	has_trait = trait_mechanical
+			#	has_trait = trait_machine_unit
+			#	has_trait = @trait_tec_bioservant
+			#}
+		}
+	}
+
+	immediate = {
+		log = "tec_assimilation.6401: [This.GetName]"
+		set_timed_planet_flag = {
+			flag = tec_executed_assimilation_step_1
+			months = 1
+		}
+		random_list = {
+			1 = {
+				set_variable = {
+					which = tec_assimilation_counter
+					value = 10
+				}
+			}
+			1 = {
+				set_variable = {
+					which = tec_assimilation_counter
+					value = 15
+				}
+			}
+			1 = {
+				set_variable = {
+					which = tec_assimilation_counter
+					value = 20
+				}
+			}
+		}
+		# Added this in case we want to add extra assimilation values
+			#if = {
+			#	limit = {
+			#		owner = {
+			#			check_variable = {
+			#				which = tec_assimilation_counter_extra
+			#				value > 0
+			#			}
+			#		}
+			#	}
+			#	change_variable = {
+			#		which = tec_assimilation_counter
+			#		value = owner.tec_assimilation_counter_extra
+			#	}
+			#}
+		# /
+		if = {
+			limit = { owner = { has_tradition = tr_cybernetics_assimilator_inevitable_assimilation } }
+			change_variable = {
+				which = tec_assimilation_counter
+				value = 1
+			}
+		}
+		
+		while = {
+			count = tec_assimilation_counter
+			limit = {
+				any_owned_pop = {
+					has_citizenship_type = {
+						type = citizenship_assimilation
+						country = root.owner
+					}
+				}
+				check_variable = {
+					which = tec_assimilation_counter
+					value > 0
+				}
+			}
+			tec_pop_assimilation_effect = yes
+		}
+		clear_variable = tec_assimilation_counter
+	}
+}
+
+# ------------------------------------------------- Deprecated
+# Assimilate Pops - Crafted species - deprecated
+ planet_event = {
+	id = tec_assimilation.6402
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			any_owned_species = {
+				has_citizenship_type = {
+					type = citizenship_assimilation
+					country = root.owner
+				}
+				OR = {
+					has_trait = trait_machine_unit
+					has_trait = trait_mechanical
+					has_trait = trait_tec_bioservant
+				}
+			}
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				has_major_upgraded_capital = yes
+			}
+			set_variable = {
+				which = tec_assimilation_counter_crafted
+				value = 15
+			}
+		}
+		else = {
+			set_variable = {
+				which = tec_assimilation_counter_crafted
+				value = 10
+			}
+		}
+		# Added this in case we want to add extra assimilation values
+		change_variable = {
+			which = tec_assimilation_counter_crafted
+			value = owner.tec_assimilation_counter_extra
+		}
+		if = {
+			limit = { owner = { has_tradition = tr_cybernetics_assimilator_inevitable_assimilation } }
+			change_variable = {
+				which = tec_assimilation_counter_crafted
+				value = 1
+			}
+		}
+
+		while = {
+			limit = {
+				any_owned_pop = {
+					has_citizenship_type = {
+						type = citizenship_assimilation
+						country = root.owner
+					}
+				}
+				check_variable = {
+					which = tec_assimilation_counter_crafted
+					value > 0
+				}
+			}
+			#tec_assimilation_effect = yes
+			set_variable = {
+				which = tec_assimilation_counter_crafted
+				value = -1
+			}
+			random_owned_pop = {
+				limit = {
+					has_citizenship_type = {
+						type = citizenship_assimilation
+						country = root.owner
+					}
+					OR = {
+						has_trait = trait_mechanical
+						has_trait = trait_machine_unit
+						#	has_trait = @trait_tec_bioservant	# not yet space cowboy
+					}
+				}
+				species = {
+					set_timed_species_flag = {
+						flag = tec_old_crafted_species_@this
+						days = 30
+					}
+					save_event_target_as = tec_old_crafted_species
+				}
+				# Replicants consuming everything
+				if = {
+					limit = {
+						root.owner = {
+							has_country_flag = tec_replicant_assimilation							
+						}
+						OR = {
+							has_trait = trait_mechanical
+							has_trait = trait_machine_unit
+						}
+						has_citizenship_type = {
+							type = citizenship_assimilation
+							country = root.owner
+						}
+					}
+					kill_pop = yes
+					root = {
+						create_pop = {
+							species = root.owner
+						}
+						owner = {
+							if = {
+								limit = { has_ascension_perk = ap_become_the_crisis }
+								complete_crisis_objective = crisobj_purge_pops
+							}
+						}
+					}
+				}
+
+				# Robots into machines
+				else_if = {
+					limit = {
+						root.owner = {
+							is_machine_empire = yes
+							NOT = {
+								has_country_flag = tec_replicant_assimilation
+							}
+						}
+						has_trait = trait_mechanical
+						has_citizenship_type = {
+							type = citizenship_assimilation
+							country = root.owner
+						}
+					}
+					kill_pop = yes
+					root = {
+						create_pop = {
+							species = root.owner
+						}
+						owner = {
+							if = {
+								limit = { has_ascension_perk = ap_become_the_crisis }
+								complete_crisis_objective = crisobj_purge_pops
+							}
+						}
+					}
+				}
+
+				# Machines into machines
+				else_if = {
+					limit = {
+						root.owner = {
+							is_machine_empire = yes
+							NOT = {
+								has_country_flag = tec_replicant_assimilation
+							}
+						}
+						has_trait = trait_machine_unit
+						has_citizenship_type = {
+							type = citizenship_assimilation
+							country = root.owner
+						}
+						NOT = {
+							is_exact_same_species = root.owner
+						}
+					}
+					kill_pop = yes
+					root = {
+						create_pop = {
+							species = root.owner
+						}
+						owner = {
+							if = {
+								limit = { has_ascension_perk = ap_become_the_crisis }
+								complete_crisis_objective = crisobj_purge_pops
+							}
+						}
+					}
+				}
+
+				# Machines into synths
+				else_if = {
+					limit = {
+						root.owner = {
+							has_country_flag = synthetic_empire
+							has_ascension_perk = ap_synthetic_evolution
+						}
+						has_trait = trait_machine_unit
+						has_citizenship_type = {
+							type = citizenship_assimilation
+							country = root.owner
+						}
+					}
+					kill_pop = yes
+					root = {
+						create_pop = {
+							species = root.owner
+						}
+						owner = {
+							if = {
+								limit = { has_ascension_perk = ap_become_the_crisis }
+								complete_crisis_objective = crisobj_purge_pops
+							}
+						}
+					}
+				}
+
+				# Machines into robots - exist a template
+				else_if = {
+					limit = {
+						root.owner = {
+							is_machine_empire = no
+							has_technology = tech_tec_machine_assimilation
+							any_owned_species = {
+								has_trait = trait_mechanical
+								has_species_flag = mechanical_species@root.owner
+							}
+							NOT = {
+								has_country_flag = tec_replicant_assimilation
+							}
+						}
+					}
+					root.owner = {
+						random_owned_species = {
+							limit = {
+								has_trait = trait_mechanical
+								has_species_flag = mechanical_species@root.owner
+							}
+							save_event_target_as = tec_robot_template
+							set_timed_species_flag = {
+								flag = tec_temp_robot_target
+								days = 30
+							}
+						}
+					}
+					kill_pop = yes
+					root = {
+						create_pop = {
+							species = event_target:tec_robot_template
+							ethos = root.owner
+						}
+						owner = {
+							if = {
+								limit = { has_ascension_perk = ap_become_the_crisis }
+								complete_crisis_objective = crisobj_purge_pops
+							}
+						}
+					}
+				}
+
+				# Machines into robots - not exist a template
+				else_if = {
+					limit = {
+						root.owner = {
+							is_machine_empire = no
+							has_technology = tech_tec_machine_assimilation
+							NOT = {
+								has_country_flag = tec_replicant_assimilation
+							}
+							any_owned_species = {
+								NAND = {
+									has_trait = trait_mechanical
+									has_species_flag = mechanical_species@root.owner
+								}
+							}
+						}
+					}
+					root.owner = {
+						tec_create_built_robot_species = yes
+					}
+					last_created_species = {
+						save_event_target_as = tec_robot_template
+						set_timed_species_flag = {
+							flag = tec_temp_robot_target
+							days = 30
+						}
+					}
+					kill_pop = yes
+					root = {
+						create_pop = {
+							species = event_target:tec_robot_template
+							ethos = root.owner
+						}
+						owner = {
+							if = {
+								limit = { has_ascension_perk = ap_become_the_crisis }
+								complete_crisis_objective = crisobj_purge_pops
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	after = {
+		set_variable = {
+			which = assimilation_crafted_counter
+			value = 0
+		}
+	}
+ }
+
+ # BACKUP - PREVIOUS ITERATION - HANDLE WITH CARE
+ # Can cause chemical burns
+ # Can induce dementia
+ # Untying the complicated event composition can led to unexpected results
+ # Assimilate Pops on Yearly Pulse
+ event = {
+	id = tec_assimilation.6499
 	hide_window = yes
 	is_triggered_only = yes
 
@@ -978,7 +1947,7 @@ event = {
 				limit = {
 					NOR = {
 						has_country_flag = tec_synthetic_assimilation			# Convert into robots
-						has_country_flag = tec_biological_assimilation			# Convert into themselves
+						has_country_flag = tec_genetic_assimilation				# Convert into themselves
 						has_country_flag = tec_hive_biological_assimilation
 						has_country_flag = tec_biopsionic_assimilation
 						has_country_flag = tec_hive_biopsionic_assimilation
@@ -1306,22 +2275,22 @@ event = {
 
 			every_owned_planet = {	# REGULAR QUEUE
 				planet_event = {
-					id = tec_assimilation.65 
+					id = tec_assimilation.6401 
 				}
 			}
 			every_owned_planet = {	# CRAFTED QUEUE
 				planet_event = {
-					id = tec_assimilation.6501
+					id = tec_assimilation.6402
 				}
 			}
 		}
 		set_update_modifiers_batch = end
 	}
-}
+ }
 
-# Assimilate Pops
-planet_event = {
-	id = tec_assimilation.65
+ # Assimilate Pops
+ planet_event = {
+	id = tec_assimilation.640199
 	hide_window = yes
 	is_triggered_only = yes
 
@@ -1383,7 +2352,7 @@ planet_event = {
 						root.owner = {
 							OR = {
 								has_country_flag = tec_synthetic_assimilation				# Convert into robots
-								has_country_flag = tec_biological_assimilation				# Convert into themselves
+								has_country_flag = tec_genetic_assimilation				# Convert into themselves
 								has_country_flag = tec_hive_biological_assimilation
 								has_country_flag = tec_biopsionic_assimilation
 								has_country_flag = tec_ethereal_assimilation
@@ -1665,11 +2634,11 @@ planet_event = {
 			value = 0
 		}
 	}
-}
+ }
 
-# Assimilate Pops - Crafted species
-planet_event = {
-	id = tec_assimilation.6501
+ # Assimilate Pops - Crafted species
+ planet_event = {
+	id = tec_assimilation.640299
 	hide_window = yes
 	is_triggered_only = yes
 
@@ -1957,5 +2926,6 @@ planet_event = {
 			value = 0
 		}
 	}
-}
+ }
 
+# /

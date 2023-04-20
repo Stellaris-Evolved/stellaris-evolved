@@ -29,6 +29,7 @@
 		#building_tec_biohive_spawning_pool_1
 
 		# Other
+		#building_tec_mechadendrite_assembler_1
 
 	# T2
 		# robotics
@@ -53,6 +54,8 @@
 		#building_spawning_pool_2
 		#building_tec_biohive_spawning_pool_2
 
+		# Other
+		#building_tec_mechadendrite_assembler_2
 
 	# T3
 		# robotics
@@ -77,7 +80,9 @@
 		#building_spawning_pool_3
 		#building_tec_biohive_spawning_pool_3
 
-
+		# Other
+		#building_tec_mechadendrite_assembler_3
+# /
 
 # Future ones
 	# building_ancient_machine_assembly_1
@@ -94,6 +99,8 @@ building_robot_assembly_plant = {
 	base_buildtime = @b1_time
 	position_priority = 20		# Assembly/growth
 	base_cap_amount = 1
+
+	ai_estimate_without_unemployment = yes
 	
 	category = pop_assembly
 	
@@ -110,71 +117,44 @@ building_robot_assembly_plant = {
 	
 	potential = {
 		exists = owner
-		OR = {
-			owner = { is_ai = no }
-			free_building_slots > 0
-		}
 		owner = {
 			is_regular_empire = yes 
 			tec_is_machine_cult = no
 			NOR = {
 				has_policy_flag = robots_outlawed 
 				has_policy_flag = tec_purity_assembly
+				has_country_flag = tec_unlock_mechadendrite_assemblers
+				has_country_flag = tec_unlock_nanite_assemblers
 			}
 		}
 		NOT = {
 			has_modifier = slave_colony 
 		}
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { ROBOTS = yes }
+		tec_ai_destroy_assembly_buildings = no
 	}
 
 	allow = {
 		tec_only_one_assembly_building = no
-		#restrict the ai from making bad decisions
-		if = {
-			limit = {
-				owner = { is_ai = yes }
-				has_global_flag = tec_desired_assembly_distributed
-			}
-			exists = owner
-			owner = {
-				has_country_flag = tec_desires_to_build_robots
-			}
-		}
-		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_regular_empire = no 
 					has_policy_flag = robots_outlawed
 					has_policy_flag = tec_purity_assembly
+					has_country_flag = tec_unlock_mechadendrite_assemblers
+					has_country_flag = tec_unlock_nanite_assemblers
 				}
 			}
 			has_modifier = slave_colony
-			AND = {
-				owner = { is_ai = yes }
-				free_jobs < 1
-				OR = {
-					num_buildings = {
-						type = any
-						value = 16
-					}
-				}
-			}
-		# AI GUIDING
-			#AND = {
-			#	owner = { is_ai = yes }
-			#	owner = {
-			#		NOT = {
-			#			has_country_flag = tec_desires_to_build_robots
-			#		}
-			#	}
-			#}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { ROBOTS = yes } }
 		}
 	}
 
@@ -197,6 +177,8 @@ building_robot_assembly_plant = {
 			building_tec_gene_clinic_1
 			building_spawning_pool
 			building_tec_biohive_spawning_pool_1
+		# Other
+			building_tec_mechadendrite_assembler_1
 	}
 
 	resources = {
@@ -204,6 +186,12 @@ building_robot_assembly_plant = {
 		inline_script = {
 			script = buildings/resources/inline_evolved_resource_cost
 			tier = 1
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_robot_assembly_plant
 		}
 	}
 
@@ -228,12 +216,8 @@ building_robot_assembly_plant = {
 		tier = 1
 	}
 
-	inline_script = jobs/effects/inline_evolved_tec_mechanists_cyborg
+	inline_script = buildings/effects/inline_evolved_tec_mechanists_cyborg
 
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
-	}
 }
 
 building_robot_assembly_complex = {
@@ -242,6 +226,8 @@ building_robot_assembly_complex = {
 	position_priority = 20		# Assembly/growth
 	category = pop_assembly
 	can_build = no
+
+	ai_estimate_without_unemployment = yes
 
 	prerequisites = { "tech_droid_workers" }
 
@@ -256,63 +242,41 @@ building_robot_assembly_complex = {
 
 	potential = {
 		exists = owner
-		OR = {
-			owner = { is_ai = no }
-			free_building_slots > 0
-		}
 		owner = {
 			is_regular_empire = yes 
 			tec_is_machine_cult = no
 			NOR = {
-				has_policy_flag = robots_outlawed 
-				has_policy_flag = tec_purity_assembly	
+				has_policy_flag = robots_outlawed
+				has_policy_flag = tec_purity_assembly
+				has_country_flag = tec_unlock_mechadendrite_assemblers
+				has_country_flag = tec_unlock_nanite_assemblers
 			}
 		}
 		NOT = { has_modifier = slave_colony }
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { ROBOTS = yes }
+		tec_ai_destroy_assembly_buildings = no
 	}
-
-	allow = {
-		#restrict the ai from making bad decisions
-		if = {
-			limit = {
-				exists = owner
-				owner = { is_ai = yes }
-				has_global_flag = tec_desired_assembly_distributed
-			}
-			owner = {
-				has_country_flag = tec_desires_to_build_robots
-			}
-		}
-		tec_invalidates_assembly_buildings = no
-	}
-
 	
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_regular_empire = no 
 					has_policy_flag = robots_outlawed
-					has_policy_flag = tec_purity_assembly	
+					has_policy_flag = tec_purity_assembly
+					has_country_flag = tec_unlock_mechadendrite_assemblers
+					has_country_flag = tec_unlock_nanite_assemblers
 				}
 			}
 			has_modifier = slave_colony
-			AND = {
-				owner = { is_ai = yes }
-				free_jobs < 1
-				OR = {
-					num_buildings = {
-						type = any
-						value = 16
-					}
-					#is_planet_class = pc_habitat
-				}
-			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { ROBOTS = yes } }
 		}
 	}
+
 
 	convert_to = {
 	# T2
@@ -333,6 +297,8 @@ building_robot_assembly_complex = {
 			building_tec_gene_clinic_2
 			building_spawning_pool_2
 			building_tec_biohive_spawning_pool_2
+		# Other
+			building_tec_mechadendrite_assembler_2
 	}
 
 	resources = {
@@ -355,6 +321,11 @@ building_robot_assembly_complex = {
 			base = 1
 			mult = value:tec_assembly_cost_scaling_building
 			trigger = "tec_has_master_roboticist = no"
+		}
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_robot_assembly_complex
 		}
 	}
 
@@ -385,13 +356,13 @@ building_robot_assembly_complex = {
 		trigger = "tec_has_master_roboticist = no"
 	}
 
-	inline_script = jobs/effects/inline_evolved_tec_mechanists_cyborg
+	inline_script = buildings/effects/inline_evolved_tec_mechanists_cyborg
 
 	triggered_desc = {
 		trigger = {
 			exists = owner
 			tec_has_master_roboticist = yes
-			tec_has_t2_robotic_buildings = no
+			tec_has_t2_robotic_assembly_buildings = no
 		}
 		text = job_tec_master_roboticist_effect_t2_desc
 	}
@@ -404,6 +375,8 @@ building_robot_assembly_plant_3 = {
 	category = pop_assembly
 	can_build = no
 
+	ai_estimate_without_unemployment = yes
+
 	prerequisites = {
 		tech_synthetic_workers
 	}
@@ -415,61 +388,42 @@ building_robot_assembly_plant_3 = {
 
 	potential = {
 		exists = owner
-		OR = {
-			owner = { is_ai = no }
-			free_building_slots > 0
-		}
 		owner = {
 			is_regular_empire = yes 
 			tec_is_machine_cult = no
 			NOR = {
 				has_policy_flag = robots_outlawed 
-				has_policy_flag = tec_purity_assembly	
+				has_policy_flag = tec_purity_assembly
+				has_country_flag = tec_unlock_mechadendrite_assemblers
+				has_country_flag = tec_unlock_nanite_assemblers
 			}
 		}
 		NOT = { has_modifier = slave_colony }
+		
 		tec_invalidates_assembly_buildings = no
-	}
-	
-	allow = {
-		#restrict the ai from making bad decisions
-		if = {
-			limit = {
-				owner = { is_ai = yes }
-				has_global_flag = tec_desired_assembly_distributed
-			}
-			owner = {
-				has_country_flag = tec_desires_to_build_robots
-			}
-		}
-		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { ROBOTS = yes }
+		tec_ai_destroy_assembly_buildings = no
 	}
 	
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_regular_empire = no 
 					has_policy_flag = robots_outlawed
-					has_policy_flag = tec_purity_assembly	
+					has_policy_flag = tec_purity_assembly
+					has_country_flag = tec_unlock_mechadendrite_assemblers
+					has_country_flag = tec_unlock_nanite_assemblers
 				}
 			}
 			has_modifier = slave_colony
-			AND = {
-				owner = { is_ai = yes }
-				free_jobs < 1
-				OR = {
-					num_buildings = {
-						type = any
-						value = 16
-					}
-					#is_planet_class = pc_habitat
-				}
-			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { ROBOTS = yes } }
 		}
 	}
+
 
 	convert_to = {
 	# T3
@@ -490,6 +444,8 @@ building_robot_assembly_plant_3 = {
 			building_tec_gene_clinic_3
 			building_spawning_pool_3
 			building_tec_biohive_spawning_pool_3
+		# Other
+			building_tec_mechadendrite_assembler_3
 	}
 
 	resources = {
@@ -504,6 +460,12 @@ building_robot_assembly_plant_3 = {
 			script = buildings/resources/inline_evolved_rare_resource_cost
 			tier = 3
 			rare = rare_crystals
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_robot_assembly_plant_3
 		}
 	}
 	
@@ -529,13 +491,13 @@ building_robot_assembly_plant_3 = {
 		tier = 3
 	}
 
-	inline_script = jobs/effects/inline_evolved_tec_mechanists_cyborg
+	inline_script = buildings/effects/inline_evolved_tec_mechanists_cyborg
 
 	triggered_desc = {
 		trigger = {
 			exists = owner
 			tec_has_master_roboticist = yes
-			tec_has_t3_robotic_buildings = no
+			tec_has_t3_robotic_assembly_buildings = no
 		}
 		text = job_tec_master_roboticist_effect_t3_desc
 	}
@@ -547,6 +509,8 @@ building_hive_robot_assembly_plant = {
 	icon = building_robot_assembly_plant
 	position_priority = 20		# Assembly/growth
 	base_cap_amount = 1
+
+	ai_estimate_without_unemployment = yes
 	
 	prerequisites = {
 		"tech_robotic_workers"
@@ -565,67 +529,46 @@ building_hive_robot_assembly_plant = {
 	
 	potential = {
 		exists = owner
-		OR = {
-			owner = { is_ai = no }
-			free_building_slots > 0
-		}
 		owner = {
 			is_hive_empire = yes
 			tec_is_biohive = no
+			NOR = {
+				has_country_flag = tec_unlock_mechadendrite_assemblers
+				has_country_flag = tec_unlock_nanite_assemblers
+				has_policy_flag = robots_outlawed
+				has_policy_flag = tec_purity_assembly
+			}
 		}
 		NOT = {
-			has_modifier = slave_colony 
+			has_modifier = slave_colony
 		}
+		
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { ROBOTS = yes }
+		tec_ai_destroy_assembly_buildings = no
 	}
 
 	allow = {
 		tec_only_one_assembly_building = no
-		#restrict the ai from making bad decisions
-		if = {
-			limit = {
-				owner = { is_ai = yes }
-				has_global_flag = tec_desired_assembly_distributed
-			}
-			owner = {
-				has_country_flag = tec_desires_to_build_robots
-			}
-		}
-		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_hive_empire = no 
 					tec_is_biohive = yes
 					has_policy_flag = robots_outlawed
 					has_policy_flag = tec_purity_assembly
+					has_country_flag = tec_unlock_mechadendrite_assemblers
+					has_country_flag = tec_unlock_nanite_assemblers
 				}
 			}
 			has_modifier = slave_colony
-			AND = {
-				owner = { is_ai = yes }
-				free_jobs < 1
-				OR = {
-					num_buildings = {
-						type = any
-						value = 16
-					}
-				}
-			}
-		# AI GUIDING
-			#AND = {
-			#	owner = { is_ai = yes }
-			#	owner = {
-			#		NOT = {
-			#			has_country_flag = tec_desires_to_build_robots
-			#		}
-			#	}
-			#}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { ROBOTS = yes } }
 		}
 	}
 
@@ -648,6 +591,8 @@ building_hive_robot_assembly_plant = {
 			building_tec_gene_clinic_1
 			building_spawning_pool
 			building_tec_biohive_spawning_pool_1
+		# Other
+			building_tec_mechadendrite_assembler_1
 	}
 
 	resources = {
@@ -655,6 +600,12 @@ building_hive_robot_assembly_plant = {
 		inline_script = {
 			script = buildings/resources/inline_evolved_resource_cost
 			tier = 1
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_hive_robot_assembly_plant
 		}
 	}
 
@@ -674,12 +625,8 @@ building_hive_robot_assembly_plant = {
 		trigger = "tec_has_master_roboticist = yes"
 	}
 
-	inline_script = jobs/effects/inline_evolved_tec_mechanists_cyborg
+	inline_script = buildings/effects/inline_evolved_tec_mechanists_cyborg
 
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
-	}
 }
 
 building_hive_robot_assembly_plant_2 = {
@@ -688,6 +635,8 @@ building_hive_robot_assembly_plant_2 = {
 	position_priority = 20		# Assembly/growth
 	category = pop_assembly
 	can_build = no
+
+	ai_estimate_without_unemployment = yes
 
 	prerequisites = { "tech_droid_workers" }
 
@@ -709,59 +658,37 @@ building_hive_robot_assembly_plant_2 = {
 		owner = {
 			is_hive_empire = yes
 			tec_is_biohive = no
+			NOR = {
+				has_country_flag = tec_unlock_mechadendrite_assemblers
+				has_country_flag = tec_unlock_nanite_assemblers
+			}
 		}
 		NOT = {
 			has_modifier = slave_colony 
 		}
+		
 		tec_invalidates_assembly_buildings = no
-	}
-
-	allow = {
-		#restrict the ai from making bad decisions
-		if = {
-			limit = {
-				owner = { is_ai = yes }
-				has_global_flag = tec_desired_assembly_distributed
-			}
-			owner = {
-				has_country_flag = tec_desires_to_build_robots
-			}
-		}
-		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { ROBOTS = yes }
+		tec_ai_destroy_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_hive_empire = no 
 					tec_is_biohive = yes
 					has_policy_flag = robots_outlawed
 					has_policy_flag = tec_purity_assembly
+					has_country_flag = tec_unlock_mechadendrite_assemblers
+					has_country_flag = tec_unlock_nanite_assemblers
 				}
 			}
 			has_modifier = slave_colony
-			AND = {
-				owner = { is_ai = yes }
-				free_jobs < 1
-				OR = {
-					num_buildings = {
-						type = any
-						value = 16
-					}
-				}
-			}
-		# AI GUIDING
-			#AND = {
-			#	owner = { is_ai = yes }
-			#	owner = {
-			#		NOT = {
-			#			has_country_flag = tec_desires_to_build_robots
-			#		}
-			#	}
-			#}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { ROBOTS = yes } }
 		}
 	}
 
@@ -783,6 +710,8 @@ building_hive_robot_assembly_plant_2 = {
 			building_tec_gene_clinic_2
 			building_spawning_pool_2
 			building_tec_biohive_spawning_pool_2
+		# Other
+			building_tec_mechadendrite_assembler_2
 	}
 
 	resources = {
@@ -805,6 +734,12 @@ building_hive_robot_assembly_plant_2 = {
 			base = 1
 			mult = value:tec_assembly_cost_scaling_building
 			trigger = "tec_has_master_roboticist = no"
+		}
+		
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_hive_robot_assembly_plant_2
 		}
 	}
 
@@ -830,20 +765,15 @@ building_hive_robot_assembly_plant_2 = {
 		trigger = "tec_has_master_roboticist = no"
 	}
 
-	inline_script = jobs/effects/inline_evolved_tec_mechanists_cyborg
+	inline_script = buildings/effects/inline_evolved_tec_mechanists_cyborg
 
 	triggered_desc = {
 		trigger = {
 			exists = owner
 			tec_has_master_roboticist = yes
-			tec_has_t2_robotic_buildings = no
+			tec_has_t2_robotic_assembly_buildings = no
 		}
 		text = job_tec_master_roboticist_effect_t2_desc
-	}
-	
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
 	}
 }
 
@@ -853,6 +783,8 @@ building_hive_robot_assembly_plant_3 = {
  	position_priority = 20		# Assembly/growth
 	category = pop_assembly
 	can_build = no
+
+	ai_estimate_without_unemployment = yes
 
 	prerequisites = {
 		tech_synthetic_workers_hive
@@ -872,60 +804,37 @@ building_hive_robot_assembly_plant_3 = {
 		owner = {
 			is_hive_empire = yes
 			tec_is_biohive = no
+			NOR = {
+				has_country_flag = tec_unlock_mechadendrite_assemblers
+				has_country_flag = tec_unlock_nanite_assemblers				
+			}
 		}
 		NOT = {
 			has_modifier = slave_colony 
 		}
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { ROBOTS = yes }
+		tec_ai_destroy_assembly_buildings = no
 		
-	}
-
-	allow = {
-		#restrict the ai from making bad decisions
-		if = {
-			limit = {
-				owner = { is_ai = yes }
-				has_global_flag = tec_desired_assembly_distributed
-			}
-			owner = {
-				has_country_flag = tec_desires_to_build_robots
-			}
-		}
-		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_hive_empire = no 
 					tec_is_biohive = yes
 					has_policy_flag = robots_outlawed
 					has_policy_flag = tec_purity_assembly
+					has_country_flag = tec_unlock_mechadendrite_assemblers
+					has_country_flag = tec_unlock_nanite_assemblers
 				}
 			}
 			has_modifier = slave_colony
-			AND = {
-				owner = { is_ai = yes }
-				free_jobs < 1
-				OR = {
-					num_buildings = {
-						type = any
-						value = 16
-					}
-				}
-			}
-		# AI GUIDING
-			#AND = {
-			#	owner = { is_ai = yes }
-			#	owner = {
-			#		NOT = {
-			#			has_country_flag = tec_desires_to_build_robots
-			#		}
-			#	}
-			#}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { ROBOTS = yes } }
 		}
 	}
 
@@ -948,6 +857,8 @@ building_hive_robot_assembly_plant_3 = {
 			building_tec_gene_clinic_3
 			building_spawning_pool_3
 			building_tec_biohive_spawning_pool_3
+		# Other
+			building_tec_mechadendrite_assembler_3
 	}
 
 	resources = {
@@ -962,6 +873,12 @@ building_hive_robot_assembly_plant_3 = {
 			script = buildings/resources/inline_evolved_rare_resource_cost
 			tier = 3
 			rare = rare_crystals
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_hive_robot_assembly_plant_3
 		}
 	}
 	
@@ -985,17 +902,13 @@ building_hive_robot_assembly_plant_3 = {
 		trigger = {
 			exists = owner
 			tec_has_master_roboticist = yes
-			tec_has_t3_robotic_buildings = no
+			tec_has_t3_robotic_assembly_buildings = no
 		}
 		text = job_tec_master_roboticist_effect_t3_desc
 	}
 
-	inline_script = jobs/effects/inline_evolved_tec_mechanists_cyborg
+	inline_script = buildings/effects/inline_evolved_tec_mechanists_cyborg
 
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
-	}
 }
 
 # --------------- Mechanicus
@@ -1003,6 +916,8 @@ building_mecha_monastery_1 = {
 	base_buildtime = @b1_time
 	position_priority = 20		# Assembly/growth
 	base_cap_amount = 1
+
+	ai_estimate_without_unemployment = yes
 
 	category = pop_assembly
 
@@ -1022,41 +937,39 @@ building_mecha_monastery_1 = {
 		exists = owner
 		owner = {
 			tec_is_machine_cult = yes
+			NOR = {
+				has_country_flag = tec_unlock_mechadendrite_assemblers
+				has_country_flag = tec_unlock_nanite_assemblers				
+			}
 		}
 		NOT = {
 			has_modifier = slave_colony 
 		}
+		
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { ROBOTS = yes }
+		tec_ai_destroy_assembly_buildings = no
 	}
 
 	allow = {
 		tec_only_one_assembly_building = no
-		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_regular_empire = no 
 					has_policy_flag = robots_outlawed
 					tec_is_machine_cult = no
+					has_country_flag = tec_unlock_mechadendrite_assemblers
+					has_country_flag = tec_unlock_nanite_assemblers
 				}
 			}
 			has_modifier = slave_colony
-			AND = {
-				owner = { is_ai = yes }
-				free_jobs < 1
-				OR = {
-					num_buildings = {
-						type = any
-						value = 16
-					}
-					#is_planet_class = pc_habitat
-				}
-			}
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { ROBOTS = yes } }
 		}
 	}
 
@@ -1079,6 +992,8 @@ building_mecha_monastery_1 = {
 			building_tec_gene_clinic_1
 			building_spawning_pool
 			building_tec_biohive_spawning_pool_1
+		# Other
+			building_tec_mechadendrite_assembler_1
 	}
 
 	resources = {
@@ -1086,6 +1001,12 @@ building_mecha_monastery_1 = {
 		inline_script = {
 			script = buildings/resources/inline_evolved_resource_cost
 			tier = 1
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_mecha_monastery_1
 		}
 	}
 	
@@ -1115,12 +1036,8 @@ building_mecha_monastery_1 = {
 		tier = 1
 	}
 
-	inline_script = jobs/effects/inline_evolved_tec_mechanists_cyborg
+	inline_script = buildings/effects/inline_evolved_tec_mechanists_cyborg
 
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
-	}
 }
 
 building_mecha_monastery_2 = {
@@ -1128,6 +1045,8 @@ building_mecha_monastery_2 = {
 	position_priority = 20		# Assembly/growth
 	category = pop_assembly
 	can_build = no
+
+	ai_estimate_without_unemployment = yes
 
 	prerequisites = { "tech_droid_workers" }
 
@@ -1141,41 +1060,36 @@ building_mecha_monastery_2 = {
 
 	potential = {
 		exists = owner
-		OR = {
-			owner = { is_ai = no }
-			free_building_slots > 0
-		}
 		owner = {
 			is_regular_empire = yes 
 			tec_is_machine_cult = yes
+			NOR = {
+				has_country_flag = tec_unlock_mechadendrite_assemblers
+				has_country_flag = tec_unlock_nanite_assemblers
+			}
 		}
 		NOT = { has_modifier = slave_colony }
+		
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { ROBOTS = yes }
+		tec_ai_destroy_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_regular_empire = no 
 					has_policy_flag = robots_outlawed
 					tec_is_machine_cult = no
+					has_country_flag = tec_unlock_mechadendrite_assemblers
+					has_country_flag = tec_unlock_nanite_assemblers
 				}
 			}
 			has_modifier = slave_colony
-			AND = {
-				owner = { is_ai = yes }
-				free_jobs < 1
-				OR = {
-					num_buildings = {
-						type = any
-						value = 16
-					}
-					#is_planet_class = pc_habitat
-				}
-			}
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { ROBOTS = yes } }
 		}
 	}
 
@@ -1198,6 +1112,8 @@ building_mecha_monastery_2 = {
 			building_tec_gene_clinic_2
 			building_spawning_pool_2
 			building_tec_biohive_spawning_pool_2
+		# Other
+			building_tec_mechadendrite_assembler_2
 	}
 
 	resources = {
@@ -1219,6 +1135,12 @@ building_mecha_monastery_2 = {
 			base = 1
 			mult = value:tec_assembly_cost_scaling_building
 			trigger = "tec_has_master_roboticist = no"
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_mecha_monastery_2
 		}
 	}
 
@@ -1254,20 +1176,15 @@ building_mecha_monastery_2 = {
 		trigger = "tec_has_master_roboticist = no"
 	}
 
-	inline_script = jobs/effects/inline_evolved_tec_mechanists_cyborg
+	inline_script = buildings/effects/inline_evolved_tec_mechanists_cyborg
 
 	triggered_desc = {
 		trigger = {
 			exists = owner
 			tec_has_master_roboticist = yes
-			tec_has_t2_robotic_buildings = no
+			tec_has_t2_robotic_assembly_buildings = no
 		}
 		text = job_tec_master_roboticist_effect_t2_desc
-	}
-
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
 	}
 }
 
@@ -1275,6 +1192,8 @@ building_mecha_monastery_3 = {
 	base_buildtime = @b3_time
 	category = pop_assembly
 	can_build = no
+
+	ai_estimate_without_unemployment = yes
 		
 	prerequisites = {
 		tech_synthetic_workers
@@ -1286,41 +1205,37 @@ building_mecha_monastery_3 = {
 
 	potential = {
 		exists = owner
-		OR = {
-			owner = { is_ai = no }
-			free_building_slots > 0
-		}
 		owner = {
 			is_regular_empire = yes 
 			tec_is_machine_cult = yes
+			NOR = {
+				has_country_flag = tec_unlock_mechadendrite_assemblers
+				has_country_flag = tec_unlock_nanite_assemblers
+			}
 		}
 		NOT = { has_modifier = slave_colony }
+		
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { ROBOTS = yes }
+		tec_ai_destroy_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_regular_empire = no 
 					has_policy_flag = robots_outlawed
 					tec_is_machine_cult = no
+					has_country_flag = tec_unlock_mechadendrite_assemblers
+					has_country_flag = tec_unlock_nanite_assemblers
 				}
 			}
 			has_modifier = slave_colony
-			AND = {
-				owner = { is_ai = yes }
-				free_jobs < 1
-				OR = {
-					num_buildings = {
-						type = any
-						value = 16
-					}
-					#is_planet_class = pc_habitat
-				}
-			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { ROBOTS = yes } }
 		}
 	}
 
@@ -1343,6 +1258,8 @@ building_mecha_monastery_3 = {
 			building_tec_gene_clinic_3
 			building_spawning_pool_3
 			building_tec_biohive_spawning_pool_3
+		# Other
+			building_tec_mechadendrite_assembler_3
 	}
 
 	resources = {
@@ -1357,6 +1274,12 @@ building_mecha_monastery_3 = {
 			script = buildings/resources/inline_evolved_rare_resource_cost
 			tier = 3
 			rare = rare_crystals
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_mecha_monastery_3
 		}
 	}
 
@@ -1386,20 +1309,15 @@ building_mecha_monastery_3 = {
 		tier = 3
 	}
 
-	inline_script = jobs/effects/inline_evolved_tec_mechanists_cyborg
+	inline_script = buildings/effects/inline_evolved_tec_mechanists_cyborg
 
 	triggered_desc = {
 		trigger = {
 			exists = owner
 			tec_has_master_roboticist = yes
-			tec_has_t3_robotic_buildings = no
+			tec_has_t3_robotic_assembly_buildings = no
 		}
 		text = job_tec_master_roboticist_effect_t3_desc
-	}
-
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
 	}
 }
 
@@ -1409,6 +1327,8 @@ building_machine_assembly_plant = {
 	icon = building_robot_assembly_plant
 	position_priority = 20		# Assembly/growth
 	base_cap_amount = 1
+
+	ai_estimate_without_unemployment = yes
 
 	category = pop_assembly
 
@@ -1423,37 +1343,36 @@ building_machine_assembly_plant = {
 	potential = {
 		exists = owner
 		owner = {
-			is_machine_empire = yes 
+			is_machine_empire = yes
+			NOR = {
+				has_country_flag = tec_unlock_mechadendrite_assemblers
+				has_country_flag = tec_unlock_nanite_assemblers
+			}
 		}
+		
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { ROBOTS = yes }
+		tec_ai_destroy_assembly_buildings = no
 	}
 		
 	allow = {
 		tec_only_one_assembly_building = no
-		OR = {
-			owner = { is_ai = no }
-			AND = {
-				num_buildings = { type = any value <= 18 }
-			}
-		}
-		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
-				is_robot_empire = no
-			}
-			AND = {
-				owner = { is_ai = yes }
-				free_jobs < 1
 				OR = {
-					num_buildings = { type = any value = 18 } #review
-					uses_habitat_capitals = yes
+					is_machine_empire = no
+					has_country_flag = tec_unlock_mechadendrite_assemblers
+					has_country_flag = tec_unlock_nanite_assemblers
 				}
 			}
+			
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { ROBOTS = yes } }
 		}
 	}
 
@@ -1476,6 +1395,8 @@ building_machine_assembly_plant = {
 			building_tec_gene_clinic_1
 			building_spawning_pool
 			building_tec_biohive_spawning_pool_1
+		# Other
+			building_tec_mechadendrite_assembler_1
 	}
 
 	resources = {
@@ -1491,6 +1412,12 @@ building_machine_assembly_plant = {
 			base = 1
 			mult = value:tec_assembly_cost_scaling_building
 			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_machine_assembly_plant
 		}
 	}
 
@@ -1508,18 +1435,14 @@ building_machine_assembly_plant = {
 		mult = 1
 		trigger = ""
 	}
-
-	
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 20
-	}
 }
 
 building_machine_assembly_complex = {
 	base_buildtime = @b2_time
 	position_priority = 20		# Assembly/growth
 	can_build = no
+
+	ai_estimate_without_unemployment = yes
 
 	category = pop_assembly
 
@@ -1539,30 +1462,31 @@ building_machine_assembly_complex = {
 		exists = owner
 		owner = {
 			is_machine_empire = yes
+			NOR = {
+				has_country_flag = tec_unlock_mechadendrite_assemblers
+				has_country_flag = tec_unlock_nanite_assemblers
+			}
 		}
+		
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { ROBOTS = yes }
+		tec_ai_destroy_assembly_buildings = no
 	}
 		
-	allow = {
-		exists = owner
-		tec_invalidates_assembly_buildings = no
-	}
-
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
-				is_robot_empire = no
-			}
-			AND = {
-				owner = { is_ai = yes }
-				free_jobs < 1
 				OR = {
-					num_buildings = { type = any value = 18 }
-					is_planet_class = pc_habitat
+					is_machine_empire = no
+					has_country_flag = tec_unlock_mechadendrite_assemblers
+					has_country_flag = tec_unlock_nanite_assemblers
 				}
 			}
+			
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { ROBOTS = yes } }
 		}
 	}
 
@@ -1585,6 +1509,8 @@ building_machine_assembly_complex = {
 			building_tec_gene_clinic_2
 			building_spawning_pool_2
 			building_tec_biohive_spawning_pool_2
+		# Other
+			building_tec_mechadendrite_assembler_2
 	}
 
 	resources = {
@@ -1608,6 +1534,12 @@ building_machine_assembly_complex = {
 			mult = value:tec_assembly_cost_scaling_building
 			trigger = ""
 		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_machine_assembly_complex
+		}
 	}
 
 	inline_script = {
@@ -1624,17 +1556,14 @@ building_machine_assembly_complex = {
 		mult = 2
 		trigger = ""
 	}
-	
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 20
-	}
 }
 
 building_machine_assembly_plant_3 = {
 	icon = building_tec_robot_assembly_plant_3
 	base_buildtime = @b3_time
 	can_build = no
+
+	ai_estimate_without_unemployment = yes
 
 	category = pop_assembly
 
@@ -1649,37 +1578,40 @@ building_machine_assembly_plant_3 = {
 	potential = {
 		exists = owner
 		owner = {
-			is_machine_empire = yes 
-		}
-		tec_invalidates_assembly_buildings = no
-	}
-		
-	allow = {
-		OR = {
-			owner = { is_ai = no }
-			AND = {
-				num_buildings = { type = any value <= 18 }
-				NOT = { is_planet_class = pc_habitat }
+			is_machine_empire = yes
+			NOR = {
+				has_country_flag = tec_unlock_mechadendrite_assemblers
+				has_country_flag = tec_unlock_nanite_assemblers
 			}
 		}
+		
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { ROBOTS = yes }
+		tec_ai_destroy_assembly_buildings = no
 	}
-
+		
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
-				is_machine_empire = no
-			}
-			AND = {
-				owner = { is_ai = yes }
-				free_jobs < 1
 				OR = {
-					num_buildings = { type = any value = 18 }
-					uses_habitat_capitals = yes
+					is_machine_empire = no
+					has_country_flag = tec_unlock_mechadendrite_assemblers
+					has_country_flag = tec_unlock_nanite_assemblers
 				}
 			}
+			#AND = {
+			#	owner = { is_ai = yes }
+			#	free_jobs < 1
+			#	OR = {
+			#		num_buildings = { type = any value = 18 }
+			#		uses_habitat_capitals = yes
+			#	}
+			#}
+			
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { ROBOTS = yes } }
 		}
 	}
 
@@ -1702,6 +1634,8 @@ building_machine_assembly_plant_3 = {
 			building_tec_gene_clinic_3
 			building_spawning_pool_3
 			building_tec_biohive_spawning_pool_3
+		# Other
+			building_tec_mechadendrite_assembler_3
 	}
 
 	resources = {
@@ -1724,6 +1658,12 @@ building_machine_assembly_plant_3 = {
 			mult = value:tec_assembly_cost_scaling_building
 			trigger = ""
 		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_machine_assembly_plant_3
+		}
 	}
 	
 	inline_script = {
@@ -1740,10 +1680,332 @@ building_machine_assembly_plant_3 = {
 		mult = 2
 		trigger = ""
 	}
+}
+
+# --------------- Nanite Machines
+building_tec_nanite_assembler_1 = {
+	base_buildtime = @b1_time
+	icon = building_robot_assembly_plant
+	position_priority = 20		# Assembly/growth
+	base_cap_amount = 1
+
+	ai_estimate_without_unemployment = yes
+
+	category = pop_assembly
+
+	upgrades = {
+		building_machine_assembly_complex
+	}
+
+	show_tech_unlock_if = {
+		is_machine_empire = yes
+	}
 	
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 20
+	potential = {
+		always = no
+		exists = owner
+		owner = {
+			is_machine_empire = yes 
+		}
+		
+		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { ROBOTS = yes }
+		tec_ai_destroy_assembly_buildings = no
+	}
+		
+	allow = {
+		tec_only_one_assembly_building = no
+	}
+
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = {
+				is_robot_empire = no
+			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { ROBOTS = yes } }
+		}
+	}
+
+	convert_to = {
+		# T1
+		# robotics
+			building_robot_assembly_plant
+			building_mecha_monastery_1
+			building_hive_robot_assembly_plant
+		# machine
+			#building_machine_assembly_plant
+		# Bioservant
+			building_tec_bioservant_plant_1
+			building_tec_hive_bioservant_plant_1
+		# Cloning
+			building_clone_vats
+			#building_tec_clone_vats_biohive_1
+			building_tec_gene_clinic_1
+		#Extreme pop growth
+			building_tec_gene_clinic_1
+			building_spawning_pool
+			building_tec_biohive_spawning_pool_1
+		# Other
+			building_tec_mechadendrite_assembler_1
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
+		}
+
+		# passive assembly cost
+		inline_script = {
+			script = jobs/resources/inline_evolved_robotic_assembly_upkeep
+			base = 1
+			mult = value:tec_assembly_cost_scaling_building
+			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_tec_machine_nanite_assembler_1
+		}
+	}
+
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = replicator
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = ""
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_assembly_robotic
+		mult = 1
+		trigger = ""
+	}
+}
+
+building_tec_nanite_assembler_2 = {
+	base_buildtime = @b2_time
+	position_priority = 20		# Assembly/growth
+	can_build = no
+
+	ai_estimate_without_unemployment = yes
+
+	category = pop_assembly
+
+	upgrades = {
+		building_machine_assembly_plant_3
+	}
+
+	show_tech_unlock_if = {
+		is_machine_empire = yes
+	}
+
+	prerequisites = {
+		tech_mega_assembly
+	}
+	
+	potential = {
+		exists = owner
+		owner = {
+			is_machine_empire = yes
+		}
+		
+		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { ROBOTS = yes }
+		tec_ai_destroy_assembly_buildings = no
+	}
+		
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = {
+				is_robot_empire = no
+			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { ROBOTS = yes } }
+		}
+	}
+
+	convert_to = {
+	# T2
+		# robotics
+			building_robot_assembly_complex
+			building_mecha_monastery_2
+			building_hive_robot_assembly_plant_2
+		# machine
+			#building_machine_assembly_complex
+		# Bioservant
+			building_tec_bioservant_plant_2
+			building_tec_hive_bioservant_plant_2
+		# Cloning
+			building_clone_vats_2
+			#building_tec_clone_vats_biohive_2
+			building_tec_gene_clinic_2
+		#Extreme pop growth
+			building_tec_gene_clinic_2
+			building_spawning_pool_2
+			building_tec_biohive_spawning_pool_2
+		# Other
+			building_tec_mechadendrite_assembler_2
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
+		}
+		
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 2
+			rare = rare_crystals
+		}
+
+		# passive assembly cost
+		inline_script = {
+			script = jobs/resources/inline_evolved_robotic_assembly_upkeep
+			base = 2
+			mult = value:tec_assembly_cost_scaling_building
+			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_tec_machine_nanite_assembler_2
+		}
+	}
+
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = replicator
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = ""
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_assembly_robotic
+		mult = 2
+		trigger = ""
+	}
+}
+
+building_tec_nanite_assembler_3 = {
+	icon = building_tec_robot_assembly_plant_3
+	base_buildtime = @b3_time
+	can_build = no
+
+	ai_estimate_without_unemployment = yes
+
+	category = pop_assembly
+
+	prerequisites = {
+		tech_tec_giga_assembly
+	}
+
+	show_tech_unlock_if = {
+		is_machine_empire = yes
+	}
+	
+	potential = {
+		exists = owner
+		owner = {
+			is_machine_empire = yes 
+		}
+		
+		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { ROBOTS = yes }
+		tec_ai_destroy_assembly_buildings = no
+	}
+		
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = {
+				is_robot_empire = no
+			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { ROBOTS = yes } }
+		}
+	}
+
+	convert_to = {
+		# T3
+		# robotics
+			building_robot_assembly_plant_3
+			building_mecha_monastery_3
+			building_hive_robot_assembly_plant_3
+		# machine
+			#building_machine_assembly_plant_3
+		# Bioservant
+			building_tec_bioservant_plant_3
+			building_tec_hive_bioservant_plant_3
+		# Cloning
+			building_clone_vats_3
+			#building_tec_clone_vats_biohive_3
+			building_tec_gene_clinic_3
+		#Extreme pop growth
+			building_tec_gene_clinic_3
+			building_spawning_pool_3
+			building_tec_biohive_spawning_pool_3
+		# Other
+			building_tec_mechadendrite_assembler_3
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 2
+			rare = rare_crystals
+		}
+
+		# passive assembly cost
+		inline_script = {
+			script = jobs/resources/inline_evolved_robotic_assembly_upkeep
+			base = 2
+			mult = value:tec_assembly_cost_scaling_building
+			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_tec_machine_nanite_assembler_3
+		}
+	}
+	
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = replicator
+		count = 2
+		mult = 1
+		display = with_desc
+		trigger = ""
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_assembly_robotic
+		mult = 2
+		trigger = ""
 	}
 }
 
@@ -1755,6 +2017,8 @@ building_tec_bioservant_plant_1 = {
 	position_priority = 20		# Assembly/growth
 	base_cap_amount = 1
 	category = pop_assembly
+
+	ai_estimate_without_unemployment = yes
 
 	prerequisites = { "tech_tec_bioservant" }
 	
@@ -1773,17 +2037,19 @@ building_tec_bioservant_plant_1 = {
 				has_policy_flag = tec_purity_assembly
 			}
 		}
+		
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { BIO = yes }
+		tec_ai_destroy_assembly_buildings = no
 	}
 
 	allow = {
 		tec_only_one_assembly_building = no
-		tec_invalidates_assembly_buildings = no
 	}
 	
 	destroy_trigger = {
+		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_machine_empire = yes
@@ -1791,7 +2057,9 @@ building_tec_bioservant_plant_1 = {
 					has_policy_flag = tec_purity_assembly
 				}
 			}
-			
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { BIO = yes } }
 		}
 	}
 
@@ -1814,6 +2082,8 @@ building_tec_bioservant_plant_1 = {
 			building_tec_gene_clinic_1
 			building_spawning_pool
 			building_tec_biohive_spawning_pool_1
+		# Other
+			building_tec_mechadendrite_assembler_1
 	}
 
 	resources = {
@@ -1821,6 +2091,12 @@ building_tec_bioservant_plant_1 = {
 		inline_script = {
 			script = buildings/resources/inline_evolved_resource_cost
 			tier = 1
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_tec_bioservant_plant_1
 		}
 	}
 
@@ -1839,17 +2115,14 @@ building_tec_bioservant_plant_1 = {
 		display = with_desc
 		trigger = "tec_has_master_bioengineer = yes"
 	}
-	
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 20
-	}
 }
 
 building_tec_bioservant_plant_2 = {
 	base_buildtime = @b2_time
 	position_priority = 20		# Assembly/growth
 	can_build = no
+
+	ai_estimate_without_unemployment = yes
 
 	category = pop_assembly
 
@@ -1870,12 +2143,14 @@ building_tec_bioservant_plant_2 = {
 			}
 		}
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { BIO = yes }
+		tec_ai_destroy_assembly_buildings = no
 		
 	}
 	
 	destroy_trigger = {
+		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_machine_empire = yes
@@ -1883,8 +2158,12 @@ building_tec_bioservant_plant_2 = {
 					has_policy_flag = tec_purity_assembly
 				}
 			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { BIO = yes } }
 		}
 	}
+
 
 	convert_to = {
 		# T2
@@ -1905,6 +2184,8 @@ building_tec_bioservant_plant_2 = {
 			building_tec_gene_clinic_2
 			building_spawning_pool_2
 			building_tec_biohive_spawning_pool_2
+		# Other
+			building_tec_mechadendrite_assembler_2
 	}
 
 	resources = {
@@ -1927,6 +2208,12 @@ building_tec_bioservant_plant_2 = {
 			base = 1
 			mult = value:tec_assembly_cost_scaling_building
 			trigger = "tec_has_master_bioengineer = no"
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_tec_bioservant_plant_2
 		}
 	}
 
@@ -1956,14 +2243,9 @@ building_tec_bioservant_plant_2 = {
 		trigger = {
 			exists = owner
 			tec_has_master_bioengineer = yes
-			tec_has_t2_bioservant_buildings = no
+			tec_has_t2_bioservant_assembly_buildings = no
 		}
 		text = job_tec_master_bioengineer_effect_t2_desc
-	}
-	
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 20
 	}
 }
 
@@ -1971,6 +2253,8 @@ building_tec_bioservant_plant_3 = {
 	base_buildtime = @b3_time
 	position_priority = 20		# Assembly/growth
 	can_build = no
+
+	ai_estimate_without_unemployment = yes
 
 	category = pop_assembly
 
@@ -1988,13 +2272,14 @@ building_tec_bioservant_plant_3 = {
 			}
 		}
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { BIO = yes }
+		tec_ai_destroy_assembly_buildings = no
 		
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_machine_empire = yes
@@ -2002,8 +2287,12 @@ building_tec_bioservant_plant_3 = {
 					has_policy_flag = tec_purity_assembly
 				}
 			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { BIO = yes } }
 		}
 	}
+
 
 	convert_to = {
 		# T3
@@ -2024,6 +2313,8 @@ building_tec_bioservant_plant_3 = {
 			building_tec_gene_clinic_3
 			building_spawning_pool_3
 			building_tec_biohive_spawning_pool_3
+		# Other
+			building_tec_mechadendrite_assembler_3
 	}
 	
 	resources = {
@@ -2037,6 +2328,12 @@ building_tec_bioservant_plant_3 = {
 			script = buildings/resources/inline_evolved_rare_resource_cost
 			tier = 3
 			rare = exotic_gases
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_tec_bioservant_plant_3
 		}
 	}
 	
@@ -2060,14 +2357,9 @@ building_tec_bioservant_plant_3 = {
 		trigger = {
 			exists = owner
 			tec_has_master_bioengineer = yes
-			tec_has_t3_bioservant_buildings = no
+			tec_has_t3_bioservant_assembly_buildings = no
 		}
 		text = job_tec_master_bioengineer_effect_t3_desc
-	}
-
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 20
 	}
 }
 
@@ -2077,6 +2369,8 @@ building_tec_hive_bioservant_plant_1 = {
 	position_priority = 20		# Assembly/growth
 	base_cap_amount = 1
 	icon = building_spawning_pool
+
+	ai_estimate_without_unemployment = yes
 
 	category = pop_assembly
 
@@ -2093,25 +2387,26 @@ building_tec_hive_bioservant_plant_1 = {
 			has_country_flag = is_hive_bioservant_empire 
 		}
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { BIO = yes }
+		tec_ai_destroy_assembly_buildings = no
 	}
 
 	allow = {
 		tec_only_one_assembly_building = no
-		tec_invalidates_assembly_buildings = no
 	}
 	
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
-				OR = {
-					is_machine_empire = yes
-					is_mechanical_empire = yes
-				}
+				NOT = { has_country_flag = is_hive_bioservant_empire  }
 			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { BIO = yes } }
 		}
 	}
+
 	
 	convert_to = {
 		# T1
@@ -2130,6 +2425,8 @@ building_tec_hive_bioservant_plant_1 = {
 			building_tec_gene_clinic_1
 		#Extreme pop growth
 			building_tec_gene_clinic_1
+		# Other
+			building_tec_mechadendrite_assembler_1
 	}
 	
 	resources = {
@@ -2137,6 +2434,12 @@ building_tec_hive_bioservant_plant_1 = {
 		inline_script = {
 			script = buildings/resources/inline_evolved_resource_cost
 			tier = 1
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_tec_hive_bioservant_plant_1
 		}
 	}
 
@@ -2154,11 +2457,6 @@ building_tec_hive_bioservant_plant_1 = {
 		mult = 1
 		display = with_desc
 		trigger = "tec_has_master_bioengineer = yes"
-	}	
-	
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 20
 	}
 }
 
@@ -2166,6 +2464,8 @@ building_tec_hive_bioservant_plant_2 = {
 	base_buildtime = @b2_time
 	can_build = no
 	icon = building_spawning_pool_2
+
+	ai_estimate_without_unemployment = yes
 
 	category = pop_assembly
 
@@ -2186,18 +2486,19 @@ building_tec_hive_bioservant_plant_2 = {
 			has_country_flag = is_hive_bioservant_empire 
 		}
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { BIO = yes }
+		tec_ai_destroy_assembly_buildings = no
 	}
 	
 	destroy_trigger = {
+		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
-			
 			owner = {
-				OR = {
-					is_machine_empire = yes
-					is_mechanical_empire = yes
-				}
+				NOT = { has_country_flag = is_hive_bioservant_empire  }
 			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { BIO = yes } }
 		}
 	}
 
@@ -2218,6 +2519,8 @@ building_tec_hive_bioservant_plant_2 = {
 			building_tec_gene_clinic_2
 		#Extreme pop growth
 			building_tec_gene_clinic_2
+		# Other
+			building_tec_mechadendrite_assembler_2
 	}
 
 	resources = {
@@ -2239,6 +2542,12 @@ building_tec_hive_bioservant_plant_2 = {
 			base = 1
 			mult = value:tec_assembly_cost_scaling_building
 			trigger = "tec_has_master_bioengineer = no"
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_tec_hive_bioservant_plant_2
 		}
 	}
 	
@@ -2268,14 +2577,9 @@ building_tec_hive_bioservant_plant_2 = {
 		trigger = {
 			exists = owner
 			tec_has_master_bioengineer = yes
-			tec_has_t2_bioservant_buildings = no
+			tec_has_t2_bioservant_assembly_buildings = no
 		}
 		text = job_tec_master_bioengineer_effect_t2_desc
-	}
-	
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 20
 	}
 }
 
@@ -2283,6 +2587,8 @@ building_tec_hive_bioservant_plant_3 = {
 	base_buildtime = @b3_time
 	can_build = no
 	icon = building_spawning_pool_3
+
+	ai_estimate_without_unemployment = yes
 
 	category = pop_assembly
 
@@ -2299,20 +2605,22 @@ building_tec_hive_bioservant_plant_3 = {
 			has_country_flag = is_hive_bioservant_empire 
 		}
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { BIO = yes }
+		tec_ai_destroy_assembly_buildings = no
 	}
 	
 	destroy_trigger = {
+		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
-				OR = {
-					is_machine_empire = yes
-					is_mechanical_empire = yes
-				}
+				NOT = { has_country_flag = is_hive_bioservant_empire  }
 			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { BIO = yes } }
 		}
-		
 	}
+
 	
 	convert_to = {
 	# T3
@@ -2331,6 +2639,8 @@ building_tec_hive_bioservant_plant_3 = {
 			building_tec_gene_clinic_3
 		#Extreme pop growth
 			building_tec_gene_clinic_3
+		# Other
+			building_tec_mechadendrite_assembler_3
 	}
 
 	resources = {
@@ -2344,6 +2654,12 @@ building_tec_hive_bioservant_plant_3 = {
 			script = buildings/resources/inline_evolved_rare_resource_cost
 			tier = 3
 			rare = exotic_gases
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_tec_hive_bioservant_plant_3
 		}
 	}
 	
@@ -2367,14 +2683,9 @@ building_tec_hive_bioservant_plant_3 = {
 		trigger = {
 			exists = owner
 			tec_has_master_bioengineer = yes
-			tec_has_t3_bioservant_buildings = no
+			tec_has_t3_bioservant_assembly_buildings = no
 		}
 		text = job_tec_master_bioengineer_effect_t3_desc
-	}
-	
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 20
 	}
 }
 
@@ -2391,15 +2702,15 @@ building_clone_vats = {
 	category = pop_assembly
 	base_cap_amount = 1
 
+	ai_estimate_without_unemployment = yes
+
 	prerequisites = {
 		tech_cloning
 	}
 
 	show_tech_unlock_if = {
 		OR = {
-			NOT = {
-				has_ethic = "ethic_gestalt_consciousness" 
-			}
+			is_regular_empire = yes
 			AND = {
 				is_gestalt = yes
 				OR = {
@@ -2423,7 +2734,6 @@ building_clone_vats = {
 	potential = {
 		exists = owner
 		owner = {
-			has_technology = tech_cloning 
 			NOT = {
 				has_policy_flag = tec_purity_assembly
 			}
@@ -2431,27 +2741,23 @@ building_clone_vats = {
 
 		NOT = { has_modifier = resort_colony }
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { CLONES = yes }
+		tec_ai_destroy_assembly_buildings = no
 	}
 
 	allow = {
 		tec_only_one_assembly_building = no
-		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				has_policy_flag = tec_purity_assembly
 			}
-			AND = {
-				owner = { is_ai = yes }
-				planet = {
-					free_district_slots = 0
-					free_building_slots = 0
-				}
-			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { CLONES = yes } }
 		}
 	}
 
@@ -2474,6 +2780,8 @@ building_clone_vats = {
 			building_tec_gene_clinic_1
 			building_spawning_pool
 			building_tec_biohive_spawning_pool_1
+		# Other
+			building_tec_mechadendrite_assembler_1
 	}
 
 	resources = {
@@ -2481,6 +2789,12 @@ building_clone_vats = {
 		inline_script = {
 			script = buildings/resources/inline_evolved_resource_cost
 			tier = 1
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_clone_vats
 		}
 	}
 
@@ -2506,6 +2820,9 @@ building_clone_vats_2 = {
 	base_buildtime = @b2_time
 	position_priority = 20		# Assembly/growth
 	can_build = no
+
+	ai_estimate_without_unemployment = yes
+
 	category = pop_assembly
 
 	prerequisites = {
@@ -2514,9 +2831,7 @@ building_clone_vats_2 = {
 
 	show_tech_unlock_if = {
 		OR = {
-			NOT = {
-				has_ethic = "ethic_gestalt_consciousness" 
-			}
+			is_regular_empire = yes
 			AND = {
 				has_ethic = ethic_gestalt_consciousness
 				OR = {
@@ -2546,22 +2861,19 @@ building_clone_vats_2 = {
 		}
 		NOT = { has_modifier = resort_colony }
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { CLONES = yes }
+		tec_ai_destroy_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				has_policy_flag = tec_purity_assembly
 			}
-			AND = {
-				owner = { is_ai = yes }
-				planet = {
-					free_district_slots = 0
-					free_building_slots = 0
-				}
-			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { CLONES = yes } }
 		}
 	}
 
@@ -2584,6 +2896,8 @@ building_clone_vats_2 = {
 			building_tec_gene_clinic_2
 			building_spawning_pool_2
 			building_tec_biohive_spawning_pool_2
+		# Other
+			building_tec_mechadendrite_assembler_2
 	}
 
 	resources = {
@@ -2605,6 +2919,12 @@ building_clone_vats_2 = {
 			base = 1
 			mult = value:tec_assembly_cost_scaling_building
 			trigger = "tec_has_master_cloner = no"
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_clone_vats_2
 		}
 	}
 
@@ -2634,7 +2954,7 @@ building_clone_vats_2 = {
 		trigger = {
 			exists = owner
 			tec_has_master_cloner = yes
-			tec_has_t2_cloning_buildings = no
+			tec_has_t2_cloning_assembly_buildings = no
 		}
 		text = job_tec_master_cloner_effect_t2_desc
 	}
@@ -2645,6 +2965,9 @@ building_clone_vats_3 = {
 	base_buildtime = @b3_time
 	position_priority = 20		# Assembly/growth
 	can_build = no
+
+	ai_estimate_without_unemployment = yes
+
 	category = pop_assembly
 
 	prerequisites = {
@@ -2653,9 +2976,7 @@ building_clone_vats_3 = {
 
 	show_tech_unlock_if = {
 		OR = {
-			NOT = {
-				has_ethic = "ethic_gestalt_consciousness" 
-			}
+			is_regular_empire = yes
 			AND = {
 				has_ethic = ethic_gestalt_consciousness
 				OR = {
@@ -2681,22 +3002,19 @@ building_clone_vats_3 = {
 		}
 		NOT = { has_modifier = resort_colony }
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { CLONES = yes }
+		tec_ai_destroy_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				has_policy_flag = tec_purity_assembly
 			}
-			AND = {
-				owner = { is_ai = yes }
-				planet = {
-					free_district_slots = 0
-					free_building_slots = 0
-				}
-			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { CLONES = yes } }
 		}
 	}
 
@@ -2719,6 +3037,8 @@ building_clone_vats_3 = {
 			building_tec_gene_clinic_3
 			building_spawning_pool_3
 			building_tec_biohive_spawning_pool_3
+		# Other
+			building_tec_mechadendrite_assembler_3
 	}
 
 	resources = {
@@ -2732,6 +3052,12 @@ building_clone_vats_3 = {
 			script = buildings/resources/inline_evolved_rare_resource_cost
 			tier = 3
 			rare = exotic_gases
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_clone_vats_3
 		}
 	}
 
@@ -2755,7 +3081,7 @@ building_clone_vats_3 = {
 		trigger = {
 			exists = owner
 			tec_has_master_cloner = yes
-			tec_has_t3_cloning_buildings = no
+			tec_has_t3_cloning_assembly_buildings = no
 		}
 		text = job_tec_master_cloner_effect_t3_desc
 	}
@@ -2767,6 +3093,8 @@ building_tec_gene_clinic_1 = {
 	position_priority = 20		# Assembly/growth
 	category = pop_assembly
 	base_cap_amount = 1
+
+	ai_estimate_without_unemployment = yes
 
 	prerequisites = {
 		tech_tec_gene_1
@@ -2784,40 +3112,22 @@ building_tec_gene_clinic_1 = {
 		NOT = {
 			has_modifier = resort_colony 
 		}
-		#restrict the ai from making bad decisions
-		if = {
-			limit = {
-				owner = { is_ai = yes }
-				has_global_flag = tec_desired_assembly_distributed
-			}
-			owner = {
-				has_country_flag = tec_desires_to_be_pure
-			}
-		}
 		tec_invalidates_assembly_buildings = no
+		tec_ai_destroy_assembly_buildings = no
 	}
 
 	allow = {
 		tec_only_one_assembly_building = no
-		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
-			AND = {
-				owner = { is_ai = yes }
-				planet = {
-					free_district_slots = 0
-					free_building_slots = 0
-				}
-			}
 			owner = {
-				NOT = {
-					has_policy_flag = tec_purity_assembly	
-				}
+				NOT = { has_policy_flag = tec_purity_assembly }
 			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
 		}
 	}
 
@@ -2840,6 +3150,8 @@ building_tec_gene_clinic_1 = {
 			#building_tec_gene_clinic_1
 			building_spawning_pool
 			building_tec_biohive_spawning_pool_1
+		# Other
+			building_tec_mechadendrite_assembler_1
 	}
 
 	resources = {
@@ -2847,6 +3159,12 @@ building_tec_gene_clinic_1 = {
 		inline_script = {
 			script = buildings/resources/inline_evolved_resource_cost
 			tier = 1
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_tec_gene_clinic_1
 		}
 	}
 
@@ -2857,11 +3175,6 @@ building_tec_gene_clinic_1 = {
 		display = with_desc
 		trigger = ""
 	}
-
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 20
-	}
 }
 
 building_tec_gene_clinic_2 = {
@@ -2869,6 +3182,8 @@ building_tec_gene_clinic_2 = {
 	position_priority = 20		# Assembly/growth
 	can_build = no
 	category = pop_assembly
+
+	ai_estimate_without_unemployment = yes
 
 	prerequisites = {
 		tech_tec_gene_2
@@ -2889,24 +3204,17 @@ building_tec_gene_clinic_2 = {
 		}
 		NOT = { has_modifier = resort_colony }
 		tec_invalidates_assembly_buildings = no
+		tec_ai_destroy_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
-			AND = {
-				owner = { is_ai = yes }
-				planet = {
-					free_district_slots = 0
-					free_building_slots = 0
-				}
-			}
 			owner = {
-				NOT = {
-					has_policy_flag = tec_purity_assembly	
-				}
+				NOT = { has_policy_flag = tec_purity_assembly }
 			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
 		}
 	}
 
@@ -2929,6 +3237,8 @@ building_tec_gene_clinic_2 = {
 			#building_tec_gene_clinic_2
 			building_spawning_pool_2
 			building_tec_biohive_spawning_pool_2
+		# Other
+			building_tec_mechadendrite_assembler_2
 	}
 
 	resources = {
@@ -2951,6 +3261,12 @@ building_tec_gene_clinic_2 = {
 			mult = value:tec_assembly_cost_scaling_building
 			trigger = ""
 		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_tec_gene_clinic_2
+		}
 	}
 
 	inline_script = {
@@ -2968,10 +3284,6 @@ building_tec_gene_clinic_2 = {
 		trigger = ""
 	}
 
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 20
-	}
 	#Free resources for ais, competitive ai
 	ai_resource_production = {
 		trigger = { always = yes}
@@ -2984,6 +3296,8 @@ building_tec_gene_clinic_3 = {
 	position_priority = 20		# Assembly/growth
 	can_build = no
 	category = pop_assembly
+
+	ai_estimate_without_unemployment = yes
 
 	prerequisites = {
 		tech_tec_gene_3
@@ -3000,24 +3314,17 @@ building_tec_gene_clinic_3 = {
 		}
 		NOT = { has_modifier = resort_colony }
 		tec_invalidates_assembly_buildings = no
+		tec_ai_destroy_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
-			AND = {
-				owner = { is_ai = yes }
-				planet = {
-					free_district_slots = 0
-					free_building_slots = 0
-				}
-			}
 			owner = {
-				NOT = {
-					has_policy_flag = tec_purity_assembly	
-				}
+				NOT = { has_policy_flag = tec_purity_assembly }
 			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
 		}
 	}
 
@@ -3040,6 +3347,8 @@ building_tec_gene_clinic_3 = {
 			#building_tec_gene_clinic_3
 			building_spawning_pool_3
 			building_tec_biohive_spawning_pool_3
+		# Other
+			building_tec_mechadendrite_assembler_3
 	}
 
 	resources = {
@@ -3054,6 +3363,12 @@ building_tec_gene_clinic_3 = {
 			tier = 3
 			rare = exotic_gases
 		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_tec_gene_clinic_3
+		}
 	}
 
 	inline_script = {
@@ -3062,11 +3377,6 @@ building_tec_gene_clinic_3 = {
 		mult = 1
 		display = with_desc
 		trigger = ""
-	}
-
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 20
 	}
 
 	#Free resources for ais, competitive ai
@@ -3082,6 +3392,8 @@ building_spawning_pool = {
 	position_priority = 20		# Assembly/growth
 	base_cap_amount = 1
 
+	ai_estimate_without_unemployment = yes
+
 	category = pop_assembly
 	
 	upgrades = {
@@ -3094,22 +3406,17 @@ building_spawning_pool = {
 			is_hive_empire = yes 
 			tec_hive_can_have_spawningpools = yes
 		}
-		or = {
-			num_buildings = { type = any value < 15 }
-			owner = { is_ai = no }
-		}
 		tec_invalidates_assembly_buildings = no
+		tec_ai_destroy_assembly_buildings = no
 	}
 	
 	allow = {
 		tec_only_one_assembly_building = no
-		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_hive_empire = no 
@@ -3117,6 +3424,9 @@ building_spawning_pool = {
 					tec_hive_can_have_spawningpools = no
 				}
 			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_allow_assembly_building = no
+			tec_ai_destroy_assembly_buildings = yes
 		}
 	}
 
@@ -3139,6 +3449,8 @@ building_spawning_pool = {
 			building_tec_gene_clinic_1
 			#building_spawning_pool
 			building_tec_biohive_spawning_pool_1
+		# Other
+			building_tec_mechadendrite_assembler_1
 	}
 
 	resources = {
@@ -3146,6 +3458,12 @@ building_spawning_pool = {
 		inline_script = {
 			script = buildings/resources/inline_evolved_resource_cost
 			tier = 1
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_spawning_pool
 		}
 	}
 
@@ -3161,11 +3479,6 @@ building_spawning_pool = {
 		display = with_desc
 		trigger = ""
 	}
-	
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
-	}
 }
 
 building_spawning_pool_2 = {
@@ -3173,6 +3486,8 @@ building_spawning_pool_2 = {
 	position_priority = 20		# Assembly/growth
 	can_build = no
 	category = pop_assembly
+
+	ai_estimate_without_unemployment = yes
 
 	prerequisites = {
 		"tech_colonial_centralization"
@@ -3192,33 +3507,25 @@ building_spawning_pool_2 = {
 			is_hive_empire = yes
 			tec_hive_can_have_spawningpools = yes
 		}
-		OR = {
-			num_buildings = { type = any value < 15 }
-			owner = { is_ai = no }
-		}
+		
 		tec_invalidates_assembly_buildings = no
-	}
-
-	allow = {
-		exists = owner
-		owner = {
-			is_hive_empire = yes
-			tec_hive_can_have_spawningpools = yes
-		}
-		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = yes
+		tec_ai_destroy_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
-					is_hive_empire = no
+					is_hive_empire = no 
 					tec_is_biohive = yes
 					tec_hive_can_have_spawningpools = no
 				}
 			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_allow_assembly_building = no
+			tec_ai_destroy_assembly_buildings = yes
 		}
 	}
 
@@ -3241,6 +3548,8 @@ building_spawning_pool_2 = {
 			building_tec_gene_clinic_2
 			#building_spawning_pool_2
 			building_tec_biohive_spawning_pool_2
+		# Other
+			building_tec_mechadendrite_assembler_2
 	}
 
 	resources = {
@@ -3263,6 +3572,12 @@ building_spawning_pool_2 = {
 			mult = value:tec_assembly_cost_scaling_building
 			trigger = ""
 		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_spawning_pool_2
+		}
 	}
 
 	triggered_desc = {
@@ -3284,11 +3599,6 @@ building_spawning_pool_2 = {
 		mult = 1
 		trigger = ""
 	}
-	
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
-	}
 }
 
 building_spawning_pool_3 = {
@@ -3296,6 +3606,8 @@ building_spawning_pool_3 = {
 	position_priority = 20		# Assembly/growth
 	can_build = no
 	category = pop_assembly
+
+	ai_estimate_without_unemployment = yes
 
 	prerequisites = {
 		"tech_galactic_administration"
@@ -3315,24 +3627,25 @@ building_spawning_pool_3 = {
 			is_hive_empire = yes
 			tec_hive_can_have_spawningpools = yes
 		}
-		or = {
-			num_buildings = { type = any value < 15 }
-			owner = { is_ai = no }
-		}
+		
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = yes
+		tec_ai_destroy_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
-					is_hive_empire = no
+					is_hive_empire = no 
 					tec_is_biohive = yes
 					tec_hive_can_have_spawningpools = no
 				}
 			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_allow_assembly_building = no
+			tec_ai_destroy_assembly_buildings = yes
 		}
 	}
 
@@ -3355,6 +3668,8 @@ building_spawning_pool_3 = {
 			building_tec_gene_clinic_3
 			#building_spawning_pool_3
 			building_tec_biohive_spawning_pool_3
+		# Other
+			building_tec_mechadendrite_assembler_3
 	}
 
 	resources = {
@@ -3369,6 +3684,12 @@ building_spawning_pool_3 = {
 			tier = 3
 			rare = exotic_gases
 		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_spawning_pool_3
+		}
 	}
 	triggered_desc = {
 		text = spawning_pool_tooltip
@@ -3382,11 +3703,6 @@ building_spawning_pool_3 = {
 		display = with_desc
 		trigger = ""
 	}
-	
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
-	}
 }
 
 # --------------- Biohives
@@ -3394,6 +3710,8 @@ building_tec_biohive_spawning_pool_1 = {
 	base_buildtime = @b1_time
 	position_priority = 20		# Assembly/growth
 	base_cap_amount = 1
+
+	ai_estimate_without_unemployment = yes
 
 	category = pop_assembly
 	
@@ -3408,23 +3726,19 @@ building_tec_biohive_spawning_pool_1 = {
 			tec_is_biohive = yes
 			tec_hive_can_have_spawningpools = yes
 		}
-		or = {
-			num_buildings = { type = any value < 15 }
-			owner = { is_ai = no }
-		}
+		
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = yes
+		tec_ai_destroy_assembly_buildings = no
 	}
 	
 	allow = {
 		tec_only_one_assembly_building = no
-		tec_invalidates_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_hive_empire = no
@@ -3432,6 +3746,9 @@ building_tec_biohive_spawning_pool_1 = {
 					tec_hive_can_have_spawningpools = no
 				}
 			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_allow_assembly_building = no
+			tec_ai_destroy_assembly_buildings = yes
 		}
 	}
 
@@ -3454,6 +3771,8 @@ building_tec_biohive_spawning_pool_1 = {
 			building_tec_gene_clinic_1
 			building_spawning_pool
 			#building_tec_biohive_spawning_pool_1
+		# Other
+			building_tec_mechadendrite_assembler_1
 	}
 
 	resources = {
@@ -3461,6 +3780,12 @@ building_tec_biohive_spawning_pool_1 = {
 		inline_script = {
 			script = buildings/resources/inline_evolved_resource_cost
 			tier = 1
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_tec_biohive_spawning_pool_1
 		}
 	}
 
@@ -3472,11 +3797,6 @@ building_tec_biohive_spawning_pool_1 = {
 		display = with_desc
 		trigger = ""
 	}
-
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
-	}
 }
 
 building_tec_biohive_spawning_pool_2 = {
@@ -3484,6 +3804,8 @@ building_tec_biohive_spawning_pool_2 = {
 	position_priority = 20		# Assembly/growth
 	can_build = no
 	category = pop_assembly
+
+	ai_estimate_without_unemployment = yes
 
 	prerequisites = {
 		"tech_colonial_centralization"
@@ -3505,34 +3827,25 @@ building_tec_biohive_spawning_pool_2 = {
 			tec_is_biohive = yes
 			tec_hive_can_have_spawningpools = yes
 		}
-		OR = {
-			num_buildings = { type = any value < 15 }
-			owner = { is_ai = no }
-		}
+		
 		tec_invalidates_assembly_buildings = no
-	}
-
-	allow = {
-		exists = owner
-		owner = {
-			is_hive_empire = yes
-			tec_is_biohive = yes
-			tec_hive_can_have_spawningpools = yes
-		}
-		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = yes
+		tec_ai_destroy_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_hive_empire = no
-					tec_hive_can_have_spawningpools = no
 					tec_is_biohive = no
+					tec_hive_can_have_spawningpools = no
 				}
 			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_allow_assembly_building = no
+			tec_ai_destroy_assembly_buildings = yes
 		}
 	}
 
@@ -3555,6 +3868,8 @@ building_tec_biohive_spawning_pool_2 = {
 			building_tec_gene_clinic_2
 			building_spawning_pool_2
 			#building_tec_biohive_spawning_pool_2
+		# Other
+			building_tec_mechadendrite_assembler_2
 	}
 		
 	resources = {
@@ -3577,6 +3892,12 @@ building_tec_biohive_spawning_pool_2 = {
 			mult = value:tec_assembly_cost_scaling_building
 			trigger = ""
 		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_tec_biohive_spawning_pool_2
+		}
 	}
 
 	triggered_desc = {
@@ -3598,11 +3919,6 @@ building_tec_biohive_spawning_pool_2 = {
 		mult = 1
 		trigger = ""
 	}
-
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
-	}
 }
 
 building_tec_biohive_spawning_pool_3 = {
@@ -3610,6 +3926,8 @@ building_tec_biohive_spawning_pool_3 = {
 	position_priority = 20		# Assembly/growth
 	can_build = no
 	category = pop_assembly
+
+	ai_estimate_without_unemployment = yes
 
 	prerequisites = {
 		"tech_galactic_administration"
@@ -3620,11 +3938,6 @@ building_tec_biohive_spawning_pool_3 = {
 		tec_is_biohive = yes
 	}
 
-	allow = {
-		has_major_upgraded_capital = yes
-		tec_invalidates_assembly_buildings = no
-	}
-
 	potential = {
 		exists = owner
 		owner = {
@@ -3632,17 +3945,15 @@ building_tec_biohive_spawning_pool_3 = {
 			tec_is_biohive = yes
 			tec_hive_can_have_spawningpools = yes
 		}
-		or = {
-			num_buildings = { type = any value < 15 }
-			owner = { is_ai = no }
-		}
+		
 		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = yes
+		tec_ai_destroy_assembly_buildings = no
 	}
 
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			tec_invalidates_assembly_buildings = yes
 			owner = {
 				OR = {
 					is_hive_empire = no
@@ -3650,6 +3961,9 @@ building_tec_biohive_spawning_pool_3 = {
 					tec_hive_can_have_spawningpools = no
 				}
 			}
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_allow_assembly_building = no
+			tec_ai_destroy_assembly_buildings = yes
 		}
 	}
 
@@ -3672,6 +3986,8 @@ building_tec_biohive_spawning_pool_3 = {
 			building_tec_gene_clinic_3
 			building_spawning_pool_3
 			#building_tec_biohive_spawning_pool_3
+		# Other
+			building_tec_mechadendrite_assembler_3
 	}
 
 	resources = {
@@ -3685,6 +4001,12 @@ building_tec_biohive_spawning_pool_3 = {
 			script = buildings/resources/inline_evolved_rare_resource_cost
 			tier = 3
 			rare = exotic_gases
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_tec_biohive_spawning_pool_3
 		}
 	}
 
@@ -3700,21 +4022,369 @@ building_tec_biohive_spawning_pool_3 = {
 		display = with_desc
 		trigger = ""
 	}
-
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
-	}
 }
 
 # ------------------------------------------------- Mixed
-#building_tec_mechadendrite_assembler_1
-#building_tec_mechadendrite_assembler_2
+# --------------- Mechadendrite
+building_tec_mechadendrite_assembler_1 = {
+	base_buildtime = @b1_time
+	position_priority = 20		# Assembly/growth
+	base_cap_amount = 1
+	
+	category = pop_assembly
 
+	ai_estimate_without_unemployment = yes
+
+	upgrades = {
+		"building_tec_mechadendrite_assembler_2"
+	}
+	
+	potential = {
+		always = no
+		exists = owner
+		owner = {
+			OR = {	# One of the two unlocks it
+				has_technology = tech_robotic_workers
+				has_technology = tech_cloning
+			}
+			has_country_flag = tec_unlock_mechadendrite_assemblers
+		}
+		
+		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { ROBOTS = yes }
+		tec_ai_destroy_assembly_buildings = no
+	}
+
+	allow = {
+		always = no
+		tec_only_one_assembly_building = no
+		tec_invalidates_assembly_buildings = no
+	}
+
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = {
+				NOT = {
+					has_country_flag = tec_unlock_mechadendrite_assemblers
+				}
+			}
+			# Note: This building is enforced for cybernetic ascended empires so the commented rule below is not necessary
+			# NOT = { tec_ai_allow_assembly_building = { ROBOTS = yes } }
+			tec_invalidates_assembly_buildings = yes
+			tec_ai_destroy_assembly_buildings = yes
+		}
+	}
+
+	convert_to = {
+		# T1
+		# robotics
+			building_robot_assembly_plant
+			building_mecha_monastery_1
+			building_hive_robot_assembly_plant
+		# machine
+			building_machine_assembly_plant
+		# Bioservant
+			building_tec_bioservant_plant_1
+			building_tec_hive_bioservant_plant_1
+		# Cloning
+			building_clone_vats
+			#building_tec_clone_vats_biohive_1
+			building_tec_gene_clinic_1
+		#Extreme pop growth
+			building_tec_gene_clinic_1
+			building_spawning_pool
+			building_tec_biohive_spawning_pool_1
+		# Other
+			#building_tec_mechadendrite_assembler_1
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
+		}
+
+		inline_script = {
+			script = jobs/resources/inline_evolved_robotic_assembly_upkeep
+			base = 1
+			mult = value:tec_assembly_cost_scaling_building
+			trigger = ""
+		}
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			building = building_tec_mechadendrite_assembler_1
+			trigger = ""
+		}
+	}
+
+	triggered_desc = {
+		text = building_tec_mechadendrite_assembler_effect
+	}
+
+	planet_modifier = {
+		planet_pop_assembly_add = 2
+		planet_pop_assembly_organic_add = 2
+	}
+	
+	inline_script = {	# Megacorp civic
+		script = buildings/effects/inline_evolved_corporate_robocorp
+		tier = 1
+	}
+
+	# Extra assembly due to mechanist origin
+	inline_script = buildings/effects/inline_evolved_tec_mechanists_cyborg
+
+}
+
+building_tec_mechadendrite_assembler_2 = {
+	base_buildtime = @b2_time
+	icon = building_machine_assembly_complex
+	position_priority = 20		# Assembly/growth
+	category = pop_assembly
+	can_build = no
+
+	ai_estimate_without_unemployment = yes
+
+	upgrades = {
+		"building_tec_mechadendrite_assembler_3"
+	}
+
+	potential = {
+		exists = owner
+		owner = {
+			OR = {	# One of the two unlocks it
+				has_technology = tech_droid_workers
+				has_technology = tech_tec_cloning_2
+			}
+			has_country_flag = tec_unlock_mechadendrite_assemblers
+		}
+		# Available at slave colonies
+		tec_invalidates_assembly_buildings = no
+		tec_ai_allow_assembly_building = { ROBOTS = yes }
+		tec_ai_destroy_assembly_buildings = no
+	}
+
+	allow = {
+		tec_only_one_assembly_building = no
+		tec_invalidates_assembly_buildings = no
+	}
+
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = {
+				NOT = {
+					has_country_flag = tec_unlock_mechadendrite_assemblers
+				}
+			}
+			has_modifier = slave_colony 
+			tec_invalidates_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { ROBOTS = yes } }
+			tec_ai_destroy_assembly_buildings = yes
+		}
+	}
+
+	convert_to = {
+	# T2
+		# robotics
+			building_robot_assembly_complex
+			building_mecha_monastery_2
+			building_hive_robot_assembly_plant_2
+		# machine
+			building_machine_assembly_complex
+		# Bioservant
+			building_tec_bioservant_plant_2
+			building_tec_hive_bioservant_plant_2
+		# Cloning
+			building_clone_vats_2
+		#building_tec_clone_vats_biohive_2
+			building_tec_gene_clinic_2
+		#Extreme pop growth
+			building_tec_gene_clinic_2
+			building_spawning_pool_2
+			building_tec_biohive_spawning_pool_2
+		# Other
+			#building_tec_mechadendrite_assembler_2
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 2
+			rare = exotic_gases
+		}
+
+		inline_script = {
+			script = jobs/resources/inline_evolved_robotic_assembly_upkeep
+			base = 2
+			mult = value:tec_assembly_cost_scaling_building
+			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_tec_mechadendrite_assembler_2
+		}
+	}
+
+	triggered_desc = {
+		text = building_tec_mechadendrite_assembler_effect
+	}
+
+	planet_modifier = {
+		planet_pop_assembly_add = 4
+		planet_pop_assembly_organic_add = 4
+	}
+
+	inline_script = {	# Megacorp civic
+		script = buildings/effects/inline_evolved_corporate_robocorp
+		tier = 2
+	}
+
+	inline_script = { # REVIEW 3.7
+		script = modifiers/inline_evolved_assembly_robotic
+		mult = 1
+		trigger = "tec_has_master_roboticist = no"
+	}
+
+	# Extra assembly due to mechanist origin
+	inline_script = buildings/effects/inline_evolved_tec_mechanists_cyborg
+
+}
+
+building_tec_mechadendrite_assembler_3 = {
+	base_buildtime = @b3_time
+	icon = building_tec_robot_assembly_plant_3
+ 	position_priority = 20		# Assembly/growth
+	category = pop_assembly
+	can_build = no
+
+	ai_estimate_without_unemployment = yes
+	
+	potential = {
+		exists = owner
+		owner = {
+			OR = {	# One of the two unlocks it
+				has_technology = tech_synthetic_workers
+				has_technology = tech_tec_cloning_3
+			}
+			has_country_flag = tec_unlock_mechadendrite_assemblers
+		}
+		tec_invalidates_assembly_buildings = no
+	}
+
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = {
+				NOT = {
+					has_country_flag = tec_unlock_mechadendrite_assemblers
+				}
+			}		
+			has_modifier = slave_colony 
+			tec_invalidates_assembly_buildings = yes
+			NOT = { tec_ai_allow_assembly_building = { ROBOTS = yes } }
+			tec_ai_destroy_assembly_buildings = yes
+		}
+	}
+
+	convert_to = {
+	# T3
+		# robotics
+			building_robot_assembly_plant_3
+			building_mecha_monastery_3
+			building_hive_robot_assembly_plant_3
+		# machine
+			building_machine_assembly_plant_3
+		# Bioservant
+			building_tec_bioservant_plant_3
+			building_tec_hive_bioservant_plant_3
+		# Cloning
+			building_clone_vats_3
+			#building_tec_clone_vats_biohive_3
+			building_tec_gene_clinic_3
+		#Extreme pop growth
+			building_tec_gene_clinic_3
+			building_spawning_pool_3
+			building_tec_biohive_spawning_pool_3
+		# Other
+			#building_tec_mechadendrite_assembler_3
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 3
+		}
+		
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 3
+			rare = exotic_gases
+		}
+
+		inline_script = {
+			script = jobs/resources/inline_evolved_robotic_assembly_upkeep
+			base = 3
+			mult = value:tec_assembly_cost_scaling_building
+			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_tec_mechadendrite_assembler_3
+		}
+	}
+
+	# REVIEW 3.7
+	inline_script = {
+		script = jobs/inline_evolved_roboticist
+		count = 2
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_roboticist = no"
+	}
+
+	inline_script = {
+		script = jobs/inline_evolved_master_roboticist
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = "tec_has_master_roboticist = yes"
+	}
+
+	triggered_desc = {
+		text = building_tec_mechadendrite_assembler_effect
+	}
+
+	planet_modifier = {
+		planet_pop_assembly_add = 6
+		planet_pop_assembly_organic_add = 6
+	}
+
+	inline_script = {	# Megacorp civic
+		script = buildings/effects/inline_evolved_corporate_robocorp
+		tier = 2
+	}
+
+	# Extra assembly due to mechanist origin
+	inline_script = buildings/effects/inline_evolved_tec_mechanists_cyborg
+}
+
+# --------------- Replicant Printer
 #building_tec_replicant_printer_1
 #building_tec_replicant_printer_2
-
-
 
 # ----------------------------------------------------------------------------------
 # TRANSFORMATIONS
@@ -3836,11 +4506,6 @@ building_tec_splicechamber = {
 			exists = owner
 			owner = { is_lithoid_empire = yes }
 		}
-	}
-	
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
 	}
 }
 
@@ -3968,11 +4633,7 @@ building_tec_splicechamber_2 = {
 			owner = { is_lithoid_empire = yes }
 		}
 	}
-	
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
-	}
+
 }
 
 # --------------- Necrophages
@@ -4060,6 +4721,12 @@ building_necrophage_elevation_chamber = {
 		inline_script = {
 			script = buildings/resources/inline_evolved_resource_cost
 			tier = 1
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_necrophage_elevation_chamber
 		}
 	}
 
@@ -4197,6 +4864,12 @@ building_necrophage_house_of_apotheosis = {
 			tier = 2
 			rare = exotic_gases
 		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_necrophage_house_of_apotheosis
+		}
 	}
 
 	inline_script = {
@@ -4244,11 +4917,7 @@ building_necrophage_house_of_apotheosis = {
 			has_planet_flag = necrophage_elevation_timer
 		}
 	}
-	
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
-	}
+
 }
 
 # ----------------------------------------------------------------------------------
@@ -4263,6 +4932,8 @@ building_posthumous_employment_center = {
 
 	category = pop_assembly
 
+	ai_estimate_without_unemployment = yes
+
 	potential = {
 		exists = owner
 		OR = {
@@ -4270,19 +4941,11 @@ building_posthumous_employment_center = {
 			NOT = { exists = assembling_species }
 			assembling_species = { is_organic_species = yes }
 		}
-		OR = {
-			owner = { is_ai = no }
-			NAND = {
-				free_district_slots = 0
-				free_building_slots <= 1
-				free_housing <= 0
-				free_jobs <= 0
-			}
-		}
 		owner = {
 			is_regular_empire = yes
 			tec_is_zombie_empire = yes
 		}
+		tec_ai_destroy_assembly_buildings = no
 	}
 
 	allow = {
@@ -4298,13 +4961,8 @@ building_posthumous_employment_center = {
 					is_regular_empire = yes
 				}
 			}
-			AND = {
-				owner = { is_ai = yes }
-				free_district_slots = 0
-				free_building_slots = 0
-				free_housing <= 0
-				free_jobs <= 0
-			}
+			
+			tec_ai_destroy_assembly_buildings = yes
 		}
 	}
 
@@ -4317,6 +4975,12 @@ building_posthumous_employment_center = {
 		inline_script = {
 			script = buildings/resources/inline_evolved_resource_cost
 			tier = 1
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = ""
+			building = building_posthumous_employment_center
 		}
 	}
 
@@ -4339,7 +5003,30 @@ building_posthumous_employment_center = {
 
 # ----------------------------------------------------------------------------------
 # BOOSTERS
-# ----------------------------------------------------------------------------------
+# Conversion
+	# T1
+		## Hospital
+		#building_clinic
+		## Cyborgs
+		#building_tec_cybernetic_hospital_1
+		## Cyborg gestalt
+		#building_tec_cybernetic_hospital_gestalt_1
+	# T2
+		## Hospital
+		#building_hospital
+		## Cyborgs
+		#building_tec_cybernetic_hospital_2
+		## Cyborg gestalt
+		#building_tec_cybernetic_hospital_gestalt_2
+	# T3
+		## Hospital
+		#building_hospital_3
+		## Cyborgs
+		#building_tec_cybernetic_hospital_3
+		## Cyborg gestalt
+		#building_tec_cybernetic_hospital_gestalt_3
+
+# /
 # --------------- Clinics
 building_clinic = {
 	base_buildtime = @b1_time
@@ -4348,23 +5035,8 @@ building_clinic = {
 
 	category = amenity
 
-	potential = {
-		owner = { is_regular_empire = yes }
-		NOT = { has_modifier = slave_colony }
-	}
-	
-	destroy_trigger = {
-		exists = owner
-		OR = {
-			owner = { is_regular_empire = no }
-			has_modifier = slave_colony
-			AND = {
-				buildings_stop_pop = yes
-				owner = { is_ai = yes }
-			}
-		}
-	}
-	
+	ai_estimate_without_unemployment = yes
+
 	prerequisites = {
 		"tech_frontier_health"
 	}
@@ -4372,6 +5044,32 @@ building_clinic = {
 	upgrades = {
 		"building_hospital"
 	}
+
+	show_tech_unlock_if = {
+		is_regular_empire = yes
+		NOT = {
+			has_country_flag = tec_unlock_cyborg_hospitals
+		}
+	}
+
+	potential = {
+		owner = {
+			OR = {
+				is_regular_empire = yes
+				AND = {
+					has_origin = origin_fear_of_the_dark
+					is_country_type = primitive
+				}
+			}
+			NOT = {
+				has_country_flag = tec_unlock_cyborg_hospitals
+			}
+		}
+		NOT = {
+			has_modifier = slave_colony
+		}
+	}
+	
 
 	resources = {
 		category = planet_buildings
@@ -4381,6 +5079,22 @@ building_clinic = {
 		}
 
 		inline_script = buildings/resources/inline_evolved_public_healthcare_upkeep
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = "
+				OR = {
+					tec_has_genetic_assembly_buildings = yes
+					tec_has_cloning_assembly_buildings = yes
+					tec_has_bioservant_assembly_buildings = yes
+					AND = {
+						tec_has_robotic_assembly_buildings = yes
+						owner = { tec_allows_machine_assembly_for_cyborg = yes }
+					}
+				}
+			"
+			building = building_clinic
+		}
 	}
 
 	inline_script = {
@@ -4394,9 +5108,59 @@ building_clinic = {
 
 	inline_script = buildings/effects/inline_evolved_public_healthcare
 
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
+
+	on_destroy = {
+		owner = {
+			if = {
+				limit = {
+					has_event_chain = payback_out_of_warranty_chain
+				}
+				end_event_chain = payback_out_of_warranty_chain
+			}
+		}
+	}
+
+	on_repaired = {
+		if = {
+			limit = {
+				planet.owner = {
+					has_event_chain = payback_out_of_warranty_chain
+				}
+			}
+			random_list = {
+				50 = { # still broken
+					planet.owner = {
+						country_event = { id = origin.4302 }
+					}
+					modifier = {
+						factor = 0
+						planet.owner = { has_technology = tech_frontier_health }
+					}
+				}
+				20 = { # repaired
+					planet.owner = {
+						country_event = { id = origin.4301 }
+					}
+					modifier = {
+						factor = 2
+						planet.owner = { num_research_agreements = 1 }
+					}
+					modifier = {
+						factor = 3
+						planet.owner = { num_research_agreements = 2 }
+					}
+					modifier = {
+						factor = 4
+						planet.owner = { num_research_agreements >= 3 }
+					}
+				}
+				10 = { # broken beyond repair
+					planet = {
+						planet_event = { id = origin.4303 }
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -4405,42 +5169,53 @@ building_hospital = {
 	position_priority = 30		# Unique
 	can_build = no
 
-	category = amenity
+	ai_estimate_without_unemployment = yes
 
-	potential = {
-		owner = { is_regular_empire = yes }
-		NOT = { has_modifier = slave_colony }
-	}
-	
-	allow = {
-		has_upgraded_capital = yes
-	}
-	
-	
-	destroy_trigger = {
-		exists = owner
-		OR = {
-			owner = { is_regular_empire = no }
-			has_modifier = slave_colony
-			AND = {
-				buildings_stop_pop = yes
-				owner = { is_ai = yes }
-			}
-		}
-	}
+	category = amenity
 
 	prerequisites = {
 		"tech_frontier_hospital"
 	}
 
 	upgrades = {
-		building_hospital_2
-	}
-	
-	show_tech_unlock_if = {
-		is_regular_empire = yes
+		building_hospital_3
 	}
 
+	show_tech_unlock_if = {
+		is_regular_empire = yes
+		NOT = {
+			has_country_flag = tec_unlock_cyborg_hospitals
+		}
+	}
+
+	potential = {
+		owner = {
+			is_regular_empire = yes
+			NOT = {
+				has_country_flag = tec_unlock_cyborg_hospitals
+			}
+		}
+		NOT = {
+			has_modifier = slave_colony
+		}
+	}
+	
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = {
+				OR = {
+					is_regular_empire = no
+					has_country_flag = tec_unlock_cyborg_hospitals
+				}
+			}
+			has_modifier = slave_colony
+		}
+	}
 
 	resources = {
 		category = planet_buildings
@@ -4456,6 +5231,22 @@ building_hospital = {
 		}
 
 		inline_script = buildings/resources/inline_evolved_public_healthcare_upkeep
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = "
+				OR = {
+					tec_has_genetic_assembly_buildings = yes
+					tec_has_cloning_assembly_buildings = yes
+					tec_has_bioservant_assembly_buildings = yes
+					AND = {
+						tec_has_robotic_assembly_buildings = yes
+						owner = { tec_allows_machine_assembly_for_cyborg = yes }
+					}
+				}
+			"
+			building = building_hospital
+		}
 	}
 
 	inline_script = {
@@ -4472,48 +5263,55 @@ building_hospital = {
 	triggered_desc = {
 		text = job_healthcare_effect_desc
 	}
-	
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
-	}
 }
 
-building_hospital_2 = {
+building_hospital_3 = {
 	base_buildtime = @b2_time
 	can_build = no
 	position_priority = 30		# Unique
 
+	ai_estimate_without_unemployment = yes
+
 	category = amenity
 
-	potential = {
-		owner = { is_regular_empire = yes }
-		NOT = { has_modifier = slave_colony }
-	}
-	
-	allow = {
-		has_upgraded_capital = yes
-	}
-	
-	
-	destroy_trigger = {
-		exists = owner
-		OR = {
-			owner = { is_regular_empire = no }
-			has_modifier = slave_colony
-			AND = {
-				buildings_stop_pop = yes
-				owner = { is_ai = yes }
-			}
-		}
-	}
-	
 	prerequisites = {
 		"tech_tec_frontier_hospital_2"
 	}
 	
 	show_tech_unlock_if = {
 		is_regular_empire = yes
+		NOT = {
+			has_country_flag = tec_unlock_cyborg_hospitals
+		}
+	}
+
+	potential = {
+		owner = {
+			is_regular_empire = yes
+			NOT = {
+				has_country_flag = tec_unlock_cyborg_hospitals
+			}
+		}
+		NOT = {
+			has_modifier = slave_colony
+		}
+	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = {
+				OR = {
+					is_regular_empire = no
+					has_country_flag = tec_unlock_cyborg_hospitals
+				}
+			}
+			has_modifier = slave_colony
+		}
 	}
 
 	resources = {
@@ -4530,6 +5328,22 @@ building_hospital_2 = {
 		}
 
 		inline_script = buildings/resources/inline_evolved_public_healthcare_upkeep
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_aibait
+			trigger = "
+				OR = {
+					tec_has_genetic_assembly_buildings = yes
+					tec_has_cloning_assembly_buildings = yes
+					tec_has_bioservant_assembly_buildings = yes
+					AND = {
+						tec_has_robotic_assembly_buildings = yes
+						owner = { tec_allows_machine_assembly_for_cyborg = yes }
+					}
+				}
+			"
+			building = building_hospital_3
+		}
 	}
 
 	
@@ -4544,19 +5358,473 @@ building_hospital_2 = {
 
 	inline_script = buildings/effects/inline_evolved_public_healthcare
 
-
-	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 5
-	}
 }
 
 # --------------- Cyberclinics
-#building_tec_cyberhospital_1
-#building_tec_cyberhospital_2
-#building_tec_cyberhospital_3
+building_tec_cybernetic_hospital_1 = {
+	base_buildtime = @b1_time
+	position_priority = 30		# Unique
+	base_cap_amount = 1
 
-# --------------- Toxoids
+	ai_estimate_without_unemployment = yes
+
+	category = amenity
+
+	prerequisites = {
+		"tech_frontier_health"
+	}
+
+	upgrades = {
+		building_tec_cybernetic_hospital_2
+	}
+
+	show_tech_unlock_if = {
+		is_regular_empire = yes
+		has_country_flag = tec_unlock_cyborg_hospitals
+	}
+
+	potential = {
+		owner = {
+			is_regular_empire = yes
+			has_country_flag = tec_unlock_cyborg_hospitals
+		}
+		NOT = {
+			has_modifier = slave_colony
+		}
+	}
+	
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = {
+				OR = {				
+					is_regular_empire = no
+					NOT = {
+						has_country_flag = tec_unlock_cyborg_hospitals
+					}
+				}
+			}
+			has_modifier = slave_colony
+			AND = {
+				buildings_stop_pop = yes
+				owner = {
+					is_ai = yes
+				}
+			}
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
+		}
+	}
+
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = tec_cyborg_ripperdoc
+		display = with_desc
+		count = @b1_jobs
+		mult = 1
+		trigger = ""
+	}
+}
+
+building_tec_cybernetic_hospital_2 = {
+	base_buildtime = @b2_time
+	position_priority = 30		# Unique
+	can_build = no
+
+	category = amenity
+
+	ai_estimate_without_unemployment = yes
+
+	prerequisites = {
+		"tech_frontier_hospital"
+	}
+
+	show_tech_unlock_if = {
+		is_regular_empire = yes
+		has_country_flag = tec_unlock_cyborg_hospitals
+	}
+
+	upgrades = {
+		building_tec_cybernetic_hospital_3
+	}
+
+	potential = {
+		owner = {
+			is_regular_empire = yes
+			has_country_flag = tec_unlock_cyborg_hospitals
+		}
+		NOT = {
+			has_modifier = slave_colony
+		}
+	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = {
+				OR = {				
+					is_regular_empire = no
+					NOT = {
+						has_country_flag = tec_unlock_cyborg_hospitals
+					}
+				}
+			}
+			has_modifier = slave_colony
+			AND = {
+				buildings_stop_pop = yes
+				owner = {
+					is_ai = yes
+				}
+			}
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 2
+			rare = exotic_gases
+		}
+	}
+
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = tec_cyborg_ripperdoc
+		display = with_desc
+		count = @b2_jobs
+		mult = 1
+		trigger = ""
+	}
+}
+
+building_tec_cybernetic_hospital_3 = {
+	base_buildtime = @b2_time
+	can_build = no
+	position_priority = 30		# Unique
+
+	category = amenity
+
+	ai_estimate_without_unemployment = yes
+	
+	prerequisites = {
+		"tech_tec_frontier_hospital_2"
+	}
+	
+	show_tech_unlock_if = {
+		is_regular_empire = yes
+		has_country_flag = tec_unlock_cyborg_hospitals
+	}
+
+	potential = {
+		owner = {
+			is_regular_empire = yes
+			has_country_flag = tec_unlock_cyborg_hospitals
+		}
+		NOT = {
+			has_modifier = slave_colony
+		}
+	}
+	
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
+	
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = {
+				OR = {				
+					is_regular_empire = no
+					NOT = {
+						has_country_flag = tec_unlock_cyborg_hospitals
+					}
+				}
+			}
+			has_modifier = slave_colony
+			AND = {
+				buildings_stop_pop = yes
+				owner = {
+					is_ai = yes
+				}
+			}
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 3
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 3
+			rare = exotic_gases
+		}
+	}
+
+	
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = tec_cyborg_ripperdoc
+		display = with_desc
+		count = @b3_jobs
+		mult = 1
+		trigger = ""
+	}
+}
+
+# --------------- Cyberclinics (gestalt)
+building_tec_cybernetic_hospital_gestalt_1 = {
+	base_buildtime = @b1_time
+	position_priority = 30		# Unique
+	base_cap_amount = 1
+
+	category = amenity
+
+	ai_estimate_without_unemployment = yes
+
+	prerequisites = {
+		"tech_planetary_government"
+	}
+
+	upgrades = {
+		"building_tec_cybernetic_hospital_gestalt_2"
+	}
+
+	show_tech_unlock_if = {
+		is_regular_empire = no
+		has_country_flag = tec_unlock_cyborg_hospitals
+	}
+
+	potential = {
+		owner = {
+			is_regular_empire = no
+			has_country_flag = tec_unlock_cyborg_hospitals
+		}
+		NOT = {
+			has_modifier = slave_colony
+		}
+	}
+	
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = {
+				OR = {				
+					is_regular_empire = yes
+					NOT = {
+						has_country_flag = tec_unlock_cyborg_hospitals
+					}
+				}
+			}
+			has_modifier = slave_colony
+			AND = {
+				buildings_stop_pop = yes
+				owner = {
+					is_ai = yes
+				}
+			}
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 1
+		}
+	}
+
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = tec_cyborg_ripperdoc_drone
+		display = with_desc
+		count = @b1_jobs
+		mult = 1
+		trigger = ""
+	}
+}
+
+building_tec_cybernetic_hospital_gestalt_2 = {
+	base_buildtime = @b2_time
+	position_priority = 30		# Unique
+	can_build = no
+
+	category = amenity
+
+	ai_estimate_without_unemployment = yes
+
+	prerequisites = {
+		"tech_colonial_centralization"
+	}
+
+	show_tech_unlock_if = {
+		is_regular_empire = no
+		has_country_flag = tec_unlock_cyborg_hospitals
+	}
+
+	upgrades = {
+		building_tec_cybernetic_hospital_gestalt_3
+	}
+
+	potential = {
+		owner = {
+			is_regular_empire = no
+			has_country_flag = tec_unlock_cyborg_hospitals
+		}
+		NOT = {
+			has_modifier = slave_colony
+		}
+	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = {
+				OR = {				
+					is_regular_empire = yes
+					NOT = {
+						has_country_flag = tec_unlock_cyborg_hospitals
+					}
+				}
+			}
+			has_modifier = slave_colony
+			AND = {
+				buildings_stop_pop = yes
+				owner = {
+					is_ai = yes
+				}
+			}
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 2
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 2
+			rare = exotic_gases
+		}
+	}
+
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = tec_cyborg_ripperdoc_drone
+		display = with_desc
+		count = @b2_jobs
+		mult = 1
+		trigger = ""
+	}
+}
+
+building_tec_cybernetic_hospital_gestalt_3 = {
+	base_buildtime = @b2_time
+	can_build = no
+	position_priority = 30		# Unique
+
+	category = amenity
+
+	ai_estimate_without_unemployment = yes
+	
+	prerequisites = {
+		"tech_galactic_administration"
+	}
+	
+	show_tech_unlock_if = {
+		is_regular_empire = no
+		has_country_flag = tec_unlock_cyborg_hospitals
+	}
+
+	potential = {
+		owner = {
+			is_regular_empire = no
+			has_country_flag = tec_unlock_cyborg_hospitals
+		}
+		NOT = {
+			has_modifier = slave_colony
+		}
+	}
+	
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
+	
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = {
+				OR = {				
+					is_regular_empire = yes
+					NOT = {
+						has_country_flag = tec_unlock_cyborg_hospitals
+					}
+				}
+			}
+			has_modifier = slave_colony
+			AND = {
+				buildings_stop_pop = yes
+				owner = {
+					is_ai = yes
+				}
+			}
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 3
+		}
+
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 3
+			rare = exotic_gases
+		}
+	}
+
+	
+	inline_script = {
+		script = jobs/inline_evolved_job
+		job = tec_cyborg_ripperdoc_drone
+		display = with_desc
+		count = @b3_jobs
+		mult = 1
+		trigger = ""
+	}
+}
+
+# --------------- Toxoids (not mutual)
 building_toxic_bath = {
 	base_buildtime = @b1_time
 	position_priority = 30		# Unique
@@ -4615,6 +5883,18 @@ building_toxic_bath_hive = {
 		owner = {
 			is_hive_empire = yes
 			has_valid_civic = civic_hive_toxic_baths
+			NAND = {
+				is_ai = yes
+				prev = { has_any_industry_district = no }
+			}
+		}
+	}
+	allow = {
+		owner = {
+			OR = {
+				is_ai = no
+				prev = { has_any_industry_district = yes }
+			}
 		}
 	}
 	destroy_trigger = {
@@ -4701,12 +5981,10 @@ building_offspring_nest = {
 
 	category = amenity
 
+	ai_estimate_without_unemployment = yes
+
 	potential = {
 		owner = { has_origin = origin_progenitor_hive }
-		or = {
-			num_buildings = { type = any value < 15 }
-			owner = { is_ai = no }
-		}
 	}
 
 	destroy_trigger = {
@@ -4748,6 +6026,9 @@ building_clone_army_clone_vat = {
 	}
 
 	category = pop_assembly
+
+	is_essential = yes
+	ai_estimate_without_unemployment = yes
 
 	potential = {
 		exists = owner
@@ -4834,8 +6115,6 @@ building_clone_army_clone_vat = {
 	triggered_desc = {
 		text = building_clone_army_clone_vat_effect_desc
 	}
-
-	is_essential = yes
 }
 
 #building_tec_repeatable_clone_army_vat
