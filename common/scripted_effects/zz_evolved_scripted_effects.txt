@@ -1,0 +1,366 @@
+tec_cache = {
+	if = {
+		limit = { $trigger$ = yes }
+		set_$scope$_flag = $trigger$
+	} else = {
+		remove_$scope$_flag = $trigger$
+	}
+}
+
+tec_cache_planet_triggers = {
+	tec_cache = {
+		scope = planet
+		trigger = tec_is_arcology
+	}
+	tec_cache = {
+		scope = planet
+		trigger = tec_is_space_arcology
+	}
+	tec_cache = {
+		scope = planet
+		trigger = tec_is_habitat
+	}
+	tec_cache = {
+		scope = planet
+		trigger = tec_is_ringworld
+	}
+	tec_cache = {
+		scope = planet
+		trigger = tec_is_elysium
+	}
+	tec_cache = {
+		scope = planet
+		trigger = tec_is_city_world
+	}
+	tec_cache = {
+		scope = planet
+		trigger = tec_is_perfect_planet
+	}
+	tec_cache = {
+		scope = planet
+		trigger = tec_is_neutral_planet
+	}
+}
+
+tec_cache_capital_triggers = {
+	tec_cache = {
+		scope = planet
+		trigger = tec_has_t1_capital
+	}
+	tec_cache = {
+		scope = planet
+		trigger = tec_has_t2_capital
+	}
+	tec_cache = {
+		scope = planet
+		trigger = tec_has_t3_capital
+	}
+	tec_cache = {
+		scope = planet
+		trigger = tec_has_t4_capital
+	}
+	tec_cache = {
+		scope = planet
+		trigger = tec_has_t5_capital
+	}
+	tec_cache = {
+		scope = planet
+		trigger = tec_has_imperial_capital
+	}
+}
+
+
+tec_validate_planet_without_district_or_building_caps = {
+	if = {
+		limit = {
+			num_deposits = 0
+		}
+		log_error = "REEEEEEEEEEEEEEEEEEEEEEEEEEEE: No deposits"
+	}
+	# add_modifier = {
+	# 	modifier = tec_planet_validation_fix
+	# 	days = -1
+	# }
+	# calculate_modifier = yes
+	validate_and_repair_planet_buildings_and_districts = yes
+	# remove_modifier = tec_planet_validation_fix
+	# calculate_modifier = yes
+}
+
+tec_hoarders_recover_resource = {
+	if = {
+		limit = {
+			is_variable_set = tec_$RESOURCE$_stockpile
+		}
+		set_variable = {
+			which = tec_$RESOURCE$_recovered
+			value = tec_$RESOURCE$_stockpile
+		}
+		divide_variable = {
+			which = tec_$RESOURCE$_recovered
+			value = 2
+		}
+		owner = {
+			add_resource = {
+				$RESOURCE$ = 1
+				mult = prev.tec_$RESOURCE$_recovered
+			}
+		}
+		clear_variable = tec_$RESOURCE$_stockpile
+	} else = {
+		set_variable = {
+			which = tec_$RESOURCE$_recovered
+			value = 0
+		}
+	}
+}
+
+tec_hoarders_withdraw_resource = {
+	if = {
+		limit = {
+			is_variable_set = tec_$RESOURCE$_stockpile
+		}
+		owner = {
+			add_resource = {
+				$RESOURCE$ = 1
+				mult = prev.tec_$RESOURCE$_stockpile
+			}
+		}
+		clear_variable = tec_$RESOURCE$_stockpile
+	}
+	
+}
+
+tec_hoarders_manage_resource = {
+	if = {
+		limit = {
+			has_planet_flag = tec_vault_manage_$RESOURCE$
+		}
+		event_target:tec_hoarders_managed_planet = {
+			change_variable = {
+				which = tec_$RESOURCE$_stockpile
+				value = tec_stockpile_change
+			}
+			owner = {
+				add_resource = {
+					$RESOURCE$ = -1
+					mult = prev.tec_stockpile_change
+				}
+			}
+		}
+	}
+}
+
+tec_terraformer_keeper_planet_deposit_effect = {
+	random_list = {
+		10 = {
+			add_deposit = d_tec_sanctified_eco_grounds
+		}
+	}
+}
+
+tec_terraformer_keeper_arcology_deposit_effect = {
+	random_list = {
+		10 = {
+			add_deposit = d_tec_sanctified_eco_grounds_ring
+		}
+	}
+}
+
+tec_terraformer_engineers_planet_deposit_effect = {
+	random_list = {
+		10 = {
+			add_deposit = d_tec_eco_basin
+		}
+		10 = {
+			add_deposit = d_tec_eco_glacier
+		}
+		10 = {
+			add_deposit = d_tec_eco_jungle
+		}
+		10 = {
+			add_deposit = d_tec_eco_kelp
+		}
+		10 = {
+			add_deposit = d_tec_eco_mountains_range
+		}
+		10 = {
+			add_deposit = d_tec_eco_sinkhole
+		}
+		10 = {
+			add_deposit = d_tec_eco_swamp
+		}
+		10 = {
+			add_deposit = d_tec_eco_volcano
+		}
+		10 = {
+			add_deposit = d_tec_eco_wildlife_blocker
+		}
+	}
+}
+
+tec_terraformer_engineers_arcology_deposit_effect = {
+	random_list = {
+		10 = {
+			add_deposit = d_tec_eco_synthetic_life
+		}
+		10 = {
+			add_deposit = d_tec_eco_synthetic_volcano
+		}
+		10 = {
+			add_deposit = d_tec_eco_synthetic_flora
+		}
+	}
+}
+
+tec_terraformer_environmentalist_planet_deposit_effect = {
+	random_list = {
+		10 = {
+			add_deposit = d_tec_preserved_eco_ecology
+		}
+		10 = {
+			add_deposit = d_tec_preserved_eco_mining
+		}
+		10 = {
+			add_deposit = d_tec_preserved_eco_other
+		}
+	}
+}
+
+tec_terraformer_environmentalist_arcology_deposit_effect = {
+	random_list = {
+		10 = {
+			add_deposit = d_tec_preserved_eco_ring
+		}
+		10 = {
+			add_deposit = d_tec_preserved_eco_ring_2
+		}
+	}
+}
+
+tec_engineer_precursor_deposit_effect = {
+	if = {
+		limit = {
+			this.solar_system = {
+				any_system_planet = {
+					OR = {
+						has_planet_flag = precursor_world
+						has_planet_flag = gpm_is_precursor_world
+					}
+				}
+			}
+		}
+		add_deposit = d_tec_engineered_precursor
+	}
+}
+
+tec_engineer_habitat_deposit_effect = {
+	random_list = {
+		10 = {
+			add_deposit = d_tec_engineered_hangar
+		}
+		10 = {
+			add_deposit = d_tec_engineered_industrial
+		}
+		10 = {
+			add_deposit = d_tec_engineered_refinery
+			random_list = {
+				10 = {
+					set_planet_flag = tec_engineer_chemist_refinery
+				}
+				10 = {
+					set_planet_flag = tec_engineer_gas_refiner_refinery
+				}
+				10 = {
+					set_planet_flag = tec_engineer_translucer_refinery
+				}
+			}
+		}
+	}
+}
+
+tec_engineer_arcology_deposit_effect = {
+	random_list = {
+		10 = {
+			add_deposit = d_tec_engineered_eco_ring_1
+		}
+		10 = {
+			add_deposit = d_tec_preserved_eco_ring_2			
+		}
+		10 = {
+			add_deposit = d_tec_engineered_eco_ring_3
+		}
+	}
+}
+
+tec_terraformer_deposit_effect = {
+	if = {
+		limit = {
+			owner = {
+				tec_is_terraformer_keeper_empire = yes
+			}
+		}
+		while = {
+			count = $count$
+			tec_terraformer_keeper_$type$_deposit_effect = yes
+		}
+	}
+	if = {
+		limit = {
+			owner = {
+				tec_is_terraformer_engineer_empire = yes
+			}
+		}
+		while = {
+			count = $count$
+			tec_terraformer_engineers_$type$_deposit_effect = yes
+		}
+	}
+	if = {
+		limit = {
+			owner = {
+				tec_is_terraformer_environmentalist_empire = yes
+			}
+		}
+		while = {
+			count = $count$
+			tec_terraformer_environmentalist_$type$_deposit_effect = yes
+		}
+	}
+}
+
+tec_add_engineered_weather = {
+	if = {
+		limit = {
+			NOT = {
+				has_modifier = pm_tec_engineered_weather
+			}
+		}
+		add_modifier = {
+			modifier = pm_tec_engineered_weather
+			days = -1
+		}
+	}
+}
+
+tec_add_engineered_habitat = {
+	if = {
+		limit = {
+			NOT = {
+				has_modifier = pm_tec_engineered_habitat
+			}
+		}
+		add_modifier = {
+			modifier = pm_tec_engineered_habitat
+			days = -1
+		}
+	}
+}
+
+tec_faction_terraform_effect = {
+	change_variable = {
+		which = tec_terraformed_worlds
+		value = 1
+	}
+}
+
