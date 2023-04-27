@@ -210,6 +210,7 @@ decision_tec_hab_arcology_civil = {
 				modifier = pm_tec_arcology_habitat
 				days = -1
 			}
+			validate_and_repair_planet_buildings_and_districts = yes
 		}
 	}
 
@@ -295,12 +296,13 @@ decision_tec_hab_arcology_industrial = {
 				days = -1
 			}
 			# Converts district adequately
-			tec_set_ecu_hab_focus_flags_effect = yes
+			tec_set_focus_flags_effect = yes
 			tec_set_ecu_hab_conversion_effect = {
 				DISTRICT = district_tec_hab_arcology_industry
 				VARIABLE = num_industrial_districts
 			}
 			tec_set_ecu_hab_industrial_districts_effect = yes
+			validate_and_repair_planet_buildings_and_districts = yes
 		}
 	}
 
@@ -442,6 +444,7 @@ decision_tec_menial_ely = {
 			remove_planet_flag = tec_mil_elysium
 		#	remove_planet_flag = tec_research_elysium
 		#	remove_planet_flag = tec_resort_elysium
+			validate_and_repair_planet_buildings_and_districts = yes
 		}
 	}
 	ai_weight = {
@@ -493,6 +496,7 @@ decision_tec_civ_ely = {
 		#	remove_planet_flag = tec_resort_elysium
 
 			set_planet_flag = tec_civ_elysium
+			validate_and_repair_planet_buildings_and_districts = yes
 		}
 		
 	}
@@ -544,6 +548,7 @@ decision_tec_mil_ely = {
 		#	remove_planet_flag = tec_resort_elysium
 
 			set_planet_flag = tec_mil_elysium
+			validate_and_repair_planet_buildings_and_districts = yes
 		}
 		
 	}
@@ -603,6 +608,7 @@ decision_tec_basic_ring = {
 				remove_planet_flag = tec_rw_spec_cg			# - subspec
 				remove_planet_flag = tec_rw_spec_naval		# - subspec
 			remove_planet_flag = tec_rw_spec_admin
+			validate_and_repair_planet_buildings_and_districts = yes
 		}
 	}
 
@@ -659,6 +665,7 @@ decision_tec_science_ring = {
 				remove_planet_flag = tec_rw_spec_cg			# - subspec
 				remove_planet_flag = tec_rw_spec_naval		# - subspec
 			remove_planet_flag = tec_rw_spec_admin
+			validate_and_repair_planet_buildings_and_districts = yes
 		}
 		
 	}
@@ -713,6 +720,7 @@ decision_tec_fabrication_ring = {
 			#anticheese
 			remove_planet_flag = tec_rw_spec_admin
 			remove_planet_flag = tec_rw_spec_science
+			validate_and_repair_planet_buildings_and_districts = yes
 		}
 		
 	}
@@ -783,6 +791,7 @@ decision_tec_cgnaval_ring = {
 				set_planet_flag = tec_rw_spec_naval
 				break = yes
 			}
+			validate_and_repair_planet_buildings_and_districts = yes
 		}
 		
 	}
@@ -836,6 +845,8 @@ decision_tec_administration_ring = {
 			#anticheese
 			remove_planet_flag = tec_rw_spec_industry
 			remove_planet_flag = tec_rw_spec_science
+
+			validate_and_repair_planet_buildings_and_districts = yes
 		}
 		
 	}
@@ -889,6 +900,8 @@ decision_tec_precursor_ring = {
 			remove_planet_flag = tec_rw_spec_admin
 			remove_planet_flag = tec_rw_spec_industry
 			remove_planet_flag = tec_rw_spec_science
+
+			validate_and_repair_planet_buildings_and_districts = yes
 		}
 		
 	}
@@ -901,5 +914,136 @@ decision_tec_precursor_ring = {
 	}
 	ai_weight = {
 		weight = 0
+	}
+}
+
+# Note: O V E R W R I T E	02_special_decisions.txt
+# Repair Shattered Ring
+
+decision_shattered_ring_project = {
+	owned_planets_only = yes
+	icon = decision_arcology_project
+
+	enactment_time = 2700
+	resources = {
+		category = decisions
+		cost = {
+			alloys = 7500
+		}
+	}
+
+	potential = {
+		is_planet_class = pc_shattered_ring_habitable
+		exists = owner
+	}
+
+	allow = {
+		num_uncleared_blockers < 1
+		owner = { has_technology = tech_mega_engineering }
+	}
+
+	effect = {
+		# Make ringworld
+		custom_tooltip = decision_shattered_ring_project_effects
+		hidden_effect = {
+			clear_deposits = yes
+			change_pc = pc_ringworld_habitable
+
+			set_planet_entity = {
+				entity = "ringworld_seam_entity_01_entity"
+				graphical_culture = owner
+			}
+			solar_system = {
+				every_system_planet = {
+					limit = { is_planet_class = pc_ringworld_tech }
+					set_planet_entity = {
+						entity = ringworld_tech_entity_01_entity
+						graphical_culture = root.owner
+					}
+				}
+				every_system_planet = {
+					limit = { is_planet_class = pc_ringworld_seam }
+					set_planet_entity = {
+						entity = ringworld_seam_entity_01_entity
+						graphical_culture = root.owner
+					}
+				}
+			}
+
+			# Remove Scrap Processing Buildings
+			if = {
+				limit = { has_building = building_mineral_purification_plant }
+				remove_building = building_mineral_purification_plant
+			}
+
+			if = {
+				limit = { has_building = building_mineral_purification_hub }
+				remove_building = building_mineral_purification_hub
+			}
+
+			if = {
+				limit = { has_building = building_mineral_purification_complex }
+				remove_building = building_mineral_purification_complex
+			}
+
+			# This removes the extra districts when fixing the ring world.
+			if = {
+				limit = {
+					owner = { is_regular_empire = yes }
+				}
+				shattered_ring_world_conversion_effect = {
+					DISTRICT = district_rw_city
+					VARIABLE = num_housing_districts
+				}
+			}
+
+			if = {
+				limit = {
+					owner = { is_hive_empire = yes }
+				}
+				shattered_ring_world_conversion_effect = {
+					DISTRICT = district_rw_hive
+					VARIABLE = num_housing_districts
+				}
+			}
+
+			if = {
+				limit = {
+					owner = { is_machine_empire = yes }
+				}
+				shattered_ring_world_conversion_effect = {
+					DISTRICT = district_rw_nexus
+					VARIABLE = num_housing_districts
+				}
+			}
+
+			# All empire types get farming and industrial districts
+			shattered_ring_world_conversion_effect = {
+				DISTRICT = district_tec_rw_replicator
+				VARIABLE = num_generator_districts
+			}
+
+			shattered_ring_world_conversion_effect = {
+				DISTRICT = district_rw_generator
+				VARIABLE = num_generator_districts
+			}
+
+			shattered_ring_world_conversion_effect = {
+				DISTRICT = district_rw_farming
+				VARIABLE = num_farming_districts
+			}
+			shattered_ring_world_conversion_effect = {
+				DISTRICT = district_rw_industrial
+				VARIABLE = num_industrial_districts
+			}
+			# Finally, bring it in line with ringworld sizes
+			set_planet_size = 10
+			# And set the country flag so you can take Galactic Wonders
+			owner = { set_country_flag = has_built_or_repaired_megastructure }
+		}
+	}
+
+	ai_weight = {
+		weight = 100
 	}
 }

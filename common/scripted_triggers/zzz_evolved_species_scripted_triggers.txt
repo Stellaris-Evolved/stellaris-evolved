@@ -49,10 +49,7 @@
 	
 	tec_is_replicant_empire = {
 		#exists = from
-		OR = {
-			has_completed_special_project_in_log = TEC_REPLICANT_PROJECT
-			has_country_flag = tec_replicant_path_finished
-		}
+		has_country_flag = tec_replicant_path_finished
 	}
 	
 	tec_has_replicant_species = {	# Unused
@@ -315,11 +312,66 @@
 			# This includes plantoid and lithoid budding
 			has_budding_trait = yes
 			has_trait = trait_tec_lithoid_sedimentary
+			has_trait = trait_tec_replicant_budding
 		}
 	}
 
+	# removed trait check for performance since this only happen in said traits
+	# cloned vanilla ones to not break other stuff
+
+	tec_can_assemble_budding_pop = {
+		planet = {
+			OR = {
+				NOT = { exists = assembling_species }
+				AND = {
+					exists = assembling_species
+					assembling_species = {
+						OR = {
+							has_budding_trait = yes
+							is_robotic = yes
+						}
+					}
+				}
+			}
+		}
+	}
+
+	tec_can_assemble_tiyanki_pop = {
+		planet = {
+			OR = {
+				NOT = { exists = assembling_species }
+				AND = {
+					exists = assembling_species
+					assembling_species = {
+						OR = {
+							has_trait = trait_tiyanki
+							is_robotic = yes
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	tec_can_assemble_replicant_budding_species = {
+		planet = {
+			OR = {
+				NOT = { exists = assembling_species }
+				AND = {
+					exists = assembling_species
+					assembling_species = {
+						OR = {
+							has_trait = trait_tec_replicant_budding
+							is_robotic = yes
+						}
+					}
+				}
+			}
+		}
+	}
+	# /
+
 	tec_can_assemble_fractal_species = {
-		has_trait = trait_tec_robot_fractal
 		planet = {
 			OR = {
 				NOT = { exists = assembling_species }
@@ -337,7 +389,6 @@
 	}
 	
 	tec_can_assemble_sedimentary_species = {
-		has_trait = trait_tec_lithoid_sedimentary
 		planet = {
 			OR = {
 				NOT = { exists = assembling_species }
@@ -375,7 +426,7 @@
 		}
 	}
 
-	species_rights_bioservant_full_rights_check_pop_faction = {
+	tec_species_rights_bioservant_full_rights_check_pop_faction = {
 		exists = prev.prev
 		prev.prev = {
 			OR = {
@@ -385,3 +436,34 @@
 		}
 	}
 # /
+
+tec_purge_pop_category_trigger = {
+	[[cached]
+		has_pop_flag = tec_purge_pop_category_trigger
+	]
+	[[!cached]
+		OR = {
+			is_being_purged = yes
+			has_pop_flag = event_purge
+			AND = { # controlled by crisis
+				exists = planet
+				planet = {
+					exists = controller
+					controller = {
+						OR = {
+							is_country_type = ai_empire
+							is_country_type = swarm
+						}
+					}
+				}
+				OR = { # contingency won't purge itself
+					NOT = { exists = event_target:custodian_bot }
+					AND = {
+						exists = event_target:custodian_bot
+						NOT = { species = { is_same_value = event_target:custodian_bot } }
+					}
+				}
+			}
+		}
+	]
+}
