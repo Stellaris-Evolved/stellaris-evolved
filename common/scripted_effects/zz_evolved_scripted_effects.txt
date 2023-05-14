@@ -397,3 +397,201 @@ tec_faction_terraform_effect = {
 	}
 }
 
+# Galactic Paragons
+
+tec_country_force_council_swaps = {
+	force_add_civic = civic_tec_force_reform
+	force_remove_civic = civic_tec_force_reform
+}
+
+
+tec_country_prepare_aiauth = {
+	# Sets variables
+	set_variable = {
+		which = tec_max_aiauth_programs
+		value = 4
+	}
+	set_variable = {
+		which = tec_aiauth_used_programs
+		value = 0
+	}
+	set_variable = {
+		which = tec_aiauth_stored_programs
+		value = 0
+	}
+	set_variable = {
+		which = tec_aiauth_program_cost
+		value = 500
+	}
+	if = {	# Has robotic species
+		# If the empire has robotic species, adapts the aiauth to it
+		limit = {
+			OR = {
+				has_country_flag = done_first_robot
+				any_galaxy_species = {
+					has_species_flag = mechanical_species@root
+				}
+			}
+		}
+		random_galaxy_species = {
+			limit = {
+				has_species_flag = mechanical_species@root
+			}
+			save_event_target_as = tec_ai_species
+		}
+	}
+	else = {
+		# Creates a fake robot species
+		# Later when the robot tech is researched the leader change species
+		tec_create_fake_robot_species = yes
+		last_created_species = {
+			save_event_target_as = tec_ai_species
+		}
+	}
+}
+
+tec_country_create_aiauth_ruler  = {
+	set_global_flag = tec_force_councilor_traits
+	random_galaxy_species = {
+		limit = {
+			has_species_flag = mechanical_species@prev
+		}
+		save_event_target_as = tec_ai_species
+	}
+	create_leader = {
+		class = governor
+		species = event_target:tec_ai_species
+		name = tec_aiauth_ruler
+		skill = 1
+		gender = indeterminable
+		event_leader = yes
+		skip_background_generation = yes
+		can_manually_change_location = no
+		can_see_in_list = no
+		custom_description = councilor_tec_aiauth_desc
+		randomize_traits = no
+		background_ethic = ethic_gestalt_consciousness
+		effect = {
+			save_event_target_as = tec_aiauth_ruler
+		}
+	}
+	event_target:tec_aiauth_ruler = {
+		set_owner = prev
+		change_leader_portrait = event_target:tec_ai_species
+		set_leader_flag = leader_death_events_blocked
+		set_leader_flag = tec_aiauth_ruler_@prev
+
+		add_trait_no_notify = trait_tec_aiauth_ruler
+		tec_leader_add_councilor_trait = yes
+	}
+	set_leader = event_target:tec_aiauth_ruler
+	remove_global_flag = tec_force_councilor_traits
+}
+
+tec_country_create_aiauth_ruler_replace = {
+	set_global_flag = tec_force_councilor_traits
+	random_galaxy_species = {
+		limit = {
+			has_species_flag = mechanical_species@prev
+		}
+		save_event_target_as = tec_ai_species
+	}
+	clone_leader = {
+		target = $RULER$
+		species = event_target:tec_ai_species
+		skill = 1
+		gender = indeterminable
+		event_leader = yes
+		skip_background_generation = yes
+		can_manually_change_location = no
+		can_see_in_list = no
+		custom_description = councilor_tec_aiauth_desc
+		background_ethic = ethic_gestalt_consciousness
+		effect = {
+			save_event_target_as = tec_aiauth_ruler
+		}
+	}
+
+	event_target:tec_aiauth_ruler = {
+		set_owner = prev
+		change_leader_portrait = event_target:tec_ai_species
+		set_leader_flag = leader_death_events_blocked
+		set_leader_flag = tec_aiauth_ruler_@prev
+
+		add_trait_no_notify = trait_tec_aiauth_ruler
+		tec_leader_add_councilor_trait = yes
+	}
+	set_leader = event_target:tec_aiauth_ruler
+
+	$RULER$ = {
+		exile_leader_as = destitute_ruler_ai_auth
+	}
+	remove_global_flag = tec_force_councilor_traits
+}
+
+tec_country_create_aiauth_councilor = {
+	set_global_flag = tec_force_councilor_traits
+	random_galaxy_species = {
+		limit = {
+			has_species_flag = mechanical_species@prev
+		}
+		save_event_target_as = tec_ai_species
+	}
+	create_leader = {
+		class = $CLASS$
+		species = event_target:tec_ai_species
+		name = $COUNCIL_POS$
+		skill = 1
+		gender = indeterminable
+		event_leader = yes
+		skip_background_generation = yes
+		can_manually_change_location = no
+		can_see_in_list = no
+		custom_description = $DESC$
+		randomize_traits = no
+		background_ethic = ethic_gestalt_consciousness
+		effect = {
+			save_event_target_as = tec_aiauth_councilor
+		}
+	}
+	event_target:tec_aiauth_councilor = {
+		set_owner = prev
+		change_leader_portrait = councilor_hive_$CLASS$_1
+		set_council_position = $COUNCIL_POS$
+		set_leader_flag = leader_death_events_blocked
+
+		add_trait_no_notify = trait_tec_aiauth_node
+		tec_leader_add_councilor_trait = yes
+	}
+	remove_global_flag = tec_force_councilor_traits
+}
+
+tec_leader_add_councilor_trait = {
+	if = {
+		limit = {
+			has_paragon_dlc = yes
+		}
+		switch = {
+			trigger = leader_class
+			admiral = {
+				add_trait_no_notify = subclass_admiral_strategist
+			}
+			scientist = {
+				add_trait_no_notify = subclass_scientist_researcher
+			}
+			general = {
+				add_trait_no_notify = subclass_general_marshall
+			}
+			governor = {
+				add_trait_no_notify = subclass_governor_visionary
+			}
+		}
+	}
+}
+
+# scope: leader
+tec_leader_aiauth_add_experience = {
+	add_trait = trait_tec_aiauth_fix_xp
+	add_experience = $amount$
+	remove_trait = trait_tec_aiauth_fix_xp
+}
