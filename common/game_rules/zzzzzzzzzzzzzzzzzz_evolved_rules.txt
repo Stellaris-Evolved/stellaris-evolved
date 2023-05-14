@@ -912,3 +912,97 @@ can_modify_organic_portraits = {
 		has_technology = tech_tec_appearance_recombination
 	}
 }
+
+# Paragons
+
+# this = leader
+can_leader_get_normal_trait = {
+	NOR = {
+		has_global_flag = tec_force_councilor_traits
+		check_variable_arithmetic = {
+			which = modifier:tec_leader_only_councilor_traits
+			value > 0
+		}
+		AND = {
+			is_councilor = yes
+			exists = owner
+			owner = { 
+				OR = {
+					# gestalts
+					is_gestalt = yes 
+					check_variable_arithmetic = {
+						which = modifier:tec_councilor_only_councilor_traits
+						value > 0
+					}
+				}
+			}
+		}
+		AND = {
+			is_ruler = yes
+			exists = owner
+			owner = {
+				OR = {
+					has_authority = auth_dictatorial
+					has_authority = auth_imperial
+					has_authority = auth_tec_theocracy
+					has_authority = auth_tec_patrocorporate
+					check_variable_arithmetic = {
+						which = modifier:tec_ruler_only_councilor_traits
+						value > 0
+					}
+				}
+			}
+		}
+	}
+}
+
+can_leader_get_subclass_trait = {
+	NAND = {
+		exists = owner
+		owner = { is_gestalt = yes }
+		is_councilor = yes
+	}
+	NAND = {
+		exists = owner
+		owner = { tec_is_aiauth_empire = yes }
+		tec_is_aiauth_councilor_node = yes
+	}
+	has_any_subclass = no
+}
+
+can_leader_get_destiny_trait = {
+	NAND = {
+		exists = owner
+		owner = { is_gestalt = yes }
+	}
+}
+
+should_count_towards_leader_cap = {
+	NOR = {
+		leader_class = envoy
+		AND = {
+			owner = { is_gestalt = yes }
+			is_councilor = yes
+			# We count all rulers as well
+			is_ruler = no
+		}
+		AND = {
+			exists = owner
+			owner = { tec_is_aiauth_empire = yes }
+			tec_is_aiauth_node = yes
+			# We count all rulers as well
+			is_ruler = no
+		}
+	}
+}
+
+# This = leader
+will_leader_retire = {
+	exists = owner
+	not = { has_leader_flag = use_unspecific_death_reason }
+	owner = {
+		is_gestalt = no
+	}
+	has_leader_flag = retirement_is_default # Randomized retirement instead of death in paragon.590
+	tec_is_aiauth_node = no
+}
