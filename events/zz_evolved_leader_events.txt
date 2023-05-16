@@ -1,0 +1,182 @@
+# events\zz_evolved_leader_events.txt
+
+namespace = tec_leaders
+
+country_event = { 
+	id = tec_leaders.10
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		always = no
+		OR = {
+			has_ethic = ethic_gestalt_consciousness
+			is_pluralist = yes
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				has_ethic = ethic_gestalt_consciousness
+			}
+			ruler = {
+				save_event_target_as = tec_gestalt_ruler
+			}
+			# Ruler level = xp base
+			# Note: 400(2) 1500(3) 3600(4) 7000(5) 12000(6) 18900(7) 27000(8) 37600(9) 51000(10)
+			export_modifier_to_variable = {
+				modifier = trigger:event_target:tec_gestalt_ruler.has_skill
+				variable = tec_monthly_xp_base
+			}
+			multiply_variable = {	# 10 times the ruler level
+				which = tec_monthly_xp_base
+				value = 10
+			}
+			set_variable = {
+				which = tec_monthly_xp_base
+				value = tec_monthly_xp_given
+			}
+			every_owned_leader = {
+				limit = { has_skill < event_target:tec_gestalt_ruler }
+				add_experience = owner.tec_monthly_xp_given
+			}
+			every_pool_leader = {
+				limit = { has_skill < event_target:tec_gestalt_ruler }
+				add_experience = owner.tec_monthly_xp_given
+			}
+			clear_variable = tec_monthly_xp_base
+			clear_variable = tec_monthly_xp_given
+		}
+		if = {
+			limit = {
+				is_pluralist = yes
+			}
+			# 15 for normal, 30 for fanatic
+			if = {
+				limit = {
+					has_ethic = ethic_pluralist
+					NOT = {	has_ethic = ethic_fanatic_pluralist	}
+				}
+				set_variable = {
+					which = tec_monthly_xp_given
+					value = 15
+				}
+				every_owned_leader = {
+					limit = { has_skill < 3 }
+					add_experience = owner.tec_monthly_xp_given
+				}
+				every_pool_leader = {
+					limit = { has_skill < 3 }
+					add_experience = owner.tec_monthly_xp_given
+				}
+			}
+			if = {
+				limit = {
+					NOT = {	has_ethic = ethic_pluralist	}
+					has_ethic = ethic_fanatic_pluralist
+				}
+				set_variable = {
+					which = tec_monthly_xp_given
+					value = 30
+				}
+				every_owned_leader = {
+					limit = { has_skill < 5 }
+					add_experience = owner.tec_monthly_xp_given
+				}
+				every_pool_leader = {
+					limit = { has_skill < 5 }
+					add_experience = owner.tec_monthly_xp_given
+				}
+			}
+			clear_variable = tec_monthly_xp_base
+			clear_variable = tec_monthly_xp_given
+		}
+	}
+}
+
+
+# Reference event from progenitor hive
+country_event = {
+	id = tec_leaders.3200
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_origin = origin_progenitor_hive
+	}
+
+	immediate = {
+		every_owned_leader = {
+			limit = { is_idle = no }
+			#This approximates a function to level up every 1.5(n+1) years so that you can expect to get a level 10 leader after 80 years.
+			export_trigger_value_to_variable = {
+				trigger = has_skill
+				variable = experience_bonus
+			}
+			multiply_variable = {
+				which = experience_bonus
+				value = 2.5
+			}
+			floor_variable = experience_bonus
+
+			change_variable = {
+				which = experience_bonus
+				value = 4
+			}
+			random_list = { #We want some randomness
+				1 = {
+					set_variable = {
+						which = random_factor
+						value = -3
+					}
+				}
+				1 = {
+					set_variable = {
+						which = random_factor
+						value = -2
+					}
+				}
+				1 = {
+					set_variable = {
+						which = random_factor
+						value = -1
+					}
+				}
+				1 = {
+					set_variable = {
+						which = random_factor
+						value = 0
+					}
+				}
+				1 = {
+					set_variable = {
+						which = random_factor
+						value = 1
+					}
+				}
+				1 = {
+					set_variable = {
+						which = random_factor
+						value = 2
+					}
+				}
+				1 = {
+					set_variable = {
+						which = random_factor
+						value = 3
+					}
+				}
+			}
+			change_variable = {
+				which = experience_bonus
+				value = random_factor
+			}
+			add_experience = experience_bonus
+
+			clear_variable = experience_bonus
+			clear_variable = random_factor
+		}
+	}
+}
