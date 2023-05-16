@@ -404,6 +404,65 @@ tec_country_force_council_swaps = {
 	force_remove_civic = civic_tec_force_reform
 }
 
+tec_country_get_robot_species = {
+	if = {	# get true if exists
+		# If the empire has robotic species, adapts the aiauth to it
+		limit = {
+			OR = {
+				any_galaxy_species = {
+					OR = {
+						has_species_flag = mechanical_species@root
+					}
+					
+				}
+			}
+		}
+		random_galaxy_species = {
+			limit = {
+				has_species_flag = mechanical_species@root
+			}
+			save_event_target_as = tec_robot_search_species
+		}
+	}
+	else_if = {	# Get fake then
+		limit = {
+			OR = {
+				any_galaxy_species = {
+					OR = {
+						has_species_flag = mechanical_species_fake_@root
+					}
+					
+				}
+			}
+		}
+		random_galaxy_species = {
+			limit = {
+				has_species_flag = mechanical_species_fake_@root
+			}
+			save_event_target_as = tec_robot_search_species
+		}
+	}
+	else = {
+		# Creates a fake robot species
+		# Later when the robot tech is researched the leader change species
+		tec_create_fake_robot_species = yes
+		last_created_species = {
+			save_event_target_as = tec_robot_search_species
+		}
+	}
+}
+
+tec_country_aiauth_prepare_ai_species = {
+	if = {
+		limit = {
+			NOT = { exists = event_target:tec_ai_species }
+		}
+		tec_country_get_robot_species = yes
+		event_target:tec_robot_search_species = {
+			save_event_target_as = tec_ai_species
+		}
+	}
+}
 
 tec_country_prepare_aiauth = {
 	# Sets variables
@@ -423,41 +482,12 @@ tec_country_prepare_aiauth = {
 		which = tec_aiauth_program_cost
 		value = 500
 	}
-	if = {	# Has robotic species
-		# If the empire has robotic species, adapts the aiauth to it
-		limit = {
-			OR = {
-				has_country_flag = done_first_robot
-				any_galaxy_species = {
-					has_species_flag = mechanical_species@root
-				}
-			}
-		}
-		random_galaxy_species = {
-			limit = {
-				has_species_flag = mechanical_species@root
-			}
-			save_event_target_as = tec_ai_species
-		}
-	}
-	else = {
-		# Creates a fake robot species
-		# Later when the robot tech is researched the leader change species
-		tec_create_fake_robot_species = yes
-		last_created_species = {
-			save_event_target_as = tec_ai_species
-		}
-	}
+	tec_country_aiauth_prepare_ai_species = yes
 }
 
 tec_country_create_aiauth_ruler  = {
 	set_country_flag = tec_force_councilor_traits
-	random_galaxy_species = {
-		limit = {
-			has_species_flag = mechanical_species@prev
-		}
-		save_event_target_as = tec_ai_species
-	}
+	tec_country_aiauth_prepare_ai_species = yes
 	create_leader = {
 		class = governor
 		species = event_target:tec_ai_species
@@ -483,6 +513,7 @@ tec_country_create_aiauth_ruler  = {
 
 		add_trait_no_notify = trait_tec_aiauth_ruler
 		tec_leader_add_councilor_trait = yes
+		tec_leader_added_to_leader_pool = yes
 	}
 	set_leader = event_target:tec_aiauth_ruler
 	remove_country_flag = tec_force_councilor_traits
@@ -492,12 +523,7 @@ tec_country_create_aiauth_ruler_replace = {
 	set_country_flag = tec_force_councilor_traits
 	set_country_flag = tec_no_starting_traits_modification
 	set_country_flag = tec_no_starting_skill_modification
-	random_galaxy_species = {
-		limit = {
-			has_species_flag = mechanical_species@prev
-		}
-		save_event_target_as = tec_ai_species
-	}
+	tec_country_aiauth_prepare_ai_species = yes
 	clone_leader = {
 		target = $RULER$
 		species = event_target:tec_ai_species
@@ -536,16 +562,11 @@ tec_country_create_aiauth_ruler_replace = {
 
 tec_country_create_aiauth_councilor = {
 	set_country_flag = tec_force_councilor_traits
-	random_galaxy_species = {
-		limit = {
-			has_species_flag = mechanical_species@prev
-		}
-		save_event_target_as = tec_ai_species
-	}
+	tec_country_aiauth_prepare_ai_species = yes
 	create_leader = {
 		class = $CLASS$
 		species = event_target:tec_ai_species
-		name = $COUNCIL_POS$
+		name = $NAME$
 		skill = 1
 		gender = indeterminable
 		event_leader = yes
@@ -562,11 +583,12 @@ tec_country_create_aiauth_councilor = {
 	event_target:tec_aiauth_councilor = {
 		set_owner = prev
 		change_leader_portrait = councilor_hive_$CLASS$_1
-		set_council_position = $COUNCIL_POS$
+		[[COUNCIL_POS] set_council_position = $COUNCIL_POS$ ]
 		set_leader_flag = leader_death_events_blocked
 
 		add_trait_no_notify = trait_tec_aiauth_node
 		tec_leader_add_councilor_trait = yes
+		tec_leader_added_to_leader_pool = yes
 	}
 	remove_country_flag = tec_force_councilor_traits
 }
@@ -589,6 +611,17 @@ tec_leader_add_councilor_trait = {
 			}
 			governor = {
 				add_trait_no_notify = subclass_governor_visionary
+			}
+		}
+	}
+}
+
+tec_leader_added_to_leader_pool = {
+	owner = {
+		fire_on_action = {
+			on_action = on_added_to_leader_pool
+			scopes = {
+				from = prev
 			}
 		}
 	}
