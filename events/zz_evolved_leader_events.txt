@@ -2,21 +2,51 @@
 
 namespace = tec_leaders
 
+# ------------------------------------------------- MISC
+# New Leaders Get custom traits
+country_event = {
+	id = tec_leaders.1
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		always = yes
+	}
+
+	immediate = {
+		from = {
+			remove_leader_traits_after_modification = yes
+		}
+	}
+
+	after = {
+		from = {
+			add_leader_traits_after_modification = yes
+		}
+	}
+}
+
+
+
+
+
+# ------------------------------------------------- AUTH - 100XX
 country_event = { 
-	id = tec_leaders.10
+	id = tec_leaders.100
 	hide_window = yes
 
 	is_triggered_only = yes
 
 	trigger = {
-		always = no
 		OR = {
 			has_ethic = ethic_gestalt_consciousness
 			is_pluralist = yes
 		}
+		NOT = { has_country_flag = spawning_renowned_leader }
 	}
 
 	immediate = {
+		# Note: 400(2) 1500(3) 3600(4) 7000(5) 12000(6) 18900(7) 27000(8) 37600(9) 51000(10)
 		if = {
 			limit = {
 				has_ethic = ethic_gestalt_consciousness
@@ -25,51 +55,153 @@ country_event = {
 				save_event_target_as = tec_gestalt_ruler
 			}
 			# Ruler level = xp base
-			# Note: 400(2) 1500(3) 3600(4) 7000(5) 12000(6) 18900(7) 27000(8) 37600(9) 51000(10)
-			export_modifier_to_variable = {
-				modifier = trigger:event_target:tec_gestalt_ruler.has_skill
-				variable = tec_monthly_xp_base
-			}
-			multiply_variable = {	# 10 times the ruler level
-				which = tec_monthly_xp_base
-				value = 10
-			}
-			set_variable = {
-				which = tec_monthly_xp_base
-				value = tec_monthly_xp_given
-			}
 			every_owned_leader = {
-				limit = { has_skill < event_target:tec_gestalt_ruler }
-				add_experience = owner.tec_monthly_xp_given
+				limit = {
+					OR = {
+						AND = {
+							has_skill = 1
+							owner.ruler = {
+								has_skill > 1
+							}
+						}
+						AND = {
+							has_skill = 2
+							owner.ruler = {
+								has_skill > 2
+							}
+						}
+						AND = {
+							has_skill = 3
+							owner.ruler = {
+								has_skill > 3
+							}
+						}
+						AND = {
+							has_skill = 4
+							owner.ruler = {
+								has_skill > 4
+							}
+						}
+						AND = {
+							has_skill = 5
+							owner.ruler = {
+								has_skill > 5
+							}
+						}
+						AND = {
+							has_skill = 6
+							owner.ruler = {
+								has_skill > 6
+							}
+						}
+						AND = {
+							has_skill = 7
+							owner.ruler = {
+								has_skill > 7
+							}
+						}
+						AND = {
+							has_skill = 8
+							owner.ruler = {
+								has_skill > 8
+							}
+						}
+						AND = {
+							has_skill = 9
+							owner.ruler = {
+								has_skill > 9
+							}
+						}
+					}
+				}
+				add_experience = value:tec_gestalt_xp_gain
 			}
 			every_pool_leader = {
-				limit = { has_skill < event_target:tec_gestalt_ruler }
-				add_experience = owner.tec_monthly_xp_given
+				limit = {
+					OR = {
+						AND = {
+							has_skill = 1
+							owner.ruler = {
+								has_skill > 1
+							}
+						}
+						AND = {
+							has_skill = 2
+							owner.ruler = {
+								has_skill > 2
+							}
+						}
+						AND = {
+							has_skill = 3
+							owner.ruler = {
+								has_skill > 3
+							}
+						}
+						AND = {
+							has_skill = 4
+							owner.ruler = {
+								has_skill > 4
+							}
+						}
+						AND = {
+							has_skill = 5
+							owner.ruler = {
+								has_skill > 5
+							}
+						}
+						AND = {
+							has_skill = 6
+							owner.ruler = {
+								has_skill > 6
+							}
+						}
+						AND = {
+							has_skill = 7
+							owner.ruler = {
+								has_skill > 7
+							}
+						}
+						AND = {
+							has_skill = 8
+							owner.ruler = {
+								has_skill > 8
+							}
+						}
+						AND = {
+							has_skill = 9
+							owner.ruler = {
+								has_skill > 9
+							}
+						}
+					}
+				}
+				add_experience = value:tec_gestalt_xp_gain
 			}
-			clear_variable = tec_monthly_xp_base
-			clear_variable = tec_monthly_xp_given
 		}
 		if = {
 			limit = {
 				is_pluralist = yes
 			}
-			# 15 for normal, 30 for fanatic
+			# 10 xp, cap the level
+			# 40m for lvl 2, 150 for lvl 3, 360 for 4, 700 for 5, 1200 for 6
 			if = {
 				limit = {
 					has_ethic = ethic_pluralist
 					NOT = {	has_ethic = ethic_fanatic_pluralist	}
 				}
-				set_variable = {
-					which = tec_monthly_xp_given
-					value = 15
-				}
 				every_owned_leader = {
-					limit = { has_skill < 3 }
-					add_experience = owner.tec_monthly_xp_given
+					limit = {
+						tec_is_aiauth_node = no
+						has_skill < 3
+					}
+					add_experience = 2.5
 				}
 				every_pool_leader = {
-					limit = { has_skill < 3 }
-					add_experience = owner.tec_monthly_xp_given
+					limit = {
+						tec_is_aiauth_node = no
+						has_skill < 3
+					}
+					add_experience = 2.5
 				}
 			}
 			if = {
@@ -77,24 +209,282 @@ country_event = {
 					NOT = {	has_ethic = ethic_pluralist	}
 					has_ethic = ethic_fanatic_pluralist
 				}
-				set_variable = {
-					which = tec_monthly_xp_given
-					value = 30
-				}
 				every_owned_leader = {
-					limit = { has_skill < 5 }
-					add_experience = owner.tec_monthly_xp_given
+					limit = {
+						tec_is_aiauth_node = no
+						has_skill < 6
+					}
+					add_experience = 5
 				}
 				every_pool_leader = {
-					limit = { has_skill < 5 }
-					add_experience = owner.tec_monthly_xp_given
+					limit = {
+						tec_is_aiauth_node = no
+						has_skill < 6
+					}
+					add_experience = 5
 				}
 			}
-			clear_variable = tec_monthly_xp_base
-			clear_variable = tec_monthly_xp_given
 		}
 	}
 }
+
+# ------------------------------------------------- CIVICS - 200XX
+# --------- tec_leaders.205 - SHARED
+# Patronage, Cerebrate and machine leader handling - 33% chance of leader having it
+# this = country, from = leader
+country_event = {
+	id = tec_leaders.205
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		OR = {
+			has_valid_civic = civic_tec_regular_patronage
+			has_valid_civic = civic_tec_hive_cerebrates
+			has_valid_civic = civic_tec_hive_cerebrates_cyborg
+			has_valid_civic = civic_machine_delegated_functions
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				has_valid_civic = civic_tec_regular_patronage
+			}
+			random_list = {
+				10 = {
+					from = {
+						if = {
+							limit = {
+								leader_class = admiral
+							}
+							random_list = {
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_movement
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_emulators
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_tactical
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_arts
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_research
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_materials
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_industry
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_unity
+								}
+							}
+						}
+						else_if = {
+							limit = {
+								leader_class = scientist
+							}
+							random_list = {
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_movement
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_emulators
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_arts
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_research
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_materials
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_industry
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_unity
+								}
+							}
+						}
+						else_if = {
+							limit = {
+								leader_class = general
+							}
+							random_list = {
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_emulators
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_tactical
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_arts
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_research
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_materials
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_industry
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_unity
+								}
+							}
+						}
+						else_if = {
+							limit = {
+								leader_class = governor
+							}
+							random_list = {
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_emulators
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_arts
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_research
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_materials
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_industry
+								}
+								1 = {
+									add_trait_no_notify = leader_trait_tec_prodigy_unity
+								}
+							}
+						}
+						else = {	# No traits for special classes yet
+							break = yes
+						}
+					}
+				}
+				90 = {
+					modifier = {
+						factor = 0
+						from = {
+							is_pool_leader = no
+						}
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_valid_civic = civic_tec_hive_cerebrates
+			}
+			random_list = {
+				33 = {
+					from = {
+						add_trait_no_notify = leader_trait_tec_hive_cerebrate
+						tec_roll_cerebrate_leader_trait_flags = yes
+					}
+				}
+				66 = {
+					modifier = {
+						factor = 0
+						from = {
+							is_pool_leader = no
+						}
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_valid_civic = civic_tec_hive_cerebrates_cyborg
+			}
+			random_list = {
+				33 = {
+					from = {
+						add_trait_no_notify = leader_trait_tec_hive_matrix
+						tec_roll_cerebrate_leader_trait_flags = yes
+					}
+				}
+				66 = {
+					modifier = {
+						factor = 0
+						from = {
+							is_pool_leader = no
+						}
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_valid_civic = civic_machine_delegated_functions
+			}
+			random_list = {
+				33 = {
+					from = {
+						add_trait_no_notify = leader_trait_tec_machine_delegated
+						tec_roll_cerebrate_leader_trait_flags = yes
+					}
+				}
+				66 = {
+					modifier = {
+						factor = 0
+						from = {
+							is_pool_leader = no
+						}
+					}
+				}
+			}
+		}
+		
+	}
+}
+
+# --------- tec_leaders.210 - PATRONAGE
+country_event = { # New Leaders are younger for the patronage civic
+	id = tec_leaders.210
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		owner = {
+			has_valid_civic = civic_tec_regular_patronage
+		}
+	}
+
+	immediate = {
+		from = {
+			random_list = {
+				1 = { set_age = 24 }
+				1 = { set_age = 25 }
+				1 = { set_age = 26 }
+				1 = { set_age = 27 }
+				1 = { set_age = 28 }
+				1 = { set_age = 29 }
+				1 = { set_age = 30 }
+				1 = { set_age = 31 }
+				1 = { set_age = 32 }
+				1 = { set_age = 33 }
+				1 = { set_age = 34 }
+				1 = { set_age = 35 }
+			}
+		}
+	}
+}
+
+
+
+
+
+
 
 
 # Reference event from progenitor hive
