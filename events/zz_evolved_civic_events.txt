@@ -1,1950 +1,1953 @@
-
+# events\zz_evolved_civic_events.txt
 
 # Dread armies - reanimators
 # ------------------------------------------------------------
 namespace = tec_reanimator
 
-#on_army_killed_in_combat
-# This = owner
-# From = army
-# FromFrom = opponent
-# FromFromFrom = planet
+	#on_army_killed_in_combat
+	# This = owner
+	# From = army
+	# FromFrom = opponent
+	# FromFromFrom = planet
 
-country_event = {
-	id = tec_reanimator.10
-	hide_window = yes
-	is_triggered_only = yes
+	country_event = {
+		id = tec_reanimator.10
+		hide_window = yes
+		is_triggered_only = yes
 
-	trigger = {
-		From = {
-			exists = species
-			species = { # Robots cant be raised i guess?
-				is_organic_species = yes
-			}
-			NOR = { # Cant reanimate the reanimated
-				army_type = undead_army
-				army_type = tec_geist_army
-			}
-			
-		}
-		OR = {
-			FromFrom = {
-				is_regular_empire = yes
-				tec_is_reanimator_empire = yes
-			}
-			This = {
-				is_regular_empire = yes
-				tec_is_reanimator_empire = yes
-				NOT = { is_country_type = "gate_builders" }
-			}
-		}
-
-		FromFromFrom = { # tec_battle_planet
-			NOT = {
-				has_planet_flag = tec_recent_reanimation
-			}
-		}
-
-	}
-
-	immediate = {
-		# Sorting event targets for clarity...
-		FromFromFrom = { # tec_battle_planet
-			save_event_target_as = tec_bp
-		}
-		FromFrom = {	# tec_deceased_army_killer
-			save_event_target_as = tec_dak
-		}
-		From = {		#tec_deceased_army
-			save_event_target_as = tec_da
-		}
-		This = {		#tec_deceased_army_owner
-			save_event_target_as = tec_dao
-		}
-
-		event_target:tec_bp = {
-			set_timed_planet_flag = {
-				flag = tec_recent_reanimation
-				days = 1
-			}
-		}
-
-		# Roll the dice
-		random_list = {
-			2 = {
-				break = yes
-			}
-			1 = {
-				if = {	# Both are necromancers
-					limit = {
-						event_target:tec_dak = {
-							tec_is_reanimator_empire = yes
-						}
-						event_target:tec_dao = {
-							tec_is_reanimator_empire = yes
-						}
-
-					}
-					random_list = {
-						60 = {
-							event_target:tec_bp = { #for the defender	
-								if = {
-									limit = { # Extracheck to avoid non necro empire benefitting
-										event_target:tec_dao = {
-											tec_is_reanimator_empire = yes
-										}
-									}
-									create_army = {
-										name = random
-										owner = event_target:tec_dao
-										type = undead_army 
-										species = event_target:tec_da.species
-									}
-
-									last_created_army = {
-										set_army_flag = tec_delete_this_army
-									}
-									
-									change_variable = {# adds variable for later winner messages
-										which = tec_reanimated_armies_def
-										value = 1
-									}
-								}
-							}
-							break = yes
-						}
-						40 = {
-							event_target:tec_bp = {	# for the oponent
-								if = {	# Extracheck to avoid non necro empire benefitting
-									limit = {
-										event_target:tec_dak = {
-											tec_is_reanimator_empire = yes
-										}
-										NOR = {
-											event_target:tec_da = {
-												army_type = undead_army 
-											}
-											event_target:tec_da = {
-												army_type = tec_geist_army
-											}
-										}
-									}
-									create_army = {
-										name = random
-										owner = event_target:tec_dak
-										type = undead_army 
-										species = event_target:tec_da.species
-									}
-
-									last_created_army = {
-										set_army_flag = tec_delete_this_army
-									}
-													
-									change_variable = { # adds variable for later winner messages
-										which = tec_reanimated_armies_att
-										value = 1
-									}
-								}
-							}
-							break = yes
-						}
-					}
-					break = yes
+		trigger = {
+			From = {
+				exists = species
+				species = { # Robots cant be raised i guess?
+					is_organic_species = yes
 				}
-				else_if = {	# Only def is necro
-					limit = {
-						event_target:tec_dak = {
-							NOT = {
-								tec_is_reanimator_empire = yes
-							}
-						}
-						event_target:tec_dao = {
-							tec_is_reanimator_empire = yes
-						}
-					}
-					
-					
-					event_target:tec_bp = {
-						if = {
-							limit = { # Extracheck to avoid non necro empire benefitting
-								event_target:tec_dao = {
-									tec_is_reanimator_empire = yes
-								}
-																
-							}
-							create_army = { #for the defender
-								name = random
-								owner = event_target:tec_dao
-								type = undead_army 
-								species = event_target:tec_da.species
-							}
-
-							last_created_army = {
-								set_army_flag = tec_delete_this_army
-							}
-
-							change_variable = {# adds variable for later winner messages
-								which = tec_reanimated_armies_def
-								value = 1
-							}
-						}
-					}
-					break = yes
-				}
-				else_if = {	# Only opponent is necro
-					limit = {
-						event_target:tec_dak = {
-							tec_is_reanimator_empire = yes
-						}
-						event_target:tec_dao = {
-							NOT = {
-								tec_is_reanimator_empire = yes
-							}
-						}
-					}
-					
-					event_target:tec_bp = {
-						if = {
-							limit = { 	# Extracheck to avoid non necro empire benefitting
-								event_target:tec_dak = {
-									tec_is_reanimator_empire = yes
-								}
-
-							}
-							create_army = { # for the oponent
-								name = random
-								owner = event_target:tec_dak
-								type = undead_army 
-								species = event_target:tec_da.species
-							}
-
-							last_created_army = {
-								set_army_flag = tec_delete_this_army
-							}
-
-							change_variable = { # adds variable for later winner messages
-								which = tec_reanimated_armies_att
-								value = 1
-							}
-						}
-					}
-					break = yes
-				}
-				else = {
-					break = yes
+				NOR = { # Cant reanimate the reanimated
+					army_type = undead_army
+					army_type = tec_geist_army
 				}
 				
 			}
-		}
-	}
-}
+			OR = {
+				FromFrom = {
+					is_regular_empire = yes
+					tec_is_reanimator_empire = yes
+				}
+				This = {
+					is_regular_empire = yes
+					tec_is_reanimator_empire = yes
+					NOT = { is_country_type = "gate_builders" }
+				}
+			}
 
-#on_planet_attackers_win = {
-country_event = {	# Necromancers announce
-	id = tec_reanimator.20
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		OR = {
-			tec_is_reanimator_empire = yes
-			has_valid_civic = civic_tec_machine_reanimation
-			has_valid_civic = civic_tec_hive_necrophage
-		}
-	}
-
-	immediate = {
-		if = {
-			limit = {
+			FromFromFrom = { # tec_battle_planet
 				NOT = {
-					has_country_flag = tec_first_necro
+					has_planet_flag = tec_recent_reanimation
+				}
+			}
+
+		}
+
+		immediate = {
+			# Sorting event targets for clarity...
+			FromFromFrom = { # tec_battle_planet
+				save_event_target_as = tec_bp
+			}
+			FromFrom = {	# tec_deceased_army_killer
+				save_event_target_as = tec_dak
+			}
+			From = {		#tec_deceased_army
+				save_event_target_as = tec_da
+			}
+			This = {		#tec_deceased_army_owner
+				save_event_target_as = tec_dao
+			}
+
+			event_target:tec_bp = {
+				set_timed_planet_flag = {
+					flag = tec_recent_reanimation
+					days = 1
+				}
+			}
+
+			# Roll the dice
+			random_list = {
+				2 = {
+					break = yes
+				}
+				1 = {
+					if = {	# Both are necromancers
+						limit = {
+							event_target:tec_dak = {
+								tec_is_reanimator_empire = yes
+							}
+							event_target:tec_dao = {
+								tec_is_reanimator_empire = yes
+							}
+
+						}
+						random_list = {
+							60 = {
+								event_target:tec_bp = { #for the defender	
+									if = {
+										limit = { # Extracheck to avoid non necro empire benefitting
+											event_target:tec_dao = {
+												tec_is_reanimator_empire = yes
+											}
+										}
+										create_army = {
+											name = random
+											owner = event_target:tec_dao
+											type = undead_army 
+											species = event_target:tec_da.species
+										}
+
+										last_created_army = {
+											set_army_flag = tec_delete_this_army
+										}
+										
+										change_variable = {# adds variable for later winner messages
+											which = tec_reanimated_armies_def
+											value = 1
+										}
+									}
+								}
+								break = yes
+							}
+							40 = {
+								event_target:tec_bp = {	# for the oponent
+									if = {	# Extracheck to avoid non necro empire benefitting
+										limit = {
+											event_target:tec_dak = {
+												tec_is_reanimator_empire = yes
+											}
+											NOR = {
+												event_target:tec_da = {
+													army_type = undead_army 
+												}
+												event_target:tec_da = {
+													army_type = tec_geist_army
+												}
+											}
+										}
+										create_army = {
+											name = random
+											owner = event_target:tec_dak
+											type = undead_army 
+											species = event_target:tec_da.species
+										}
+
+										last_created_army = {
+											set_army_flag = tec_delete_this_army
+										}
+														
+										change_variable = { # adds variable for later winner messages
+											which = tec_reanimated_armies_att
+											value = 1
+										}
+									}
+								}
+								break = yes
+							}
+						}
+						break = yes
+					}
+					else_if = {	# Only def is necro
+						limit = {
+							event_target:tec_dak = {
+								NOT = {
+									tec_is_reanimator_empire = yes
+								}
+							}
+							event_target:tec_dao = {
+								tec_is_reanimator_empire = yes
+							}
+						}
+						
+						
+						event_target:tec_bp = {
+							if = {
+								limit = { # Extracheck to avoid non necro empire benefitting
+									event_target:tec_dao = {
+										tec_is_reanimator_empire = yes
+									}
+																	
+								}
+								create_army = { #for the defender
+									name = random
+									owner = event_target:tec_dao
+									type = undead_army 
+									species = event_target:tec_da.species
+								}
+
+								last_created_army = {
+									set_army_flag = tec_delete_this_army
+								}
+
+								change_variable = {# adds variable for later winner messages
+									which = tec_reanimated_armies_def
+									value = 1
+								}
+							}
+						}
+						break = yes
+					}
+					else_if = {	# Only opponent is necro
+						limit = {
+							event_target:tec_dak = {
+								tec_is_reanimator_empire = yes
+							}
+							event_target:tec_dao = {
+								NOT = {
+									tec_is_reanimator_empire = yes
+								}
+							}
+						}
+						
+						event_target:tec_bp = {
+							if = {
+								limit = { 	# Extracheck to avoid non necro empire benefitting
+									event_target:tec_dak = {
+										tec_is_reanimator_empire = yes
+									}
+
+								}
+								create_army = { # for the oponent
+									name = random
+									owner = event_target:tec_dak
+									type = undead_army 
+									species = event_target:tec_da.species
+								}
+
+								last_created_army = {
+									set_army_flag = tec_delete_this_army
+								}
+
+								change_variable = { # adds variable for later winner messages
+									which = tec_reanimated_armies_att
+									value = 1
+								}
+							}
+						}
+						break = yes
+					}
+					else = {
+						break = yes
+					}
+					
+				}
+			}
+		}
+	}
+
+	#on_planet_attackers_win = {
+	country_event = {	# Necromancers announce
+		id = tec_reanimator.20
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			OR = {
+				tec_is_reanimator_empire = yes
+				has_valid_civic = civic_tec_machine_reanimation
+				has_valid_civic = civic_tec_hive_necrophage
+			}
+		}
+
+		immediate = {
+			if = {
+				limit = {
+					NOT = {
+						has_country_flag = tec_first_necro
+					}
+					FromFrom = {
+						check_variable = {
+							which = tec_reanimated_armies_att
+							value > 0
+						}
+					}
+				}
+				this = {
+					save_event_target_as = tec_necro_attacker
+				}
+				from = {
+					save_event_target_as = tec_necro_attacked
 				}
 				FromFrom = {
-					check_variable = {
-						which = tec_reanimated_armies_att
-						value > 0
+					save_event_target_as = tec_assaulted_planet
+				}
+				if = {
+					limit = {
+						is_machine_empire = no
+						is_hive_empire = no
+					}
+					country_event = {
+						id = tec_reanimator.25
+					}
+				}
+				create_message = {
+					type = MESSAGE_TEC_REANIMATED_EVENT
+					localization = MESSAGE_TEC_REANIMATED_ARMIES
+					days = 30
+					target = FromFrom
+					variable = {
+						type = name
+						localization = PLANET
+						scope = FromFrom
+					}
+					variable = {
+						type = variable
+						varname = tec_reanimated_armies_att
+						localization = VALUE
+						scope = FromFrom
+					}
+				}
+				FromFrom = {
+					clear_variable = tec_reanimated_armies_att
+					clear_variable = tec_reanimated_armies_def
+				}
+			}
+			
+			if = {
+				limit = {
+					has_country_flag = tec_first_necro
+					FromFrom = {
+						check_variable = {
+							which = tec_reanimated_armies_att
+							value > 0
+						}
+					}
+				}
+				create_message = {
+					type = MESSAGE_TEC_REANIMATED_EVENT
+					localization = MESSAGE_TEC_REANIMATED_ARMIES
+					days = 30
+					target = FromFrom
+					variable = {
+						type = name
+						localization = PLANET
+						scope = FromFrom
+					}
+					variable = {
+						type = variable
+						varname = tec_reanimated_armies_att
+						localization = VALUE
+						scope = FromFrom
+					}
+				}
+				FromFrom = {
+					clear_variable = tec_reanimated_armies_att
+					clear_variable = tec_reanimated_armies_def
+				}
+			}
+		}
+
+		after = {
+			hidden_effect = {
+				every_owned_army = {
+					limit = {
+						has_army_flag = tec_delete_this_army
+					}
+					random_list = {
+						50 = {
+							remove_army_flag = tec_delete_this_army
+						}
+						50 = {
+							remove_army = yes
+						}
 					}
 				}
 			}
-			this = {
-				save_event_target_as = tec_necro_attacker
+		}
+	}
+
+	# First necromancy
+	country_event = {	# Necromancers announce
+		id = tec_reanimator.25
+		is_triggered_only = yes
+		trigger = {
+			NOT = {
+				has_country_flag = tec_first_necro
 			}
-			from = {
-				save_event_target_as = tec_necro_attacked
-			}
-			FromFrom = {
-				save_event_target_as = tec_assaulted_planet
-			}
-			if = {
-				limit = {
-					is_machine_empire = no
-					is_hive_empire = no
-				}
-				country_event = {
-					id = tec_reanimator.25
-				}
-			}
-			create_message = {
-				type = MESSAGE_TEC_REANIMATED_EVENT
-				localization = MESSAGE_TEC_REANIMATED_ARMIES
-				days = 30
-				target = FromFrom
-				variable = {
-					type = name
-					localization = PLANET
-					scope = FromFrom
-				}
-				variable = {
-					type = variable
-					varname = tec_reanimated_armies_att
-					localization = VALUE
-					scope = FromFrom
-				}
-			}
-			FromFrom = {
-				clear_variable = tec_reanimated_armies_att
-				clear_variable = tec_reanimated_armies_def
-			}
+			tec_is_reanimator_empire = yes
 		}
 		
-		if = {
-			limit = {
-				has_country_flag = tec_first_necro
-				FromFrom = {
-					check_variable = {
-						which = tec_reanimated_armies_att
-						value > 0
-					}
-				}
-			}
-			create_message = {
-				type = MESSAGE_TEC_REANIMATED_EVENT
-				localization = MESSAGE_TEC_REANIMATED_ARMIES
-				days = 30
-				target = FromFrom
-				variable = {
-					type = name
-					localization = PLANET
-					scope = FromFrom
-				}
-				variable = {
-					type = variable
-					varname = tec_reanimated_armies_att
-					localization = VALUE
-					scope = FromFrom
-				}
-			}
-			FromFrom = {
-				clear_variable = tec_reanimated_armies_att
-				clear_variable = tec_reanimated_armies_def
+		picture = GFX_evt_necrophage
+		title = tec_reanimator.25.title
+		desc = tec_reanimator.25.desc
+
+		option = {
+			name = tec_reanimator.25.excellent
+		}
+
+		immediate = {
+			hidden_effect = {
+				set_country_flag = tec_first_necro
 			}
 		}
 	}
 
-	after = {
-		hidden_effect = {
-			every_owned_army = {
-				limit = {
-					has_army_flag = tec_delete_this_army
-				}
-				random_list = {
-					50 = {
-						remove_army_flag = tec_delete_this_army
-					}
-					50 = {
-						remove_army = yes
-					}
-				}
-			}
-		}
-	}
-}
+	#on_planet_defenders_win = {
+	country_event = {
+		id = tec_reanimator.30
+		hide_window = yes
+		is_triggered_only = yes
 
-# First necromancy
-country_event = {	# Necromancers announce
-	id = tec_reanimator.25
-	is_triggered_only = yes
-	trigger = {
-		NOT = {
-			has_country_flag = tec_first_necro
-		}
-		tec_is_reanimator_empire = yes
-	}
-	
-	picture = GFX_evt_necrophage
-	title = tec_reanimator.25.title
-	desc = tec_reanimator.25.desc
-
-	option = {
-		name = tec_reanimator.25.excellent
-	}
-
-	immediate = {
-		hidden_effect = {
-			set_country_flag = tec_first_necro
-		}
-	}
-}
-
-#on_planet_defenders_win = {
-country_event = {
-	id = tec_reanimator.30
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		OR = {
-			tec_is_reanimator_empire = yes
-			has_valid_civic = civic_tec_machine_reanimation
-			has_valid_civic = civic_tec_hive_necrophage
-		}
-	}
-
-	immediate = {
-		if = {
-			limit = {
-				NOT = {
-					has_country_flag = tec_first_necro
-				}
-				FromFrom = {
-					check_variable = {
-						which = tec_reanimated_armies_def
-						value > 0
-					}
-				}
-			}
-			from = {
-				save_event_target_as = tec_necro_attacker
-			}
-			root = {
-				save_event_target_as = tec_necro_attacked
-			}
-			FromFrom = {
-				save_event_target_as = tec_assaulted_planet
-			}
-			if = {
-				limit = {
-					is_machine_empire = no
-					is_hive_empire = no
-				}
-				country_event = {
-					id = tec_reanimator.35
-				}
-			}
-			create_message = {
-				type = MESSAGE_TEC_REANIMATED_EVENT
-				localization = MESSAGE_TEC_REANIMATED_ARMIES
-				days = 30
-				target = FromFrom
-				variable = {
-					type = name
-					localization = PLANET
-					scope = FromFrom
-				}
-				variable = {
-					type = variable
-					varname = tec_reanimated_armies_def
-					localization = VALUE
-					scope = FromFrom
-				}
-			}
-			FromFrom = {
-				clear_variable = tec_reanimated_armies_att
-				clear_variable = tec_reanimated_armies_def
-			}
-		}
-	
-		if = {
-			limit = {
-				has_country_flag = tec_first_necro
-				FromFrom = {
-					check_variable = {
-						which = tec_reanimated_armies_def
-						value > 0
-					}
-				}
-			}
-			create_message = {
-				type = MESSAGE_TEC_REANIMATED_EVENT
-				localization = MESSAGE_TEC_REANIMATED_ARMIES
-				days = 30
-				target = FromFrom
-				variable = {
-					type = name
-					localization = PLANET
-					scope = FromFrom
-				}
-				variable = {
-					type = variable
-					varname = tec_reanimated_armies_def
-					localization = VALUE
-					scope = FromFrom
-				}
-			}
-			FromFrom = {
-				clear_variable = tec_reanimated_armies_att
-				clear_variable = tec_reanimated_armies_def
-			}
-		}
-	}
-	after = {
-		hidden_effect = {
-			every_owned_army = {
-				limit = {
-					has_army_flag = tec_delete_this_army
-				}
-				random_list = {
-					50 = {
-						remove_army_flag = tec_delete_this_army
-					}
-					50 = {
-						remove_army = yes
-					}
-				}
-			}
-		}
-	}
-}
-
-country_event = {	# Necromancers announce
-	id = tec_reanimator.35
-	is_triggered_only = yes
-	trigger = {
-		NOT = {
-			has_country_flag = tec_first_necro
-		}
-		tec_is_reanimator_empire = yes
-	}
-
-	picture = GFX_evt_necrophage
-	title = tec_reanimator.35.title
-	desc = tec_reanimator.35.desc
-
-	option = {
-		name = tec_reanimator.35.excellent
-	}
-
-	immediate = {
-		hidden_effect = {
-			set_country_flag = tec_first_necro
-		}
-	}
-}
-
-# This = Planet scope
-# From = Country
-# FromFrom = Pop
-#Purging pops generate a dread army
-planet_event = {
-	id = tec_reanimator.50
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		FROM = {
+		trigger = {
 			OR = {
 				tec_is_reanimator_empire = yes
+				has_valid_civic = civic_tec_machine_reanimation
+				has_valid_civic = civic_tec_hive_necrophage
 			}
 		}
-		FROMFROM = {
-			is_organic_species = yes
-			OR = {
-				has_purge_type = {
-					type = purge_normal
-				}
-				has_purge_type = {
-					type = purge_labor_camps
-				}
-				has_purge_type = {
-					type = purge_neutering
-				}
-			}
-		}
-		is_controlled_by = FROM
-		has_building = building_dread_encampment
-	}
 
-	immediate = {
-		ROOT = {
-			create_army = {
-				name = random
-				owner = root.owner
-				type = undead_army 
-				species = fromfrom.species
-			}
-		}
-	}
-}
-
-# -------------------------------------------------------
-# Dread machines leader event
-country_event = {
-	id = tec_reanimator.101
-	is_triggered_only = yes
-	hide_window = yes
-
-	trigger = {
-		from = {
-			owner = {
-				is_same_value = root
-			}
-			has_level >= 2
-			is_idle = no
-		}
-		has_valid_civic = civic_tec_machine_reanimation
-	}
-
-	immediate = {
-		random = {
-			chance = 50
-			clone_leader = {
-				target = from
-				effect = {
-					save_event_target_as = tec_recently_reanimated_leader
-					set_owner = event_target:global_event_country	
-					# moves the leader to gec
-				}
-			}
-			last_created_leader = {
-				set_leader_flag = tec_reanimated_leader_@root
-			}
-			root = {
-				country_event = {
-					id = tec_reanimator.102
-					days = @tec_reanim_delay_1
-				}
-			}
-		}
-	}
-}
-
-# Announces and gives back the leader
-country_event = {
-	id = tec_reanimator.102
-	is_triggered_only = yes
-
-	trigger = {
-		has_valid_civic = civic_tec_machine_reanimation
-	}
-
-	immediate = {
-		event_target:global_event_country = {
-			random_owned_leader = {
+		immediate = {
+			if = {
 				limit = {
-					has_leader_flag = tec_reanimated_leader_@root
+					NOT = {
+						has_country_flag = tec_first_necro
+					}
+					FromFrom = {
+						check_variable = {
+							which = tec_reanimated_armies_def
+							value > 0
+						}
+					}
 				}
-				save_event_target_as = tec_reanimated_leader
-				set_owner = root
-				
-				remove_leader_flag = tec_reanimated_leader_@root
-				save_event_target_as = thrl
+				from = {
+					save_event_target_as = tec_necro_attacker
+				}
+				root = {
+					save_event_target_as = tec_necro_attacked
+				}
+				FromFrom = {
+					save_event_target_as = tec_assaulted_planet
+				}
+				if = {
+					limit = {
+						is_machine_empire = no
+						is_hive_empire = no
+					}
+					country_event = {
+						id = tec_reanimator.35
+					}
+				}
+				create_message = {
+					type = MESSAGE_TEC_REANIMATED_EVENT
+					localization = MESSAGE_TEC_REANIMATED_ARMIES
+					days = 30
+					target = FromFrom
+					variable = {
+						type = name
+						localization = PLANET
+						scope = FromFrom
+					}
+					variable = {
+						type = variable
+						varname = tec_reanimated_armies_def
+						localization = VALUE
+						scope = FromFrom
+					}
+				}
+				FromFrom = {
+					clear_variable = tec_reanimated_armies_att
+					clear_variable = tec_reanimated_armies_def
+				}
+			}
+		
+			if = {
+				limit = {
+					has_country_flag = tec_first_necro
+					FromFrom = {
+						check_variable = {
+							which = tec_reanimated_armies_def
+							value > 0
+						}
+					}
+				}
+				create_message = {
+					type = MESSAGE_TEC_REANIMATED_EVENT
+					localization = MESSAGE_TEC_REANIMATED_ARMIES
+					days = 30
+					target = FromFrom
+					variable = {
+						type = name
+						localization = PLANET
+						scope = FromFrom
+					}
+					variable = {
+						type = variable
+						varname = tec_reanimated_armies_def
+						localization = VALUE
+						scope = FromFrom
+					}
+				}
+				FromFrom = {
+					clear_variable = tec_reanimated_armies_att
+					clear_variable = tec_reanimated_armies_def
+				}
 			}
 		}
-		#event_target:tec_reanimated_leader = {
-		#	remove_leader_flag = tec_reanimated_leader_@root
-		#	save_event_target_as = thrl
-		#}
+		after = {
+			hidden_effect = {
+				every_owned_army = {
+					limit = {
+						has_army_flag = tec_delete_this_army
+					}
+					random_list = {
+						50 = {
+							remove_army_flag = tec_delete_this_army
+						}
+						50 = {
+							remove_army = yes
+						}
+					}
+				}
+			}
+		}
 	}
 
-	picture = GFX_evt_sapient_AI
-	title = tec_reanimator.102
-	desc = tec_reanimator.102.desc
+	country_event = {	# Necromancers announce
+		id = tec_reanimator.35
+		is_triggered_only = yes
+		trigger = {
+			NOT = {
+				has_country_flag = tec_first_necro
+			}
+			tec_is_reanimator_empire = yes
+		}
 
-	option = {
-		name = EXCELLENT
+		picture = GFX_evt_necrophage
+		title = tec_reanimator.35.title
+		desc = tec_reanimator.35.desc
+
+		option = {
+			name = tec_reanimator.35.excellent
+		}
+
+		immediate = {
+			hidden_effect = {
+				set_country_flag = tec_first_necro
+			}
+		}
 	}
 
-}
+	# This = Planet scope
+	# From = Country
+	# FromFrom = Pop
+	#Purging pops generate a dread army
+	planet_event = {
+		id = tec_reanimator.50
+		hide_window = yes
+		is_triggered_only = yes
 
-#on_army_killed_in_combat
-# This = owner
-# From = army
-# FromFrom = opponent
-# FromFromFrom = planet
-country_event = {
-	id = tec_reanimator.110
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		From = {	# Killed army
-			species = { # only robots can be raised
+		trigger = {
+			FROM = {
 				OR = {
-					is_robotic_species = yes
-					is_archetype = REPLICANT
+					tec_is_reanimator_empire = yes
 				}
 			}
-			NOR = { # Cant reanimate the reanimated
-				army_type = tec_shambling_robot
-			}
-			
-		}
-		OR = {
-			FromFrom = {	# Attacker
-				is_machine_empire = yes
-				has_valid_civic = civic_tec_machine_reanimation
-				NOT = { is_country_type = "gate_builders" }
-			}
-			This = {	# Army owner
-				is_machine_empire = yes
-				has_valid_civic = civic_tec_machine_reanimation
-				NOT = { is_country_type = "gate_builders" }
-			}
-		}
-
-		FromFromFrom = { # tec_battle_planet
-			NOT = {
-				has_planet_flag = tec_recent_reanimation
-			}
-			OR = {
-				count_ground_combat_defender = {
-					limit = {
-						army_type = tec_reanimator
-					}
-					count >= 1
-				}
-				count_ground_combat_attacker = {
-					limit = {
-						army_type = tec_reanimator
-					}
-					count >= 1
-				}
-			}
-		}
-
-	}
-
-	immediate = {
-		# Sorting event targets for clarity...
-		FromFromFrom = { # tec_battle_planet
-			save_event_target_as = tec_bp
-		}
-		FromFrom = {	# tec_deceased_army_killer
-			save_event_target_as = tec_dak
-		}
-		From = {		#tec_deceased_army
-			save_event_target_as = tec_da
-		}
-		This = {		#tec_deceased_army_owner
-			save_event_target_as = tec_dao
-		}
-
-		event_target:tec_bp = {
-			set_timed_planet_flag = {
-				flag = tec_recent_reanimation
-				days = 1
-			}
-		}
-
-		random_list = {
-			2 = {
-				}
-			1 = {
-				if = {	# Both are necromancers
-					limit = {
-						event_target:tec_dak = {
-							has_valid_civic = civic_tec_machine_reanimation
-						}
-						event_target:tec_dao = {
-							has_valid_civic = civic_tec_machine_reanimation
-						}
-
-					}
-					random_list = {
-						60 = {
-							event_target:tec_bp = { #for the defender	
-								if = {
-									limit = { # Extracheck to avoid non necro empire benefitting
-										event_target:tec_dao = {
-											has_valid_civic = civic_tec_machine_reanimation
-										}
-									}
-									random_list = {
-										30 = {	# re-reanimated robot
-											if = {
-												limit = {
-													event_target:tec_da = {
-														army_type = robotic_army
-													}
-												}
-												create_army = {
-													name = random
-													owner = event_target:tec_dao
-													type = robotic_army
-													species = event_target:tec_da.species
-												}
-											}
-
-											else_if = {
-												limit = {
-													event_target:tec_da = {
-														army_type = machine_assault_1
-													}
-												}
-												create_army = {
-													name = random
-													owner = event_target:tec_dao
-													type = machine_assault_1
-													species = event_target:tec_da.species
-												}
-											}
-
-											else_if = {
-												limit = {
-													event_target:tec_da = {
-														army_type = machine_assault_2
-													}
-												}
-												create_army = {
-													name = random
-													owner = event_target:tec_dao
-													type = machine_assault_2
-													species = event_target:tec_da.species
-												}
-											}
-
-											else_if = {
-												limit = {
-													event_target:tec_da = {
-														army_type = robotic_defense_army
-													}
-												}
-												create_army = {
-													name = random
-													owner = event_target:tec_dao
-													type = robotic_defense_army
-													species = event_target:tec_da.species
-												}
-											}
-
-											else_if = {
-												limit = {
-													event_target:tec_da = {
-														army_type = machine_defense
-													}
-												}
-												create_army = {
-													name = random
-													owner = event_target:tec_dao
-													type = machine_defense
-													species = event_target:tec_da.species
-												}
-											}
-
-											else = {
-												create_army = {
-													name = random
-													owner = event_target:tec_dao
-													type = machine_assault_1
-													species = event_target:tec_da.species
-												}
-											}
-											# Megawarforms excluded, for balance sake
-										}
-										70 = {	# zombot
-											create_army = {
-												name = random
-												owner = event_target:tec_dao
-												type = tec_shambling_robot
-												species = event_target:tec_da.species
-											}
-
-											last_created_army = {
-												set_army_flag = tec_delete_this_army
-											}
-										}
-									}
-
-									change_variable = {# adds variable for later winner messages
-										which = tec_reanimated_armies_def
-										value = 1
-									}
-								}
-							}
-							break = yes
-						}
-						40 = {
-							event_target:tec_bp = {	# for the oponent
-								if = {	# Extracheck to avoid non necro empire benefitting
-									limit = {
-										event_target:tec_dak = {
-											has_valid_civic = civic_tec_machine_reanimation
-										}
-										NOR = {
-											event_target:tec_da = {
-												army_type = tec_shambling_robot
-											}
-										}
-									}
-									# For the oponent
-									random_list = {
-										30 = {	# re-reanimated robot
-											if = {
-												limit = {
-													event_target:tec_da = {
-														army_type = robotic_army
-													}
-												}
-												create_army = {
-													name = random
-													owner = event_target:tec_dak
-													type = robotic_army
-													species = event_target:tec_da.species
-												}
-											}
-
-											else_if = {
-												limit = {
-													event_target:tec_da = {
-														army_type = machine_assault_1
-													}
-												}
-												create_army = {
-													name = random
-													owner = event_target:tec_dak
-													type = machine_assault_1
-													species = event_target:tec_da.species
-												}
-											}
-
-											else_if = {
-												limit = {
-													event_target:tec_da = {
-														army_type = machine_assault_2
-													}
-												}
-												create_army = {
-													name = random
-													owner = event_target:tec_dak
-													type = machine_assault_2
-													species = event_target:tec_da.species
-												}
-											}
-
-											else_if = {
-												limit = {
-													event_target:tec_da = {
-														army_type = robotic_defense_army
-													}
-												}
-												create_army = {
-													name = random
-													owner = event_target:tec_dak
-													type = robotic_defense_army
-													species = event_target:tec_da.species
-												}
-											}
-
-											else_if = {
-												limit = {
-													event_target:tec_da = {
-														army_type = machine_defense
-													}
-												}
-												create_army = {
-													name = random
-													owner = event_target:tec_dak
-													type = machine_defense
-													species = event_target:tec_da.species
-												}
-											}
-
-											else = {
-												create_army = {
-													name = random
-													owner = event_target:tec_dak
-													type = machine_assault_1
-													species = event_target:tec_da.species
-												}
-											}
-											# Megawarforms excluded, for balance sake
-										}
-										70 = {	# zombot
-											create_army = {
-												name = random
-												owner = event_target:tec_dak
-												type = tec_shambling_robot
-												species = event_target:tec_da.species
-											}
-
-											last_created_army = {
-												set_army_flag = tec_delete_this_army
-											}
-										}
-									}
-													
-									change_variable = { # adds variable for later winner messages
-										which = tec_reanimated_armies_att
-										value = 1
-									}
-								}
-							}
-							break = yes
-						}
-					}
-					break = yes
-				}
-				else_if = {	# Only def is necro
-					limit = {
-						event_target:tec_dak = {
-							NOT = {
-								has_valid_civic = civic_tec_machine_reanimation
-							}
-						}
-						event_target:tec_dao = {
-							has_valid_civic = civic_tec_machine_reanimation
-						}
-					}
-					
-					
-					event_target:tec_bp = {
-						if = {
-							limit = { # Extracheck to avoid non necro empire benefitting
-								event_target:tec_dao = {
-									has_valid_civic = civic_tec_machine_reanimation
-								}
-																
-							}
-							random_list = {
-								30 = {	# re-reanimated robot
-									if = {
-										limit = {
-											event_target:tec_da = {
-												army_type = robotic_army
-											}
-										}
-										create_army = {
-											name = random
-											owner = event_target:tec_dao
-											type = robotic_army
-											species = event_target:tec_da.species
-										}
-									}
-
-									else_if = {
-										limit = {
-											event_target:tec_da = {
-												army_type = machine_assault_1
-											}
-										}
-										create_army = {
-											name = random
-											owner = event_target:tec_dao
-											type = machine_assault_1
-											species = event_target:tec_da.species
-										}
-									}
-
-									else_if = {
-										limit = {
-											event_target:tec_da = {
-												army_type = machine_assault_2
-											}
-										}
-										create_army = {
-											name = random
-											owner = event_target:tec_dao
-											type = machine_assault_2
-											species = event_target:tec_da.species
-										}
-									}
-
-									else_if = {
-										limit = {
-											event_target:tec_da = {
-												army_type = robotic_defense_army
-											}
-										}
-										create_army = {
-											name = random
-											owner = event_target:tec_dao
-											type = robotic_defense_army
-											species = event_target:tec_da.species
-										}
-									}
-
-									else_if = {
-										limit = {
-											event_target:tec_da = {
-												army_type = machine_defense
-											}
-										}
-										create_army = {
-											name = random
-											owner = event_target:tec_dao
-											type = machine_defense
-											species = event_target:tec_da.species
-										}
-									}
-
-									else = {
-										create_army = {
-											name = random
-											owner = event_target:tec_dao
-											type = machine_assault_1
-											species = event_target:tec_da.species
-										}
-									}
-									# Megawarforms excluded, for balance sake
-								}
-								70 = {	# zombot
-									create_army = {
-										name = random
-										owner = event_target:tec_dao
-										type = tec_shambling_robot
-										species = event_target:tec_da.species
-									}
-
-									last_created_army = {
-										set_army_flag = tec_delete_this_army
-									}
-								}
-							}
-
-							change_variable = {# adds variable for later winner messages
-								which = tec_reanimated_armies_def
-								value = 1
-							}
-						}
-					}
-					break = yes
-				}
-				else_if = {	# Only opponent is necro
-					limit = {
-						event_target:tec_dak = {
-							has_valid_civic = civic_tec_machine_reanimation
-						}
-						event_target:tec_dao = {
-							NOT = {
-								has_valid_civic = civic_tec_machine_reanimation
-							}
-						}
-					}
-					
-					event_target:tec_bp = {
-						if = {
-							limit = { 	# Extracheck to avoid non necro empire benefitting
-								event_target:tec_dak = {
-									has_valid_civic = civic_tec_machine_reanimation
-								}
-
-							}
-							# for the opponent
-							random_list = {
-								30 = {	# re-reanimated robot
-									if = {
-										limit = {
-											event_target:tec_da = {
-												army_type = robotic_army
-											}
-										}
-										create_army = {
-											name = random
-											owner = event_target:tec_dak
-											type = robotic_army
-											species = event_target:tec_da.species
-										}
-									}
-
-									else_if = {
-										limit = {
-											event_target:tec_da = {
-												army_type = machine_assault_1
-											}
-										}
-										create_army = {
-											name = random
-											owner = event_target:tec_dak
-											type = machine_assault_1
-											species = event_target:tec_da.species
-										}
-									}
-
-									else_if = {
-										limit = {
-											event_target:tec_da = {
-												army_type = machine_assault_2
-											}
-										}
-										create_army = {
-											name = random
-											owner = event_target:tec_dak
-											type = machine_assault_2
-											species = event_target:tec_da.species
-										}
-									}
-
-									else_if = {
-										limit = {
-											event_target:tec_da = {
-												army_type = robotic_defense_army
-											}
-										}
-										create_army = {
-											name = random
-											owner = event_target:tec_dak
-											type = robotic_defense_army
-											species = event_target:tec_da.species
-										}
-									}
-
-									else_if = {
-										limit = {
-											event_target:tec_da = {
-												army_type = machine_defense
-											}
-										}
-										create_army = {
-											name = random
-											owner = event_target:tec_dak
-											type = machine_defense
-											species = event_target:tec_da.species
-										}
-									}
-
-									else = {
-										create_army = {
-											name = random
-											owner = event_target:tec_dak
-											type = machine_assault_1
-											species = event_target:tec_da.species
-										}
-									}
-									# Megawarforms excluded, for balance sake
-								}
-								70 = {	# zombot
-									create_army = {
-										name = random
-										owner = event_target:tec_dak
-										type = tec_shambling_robot
-										species = event_target:tec_da.species
-									}
-
-									last_created_army = {
-										set_army_flag = tec_delete_this_army
-									}
-								}
-							}
-
-							change_variable = { # adds variable for later winner messages
-								which = tec_reanimated_armies_att
-								value = 1
-							}
-						}
-					}
-					break = yes
-				}
-				else = {
-					break = yes
-				}
-
-			}
-		}
-	}
-}
-
-# -------------------------------------------------------
-# Dread hives event
-country_event = {
-	id = tec_reanimator.210
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		From = {	# Killed army
-			exists = species
-			species = { # only organics can be snatched
+			FROMFROM = {
 				is_organic_species = yes
+				OR = {
+					has_purge_type = {
+						type = purge_normal
+					}
+					has_purge_type = {
+						type = purge_labor_camps
+					}
+					has_purge_type = {
+						type = purge_neutering
+					}
+				}
 			}
-			
-		}
-		OR = {
-			FromFrom = {	# Attacker
-				is_hive_empire = yes
-				has_valid_civic = civic_tec_hive_necrophage
-				NOT = { is_country_type = "gate_builders" }
-			}
-			This = {	# Army owner
-				is_hive_empire = yes
-				has_valid_civic = civic_tec_hive_necrophage
-				NOT = { is_country_type = "gate_builders" }
-			}
+			is_controlled_by = FROM
+			has_building = building_dread_encampment
 		}
 
-		FromFromFrom = { # tec_battle_planet
-			NOT = {
-				has_planet_flag = tec_recent_reanimation
-			}
-			OR = {
-				count_ground_combat_defender = {
-					limit = {
-						army_type = tec_pherodrone
-					}
-					count >= 1
-						
-				}
-				count_ground_combat_defender = {
-					limit = {
-						army_type = tec_pherodrone_def
-					}
-					count >= 1
-						
-				}
-				count_ground_combat_attacker = {
-					limit = {
-						army_type = tec_pherodrone
-					}
-					count >= 1
-						
-				}
-				count_ground_combat_attacker = {
-					limit = {
-						army_type = tec_pherodrone_def
-					}
-					count >= 1
-						
+		immediate = {
+			ROOT = {
+				create_army = {
+					name = random
+					owner = root.owner
+					type = undead_army 
+					species = fromfrom.species
 				}
 			}
+		}
+	}
+
+	# -------------------------------------------------------
+	# Dread machines leader event
+	country_event = {
+		id = tec_reanimator.101
+		is_triggered_only = yes
+		hide_window = yes
+
+		trigger = {
+			from = {
+				owner = {
+					is_same_value = root
+				}
+				has_level >= 2
+				is_idle = no
+			}
+			has_valid_civic = civic_tec_machine_reanimation
+		}
+
+		immediate = {
+			random = {
+				chance = 50
+				clone_leader = {
+					target = from
+					effect = {
+						save_event_target_as = tec_recently_reanimated_leader
+						set_owner = event_target:global_event_country	
+						# moves the leader to gec
+					}
+				}
+				last_created_leader = {
+					set_leader_flag = tec_reanimated_leader_@root
+				}
+				root = {
+					country_event = {
+						id = tec_reanimator.102
+						days = @tec_reanim_delay_1
+					}
+				}
+			}
+		}
+	}
+
+	# Announces and gives back the leader
+	country_event = {
+		id = tec_reanimator.102
+		is_triggered_only = yes
+
+		trigger = {
+			has_valid_civic = civic_tec_machine_reanimation
+		}
+
+		immediate = {
+			event_target:global_event_country = {
+				random_owned_leader = {
+					limit = {
+						has_leader_flag = tec_reanimated_leader_@root
+					}
+					save_event_target_as = tec_reanimated_leader
+					set_owner = root
+					
+					remove_leader_flag = tec_reanimated_leader_@root
+					save_event_target_as = thrl
+				}
+			}
+			#event_target:tec_reanimated_leader = {
+			#	remove_leader_flag = tec_reanimated_leader_@root
+			#	save_event_target_as = thrl
+			#}
+		}
+
+		picture = GFX_evt_sapient_AI
+		title = tec_reanimator.102
+		desc = tec_reanimator.102.desc
+
+		option = {
+			name = EXCELLENT
 		}
 
 	}
 
-	immediate = {
-		# Sorting event targets for clarity...
-		FromFromFrom = { # tec_battle_planet
-			save_event_target_as = tec_bp
-		}
-		FromFrom = {	# tec_deceased_army_killer
-			save_event_target_as = tec_dak
-		}
-		From = {		#tec_deceased_army
-			save_event_target_as = tec_da
-		}
-		This = {		#tec_deceased_army_owner
-			save_event_target_as = tec_dao
-		}
+	#on_army_killed_in_combat
+	# This = owner
+	# From = army
+	# FromFrom = opponent
+	# FromFromFrom = planet
+	country_event = {
+		id = tec_reanimator.110
+		hide_window = yes
+		is_triggered_only = yes
 
-		event_target:tec_bp = {
-			set_timed_planet_flag = {
-				flag = tec_recent_reanimation
-				days = 12
-			}
-		}
-
-		random_list = {
-			2 = {
-			}
-			1 = {
-				if = {	# Both are necromancers
-					limit = {
-						event_target:tec_dak = {
-							has_valid_civic = civic_tec_hive_necrophage
-						}
-						event_target:tec_dao = {
-							has_valid_civic = civic_tec_hive_necrophage
-						}
-
+		trigger = {
+			From = {	# Killed army
+				species = { # only robots can be raised
+					OR = {
+						is_robotic_species = yes
+						is_archetype = REPLICANT
 					}
-					random_list = {
-						60 = {
-							event_target:tec_bp = { #for the defender	
-								if = {
-									limit = { # Extracheck to avoid non necro empire benefitting
-										event_target:tec_dao = {
-											has_valid_civic = civic_tec_hive_necrophage
+				}
+				NOR = { # Cant reanimate the reanimated
+					army_type = tec_shambling_robot
+				}
+				
+			}
+			OR = {
+				FromFrom = {	# Attacker
+					is_machine_empire = yes
+					has_valid_civic = civic_tec_machine_reanimation
+					NOT = { is_country_type = "gate_builders" }
+				}
+				This = {	# Army owner
+					is_machine_empire = yes
+					has_valid_civic = civic_tec_machine_reanimation
+					NOT = { is_country_type = "gate_builders" }
+				}
+			}
+
+			FromFromFrom = { # tec_battle_planet
+				NOT = {
+					has_planet_flag = tec_recent_reanimation
+				}
+				OR = {
+					count_ground_combat_defender = {
+						limit = {
+							army_type = tec_reanimator
+						}
+						count >= 1
+					}
+					count_ground_combat_attacker = {
+						limit = {
+							army_type = tec_reanimator
+						}
+						count >= 1
+					}
+				}
+			}
+
+		}
+
+		immediate = {
+			# Sorting event targets for clarity...
+			FromFromFrom = { # tec_battle_planet
+				save_event_target_as = tec_bp
+			}
+			FromFrom = {	# tec_deceased_army_killer
+				save_event_target_as = tec_dak
+			}
+			From = {		#tec_deceased_army
+				save_event_target_as = tec_da
+			}
+			This = {		#tec_deceased_army_owner
+				save_event_target_as = tec_dao
+			}
+
+			event_target:tec_bp = {
+				set_timed_planet_flag = {
+					flag = tec_recent_reanimation
+					days = 1
+				}
+			}
+
+			random_list = {
+				2 = {
+					}
+				1 = {
+					if = {	# Both are necromancers
+						limit = {
+							event_target:tec_dak = {
+								has_valid_civic = civic_tec_machine_reanimation
+							}
+							event_target:tec_dao = {
+								has_valid_civic = civic_tec_machine_reanimation
+							}
+
+						}
+						random_list = {
+							60 = {
+								event_target:tec_bp = { #for the defender	
+									if = {
+										limit = { # Extracheck to avoid non necro empire benefitting
+											event_target:tec_dao = {
+												has_valid_civic = civic_tec_machine_reanimation
+											}
+										}
+										random_list = {
+											30 = {	# re-reanimated robot
+												if = {
+													limit = {
+														event_target:tec_da = {
+															army_type = robotic_army
+														}
+													}
+													create_army = {
+														name = random
+														owner = event_target:tec_dao
+														type = robotic_army
+														species = event_target:tec_da.species
+													}
+												}
+
+												else_if = {
+													limit = {
+														event_target:tec_da = {
+															army_type = machine_assault_1
+														}
+													}
+													create_army = {
+														name = random
+														owner = event_target:tec_dao
+														type = machine_assault_1
+														species = event_target:tec_da.species
+													}
+												}
+
+												else_if = {
+													limit = {
+														event_target:tec_da = {
+															army_type = machine_assault_2
+														}
+													}
+													create_army = {
+														name = random
+														owner = event_target:tec_dao
+														type = machine_assault_2
+														species = event_target:tec_da.species
+													}
+												}
+
+												else_if = {
+													limit = {
+														event_target:tec_da = {
+															army_type = robotic_defense_army
+														}
+													}
+													create_army = {
+														name = random
+														owner = event_target:tec_dao
+														type = robotic_defense_army
+														species = event_target:tec_da.species
+													}
+												}
+
+												else_if = {
+													limit = {
+														event_target:tec_da = {
+															army_type = machine_defense
+														}
+													}
+													create_army = {
+														name = random
+														owner = event_target:tec_dao
+														type = machine_defense
+														species = event_target:tec_da.species
+													}
+												}
+
+												else = {
+													create_army = {
+														name = random
+														owner = event_target:tec_dao
+														type = machine_assault_1
+														species = event_target:tec_da.species
+													}
+												}
+												# Megawarforms excluded, for balance sake
+											}
+											70 = {	# zombot
+												create_army = {
+													name = random
+													owner = event_target:tec_dao
+													type = tec_shambling_robot
+													species = event_target:tec_da.species
+												}
+
+												last_created_army = {
+													set_army_flag = tec_delete_this_army
+												}
+											}
+										}
+
+										change_variable = {# adds variable for later winner messages
+											which = tec_reanimated_armies_def
+											value = 1
 										}
 									}
-									random_list = {
-										20 = {	# re-reanimated robot
-											if = {
-												limit = {
-													event_target:tec_da = {
-														army_type = assault_army
-													}
-												}
-												create_army = {
-													name = random
-													owner = event_target:tec_dao
-													type = assault_army
-													species = event_target:tec_da.species
+								}
+								break = yes
+							}
+							40 = {
+								event_target:tec_bp = {	# for the oponent
+									if = {	# Extracheck to avoid non necro empire benefitting
+										limit = {
+											event_target:tec_dak = {
+												has_valid_civic = civic_tec_machine_reanimation
+											}
+											NOR = {
+												event_target:tec_da = {
+													army_type = tec_shambling_robot
 												}
 											}
-
-											else_if = {
-												limit = {
-													event_target:tec_da = {
-														army_type = gene_warrior_army
+										}
+										# For the oponent
+										random_list = {
+											30 = {	# re-reanimated robot
+												if = {
+													limit = {
+														event_target:tec_da = {
+															army_type = robotic_army
+														}
+													}
+													create_army = {
+														name = random
+														owner = event_target:tec_dak
+														type = robotic_army
+														species = event_target:tec_da.species
 													}
 												}
-												create_army = {
-													name = random
-													owner = event_target:tec_dao
-													type = gene_warrior_army
-													species = event_target:tec_da.species
-												}
-											}
 
-											else_if = {
-												limit = {
-													event_target:tec_da = {
-														army_type = clone_army
+												else_if = {
+													limit = {
+														event_target:tec_da = {
+															army_type = machine_assault_1
+														}
+													}
+													create_army = {
+														name = random
+														owner = event_target:tec_dak
+														type = machine_assault_1
+														species = event_target:tec_da.species
 													}
 												}
-												create_army = {
-													name = random
-													owner = event_target:tec_dao
-													type = clone_army
-													species = event_target:tec_da.species
-												}
-											}
 
-											else_if = {
-												limit = {
-													event_target:tec_da = {
-														army_type = titanic_azizian_assault_army
+												else_if = {
+													limit = {
+														event_target:tec_da = {
+															army_type = machine_assault_2
+														}
+													}
+													create_army = {
+														name = random
+														owner = event_target:tec_dak
+														type = machine_assault_2
+														species = event_target:tec_da.species
 													}
 												}
-												create_army = {
-													name = random
-													owner = event_target:tec_dao
-													type = titanic_azizian_assault_army
-													species = event_target:tec_da.species
-												}
-											}
 
-											else_if = {
-												limit = {
-													event_target:tec_da = {
-														army_type = titanic_assault_army
+												else_if = {
+													limit = {
+														event_target:tec_da = {
+															army_type = robotic_defense_army
+														}
+													}
+													create_army = {
+														name = random
+														owner = event_target:tec_dak
+														type = robotic_defense_army
+														species = event_target:tec_da.species
 													}
 												}
+
+												else_if = {
+													limit = {
+														event_target:tec_da = {
+															army_type = machine_defense
+														}
+													}
+													create_army = {
+														name = random
+														owner = event_target:tec_dak
+														type = machine_defense
+														species = event_target:tec_da.species
+													}
+												}
+
+												else = {
+													create_army = {
+														name = random
+														owner = event_target:tec_dak
+														type = machine_assault_1
+														species = event_target:tec_da.species
+													}
+												}
+												# Megawarforms excluded, for balance sake
+											}
+											70 = {	# zombot
 												create_army = {
 													name = random
-													owner = event_target:tec_dao
-													type = titanic_assault_army
+													owner = event_target:tec_dak
+													type = tec_shambling_robot
 													species = event_target:tec_da.species
 												}
-											}
 
-											else = {
+												last_created_army = {
+													set_army_flag = tec_delete_this_army
+												}
+											}
+										}
+														
+										change_variable = { # adds variable for later winner messages
+											which = tec_reanimated_armies_att
+											value = 1
+										}
+									}
+								}
+								break = yes
+							}
+						}
+						break = yes
+					}
+					else_if = {	# Only def is necro
+						limit = {
+							event_target:tec_dak = {
+								NOT = {
+									has_valid_civic = civic_tec_machine_reanimation
+								}
+							}
+							event_target:tec_dao = {
+								has_valid_civic = civic_tec_machine_reanimation
+							}
+						}
+						
+						
+						event_target:tec_bp = {
+							if = {
+								limit = { # Extracheck to avoid non necro empire benefitting
+									event_target:tec_dao = {
+										has_valid_civic = civic_tec_machine_reanimation
+									}
+																	
+								}
+								random_list = {
+									30 = {	# re-reanimated robot
+										if = {
+											limit = {
+												event_target:tec_da = {
+													army_type = robotic_army
+												}
+											}
+											create_army = {
+												name = random
+												owner = event_target:tec_dao
+												type = robotic_army
+												species = event_target:tec_da.species
+											}
+										}
+
+										else_if = {
+											limit = {
+												event_target:tec_da = {
+													army_type = machine_assault_1
+												}
+											}
+											create_army = {
+												name = random
+												owner = event_target:tec_dao
+												type = machine_assault_1
+												species = event_target:tec_da.species
+											}
+										}
+
+										else_if = {
+											limit = {
+												event_target:tec_da = {
+													army_type = machine_assault_2
+												}
+											}
+											create_army = {
+												name = random
+												owner = event_target:tec_dao
+												type = machine_assault_2
+												species = event_target:tec_da.species
+											}
+										}
+
+										else_if = {
+											limit = {
+												event_target:tec_da = {
+													army_type = robotic_defense_army
+												}
+											}
+											create_army = {
+												name = random
+												owner = event_target:tec_dao
+												type = robotic_defense_army
+												species = event_target:tec_da.species
+											}
+										}
+
+										else_if = {
+											limit = {
+												event_target:tec_da = {
+													army_type = machine_defense
+												}
+											}
+											create_army = {
+												name = random
+												owner = event_target:tec_dao
+												type = machine_defense
+												species = event_target:tec_da.species
+											}
+										}
+
+										else = {
+											create_army = {
+												name = random
+												owner = event_target:tec_dao
+												type = machine_assault_1
+												species = event_target:tec_da.species
+											}
+										}
+										# Megawarforms excluded, for balance sake
+									}
+									70 = {	# zombot
+										create_army = {
+											name = random
+											owner = event_target:tec_dao
+											type = tec_shambling_robot
+											species = event_target:tec_da.species
+										}
+
+										last_created_army = {
+											set_army_flag = tec_delete_this_army
+										}
+									}
+								}
+
+								change_variable = {# adds variable for later winner messages
+									which = tec_reanimated_armies_def
+									value = 1
+								}
+							}
+						}
+						break = yes
+					}
+					else_if = {	# Only opponent is necro
+						limit = {
+							event_target:tec_dak = {
+								has_valid_civic = civic_tec_machine_reanimation
+							}
+							event_target:tec_dao = {
+								NOT = {
+									has_valid_civic = civic_tec_machine_reanimation
+								}
+							}
+						}
+						
+						event_target:tec_bp = {
+							if = {
+								limit = { 	# Extracheck to avoid non necro empire benefitting
+									event_target:tec_dak = {
+										has_valid_civic = civic_tec_machine_reanimation
+									}
+
+								}
+								# for the opponent
+								random_list = {
+									30 = {	# re-reanimated robot
+										if = {
+											limit = {
+												event_target:tec_da = {
+													army_type = robotic_army
+												}
+											}
+											create_army = {
+												name = random
+												owner = event_target:tec_dak
+												type = robotic_army
+												species = event_target:tec_da.species
+											}
+										}
+
+										else_if = {
+											limit = {
+												event_target:tec_da = {
+													army_type = machine_assault_1
+												}
+											}
+											create_army = {
+												name = random
+												owner = event_target:tec_dak
+												type = machine_assault_1
+												species = event_target:tec_da.species
+											}
+										}
+
+										else_if = {
+											limit = {
+												event_target:tec_da = {
+													army_type = machine_assault_2
+												}
+											}
+											create_army = {
+												name = random
+												owner = event_target:tec_dak
+												type = machine_assault_2
+												species = event_target:tec_da.species
+											}
+										}
+
+										else_if = {
+											limit = {
+												event_target:tec_da = {
+													army_type = robotic_defense_army
+												}
+											}
+											create_army = {
+												name = random
+												owner = event_target:tec_dak
+												type = robotic_defense_army
+												species = event_target:tec_da.species
+											}
+										}
+
+										else_if = {
+											limit = {
+												event_target:tec_da = {
+													army_type = machine_defense
+												}
+											}
+											create_army = {
+												name = random
+												owner = event_target:tec_dak
+												type = machine_defense
+												species = event_target:tec_da.species
+											}
+										}
+
+										else = {
+											create_army = {
+												name = random
+												owner = event_target:tec_dak
+												type = machine_assault_1
+												species = event_target:tec_da.species
+											}
+										}
+										# Megawarforms excluded, for balance sake
+									}
+									70 = {	# zombot
+										create_army = {
+											name = random
+											owner = event_target:tec_dak
+											type = tec_shambling_robot
+											species = event_target:tec_da.species
+										}
+
+										last_created_army = {
+											set_army_flag = tec_delete_this_army
+										}
+									}
+								}
+
+								change_variable = { # adds variable for later winner messages
+									which = tec_reanimated_armies_att
+									value = 1
+								}
+							}
+						}
+						break = yes
+					}
+					else = {
+						break = yes
+					}
+
+				}
+			}
+		}
+	}
+
+	# -------------------------------------------------------
+	# Dread hives event
+	country_event = {
+		id = tec_reanimator.210
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			From = {	# Killed army
+				exists = species
+				species = { # only organics can be snatched
+					is_organic_species = yes
+				}
+				
+			}
+			OR = {
+				FromFrom = {	# Attacker
+					is_hive_empire = yes
+					has_valid_civic = civic_tec_hive_necrophage
+					NOT = { is_country_type = "gate_builders" }
+				}
+				This = {	# Army owner
+					is_hive_empire = yes
+					has_valid_civic = civic_tec_hive_necrophage
+					NOT = { is_country_type = "gate_builders" }
+				}
+			}
+
+			FromFromFrom = { # tec_battle_planet
+				NOT = {
+					has_planet_flag = tec_recent_reanimation
+				}
+				OR = {
+					count_ground_combat_defender = {
+						limit = {
+							army_type = tec_pherodrone
+						}
+						count >= 1
+							
+					}
+					count_ground_combat_defender = {
+						limit = {
+							army_type = tec_pherodrone_def
+						}
+						count >= 1
+							
+					}
+					count_ground_combat_attacker = {
+						limit = {
+							army_type = tec_pherodrone
+						}
+						count >= 1
+							
+					}
+					count_ground_combat_attacker = {
+						limit = {
+							army_type = tec_pherodrone_def
+						}
+						count >= 1
+							
+					}
+				}
+			}
+
+		}
+
+		immediate = {
+			# Sorting event targets for clarity...
+			FromFromFrom = { # tec_battle_planet
+				save_event_target_as = tec_bp
+			}
+			FromFrom = {	# tec_deceased_army_killer
+				save_event_target_as = tec_dak
+			}
+			From = {		#tec_deceased_army
+				save_event_target_as = tec_da
+			}
+			This = {		#tec_deceased_army_owner
+				save_event_target_as = tec_dao
+			}
+
+			event_target:tec_bp = {
+				set_timed_planet_flag = {
+					flag = tec_recent_reanimation
+					days = 12
+				}
+			}
+
+			random_list = {
+				2 = {
+				}
+				1 = {
+					if = {	# Both are necromancers
+						limit = {
+							event_target:tec_dak = {
+								has_valid_civic = civic_tec_hive_necrophage
+							}
+							event_target:tec_dao = {
+								has_valid_civic = civic_tec_hive_necrophage
+							}
+
+						}
+						random_list = {
+							60 = {
+								event_target:tec_bp = { #for the defender	
+									if = {
+										limit = { # Extracheck to avoid non necro empire benefitting
+											event_target:tec_dao = {
+												has_valid_civic = civic_tec_hive_necrophage
+											}
+										}
+										random_list = {
+											20 = {	# re-reanimated robot
+												if = {
+													limit = {
+														event_target:tec_da = {
+															army_type = assault_army
+														}
+													}
+													create_army = {
+														name = random
+														owner = event_target:tec_dao
+														type = assault_army
+														species = event_target:tec_da.species
+													}
+												}
+
+												else_if = {
+													limit = {
+														event_target:tec_da = {
+															army_type = gene_warrior_army
+														}
+													}
+													create_army = {
+														name = random
+														owner = event_target:tec_dao
+														type = gene_warrior_army
+														species = event_target:tec_da.species
+													}
+												}
+
+												else_if = {
+													limit = {
+														event_target:tec_da = {
+															army_type = clone_army
+														}
+													}
+													create_army = {
+														name = random
+														owner = event_target:tec_dao
+														type = clone_army
+														species = event_target:tec_da.species
+													}
+												}
+
+												else_if = {
+													limit = {
+														event_target:tec_da = {
+															army_type = titanic_azizian_assault_army
+														}
+													}
+													create_army = {
+														name = random
+														owner = event_target:tec_dao
+														type = titanic_azizian_assault_army
+														species = event_target:tec_da.species
+													}
+												}
+
+												else_if = {
+													limit = {
+														event_target:tec_da = {
+															army_type = titanic_assault_army
+														}
+													}
+													create_army = {
+														name = random
+														owner = event_target:tec_dao
+														type = titanic_assault_army
+														species = event_target:tec_da.species
+													}
+												}
+
+												else = {
+													create_army = {
+														name = random
+														owner = event_target:tec_dao
+														type = tec_husk
+														species = event_target:tec_da.species
+													}
+												}
+												# Megawarforms excluded, for balance sake
+											}
+											80 = {	# zombies
 												create_army = {
 													name = random
 													owner = event_target:tec_dao
 													type = tec_husk
 													species = event_target:tec_da.species
 												}
+
+												last_created_army = {
+													set_army_flag = tec_delete_this_army
+												}
 											}
-											# Megawarforms excluded, for balance sake
 										}
-										80 = {	# zombies
+
+										change_variable = {# adds variable for later winner messages
+											which = tec_reanimated_armies_def
+											value = 1
+										}
+									}
+								}
+								break = yes
+							}
+							40 = {
+								event_target:tec_bp = {	# for the oponent
+									if = {	# Extracheck to avoid non necro empire benefitting
+										limit = {
+											event_target:tec_dak = {
+												has_valid_civic = civic_tec_hive_necrophage
+											}
+											NOR = {
+												event_target:tec_da = {
+													army_type = tec_shambling_robot
+												}
+											}
+										}
+										# For the oponent
+										random_list = {
+											20 = {	# re-reanimated robot
+												if = {
+													limit = {
+														event_target:tec_da = {
+															army_type = assault_army
+														}
+													}
+													create_army = {
+														name = random
+														owner = event_target:tec_dak
+														type = assault_army
+														species = event_target:tec_da.species
+													}
+												}
+
+												else_if = {
+													limit = {
+														event_target:tec_da = {
+															army_type = gene_warrior_army
+														}
+													}
+													create_army = {
+														name = random
+														owner = event_target:tec_dak
+														type = gene_warrior_army
+														species = event_target:tec_da.species
+													}
+												}
+
+												else_if = {
+													limit = {
+														event_target:tec_da = {
+															army_type = clone_army
+														}
+													}
+													create_army = {
+														name = random
+														owner = event_target:tec_dak
+														type = clone_army
+														species = event_target:tec_da.species
+													}
+												}
+
+												else_if = {
+													limit = {
+														event_target:tec_da = {
+															army_type = titanic_azizian_assault_army
+														}
+													}
+													create_army = {
+														name = random
+														owner = event_target:tec_dak
+														type = titanic_azizian_assault_army
+														species = event_target:tec_da.species
+													}
+												}
+
+												else_if = {
+													limit = {
+														event_target:tec_da = {
+															army_type = titanic_assault_army
+														}
+													}
+													create_army = {
+														name = random
+														owner = event_target:tec_dak
+														type = titanic_assault_army
+														species = event_target:tec_da.species
+													}
+												}
+
+												else = {
+													create_army = {
+														name = random
+														owner = event_target:tec_dak
+														type = tec_husk
+														species = event_target:tec_da.species
+													}
+												}
+												# Megawarforms excluded, for balance sake
+											}
+											80 = {	# zombies
+												create_army = {
+													name = random
+													owner = event_target:tec_dak
+													type = tec_husk
+													species = event_target:tec_da.species
+												}
+
+												last_created_army = {
+													set_army_flag = tec_delete_this_army
+												}
+											}
+										}
+														
+										change_variable = { # adds variable for later winner messages
+											which = tec_reanimated_armies_att
+											value = 1
+										}
+									}
+								}
+								break = yes
+							}
+						}
+						break = yes
+					}
+					else_if = {	# Only def is necro
+						limit = {
+							event_target:tec_dak = {
+								NOT = {
+									has_valid_civic = civic_tec_hive_necrophage
+								}
+							}
+							event_target:tec_dao = {
+								has_valid_civic = civic_tec_hive_necrophage
+							}
+						}
+						
+						
+						event_target:tec_bp = {
+							if = {
+								limit = { # Extracheck to avoid non necro empire benefitting
+									event_target:tec_dao = {
+										has_valid_civic = civic_tec_hive_necrophage
+									}
+																	
+								}
+								random_list = {
+									20 = {	# re-reanimated robot
+										if = {
+											limit = {
+												event_target:tec_da = {
+													army_type = assault_army
+												}
+											}
+											create_army = {
+												name = random
+												owner = event_target:tec_dao
+												type = assault_army
+												species = event_target:tec_da.species
+											}
+										}
+
+										else_if = {
+											limit = {
+												event_target:tec_da = {
+													army_type = gene_warrior_army
+												}
+											}
+											create_army = {
+												name = random
+												owner = event_target:tec_dao
+												type = gene_warrior_army
+												species = event_target:tec_da.species
+											}
+										}
+
+										else_if = {
+											limit = {
+												event_target:tec_da = {
+													army_type = clone_army
+												}
+											}
+											create_army = {
+												name = random
+												owner = event_target:tec_dao
+												type = clone_army
+												species = event_target:tec_da.species
+											}
+										}
+
+										else_if = {
+											limit = {
+												event_target:tec_da = {
+													army_type = titanic_azizian_assault_army
+												}
+											}
+											create_army = {
+												name = random
+												owner = event_target:tec_dao
+												type = titanic_azizian_assault_army
+												species = event_target:tec_da.species
+											}
+										}
+
+										else_if = {
+											limit = {
+												event_target:tec_da = {
+													army_type = titanic_assault_army
+												}
+											}
+											create_army = {
+												name = random
+												owner = event_target:tec_dao
+												type = titanic_assault_army
+												species = event_target:tec_da.species
+											}
+										}
+
+										else = {
 											create_army = {
 												name = random
 												owner = event_target:tec_dao
 												type = tec_husk
 												species = event_target:tec_da.species
 											}
-
-											last_created_army = {
-												set_army_flag = tec_delete_this_army
-											}
 										}
+										# Megawarforms excluded, for balance sake
 									}
+									80 = {	# zombies
+										create_army = {
+											name = random
+											owner = event_target:tec_dao
+											type = tec_husk
+											species = event_target:tec_da.species
+										}
 
-									change_variable = {# adds variable for later winner messages
-										which = tec_reanimated_armies_def
-										value = 1
+										last_created_army = {
+											set_army_flag = tec_delete_this_army
+										}
 									}
 								}
+
+								change_variable = {# adds variable for later winner messages
+									which = tec_reanimated_armies_def
+									value = 1
+								}
 							}
-							break = yes
 						}
-						40 = {
-							event_target:tec_bp = {	# for the oponent
-								if = {	# Extracheck to avoid non necro empire benefitting
-									limit = {
-										event_target:tec_dak = {
-											has_valid_civic = civic_tec_hive_necrophage
-										}
-										NOR = {
-											event_target:tec_da = {
-												army_type = tec_shambling_robot
-											}
-										}
+						break = yes
+					}
+					else_if = {	# Only opponent is necro
+						limit = {
+							event_target:tec_dak = {
+								has_valid_civic = civic_tec_hive_necrophage
+							}
+							event_target:tec_dao = {
+								NOT = {
+									has_valid_civic = civic_tec_hive_necrophage
+								}
+							}
+						}
+						
+						event_target:tec_bp = {
+							if = {
+								limit = { 	# Extracheck to avoid non necro empire benefitting
+									event_target:tec_dak = {
+										has_valid_civic = civic_tec_hive_necrophage
 									}
-									# For the oponent
-									random_list = {
-										20 = {	# re-reanimated robot
-											if = {
-												limit = {
-													event_target:tec_da = {
-														army_type = assault_army
-													}
-												}
-												create_army = {
-													name = random
-													owner = event_target:tec_dak
-													type = assault_army
-													species = event_target:tec_da.species
-												}
-											}
 
-											else_if = {
-												limit = {
-													event_target:tec_da = {
-														army_type = gene_warrior_army
-													}
-												}
-												create_army = {
-													name = random
-													owner = event_target:tec_dak
-													type = gene_warrior_army
-													species = event_target:tec_da.species
+								}
+								# for the opponent
+								random_list = {
+									20 = {	# re-reanimated robot
+										if = {
+											limit = {
+												event_target:tec_da = {
+													army_type = assault_army
 												}
 											}
-
-											else_if = {
-												limit = {
-													event_target:tec_da = {
-														army_type = clone_army
-													}
-												}
-												create_army = {
-													name = random
-													owner = event_target:tec_dak
-													type = clone_army
-													species = event_target:tec_da.species
-												}
+											create_army = {
+												name = random
+												owner = event_target:tec_dak
+												type = assault_army
+												species = event_target:tec_da.species
 											}
-
-											else_if = {
-												limit = {
-													event_target:tec_da = {
-														army_type = titanic_azizian_assault_army
-													}
-												}
-												create_army = {
-													name = random
-													owner = event_target:tec_dak
-													type = titanic_azizian_assault_army
-													species = event_target:tec_da.species
-												}
-											}
-
-											else_if = {
-												limit = {
-													event_target:tec_da = {
-														army_type = titanic_assault_army
-													}
-												}
-												create_army = {
-													name = random
-													owner = event_target:tec_dak
-													type = titanic_assault_army
-													species = event_target:tec_da.species
-												}
-											}
-
-											else = {
-												create_army = {
-													name = random
-													owner = event_target:tec_dak
-													type = tec_husk
-													species = event_target:tec_da.species
-												}
-											}
-											# Megawarforms excluded, for balance sake
 										}
-										80 = {	# zombies
+
+										else_if = {
+											limit = {
+												event_target:tec_da = {
+													army_type = gene_warrior_army
+												}
+											}
+											create_army = {
+												name = random
+												owner = event_target:tec_dak
+												type = gene_warrior_army
+												species = event_target:tec_da.species
+											}
+										}
+
+										else_if = {
+											limit = {
+												event_target:tec_da = {
+													army_type = clone_army
+												}
+											}
+											create_army = {
+												name = random
+												owner = event_target:tec_dak
+												type = clone_army
+												species = event_target:tec_da.species
+											}
+										}
+
+										else_if = {
+											limit = {
+												event_target:tec_da = {
+													army_type = titanic_azizian_assault_army
+												}
+											}
+											create_army = {
+												name = random
+												owner = event_target:tec_dak
+												type = titanic_azizian_assault_army
+												species = event_target:tec_da.species
+											}
+										}
+
+										else_if = {
+											limit = {
+												event_target:tec_da = {
+													army_type = titanic_assault_army
+												}
+											}
+											create_army = {
+												name = random
+												owner = event_target:tec_dak
+												type = titanic_assault_army
+												species = event_target:tec_da.species
+											}
+										}
+
+										else = {
 											create_army = {
 												name = random
 												owner = event_target:tec_dak
 												type = tec_husk
 												species = event_target:tec_da.species
 											}
-
-											last_created_army = {
-												set_army_flag = tec_delete_this_army
-											}
 										}
+										# Megawarforms excluded, for balance sake
 									}
-													
-									change_variable = { # adds variable for later winner messages
-										which = tec_reanimated_armies_att
-										value = 1
-									}
-								}
-							}
-							break = yes
-						}
-					}
-					break = yes
-				}
-				else_if = {	# Only def is necro
-					limit = {
-						event_target:tec_dak = {
-							NOT = {
-								has_valid_civic = civic_tec_hive_necrophage
-							}
-						}
-						event_target:tec_dao = {
-							has_valid_civic = civic_tec_hive_necrophage
-						}
-					}
-					
-					
-					event_target:tec_bp = {
-						if = {
-							limit = { # Extracheck to avoid non necro empire benefitting
-								event_target:tec_dao = {
-									has_valid_civic = civic_tec_hive_necrophage
-								}
-																
-							}
-							random_list = {
-								20 = {	# re-reanimated robot
-									if = {
-										limit = {
-											event_target:tec_da = {
-												army_type = assault_army
-											}
-										}
-										create_army = {
-											name = random
-											owner = event_target:tec_dao
-											type = assault_army
-											species = event_target:tec_da.species
-										}
-									}
-
-									else_if = {
-										limit = {
-											event_target:tec_da = {
-												army_type = gene_warrior_army
-											}
-										}
-										create_army = {
-											name = random
-											owner = event_target:tec_dao
-											type = gene_warrior_army
-											species = event_target:tec_da.species
-										}
-									}
-
-									else_if = {
-										limit = {
-											event_target:tec_da = {
-												army_type = clone_army
-											}
-										}
-										create_army = {
-											name = random
-											owner = event_target:tec_dao
-											type = clone_army
-											species = event_target:tec_da.species
-										}
-									}
-
-									else_if = {
-										limit = {
-											event_target:tec_da = {
-												army_type = titanic_azizian_assault_army
-											}
-										}
-										create_army = {
-											name = random
-											owner = event_target:tec_dao
-											type = titanic_azizian_assault_army
-											species = event_target:tec_da.species
-										}
-									}
-
-									else_if = {
-										limit = {
-											event_target:tec_da = {
-												army_type = titanic_assault_army
-											}
-										}
-										create_army = {
-											name = random
-											owner = event_target:tec_dao
-											type = titanic_assault_army
-											species = event_target:tec_da.species
-										}
-									}
-
-									else = {
-										create_army = {
-											name = random
-											owner = event_target:tec_dao
-											type = tec_husk
-											species = event_target:tec_da.species
-										}
-									}
-									# Megawarforms excluded, for balance sake
-								}
-								80 = {	# zombies
-									create_army = {
-										name = random
-										owner = event_target:tec_dao
-										type = tec_husk
-										species = event_target:tec_da.species
-									}
-
-									last_created_army = {
-										set_army_flag = tec_delete_this_army
-									}
-								}
-							}
-
-							change_variable = {# adds variable for later winner messages
-								which = tec_reanimated_armies_def
-								value = 1
-							}
-						}
-					}
-					break = yes
-				}
-				else_if = {	# Only opponent is necro
-					limit = {
-						event_target:tec_dak = {
-							has_valid_civic = civic_tec_hive_necrophage
-						}
-						event_target:tec_dao = {
-							NOT = {
-								has_valid_civic = civic_tec_hive_necrophage
-							}
-						}
-					}
-					
-					event_target:tec_bp = {
-						if = {
-							limit = { 	# Extracheck to avoid non necro empire benefitting
-								event_target:tec_dak = {
-									has_valid_civic = civic_tec_hive_necrophage
-								}
-
-							}
-							# for the opponent
-							random_list = {
-								20 = {	# re-reanimated robot
-									if = {
-										limit = {
-											event_target:tec_da = {
-												army_type = assault_army
-											}
-										}
-										create_army = {
-											name = random
-											owner = event_target:tec_dak
-											type = assault_army
-											species = event_target:tec_da.species
-										}
-									}
-
-									else_if = {
-										limit = {
-											event_target:tec_da = {
-												army_type = gene_warrior_army
-											}
-										}
-										create_army = {
-											name = random
-											owner = event_target:tec_dak
-											type = gene_warrior_army
-											species = event_target:tec_da.species
-										}
-									}
-
-									else_if = {
-										limit = {
-											event_target:tec_da = {
-												army_type = clone_army
-											}
-										}
-										create_army = {
-											name = random
-											owner = event_target:tec_dak
-											type = clone_army
-											species = event_target:tec_da.species
-										}
-									}
-
-									else_if = {
-										limit = {
-											event_target:tec_da = {
-												army_type = titanic_azizian_assault_army
-											}
-										}
-										create_army = {
-											name = random
-											owner = event_target:tec_dak
-											type = titanic_azizian_assault_army
-											species = event_target:tec_da.species
-										}
-									}
-
-									else_if = {
-										limit = {
-											event_target:tec_da = {
-												army_type = titanic_assault_army
-											}
-										}
-										create_army = {
-											name = random
-											owner = event_target:tec_dak
-											type = titanic_assault_army
-											species = event_target:tec_da.species
-										}
-									}
-
-									else = {
+									80 = {	# zombies
 										create_army = {
 											name = random
 											owner = event_target:tec_dak
 											type = tec_husk
 											species = event_target:tec_da.species
 										}
-									}
-									# Megawarforms excluded, for balance sake
-								}
-								80 = {	# zombies
-									create_army = {
-										name = random
-										owner = event_target:tec_dak
-										type = tec_husk
-										species = event_target:tec_da.species
-									}
 
-									last_created_army = {
-										set_army_flag = tec_delete_this_army
+										last_created_army = {
+											set_army_flag = tec_delete_this_army
+										}
 									}
 								}
-							}
 
-							change_variable = { # adds variable for later winner messages
-								which = tec_reanimated_armies_att
-								value = 1
+								change_variable = { # adds variable for later winner messages
+									which = tec_reanimated_armies_att
+									value = 1
+								}
 							}
 						}
+						break = yes
 					}
-					break = yes
-				}
-				else = {
-					break = yes
+					else = {
+						break = yes
+					}
 				}
 			}
 		}
 	}
-}
+# /
 
 # Envoy Civics
 # ------------------------------------------------------------
 namespace = tec_envoy
 
-leader_event = {	# Envoy is assigned on_leader_assigned
-	id = tec_envoy.10
-	hide_window = yes
+	leader_event = {	# Envoy is assigned on_leader_assigned
+		id = tec_envoy.10
+		hide_window = yes
 
-	is_triggered_only = yes
+		is_triggered_only = yes
 
-	trigger = {
-		leader_class = envoy
-		OR = {
-			has_envoy_task = {
-				task = improve_relations
-			}
-			has_envoy_task = {
-				task = harm_relations
-			}
-			has_envoy_task = {
-				task = federation
-			}
-			has_envoy_task = {
-				task = galactic_community
+		trigger = {
+			leader_class = envoy
+			OR = {
+				has_envoy_task = {
+					task = improve_relations
+				}
+				has_envoy_task = {
+					task = harm_relations
+				}
+				has_envoy_task = {
+					task = federation
+				}
+				has_envoy_task = {
+					task = galactic_community
+				}
 			}
 		}
-	}
 
-	immediate = {
-		hidden_effect = {
-			if = {
-				limit = {
-					owner = {
-						is_regular_empire = yes
-						is_megacorp = no
-					}
-				}
-				break = yes
-			}
-			else_if = {
-				limit = {
-					owner = {
-						is_regular_empire = yes
-						is_megacorp = yes
-					}
-				}
-				break = yes
-			}
-			else_if = {
-				limit = {
-					owner = {
-						is_machine_empire = yes
-					}
-				}
+		immediate = {
+			hidden_effect = {
 				if = {
 					limit = {
 						owner = {
-							has_valid_civic = civic_environmentalist
+							is_regular_empire = yes
+							is_megacorp = no
 						}
 					}
 					break = yes
 				}
-			}
-			else_if = {
-				limit = {
-					owner = {
-						is_hive_empire = yes
+				else_if = {
+					limit = {
+						owner = {
+							is_regular_empire = yes
+							is_megacorp = yes
+						}
+					}
+					break = yes
+				}
+				else_if = {
+					limit = {
+						owner = {
+							is_machine_empire = yes
+						}
+					}
+					if = {
+						limit = {
+							owner = {
+								has_valid_civic = civic_environmentalist
+							}
+						}
+						break = yes
 					}
 				}
-				break = yes
-			}
-			else = {
-				break = yes
-			}
-		}
-	}
-}
-
-leader_event = {	# Envoy is unassigned
-	id = tec_envoy.15
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		leader_class = envoy
-		NOR = {
-			has_envoy_task = {
-				task = improve_relations
-			}
-			has_envoy_task = {
-				task = harm_relations
-			}
-			has_envoy_task = {
-				task = federation
-			}
-			has_envoy_task = {
-				task = galactic_community
+				else_if = {
+					limit = {
+						owner = {
+							is_hive_empire = yes
+						}
+					}
+					break = yes
+				}
+				else = {
+					break = yes
+				}
 			}
 		}
 	}
 
-	immediate = {
-		hidden_effect = {
-			
+	leader_event = {	# Envoy is unassigned
+		id = tec_envoy.15
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			leader_class = envoy
+			NOR = {
+				has_envoy_task = {
+					task = improve_relations
+				}
+				has_envoy_task = {
+					task = harm_relations
+				}
+				has_envoy_task = {
+					task = federation
+				}
+				has_envoy_task = {
+					task = galactic_community
+				}
+			}
+		}
+
+		immediate = {
+			hidden_effect = {
+				
+			}
 		}
 	}
-}
+
+# /
 
 # Imperial cult
 # ------------------------------------------------------------
@@ -1973,1530 +1976,996 @@ namespace = tec_imperial_cult
 # - Ruler uses minor artifacts to empower himself
 
 # path f - Chosen one (override)
-
+# /
 
 # Percussive Hiveminds
 # ------------------------------------------------------------
 namespace = tec_percuhive
 
-# # This = owner of fleet 1 (destroyed)
-# # From = owner of fleet 2 (combatant)
-# # FromFrom = fleet 1
-# # FromFromFrom = fleet 2
-# # on_fleet_destroyed_victim
-# country_event = {
-# 	id = tec_percuhive.10
-# 	is_triggered_only = yes
-# 	hide_window = yes
+	# Executed as a leader has died
+	# This = Country
+	# From = Leader
+	#on_leader_death = {
+	country_event = {
+		id = tec_percuhive.10
+		is_triggered_only = yes
+		hide_window = yes
 
-# 	trigger = {
-# 		# Somehow the ship scope is not working, i willtry to fix it
-# 		always = no
-# 		has_valid_civic = civic_tec_hive_percussive
-# 		NOT = {
-# 			has_country_flag = tec_percussive_cd
-# 		}
-# 		#fromfrom = {
-# 		#	exists = leader
-# 		#	leader = {
-# 		#		leader_class = admiral
-# 		#	}
-# 		#}
-# 	}
-
-# 	immediate = {
-# 		if = {
-# 			limit = {
-# 				exists = from.from.leader
-# 				from.from.leader = {
-# 					leader_class = admiral
-# 				}
-# 			}
-# 			# Adds country flag
-# 			set_timed_country_flag = {
-# 				flag = tec_percussive_cd
-# 				months = 6
-# 			}
-# 			# Export leader level to a var
-# 			from.from.leader = {
-# 				export_trigger_value_to_variable = {
-# 					trigger = has_skill
-# 					variable = root.tec_percussive_effect
-# 				}
-# 			}
-# 			# Apply effect
-# 			fromfrom.solar_system = {
-# 				every_fleet_in_system = {
-# 					add_modifier = {
-# 						modifier = modifier_tec_percussive_modifier
-# 						multiplier = root.tec_percussive_effect
-# 						months = 2
-# 					}
-# 				}
-# 			}
-# 		}
-# 		else = {
-# 			# Adds country flag
-# 			set_timed_country_flag = {
-# 				flag = tec_percussive_cd
-# 				months = 6
-# 			}
-# 			# Export leader level to a var
-# 			from.from.leader = {
-# 				export_trigger_value_to_variable = {
-# 					trigger = has_skill
-# 					variable = root.tec_percussive_effect
-# 				}
-# 			}
-# 			# Apply effect
-# 			fromfrom.solar_system = {
-# 				every_fleet_in_system = {
-# 					add_modifier = {
-# 						modifier = modifier_tec_percussive_modifier
-# 						multiplier = root.tec_percussive_effect
-# 						months = 2
-# 					}
-# 				}
-# 			}
-# 		}
-# 	}
-# }
-
-# good version
-# Executed as a leader has died
-# This = Country
-# From = Leader
-#on_leader_death = {
-country_event = {
-	id = tec_percuhive.10
-	is_triggered_only = yes
-	hide_window = yes
-
-	trigger = {
-		has_valid_civic = civic_tec_hive_percussive
-		NOT = {
-			has_country_flag = tec_percussive_cd
+		trigger = {
+			has_valid_civic = civic_tec_hive_percussive
+			NOT = {
+				has_country_flag = tec_percussive_cd
+			}
+			from = {
+				leader_class = admiral
+			}
 		}
-		from = {
-			leader_class = admiral
+
+		immediate = {
+			# Adds country flag
+			set_timed_country_flag = {
+				flag = tec_percussive_cd
+				months = 12
+			}
+			# Apply effect
+			add_modifier = {
+				modifier = modifier_tec_percussive_modifier_good
+				multiplier = from.trigger:has_skill
+				months = 2
+			}
 		}
 	}
-
-	immediate = {
-		# Adds country flag
-		set_timed_country_flag = {
-			flag = tec_percussive_cd
-			months = 12
-		}
-		# Apply effect
-		add_modifier = {
-			modifier = modifier_tec_percussive_modifier_good
-			multiplier = from.trigger:has_skill
-			months = 2
-		}
-	}
-}
+# /
 
 # -------------------------------------------------------
 #Trait events
 
 namespace = tec_trait
-#traitchecker
-planet_event = {
-	id = tec_trait.10
-	hide_window = yes
+	#traitchecker
+	planet_event = {
+		id = tec_trait.10
+		hide_window = yes
 
-	is_triggered_only = yes
+		is_triggered_only = yes
 
-	trigger = {
-		always = yes
-	}
-
-	immediate = {
-		# Cryptobiotic
-		planet_event = {
-			id = tec_trait.11
-			#extra delay to ensure it works well
-			days = 1
+		trigger = {
+			always = yes
 		}
-	}
-}
 
-#Cryptobiotic
-planet_event = {
-	id = tec_trait.11
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		any_owned_pop = {
-			has_trait = trait_tec_cryptobiotic
+		immediate = {
+			# Cryptobiotic
+			planet_event = {
+				id = tec_trait.11
+				#extra delay to ensure it works well
+				days = 1
+			}
 		}
 	}
 
-	immediate = {
-		root = {
-			random_owned_pop = {
+	#Cryptobiotic
+	planet_event = {
+		id = tec_trait.11
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			any_owned_pop = {
+				has_trait = trait_tec_cryptobiotic
+			}
+		}
+
+		immediate = {
+			root = {
+				random_owned_pop = {
+					limit = {
+						has_trait = trait_tec_cryptobiotic
+					}
+					root = {
+						create_pop = {
+							species = prev
+						}
+					}
+				}
+			}
+		}
+	}
+
+
+	# Lithoid sedimentary
+	planet_event = {
+		id = tec_trait.15
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			NOT = {
+				has_planet_flag = tec_recent_sedimentary_colonization
+			}
+			any_owned_pop = {
+				has_trait = trait_tec_lithoid_sedimentary
+			}
+		}
+
+		immediate = {
+			root = {
+				set_timed_planet_flag = {
+					flag = tec_recent_sedimentary_colonization
+					years = 25
+				}
+				random_list = {
+					25 = {
+						while = {
+							count = 3
+							add_deposit = d_tec_sedimented_lithoids
+						}
+					}
+					25 = {
+						while = {
+							count = 4
+							add_deposit = d_tec_sedimented_lithoids
+						}
+					}
+					25 = {
+						while = {
+							count = 5
+							add_deposit = d_tec_sedimented_lithoids
+						}
+					}
+				}
+			}
+		}
+	}
+
+	# Metamorphosis
+	pop_event = {
+		id = tec_trait.20
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			has_trait = trait_tec_metamorphosis
+		}
+
+		immediate = {
+			hidden_effect = {
+				set_timed_pop_flag = {
+					flag = tec_metamorphosis_phase_0
+					years = 10
+				}
+				set_timed_pop_flag = {
+					flag = tec_metamorphosis_phase_1
+					years = 20
+				}
+			}
+		}
+	}
+
+	# If the robot is mammalian, it changes to a mammalian appeal controlled via policy
+	# If the robot has a mammalian appeal, fall backs to mammalian robot if trait is out
+	# Synthetic skin/Nanite swarm appearance 
+	country_event = {
+		id = tec_trait.1000
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			always = no
+			from = {
+				OR = {
+					has_trait = @trait_tec_robot_liquid
+					has_trait = @trait_tec_robot_nanitebody
+				}
+			}
+		}
+
+		immediate = {
+			every_owned_leader = {
 				limit = {
-					has_trait = trait_tec_cryptobiotic
+					is_same_species = from
 				}
-				root = {
-					create_pop = {
-						species = prev
-					}
-				}
-			}
-		}
-	}
-}
-
-
-# Lithoid sedimentary
-planet_event = {
-	id = tec_trait.15
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		NOT = {
-			has_planet_flag = tec_recent_sedimentary_colonization
-		}
-		any_owned_pop = {
-			has_trait = trait_tec_lithoid_sedimentary
-		}
-	}
-
-	immediate = {
-		root = {
-			set_timed_planet_flag = {
-				flag = tec_recent_sedimentary_colonization
-				years = 25
-			}
-			random_list = {
-				25 = {
-					while = {
-						count = 3
-						add_deposit = d_tec_sedimented_lithoids
-					}
-				}
-				25 = {
-					while = {
-						count = 4
-						add_deposit = d_tec_sedimented_lithoids
-					}
-				}
-				25 = {
-					while = {
-						count = 5
-						add_deposit = d_tec_sedimented_lithoids
-					}
-				}
-			}
-		}
-	}
-}
-
-# Metamorphosis
-pop_event = {
-	id = tec_trait.20
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		has_trait = trait_tec_metamorphosis
-	}
-
-	immediate = {
-		hidden_effect = {
-			set_timed_pop_flag = {
-				flag = tec_metamorphosis_phase_0
-				years = 10
-			}
-			set_timed_pop_flag = {
-				flag = tec_metamorphosis_phase_1
-				years = 20
-			}
-		}
-	}
-}
-
-# If the robot is mammalian, it changes to a mammalian appeal controlled via policy
-# If the robot has a mammalian appeal, fall backs to mammalian robot if trait is out
-# Synthetic skin/Nanite swarm appearance 
-country_event = {
-	id = tec_trait.1000
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		always = no
-		from = {
-			OR = {
-				has_trait = @trait_tec_robot_liquid
-				has_trait = @trait_tec_robot_nanitebody
-			}
-		}
-	}
-
-	immediate = {
-		every_owned_leader = {
-			limit = {
-				is_same_species = from
-			}
-			tec_machine_organic_camouflage = yes
-		}
-		if = {
-			limit = {
-				ruler = {
-					species = {
-						is_same_species = from
-					}
-				}
-			}
-			ruler = {
 				tec_machine_organic_camouflage = yes
 			}
-		}
-	}
-}
-
-# Misc gestalt events
-# ------------------------------------------------------------
-namespace = tec_gestalt
-
-# Assimilator fixer
-country_event = {
-	id = tec_gestalt.90100
-	hide_window = yes
-	is_triggered_only = yes
-	
-	trigger = {
-		is_machine_empire = yes
-		has_valid_civic = civic_machine_assimilator
-	}
-	
-	immediate = {
-		every_owned_species = {
-			limit = {
-				has_citizenship_type = {
-					type = citizenship_assimilation
-					country = root
-				}
-			}
-			set_citizenship_type = {
-				type = citizenship_full_machine
-				country = root
-			}
-		}
-	}
-}
-
-# Empathy
-# ------------------------------------------------------------
-namespace = tec_gestalt_empathy
-
-# Gestalt migration event - Manager
-country_event = {	# PREV
-	id = tec_gestalt_empathy.11111
-	title = "tec_gestalt_empathy.11.name"
-	desc = "tec_gestalt_empathy.11.desc"
-	picture = GFX_evt_diplomatic_visit
-	show_sound = event_ship_bridge
-	
-	is_triggered_only = yes
-
-	trigger = {
-		has_ethic = ethic_gestalt_empathy
-		has_technology = tech_tec_gestalt_friendship
-		any_playable_country = {
-			NOT = {				
-				has_country_flag = tec_provided_pop_@root
-			}
-			NOT = {
-				is_at_war_with = root
-			}
-			OR = {
-				opinion_level = {
-					who = root
-					level >= good
-				}
-				is_in_federation_with = root
-				is_loyal_to = root
-			}
-			OR = {
-				is_gestalt = no					# No other gestalts for balance reasons
-				AND = {
-					is_gestalt = yes			# But yes for empathic gestalt hives
-					is_hive_empire = yes
-					has_ethic = ethic_gestalt_empathy
-				}
-			}
-			is_fallen_empire = no			# No fe cheese
-			is_synthetic_empire = no		# No droids
-		}
-	}
-
-	option = {
-		name = tec_gestalt_empathy.11.a
-	}
-
-	immediate = {
-		hidden_effect = {
-			set_variable = {
-				which = tec_empath_welcome_pops_temp
-				value = 0
-			}
-			while = {
-				count = 5
-				# Marks up to 5 candidate planets to receive a pop 
-				# DEPRECATED - Distribution will be random and number of pops capped to 1 per 
-				#				planet to prevent overcrowding
-				random_owned_planet = {
-					limit = {
-						is_colony = yes
-						NOR = {	# Avoid organics being resettled on worlds they should not be resettled on
-							uses_district_set = hive_world
-							uses_district_set = machine_world
+			if = {
+				limit = {
+					ruler = {
+						species = {
+							is_same_species = from
 						}
-						NOT = {
-							has_planet_flag = tec_empathy_migration_candidate_off
-						}
-					}
-					save_event_target_as = tec_empathy_migration_candidate
-					set_timed_planet_flag = {
-						flag = tec_empathy_migration_candidate_off
-						years = 1
 					}
 				}
-
-				# Checks up to 5 compatible countries and moves a pop to one of the candidate planets
-				random_playable_country = {
-					limit = {
-						NOT = {				
-							has_country_flag = tec_provided_pop_@root
-						}
-						NOT = {
-							is_at_war_with = root
-						}
-						OR = {
-							opinion_level = {
-								who = root
-								level >= good
-							}
-							is_in_federation_with = root
-							is_loyal_to = root
-						}
-						OR = {
-							is_gestalt = no					# No other gestalts for balance reasons
-							AND = {
-								is_gestalt = yes			# But yes for empathic gestalt hives
-								is_hive_empire = yes
-								has_ethic = ethic_gestalt_empathy
-							}
-						}
-						is_fallen_empire = no			# No fe cheese
-						is_synthetic_empire = no		# No droids
-					}
-					set_timed_country_flag = {			#Prevents repeated pops in the same sequence, diversity!
-						flag = tec_provided_pop_@root
-						years = 10
-					}
-					# Duplicates a compatible pop
-					capital_scope = {
-						random_owned_pop = {
-							limit = {
-								is_organic_species = yes
-								is_enslaved = no
-							}
-							save_event_target_as = tec_copy_pop_@prevprev
-						}
-						# Aliens are friendly, we want to migrate there
-						while = {
-							count = 1 #test
-							create_pop = {
-								species = event_target:tec_copy_pop_@prev
-								ethos = {
-									ethic = "ethic_xenophile"
-								}
-							}
-						}
-					}
-					
-					# Clears the pop category and moves it to a candidate
-					last_created_pop = {
-						clear_pop_category = yes
-						resettle_pop = {
-							pop = THIS
-							planet = event_target:tec_empathy_migration_candidate
-						}
-					#	if = {			# too op and subspecies = bad
-					#		limit = {
-					#			NOT = {
-					#				ideal_planet_class = event_target:tec_empathy_migration_candidate
-					#			}
-					#		}
-					#		last_created_pop = {
-					#			modify_species = {
-					#				ideal_planet_class = event_target:tec_empathy_migration_candidate
-					#			}
-					#		}
-					#	}
-						
-					}
-					# Total welcome pops
-					root = {
-						change_variable = {
-							which = tec_empath_welcome_pops
-							value = 1
-						}
-					}
-					# Local welcome pops for message
-					root = {
-						change_variable = {
-							which = tec_empath_welcome_pops_temp
-							value = 1
-						}
-					}
+				ruler = {
+					tec_machine_organic_camouflage = yes
 				}
 			}
 		}
 	}
-}
+# /
 
-country_event = {	# Test
-	id = tec_gestalt_empathy.11
-	title = "tec_gestalt_empathy.11.name"
-	desc = "tec_gestalt_empathy.11.desc"
-	picture = GFX_evt_diplomatic_visit
-	show_sound = event_ship_bridge
-	
-	is_triggered_only = yes
-
-	trigger = {
-		has_ethic = ethic_gestalt_empathy
-		has_technology = tech_tec_gestalt_friendship
-		any_playable_country = {
-			NOT = {				
-				has_country_flag = tec_provided_pop_@root
-			}
-			NOT = {
-				is_at_war_with = root
-			}
-			OR = {
-				opinion_level = {
-					who = root
-					level >= good
-				}
-				is_in_federation_with = root
-				is_loyal_to = root
-			}
-			OR = {
-				is_gestalt = no					# No other gestalts for balance reasons
-				AND = {
-					is_gestalt = yes			# But yes for empathic gestalt hives
-					is_hive_empire = yes
-					has_ethic = ethic_gestalt_empathy
-				}
-			}
-			is_fallen_empire = no			# No fe cheese
-			is_synthetic_empire = no		# No droids
-		}
-	}
-
-	option = {
-		name = tec_gestalt_empathy.11.a
-	}
-
-	immediate = {
-		hidden_effect = {
-			set_variable = {
-				which = tec_empath_welcome_pops_temp
-				value = 0
-			}
-			while = {
-				count = 5
-				# Marks up to 5 candidate planets to receive a pop 
-				# DEPRECATED - Distribution will be random and number of pops capped to 1 per 
-				#				planet to prevent overcrowding
-				random_owned_planet = {
-					limit = {
-						is_colony = yes
-						NOT = {
-							has_planet_flag = tec_empathy_migration_candidate_off
-						}
-					}
-					save_event_target_as = tec_empathy_migration_candidate
-					set_timed_planet_flag = {
-						flag = tec_empathy_migration_candidate_off
-						years = 1
-					}
-				}
-
-				# Checks up to 5 compatible countries and moves a pop to one of the candidate planets
-				random_playable_country = {
-					limit = {
-						NOT = {				
-							has_country_flag = tec_provided_pop_@root
-						}
-						NOT = {
-							is_at_war_with = root
-						}
-						OR = {
-							opinion_level = {
-								who = root
-								level >= good
-							}
-							is_in_federation_with = root
-							is_loyal_to = root
-						}
-						OR = {
-							is_gestalt = no					# No other gestalts for balance reasons
-							AND = {
-								is_gestalt = yes			# But yes for empathic gestalt hives
-								is_hive_empire = yes
-								has_ethic = ethic_gestalt_empathy
-							}
-						}
-						is_fallen_empire = no			# No fe cheese
-						is_synthetic_empire = no		# No droids
-					}
-					save_event_target_as = tec_g_m_cand
-					set_timed_country_flag = {			#Prevents repeated pops in the same sequence, diversity!
-						flag = tec_provided_pop_@root
-						years = 10
-					}
-					# Duplicates a compatible pop
-					random_owned_species = {
-						limit = {
-							is_organic_species = yes
-							NOR = {
-								is_archetype = BIOSERVANT
-								has_trait = @trait_tec_bioservant
-							}
-						}
-						save_event_target_as = tec_copy_pop
-					}
-				
-					# Clears the pop category and moves it to a candidate
-					event_target:tec_empathy_migration_candidate = {
-						create_pop = {
-							species = event_target:tec_copy_pop
-							ethos = event_target:tec_g_m_cand
-						}
-					}
-					# Total welcome pops
-					root = {
-						change_variable = {
-							which = tec_empath_welcome_pops
-							value = 1
-						}
-					}
-					# Local welcome pops for message
-					root = {
-						change_variable = {
-							which = tec_empath_welcome_pops_temp
-							value = 1
-						}
-					}
-				}
-			}
-		}
-	}
-}
 
 # Cost swaps
 # ------------------------------------------------------------
 namespace = tec_cost_swap_civic
-# Organic architecture hidden modifier
-country_event = {
-	id = tec_cost_swap_civic.501
-	hide_window = yes
+	# Organic architecture hidden modifier
+	country_event = {
+		id = tec_cost_swap_civic.501
+		hide_window = yes
 
-	is_triggered_only = yes
+		is_triggered_only = yes
 
-	trigger = {
-		OR = {
-			tec_is_bioarch_empire = yes
-			has_valid_civic = civic_tec_machine_digitalization
-		}
-		if = {
-			limit = { tec_is_bioarch_empire = yes }
-			NOT = {
-				has_modifier = modifier_tec_hidden_organicarch_modifier
-			}
-		}
-		if = {
-			limit = { has_valid_civic = civic_tec_machine_digitalization }
-			NOT = {
-				has_modifier = modifier_tec_hidden_digitalization_modifier
-			}
-		}
-	}
-
-	immediate = {
-		if = {
-			limit = {
+		trigger = {
+			OR = {
 				tec_is_bioarch_empire = yes
+				has_valid_civic = civic_tec_machine_digitalization
+			}
+			if = {
+				limit = { tec_is_bioarch_empire = yes }
 				NOT = {
 					has_modifier = modifier_tec_hidden_organicarch_modifier
 				}
 			}
-			add_modifier = {
-				modifier = modifier_tec_hidden_organicarch_modifier
-				days = -1
-			}
-		}
-		if = {
-			limit = {
-				has_valid_civic = civic_tec_machine_digitalization
+			if = {
+				limit = { has_valid_civic = civic_tec_machine_digitalization }
 				NOT = {
 					has_modifier = modifier_tec_hidden_digitalization_modifier
 				}
 			}
-			add_modifier = {
-				modifier = modifier_tec_hidden_digitalization_modifier
-				days = -1
+		}
+
+		immediate = {
+			if = {
+				limit = {
+					tec_is_bioarch_empire = yes
+					NOT = {
+						has_modifier = modifier_tec_hidden_organicarch_modifier
+					}
+				}
+				add_modifier = {
+					modifier = modifier_tec_hidden_organicarch_modifier
+					days = -1
+				}
+			}
+			if = {
+				limit = {
+					has_valid_civic = civic_tec_machine_digitalization
+					NOT = {
+						has_modifier = modifier_tec_hidden_digitalization_modifier
+					}
+				}
+				add_modifier = {
+					modifier = modifier_tec_hidden_digitalization_modifier
+					days = -1
+				}
 			}
 		}
 	}
-}
+# /
 
 # Hive Everevolving
 # ------------------------------------------------------------
 namespace = tec_hive_everevolving
 
-# Everevolving hive events - 1000-1100
-country_event = {
-	id = tec_hive_everevolving.1000
-	hide_window = yes
+	# Everevolving hive events - 1000-1100
+	country_event = {
+		id = tec_hive_everevolving.1000
+		hide_window = yes
 
-	is_triggered_only = yes
+		is_triggered_only = yes
 
-	trigger = {
-		has_valid_civic = civic_tec_hive_everevolving
-	}
-
-	immediate = {
-		add_modifier = {
-			modifier = modifier_tec_everevolving_primal
-			days = -1
+		trigger = {
+			has_valid_civic = civic_tec_hive_everevolving
 		}
-		set_variable = {
-			which = modifier_tec_everevolving_checker
-			value = 0
-		}
-	}
-}
 
-# Everevolving hive trigger
-country_event = {
-	id = tec_hive_everevolving.1001
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		has_valid_civic = civic_tec_hive_everevolving
-	}
-	
-	immediate = {
-		# 10% chance of evolving per 2 year passed, if a empire hasnt evolved in 10 years 40%
-		if = {
-			limit = {
-				check_variable = {
-					which = modifier_tec_everevolving_checker
-					value < 5
-				}
+		immediate = {
+			add_modifier = {
+				modifier = modifier_tec_everevolving_primal
+				days = -1
 			}
-			random_list = {
-				1 = {
-					# variable will be reseted anyways if conditions are met
-				#	change_variable = {
-				#		which = modifier_tec_everevolving_checker
-				#		value = 1
-				#	}
-					country_event = {
-						id = tec_hive_everevolving.1002
-					#	days = 45
-					}
-				}
-				9 = {
-					change_variable = {
-						which = modifier_tec_everevolving_checker
-						value = 1
-					}
-					# more luck next time
-				}
-
+			set_variable = {
+				which = modifier_tec_everevolving_checker
+				value = 0
 			}
 		}
-		if = {
-			limit = {
-				check_variable = {
-					which = modifier_tec_everevolving_checker
-					value >= 5
-				}
-			}
-			random_list = {
-				4 = {
-					# variable will be reseted anyways if conditions are met
-				#	change_variable = {
-				#		which = modifier_tec_everevolving_checker
-				#		value = 1
-				#	}
-					country_event = {
-						id = tec_hive_everevolving.1002
-					#	days = 45
-					}
-				}
-				6 = {
-					change_variable = {
-						which = modifier_tec_everevolving_checker
-						value = 1
-					}
-					# more luck next time
-				}
-			}
+	}
+
+	# Everevolving hive trigger
+	country_event = {
+		id = tec_hive_everevolving.1001
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			has_valid_civic = civic_tec_hive_everevolving
 		}
 		
-	}
-}
-
-# Hive everevolving manager
-country_event = {
-	id = tec_hive_everevolving.1002
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		has_valid_civic = civic_tec_hive_everevolving
-	}
-
-	immediate = {
-		hidden_effect = {
-			# Primal to Young
+		immediate = {
+			# 10% chance of evolving per 2 year passed, if a empire hasnt evolved in 10 years 40%
 			if = {
 				limit = {
-					OR = {
-						num_owned_planets > 3
-						years_passed > 15
-						num_rare_techs > 0
-					#	always = yes
+					check_variable = {
+						which = modifier_tec_everevolving_checker
+						value < 5
 					}
-					NOR = {
+				}
+				random_list = {
+					1 = {
+						# variable will be reseted anyways if conditions are met
+					#	change_variable = {
+					#		which = modifier_tec_everevolving_checker
+					#		value = 1
+					#	}
+						country_event = {
+							id = tec_hive_everevolving.1002
+						#	days = 45
+						}
+					}
+					9 = {
+						change_variable = {
+							which = modifier_tec_everevolving_checker
+							value = 1
+						}
+						# more luck next time
+					}
+
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						which = modifier_tec_everevolving_checker
+						value >= 5
+					}
+				}
+				random_list = {
+					4 = {
+						# variable will be reseted anyways if conditions are met
+					#	change_variable = {
+					#		which = modifier_tec_everevolving_checker
+					#		value = 1
+					#	}
+						country_event = {
+							id = tec_hive_everevolving.1002
+						#	days = 45
+						}
+					}
+					6 = {
+						change_variable = {
+							which = modifier_tec_everevolving_checker
+							value = 1
+						}
+						# more luck next time
+					}
+				}
+			}
+			
+		}
+	}
+
+	# Hive everevolving manager
+	country_event = {
+		id = tec_hive_everevolving.1002
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			has_valid_civic = civic_tec_hive_everevolving
+		}
+
+		immediate = {
+			hidden_effect = {
+				# Primal to Young
+				if = {
+					limit = {
+						OR = {
+							num_owned_planets > 3
+							years_passed > 15
+							num_rare_techs > 0
+						#	always = yes
+						}
+						NOR = {
+							has_country_flag = tec_young_hive
+							has_country_flag = tec_mature_hive
+							has_country_flag = tec_venerable_hive
+						}
+					}
+					set_variable = {
+						which = modifier_tec_everevolving_checker
+						value = 0
+					}
+					set_country_flag = tec_young_hive
+					remove_country_flag = tec_primal_hive
+					remove_modifier = modifier_tec_everevolving_primal
+					add_modifier = {
+						modifier = modifier_tec_everevolving_young
+						days = -1
+					}
+					country_event = {
+						id = tec_hive_everevolving.1010
+					}
+					break = yes
+				}
+				# Young to Primal - Yes, its possible to revert
+				if = {
+					limit = {
+						always = no
 						has_country_flag = tec_young_hive
-						has_country_flag = tec_mature_hive
-						has_country_flag = tec_venerable_hive
+						num_owned_planets < 4
+						num_pops < 60
+						NOR = {
+							has_country_flag = tec_mature_hive
+							has_country_flag = tec_venerable_hive
+						}
 					}
-				}
-				set_variable = {
-					which = modifier_tec_everevolving_checker
-					value = 0
-				}
-				set_country_flag = tec_young_hive
-				remove_country_flag = tec_primal_hive
-				remove_modifier = modifier_tec_everevolving_primal
-				add_modifier = {
-					modifier = modifier_tec_everevolving_young
-					days = -1
-				}
-				country_event = {
-					id = tec_hive_everevolving.1010
-				}
-				break = yes
-			}
-			# Young to Primal - Yes, its possible to revert
-			if = {
-				limit = {
-					always = no
-					has_country_flag = tec_young_hive
-					num_owned_planets < 4
-					num_pops < 60
-					NOR = {
-						has_country_flag = tec_mature_hive
-						has_country_flag = tec_venerable_hive
+					set_variable = {
+						which = modifier_tec_everevolving_checker
+						value = 0
 					}
+					remove_country_flag = tec_young_hive
+					set_country_flag = tec_primal_hive
+					remove_modifier = modifier_tec_everevolving_young
+					add_modifier = {
+						modifier = modifier_tec_everevolving_primal
+						days = -1
+					}
+					country_event = {
+						id = tec_hive_everevolving.1011
+					}
+					break = yes
 				}
-				set_variable = {
-					which = modifier_tec_everevolving_checker
-					value = 0
-				}
-				remove_country_flag = tec_young_hive
-				set_country_flag = tec_primal_hive
-				remove_modifier = modifier_tec_everevolving_young
-				add_modifier = {
-					modifier = modifier_tec_everevolving_primal
-					days = -1
-				}
-				country_event = {
-					id = tec_hive_everevolving.1011
-				}
-				break = yes
-			}
 
-			# Young to Mature
-			if = {
-				limit = {
-				#	always = yes
-					has_country_flag = tec_young_hive
-					num_owned_planets > 3
-					years_passed > 30
-					num_pops > 50
-					NOR = {
+				# Young to Mature
+				if = {
+					limit = {
+					#	always = yes
+						has_country_flag = tec_young_hive
+						num_owned_planets > 3
+						years_passed > 30
+						num_pops > 50
+						NOR = {
+							has_country_flag = tec_mature_hive
+							has_country_flag = tec_venerable_hive
+						}
+					}
+					set_variable = {
+						which = modifier_tec_everevolving_checker
+						value = 0
+					}
+					remove_country_flag = tec_young_hive
+					set_country_flag = tec_mature_hive
+					remove_modifier = modifier_tec_everevolving_young
+					add_modifier = {
+						modifier = modifier_tec_everevolving_mature
+						days = -1
+					}
+					country_event = {
+						id = tec_hive_everevolving.1012
+					}
+					break = yes
+				}
+				# Mature to Venerable
+				if = {
+					limit = {
+					#	always = yes
 						has_country_flag = tec_mature_hive
-						has_country_flag = tec_venerable_hive
+						num_owned_planets > 3
+						num_pops > 80
+						years_passed > 50
+						num_rare_techs > 1
+						NOT = {
+							has_country_flag = tec_venerable_hive
+						}
 					}
-				}
-				set_variable = {
-					which = modifier_tec_everevolving_checker
-					value = 0
-				}
-				remove_country_flag = tec_young_hive
-				set_country_flag = tec_mature_hive
-				remove_modifier = modifier_tec_everevolving_young
-				add_modifier = {
-					modifier = modifier_tec_everevolving_mature
-					days = -1
-				}
-				country_event = {
-					id = tec_hive_everevolving.1012
-				}
-				break = yes
-			}
-			# Mature to Venerable
-			if = {
-				limit = {
-				#	always = yes
-					has_country_flag = tec_mature_hive
-					num_owned_planets > 3
-					num_pops > 80
-					years_passed > 50
-					num_rare_techs > 1
-					NOT = {
-						has_country_flag = tec_venerable_hive
+					set_variable = {
+						which = modifier_tec_everevolving_checker
+						value = 0
 					}
+					remove_country_flag = tec_mature_hive
+					set_country_flag = tec_venerable_hive
+					remove_modifier = modifier_tec_everevolving_mature
+					add_modifier = {
+						modifier = modifier_tec_everevolving_venerable
+						days = -1
+					}
+					country_event = {
+						id = tec_hive_everevolving.1013
+					}
+					break = yes
 				}
-				set_variable = {
-					which = modifier_tec_everevolving_checker
-					value = 0
-				}
-				remove_country_flag = tec_mature_hive
-				set_country_flag = tec_venerable_hive
-				remove_modifier = modifier_tec_everevolving_mature
-				add_modifier = {
-					modifier = modifier_tec_everevolving_venerable
-					days = -1
-				}
-				country_event = {
-					id = tec_hive_everevolving.1013
-				}
-				break = yes
 			}
 		}
 	}
-}
 
-	# evolved to young
-country_event = {
-	id = tec_hive_everevolving.1010
-	title = tec_hive_everevolving.1010.title
-	desc = tec_hive_everevolving.1010.desc
-	picture = GFX_evt_unity_symbol
-	show_sound = event_alien_nature
+		# evolved to young
+	country_event = {
+		id = tec_hive_everevolving.1010
+		title = tec_hive_everevolving.1010.title
+		desc = tec_hive_everevolving.1010.desc
+		picture = GFX_evt_unity_symbol
+		show_sound = event_alien_nature
 
 
-	is_triggered_only = yes
+		is_triggered_only = yes
 
-	option = {
-		name = tec_hive_everevolving.1010.a	# We shall improve, we shall evolve.
+		option = {
+			name = tec_hive_everevolving.1010.a	# We shall improve, we shall evolve.
+		}
 	}
-}
 
-	# devolved to feral
-country_event = {
-	id = tec_hive_everevolving.1011
-	title = tec_hive_everevolving.1011.title
-	desc = tec_hive_everevolving.1011.desc
-	picture = GFX_evt_unity_symbol
-	show_sound = event_alien_nature
+		# devolved to feral
+	country_event = {
+		id = tec_hive_everevolving.1011
+		title = tec_hive_everevolving.1011.title
+		desc = tec_hive_everevolving.1011.desc
+		picture = GFX_evt_unity_symbol
+		show_sound = event_alien_nature
 
 
-	is_triggered_only = yes
+		is_triggered_only = yes
 
-	option = {
-		name = tec_hive_everevolving.1011.a	# Consume... Improve... Overcome...
+		option = {
+			name = tec_hive_everevolving.1011.a	# Consume... Improve... Overcome...
+		}
 	}
-}
 
-	# evolved to mature
-country_event = {
-	id = tec_hive_everevolving.1012
-	title = tec_hive_everevolving.1012.title
-	desc = tec_hive_everevolving.1012.desc
-	picture = GFX_evt_unity_symbol
-	show_sound = event_alien_nature
+		# evolved to mature
+	country_event = {
+		id = tec_hive_everevolving.1012
+		title = tec_hive_everevolving.1012.title
+		desc = tec_hive_everevolving.1012.desc
+		picture = GFX_evt_unity_symbol
+		show_sound = event_alien_nature
 
 
-	is_triggered_only = yes
+		is_triggered_only = yes
 
-	option = {
-		name = tec_hive_everevolving.1012.a	# Our mind stays strong and our will is infinite.
+		option = {
+			name = tec_hive_everevolving.1012.a	# Our mind stays strong and our will is infinite.
+		}
 	}
-}
 
-	# evolved to venerable
-country_event = {
-	id = tec_hive_everevolving.1013
-	title = tec_hive_everevolving.1013.title
-	desc = tec_hive_everevolving.1013.desc
-	picture = GFX_evt_unity_symbol
-	show_sound = event_alien_nature
+		# evolved to venerable
+	country_event = {
+		id = tec_hive_everevolving.1013
+		title = tec_hive_everevolving.1013.title
+		desc = tec_hive_everevolving.1013.desc
+		picture = GFX_evt_unity_symbol
+		show_sound = event_alien_nature
 
 
-	is_triggered_only = yes
+		is_triggered_only = yes
 
-	option = {
-		name = tec_hive_everevolving.1013.a	# We are one and infinite and so we will be through eons.
+		option = {
+			name = tec_hive_everevolving.1013.a	# We are one and infinite and so we will be through eons.
+		}
 	}
-}
+# /
 
 # Servitors
 # ------------------------------------------------------------
 namespace = tec_machine_servitor
-# Servitor branch migration mechanic
+	# Servitor branch migration mechanic
 
-# Gestalt migration event - Manager
-planet_event = {
-	id = tec_machine_servitor.5555
-	hide_window = yes
-	
-	is_triggered_only = yes
+	# Gestalt migration event - Manager
+	planet_event = {
+		id = tec_machine_servitor.5555
+		hide_window = yes
+		
+		is_triggered_only = yes
 
-	trigger = {
-		has_planet_flag = tec_servitor_snatcher_candidate
-		has_branch_office = yes
-		has_holding = {
-			holding = building_tec_machinecorp_carebots_2
-			owner = branch_office_owner
+		trigger = {
+			has_planet_flag = tec_servitor_snatcher_candidate
+			has_branch_office = yes
+			has_holding = {
+				holding = building_tec_machinecorp_carebots_2
+				owner = branch_office_owner
+			}
+			# double check just in case
+			branch_office_owner = {
+				is_gestalt = yes
+				is_machine_empire = yes
+				tec_is_symbiotic_machine = yes
+			}
 		}
-		# double check just in case
-		branch_office_owner = {
-			is_gestalt = yes
-			is_machine_empire = yes
-			tec_is_symbiotic_machine = yes
+
+		immediate = {
+			hidden_effect = {
+				random_list = {
+					66 = {
+						# nothing, repeats itself
+					}
+					33 = {
+						# A happy pop moves to a servitor planet
+						random_owned_pop = {
+							limit = {
+								has_job = tec_hedonist
+								is_organic_species = yes
+							}
+							species = {
+								save_event_target_as = tec_servitor_snatched_pop
+							}
+						}
+
+						branch_office_owner = {
+							change_variable = {
+								which = tec_branch_snatched_pops
+								value = 1
+							}
+							random_owned_planet = {
+								limit = {
+									has_available_jobs = bio_trophy
+								}
+								create_pop = {
+									species = event_target:tec_servitor_snatched_pop
+									ethos = {
+										ethic = "ethic_xenophile"
+									}
+								}
+								last_created_pop = {
+									if = {
+										limit = {
+											prev.owner = {
+												has_technology = tech_glandular_acclimation
+											}
+											prev = {
+												# For avoiding messy errors or op habitability
+												tec_is_habitable_regular_planet = yes
+											}
+											NOT = {
+												ideal_planet_class = prev
+											}
+										}
+										last_created_pop = {
+											modify_species = {
+												ideal_planet_class = prev
+											}
+										}
+									}
+								}
+								# deliver message to the gestalt empire 
+								owner = {
+									create_message = {
+										type = MESSAGE_TEC_SNATCHED_POP_EVENT
+										localization = MESSAGE_TEC_SNATCHED_POP
+										days = 30
+										target = this
+										variable = {
+											type = name
+											localization = SPECIES
+											scope = event_target:tec_servitor_snatched_pop
+										}
+										variable = {
+											type = name
+											localization = OGPLANET
+											scope = root
+										}
+										variable = {
+											type = name
+											localization = PLANET
+											scope = prev
+										}
+									}
+								}
+								# deliver message to the branch host empire
+								root.owner = {
+									create_message = {
+										type = MESSAGE_TEC_SNATCHED_POP_OG_EVENT
+										localization = MESSAGE_TEC_SNATCHED_POP_OG
+										days = 30
+										target = this
+										variable = {
+											type = name
+											localization = SPECIES
+											scope = event_target:tec_servitor_snatched_pop
+										}
+										variable = {
+											type = name
+											localization = OGPLANET
+											scope = root
+										}
+										variable = {
+											type = name
+											localization = PLANET
+											scope = prev
+										}
+									}
+								}
+								
+							}
+						}
+					}
+				}
+			}
+		}
+
+		after = {
+			planet_event = {
+				id = tec_machine_servitor.5555
+				days = 1800
+				random = 100
+			}
 		}
 	}
 
-	immediate = {
-		hidden_effect = {
-			random_list = {
-				66 = {
-					# nothing, repeats itself
+	# Gestalt migration event - Branch office owner via message 
+	# will do soon tm ^_^
+
+	# Gestalt migration event - Inform the host via message
+	# will do soon tm ^_^
+# /
+
+# Query Proposers
+# ------------------------------------------------------------
+namespace = tec_machine_pompous
+
+	country_event = {
+		id = tec_machine_pompous.100
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			has_valid_civic = civic_tec_machine_pompous
+		}
+		
+		immediate = {
+			export_resource_stockpile_to_variable = {
+				resource = influence
+				variable = tec_influence_temp
+			}
+			if = {		# Capped at 1000
+				limit = {
+					check_variable = {
+						which = tec_influence_temp
+						value <= 1000
+					}
 				}
-				33 = {
-					# A happy pop moves to a servitor planet
-					random_owned_pop = {
+				# Multiplies it by 0.01
+				multiply_variable = {
+					which = tec_influence_temp
+					value = 0.05
+					# 1000 influence = 50%
+				}
+			}
+			else = {	# Over 1000 = 50% still
+				set_variable = {
+					which = tec_influence_temp
+					value = 50
+				}
+			}
+			remove_modifier = modifier_tec_machine_pompous
+			add_modifier = {
+				modifier = modifier_tec_machine_pompous
+				mult = tec_influence_temp
+			}
+			clear_variable = tec_influence_temp
+		}
+	}
+# /
+
+# Impersonation Protocol
+# ------------------------------------------------------------
+namespace = tec_machine_impersonation
+	# Impersonation protocol events - 2000
+	# manager - on 5 year pulse
+	country_event = {
+		id = tec_machine_impersonation.1999
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			has_valid_civic = civic_tec_machine_bias
+		}
+		
+		immediate = {
+			# each 10 years
+			change_variable = {
+				which = tec_machinebias_checker
+				value = 1
+			}
+			if = {
+				limit = {
+					check_variable = {
+						which = tec_machinebias_checker
+						value = 2
+					}
+				}
+		
+				# Procurator round to other
+				if = {
+					limit = {
+						has_modifier = modifier_tec_impersonation_procurator
+					}
+					set_country_flag = tec_was_procurator_bias
+					set_variable = {
+						which = tec_machinebias_checker
+						value = 0
+					}
+					# was inventor, automatically offender wins
+					if = {
 						limit = {
-							has_job = tec_hedonist
-							is_organic_species = yes
+							has_country_flag = tec_was_inventor_bias
 						}
-						species = {
-							save_event_target_as = tec_servitor_snatched_pop
+						remove_modifier = modifier_tec_impersonation_neutral
+						remove_modifier = modifier_tec_impersonation_procurator
+						remove_modifier = modifier_tec_impersonation_offender
+						remove_modifier = modifier_tec_impersonation_inventor
+						add_modifier = {
+							modifier = modifier_tec_impersonation_offender
+							days = -1
+						}
+						country_event = {
+							id = tec_machine_impersonation.2011
+							days = 2
 						}
 					}
-
-					branch_office_owner = {
-						change_variable = {
-							which = tec_branch_snatched_pops
-							value = 1
+					# was offender, automatically inventor wins
+					if = {
+						limit = {
+							has_country_flag = tec_was_offender_bias
 						}
-						random_owned_planet = {
-							limit = {
-								has_available_jobs = bio_trophy
+						remove_modifier = modifier_tec_impersonation_neutral
+						remove_modifier = modifier_tec_impersonation_procurator
+						remove_modifier = modifier_tec_impersonation_offender
+						remove_modifier = modifier_tec_impersonation_inventor
+						add_modifier = {
+							modifier = modifier_tec_impersonation_inventor
+							days = -1
+						}
+						country_event = {
+							id = tec_machine_impersonation.2012
+							days = 2
+						}
+					}
+					# Only was procurator, never the others
+					if = {
+						limit = {
+							NOR = {
+								has_country_flag = tec_was_inventor_bias
+								has_country_flag = tec_was_offender_bias
 							}
-							create_pop = {
-								species = event_target:tec_servitor_snatched_pop
-								ethos = {
-									ethic = "ethic_xenophile"
+						}
+						random_list = {
+							1 = {	# offender wins
+								remove_modifier = modifier_tec_impersonation_neutral
+								remove_modifier = modifier_tec_impersonation_procurator
+								remove_modifier = modifier_tec_impersonation_offender
+								remove_modifier = modifier_tec_impersonation_inventor
+								add_modifier = {
+									modifier = modifier_tec_impersonation_offender
+									days = -1
+								}
+								country_event = {
+									id = tec_machine_impersonation.2011
+									days = 2
 								}
 							}
-							last_created_pop = {
-								if = {
-									limit = {
-										prev.owner = {
-											has_technology = tech_glandular_acclimation
-										}
-										prev = {
-											# For avoiding messy errors or op habitability
-											tec_is_habitable_regular_planet = yes
-										}
-										NOT = {
-											ideal_planet_class = prev
-										}
-									}
-									last_created_pop = {
-										modify_species = {
-											ideal_planet_class = prev
-										}
-									}
+							1 = {	# inventor wins
+								remove_modifier = modifier_tec_impersonation_neutral
+								remove_modifier = modifier_tec_impersonation_procurator
+								remove_modifier = modifier_tec_impersonation_offender
+								remove_modifier = modifier_tec_impersonation_inventor
+								add_modifier = {
+									modifier = modifier_tec_impersonation_inventor
+									days = -1
+								}
+								country_event = {
+									id = tec_machine_impersonation.2012
+									days = 2
 								}
 							}
-							# deliver message to the gestalt empire 
-							owner = {
-								create_message = {
-									type = MESSAGE_TEC_SNATCHED_POP_EVENT
-									localization = MESSAGE_TEC_SNATCHED_POP
-									days = 30
-									target = this
-									variable = {
-										type = name
-										localization = SPECIES
-										scope = event_target:tec_servitor_snatched_pop
-									}
-									variable = {
-										type = name
-										localization = OGPLANET
-										scope = root
-									}
-									variable = {
-										type = name
-										localization = PLANET
-										scope = prev
-									}
+						}
+					}
+				}
+
+				# Inventor round to other
+				if = {
+					limit = {
+						has_modifier = modifier_tec_impersonation_inventor
+					}
+					set_country_flag = tec_was_inventor_bias
+					set_variable = {
+						which = tec_machinebias_checker
+						value = 0
+					}
+					# was procurator, automatically offender wins
+					if = {
+						limit = {
+							has_country_flag = tec_was_procurator_bias
+						}
+						remove_modifier = modifier_tec_impersonation_neutral
+						remove_modifier = modifier_tec_impersonation_procurator
+						remove_modifier = modifier_tec_impersonation_offender
+						remove_modifier = modifier_tec_impersonation_inventor
+						add_modifier = {
+							modifier = modifier_tec_impersonation_offender
+							days = -1
+						}
+						country_event = {
+							id = tec_machine_impersonation.2011
+							days = 2
+						}
+					}
+					# was offender, automatically procurator wins
+					if = {
+						limit = {
+							has_country_flag = tec_was_offender_bias
+						}
+						remove_modifier = modifier_tec_impersonation_neutral
+						remove_modifier = modifier_tec_impersonation_procurator
+						remove_modifier = modifier_tec_impersonation_offender
+						remove_modifier = modifier_tec_impersonation_inventor
+						add_modifier = {
+							modifier = modifier_tec_impersonation_procurator
+							days = -1
+						}
+						country_event = {
+							id = tec_machine_impersonation.2010
+							days = 2
+						}
+					}
+					# Only was procurator, never the others
+					if = {
+						limit = {
+							NOR = {
+								has_country_flag = tec_was_inventor_bias
+								has_country_flag = tec_was_offender_bias
+							}
+						}
+						random_list = {
+							1 = {	# procurator wins
+								remove_modifier = modifier_tec_impersonation_neutral
+								remove_modifier = modifier_tec_impersonation_procurator
+								remove_modifier = modifier_tec_impersonation_offender
+								remove_modifier = modifier_tec_impersonation_inventor
+								add_modifier = {
+									modifier = modifier_tec_impersonation_procurator
+									days = -1
+								}
+								country_event = {
+									id = tec_machine_impersonation.2010
+									days = 2
 								}
 							}
-							# deliver message to the branch host empire
-							root.owner = {
-								create_message = {
-									type = MESSAGE_TEC_SNATCHED_POP_OG_EVENT
-									localization = MESSAGE_TEC_SNATCHED_POP_OG
-									days = 30
-									target = this
-									variable = {
-										type = name
-										localization = SPECIES
-										scope = event_target:tec_servitor_snatched_pop
-									}
-									variable = {
-										type = name
-										localization = OGPLANET
-										scope = root
-									}
-									variable = {
-										type = name
-										localization = PLANET
-										scope = prev
-									}
+							1 = {	# offender wins
+								remove_modifier = modifier_tec_impersonation_neutral
+								remove_modifier = modifier_tec_impersonation_procurator
+								remove_modifier = modifier_tec_impersonation_offender
+								remove_modifier = modifier_tec_impersonation_inventor
+								add_modifier = {
+									modifier = modifier_tec_impersonation_offender
+									days = -1
+								}
+								country_event = {
+									id = tec_machine_impersonation.2011
+									days = 2
 								}
 							}
 							
 						}
 					}
 				}
-			}
-		}
-	}
 
-	after = {
-		planet_event = {
-			id = tec_machine_servitor.5555
-			days = 1800
-			random = 100
-		}
-	}
-}
-
-# Gestalt migration event - Branch office owner via message 
-# will do soon tm ^_^
-
-# Gestalt migration event - Inform the host via message
-# will do soon tm ^_^
-
-
-# Query Proposers
-# ------------------------------------------------------------
-namespace = tec_machine_pompous
-
-country_event = {
-	id = tec_machine_pompous.100
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		has_valid_civic = civic_tec_machine_pompous
-	}
-	
-	immediate = {
-		export_resource_stockpile_to_variable = {
-			resource = influence
-			variable = tec_influence_temp
-		}
-		if = {		# Capped at 1000
-			limit = {
-				check_variable = {
-					which = tec_influence_temp
-					value <= 1000
-				}
-			}
-			# Multiplies it by 0.01
-			multiply_variable = {
-				which = tec_influence_temp
-				value = 0.05
-				# 1000 influence = 50%
-			}
-		}
-		else = {	# Over 1000 = 50% still
-			set_variable = {
-				which = tec_influence_temp
-				value = 50
-			}
-		}
-		remove_modifier = modifier_tec_machine_pompous
-		add_modifier = {
-			modifier = modifier_tec_machine_pompous
-			mult = tec_influence_temp
-		}
-		clear_variable = tec_influence_temp
-	}
-}
-
-# Impersonation Protocol
-# ------------------------------------------------------------
-namespace = tec_machine_impersonation
-# Impersonation protocol events - 2000
-# manager - on 5 year pulse
-country_event = {
-	id = tec_machine_impersonation.1999
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		has_valid_civic = civic_tec_machine_bias
-	}
-	
-	immediate = {
-		# each 10 years
-		change_variable = {
-			which = tec_machinebias_checker
-			value = 1
-		}
-		if = {
-			limit = {
-				check_variable = {
-					which = tec_machinebias_checker
-					value = 2
-				}
-			}
-	
-			# Procurator round to other
-			if = {
-				limit = {
-					has_modifier = modifier_tec_impersonation_procurator
-				}
-				set_country_flag = tec_was_procurator_bias
-				set_variable = {
-					which = tec_machinebias_checker
-					value = 0
-				}
-				# was inventor, automatically offender wins
+				# offender round to other
 				if = {
 					limit = {
-						has_country_flag = tec_was_inventor_bias
+						has_modifier = modifier_tec_impersonation_offender
 					}
-					remove_modifier = modifier_tec_impersonation_neutral
-					remove_modifier = modifier_tec_impersonation_procurator
-					remove_modifier = modifier_tec_impersonation_offender
-					remove_modifier = modifier_tec_impersonation_inventor
-					add_modifier = {
-						modifier = modifier_tec_impersonation_offender
-						days = -1
+					set_country_flag = tec_was_offender_bias
+					set_variable = {
+						which = tec_machinebias_checker
+						value = 0
 					}
-					country_event = {
-						id = tec_machine_impersonation.2011
-						days = 2
-					}
-				}
-				# was offender, automatically inventor wins
-				if = {
-					limit = {
-						has_country_flag = tec_was_offender_bias
-					}
-					remove_modifier = modifier_tec_impersonation_neutral
-					remove_modifier = modifier_tec_impersonation_procurator
-					remove_modifier = modifier_tec_impersonation_offender
-					remove_modifier = modifier_tec_impersonation_inventor
-					add_modifier = {
-						modifier = modifier_tec_impersonation_inventor
-						days = -1
-					}
-					country_event = {
-						id = tec_machine_impersonation.2012
-						days = 2
-					}
-				}
-				# Only was procurator, never the others
-				if = {
-					limit = {
-						NOR = {
-							has_country_flag = tec_was_inventor_bias
-							has_country_flag = tec_was_offender_bias
+					# was procurator, automatically inventor wins
+					if = {
+						limit = {
+							has_country_flag = tec_was_procurator_bias
 						}
-					}
-					random_list = {
-						1 = {	# offender wins
-							remove_modifier = modifier_tec_impersonation_neutral
-							remove_modifier = modifier_tec_impersonation_procurator
-							remove_modifier = modifier_tec_impersonation_offender
-							remove_modifier = modifier_tec_impersonation_inventor
-							add_modifier = {
-								modifier = modifier_tec_impersonation_offender
-								days = -1
-							}
-							country_event = {
-								id = tec_machine_impersonation.2011
-								days = 2
-							}
-						}
-						1 = {	# inventor wins
-							remove_modifier = modifier_tec_impersonation_neutral
-							remove_modifier = modifier_tec_impersonation_procurator
-							remove_modifier = modifier_tec_impersonation_offender
-							remove_modifier = modifier_tec_impersonation_inventor
-							add_modifier = {
-								modifier = modifier_tec_impersonation_inventor
-								days = -1
-							}
-							country_event = {
-								id = tec_machine_impersonation.2012
-								days = 2
-							}
-						}
-					}
-				}
-			}
-
-			# Inventor round to other
-			if = {
-				limit = {
-					has_modifier = modifier_tec_impersonation_inventor
-				}
-				set_country_flag = tec_was_inventor_bias
-				set_variable = {
-					which = tec_machinebias_checker
-					value = 0
-				}
-				# was procurator, automatically offender wins
-				if = {
-					limit = {
-						has_country_flag = tec_was_procurator_bias
-					}
-					remove_modifier = modifier_tec_impersonation_neutral
-					remove_modifier = modifier_tec_impersonation_procurator
-					remove_modifier = modifier_tec_impersonation_offender
-					remove_modifier = modifier_tec_impersonation_inventor
-					add_modifier = {
-						modifier = modifier_tec_impersonation_offender
-						days = -1
-					}
-					country_event = {
-						id = tec_machine_impersonation.2011
-						days = 2
-					}
-				}
-				# was offender, automatically procurator wins
-				if = {
-					limit = {
-						has_country_flag = tec_was_offender_bias
-					}
-					remove_modifier = modifier_tec_impersonation_neutral
-					remove_modifier = modifier_tec_impersonation_procurator
-					remove_modifier = modifier_tec_impersonation_offender
-					remove_modifier = modifier_tec_impersonation_inventor
-					add_modifier = {
-						modifier = modifier_tec_impersonation_procurator
-						days = -1
-					}
-					country_event = {
-						id = tec_machine_impersonation.2010
-						days = 2
-					}
-				}
-				# Only was procurator, never the others
-				if = {
-					limit = {
-						NOR = {
-							has_country_flag = tec_was_inventor_bias
-							has_country_flag = tec_was_offender_bias
-						}
-					}
-					random_list = {
-						1 = {	# procurator wins
-							remove_modifier = modifier_tec_impersonation_neutral
-							remove_modifier = modifier_tec_impersonation_procurator
-							remove_modifier = modifier_tec_impersonation_offender
-							remove_modifier = modifier_tec_impersonation_inventor
-							add_modifier = {
-								modifier = modifier_tec_impersonation_procurator
-								days = -1
-							}
-							country_event = {
-								id = tec_machine_impersonation.2010
-								days = 2
-							}
-						}
-						1 = {	# offender wins
-							remove_modifier = modifier_tec_impersonation_neutral
-							remove_modifier = modifier_tec_impersonation_procurator
-							remove_modifier = modifier_tec_impersonation_offender
-							remove_modifier = modifier_tec_impersonation_inventor
-							add_modifier = {
-								modifier = modifier_tec_impersonation_offender
-								days = -1
-							}
-							country_event = {
-								id = tec_machine_impersonation.2011
-								days = 2
-							}
-						}
-						
-					}
-				}
-			}
-
-			# offender round to other
-			if = {
-				limit = {
-					has_modifier = modifier_tec_impersonation_offender
-				}
-				set_country_flag = tec_was_offender_bias
-				set_variable = {
-					which = tec_machinebias_checker
-					value = 0
-				}
-				# was procurator, automatically inventor wins
-				if = {
-					limit = {
-						has_country_flag = tec_was_procurator_bias
-					}
-					remove_modifier = modifier_tec_impersonation_neutral
-					remove_modifier = modifier_tec_impersonation_procurator
-					remove_modifier = modifier_tec_impersonation_offender
-					remove_modifier = modifier_tec_impersonation_inventor
-					add_modifier = {
-						modifier = modifier_tec_impersonation_inventor
-						days = -1
-					}
-					country_event = {
-						id = tec_machine_impersonation.2012
-						days = 2
-					}
-				}
-				# was inventor, automatically procurator wins
-				if = {
-					limit = {
-						has_country_flag = tec_was_inventor_bias
-					}
-					remove_modifier = modifier_tec_impersonation_neutral
-					remove_modifier = modifier_tec_impersonation_procurator
-					remove_modifier = modifier_tec_impersonation_offender
-					remove_modifier = modifier_tec_impersonation_inventor
-					add_modifier = {
-						modifier = modifier_tec_impersonation_procurator
-						days = -1
-					}
-					country_event = {
-						id = tec_machine_impersonation.2010
-						days = 2
-					}
-				}
-				# Only was offender, never the others
-				if = {
-					limit = {
-						NOR = {
-							has_country_flag = tec_was_inventor_bias
-							has_country_flag = tec_was_offender_bias
-						}
-					}
-					random_list = {
-						1 = {	# procurator wins
-							remove_modifier = modifier_tec_impersonation_neutral
-							remove_modifier = modifier_tec_impersonation_procurator
-							remove_modifier = modifier_tec_impersonation_offender
-							remove_modifier = modifier_tec_impersonation_inventor
-							add_modifier = {
-								modifier = modifier_tec_impersonation_procurator
-								days = -1
-							}
-							country_event = {
-								id = tec_machine_impersonation.2010
-								days = 2
-							}
-						}
-						1 = {	# inventor wins
-							remove_modifier = modifier_tec_impersonation_neutral
-							remove_modifier = modifier_tec_impersonation_procurator
-							remove_modifier = modifier_tec_impersonation_offender
-							remove_modifier = modifier_tec_impersonation_inventor
-							add_modifier = {
-								modifier = modifier_tec_impersonation_inventor
-								days = -1
-							}
-							country_event = {
-								id = tec_machine_impersonation.2012
-								days = 2
-							}
-						}
-						
-					}
-				}
-			}
-
-			# prevents repetition
-			if = {	# first round
-				limit = {
-					has_modifier = modifier_tec_impersonation_neutral
-				}
-				set_variable = {
-					which = tec_machinebias_checker
-					value = 0
-				}
-				random_list = {
-					1 = {	# procurator wins
-						remove_modifier = modifier_tec_impersonation_neutral
-						remove_modifier = modifier_tec_impersonation_procurator
-						remove_modifier = modifier_tec_impersonation_offender
-						remove_modifier = modifier_tec_impersonation_inventor
-						add_modifier = {
-							modifier = modifier_tec_impersonation_procurator
-							days = -1
-						}
-						country_event = {
-							id = tec_machine_impersonation.2010
-							days = 2
-						}
-					}
-					1 = {	# offender wins
-						remove_modifier = modifier_tec_impersonation_neutral
-						remove_modifier = modifier_tec_impersonation_procurator
-						remove_modifier = modifier_tec_impersonation_offender
-						remove_modifier = modifier_tec_impersonation_inventor
-						add_modifier = {
-							modifier = modifier_tec_impersonation_offender
-							days = -1
-						}
-						country_event = {
-							id = tec_machine_impersonation.2011
-							days = 2
-						}
-					}
-					1 = {	# inventor wins
 						remove_modifier = modifier_tec_impersonation_neutral
 						remove_modifier = modifier_tec_impersonation_procurator
 						remove_modifier = modifier_tec_impersonation_offender
@@ -3510,120 +2979,267 @@ country_event = {
 							days = 2
 						}
 					}
+					# was inventor, automatically procurator wins
+					if = {
+						limit = {
+							has_country_flag = tec_was_inventor_bias
+						}
+						remove_modifier = modifier_tec_impersonation_neutral
+						remove_modifier = modifier_tec_impersonation_procurator
+						remove_modifier = modifier_tec_impersonation_offender
+						remove_modifier = modifier_tec_impersonation_inventor
+						add_modifier = {
+							modifier = modifier_tec_impersonation_procurator
+							days = -1
+						}
+						country_event = {
+							id = tec_machine_impersonation.2010
+							days = 2
+						}
+					}
+					# Only was offender, never the others
+					if = {
+						limit = {
+							NOR = {
+								has_country_flag = tec_was_inventor_bias
+								has_country_flag = tec_was_offender_bias
+							}
+						}
+						random_list = {
+							1 = {	# procurator wins
+								remove_modifier = modifier_tec_impersonation_neutral
+								remove_modifier = modifier_tec_impersonation_procurator
+								remove_modifier = modifier_tec_impersonation_offender
+								remove_modifier = modifier_tec_impersonation_inventor
+								add_modifier = {
+									modifier = modifier_tec_impersonation_procurator
+									days = -1
+								}
+								country_event = {
+									id = tec_machine_impersonation.2010
+									days = 2
+								}
+							}
+							1 = {	# inventor wins
+								remove_modifier = modifier_tec_impersonation_neutral
+								remove_modifier = modifier_tec_impersonation_procurator
+								remove_modifier = modifier_tec_impersonation_offender
+								remove_modifier = modifier_tec_impersonation_inventor
+								add_modifier = {
+									modifier = modifier_tec_impersonation_inventor
+									days = -1
+								}
+								country_event = {
+									id = tec_machine_impersonation.2012
+									days = 2
+								}
+							}
+							
+						}
+					}
 				}
-			}
 
-			# Round reset
-			if = {
-				limit = {
-					has_country_flag = tec_was_procurator_bias
-					has_country_flag = tec_was_offender_bias
-					has_country_flag = tec_was_inventor_bias
-				}
-				if = {
+				# prevents repetition
+				if = {	# first round
 					limit = {
-						NOT = {
-							has_modifier = modifier_tec_impersonation_procurator
+						has_modifier = modifier_tec_impersonation_neutral
+					}
+					set_variable = {
+						which = tec_machinebias_checker
+						value = 0
+					}
+					random_list = {
+						1 = {	# procurator wins
+							remove_modifier = modifier_tec_impersonation_neutral
+							remove_modifier = modifier_tec_impersonation_procurator
+							remove_modifier = modifier_tec_impersonation_offender
+							remove_modifier = modifier_tec_impersonation_inventor
+							add_modifier = {
+								modifier = modifier_tec_impersonation_procurator
+								days = -1
+							}
+							country_event = {
+								id = tec_machine_impersonation.2010
+								days = 2
+							}
+						}
+						1 = {	# offender wins
+							remove_modifier = modifier_tec_impersonation_neutral
+							remove_modifier = modifier_tec_impersonation_procurator
+							remove_modifier = modifier_tec_impersonation_offender
+							remove_modifier = modifier_tec_impersonation_inventor
+							add_modifier = {
+								modifier = modifier_tec_impersonation_offender
+								days = -1
+							}
+							country_event = {
+								id = tec_machine_impersonation.2011
+								days = 2
+							}
+						}
+						1 = {	# inventor wins
+							remove_modifier = modifier_tec_impersonation_neutral
+							remove_modifier = modifier_tec_impersonation_procurator
+							remove_modifier = modifier_tec_impersonation_offender
+							remove_modifier = modifier_tec_impersonation_inventor
+							add_modifier = {
+								modifier = modifier_tec_impersonation_inventor
+								days = -1
+							}
+							country_event = {
+								id = tec_machine_impersonation.2012
+								days = 2
+							}
 						}
 					}
-					remove_country_flag = tec_was_procurator_bias
 				}
+
+				# Round reset
 				if = {
 					limit = {
-						NOT = {
-							has_modifier = modifier_tec_impersonation_offender
-						}
+						has_country_flag = tec_was_procurator_bias
+						has_country_flag = tec_was_offender_bias
+						has_country_flag = tec_was_inventor_bias
 					}
-					remove_country_flag = tec_was_offender_bias
-				}
-				if = {
-					limit = {
-						NOT = {
-							has_modifier = modifier_tec_impersonation_inventor
+					if = {
+						limit = {
+							NOT = {
+								has_modifier = modifier_tec_impersonation_procurator
+							}
 						}
+						remove_country_flag = tec_was_procurator_bias
 					}
-					remove_country_flag = tec_was_inventor_bias
+					if = {
+						limit = {
+							NOT = {
+								has_modifier = modifier_tec_impersonation_offender
+							}
+						}
+						remove_country_flag = tec_was_offender_bias
+					}
+					if = {
+						limit = {
+							NOT = {
+								has_modifier = modifier_tec_impersonation_inventor
+							}
+						}
+						remove_country_flag = tec_was_inventor_bias
+					}
+					
 				}
 				
 			}
-			
-		}
-		else = {
-			#nothing
-		}
-	}
-}
-
-country_event = {
-	id = tec_machine_impersonation.2000
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		has_valid_civic = civic_tec_machine_bias
-	}
-	
-	immediate = {
-		# each 10 years
-		change_variable = {
-			which = tec_machinebias_checker
-			value = 1
-		}
-		if = {
-			limit = {
-				check_variable = {
-					which = tec_machinebias_checker
-					value = 2
-				}
+			else = {
+				#nothing
 			}
-			# reset
-			set_variable = {
+		}
+	}
+
+	country_event = {
+		id = tec_machine_impersonation.2000
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			has_valid_civic = civic_tec_machine_bias
+		}
+		
+		immediate = {
+			# each 10 years
+			change_variable = {
 				which = tec_machinebias_checker
-				value = 0
+				value = 1
 			}
-			
-		#	if = {
-		#		limit = {
-		#			has_country_flag = tec_was_procurator_bias
-		#			has_country_flag = tec_was_offender_bias
-		#			has_country_flag = tec_was_inventor_bias
-		#		}
-		#		remove_country_flag = tec_was_procurator_bias
-		#		remove_country_flag = tec_was_offender_bias
-		#		remove_country_flag = tec_was_inventor_bias
-		#		random_list = {
-		#	#		1 = {
-		#	#			remove_country_flag = tec_was_procurator_bias
-		#	#		}
-		#	#		1 = {
-		#	#			remove_country_flag = tec_was_offender_bias
-		#	#		}
-		#	#		1 = {
-		#	#			remove_country_flag = tec_was_inventor_bias
-		#	#		}
-		#			
-		#			
-		#		}
-
-			if = {	# first round
+			if = {
 				limit = {
-					has_modifier = modifier_tec_impersonation_neutral
+					check_variable = {
+						which = tec_machinebias_checker
+						value = 2
+					}
 				}
-				random_list = {
-					1 = {	# procurator wins
-						remove_modifier = modifier_tec_impersonation_neutral
-						add_modifier = {
-							modifier = modifier_tec_impersonation_procurator
-							days = -1
+				# reset
+				set_variable = {
+					which = tec_machinebias_checker
+					value = 0
+				}
+				
+			#	if = {
+			#		limit = {
+			#			has_country_flag = tec_was_procurator_bias
+			#			has_country_flag = tec_was_offender_bias
+			#			has_country_flag = tec_was_inventor_bias
+			#		}
+			#		remove_country_flag = tec_was_procurator_bias
+			#		remove_country_flag = tec_was_offender_bias
+			#		remove_country_flag = tec_was_inventor_bias
+			#		random_list = {
+			#	#		1 = {
+			#	#			remove_country_flag = tec_was_procurator_bias
+			#	#		}
+			#	#		1 = {
+			#	#			remove_country_flag = tec_was_offender_bias
+			#	#		}
+			#	#		1 = {
+			#	#			remove_country_flag = tec_was_inventor_bias
+			#	#		}
+			#			
+			#			
+			#		}
+
+				if = {	# first round
+					limit = {
+						has_modifier = modifier_tec_impersonation_neutral
+					}
+					random_list = {
+						1 = {	# procurator wins
+							remove_modifier = modifier_tec_impersonation_neutral
+							add_modifier = {
+								modifier = modifier_tec_impersonation_procurator
+								days = -1
+							}
+							country_event = {
+								id = tec_machine_impersonation.2010
+								days = 2
+							}
 						}
-						country_event = {
-							id = tec_machine_impersonation.2010
-							days = 2
+						1 = {	# offender wins
+							remove_modifier = modifier_tec_impersonation_neutral
+							add_modifier = {
+								modifier = modifier_tec_impersonation_offender
+								days = -1
+							}
+							country_event = {
+								id = tec_machine_impersonation.2011
+								days = 2
+							}
+						}
+						1 = {	# inventor wins
+							remove_modifier = modifier_tec_impersonation_neutral
+							add_modifier = {
+								modifier = modifier_tec_impersonation_inventor
+								days = -1
+							}
+							country_event = {
+								id = tec_machine_impersonation.2012
+								days = 2
+							}
 						}
 					}
-					1 = {	# offender wins
-						remove_modifier = modifier_tec_impersonation_neutral
+					break = yes
+				}
+
+				# If has Procurator
+				if = {
+					limit = {
+						has_modifier = modifier_tec_impersonation_procurator
+					}
+					set_country_flag = tec_was_procurator_bias
+					if = {
+						limit = {
+							has_country_flag = tec_was_inventor_bias
+						}
+						remove_modifier = modifier_tec_impersonation_procurator
 						add_modifier = {
 							modifier = modifier_tec_impersonation_offender
 							days = -1
@@ -3632,9 +3248,17 @@ country_event = {
 							id = tec_machine_impersonation.2011
 							days = 2
 						}
+
+						remove_country_flag = tec_was_inventor_bias
+
+
+						break = yes
 					}
-					1 = {	# inventor wins
-						remove_modifier = modifier_tec_impersonation_neutral
+					if = {
+						limit = {
+							has_country_flag = tec_was_offender_bias
+						}
+						remove_modifier = modifier_tec_impersonation_procurator
 						add_modifier = {
 							modifier = modifier_tec_impersonation_inventor
 							days = -1
@@ -3643,796 +3267,754 @@ country_event = {
 							id = tec_machine_impersonation.2012
 							days = 2
 						}
-					}
-				}
-				break = yes
-			}
 
-			# If has Procurator
-			if = {
-				limit = {
-					has_modifier = modifier_tec_impersonation_procurator
-				}
-				set_country_flag = tec_was_procurator_bias
-				if = {
-					limit = {
-						has_country_flag = tec_was_inventor_bias
+						remove_country_flag = tec_was_offender_bias
+
+						break = yes
 					}
-					remove_modifier = modifier_tec_impersonation_procurator
-					add_modifier = {
-						modifier = modifier_tec_impersonation_offender
-						days = -1
-					}
-					country_event = {
-						id = tec_machine_impersonation.2011
-						days = 2
+					if = {
+						limit = {
+							NOR = {
+								has_country_flag = tec_was_inventor_bias
+								has_country_flag = tec_was_offender_bias	
+							}
+						}
+						random_list = {
+							1 = {	# offender wins
+								remove_modifier = modifier_tec_impersonation_procurator
+								add_modifier = {
+									modifier = modifier_tec_impersonation_offender
+									days = -1
+								}
+								country_event = {
+									id = tec_machine_impersonation.2011
+									days = 2
+								}
+							}
+							1 = {	# inventor wins
+								remove_modifier = modifier_tec_impersonation_procurator
+								add_modifier = {
+									modifier = modifier_tec_impersonation_inventor
+									days = -1
+								}
+								country_event = {
+									id = tec_machine_impersonation.2012
+									days = 2
+								}
+							}
+						}
 					}
 
-					remove_country_flag = tec_was_inventor_bias
-
-
+					
+					
 					break = yes
 				}
+
+				# If has Inventor
 				if = {
 					limit = {
-						has_country_flag = tec_was_offender_bias
+						has_modifier = modifier_tec_impersonation_inventor
 					}
-					remove_modifier = modifier_tec_impersonation_procurator
-					add_modifier = {
-						modifier = modifier_tec_impersonation_inventor
-						days = -1
-					}
-					country_event = {
-						id = tec_machine_impersonation.2012
-						days = 2
-					}
+					set_country_flag = tec_was_inventor_bias
+					if = {
+						limit = {
+							has_country_flag = tec_was_procurator_bias
+						}
+						remove_modifier = modifier_tec_impersonation_inventor
+						add_modifier = {
+							modifier = modifier_tec_impersonation_procurator
+							days = -1
+						}
+						country_event = {
+							id = tec_machine_impersonation.2010
+							days = 2
+						}
 
-					remove_country_flag = tec_was_offender_bias
+						remove_country_flag = tec_was_procurator_bias
 
+						break = yes
+					}
+					if = {
+						limit = {
+							has_country_flag = tec_was_offender_bias
+						}
+						remove_modifier = modifier_tec_impersonation_inventor
+						add_modifier = {
+							modifier = modifier_tec_impersonation_offender
+							days = -1
+						}
+						country_event = {
+							id = tec_machine_impersonation.2011
+							days = 2
+						}
+
+						remove_country_flag = tec_was_offender_bias
+
+						break = yes
+					}
+					if = {
+						limit = {
+							NOR = {
+								has_country_flag = tec_was_procurator_bias
+								has_country_flag = tec_was_offender_bias	
+							}
+						}
+						random_list = {
+							1 = {	# procurator wins
+								remove_modifier = modifier_tec_impersonation_inventor
+								add_modifier = {
+									modifier = modifier_tec_impersonation_procurator
+									days = -1
+								}
+								country_event = {
+									id = tec_machine_impersonation.2010
+									days = 2
+								}
+							}
+							1 = {	# inventor wins
+								remove_modifier = modifier_tec_impersonation_inventor
+								add_modifier = {
+									modifier = modifier_tec_impersonation_offender
+									days = -1
+								}
+								country_event = {
+									id = tec_machine_impersonation.2011
+									days = 2
+								}
+							}
+						}
+					}
+					
 					break = yes
 				}
+
+				
+				# If has Offender
 				if = {
 					limit = {
-						NOR = {
+						has_modifier = modifier_tec_impersonation_offender
+					}
+					set_country_flag = tec_was_offender_bias
+					if = {
+						limit = {
+							has_country_flag = tec_was_procurator_bias
+						}
+						remove_modifier = modifier_tec_impersonation_offender
+						add_modifier = {
+							modifier = modifier_tec_impersonation_procurator
+							days = -1
+						}
+						country_event = {
+							id = tec_machine_impersonation.2010
+							days = 2
+						}
+
+						remove_country_flag = tec_was_procurator_bias
+
+						break = yes
+					}
+					if = {
+						limit = {
 							has_country_flag = tec_was_inventor_bias
-							has_country_flag = tec_was_offender_bias	
 						}
-					}
-					random_list = {
-						1 = {	# offender wins
-							remove_modifier = modifier_tec_impersonation_procurator
-							add_modifier = {
-								modifier = modifier_tec_impersonation_offender
-								days = -1
-							}
-							country_event = {
-								id = tec_machine_impersonation.2011
-								days = 2
-							}
+						remove_modifier = modifier_tec_impersonation_offender
+						add_modifier = {
+							modifier = modifier_tec_impersonation_inventor
+							days = -1
 						}
-						1 = {	# inventor wins
-							remove_modifier = modifier_tec_impersonation_procurator
-							add_modifier = {
-								modifier = modifier_tec_impersonation_inventor
-								days = -1
-							}
-							country_event = {
-								id = tec_machine_impersonation.2012
-								days = 2
-							}
+						country_event = {
+							id = tec_machine_impersonation.2012
+							days = 2
 						}
-					}
-				}
 
-				
-				
-				break = yes
+						remove_country_flag = tec_was_inventor_bias
+
+						break = yes
+					}
+					if = {
+						limit = {
+							NOR = {
+								has_country_flag = tec_was_procurator_bias
+								has_country_flag = tec_was_inventor_bias	
+							}
+						}
+						random_list = {
+							1 = {	# procurator wins
+								remove_modifier = modifier_tec_impersonation_offender
+								add_modifier = {
+									modifier = modifier_tec_impersonation_procurator
+									days = -1
+								}
+								country_event = {
+									id = tec_machine_impersonation.2010
+									days = 2
+								}
+							}
+							1 = {	# inventor wins
+								remove_modifier = modifier_tec_impersonation_offender
+								add_modifier = {
+									modifier = modifier_tec_impersonation_inventor
+									days = -1
+								}
+								country_event = {
+									id = tec_machine_impersonation.2012
+									days = 2
+								}
+							}
+						}
+					}
+					
+					break = yes
+				}
 			}
-
-			# If has Inventor
-			if = {
-				limit = {
-					has_modifier = modifier_tec_impersonation_inventor
-				}
-				set_country_flag = tec_was_inventor_bias
-				if = {
-					limit = {
-						has_country_flag = tec_was_procurator_bias
-					}
-					remove_modifier = modifier_tec_impersonation_inventor
-					add_modifier = {
-						modifier = modifier_tec_impersonation_procurator
-						days = -1
-					}
-					country_event = {
-						id = tec_machine_impersonation.2010
-						days = 2
-					}
-
-					remove_country_flag = tec_was_procurator_bias
-
-					break = yes
-				}
-				if = {
-					limit = {
-						has_country_flag = tec_was_offender_bias
-					}
-					remove_modifier = modifier_tec_impersonation_inventor
-					add_modifier = {
-						modifier = modifier_tec_impersonation_offender
-						days = -1
-					}
-					country_event = {
-						id = tec_machine_impersonation.2011
-						days = 2
-					}
-
-					remove_country_flag = tec_was_offender_bias
-
-					break = yes
-				}
-				if = {
-					limit = {
-						NOR = {
-							has_country_flag = tec_was_procurator_bias
-							has_country_flag = tec_was_offender_bias	
-						}
-					}
-					random_list = {
-						1 = {	# procurator wins
-							remove_modifier = modifier_tec_impersonation_inventor
-							add_modifier = {
-								modifier = modifier_tec_impersonation_procurator
-								days = -1
-							}
-							country_event = {
-								id = tec_machine_impersonation.2010
-								days = 2
-							}
-						}
-						1 = {	# inventor wins
-							remove_modifier = modifier_tec_impersonation_inventor
-							add_modifier = {
-								modifier = modifier_tec_impersonation_offender
-								days = -1
-							}
-							country_event = {
-								id = tec_machine_impersonation.2011
-								days = 2
-							}
-						}
-					}
-				}
-				
-				break = yes
-			}
-
-			
-			# If has Offender
-			if = {
-				limit = {
-					has_modifier = modifier_tec_impersonation_offender
-				}
-				set_country_flag = tec_was_offender_bias
-				if = {
-					limit = {
-						has_country_flag = tec_was_procurator_bias
-					}
-					remove_modifier = modifier_tec_impersonation_offender
-					add_modifier = {
-						modifier = modifier_tec_impersonation_procurator
-						days = -1
-					}
-					country_event = {
-						id = tec_machine_impersonation.2010
-						days = 2
-					}
-
-					remove_country_flag = tec_was_procurator_bias
-
-					break = yes
-				}
-				if = {
-					limit = {
-						has_country_flag = tec_was_inventor_bias
-					}
-					remove_modifier = modifier_tec_impersonation_offender
-					add_modifier = {
-						modifier = modifier_tec_impersonation_inventor
-						days = -1
-					}
-					country_event = {
-						id = tec_machine_impersonation.2012
-						days = 2
-					}
-
-					remove_country_flag = tec_was_inventor_bias
-
-					break = yes
-				}
-				if = {
-					limit = {
-						NOR = {
-							has_country_flag = tec_was_procurator_bias
-							has_country_flag = tec_was_inventor_bias	
-						}
-					}
-					random_list = {
-						1 = {	# procurator wins
-							remove_modifier = modifier_tec_impersonation_offender
-							add_modifier = {
-								modifier = modifier_tec_impersonation_procurator
-								days = -1
-							}
-							country_event = {
-								id = tec_machine_impersonation.2010
-								days = 2
-							}
-						}
-						1 = {	# inventor wins
-							remove_modifier = modifier_tec_impersonation_offender
-							add_modifier = {
-								modifier = modifier_tec_impersonation_inventor
-								days = -1
-							}
-							country_event = {
-								id = tec_machine_impersonation.2012
-								days = 2
-							}
-						}
-					}
-				}
-				
+			else = {
 				break = yes
 			}
 		}
-		else = {
-			break = yes
+	}
+
+	# gamestart, marks the neutral
+	country_event = {
+		id = tec_machine_impersonation.2001
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			has_valid_civic = civic_tec_machine_bias
+		}
+		
+		immediate = {
+			add_modifier = {
+				modifier = modifier_tec_impersonation_neutral
+				days = -1
+			}
 		}
 	}
-}
 
-# gamestart, marks the neutral
-country_event = {
-	id = tec_machine_impersonation.2001
-	hide_window = yes
+	# Gets Procurator
+	country_event = {
+		id = tec_machine_impersonation.2010
+		title = "tec_machine_impersonation.2010.title"
+		desc = "tec_machine_impersonation.2010.desc"
+		show_sound = event_yellow_alert
+		picture = GFX_evt_sapient_AI
 
-	is_triggered_only = yes
+		is_triggered_only = yes
 
-	trigger = {
-		has_valid_civic = civic_tec_machine_bias
-	}
-	
-	immediate = {
-		add_modifier = {
-			modifier = modifier_tec_impersonation_neutral
-			days = -1
+		trigger = {
+			has_valid_civic = civic_tec_machine_bias
+		}
+		
+		option = {
+			name = "tec_machine_impersonation.2010.a"
 		}
 	}
-}
 
-# Gets Procurator
-country_event = {
-	id = tec_machine_impersonation.2010
-	title = "tec_machine_impersonation.2010.title"
-	desc = "tec_machine_impersonation.2010.desc"
-	show_sound = event_yellow_alert
-	picture = GFX_evt_sapient_AI
+	# Gets offender
+	country_event = {
+		id = tec_machine_impersonation.2011
+		title = "tec_machine_impersonation.2011.title"
+		desc = "tec_machine_impersonation.2011.desc"
+		show_sound = event_yellow_alert
+		picture = GFX_evt_sapient_AI
 
-	is_triggered_only = yes
+		is_triggered_only = yes
 
-	trigger = {
-		has_valid_civic = civic_tec_machine_bias
+		trigger = {
+			has_valid_civic = civic_tec_machine_bias
+		}
+		
+		option = {
+			name = "tec_machine_impersonation.2011.a"
+		}
 	}
-	
-	option = {
-		name = "tec_machine_impersonation.2010.a"
+
+	# Gets inventor
+	country_event = {
+		id = tec_machine_impersonation.2012
+		title = "tec_machine_impersonation.2012.title"
+		desc = "tec_machine_impersonation.2012.desc"
+		show_sound = event_yellow_alert
+		picture = GFX_evt_sapient_AI
+
+		is_triggered_only = yes
+
+		trigger = {
+			has_valid_civic = civic_tec_machine_bias
+		}
+		
+		option = {
+			name = "tec_machine_impersonation.2012.a"
+		}
 	}
-}
-
-# Gets offender
-country_event = {
-	id = tec_machine_impersonation.2011
-	title = "tec_machine_impersonation.2011.title"
-	desc = "tec_machine_impersonation.2011.desc"
-	show_sound = event_yellow_alert
-	picture = GFX_evt_sapient_AI
-
-	is_triggered_only = yes
-
-	trigger = {
-		has_valid_civic = civic_tec_machine_bias
-	}
-	
-	option = {
-		name = "tec_machine_impersonation.2011.a"
-	}
-}
-
-# Gets inventor
-country_event = {
-	id = tec_machine_impersonation.2012
-	title = "tec_machine_impersonation.2012.title"
-	desc = "tec_machine_impersonation.2012.desc"
-	show_sound = event_yellow_alert
-	picture = GFX_evt_sapient_AI
-
-	is_triggered_only = yes
-
-	trigger = {
-		has_valid_civic = civic_tec_machine_bias
-	}
-	
-	option = {
-		name = "tec_machine_impersonation.2012.a"
-	}
-}
+# /
 
 
 # Hoarders
 
 namespace = tec_hoarders
 
-planet_event = {
-	id = tec_hoarders.1
-	title = "tec_hoarders.1.title"
-	desc = "tec_hoarders.1.desc"
-	picture = GFX_evt_metropolis
+	planet_event = {
+		id = tec_hoarders.1
+		title = "tec_hoarders.1.title"
+		desc = "tec_hoarders.1.desc"
+		picture = GFX_evt_metropolis
 
-	is_triggered_only = yes
+		is_triggered_only = yes
 
-	trigger = {
-		has_building = building_tec_vault_of_plenty
-	}
-
-	immediate = {
-		save_event_target_as = tec_hoarders_managed_planet
-		set_variable = {
-			which = tec_stockpile_change
-			value = 0
+		trigger = {
+			has_building = building_tec_vault_of_plenty
 		}
-		remove_planet_flag = tec_vault_manage_minerals
-		remove_planet_flag = tec_vault_manage_food
-		remove_planet_flag = tec_vault_manage_alloys
-		remove_planet_flag = tec_vault_manage_consumer_goods
-		remove_planet_flag = tec_vault_manage_rare_crystals
-		remove_planet_flag = tec_vault_manage_exotic_gases
-		remove_planet_flag = tec_vault_manage_volatile_motes
-		remove_planet_flag = tec_vault_manage_minor_artifacts
-	}
 
-	inline_script = {
-		script = events/inline_evolved_tec_hoarder_manage_option
-		resource = minerals 
-	}
-	
-	inline_script = {
-		script = events/inline_evolved_tec_hoarder_manage_option
-		resource = food 
-	}
-
-	inline_script = {
-		script = events/inline_evolved_tec_hoarder_manage_option
-		resource = alloys 
-	}
-
-	inline_script = {
-		script = events/inline_evolved_tec_hoarder_manage_option
-		resource = consumer_goods
-	}
-
-	inline_script = {
-		script = events/inline_evolved_tec_hoarder_manage_option
-		resource = rare_crystals 
-	}
-
-	inline_script = {
-		script = events/inline_evolved_tec_hoarder_manage_option
-		resource = exotic_gases 
-	}
-
-	inline_script = {
-		script = events/inline_evolved_tec_hoarder_manage_option
-		resource = volatile_motes 
-	}
-
-	inline_script = {
-		script = events/inline_evolved_tec_hoarder_manage_option
-		resource = minor_artifacts 
-	}
-
-	option = {
-		name = "tec_hoarders.1.withdraw"
-		hidden_effect = {
-			tec_hoarders_withdraw_resource = { RESOURCE = minerals }
-			tec_hoarders_withdraw_resource = { RESOURCE = food }
-			tec_hoarders_withdraw_resource = { RESOURCE = alloys }
-			tec_hoarders_withdraw_resource = { RESOURCE = consumer_goods }
-			tec_hoarders_withdraw_resource = { RESOURCE = rare_crystals }
-			tec_hoarders_withdraw_resource = { RESOURCE = exotic_gases }
-			tec_hoarders_withdraw_resource = { RESOURCE = volatile_motes }
-			tec_hoarders_withdraw_resource = { RESOURCE = minor_artifacts }
-		}
-	}
-
-	option = {
-		name = "tec_hoarders.1.exit"
-	}
-}
-
-planet_event = {
-	id = tec_hoarders.2
-	title = "tec_hoarders.2.title"
-	desc = "tec_hoarders.2.desc"
-	picture = GFX_evt_metropolis
-
-	is_triggered_only = yes
-
-	option = {
-		name = "tec_hoarders.2.max"
-		hidden_effect = {
-			change_variable = {
+		immediate = {
+			save_event_target_as = tec_hoarders_managed_planet
+			set_variable = {
 				which = tec_stockpile_change
-				value = value:tec_hoarders_max_that_can_be_deposited
+				value = 0
 			}
-			planet_event = {
-				id = tec_hoarders.2
+			remove_planet_flag = tec_vault_manage_minerals
+			remove_planet_flag = tec_vault_manage_food
+			remove_planet_flag = tec_vault_manage_alloys
+			remove_planet_flag = tec_vault_manage_consumer_goods
+			remove_planet_flag = tec_vault_manage_rare_crystals
+			remove_planet_flag = tec_vault_manage_exotic_gases
+			remove_planet_flag = tec_vault_manage_volatile_motes
+			remove_planet_flag = tec_vault_manage_minor_artifacts
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_manage_option
+			resource = minerals 
+		}
+		
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_manage_option
+			resource = food 
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_manage_option
+			resource = alloys 
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_manage_option
+			resource = consumer_goods
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_manage_option
+			resource = rare_crystals 
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_manage_option
+			resource = exotic_gases 
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_manage_option
+			resource = volatile_motes 
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_manage_option
+			resource = minor_artifacts 
+		}
+
+		option = {
+			name = "tec_hoarders.1.withdraw"
+			hidden_effect = {
+				tec_hoarders_withdraw_resource = { RESOURCE = minerals }
+				tec_hoarders_withdraw_resource = { RESOURCE = food }
+				tec_hoarders_withdraw_resource = { RESOURCE = alloys }
+				tec_hoarders_withdraw_resource = { RESOURCE = consumer_goods }
+				tec_hoarders_withdraw_resource = { RESOURCE = rare_crystals }
+				tec_hoarders_withdraw_resource = { RESOURCE = exotic_gases }
+				tec_hoarders_withdraw_resource = { RESOURCE = volatile_motes }
+				tec_hoarders_withdraw_resource = { RESOURCE = minor_artifacts }
 			}
 		}
-		allow = {
-			custom_tooltip = {
-				fail_text = tec_hoarders.2.not_enough_resources
-				check_variable_arithmetic = {
-					which = value:tec_hoarders_after_deposit_balance|DEPOSIT|0|
-					value >= 0
+
+		option = {
+			name = "tec_hoarders.1.exit"
+		}
+	}
+
+	planet_event = {
+		id = tec_hoarders.2
+		title = "tec_hoarders.2.title"
+		desc = "tec_hoarders.2.desc"
+		picture = GFX_evt_metropolis
+
+		is_triggered_only = yes
+
+		option = {
+			name = "tec_hoarders.2.max"
+			hidden_effect = {
+				change_variable = {
+					which = tec_stockpile_change
+					value = value:tec_hoarders_max_that_can_be_deposited
+				}
+				planet_event = {
+					id = tec_hoarders.2
 				}
 			}
-			custom_tooltip = {
-				fail_text = tec_hoarders.2.not_enough_vault_cap
-				check_variable_arithmetic = {
-					which = value:tec_hoarders_after_deposit_remaining_capacity|DEPOSIT|0|
-					value >= 0
+			allow = {
+				custom_tooltip = {
+					fail_text = tec_hoarders.2.not_enough_resources
+					check_variable_arithmetic = {
+						which = value:tec_hoarders_after_deposit_balance|DEPOSIT|0|
+						value >= 0
+					}
+				}
+				custom_tooltip = {
+					fail_text = tec_hoarders.2.not_enough_vault_cap
+					check_variable_arithmetic = {
+						which = value:tec_hoarders_after_deposit_remaining_capacity|DEPOSIT|0|
+						value >= 0
+					}
+				}
+				owner = {
+					tec_is_hoarder_empire = yes
 				}
 			}
-			owner = {
+		}
+		
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_deposit_option
+			count = 10000
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_deposit_option
+			count = 1000
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_deposit_option
+			count = 500
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_deposit_option
+			count = 100
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_withdraw_option
+			count = 100
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_withdraw_option
+			count = 500
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_withdraw_option
+			count = 1000
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_withdraw_option
+			count = 10000
+		}
+
+		option = {
+			name = "tec_hoarders.2.withdraw"
+			hidden_effect = {
+				set_variable = {
+					which = tec_stockpile_change
+					value = value:tec_hoarder_get_vault_stockpile
+				}
+				multiply_variable = {
+					which = tec_stockpile_change
+					value = -1
+				}
+				planet_event = {
+					id = tec_hoarders.2
+				}
+			}
+			allow = {
+				custom_tooltip = {
+					fail_text = tec_hoarders.2.not_enough_stockpile
+					check_variable_arithmetic = {
+						which = value:tec_hoarder_get_vault_stockpile
+						value > 0
+					}
+				}
+			}
+		}
+
+		option = {
+			name = "tec_hoarders.2.clear"
+			hidden_effect = {
+				set_variable = {
+					which = tec_stockpile_change
+					value = 0
+				} 
+				planet_event = {
+					id = tec_hoarders.2
+				}
+			}
+		}
+
+		option = {
+			name = "tec_hoarders.2.complete"
+			hidden_effect = {
+				tec_hoarders_manage_resource = { RESOURCE = minerals }
+				tec_hoarders_manage_resource = { RESOURCE = food }
+				tec_hoarders_manage_resource = { RESOURCE = alloys }
+				tec_hoarders_manage_resource = { RESOURCE = consumer_goods }
+				tec_hoarders_manage_resource = { RESOURCE = rare_crystals }
+				tec_hoarders_manage_resource = { RESOURCE = exotic_gases }
+				tec_hoarders_manage_resource = { RESOURCE = volatile_motes }
+				tec_hoarders_manage_resource = { RESOURCE = minor_artifacts }
+				set_variable = {
+					which = tec_stockpile_change
+					value = 0
+				} 
+				planet_event = {
+					id = tec_hoarders.1
+				}
+			}
+			allow = {
+				custom_tooltip = {
+					fail_text = tec_hoarders.2.not_enough_resources
+					check_variable_arithmetic = {
+						which = value:tec_hoarders_after_deposit_balance|DEPOSIT|0|
+						value >= 0
+					}
+				}
+				custom_tooltip = {
+					fail_text = tec_hoarders.2.not_enough_vault_cap
+					check_variable_arithmetic = {
+						which = value:tec_hoarders_after_deposit_remaining_capacity|DEPOSIT|0|
+						value >= 0
+					}
+				}
+				custom_tooltip = {
+					fail_text = tec_hoarders.2.not_enough_stockpile
+					check_variable_arithmetic = {
+						which = value:tec_hoarders_after_withdraw_balance|WITHDRAW|0|
+						value >= 0
+					}
+				}
+			}
+		}
+	}
+
+	pop_event  = {
+		id = tec_hoarders.3
+
+		is_triggered_only = yes
+		hide_window = yes
+
+		trigger = {
+			exists = from.owner
+			exists = root.planet.owner
+			root.planet.owner = {
 				tec_is_hoarder_empire = yes
 			}
+			# from = { # commented for future balancing
+			# 	planet_devastation > 50 
+			# }
 		}
-	}
-	
-	inline_script = {
-		script = events/inline_evolved_tec_hoarder_deposit_option
-		count = 10000
-	}
 
-	inline_script = {
-		script = events/inline_evolved_tec_hoarder_deposit_option
-		count = 1000
-	}
-
-	inline_script = {
-		script = events/inline_evolved_tec_hoarder_deposit_option
-		count = 500
-	}
-
-	inline_script = {
-		script = events/inline_evolved_tec_hoarder_deposit_option
-		count = 100
-	}
-
-	inline_script = {
-		script = events/inline_evolved_tec_hoarder_withdraw_option
-		count = 100
-	}
-
-	inline_script = {
-		script = events/inline_evolved_tec_hoarder_withdraw_option
-		count = 500
-	}
-
-	inline_script = {
-		script = events/inline_evolved_tec_hoarder_withdraw_option
-		count = 1000
-	}
-
-	inline_script = {
-		script = events/inline_evolved_tec_hoarder_withdraw_option
-		count = 10000
-	}
-
-	option = {
-		name = "tec_hoarders.2.withdraw"
-		hidden_effect = {
-			set_variable = {
-				which = tec_stockpile_change
-				value = value:tec_hoarder_get_vault_stockpile
-			}
-			multiply_variable = {
-				which = tec_stockpile_change
-				value = -1
-			}
-			planet_event = {
-				id = tec_hoarders.2
-			}
-		}
-		allow = {
-			custom_tooltip = {
-				fail_text = tec_hoarders.2.not_enough_stockpile
-				check_variable_arithmetic = {
-					which = value:tec_hoarder_get_vault_stockpile
-					value > 0
-				}
-			}
-		}
-	}
-
-	option = {
-		name = "tec_hoarders.2.clear"
-		hidden_effect = {
-			set_variable = {
-				which = tec_stockpile_change
-				value = 0
-			} 
-			planet_event = {
-				id = tec_hoarders.2
-			}
-		}
-	}
-
-	option = {
-		name = "tec_hoarders.2.complete"
-		hidden_effect = {
-			tec_hoarders_manage_resource = { RESOURCE = minerals }
-			tec_hoarders_manage_resource = { RESOURCE = food }
-			tec_hoarders_manage_resource = { RESOURCE = alloys }
-			tec_hoarders_manage_resource = { RESOURCE = consumer_goods }
-			tec_hoarders_manage_resource = { RESOURCE = rare_crystals }
-			tec_hoarders_manage_resource = { RESOURCE = exotic_gases }
-			tec_hoarders_manage_resource = { RESOURCE = volatile_motes }
-			tec_hoarders_manage_resource = { RESOURCE = minor_artifacts }
-			set_variable = {
-				which = tec_stockpile_change
-				value = 0
-			} 
-			planet_event = {
-				id = tec_hoarders.1
-			}
-		}
-		allow = {
-			custom_tooltip = {
-				fail_text = tec_hoarders.2.not_enough_resources
-				check_variable_arithmetic = {
-					which = value:tec_hoarders_after_deposit_balance|DEPOSIT|0|
-					value >= 0
-				}
-			}
-			custom_tooltip = {
-				fail_text = tec_hoarders.2.not_enough_vault_cap
-				check_variable_arithmetic = {
-					which = value:tec_hoarders_after_deposit_remaining_capacity|DEPOSIT|0|
-					value >= 0
-				}
-			}
-			custom_tooltip = {
-				fail_text = tec_hoarders.2.not_enough_stockpile
-				check_variable_arithmetic = {
-					which = value:tec_hoarders_after_withdraw_balance|WITHDRAW|0|
-					value >= 0
-				}
-			}
-		}
-	}
-}
-
-
-pop_event  = {
-	id = tec_hoarders.3
-
-	is_triggered_only = yes
-	hide_window = yes
-
-	trigger = {
-		exists = from.owner
-		exists = root.planet.owner
-		root.planet.owner = {
-			tec_is_hoarder_empire = yes
-		}
-		# from = { # commented for future balancing
-		# 	planet_devastation > 50 
-		# }
-	}
-
-	immediate = {
-		random_list = {
-			8 = {
-				random_list = {
-					1 = {
-						root.planet.owner = {
-							add_resource = {
-								minerals = 250
+		immediate = {
+			random_list = {
+				8 = {
+					random_list = {
+						1 = {
+							root.planet.owner = {
+								add_resource = {
+									minerals = 250
+								}
 							}
-						}
-						from.owner = {
-							add_resource = {
-								minerals = -250
+							from.owner = {
+								add_resource = {
+									minerals = -250
+								}
 							}
-						}
-						modifier = {
-							factor = 0
-							exists = from
-							from.owner = { 
-								resource_stockpile_compare = {
-									resource = minerals
-									value < 1000
+							modifier = {
+								factor = 0
+								exists = from
+								from.owner = { 
+									resource_stockpile_compare = {
+										resource = minerals
+										value < 1000
+									}
 								}
 							}
 						}
-					}
-					1 = {
-						root.planet.owner = {
-							add_resource = {
-								food = 250
+						1 = {
+							root.planet.owner = {
+								add_resource = {
+									food = 250
+								}
 							}
-						}
-						from.owner = {
-							add_resource = {
-								food = -250
+							from.owner = {
+								add_resource = {
+									food = -250
+								}
 							}
-						}
-						modifier = {
-							factor = 0
-							exists = from
-							from.owner = { 
-								resource_stockpile_compare = {
-									resource = food
-									value < 1000
+							modifier = {
+								factor = 0
+								exists = from
+								from.owner = { 
+									resource_stockpile_compare = {
+										resource = food
+										value < 1000
+									}
 								}
 							}
 						}
 					}
 				}
+				3 = {
+					random_list = {
+						1 = {
+							root.planet.owner = {
+								add_resource = {
+									alloys = 250
+								}
+							}
+							from.owner = {
+								add_resource = {
+									alloys = -250
+								}
+							}
+							modifier = {
+								factor = 0
+								exists = from
+								from.owner = { 
+									resource_stockpile_compare = {
+										resource = alloys
+										value < 1000
+									}
+								}
+							}
+						}
+						1 = {
+							root.planet.owner = {
+								add_resource = {
+									consumer_goods = 250
+								}
+							}
+							from.owner = {
+								add_resource = {
+									consumer_goods = -250
+								}
+							}
+							modifier = {
+								factor = 0
+								exists = from
+								from.owner = { 
+									resource_stockpile_compare = {
+										resource = consumer_goods
+										value < 1000
+									}
+								}
+							}
+						}
+					}
+				}
+				2 = {
+					random_list = {
+						1 = {
+							root.planet.owner = {
+								add_resource = {
+									rare_crystals = 100
+								}
+							}
+							from.owner = {
+								add_resource = {
+									rare_crystals = -100
+								}
+							}
+							modifier = {
+								factor = 0
+								exists = from
+								from.owner = { 
+									resource_stockpile_compare = {
+										resource = rare_crystals
+										value < 300
+									}
+								}
+							}
+						}
+						1 = {
+							root.planet.owner = {
+								add_resource = {
+									exotic_gases = 100
+								}
+							}
+							from.owner = {
+								add_resource = {
+									exotic_gases = -100
+								}
+							}
+							modifier = {
+								factor = 0
+								exists = from
+								from.owner = { 
+									resource_stockpile_compare = {
+										resource = exotic_gases
+										value < 300
+									}
+								}
+							}
+						}
+						1 = {
+							root.planet.owner = {
+								add_resource = {
+									volatile_motes = 100
+								}
+							}
+							from.owner = {
+								add_resource = {
+									volatile_motes = -100
+								}
+							}
+							modifier = {
+								factor = 0
+								exists = from
+								from.owner = { 
+									resource_stockpile_compare = {
+										resource = volatile_motes
+										value < 300
+									}
+								}
+							}
+						}
+					}
+				}
+				1 = {
+					root.planet.owner = {
+						add_resource = {
+							minor_artifacts = 50
+						}
+					}
+					from.owner = {
+						add_resource = {
+							minor_artifacts = -50
+						}
+					}
+					modifier = {
+						factor = 0
+						exists = from
+						from.owner = { 
+							resource_stockpile_compare = {
+								resource = minor_artifacts
+								value < 100
+							}
+						}
+					}
+				}
+				8 = {} # 40% chance of nothing being gotten
 			}
-			3 = {
-				random_list = {
-					1 = {
-						root.planet.owner = {
-							add_resource = {
-								alloys = 250
-							}
-						}
-						from.owner = {
-							add_resource = {
-								alloys = -250
-							}
-						}
-						modifier = {
-							factor = 0
-							exists = from
-							from.owner = { 
-								resource_stockpile_compare = {
-									resource = alloys
-									value < 1000
-								}
-							}
-						}
-					}
-					1 = {
-						root.planet.owner = {
-							add_resource = {
-								consumer_goods = 250
-							}
-						}
-						from.owner = {
-							add_resource = {
-								consumer_goods = -250
-							}
-						}
-						modifier = {
-							factor = 0
-							exists = from
-							from.owner = { 
-								resource_stockpile_compare = {
-									resource = consumer_goods
-									value < 1000
-								}
-							}
-						}
-					}
-				}
-			}
-			2 = {
-				random_list = {
-					1 = {
-						root.planet.owner = {
-							add_resource = {
-								rare_crystals = 100
-							}
-						}
-						from.owner = {
-							add_resource = {
-								rare_crystals = -100
-							}
-						}
-						modifier = {
-							factor = 0
-							exists = from
-							from.owner = { 
-								resource_stockpile_compare = {
-									resource = rare_crystals
-									value < 300
-								}
-							}
-						}
-					}
-					1 = {
-						root.planet.owner = {
-							add_resource = {
-								exotic_gases = 100
-							}
-						}
-						from.owner = {
-							add_resource = {
-								exotic_gases = -100
-							}
-						}
-						modifier = {
-							factor = 0
-							exists = from
-							from.owner = { 
-								resource_stockpile_compare = {
-									resource = exotic_gases
-									value < 300
-								}
-							}
-						}
-					}
-					1 = {
-						root.planet.owner = {
-							add_resource = {
-								volatile_motes = 100
-							}
-						}
-						from.owner = {
-							add_resource = {
-								volatile_motes = -100
-							}
-						}
-						modifier = {
-							factor = 0
-							exists = from
-							from.owner = { 
-								resource_stockpile_compare = {
-									resource = volatile_motes
-									value < 300
-								}
-							}
-						}
-					}
-				}
-			}
-			1 = {
-				root.planet.owner = {
-					add_resource = {
-						minor_artifacts = 50
-					}
-				}
-				from.owner = {
-					add_resource = {
-						minor_artifacts = -50
-					}
-				}
-				modifier = {
-					factor = 0
-					exists = from
-					from.owner = { 
-						resource_stockpile_compare = {
-							resource = minor_artifacts
-							value < 100
-						}
-					}
-				}
-			}
-			8 = {} # 40% chance of nothing being gotten
 		}
 	}
-}
+# /
