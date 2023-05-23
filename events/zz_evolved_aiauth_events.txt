@@ -126,74 +126,161 @@ country_event = {	# Restores or creates leader when the aiauth is added - POST
 	}
 }
 
-country_event = {	# Manages the traits per year
-	id = tec_aiauth.20
-	is_triggered_only = yes
-	hide_window = yes
+# country_event = {	# Manages the traits per year
+# 	id = tec_aiauth.20
+# 	is_triggered_only = yes
+# 	hide_window = yes
 
-	trigger = {
-		tec_is_aiauth_empire = yes
+# 	trigger = {
+# 		tec_is_aiauth_empire = yes
+# 	}
+
+# 	immediate = {
+# 		hidden_effect = {
+# 			export_resource_stockpile_to_variable = {
+# 				resource = sr_tec_ai_power
+# 				variable = tec_aiauth_program_stored
+# 			}
+# 			# Checks Threshholds
+# 			if = {	# T1
+# 				# First time?
+# 				limit = {
+# 					check_variable = {
+# 						which = tec_aiauth_program_stored
+# 						value >= tec_aiauth_program_cost
+# 					}
+# 				}
+# 				# Adapts the new cost
+# 				multiply_variable = {
+# 					which = tec_aiauth_program_cost
+# 					value = 2
+# 				}
+# 				# This makes cost go from 500 to 1000, 2000, 4000, 8000, etc
+# 				# Ruler gets a trait
+# 				ruler = {
+# 					if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_0
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_0
+# 						add_trait = leader_trait_aiauth_ruler_checker_1
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_1
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_1
+# 						add_trait = leader_trait_aiauth_ruler_checker_2
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_2
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_2
+# 						add_trait = leader_trait_aiauth_ruler_checker_3
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_3
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_3
+# 						add_trait = leader_trait_aiauth_ruler_checker_4
+# 					}
+# 					else = {
+# 						break = yes
+# 					}
+# 				}
+# 			}
+# 		}
+# 	}
+# }
+
+situation_event = {
+	id = tec_aiauth.200
+	title = tec_aiauth.200.name
+	desc = {
+		text = tec_aiauth.200.desc
+		trigger = { always = yes }
+	}
+
+	picture = GFX_evt_deficit
+	show_sound = event_bad_omen
+	is_triggered_only = yes
+	situation = this
+
+	abort_trigger = {
+		situation_progress >= 100
 	}
 
 	immediate = {
-		hidden_effect = {
-			export_resource_stockpile_to_variable = {
-				resource = sr_tec_ai_power
-				variable = tec_aiauth_program_stored
+		owner = {
+			ordered_owned_planet = {
+				limit = { is_capital = no }
+				order_by = value:research_combined_value
+				position = 0
+				save_event_target_as = tec_repurposed_planet
 			}
-			# Checks Threshholds
-			if = {	# T1
-				# First time?
+			if = {
 				limit = {
-					check_variable = {
-						which = tec_aiauth_program_stored
-						value >= tec_aiauth_program_cost
-					}
+					NOT = { exists = event_target:tec_repurposed_planet }
 				}
-				# Adapts the new cost
-				multiply_variable = {
-					which = tec_aiauth_program_cost
-					value = 2
-				}
-				# This makes cost go from 500 to 1000, 2000, 4000, 8000, etc
-				# Ruler gets a trait
-				ruler = {
-					if = {
-						limit = {
-							has_trait = leader_trait_aiauth_ruler_checker_0
-						}
-						remove_trait = leader_trait_aiauth_ruler_checker_0
-						add_trait = leader_trait_aiauth_ruler_checker_1
-					}
-					else_if = {
-						limit = {
-							has_trait = leader_trait_aiauth_ruler_checker_1
-						}
-						remove_trait = leader_trait_aiauth_ruler_checker_1
-						add_trait = leader_trait_aiauth_ruler_checker_2
-					}
-					else_if = {
-						limit = {
-							has_trait = leader_trait_aiauth_ruler_checker_2
-						}
-						remove_trait = leader_trait_aiauth_ruler_checker_2
-						add_trait = leader_trait_aiauth_ruler_checker_3
-					}
-					else_if = {
-						limit = {
-							has_trait = leader_trait_aiauth_ruler_checker_3
-						}
-						remove_trait = leader_trait_aiauth_ruler_checker_3
-						add_trait = leader_trait_aiauth_ruler_checker_4
-					}
-					else = {
-						break = yes
-					}
+				capital_scope = {
+					save_event_target_as = tec_repurposed_planet
 				}
 			}
 		}
 	}
+
+	option = {
+		name = tec_aiauth.200.A
+		owner = {
+			event_target:tec_repurposed_planet = {
+				add_modifier = {
+					modifier = pm_tec_repurpose_research_to_ai_power
+					years = 2
+				}
+			}
+		}
+	}
+	option = {
+		name = tec_aiauth.200.B
+	}
 }
+
+
+situation_event = {
+	id = tec_aiauth.210
+	title = BANKRUPTCY
+	desc = {
+		text = deficit.110.desc
+		trigger = {
+			owner = { is_regular_empire = yes }
+		}
+	}
+	desc = {
+		text = deficit.110.desc.gestalt
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+	}
+	picture = GFX_evt_deficit
+	show_sound = event_life_support_fail
+	is_triggered_only = yes
+	situation = this
+	force_open = yes
+
+	option = {
+		name = UNFORTUNATE
+
+		owner = {
+			tec_aiauth_power_defaulted_effect = yes
+		}
+	}
+	after = {
+		destroy_situation = this
+	}
+}
+
 
 # event = {
 # 	id = tec_aiauth.24
