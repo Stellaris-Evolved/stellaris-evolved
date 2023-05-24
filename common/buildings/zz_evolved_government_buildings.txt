@@ -1019,3 +1019,93 @@ building_slave_processing = {
 	}
 
 }
+
+
+# AI Auth
+# -----------------------------------------
+# Planetary Node Center
+
+building_tec_planetary_node_center = {
+	base_buildtime = @b4_time
+	base_cap_amount = 1
+	can_be_disabled = no
+	can_be_ruined = no
+	position_priority = 30		# Unique
+
+	category = government
+
+	potential = {
+		exists = owner
+		owner = {
+			tec_is_aiauth_empire = yes
+		}
+	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/inline_evolved_resource_cost
+			tier = 4
+		}
+		upkeep = {
+			energy = 10
+		}
+	}
+
+	triggered_country_modifier = {
+		potential = {
+			leader = {
+				tec_is_aiauth_planetary_node = yes
+				tec_leader_is_at_max_skill = no
+			}
+		}
+		tec_aiauth_total_weight_add = 1
+		show_only_custom_tooltip = yes
+		custom_tooltip = tec_blank
+		mult = leader.value:tec_aiauth_node_weight
+	}
+
+	inline_script = { 
+		script = jobs/inline_evolved_politician
+		trigger = ""
+		count = 1
+		mult = 1
+		display = with_desc
+	}
+
+	inline_script = { 
+		script = jobs/inline_evolved_bureaucrat
+		trigger = ""
+		count = 2
+		mult = 1
+		display = with_desc
+	}
+
+	on_built = {
+		owner = {
+			tec_country_create_aiauth_non_councilor = {
+				CLASS = governor
+				NAME = tec_aiauth_planetary_governor
+				DESC = tec_aiauth_planetary_governor_desc
+			}
+		}
+		assign_leader = last_created_leader
+	}
+
+	on_destroy = {
+		leader = {
+			if = {
+				limit = {
+					tec_is_aiauth_planetary_node = yes
+				}
+				kill_leader = {
+					show_notification = no
+				}
+			}
+		}
+	}
+}
