@@ -3,9 +3,16 @@ tec_cache = {
 		limit = { 
 			$trigger$ = yes
 		}
-		set_$scope$_flag = $trigger$
+		set_$scope$_flag = tec_cache_$trigger$
 	} else = {
-		remove_$scope$_flag = $trigger$
+		remove_$scope$_flag = tec_cache_$trigger$
+	}
+}
+
+tec_cache_value = {
+	set_variable = {
+		which = tec_cache_$value$
+		value = value:$value$
 	}
 }
 
@@ -111,10 +118,7 @@ tec_cache_capital_triggers = {
 }
 
 tec_cache_colony_triggers = {
-	tec_cache = {
-		scope = planet
-		trigger = tec_has_ring_trade_hub
-	}
+	
 }
 
 tec_cache_planet_scope_triggers = {
@@ -152,6 +156,71 @@ tec_cache_pop_triggers = {
 	tec_cache = {
 		scope = pop
 		trigger = tec_has_stapled_trait
+	}
+}
+
+tec_cache_species_traits_triggers = {
+	tec_cache = {
+		scope = species
+		trigger = tec_has_stapled_trait
+	}
+	
+	tec_cache = {
+		scope = species
+		trigger = tec_has_ruler_job_invalidation_trait
+	}
+}
+
+tec_cache_country_monthly_triggers = {
+	if = {
+		limit = {
+			is_regular_empire = yes
+		}
+		tec_cache = {
+			scope = country
+			trigger = tec_xeno_any_genocided_our_species
+		}
+		tec_cache = {
+			scope = country
+			trigger = tec_xeno_we_genocided_any
+		}
+		tec_cache = {
+			scope = country
+			trigger = tec_xeno_any_enslaved_us
+		}
+		tec_cache = {
+			scope = country
+			trigger = tec_militarist_any_own_our_planets
+		}
+
+		# values
+		tec_cache_value = {
+			value = authoritarian_ethics_from_relations
+		}
+		tec_cache_value = {
+			value = egalitarian_ethics_from_relations
+		}
+		tec_cache_value = {
+			value = xenophobe_ethics_from_relations
+		}
+		tec_cache_value = {
+			value = xenophile_ethics_from_relations
+		}
+		tec_cache_value = {
+			value = spiritualist_ethics_from_relations
+		}
+		tec_cache_value = {
+			value = materialist_ethics_from_relations
+		}
+		tec_cache_value = {
+			value = pacifist_ethics_from_pacts
+		}
+		tec_cache_value = {
+			value = tec_cooperative_ethics_from_relations
+		}
+		tec_cache_value = {
+			value = tec_competitive_ethics_from_relations
+		}
 	}
 }
 
@@ -345,12 +414,12 @@ tec_cache_councilor = {
 		limit = { 
 			is_councilor_type = $type$
 		}
-		prev = { set_country_flag = tec_has_councilor_$type$ }
+		prev = { set_country_flag = tec_cache_tec_has_councilor_$type$ }
 	}
 }
 
 tec_clean_councilor_cache = {
-	remove_country_flag = tec_has_councilor_$type$
+	remove_country_flag = tec_cache_tec_has_councilor_$type$
 }
 
 tec_cache_country_councilor_triggers = {
@@ -396,6 +465,45 @@ tec_cache_country_councilor_triggers = {
 		tec_cache_councilor = { type = councilor_indentured_assets }
 		tec_cache_councilor = { type = councilor_trading_posts }
 		# These are from evolved
+	}
+}
+
+
+# scope: country
+tec_cache_opinions = {
+	if = {
+		limit = {
+			OR = {
+				tec_is_default_country = yes
+				is_fallen_empire = yes
+			}
+		}
+		every_spynetwork = {
+			limit = {
+				target = {
+					has_established_contact = prevprev
+					OR = {
+						tec_is_default_country = yes
+						is_fallen_empire = yes
+					}
+				}
+			}
+			target = {
+				set_variable = {
+					which = tec_opinion 
+					value = 0
+				}
+				export_trigger_value_to_variable = {
+					variable = tec_cache_tec_opinion
+					trigger = opinion
+					parameters = { who = prevprev }
+				}
+			}
+			set_variable = {
+				which = tec_cache_tec_opinion
+				value = target.tec_opinion
+			}
+		}
 	}
 }
 
