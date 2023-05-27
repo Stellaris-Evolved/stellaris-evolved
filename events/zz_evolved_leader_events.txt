@@ -28,6 +28,168 @@ country_event = {
 
 
 
+country_event = { 
+	id = tec_leaders.2
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+	}
+
+	immediate = {
+		tec_country_leaders_handle_starting_modifiers = yes
+	}
+}
+
+# from: leader
+# scope: country
+country_event = {
+	id = tec_leaders.3
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = {
+			tec_leader_handle_starting_modifiers = {
+				from = root
+			}
+		}
+	}
+}
+
+country_event = { 
+	id = tec_leaders.4
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		# moved to in immediate effect
+		exists = owner
+		tec_is_default_country = yes
+	}
+
+	immediate = {
+		FROM = {
+			if = {
+				limit = {
+					# on consecutive iterations, aka when an empire might get new shite from civics, etc
+					is_variable_set = tec_leader_starting_level_modifier 
+					check_variable = {
+						which = tec_leader_starting_level_modifier
+						value < value:tec_leader_starting_skill_add
+					}
+				}
+				set_variable = {
+					which = tec_difference
+					value = value:tec_leader_starting_skill_add
+				}
+				subtract_variable = {
+					which = tec_difference
+					value = tec_leader_starting_level_modifier
+				}
+				if = {
+					limit = {
+						is_pool_leader = yes
+					}
+					# add difference levels
+					add_skill = tec_difference
+				}
+				else = {
+					# add 200 xp x difference of starting level
+					multiply_variable = {
+						which = tec_difference
+						mult = 200
+					}
+					add_experience = tec_difference
+				}
+				clear_variable = tec_difference
+			}
+			else_if = {
+				limit = {
+					NOT = { is_variable_set = tec_leader_starting_level_modifier}
+					tec_leader_gets_starting_actions = yes
+					root = { 
+						tec_country_leader_gets_starting_actions = { flag = tec_no_starting_skill_modification }  
+					}
+				}
+				if = {
+					limit = {
+						is_pool_leader = yes
+					}
+					add_skill = value:tec_leader_starting_skill_add
+				}
+				else = {
+					add_skill_without_trait_selection = value:tec_leader_starting_skill_add
+				}
+			}
+			set_variable = {
+				which = tec_leader_starting_level_modifier 
+				value = value:tec_leader_starting_skill_add
+			}
+		}
+	}
+}
+
+country_event = { 
+	id = tec_leaders.5
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		# moved to in immediate effect
+		exists = owner
+		tec_is_default_country = yes
+	}
+
+	immediate = {
+		FROM = {
+			if = {
+				limit = {
+					# on consecutive iterations, aka when an empire might get new shite from civics, etc
+					is_variable_set = tec_leader_starting_traits_modifier 
+					check_variable = {
+						which = tec_leader_starting_traits_modifier
+						value < value:tec_leader_starting_traits_add
+					}
+				}
+				set_variable = {
+					which = tec_difference
+					value = value:tec_leader_starting_traits_add
+				}
+				subtract_variable = {
+					which = tec_difference
+					value = tec_leader_starting_traits_modifier
+				}
+				while = {
+					count = tec_difference
+					add_trait_no_notify = "random_common"
+				}
+				clear_variable = tec_difference
+			}
+			else_if = {
+				limit = {
+					NOT = { is_variable_set = tec_leader_starting_traits_modifier }
+					tec_leader_gets_starting_actions = yes
+					root = { 
+						tec_country_leader_gets_starting_actions = { flag = tec_no_starting_traits_modification } 
+					}
+				}
+				while = {
+					count = value:tec_leader_starting_traits_add
+					add_trait_no_notify = "random_common"
+				}
+			}
+			set_variable = {
+				which = tec_leader_starting_traits_modifier 
+				value = value:tec_leader_starting_traits_add
+			}
+		}
+	}
+}
 
 
 # ------------------------------------------------- AUTH - 100XX
@@ -42,7 +204,6 @@ country_event = {
 			has_ethic = ethic_gestalt_consciousness
 			is_pluralist = yes
 		}
-		NOT = { has_country_flag = spawning_renowned_leader }
 	}
 
 	immediate = {
@@ -244,15 +405,21 @@ country_event = {
 	hide_window = yes
 
 	trigger = {
+		tec_country_leader_gets_starting_actions = yes
 		OR = {
 			has_valid_civic = civic_tec_regular_patronage
 			has_valid_civic = civic_tec_hive_cerebrates
 			has_valid_civic = civic_tec_hive_cerebrates_cyborg
 			has_valid_civic = civic_machine_delegated_functions
 		}
+		from = { 
+			tec_leader_gets_starting_actions = { flag = tec_patronage_traits } 
+			tec_leader_first_staring_actions_done = no # called once, and only on new leaders
+		}
 	}
 
 	immediate = {
+		set_country_flag = tec_force_allow_all_traits
 		if = {
 			limit = {
 				has_valid_civic = civic_tec_regular_patronage
@@ -266,12 +433,29 @@ country_event = {
 							}
 							random_list = {
 								1 = {
+									modifier = {
+										factor = 0
+										is_councilor = yes
+									}
 									add_trait_no_notify = leader_trait_tec_prodigy_movement
 								}
 								1 = {
+									modifier = {
+										factor = 0
+										is_councilor = yes
+										it_ruler = no
+									}
+									modifier = { # this is best ruler trait, we wanna encourage it at start
+										add = 2
+										is_ruler = yes
+									}
 									add_trait_no_notify = leader_trait_tec_prodigy_emulators
 								}
 								1 = {
+									modifier = {
+										factor = 0
+										is_councilor = yes
+									}
 									add_trait_no_notify = leader_trait_tec_prodigy_tactical
 								}
 								1 = {
@@ -296,10 +480,23 @@ country_event = {
 								leader_class = scientist
 							}
 							random_list = {
-								1 = {
+								1.5 = {
+									modifier = {
+										factor = 0
+										is_councilor = yes
+									}
 									add_trait_no_notify = leader_trait_tec_prodigy_movement
 								}
-								1 = {
+								1.5 = {
+									modifier = {
+										factor = 0
+										is_councilor = yes
+										it_ruler = no
+									}
+									modifier = { # this is best ruler trait, we wanna encourage it at start
+										add = 2
+										is_ruler = yes
+									}
 									add_trait_no_notify = leader_trait_tec_prodigy_emulators
 								}
 								1 = {
@@ -324,10 +521,23 @@ country_event = {
 								leader_class = general
 							}
 							random_list = {
-								1 = {
+								1.5 = {
+									modifier = {
+										factor = 0
+										is_councilor = yes
+										it_ruler = no
+									}
+									modifier = { # this is best ruler trait, we wanna encourage it at start
+										add = 2
+										is_ruler = yes
+									}
 									add_trait_no_notify = leader_trait_tec_prodigy_emulators
 								}
-								1 = {
+								1.5 = {
+									modifier = {
+										factor = 0
+										is_councilor = yes
+									}
 									add_trait_no_notify = leader_trait_tec_prodigy_tactical
 								}
 								1 = {
@@ -352,7 +562,16 @@ country_event = {
 								leader_class = governor
 							}
 							random_list = {
-								1 = {
+								3 = {
+									modifier = {
+										factor = 0
+										is_councilor = yes
+										it_ruler = no
+									}
+									modifier = { # this is best ruler trait, we wanna encourage it at start
+										add = 2
+										is_ruler = yes
+									}
 									add_trait_no_notify = leader_trait_tec_prodigy_emulators
 								}
 								1 = {
@@ -450,7 +669,10 @@ country_event = {
 				}
 			}
 		}
-		
+		from = {
+			set_leader_flag = tec_patronage_traits
+		}
+		remove_country_flag = tec_force_allow_all_traits
 	}
 }
 
@@ -461,8 +683,12 @@ country_event = { # New Leaders are younger for the patronage civic
 	hide_window = yes
 
 	trigger = {
+		tec_country_leader_gets_starting_actions = yes
 		owner = {
 			has_valid_civic = civic_tec_regular_patronage
+		}
+		from = { 
+			tec_leader_gets_starting_actions = { flag = tec_patronage_age } 
 		}
 	}
 
@@ -482,6 +708,7 @@ country_event = { # New Leaders are younger for the patronage civic
 				1 = { set_age = 34 }
 				1 = { set_age = 35 }
 			}
+			set_leader_flag = tec_patronage_age
 		}
 	}
 }
@@ -576,3 +803,149 @@ country_event = {
 		}
 	}
 }
+
+namespace = tec_leaders_paragon_2
+
+# This = country
+# From = leader
+country_event = { # Crusader Spirit Civic Giving Traits / FROM = Leader
+	id = tec_leaders_paragon_2.2055
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		tec_country_leader_gets_starting_actions = yes
+		from = { 
+			tec_leader_gets_starting_actions = { flag = tec_crusader_traits } 
+			tec_leader_first_staring_actions_done = no # called once, and only on new leaders
+		}
+		exists = owner
+		has_valid_civic = civic_crusader_spirit
+		FROM = {
+			OR = {
+				leader_class = general
+				leader_class = admiral
+			}
+		}
+	}
+
+	immediate = {
+		set_country_flag = tec_force_allow_all_traits
+		FROM = {
+			if = {
+				limit = {
+					leader_class = admiral
+				}
+				add_trait_no_notify = leader_trait_par_zealot
+			}
+			else_if = {
+				limit = {
+					leader_class = general
+				}
+				add_trait_no_notify = leader_trait_crusader
+			}
+			set_leader_flag = tec_crusader_traits
+		}
+		
+		remove_country_flag = tec_force_allow_all_traits
+	}
+}
+
+
+country_event = { # Technocracy Civic Giving Traits / FROM = Leader
+	id = tec_leaders_paragon_2.2071
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		tec_country_leader_gets_starting_actions = yes
+		from = { 
+			tec_leader_gets_starting_actions = { flag = tec_directorate_traits } 
+			tec_leader_first_staring_actions_done = no # called once, and only on new leaders
+		}
+		exists = owner
+		OR = {
+			has_valid_civic = civic_tec_regular_science_directorate
+			has_valid_civic = civic_tec_corporate_innovative
+		}
+		FROM = { leader_class = scientist }
+	}
+
+	immediate = {
+		set_country_flag = tec_force_allow_all_traits
+		FROM = {
+			random_list = {
+				10 = { add_trait_no_notify = leader_trait_expertise_materials }
+				10 = { add_trait_no_notify = leader_trait_expertise_propulsion }
+				10 = { add_trait_no_notify = leader_trait_expertise_voidcraft }
+				10 = { add_trait_no_notify = leader_trait_expertise_industry }
+				10 = { add_trait_no_notify = leader_trait_expertise_field_manipulation }
+				10 = { add_trait_no_notify = leader_trait_expertise_particles }
+				10 = { add_trait_no_notify = leader_trait_expertise_computing }
+				10 = { add_trait_no_notify = leader_trait_expertise_new_worlds }
+				10 = { add_trait_no_notify = leader_trait_expertise_statecraft }
+				10 = { add_trait_no_notify = leader_trait_expertise_biology }
+				10 = { add_trait_no_notify = leader_trait_expertise_military_theory }
+				1 = {
+					modifier = {
+						add = 4
+						root = {
+							any_system_within_border = {
+								any_archaeological_site = {
+									is_site_completed = yes
+								}
+							}
+						}
+					}
+					add_trait_no_notify = leader_trait_expertise_archaeostudies
+				}
+				1 = {
+					modifier = {
+						add = 4
+						root = { has_technology = tech_psionic_theory }
+					}
+					add_trait_no_notify = leader_trait_expertise_psionics
+				}
+			}
+			set_leader_flag = tec_directorate_traits
+		}
+		remove_country_flag = tec_force_allow_all_traits
+	}
+}
+
+country_event = { # Letters of Marque Civic Giving Traits / FROM = Leader
+	id = tec_leaders_paragon_2.2110
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		tec_country_leader_gets_starting_actions = yes
+		from = { 
+			tec_leader_gets_starting_actions = { flag = tec_marque_traits } 
+			tec_leader_first_staring_actions_done = no # called once, and only on new leaders
+		}
+		exists = owner
+		has_valid_civic = civic_crusader_spirit_corporate
+		FROM = {
+			leader_class = admiral
+		}
+	}
+
+	immediate = {
+		set_country_flag = tec_force_allow_all_traits
+		FROM = {
+			if = {
+				limit = {
+					leader_class = admiral
+				}
+				add_trait_no_notify = leader_trait_corsair
+			}
+			set_leader_flag = tec_marque_traits
+		}
+		remove_country_flag = tec_force_allow_all_traits
+	}
+}
+
