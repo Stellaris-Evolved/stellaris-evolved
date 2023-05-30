@@ -23,18 +23,18 @@ country_event = { # Moved to tec_leaders_paragon_2.2071
 	}
 }
 
-# This = leader
-leader_event = { # disabled in favor of tec_leaders.3
-	id = paragon_2.2072
-	hide_window = yes
-	is_triggered_only = yes
+# # This = leader
+# leader_event = { # disabled in favor of tec_leaders.3
+# 	id = paragon_2.2072
+# 	hide_window = yes
+# 	is_triggered_only = yes
 
-	trigger = {
-		always = no
-	}
+# 	trigger = {
+# 		always = no
+# 	}
 
-	immediate = {}
-}
+# 	immediate = {}
+# }
 
 # This = country
 # From = leader
@@ -52,17 +52,17 @@ country_event = { # disabled in favor of tec_leaders.4 handler
 }
 
 
-leader_event = { # disabled in favor of tec_leaders.3
-	id = paragon_2.2051
-	hide_window = yes
+# leader_event = { # disabled in favor of tec_leaders.3
+# 	id = paragon_2.2051
+# 	hide_window = yes
 
-	is_triggered_only = yes
+# 	is_triggered_only = yes
 
-	trigger = {
-		always = no
-	}
-	immediate = {}
-}
+# 	trigger = {
+# 		always = no
+# 	}
+# 	immediate = {}
+# }
 
 country_event = { # moved to tec_leaders_paragon_2.2055
 	id = paragon_2.2055
@@ -84,16 +84,16 @@ country_event = { # moved to tec_leaders_paragon_2.2055
 }
 
 # This = leader
-leader_event = { # disabled in favor of tec_leaders.3
-	id = paragon_2.2056
-	hide_window = yes
-	is_triggered_only = yes
+# leader_event = { # disabled in favor of tec_leaders.3
+# 	id = paragon_2.2056
+# 	hide_window = yes
+# 	is_triggered_only = yes
 
-	trigger = {
-		always = no
-	}
-	immediate = {}
-}
+# 	trigger = {
+# 		always = no
+# 	}
+# 	immediate = {}
+# }
 
 
 country_event = {  # disabled in favor of tec_leaders.2
@@ -124,17 +124,17 @@ country_event = {  # disabled in favor of tec_leaders.5 handler
 	immediate = {}
 }
 
-# This = leader
-leader_event = { # disabled in favor of tec_leaders.3
-	id = paragon_2.2091
-	hide_window = yes
-	is_triggered_only = yes
+# # This = leader
+# leader_event = { # disabled in favor of tec_leaders.3
+# 	id = paragon_2.2091
+# 	hide_window = yes
+# 	is_triggered_only = yes
 
-	trigger = {
-		always = no
-	}
-	immediate = {}
-}
+# 	trigger = {
+# 		always = no
+# 	}
+# 	immediate = {}
+# }
 
 
 country_event = { # moved to tec_leaders_paragon_2.2110
@@ -170,6 +170,71 @@ country_event = { # Moved to tec_leaders.2
 	immediate = {
 		country_event = {
 			id = tec_leaders.2
+		}
+	}
+}
+
+# NOTE: Modified to disable effect on non working ai nodes
+# Aptitude - Champions of the Empire Tradition
+# on_monthly_pulse
+event = {
+	id = paragon_2.1145
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		every_playable_country = {
+			limit = { has_tradition = tr_aptitude_champions_of_the_empire }
+
+			# Reset counters
+			set_variable = { which = champs_of_empire_mil_amount value = 0 }
+			set_variable = { which = champs_of_empire_gov_amount value = 0 }
+			set_variable = { which = champs_of_empire_sci_amount value = 0 }
+			create_variable_if_not_exists = { VARIABLE = prev_champs_of_empire_mil_amount VALUE_IF_CREATED = 0 }
+			create_variable_if_not_exists = { VARIABLE = prev_champs_of_empire_gov_amount VALUE_IF_CREATED = 0 }
+			create_variable_if_not_exists = { VARIABLE = prev_champs_of_empire_sci_amount VALUE_IF_CREATED = 0 }
+			
+			# Count how many leaders and skill levels there are of each class.
+			if = {
+				every_owned_leader = {
+					# Exceptions
+					limit = {
+						OR = {
+							tec_is_aiauth_node = no
+							tec_leader_is_true_idle = no
+						}
+					}
+					if = {
+						limit = { OR = { leader_class = admiral leader_class = general } }
+						PREV = { change_variable = { which = champs_of_empire_mil_amount value = value:prev_has_skill } }
+					}
+					else_if = {
+						limit = { leader_class = governor }
+						PREV = { change_variable = { which = champs_of_empire_gov_amount value = value:prev_has_skill } }
+					}
+					else_if = {
+						limit = { leader_class = scientist }
+						PREV = { change_variable = { which = champs_of_empire_sci_amount value = value:prev_has_skill } }
+					}
+				}
+			}
+
+			# Update/remove modifier as needed
+			update_modifier_amount_if_needed = {
+				MODIFIER = champs_of_empire_mil_effect
+				MULT_VAR = champs_of_empire_mil_amount
+				PREV_MULT_VAR = prev_champs_of_empire_mil_amount
+			}
+			update_modifier_amount_if_needed = {
+				MODIFIER = champs_of_empire_gov_effect
+				MULT_VAR = champs_of_empire_gov_amount
+				PREV_MULT_VAR = prev_champs_of_empire_gov_amount
+			}
+			update_modifier_amount_if_needed = {
+				MODIFIER = champs_of_empire_sci_effect
+				MULT_VAR = champs_of_empire_sci_amount
+				PREV_MULT_VAR = prev_champs_of_empire_sci_amount
+			}
 		}
 	}
 }
