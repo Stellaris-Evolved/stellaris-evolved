@@ -2589,10 +2589,34 @@ tec_has_crime_jobs_available = {
 tec_is_crime_job = {
 	OR = {
 		has_job = enforcer
+		has_job = colonist
 		has_job = telepath
-		has_job = transcend
+		# evolved
+			has_job = transcend
+			has_job = tec_overseer
+			has_job = tec_corpo_overseer
+		# /
 	}
 }
+
+tec_is_ruler_pop_category = {
+	OR = {
+		is_pop_category = ruler
+		is_pop_category = tec_hedonists	
+	}
+}
+tec_is_specialist_pop_category = {
+	OR = {
+		is_pop_category = specialist
+	}
+}
+tec_is_worker_pop_category = {
+	OR = {
+		is_pop_category = worker
+		is_pop_category = tec_free_agent # considered worker for living standards
+	}
+}
+
 
 
 # Paragons
@@ -2702,61 +2726,45 @@ tec_has_councilor = { # NOTE: adjust tec_cache_country_councilor_triggers with e
 # $GT$ $GTE$ $EQ$ $LTE$ $LT$ $WHO$ $VALUE$
 tec_has_opinion = {
 	[[!GT]] [[!GTE]] [[!EQ]] [[!LTE]] [[!LT]]
-	[[ GT ] 
 	any_spynetwork = {
 		target = {
 			is_same_value = prev.$WHO$
 		}
+		is_variable_set = tec_cache_tec_opinion
+		[[ GT ] 
 		check_variable_arithmetic = {
 			which = tec_cache_tec_opinion
 			value > $VALUE$
 		}
-	}
-	]
-	[[ GTE ] 
-	any_spynetwork = {
-		target = {
-			is_same_value = prev.$WHO$
-		}
+		]
+		[[ GTE ] 
 		check_variable_arithmetic = {
 			which = tec_cache_tec_opinion
 			value >= $VALUE$
 		}
-	}
-	]
-	[[ EQ ] 
-	any_spynetwork = {
-		target = {
-			is_same_value = prev.$WHO$
-		}
+	
+		]
+		[[ EQ ] 
 		check_variable_arithmetic = {
 			which = tec_cache_tec_opinion
 			value = $VALUE$
 		}
-	}
+	
 	]
-	[[ LTE ] 
-	any_spynetwork = {
-		target = {
-			is_same_value = prev.$WHO$
-		}
+		[[ LTE ] 
 		check_variable_arithmetic = {
 			which = tec_cache_tec_opinion
 			value <= $VALUE$
 		}
-	}
-	]
-	[[ LT ] 
-	any_spynetwork = {
-		target = {
-			is_same_value = prev.$WHO$
-		}
+	
+		]
+		[[ LT ] 
 		check_variable_arithmetic = {
 			which = tec_cache_tec_opinion
 			value < $VALUE$
 		}
+		]
 	}
-	]
 }
 
 # only use on default/fallen empires, since caching
@@ -2772,83 +2780,59 @@ tec_has_opinion_level = {
 
 	# we have to do this cause you cannot nest brackets xd
 
-	if = { 
-		limit = {
-			always = $EXCELLENT|no$
+	any_spynetwork = {
+		target = {
+			is_same_value = prev.$WHO$
 		}
-	# 750 - 3000
-		[[GT] 
-		always = no
-		]
-		[[GTE] 
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
+		is_variable_set = tec_cache_tec_opinion
+		if = { 
+			limit = {
+				always = $EXCELLENT|no$
 			}
+		# 750 - 3000
+			[[GT] 
+			always = no
+			]
+			[[GTE] 
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value >= 750
 			}
-		}
-		]
-		[[EQ] 
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
-			}
+			]
+			[[EQ] 
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value >= 750
 			}
-		}
-		]
-		[[LTE] 
-		always = yes
-		]
-		[[LT] 
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
-			}
+			]
+			[[LTE] 
+			always = yes
+			]
+			[[LT] 
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value < 750
 			}
+			]
 		}
-		]
-	}
-	else_if = {
-		limit = {
-			always = $GOOD|no$
-		}
-	# 300 - 750
-		[[GT]
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
+		else_if = {
+			limit = {
+				always = $GOOD|no$
 			}
+		# 300 - 750
+			[[GT]
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value >= 750
 			}
-		}
-		]
-		[[GTE] 
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
-			}
+			]
+			[[GTE] 
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value >= 300
 			}
-		}
-		]
-		[[EQ] 
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
-			}
+			]
+			[[EQ] 
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value >= 300
@@ -2857,63 +2841,38 @@ tec_has_opinion_level = {
 				which = tec_cache_tec_opinion
 				value < 750
 			}
-		}
-		]
-		[[LTE] 
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
-			}
+			]
+			[[LTE] 
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value < 750
 			}
-		}
-		]
-		[[LT] 
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
-			}
+			]
+			[[LT] 
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value < 300
 			}
+			]
 		}
-		]
-	}
-	else_if = {
-		limit = {
-			always = $NEUTRAL|no$
-		}
-	# -300 - 300
-		[[GT] 
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
+		else_if = {
+			limit = {
+				always = $NEUTRAL|no$
 			}
+		# -300 - 300
+			[[GT] 
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value >= 300
 			}
-		}
-		]
-		[[GTE] 
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
-			}
+			]
+			[[GTE] 
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value >= -300
 			}
-		}
-		]
-		[[EQ] 
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
-			}
+			]
+			[[EQ] 
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value >= -300
@@ -2922,63 +2881,38 @@ tec_has_opinion_level = {
 				which = tec_cache_tec_opinion
 				value < 300
 			}
-		}
-		]
-		[[LTE] 
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
-			}
+			]
+			[[LTE] 
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value < 300
 			}
-		}
-		]
-		[[LT] 
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
-			}
+			]
+			[[LT]
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value < -300
 			}
+			]
 		}
-		]
-	}
-	else_if = {
-		limit = {
-			always = $POOR|no$
-		}
-	# -750 - -300
-		[[GT] 
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
+		else_if = {
+			limit = {
+				always = $POOR|no$
 			}
+		# -750 - -300
+			[[GT]
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value >= -300
 			}
-		}
-		]
-		[[GTE] 
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
-			}
+			]
+			[[GTE]
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value >= -750
 			}
-		}
-		]
-		[[EQ] 
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
-			}
+			]
+			[[EQ]
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value >= -750
@@ -2987,74 +2921,49 @@ tec_has_opinion_level = {
 				which = tec_cache_tec_opinion
 				value < -300
 			}
-		}
-		]
-		[[LTE] 
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
-			}
+			]
+			[[LTE]
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value < -300
 			}
-		}
-		]
-		[[LT] 
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
-			}
+			]
+			[[LT]
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value < -750
 			}
+			]
 		}
-		]
-	}
-	else_if = {
-		limit = {
-			always = $TERRIBLE|no$
-		}
-	# -3000 - -750
-		[[GT] 
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
+		else_if = {
+			limit = {
+				always = $TERRIBLE|no$
 			}
+		# -3000 - -750
+			[[GT] 
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value >= -750
 			}
-		}
-		]
-		[[GTE] 
-		always = yes
-		]
-		[[EQ] 
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
-			}
+			]
+			[[GTE] 
+			always = yes
+			]
+			[[EQ] 
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value < -750
 			}
-		}
-		]
-		[[LTE] 
-		any_spynetwork = {
-			target = {
-				is_same_value = prev.$WHO$
-			}
+			]
+			[[LTE] 
 			check_variable_arithmetic = {
 				which = tec_cache_tec_opinion
 				value < -750
 			}
+			]
+			[[LT] 
+			always = no
+			]
 		}
-		]
-		[[LT] 
-		always = no
-		]
 	}
 }

@@ -65,6 +65,84 @@ namespace = paragon
 # Beholder Spawn
 # paragon.1
 
+planet_event = {
+	id = paragon.50
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_building = building_the_beholder
+		has_planet_flag = psi_inoculating_pops
+		exists = event_target:beholder_leader
+	}
+
+	immediate = {
+		set_saved_date = {
+			key = beholder_psi_pops_timer
+			days_from_present = 180
+			expires = 180
+		}
+		random_owned_pop = {
+			limit = {
+				is_organic_species = yes 
+				is_being_assimilated = no
+				is_being_purged = no
+				tec_is_total_psionic_species = no
+				tec_is_cyborg_species = no
+				NOR = {
+					has_trait = trait_hive_mind
+				}
+			}
+			modify_species = {
+				remove_trait = trait_latent_psionic
+				add_trait = trait_psionic
+			}
+		}
+		create_message = {
+			type = MESSAGE_POPS_INOCULATED
+			localization = MESSAGE_POPS_INOCULATED_DESC
+			days = 20
+			target = root
+			variable = {
+				type = name
+				localization = PLANET
+				scope = root
+			}
+		}
+		if = {
+			limit = {
+				count_owned_pop = {
+					count = 0
+					limit = {
+						is_organic_species = yes 
+						is_being_assimilated = no
+						is_being_purged = no
+						tec_is_total_psionic_species = no
+						tec_is_cyborg_species = no
+						NOR = {
+							has_trait = trait_hive_mind
+						}
+					}
+				}
+			}
+			remove_planet_flag = psi_inoculating_pops
+			remove_planet_flag = beholder_psi_pops_timer
+			set_saved_date = {
+				key = beholder_psi_pops_cooldown_timer
+				days_from_present = 180
+				expires = 180
+			}
+		}
+		else = {
+			planet_event = {
+				id = paragon.50
+				days = 180
+			}
+		}
+	}
+}
+
+
 ###########################
 ### ASTROCREATOR AZARYN ###
 ###########################
