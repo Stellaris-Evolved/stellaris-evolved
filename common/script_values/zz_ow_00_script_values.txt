@@ -130,3 +130,117 @@ toxic_attendant_growth = {
 	base = 1
 	add = value:industrial_districts_value
 }
+
+job_weights_manual_corrections = {
+	#What comes below fixes an annoying logical problem in the system:
+	#check_economic_production_modifier_for_job checks the economic modifiers the current pop would get if it worked that job
+	#But it checks based on the pop's current characteristics. Which means it evaluates triggered job output modifiers such as
+	#planet_jobs_worker_produces_mult as if it were in its current pop category, which means "strong" pops would register as being
+	#good at research so long as they are currently workers.
+
+	# worker
+	modifier = {
+		subtract = species.modifier:planet_jobs_worker_produces_mult
+		NOR = {
+			tec_is_job_of_worker_category = yes
+			tec_is_job_of_simple_drone_category = yes
+		}
+		OR = {
+			tec_has_worker_job_category = yes
+			tec_has_simple_drone_job_category = yes 
+		}
+	}
+	modifier = {
+		add = species.modifier:planet_jobs_worker_produces_mult
+		OR = {
+			tec_is_job_of_worker_category = yes
+			tec_is_job_of_simple_drone_category = yes
+		}
+		NOR = {
+			tec_has_worker_job_category = yes
+			tec_has_simple_drone_job_category = yes 
+		}
+	}
+	# Worker only
+	modifier = {
+		subtract = species.modifier:planet_jobs_worker_only_produces_mult
+		tec_is_job_of_worker_category = no
+		tec_has_worker_job_category = yes
+	}
+	modifier = {
+		add = species.modifier:planet_jobs_worker_only_produces_mult
+		tec_is_job_of_worker_category = yes
+		tec_has_worker_job_category = no
+	}
+	# slave
+	modifier = {
+		subtract = species.modifier:planet_jobs_slave_produces_mult
+		NOR = {
+			tec_is_job_of_worker_category = yes
+			tec_is_job_of_specialist_category = yes
+		}
+		is_pop_category = slave
+		OR = {
+			tec_has_specialist_job_category = yes
+			tec_has_worker_job_category = yes
+		}
+	}
+	# no need for add check for em
+
+	# Specialist
+	modifier = {
+		subtract = species.modifier:planet_jobs_specialist_produces_mult
+		NOR = {
+			tec_is_job_of_specialist_category = yes
+			tec_is_job_of_complex_drone_category = yes
+		}
+		OR = {
+			tec_has_specialist_job_category = yes
+			tec_has_complex_drone_job_category = yes
+		}
+	}
+	modifier = {
+		add = species.modifier:planet_jobs_specialist_produces_mult
+		OR = {
+			tec_is_job_of_specialist_category = yes
+			tec_is_job_of_complex_drone_category = yes
+		}
+		NOR = {
+			tec_has_specialist_job_category = yes
+			tec_has_complex_drone_job_category = yes
+		}
+	}
+	# Specialist Only
+	modifier = {
+		subtract = species.modifier:planet_jobs_specialist_only_produces_mult
+		tec_is_job_of_specialist_category = no
+		tec_has_specialist_job_category = yes
+	}
+	modifier = {
+		add = species.modifier:planet_jobs_specialist_only_produces_mult
+		tec_is_job_of_specialist_category = yes
+		tec_has_specialist_job_category = no
+	}
+	# Simple Drone
+	modifier = {
+		subtract = species.modifier:planet_jobs_simple_drone_produces_mult
+		tec_is_job_of_simple_drone_category = no
+		tec_has_simple_drone_job_category = yes
+	}
+	modifier = {
+		add = species.modifier:planet_jobs_simple_drone_produces_mult
+		tec_is_job_of_simple_drone_category = yes
+		tec_has_simple_drone_job_category = no
+	}
+	# Complex
+	modifier = {
+		subtract = species.modifier:planet_jobs_complex_drone_produces_mult
+		tec_is_job_of_complex_drone_category = no
+		tec_has_complex_drone_job_category = yes
+	}
+	modifier = {
+		add = species.modifier:planet_jobs_complex_drone_produces_mult
+		tec_is_job_of_complex_drone_category = yes
+		tec_has_complex_drone_job_category = no
+	}
+}
