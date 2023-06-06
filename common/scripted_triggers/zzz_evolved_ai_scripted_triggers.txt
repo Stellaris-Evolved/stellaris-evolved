@@ -298,7 +298,6 @@ tec_ai_destroy_assembly_buildings = {
 		AND = {
 			free_district_slots = 0
 			free_housing <= 0
-			free_jobs <= 0
 		}
 	}
 	else = {
@@ -313,7 +312,6 @@ tec_ai_destroy_housing_building = {
 		}
 		AND = {
 			free_building_slots = 0
-			free_jobs < 1
 			free_housing > 10
 		}
 	}
@@ -329,10 +327,7 @@ tec_ai_allow_housing_building = {
 		}
 		AND = {
 			free_district_slots = 0
-			OR = {
-				free_jobs > 2
-				free_building_slots > 2
-			}
+			free_building_slots > 2
 			free_housing < 0
 		}
 	}
@@ -396,7 +391,21 @@ tec_ai_destroy_crime_building = {
 	}
 }
 
-tec_ai_destroy_industry_building = {
+tec_ai_destroy_foundry_building = {
+	if = {
+		limit = {
+			owner = { is_ai = yes }
+		}
+		OR = {
+			has_any_industry_district = no
+		}
+	}
+	else = {
+		always = no
+	}
+}
+
+tec_ai_destroy_factory_building = {
 	if = {
 		limit = {
 			owner = { is_ai = yes }
@@ -411,6 +420,28 @@ tec_ai_destroy_industry_building = {
 	}
 	else = {
 		always = no
+	}
+}
+
+tec_ai_allow_living_metal_dependant_building = { # to not block ai build plans
+	if = {
+		limit = {
+			exists = owner
+			owner = { is_ai = yes }
+		}
+		onwer = {
+			resource_stockpile_compare = {
+				resource = sr_living_metal
+				value >= @b_exotic_cost
+			}
+			has_monthly_income = {
+				resource = sr_living_metal
+				value >= @b_exotic_upkeep
+			}
+		}
+	}
+	else = {
+		always = yes
 	}
 }
 
@@ -815,18 +846,6 @@ tec_ai_allow_silo_building = {
 	}
 }
 
-tec_ai_needs_housing_district_housing = {
-	free_housing < 1
-	OR = {
-		free_building_slots > 0
-		free_jobs > 2
-	}
-}
-
-tec_ai_needs_housing_district_building_slots = {
-	free_building_slots < 1
-	free_district_slots > 1
-}
 
 # Starbase
 tec_ai_allow_crew_quarters_starbase_building = {
@@ -880,6 +899,44 @@ tec_ai_allow_research_starbase_building = {
 			has_starbase_module = tec_starbase_m_physics
 			has_starbase_module = tec_starbase_m_society
 			has_starbase_module = tec_starbase_m_engineering
+		}
+	}
+	else = {
+		always = yes
+	}
+}
+
+# districts
+
+tec_ai_needs_housing_district_housing = {
+	free_housing < 1
+	free_building_slots > 0
+}
+
+tec_ai_needs_housing_district_building_slots = {
+	free_building_slots < 1
+	free_district_slots > 1
+}
+
+
+tec_ai_allow_housing_district = {
+	# $housing$ $has_building_slots$
+	if = {
+		limit = { 
+			exists = owner
+			owner = { is_ai = yes } 
+		}
+		OR = {
+			AND = {
+				free_housing < $housing$
+			}
+			if = {
+				limit = {
+					$has_building_slots$
+				}
+				free_building_slots < 1
+				num_buildings = { type = any value < @tec_building_slot_max }
+			}
 		}
 	}
 	else = {
