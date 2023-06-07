@@ -1,0 +1,94 @@
+# factions/actions/inline_evolved_embrace_faction
+actions = {
+	embrace_faction = {
+		title = "EMBRACE_FACTION"
+		description = "EMBRACE_FACTION_DESC"
+		
+		cost = {
+			unity = @tec_fac_embrace_cost
+		}
+		
+		potential = {
+			exists = owner
+			owner = {
+				OR = {
+					is_subject = no
+					NOT = { any_agreement = { agreement_preset = preset_dominion } }
+				}
+			}
+		}
+		
+		valid = {
+			custom_tooltip = {
+				fail_text = EMBRACE_FACTION_COOLDOWN
+				parameter:empire = {
+					NOT = { has_modifier = embraced_faction_timer }
+				}
+			}
+			support > @tec_fac_embrace_min_support
+			parameter:empire = {
+				NOT = { has_ethic = "ethic_fanatic_$ETHIC$" }
+			}
+		}
+
+		effect = {
+			add_modifier = { modifier = embraced_faction days = @tec_fac_embrace_cd}
+			parameter:empire = {
+				shift_ethic = ethic_$ETHIC$
+				hidden_effect = {
+					add_modifier = { modifier = embraced_faction_timer days = @tec_fac_embrace_cd}
+					every_pop_faction = {
+						limit = { NOT = { is_same_value = root } }
+						add_modifier = { modifier = embraced_another_faction days = @tec_fac_embrace_cd}
+					}
+				}
+			}
+			hidden_effect = {
+				save_event_target_as = TargetFaction
+				parameter:empire = {
+					every_relation = {
+						limit = {
+							is_ai = no
+							tec_is_default_country = yes
+							has_communications = prev
+							has_intel_level = {
+								who = prev
+								category = government
+								level >= 1
+							}
+						}
+						country_event = { id = factions.2000 }
+					}
+				}
+			}
+		}
+		
+		ai_weight = {
+			base = 1
+			modifier = {
+				factor = 0
+				support < 0.50
+				owner = {
+					has_ethic = ethic_$ETHIC$
+				}
+			}
+			modifier = {
+				factor = 0
+				owner = { has_valid_civic = civic_fanatic_purifiers }
+			}
+			modifier = {
+				factor = 0
+				owner = {
+					count_pop_faction = {
+						count < 4
+					}
+				}
+			}
+
+			modifier = {
+				factor = 0
+				tec_has_enough_ethic_points = no
+			}
+		}
+	}
+}

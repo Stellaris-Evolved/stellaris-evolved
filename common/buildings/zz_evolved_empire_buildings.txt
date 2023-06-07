@@ -73,11 +73,6 @@ building_tec_entepre_factory = {	# CG
 			owner = { is_regular_empire = yes }
 		"
 	}
-
-	ai_resource_production = {
-		trigger = { always = yes }
-		consumer_goods = 1
-	}
 }
 
 building_tec_entepre_research = {	# Research
@@ -133,13 +128,6 @@ building_tec_entepre_research = {	# Research
 	}
 
 	inline_script = buildings/effects/inline_evolved_corporate_researchbureau
-
-	ai_resource_production = {
-		trigger = { always = yes }
-		physics_research = 1
-		society_research = 1
-		engineering_research = 1
-	}
 }
 
 building_tec_entepre_theatres = {	# Amenities
@@ -235,11 +223,16 @@ building_tec_outreach_platform = {	# Outreach
 				planet_building_build_speed_mult = 0.25
 				planet_decision_enact_speed_mult = 0.05
 			}
-			triggered_planet_modifier = {	# 1
+			triggered_planet_modifier = {	# 2 or AI
 				potential = {
-					tec_has_constructors_in_orbit = {
-						NUM = 2
+					exists = owner
+					OR = {
+						tec_has_constructors_in_orbit = {
+							NUM = 2
+						}
+						owner = { is_ai = yes }
 					}
+
 				}
 				planet_building_build_speed_mult = 0.5
 				planet_decision_enact_speed_mult = 0.15
@@ -453,11 +446,9 @@ building_tec_biopsionic_convergence = {
 		
 	}
 
-	ai_resource_production = {
-		sr_zro = 50
-		trigger = {
-			always = yes
-		}
+	inline_script = {
+		script = buildings/inline_evolved_aibait
+		trigger = ""
 	}
 }
 
@@ -605,6 +596,13 @@ building_tec_cyberpsionic_extractor = {
 				set_country_flag = tec_cyberpsionic_entropy_check
 			}
 		}
+	}
+
+	inline_script = {
+		script = buildings/inline_evolved_aibait
+		trigger = "
+ 			not = { has_building = building_tec_cyberpsionic_extractor }
+ 		"
 	}
 }
 
@@ -773,6 +771,11 @@ building_tec_cyberpsionic_gate = {
 		}
 	}
 
+	allow = {
+		has_upgraded_capital = yes
+		tec_ai_allow_cyberpsionic_gate_building = yes
+	}
+
 	resources = {
 		category = planet_buildings
 		inline_script = {
@@ -852,6 +855,26 @@ building_tec_cyberpsionic_gate = {
 			multiplier = value:tec_cyberpsionic_entropy_scaling
 		}
 	# /
+
+	inline_script = {
+		script = buildings/inline_evolved_aibait
+		trigger = "
+ 			OR = {
+				tec_is_arcology = yes
+				AND = {
+					exists = owner
+					owner = { tec_uses_trade_value = yes }
+					OR = {
+						has_trade_designation = yes
+						check_variable_arithmetic = {
+							which = value:trade_combined_value
+							value >= 4
+						}
+					}
+				}
+			}
+		"
+	}
 }
 
 # Old/do not remove yet
