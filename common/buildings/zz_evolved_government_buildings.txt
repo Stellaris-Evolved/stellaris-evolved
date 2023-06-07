@@ -367,12 +367,16 @@ building_grand_embassy = {
 
 # CIVICS
 # -----------------------------------------
-# Gaia civics
+# Idyllic bloom
 building_gaiaseeders_1 = {
 	base_buildtime = @b2_time
+	position_priority = 10		# Important
+
 	base_cap_amount = 1
-	category = government
 	can_be_disabled = no
+
+	category = government
+
 	upgrades = { "building_gaiaseeders_2" }
 
 	potential = {
@@ -410,17 +414,77 @@ building_gaiaseeders_1 = {
 		}
 	}
 
-	planet_modifier = {
+	#planet_modifier = {
+	#	pop_growth_speed = 0.1
+	#}
+
+	triggered_planet_modifier = {	# Regular empires
+		potential = {
+			exists = owner
+			owner = {
+				is_machine_empire = no
+			}
+		}
+		pop_growth_speed = 0.1
+		planet_pop_assembly_organic_mult = 0.1
+	}
+	triggered_planet_modifier = {	# Robot Assembly
+		potential = {
+			exists = owner
+			owner = {
+				OR = {
+					is_synthetic_empire = yes
+					AND = {
+						is_machine_empire = yes
+						NOR = {
+							tec_is_organic_machine_empire = yes
+							tec_is_organic_coexist_machine = yes
+						}
+					}
+				}
+			}
+		}
+		planet_pop_assembly_mult = 0.1
+	}
+	triggered_planet_modifier = {	# Robot Assembly + growth
+		potential = {
+			exists = owner
+			owner = {
+				OR = {
+					tec_is_organic_machine_empire = yes
+					tec_is_organic_coexist_machine = yes
+				}
+			}
+		}
+		planet_pop_assembly_mult = 0.1
 		pop_growth_speed = 0.1
 	}
 }
 
 building_gaiaseeders_2 = {
 	base_buildtime = @b2_time
+	position_priority = 10		# Important
+
 	can_build = no
-	category = government
 	can_be_disabled = no
+
+	category = government
+
 	upgrades = { "building_gaiaseeders_3" }
+
+	allow = {
+		can_build_gaiaseeder = yes
+	}
+
+	destroy_trigger = {
+		OR = {
+			tec_planet_allows_gaiaseeders = no
+			NOT = { exists = owner }
+			owner = {
+				tec_is_idyllic_bloom_empire = no
+			}
+		}
+	}
 
 	resources = {
 		category = planet_buildings
@@ -433,6 +497,107 @@ building_gaiaseeders_2 = {
 			exotic_gases = @b2_rare_upkeep
 			multiplier = value:gaiaseeder_upkeep
 		}
+		# Special machine costs
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes
+					}
+					is_dry = yes
+				}
+				food = 5
+				multiplier = value:gaiaseeder_upkeep
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes
+					}
+					is_wet = yes
+				}
+				minerals = 5
+				multiplier = value:gaiaseeder_upkeep
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes
+					}
+					is_cold = yes
+				}
+				energy = 8
+				multiplier = value:gaiaseeder_upkeep
+			}
+		# /
+	}
+
+	#planet_modifier = {
+	#	pop_growth_speed = 0.05
+	#	pop_environment_tolerance = 0.1
+	#}
+
+	triggered_planet_modifier = {	# Regular empires
+		potential = {
+			exists = owner
+			owner = {
+				is_machine_empire = no
+			}
+		}
+		pop_growth_speed = 0.1
+		planet_pop_assembly_organic_mult = 0.1
+		pop_environment_tolerance = 0.1
+	}
+	triggered_planet_modifier = {	# Synths
+		potential = {
+			exists = owner
+			owner = {
+				OR = {
+					is_synthetic_empire = yes
+					AND = {
+						is_machine_empire = yes
+						NOR = {
+							tec_is_organic_machine_empire = yes
+							tec_is_organic_coexist_machine = yes
+						}
+					}
+				}
+			}
+		}
+		planet_pop_assembly_mult = 0.1
+		pop_job_amenities_mult = 0.05
+	}
+	triggered_planet_modifier = {	# Mixed machines
+		potential = {
+			exists = owner
+			owner = {
+				OR = {
+					tec_is_organic_machine_empire = yes
+					tec_is_organic_coexist_machine = yes
+				}
+			}
+		}
+		planet_pop_assembly_mult = 0.1
+		pop_growth_speed = 0.1
+		pop_environment_tolerance = 0.1
+	}
+}
+
+building_gaiaseeders_3 = {
+	base_buildtime = @b2_time
+	position_priority = 10		# Important
+
+	can_build = no
+	can_be_disabled = no
+
+	category = government
+
+	upgrades = { "building_gaiaseeders_4" }
+
+	allow = {
+		can_build_gaiaseeder = yes
 	}
 
 	destroy_trigger = {
@@ -444,36 +609,6 @@ building_gaiaseeders_2 = {
 			}
 		}
 	}
-
-	allow = {
-		#OR = {
-		#	is_ideal_planet_class = {
-		#		who = owner
-		#		status = yes
-		#	}
-		#	owner_main_species = {
-		#		has_trait = @trait_tec_replicant_main
-		#	}
-		#	owner_main_species = {
-		#		has_trait = @trait_pc_tec_gene_preference
-		#	}
-		#}
-		#has_upgraded_capital = yes
-		can_build_gaiaseeder = yes
-	}
-
-	planet_modifier = {
-		pop_growth_speed = 0.05
-		pop_environment_tolerance = 0.1
-	}
-}
-
-building_gaiaseeders_3 = {
-	base_buildtime = @b2_time
-	can_build = no
-	category = government
-	can_be_disabled = no
-	upgrades = { "building_gaiaseeders_4" }
 
 	resources = {
 		category = planet_buildings
@@ -486,32 +621,105 @@ building_gaiaseeders_3 = {
 			exotic_gases = @b3_rare_upkeep
 			multiplier = value:gaiaseeder_upkeep
 		}
+		# Special machine costs
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes
+					}
+					is_dry = yes
+				}
+				food = 10
+				multiplier = value:gaiaseeder_upkeep
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes
+					}
+					is_wet = yes
+				}
+				minerals = 10
+				multiplier = value:gaiaseeder_upkeep
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes
+					}
+					is_cold = yes
+				}
+				energy = 15
+				multiplier = value:gaiaseeder_upkeep
+			}
+		# /
 	}
 
-	destroy_trigger = {
-		OR = {
-			tec_planet_allows_gaiaseeders = no
-			NOT = { exists = owner }
+	#planet_modifier = {
+	#	pop_environment_tolerance = 0.2
+	#}
+
+	triggered_planet_modifier = {	# Regular empires
+		potential = {
+			exists = owner
 			owner = {
-				tec_is_idyllic_bloom_empire = no
+				is_machine_empire = no
 			}
 		}
+		pop_growth_speed = 0.1
+		planet_pop_assembly_organic_mult = 0.1
+		pop_environment_tolerance = 0.2
 	}
-
-	allow = {
-		can_build_gaiaseeder = yes
+	triggered_planet_modifier = {	# Synths
+		potential = {
+			exists = owner
+			owner = {
+				OR = {
+					is_synthetic_empire = yes
+					AND = {
+						is_machine_empire = yes
+						NOR = {
+							tec_is_organic_machine_empire = yes
+							tec_is_organic_coexist_machine = yes
+						}
+					}
+				}
+			}
+		}
+		planet_pop_assembly_mult = 0.1
+		pop_job_amenities_mult = 0.1
 	}
-
-	planet_modifier = {
+	triggered_planet_modifier = {	# Mixed machines
+		potential = {
+			exists = owner
+			owner = {
+				OR = {
+					tec_is_organic_machine_empire = yes
+					tec_is_organic_coexist_machine = yes
+				}
+			}
+		}
+		planet_pop_assembly_mult = 0.1
+		pop_growth_speed = 0.1
 		pop_environment_tolerance = 0.2
 	}
 }
 
 building_gaiaseeders_4 = {
 	base_buildtime = @b2_time
+	position_priority = 10		# Important
+
 	can_build = no
-	category = government
 	can_be_disabled = no
+
+	category = government
+
+	allow = {
+		can_build_gaiaseeder = yes
+	}
 
 	destroy_trigger = {
 		OR = {
@@ -522,20 +730,232 @@ building_gaiaseeders_4 = {
 			}
 		}
 	}
+
 	resources = {
 		category = planet_buildings
 		cost = {
 			energy = 1500
 			exotic_gases = @b4_rare_cost
 		}
-	}
-
-	allow = {
-		can_build_gaiaseeder = yes
+		upkeep = {
+			energy = 20
+			exotic_gases = @b3_rare_upkeep
+			multiplier = value:gaiaseeder_upkeep
+		}
+		# Special machine costs
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes
+					}
+					is_dry = yes
+				}
+				food = 20
+				multiplier = value:gaiaseeder_upkeep
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes
+					}
+					is_wet = yes
+				}
+				minerals = 20
+				multiplier = value:gaiaseeder_upkeep
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes
+					}
+					is_cold = yes
+				}
+				energy = 30
+				multiplier = value:gaiaseeder_upkeep
+			}
+		# /
 	}
 
 	triggered_desc = {
 		text = building_gaiaseeders_4_effect_desc
+	}
+
+	triggered_planet_modifier = {	# Regular empires
+		potential = {
+			exists = owner
+			owner = {
+				is_machine_empire = no
+			}
+		}
+		pop_growth_speed = 0.15
+		planet_pop_assembly_organic_mult = 0.15
+		gaia_planet_jobs_produces_mult = 0.15
+	}
+	triggered_planet_modifier = {	# Synths
+		potential = {
+			exists = owner
+			owner = {
+				OR = {
+					is_synthetic_empire = yes
+					AND = {
+						is_machine_empire = yes
+						NOR = {
+							tec_is_organic_machine_empire = yes
+							tec_is_organic_coexist_machine = yes
+						}
+					}
+				}
+			}
+		}
+		planet_pop_assembly_mult = 0.15
+		pop_job_amenities_mult = 0.15
+		gaia_planet_jobs_produces_mult = 0.15
+	}
+	triggered_planet_modifier = {	# Mixed machines
+		potential = {
+			exists = owner
+			owner = {
+				OR = {
+					tec_is_organic_machine_empire = yes
+					tec_is_organic_coexist_machine = yes
+				}
+			}
+		}
+		planet_pop_assembly_mult = 0.15
+		pop_growth_speed = 0.15
+		gaia_planet_jobs_produces_mult = 0.15
+	}
+}
+
+# Specific building for gaia planets
+building_tec_gaiaseeders_gaia = {
+	icon = building_gaiaseeders_4
+	base_buildtime = @b2_time
+	position_priority = 10		# Important
+
+	base_cap_amount = 1
+	can_build = yes
+	can_be_disabled = no
+
+	category = government
+
+	potential = {
+		tec_is_gaia_world = yes
+	}
+
+	allow = {
+		tec_is_gaia_world = yes
+	}
+
+	destroy_trigger = {
+		OR = {
+			tec_is_gaia_world = no
+			NOT = { exists = owner }
+			owner = {
+				tec_is_idyllic_bloom_empire = no
+			}
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			energy = 2000
+			exotic_gases = @b4_rare_cost
+		}
+		upkeep = {
+			energy = 20
+			exotic_gases = @b3_rare_upkeep
+			multiplier = value:gaiaseeder_upkeep
+		}
+		# Special machine costs
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes
+					}
+					is_dry = yes
+				}
+				food = 20
+				multiplier = value:gaiaseeder_upkeep
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes
+					}
+					is_wet = yes
+				}
+				minerals = 20
+				multiplier = value:gaiaseeder_upkeep
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes
+					}
+					is_cold = yes
+				}
+				energy = 30
+				multiplier = value:gaiaseeder_upkeep
+			}
+		# /
+	}
+
+	triggered_desc = {
+		text = building_tec_gaiaseeders_gaia_effect
+	}
+
+	triggered_planet_modifier = {	# Regular empires
+		potential = {
+			exists = owner
+			owner = {
+				is_machine_empire = no
+			}
+		}
+		pop_growth_speed = 0.15
+		planet_pop_assembly_organic_mult = 0.15
+		gaia_planet_jobs_produces_mult = 0.15
+	}
+	triggered_planet_modifier = {	# Synths
+		potential = {
+			exists = owner
+			owner = {
+				OR = {
+					is_synthetic_empire = yes
+					AND = {
+						is_machine_empire = yes
+						NOR = {
+							tec_is_organic_machine_empire = yes
+							tec_is_organic_coexist_machine = yes
+						}
+					}
+				}
+			}
+		}
+		planet_pop_assembly_mult = 0.15
+		pop_job_amenities_mult = 0.15
+		gaia_planet_jobs_produces_mult = 0.15
+	}
+	triggered_planet_modifier = {	# Mixed machines
+		potential = {
+			exists = owner
+			owner = {
+				OR = {
+					tec_is_organic_machine_empire = yes
+					tec_is_organic_coexist_machine = yes
+				}
+			}
+		}
+		planet_pop_assembly_mult = 0.15
+		pop_growth_speed = 0.15
+		gaia_planet_jobs_produces_mult = 0.15
 	}
 }
 

@@ -1523,39 +1523,83 @@ holding_idyllic_bloom = {				# Idyllic Bloom
 			is_country_type = default
 			tec_is_idyllic_bloom_empire = yes
 		}
-		NOR = {
-			is_planet_class = pc_gaia
-			is_planet_class = pc_city
-			is_planet_class = pc_hive
-			is_planet_class = pc_machine
-			is_planet_class = pc_relic
-		}
-		is_artificial = no
+		tec_planet_allows_gaiaseeders = yes
 	}
 
-	planet_modifier = {
-		pop_environment_tolerance = 0.2
+	allow = {
+		can_build_overlord_gaiaseeder = yes
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = {
-				has_ascension_perk = ap_hydrocentric
+	#planet_modifier = {
+	#	pop_environment_tolerance = 0.2
+	#}
+
+	# Loyalty modifiers
+		triggered_planet_modifier = {
+			potential = {
+				exists = planet.owner
+				planet.owner = {
+					has_ascension_perk = ap_hydrocentric
+				}
 			}
+			monthly_loyalty = -0.5
 		}
-		monthly_loyalty = -0.5
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = {
-				NOT = { has_ascension_perk = ap_hydrocentric }
+		triggered_planet_modifier = {
+			potential = {
+				exists = planet.owner
+				planet.owner = {
+					NOT = { has_ascension_perk = ap_hydrocentric }
+				}
 			}
+			monthly_loyalty = 1
 		}
-		monthly_loyalty = 1
-	}
+	# /
+	# Production modifiers
+		triggered_planet_modifier = {	# Regular empires
+			potential = {
+				exists = planet.owner
+				planet.owner = {
+					is_machine_empire = no
+				}
+			}
+			pop_growth_speed = 0.1
+			planet_pop_assembly_organic_mult = 0.1
+			pop_environment_tolerance = 0.2
+		}
+		triggered_planet_modifier = {	# Synths
+			potential = {
+				exists = planet.owner
+				planet.owner = {
+					OR = {
+						is_synthetic_empire = yes
+						AND = {
+							is_machine_empire = yes
+							NOR = {
+								tec_is_organic_machine_empire = yes
+								tec_is_organic_coexist_machine = yes
+							}
+						}
+					}
+				}
+			}
+			planet_pop_assembly_mult = 0.1
+			pop_job_amenities_mult = 0.1
+		}
+		triggered_planet_modifier = {	# Mixed machines
+			potential = {
+				exists = planet.owner
+				planet.owner = {
+					OR = {
+						tec_is_organic_machine_empire = yes
+						tec_is_organic_coexist_machine = yes
+					}
+				}
+			}
+			planet_pop_assembly_mult = 0.1
+			pop_growth_speed = 0.1
+			pop_environment_tolerance = 0.2
+		}
+	# /
 
 	on_built = {
 		planet = {
@@ -1599,10 +1643,129 @@ holding_idyllic_bloom = {				# Idyllic Bloom
 		}
 		text = holding_idyllic_bloom_effect
 	}
+}
+
+holding_tec_idyllic_bloom_gaia = {		# Idyllic Bloom
+	base_buildtime = @b1_time
+	owner_type = subject_holding
+	icon = building_gaiaseeders_4
+	base_cap_amount = 1
+
+	category = government
+
+	resources = {
+		category = planet_holdings
+		inline_script = {
+			script = buildings/resources/inline_evolved_rare_resource_cost
+			tier = 3
+			rare = exotic_gases
+		}
+		cost = {
+			energy = 1500
+		}
+		upkeep = {
+			energy = 20
+			multiplier = value:overlord_gaiaseeder_upkeep
+		}
+	}
+
+	potential = {
+		exists = owner
+		owner.overlord = {
+			is_country_type = default
+			tec_is_idyllic_bloom_empire = yes
+		}
+		tec_is_gaia_world = yes
+	}
+
 	allow = {
-		can_build_overlord_gaiaseeder = yes
+		tec_is_gaia_world = yes
+	}
+
+	destroy_trigger = {
+		OR = {
+			tec_is_gaia_world = no
+			NOT = { exists = owner.overlord }
+			owner.overlord = {
+				tec_is_idyllic_bloom_empire = no
+			}
+		}
+	}
+
+	# Loyalty modifiers
+		triggered_planet_modifier = {
+			potential = {
+				exists = planet.owner
+				planet.owner = {
+					has_ascension_perk = ap_hydrocentric
+				}
+			}
+			monthly_loyalty = -0.5
+		}
+		triggered_planet_modifier = {
+			potential = {
+				exists = planet.owner
+				planet.owner = {
+					NOT = { has_ascension_perk = ap_hydrocentric }
+				}
+			}
+			monthly_loyalty = 1
+		}
+	# /
+
+	# Production modifiers
+		triggered_planet_modifier = {	# Regular empires
+			potential = {
+				exists = planet.owner
+				planet.owner = {
+					is_machine_empire = no
+				}
+			}
+			pop_growth_speed = 0.15
+			planet_pop_assembly_organic_mult = 0.15
+			gaia_planet_jobs_produces_mult = 0.15
+		}
+		triggered_planet_modifier = {	# Synths
+			potential = {
+				exists = planet.owner
+				planet.owner = {
+					OR = {
+						is_synthetic_empire = yes
+						AND = {
+							is_machine_empire = yes
+							NOR = {
+								tec_is_organic_machine_empire = yes
+								tec_is_organic_coexist_machine = yes
+							}
+						}
+					}
+				}
+			}
+			planet_pop_assembly_mult = 0.15
+			pop_job_amenities_mult = 0.15
+			gaia_planet_jobs_produces_mult = 0.15
+		}
+		triggered_planet_modifier = {	# Mixed machines
+			potential = {
+				exists = planet.owner
+				planet.owner = {
+					OR = {
+						tec_is_organic_machine_empire = yes
+						tec_is_organic_coexist_machine = yes
+					}
+				}
+			}
+			planet_pop_assembly_mult = 0.15
+			pop_growth_speed = 0.15
+			gaia_planet_jobs_produces_mult = 0.15
+		}
+	# /
+
+	triggered_desc = {
+		text = holding_tec_idyllic_bloom_gaia_effect
 	}
 }
+
 
 holding_reemployment_center = {			# Permanent Employment
 	base_buildtime = @b1_time
