@@ -35,10 +35,8 @@
 @tec_arc_hab_maintenance_sr = 1
 
 # Specs
-	# Base : 		Habitation + Industrial + Generator + leisure
 	# Industrial: 	Habitation + Alloys + CG + Secondary
 	# Civil:		Habitation + Research + Admin + Secondary
-	# Refinery: 	Habitation + Generator + Refinery + Secondary
 
 # --------------- Habitation
 district_tec_hab_arcology_housing = {
@@ -59,6 +57,9 @@ district_tec_hab_arcology_housing = {
 		tec_ai_allow_housing_district = {
 			housing = 5
 			has_building_slots = "always = yes"
+			use_for_jobs = "
+			tec_has_maintenance_drone_jobs_available = no
+			"
 		}
 	}
 
@@ -374,6 +375,10 @@ district_tec_hab_arcology_research = {
 		has_planet_flag = tec_civil_habitat
 	}
 
+	allow = {
+		tec_allow_research_buildings_and_districts = yes
+	}
+
 	conversion_ratio = 1
 	inline_script = districts/convert_to/inline_evolved_research_districts
 	inline_script = districts/convert_to/inline_evolved_industrial_districts
@@ -424,11 +429,19 @@ district_tec_hab_arcology_administration = {
 	show_on_uncolonized = {
 		tec_is_arcology_habitat = yes
 		has_planet_flag = tec_civil_habitat
+		exists = from
+		from = {
+			NOT = { has_valid_civic = civic_machine_servitor }
+		}
 	}
 	
 	potential = {
 		tec_is_arcology_habitat = yes
 		has_planet_flag = tec_civil_habitat
+		exists = owner
+		owner = {
+			NOT = { has_valid_civic = civic_machine_servitor }
+		}
 	}
 
 	conversion_ratio = 1
@@ -536,13 +549,37 @@ district_tec_hab_arcology_leisure = {
 
 	show_on_uncolonized = {
 		tec_is_arcology_habitat = yes
+		exists = from
+		from = {
+			OR = {
+				is_regular_empire = yes
+				has_valid_civic = civic_machine_servitor
+			}
+		}
 	}
 
 	potential = {
 		tec_is_arcology_habitat = yes
+		exists = owner
+		owner = {
+			OR = {
+				is_regular_empire = yes
+				has_valid_civic = civic_machine_servitor
+			}
+		}
 		NOR = {
 			has_building = building_order_keep
 			has_building = building_order_castle
+		}
+	}
+
+	allow = {
+		tec_ai_allow_leisure_district = yes
+	}
+
+	destroy_trigger = {
+		tec_ai_destroy_leisure_district = {
+			amenities = 40
 		}
 	}
 
@@ -609,37 +646,13 @@ district_tec_hab_arcology_leisure = {
 				"
 			}
 		# /
-		# Gestalt 
-			inline_script = {
-				script = jobs/inline_evolved_maintenance_drone
-				count = 3
-				mult = 1
-				display = with_desc
-				trigger = ""
-			}
-		# / 
-		# Hive
-			inline_script = {
-				script = jobs/inline_evolved_synapse
-				count = 2
-				mult = 1
-				display = with_desc
-				trigger = ""
-			}
-		# /
 		# Machine
 			inline_script = {
-				script = jobs/inline_evolved_coordinator
+				script = jobs/inline_evolved_maintenance_drone
 				count = 2
 				mult = 1
 				display = with_desc
-				trigger = "
-					owner = {
-						NOT = {
-							has_valid_civic = civic_machine_servitor
-						}
-					}
-				"
+				trigger = ""
 			}
 
 			inline_script = {
@@ -668,7 +681,9 @@ district_tec_hab_arcology_maintenance = {
 		tec_is_arcology_habitat = yes
 		exists = from
 		from = {
+			is_gestalt = yes
 			tec_uses_trade_value = no
+			NOT = { has_valid_civic = civic_machine_servitor }
 		}
 	}
 
@@ -676,7 +691,19 @@ district_tec_hab_arcology_maintenance = {
 		tec_is_arcology_habitat = yes
 		exists = owner
 		owner = {
+			is_gestalt = yes
 			tec_uses_trade_value = no
+			NOT = { has_valid_civic = civic_machine_servitor }
+		}
+	}
+
+	allow = {
+		tec_ai_allow_leisure_district = yes
+	}
+
+	destroy_trigger = {
+		tec_ai_destroy_leisure_district = {
+			amenities = 30
 		}
 	}
 
