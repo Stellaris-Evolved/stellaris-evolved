@@ -115,6 +115,94 @@ influence_expenditure_decisions = {
 	}
 }
 
+influence_expenditure_stations = {
+	resource = influence
+	type = expenditure
+	category = stations
+
+	potential = {
+		always = no # seems to not be used ?!?!
+		has_ai_expansion_plan = yes
+		tec_ai_vd_should_not_stop_expansion_for_habitats = yes
+	}
+
+	weight = {
+		weight = 0.50
+	}
+
+	# min is 1 jump away
+	desired_min = {
+		base = 75
+	}
+
+	# max is 2 jumps away
+	desired_max = {
+		base = 150
+	}
+}
+
+
+alloys_expenditure_starbases = {
+	resource = alloys
+	type = expenditure
+	category = starbases
+
+	potential = {
+		NOT = {
+			is_country_type = fallen_empire
+		}
+		tec_ai_vd_should_not_stop_expansion_for_habitats = yes
+	}
+
+	weight = {
+		weight = 0.4
+
+		# spend more on starbase upgrades if at fleet cap
+		modifier = {
+			factor = 2
+			used_naval_capacity_percent >= 1.0
+		}
+
+		# Reduce spending on claiming new systems if we have unclaimed planets
+		modifier = {
+			is_machine_empire = yes
+			has_country_resource = { type = alloys amount < 450 }
+			factor = 0.25 # more aggresive saving for robots since their colony ships cost more
+			ai_colonize_plans > 0
+		}
+		# Reduce spending on claiming new systems if we have unclaimed planets
+		modifier = {
+			is_machine_empire = no
+			has_country_resource = { type = alloys amount < 250 }
+			factor = 0.50
+			ai_colonize_plans > 0
+		}
+
+		modifier = {
+			factor = 1.5
+			used_starbase_capacity_percent < 1
+			any_owned_starbase = {
+				can_be_upgraded = yes
+			}
+		}
+		modifier = {
+			factor = 1.5
+			OR = {
+				any_owned_starbase = {
+					NOT = { has_starbase_size = starbase_outpost }
+					can_be_upgraded = yes
+				}
+				any_owned_nonprimary_starbase = {
+					can_be_upgraded = yes
+				}
+			}
+		}
+	}
+	desired_max = {
+		base = 12000
+	}
+}
+
 alloys_expenditure_decisions = {
 	resource = alloys
 	type = expenditure
@@ -267,7 +355,10 @@ unity_expenditure_leaders = {
 	category = leaders
 
 	potential = {
-		always = yes
+		check_variable_arithmetic = {
+			which = value:tec_max_leader_capacity
+			value > value:tec_used_leader_capacity
+		}
 	}
 
 	weight = {
@@ -301,8 +392,9 @@ unity_expenditure_edicts = {
 	}
 
 	desired_max = {
-		base = 0
+		base = 100
 		add = value:edict_size_effect
 		factor = 2
 	}
 }
+
