@@ -1192,6 +1192,50 @@ tec_add_shroud_cd_effect = {
 			}
 			owner = { remove_country_flag = tec_gene_necrophage_evolved }
 		}
+		if = {	# Aquatic
+			limit = {
+				has_trait = trait_aquatic
+			}
+			modify_species = {
+				remove_trait = trait_aquatic
+				add_trait = trait_tec_advanced_aquatic
+				add_traits_at_start_of_list = yes
+				change_scoped_species = no
+				effect = {
+					root = {
+						change_dominant_species = {
+							species = prev
+						}
+					}
+				}
+			}
+			owner_main_species = {
+				every_galaxy_species = {
+					limit = {
+						is_same_species = prev
+						NOT = { is_same_value = prev }
+						has_trait = trait_aquatic
+						NOR = {
+							any_country = {
+								NOT = { is_same_value = root }
+								owner_main_species = {
+									is_same_value = prevprev
+								}
+							}
+							any_species_pop = {
+								NOT = { is_owned_by = root }
+							}
+						}
+					}
+					change_species_characteristics = {
+						remove_trait = trait_aquatic
+						add_trait = trait_tec_advanced_aquatic
+						add_traits_at_start_of_list = yes
+					}
+				}
+			}
+		}
+		# /
 		species = {
 			save_event_target_as = changing_species
 			modify_species = {
@@ -1211,46 +1255,43 @@ tec_add_shroud_cd_effect = {
 							ideal_planet_class = pc_tec_gene
 						}
 						effect = {
-							save_event_target_as = tec_biospecies
-							rename_species = {
-								prompt_country = root
-								name_list = ascension_list
-							}
+							save_event_target_as = tec_gene_perfection_species
 						}
 					}
 				}
 			}
 		}
+
 		owner = {
 			every_owned_pop = {
 				limit = { is_exact_same_species = event_target:changing_species }
-				change_species = last_created_species
+				change_species = event_target:tec_gene_perfection_species
 			}
 			every_owned_leader = {
 				limit = { is_exact_same_species = event_target:changing_species }
-				change_species = last_created_species
+				change_species = event_target:tec_gene_perfection_species
 			}
 			every_pool_leader = {
 				limit = { is_exact_same_species = event_target:changing_species }
-				change_species = last_created_species
+				change_species = event_target:tec_gene_perfection_species
 			}
 			every_envoy = {
 				limit = { is_exact_same_species = event_target:changing_species }
-				change_species = last_created_species
+				change_species = event_target:tec_gene_perfection_species
 			}
 			every_owned_army = {
 				limit = {
 					exists = species
 					is_exact_same_species = event_target:changing_species
 				}
-				change_species = last_created_species
+				change_species = event_target:tec_gene_perfection_species
 			}
 			every_controlled_ship = {
 				limit = {
 					is_ship_class = shipclass_colonizer
 					is_exact_same_species = event_target:changing_species
 				}
-				change_species = last_created_species
+				change_species = event_target:tec_gene_perfection_species
 			}
 		}
 	}
@@ -1260,13 +1301,13 @@ tec_add_shroud_cd_effect = {
 			limit = {
 				any_owned_pop = {
 					is_exact_same_species = root
-					tec_has_stapled_trait =no
+					tec_has_stapled_trait = no
 				}
 			}
 			random_owned_pop = {
 				limit = {
 					is_exact_same_species = root
-					tec_has_stapled_trait =no
+					tec_has_stapled_trait = no
 				}
 				tec_create_genetic_perfection_species_mod = yes
 				species = { save_event_target_as = new_main_species }
@@ -1282,8 +1323,15 @@ tec_add_shroud_cd_effect = {
 				species = { save_event_target_as = new_main_species }
 			}
 		}
-		change_dominant_species = { species = event_target:new_main_species }
 
+		event_target:new_main_species = {
+			rename_species = {
+				prompt_country = root
+				name_list = ascension_list
+			}
+		}
+		change_dominant_species = { species = event_target:new_main_species }
+		
 		if = {
 			limit = {
 				is_hive_empire = no
@@ -2167,12 +2215,6 @@ tec_add_shroud_cd_effect = {
 						}
 					}
 				}
-
-				rename_species = {
-					prompt_country = root #If targeted country is a player they will get a popup asking for a name/plural/adjective combo. Otherwise the species will get a random name from the specified name_list
-					name_list = ascension_list
-				}
-
 				save_event_target_as = new_robotic_species
 			}
 		}
@@ -2258,6 +2300,15 @@ tec_add_shroud_cd_effect = {
 			change_species = event_target:new_robotic_species
 			change_leader_portrait = species
 		}
+
+		event_target:new_robotic_species = {
+			rename_species = {
+				prompt_country = root
+				#If targeted country is a player they will get a popup asking for a name/plural/adjective combo.
+				#Otherwise the species will get a random name from the specified name_list
+				name_list = ascension_list
+			}
+		}
 		change_dominant_species = { species = event_target:new_robotic_species }
 
 		every_owned_leader = {
@@ -2290,6 +2341,9 @@ tec_add_shroud_cd_effect = {
 		}
 	}
 	tec_create_synth_species = {
+		species = {
+			save_event_target_as = tec_original_species
+		}
 		if = {
 			limit = {
 				has_policy_flag = robots_outlawed
@@ -2374,13 +2428,7 @@ tec_add_shroud_cd_effect = {
 								TOX = { prev = { change_species_characteristics = { portrait = "tox_machine" } } }
 							}
 						}
-					}
-		
-					rename_species = {
-						prompt_country = root #If targeted country is a player they will get a popup asking for a name/plural/adjective combo. Otherwise the species will get a random name from the specified name_list
-						name_list = ascension_list
-					}
-		
+					}	
 					save_event_target_as = new_robotic_species
 				}
 			}
@@ -2394,6 +2442,7 @@ tec_add_shroud_cd_effect = {
 			}
 			event_target:new_robotic_species = {
 				modify_species = {
+					change_scoped_species = no
 					add_trait = trait_tec_machine_biobrain
 					effect = {
 						save_event_target_as = new_robotic_species
@@ -2401,6 +2450,10 @@ tec_add_shroud_cd_effect = {
 				}
 			}
 		}
+
+		# Swaps existing traits into robotic traits
+		# Note: initially thought just for slow development, but won't
+		tec_swap_organic_traits_into_synth_traits = yes
 		
 		every_owned_pop = {
 			limit = {
@@ -2485,6 +2538,13 @@ tec_add_shroud_cd_effect = {
 			change_species = event_target:new_robotic_species
 			change_leader_portrait = species
 		}
+
+		event_target:new_robotic_species = {
+			rename_species = {
+				prompt_country = root
+				name_list = ascension_list
+			}
+		}
 		change_dominant_species = { species = event_target:new_robotic_species }
 
 		every_owned_leader = {
@@ -2518,6 +2578,509 @@ tec_add_shroud_cd_effect = {
 			add_trait_no_notify = leader_trait_synthetic
 		}
 
+	}
+	tec_swap_organic_traits_into_synth_traits = {
+		# Positive ones
+		if = {	# Technician
+			limit = {
+				event_target:tec_original_species = {
+					OR = {
+						has_trait = trait_ingenious
+						has_trait = trait_cyborg_superconductive
+						has_trait = trait_technical_skill
+					}
+				}
+				event_target:new_robotic_species = {
+					NOT = {
+						has_trait = trait_robot_superconductive
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_robot_superconductive
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
+		if = {	# Mining
+			limit = {
+				event_target:tec_original_species = {
+					OR = {
+						has_trait = trait_industrious
+						has_trait = trait_industrious_lithoid
+						has_trait = trait_cyborg_power_drills
+						has_trait = trait_crack_miner
+					}
+				}
+				event_target:new_robotic_species = {
+					NOT = {
+						has_trait = trait_robot_power_drills
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_robot_power_drills
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
+		if = {	# Agrarian
+			limit = {
+				event_target:tec_original_species = {
+					OR = {
+						has_trait = trait_agrarian
+						has_trait = trait_cyborg_harvesters
+						has_trait = trait_farm_hands
+					}
+				}
+				event_target:new_robotic_species = {
+					NOT = {
+						has_trait = trait_robot_harvesters
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_robot_harvesters
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
+
+		if = {	# Intelligent
+			limit = {
+				event_target:tec_original_species = {
+					OR = {
+						has_trait = trait_intelligent
+						has_trait = trait_natural_physicists
+						has_trait = trait_natural_sociologists
+						has_trait = trait_natural_engineers
+						has_trait = trait_enigmatic_intelligence
+						has_trait = trait_enigmatic_intelligence_poor
+						has_trait = trait_cyborg_logic_engines
+						has_trait = trait_brainslug
+						has_trait = trait_erudite
+						has_trait = trait_artificial_intelligence
+						has_trait = trait_elevated_synapses
+						# Ascensions
+						has_trait = trait_tec_gene_brain
+						has_trait = trait_tec_cyborg_brain
+						has_trait = trait_tec_replicant_brain
+						# Origin
+						has_trait = trait_tec_pu_neuroslug
+					}
+				}
+				event_target:new_robotic_species = {
+					NOT = {
+						has_trait = trait_robot_logic_engines
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_robot_logic_engines
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
+		if = {	# Unity
+			limit = {
+				event_target:tec_original_species = {
+					OR = {
+						has_trait = trait_traditional
+						has_trait = trait_expressed_tradition
+					}
+				}
+				event_target:new_robotic_species = {
+					NOR = {
+						has_trait = trait_tec_robot_good_unity
+						has_trait = trait_robot_propaganda_machines
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_tec_robot_good_unity
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
+		if = {	# Thrifty
+			limit = {
+				event_target:tec_original_species = {
+					OR = {
+						has_trait = trait_thrifty
+						has_trait = trait_cyborg_trading_algorithms
+						has_trait = trait_nuumismatic_administration
+					}
+				}
+				event_target:new_robotic_species = {
+					NOT = {
+						has_trait = trait_robot_trading_algorithms
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_robot_trading_algorithms
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
+
+		if = {	# Pop growth
+			limit = {
+				event_target:tec_original_species = {
+					OR = {
+						has_trait = trait_rapid_breeders
+						has_trait = trait_rapid_breeders_lithoid
+						has_trait = trait_fertile
+						has_trait = trait_vat_grown
+						has_trait = trait_nivlac
+						has_trait = trait_preplanned_growth
+						has_trait = trait_incubator
+						has_trait = trait_exotic_metabolism
+						# Evolved
+						has_trait = trait_tec_clone_origin
+						has_trait = trait_tec_clone_template
+					}
+				}
+				event_target:new_robotic_species = {
+					NOR = {
+						has_trait = trait_robot_mass_produced
+						has_trait = trait_tec_robot_fractal
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_robot_mass_produced
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
+		if = {	# Pop autoassembly
+			limit = {
+				event_target:tec_original_species = {
+					OR = {
+						has_trait = trait_plantoid_budding
+						has_trait = trait_lithoid_budding
+						has_trait = trait_advanced_budding
+						has_trait = trait_tiyanki
+						has_trait = trait_clone_soldier_fertile
+						has_trait = trait_clone_soldier_infertile
+						has_trait = trait_clone_soldier_infertile_full_potential
+						# Evolved
+						has_trait = trait_tec_lithoid_sedimentary
+					}
+				}
+				event_target:new_robotic_species = {
+					NOR = {
+						has_trait = trait_robot_mass_produced
+						has_trait = trait_tec_robot_fractal
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_tec_robot_fractal
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
+
+		if = {	# Leaders
+			limit = {
+				event_target:tec_original_species = {
+					OR = {
+						has_trait = trait_talented
+						has_trait = trait_cyborg_enhanced_memory
+					}
+				}
+				event_target:new_robotic_species = {
+					NOT = {
+						has_trait = trait_robot_enhanced_memory
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_robot_enhanced_memory
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
+		if = {	# Leaders xp
+			limit = {
+				event_target:tec_original_species = {
+					OR = {
+						has_trait = trait_quick_learners
+						has_trait = trait_cyborg_learning_algorithms
+						has_trait = trait_gene_mentorship
+					}
+				}
+				event_target:new_robotic_species = {
+					NOR = {
+						has_trait = trait_robot_learning_algorithms
+						has_trait = trait_robot_repurposed_hardware
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_robot_learning_algorithms
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
+
+		if = {	# Pop management
+			limit = {
+				event_target:tec_original_species = {
+					OR = {
+						has_trait = trait_docile
+						has_trait = trait_cyborg_streamlined_protocols
+					}
+				}
+				event_target:new_robotic_species = {
+					NOR = {
+						has_trait = trait_robot_high_bandwidth
+						has_trait = trait_robot_streamlined_protocols
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_robot_streamlined_protocols
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
+		if = {	# Housing
+			limit = {
+				event_target:tec_original_species = {
+					OR = {
+						has_trait = trait_communal
+						has_trait = trait_cyborg_double_jointed
+					}
+				}
+				event_target:new_robotic_species = {
+					NOR = {
+						has_trait = trait_robot_double_jointed
+						has_trait = trait_robot_bulky
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_robot_double_jointed
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
+		if = {	# Amenities
+			limit = {
+				event_target:tec_original_species = {
+					OR = {
+						has_trait = trait_charismatic
+						has_trait = trait_crafted_smiles
+					}
+				}
+				event_target:new_robotic_species = {
+					NOR = {
+						has_trait = trait_robot_domestic_protocols
+						has_trait = trait_robot_emotion_emulators
+						has_trait = trait_robot_uncanny
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_robot_domestic_protocols
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
+
+		if = {	# Efficiency
+			limit = {
+				event_target:tec_original_species = {
+					OR = {
+						has_trait = trait_tec_versatile
+						has_trait = trait_very_strong
+						has_trait = trait_robust
+						has_trait = trait_cyborg_efficient_processors
+						has_trait = trait_excessive_endurance
+					}
+				}
+				event_target:new_robotic_species = {
+					NOR = {
+						has_trait = trait_tec_robot_erratic
+						has_trait = trait_robot_efficient_processors
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_robot_efficient_processors
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
+
+		if = {	# Aquatic
+			limit = {
+				event_target:tec_original_species = {
+					OR = {
+						has_trait = trait_aquatic
+						has_trait = trait_tec_advanced_aquatic
+					}
+				}
+				event_target:new_robotic_species = {
+					NOR = {
+						has_trait = trait_tec_machine_aquatic
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_tec_machine_aquatic
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
+
+		# Negative ones
+		if = {	# Growth
+			limit = {
+				event_target:tec_original_species = {
+					has_trait = trait_slow_breeders
+				}
+				event_target:new_robotic_species = {
+					NOR = {
+						has_trait = trait_robot_custom_made
+						has_trait = trait_robot_mass_produced
+						has_trait = trait_tec_robot_fractal
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_robot_custom_made
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
+		if = {	# Leader xp
+			limit = {
+				event_target:tec_original_species = {
+					OR = {
+						has_trait = trait_slow_learners
+						has_trait = trait_cyborg_neural_limiters
+					}
+				}
+				event_target:new_robotic_species = {
+					NOR = {
+						has_trait = trait_robot_learning_algorithms
+						has_trait = trait_robot_repurposed_hardware
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_robot_repurposed_hardware
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
+		if = {	# Pop management
+			limit = {
+				event_target:tec_original_species = {
+					OR = {
+						has_trait = trait_unruly
+						has_trait = trait_cyborg_high_bandwidth
+					}
+				}
+				event_target:new_robotic_species = {
+					NOR = {
+						has_trait = trait_robot_streamlined_protocols
+						has_trait = trait_robot_high_bandwidth
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_robot_high_bandwidth
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
+		if = {	# Housing
+			limit = {
+				event_target:tec_original_species = {
+					OR = {
+						has_trait = trait_solitary
+						has_trait = trait_cyborg_bulky
+					}
+				}
+				event_target:new_robotic_species = {
+					NOR = {
+						has_trait = trait_robot_double_jointed
+						has_trait = trait_robot_bulky
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_robot_bulky
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
+
+		if = {	# Amenities
+			limit = {
+				event_target:tec_original_species = {
+					has_trait = trait_repugnant
+				}
+				event_target:new_robotic_species = {
+					NOT = {
+						has_trait = trait_robot_domestic_protocols
+						has_trait = trait_robot_uncanny
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_robot_uncanny
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
+
+		if = {	# Efficiency
+			limit = {
+				event_target:tec_original_species = {
+					OR = {
+						has_trait = trait_tec_incompetent
+					}
+				}
+				event_target:new_robotic_species = {
+					NOR = {
+						has_trait = trait_tec_robot_erratic
+						has_trait = trait_robot_efficient_processors
+					}
+				}
+			}
+			modify_species = {
+				species = event_target:new_robotic_species
+				add_trait = trait_tec_robot_erratic
+				change_scoped_species = no
+				effect = { save_event_target_as = new_robotic_species }
+			}
+		}
 	}
  # Synth T2
 	tec_create_synth_nanite_species = {	# TO DO
@@ -2580,10 +3143,6 @@ tec_add_shroud_cd_effect = {
 								change_scoped_species = no
 								remove_trait = trait_pc_nuked_preference
 								effect = {
-									rename_species = {
-										prompt_country = root #If targeted country is a player they will get a popup asking for a name/plural/adjective combo. Otherwise the species will get a random name from the specified name_list
-										name_list = ascension_list
-									}
 									save_event_target_as = tec_replicant_species
 								}
 							}
@@ -2592,6 +3151,26 @@ tec_add_shroud_cd_effect = {
 				}
 			}
 		}
+
+		# Annoying traits fix
+			if = {
+				limit = {
+					event_target:tec_replicant_species = {
+						has_trait = trait_aquatic
+					}
+				}
+				event_target:tec_replicant_species = {
+					modify_species = {
+						change_scoped_species = no
+						remove_trait = trait_aquatic
+						add_trait = trait_tec_advanced_aquatic
+						effect = {
+							save_event_target_as = tec_replicant_species
+						}
+					}
+				}
+			}
+		# /
 
 		# Saves flags
 		event_target:tec_original_species = {
@@ -2683,6 +3262,13 @@ tec_add_shroud_cd_effect = {
 			}
 			change_species = event_target:tec_replicant_species
 			change_leader_portrait = species
+		}
+
+		event_target:tec_replicant_species = {
+			rename_species = {
+				prompt_country = root
+				name_list = ascension_list
+			}
 		}
 		change_dominant_species = { species = event_target:tec_replicant_species }
 
