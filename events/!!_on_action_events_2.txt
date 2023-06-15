@@ -953,19 +953,227 @@ leader_event = {
 	hide_window = yes
 	is_triggered_only = yes
 
+	trigger = {
+		exists = owner
+	}
+
 	immediate = {
-		add_trait_no_notify = trait_imperial_heir
+		# Set age to be younger than normal.
+		set_variable_to_random_value = {
+			which = heir_age_mod
+			min = -10
+			max = 0
+			rounded = yes
+		}
+
+		add_age = heir_age_mod
+
+		####################
+		# CLASS RANDOMISER #
+		####################
+
 		if = {
-			limit = {	# EVOLVED Paragon TO DO add civics using this as requirement
+			limit = {
 				owner = {
 					OR = {
-						has_civic = civic_technocracy
-						has_civic = civic_tec_regular_science_directorate
+						# Admiral
+						has_valid_civic = civic_crusader_spirit_corporate
+						has_tradition = tr_supremacy_war_games
+						# Admiral and General
+						has_valid_civic = civic_distinguished_admiralty
+						has_valid_civic = civic_crusader_spirit
+						# Governor
+						has_valid_civic = civic_aristocratic_elite
+						has_valid_civic = civic_feudal_realm
+						has_tradition = tr_domination_colonial_viceroys
+						# Scientist
+						has_valid_civic = civic_technocracy
+						has_tradition = tr_discovery_science_division
+						# Current Ruler's Class
+						has_valid_civic = civic_philosopher_king
 					}
 				}
 			}
-			change_leader_class = scientist
+
+			# All classes have a base weight of 10.
+			# Civics that boost only one class add 40.
+			# Civics that boost two classes add 20 to each class.
+			# Traditions that boost a class add 20.
+
+			random_list = {
+				# Admiral
+				0 = {
+					modifier = {
+						add = value:heir_class_weight_admiral
+					}
+					change_leader_class = admiral
+				}
+				# General
+				0 = {
+					modifier = {
+						add = value:heir_class_weight_general
+					}
+					change_leader_class = general
+				}
+				# Governor
+				0 = {
+					modifier = {
+						add = value:heir_class_weight_governor
+					}
+					change_leader_class = governor
+				}
+				# Scientist
+				0 = {
+					modifier = {
+						add = value:heir_class_weight_scientist
+					}
+					change_leader_class = scientist
+				}
+			}
 		}
+		# Initial Traits, set after determining class.
+		add_trait_no_notify = trait_imperial_heir
+		add_trait_no_notify = "random_common"
+
+		# Chance for a negative trait.
+		random_list = {
+			95 = { }
+			5 = {
+				add_trait_no_notify = "random_common"
+				add_trait_no_notify = "random_negative"
+				# Variable "leader_pending_negative_traits_unmodified" doesn't exist yet, can't reduce it yet. Checked now made in paragon_2.2200.
+				modifier = {
+					factor = 0
+					owner = { has_valid_civic = civic_philosopher_king }
+				}
+			}
+		}
+
+		################
+		# BONUS LEVELS #
+		################
+
+		# NOTE: now handled in the tec_leader events
+
+		## Vaults of Memory
+		#if = {
+		#	limit = {
+		#		owner = {
+		#			is_memory_vault_empire = yes
+		#		}
+		#	}
+		#	add_skill_without_trait_selection = 1
+		#}
+		#
+		## Distinguished Admiralty
+		#if = {
+		#	limit = {
+		#		owner = {
+		#			has_valid_civic = civic_distinguished_admiralty
+		#		}
+		#		OR = {
+		#			leader_class = admiral
+		#			leader_class = general
+		#		}
+		#	}
+		#	add_skill_without_trait_selection = 2
+		#}
+
+		##########
+		# TRAITS #
+		##########
+
+		# Under One Rule
+		if = {
+			limit = {
+				owner = {
+					OR = {
+						has_origin = origin_legendary_leader_imperial
+						ruler = { has_trait = leader_trait_legendary_offspring }
+					}
+				}
+			}
+			add_trait_no_notify = leader_trait_legendary_offspring
+		}
+
+		# NOTE: now handled in the tec_leader events
+
+		## Technocracy
+		#if = {
+		#	limit = {
+		#		owner = {
+		#			has_valid_civic = civic_technocracy
+		#		}
+		#		leader_class = scientist
+		#	}
+		#	add_random_expertise_trait_effect = yes
+		#}
+		#
+		## Heroic Tales
+		#if = {
+		#	limit = {
+		#		owner = {
+		#			has_valid_civic = civic_heroic_tales
+		#		}
+		#	}
+		#	add_trait_no_notify = "random_common"
+		#}
+		#
+		## Crusader Spirit - Admiral
+		#if = {
+		#	limit = {
+		#		owner = {
+		#			has_valid_civic = civic_crusader_spirit
+		#		}
+		#		leader_class = admiral
+		#	}
+		#	add_trait_no_notify = leader_trait_par_zealot
+		#}
+		#
+		## Crusader Spirit - General
+		#if = {
+		#	limit = {
+		#		owner = {
+		#			has_valid_civic = civic_crusader_spirit
+		#		}
+		#		leader_class = general
+		#	}
+		#	add_trait_no_notify = leader_trait_crusader
+		#}
+		#
+		## Letters of Marque
+		#if = {
+		#	limit = {
+		#		owner = {
+		#			has_valid_civic = civic_crusader_spirit_corporate
+		#		}
+		#		leader_class = admiral
+		#	}
+		#	add_trait_no_notify = leader_trait_corsair
+		#}
+		#
+		## Aptitude Traditions
+		#if = {
+		#	limit = {
+		#		owner = {
+		#			has_tradition = tr_aptitude_adopt
+		#		}
+		#	}
+		#	add_trait_no_notify = "random_common"
+		#}
+
+		# TODO: Rodah do we keep below, it is currently handled above in the random selection
+		#if = {
+		#	limit = {	# EVOLVED Paragon TO DO add civics using this as requirement
+		#		owner = {
+		#			OR = {
+		#				has_civic = civic_technocracy
+		#				has_civic = civic_tec_regular_science_directorate
+		#			}
+		#		}
+		#	}
+		#	change_leader_class = scientist
+		#}
 	}
 }
 
