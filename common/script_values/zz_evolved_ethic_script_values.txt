@@ -2,13 +2,463 @@
 
 # NOTE: Core means basic and solid ones - like ethic/auth/etc scripted values
 
+# Scope: country
+tec_ethic_base_attraction = {
+	base = 1
+	modifier = {
+		mult = 0
+		NOR = {
+			tec_is_default_country = yes
+			has_ethic = ethic_$ETHIC$
+			has_ethic = ethic_fanatic_$ETHIC$
+			AND = {
+				is_country_type = primitive
+				has_country_flag = preftl_societal_enlightenment_pact
+				capital_scope = {
+					has_observation_outpost = yes
+
+					observation_outpost_owner = {
+						OR = {
+							has_ethic = ethic_fanatic_$ETHIC$
+							has_ethic = ethic_$ETHIC$
+						}
+					}
+				}
+			}
+		}
+	}
+	# Effects of indoctrination mission
+	modifier = {
+		mult = 20
+		is_country_type = primitive
+		has_country_flag = preftl_societal_enlightenment_pact
+		capital_scope = {
+			has_observation_outpost = yes
+
+			observation_outpost_owner = { has_ethic = ethic_fanatic_$ETHIC$ }
+		}
+	}
+	modifier = {
+		mult = 10
+		is_country_type = primitive
+		has_country_flag = preftl_societal_enlightenment_pact
+		capital_scope = {
+			has_observation_outpost = yes
+
+			observation_outpost_owner = { has_ethic = ethic_$ETHIC$ }
+		}
+	}
+	modifier = {
+		mult = 2
+		is_country_type = default
+		NOR = {
+			has_ethic = ethic_$ETHIC$
+			has_ethic = ethic_fanatic_$ETHIC$
+		}
+		any_pop_faction = {
+			has_ethic = ethic_$ETHIC$
+		}
+	}
+	modifier = {
+		mult = 2
+		has_ethic = ethic_$ETHIC$
+	}
+	modifier = {
+		mult = 3
+		has_ethic = ethic_fanatic_$ETHIC$
+	}
+	modifier = {
+		exists = overlord
+		has_loyalty > 0
+		mult = value:ethics_from_overlord|ETHIC|$ETHIC$|
+	}
+	mult = value:count_councilors_with_ethic|ETHIC|$ETHIC$|
+}
+
+# Scope: pop
+tec_ethic_pop_trait_others_value = {
+	base = 1
+	modifier = {
+		mult = $MULT$
+		from = {
+			any_owned_species = {
+				NOT = { is_same_species = root }
+				has_trait = $TRAIT$
+			}
+		}
+	}
+}
+
+# Scope: pop
+tec_ethic_pop_trait_others_and_not_self_value = {
+	base = 1
+	modifier = {
+		mult =  $MULT$
+		NOT = { has_trait = $TRAIT$ }
+		from = {
+			any_owned_species = {
+				NOT = { is_same_species = root }
+				has_trait = $TRAIT$
+			}
+		}
+	}
+}
+
+# pop
+tec_ethic_pop_disables_regular_attraction = {
+	base = 1
+	modifier = {
+		mult = 0
+		OR = {
+			has_trait = trait_hive_mind
+			has_trait = trait_machine_unit
+		}
+	}
+}
+
+tec_ethic_job_value = {
+	base = 1
+	modifier = {
+		mult = $MULT$
+		has_job = $JOB$
+	}
+}
+
+tec_ethic_pop_value = {
+	base = 1
+	modifier = {
+		mult = $MULT$
+		$TRIGGER$ = yes
+	}
+}
+
+tec_ethic_election_type_value = {
+	base = 1
+	[[DEMOCRATIC]
+		modifier = {
+			mult = $DEMOCRATIC$
+			has_election_type = democratic
+		}
+	]
+	[[OLIGARCHIC]
+		modifier = {
+			mult = $OLIGARCHIC$
+			has_election_type = oligarchic
+		}
+	]
+	[[AUTOCRATIC]
+		modifier = {
+			mult = $AUTOCRATIC$
+			has_election_type = none
+		}
+	]
+}
+
+tec_ethic_federation_value = {
+	base = 1
+	modifier = {
+		mult = $MULT$
+		has_federation = yes
+		federation = {
+			has_federation_type = $TYPE$
+		}
+	}
+}
+
+tec_ethic_pop_living_standard_value = {
+	base = 1
+	[[GOOD]
+		modifier = {
+			mult = $GOOD$
+			owner = { is_$ETHIC$ = no }
+			OR = {
+				has_living_standard = { type = living_standard_utopian }
+				has_living_standard = { type = living_standard_good }
+				has_living_standard = { type = living_standard_shared_burden }
+			}
+		}
+	]
+	[[STRATIFIED]
+		modifier = {
+			mult = $STRATIFIED$
+			is_enslaved = no
+			OR = {
+				AND = {
+					tec_is_worker_pop_category = no
+					has_living_standard = { type = living_standard_stratified }
+				}
+				AND = {
+					tec_is_ruler_pop_category = yes
+					has_living_standard = { type = living_standard_dystopian_society }
+				}
+			}
+		}
+	]
+}
+
+tec_ethic_pop_likes_inequality_value = {
+	base = 1
+	modifier = {
+		mult = 1.2
+		has_citizenship_rights = yes
+		from = {
+			any_owned_species = {
+				is_sapient = yes
+				NOR = {
+					has_citizenship_type = { type = citizenship_full country = prev.owner }
+					has_citizenship_type = { type = citizenship_slavery country = prev.owner }
+				}
+			}
+		}
+	}
+}
+
+tec_ethic_pop_free_vs_same_species_slavery_value = {
+	base = 1
+	modifier = {
+		mult = 1.5
+		is_enslaved = no
+		from = {
+			any_enslaved_species = {
+				is_same_species = root
+				is_robotic = no
+			}
+		}
+	}
+}
+
+tec_ethic_pop_xeno_slaves_value = {
+	base = 1
+	modifier = {
+		mult = $MULT$
+		from = {
+			any_enslaved_species = {
+				NOT = { is_same_species = root }
+				is_robotic = no
+			}
+		}
+	}
+}
+
+tec_ethic_all_have_citizenship_value = {
+	base = 1
+	modifier = {
+		mult = 1.25
+		any_owned_species = {
+			is_robotic = no
+			NOT = { is_same_species = root }
+		}
+		count_owned_species = {
+			limit = {
+				is_sapient = yes
+				is_robotic = no
+				NOT = {
+					has_citizenship_type = { type = citizenship_full country = root }
+				}
+			}
+			count = 0
+		}
+	}
+}
+
+tec_ethic_pop_enslaved_value = {
+	base = 1
+	modifier = {
+		mult = 1.5
+		is_enslaved = yes
+		is_robot_pop = no
+	}
+}
+
+tec_ethic_pop_wants_citizenship_value = {
+	base = 1
+	modifier = {
+		mult = $MULT$
+		has_citizenship_rights = no
+	}
+}
+
+tec_ethic_xeno_leaders = {
+	base = 1
+	modifier = {
+		mult = $MULT$
+		allows_alien_leaders = yes
+	}
+}
+
+tec_ethic_purging_value = {
+	base = 1
+	modifier = {
+		mult = $MULT$
+		tec_xeno_we_genocided_any = { cached = yes }
+	}
+}
+
+tec_ethic_purging_us_value = {
+	base = 1
+	modifier = {
+		mult = $MULT$
+		tec_xeno_any_genocided_our_species = { cached = yes }
+	}
+}
+
+tec_ethic_enslaved_us_value = {
+	base = 1
+	modifier = {
+		mult = $MULT$
+		tec_xeno_any_enslaved_us = { cached = yes }
+	}
+}
+
+tec_ethic_civic_value = {
+	base = 1
+	modifier = {
+		mult = $MULT$
+		has_valid_civic = $CIVIC$
+	}
+}
+
+tec_ethic_defensive_war_value = {
+	base = 1
+	modifier = {
+		mult = $MULT$
+		any_war = {
+			any_defender = {
+				is_same_value = prevprev
+			}
+			any_attacker = {
+				NOT = { is_same_species = root }
+			}
+		}
+	}
+}
+
+tec_ethic_pop_free_xenos = {
+	base = 1
+	modifier = {
+		mult = $MULT$
+		is_enslaved = no
+		is_being_purged = no
+		from = {
+			any_owned_pop = {
+				not = { is_same_species = root }
+				is_enslaved = no
+				is_being_purged = no
+				is_sapient = yes
+				is_robot_pop = no
+			}
+		}
+	}
+}
+
+tec_ethic_peace_value = {
+	base = 1
+	modifier = {
+		mult = $MULT$
+		tec_is_default_country = yes
+		years_of_peace = {
+			value > 20
+			delay = 50
+		}
+	}
+	modifier = {
+		mult = $MULT$
+		tec_is_default_country = yes
+		years_of_peace = {
+			value > 40
+			delay = 50
+		}
+	}
+	modifier = {
+		mult = $MULT$
+		tec_is_default_country = yes
+		years_of_peace = {
+			value > 60
+			delay = 50
+		}
+	}
+	modifier = {
+		mult = $MULT$
+		tec_is_default_country = yes
+		years_of_peace = {
+			value > 80
+			delay = 50
+		}
+	}
+	modifier = {
+		mult = $MULT$
+		tec_is_default_country = yes
+		years_of_peace = {
+			value > 100
+			delay = 50
+		}
+	}
+}
+
+tec_ethic_at_war_with_rival_value = {
+	base = 1
+	modifier = {
+		mult = 1.5
+		is_at_war = yes
+		any_war = {
+			any_war_participant = {
+				is_rival = root
+				prev = { NOT = { is_war_participant = { side = root } } }
+			}
+		}
+	}
+}
+
+tec_ethic_military_superior_rival_value = {
+	base = 1
+	modifier = {
+		mult = 1.25
+		any_rival_country = {
+			is_neighbor_of = root
+			relative_power = {
+				who = root
+				category = fleet
+				value >= superior
+			}
+		}
+	}
+}
+
+tec_ethic_neighbor_rivals_value = {
+	base = 1
+	modifier = {
+		mult = $MULT$
+		any_neighbor_country = {
+			OR = {
+				is_hostile_to = root
+				is_domineering_to = root
+				is_rival = root
+			}
+		}
+	}
+}
+
+tec_ethic_ruler_trait_value = {
+	base = 1
+	modifier = {
+		mult = $MULT$
+		exists = ruler
+		ruler = {
+			has_trait_tier1or2or3 = {
+				TRAIT = $TRAIT$
+			}
+		}
+	}
+}
+
 # Ethic scripted values
 # ------------------------------------------------------------
 	tec_cooperative_ethics_from_relations = {
 		[[CACHED]
+		base = 1
 		modifier = {
 			is_variable_set = tec_cache_tec_cooperative_ethics_from_relations
-			add = tec_cache_tec_cooperative_ethics_from_relations # cache_variable
+			set = tec_cache_tec_cooperative_ethics_from_relations # cache_variable
 		}
 		]
 		[[!CACHED]
@@ -45,9 +495,10 @@
 
 	tec_competitive_ethics_from_relations = {
 		[[CACHED]
+		base = 1
 		modifier = {
 			is_variable_set = tec_cache_tec_competitive_ethics_from_relations
-			add = tec_cache_tec_competitive_ethics_from_relations # cache_variable
+			set = tec_cache_tec_competitive_ethics_from_relations # cache_variable
 		}
 		]
 		[[!CACHED]
