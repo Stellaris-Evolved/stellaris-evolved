@@ -2779,6 +2779,8 @@ void_dweller_home_planet_setup = {
 			
 			# districts
 			add_district = district_hab_housing
+			add_district = district_hab_industrial
+			add_district = district_hab_industrial
 
 			#buildings
 			tec_start_add_major_habitat_capital = yes
@@ -2815,8 +2817,8 @@ void_dweller_home_planet_setup = {
 			
 			set_owner = event_target:void_dweller_owner
 			tec_start_hab_pops_spawn = {
-				count = 8
-				eager_count = 5
+				count = 7
+				eager_count = 4
 			}
 			# deposit
 			add_deposit = d_tec_minor_arcane_replicator
@@ -2825,16 +2827,15 @@ void_dweller_home_planet_setup = {
 			add_district = district_hab_housing
 			add_district = district_hab_mining
 			add_district = district_hab_mining
-			add_district = district_hab_mining
-			add_district = district_hab_industrial
-			add_district = district_hab_industrial
 
 			# buildings
+			tec_start_add_amenities_building = yes
 			tec_start_hab_try_add_aux = yes
 			
 			tec_start_hab_zombies_effect = yes
 			tec_start_hab_aquatic_flood_effect = yes
 			validate_and_repair_planet_buildings_and_districts = yes
+
 		}
 
 		random_system_planet = {
@@ -2851,8 +2852,8 @@ void_dweller_home_planet_setup = {
 
 			set_owner = event_target:void_dweller_owner
 			tec_start_hab_pops_spawn = {
-				count = 8
-				eager_count = 5
+				count = 7
+				eager_count = 4
 			}
 			#deposit
 			add_deposit = d_tec_minor_arcane_replicator
@@ -2860,23 +2861,30 @@ void_dweller_home_planet_setup = {
 			#districts
 			add_district = district_hab_housing
 			add_district = district_hab_energy
-			add_district = district_hab_energy
-			add_district = district_hab_energy
+			if = {
+				limit = {
+					owner = { tec_uses_trade_value = yes }
+				}
+				add_district = district_hab_commercial
+			}
+			else = {
+				add_district = district_hab_energy
+			}
 
 			# buildings
-			tec_start_add_unity_building = yes
+			if = {
+				limit = {
+					owner = { is_low_tech_start = yes }
+				}
+				tec_start_add_unity_building = yes
+			}
 			tec_start_hab_try_add_aux = yes
 
 			tec_start_hab_zombies_effect = yes
 			tec_start_hab_aquatic_flood_effect = yes
 
 			validate_and_repair_planet_buildings_and_districts = yes
-			while = {
-				limit = {
-					num_unemployed > 0
-				}
-				add_district = district_hab_energy
-			}
+
 		}
 		if = {
 			limit = {
@@ -2894,8 +2902,6 @@ void_dweller_home_planet_setup = {
 				set_planet_flag = tec_food_habitat
 				#districts
 				add_district = district_tec_hab_food
-				add_district = district_hab_commercial
-				
 			}
 		}
 		# Regular Lithoid Empires
@@ -2925,7 +2931,6 @@ void_dweller_home_planet_setup = {
 					set_planet_flag = tec_food_habitat
 					add_district = district_tec_hab_food
 				}
-				add_district = district_hab_commercial
 			}
 		}
 
@@ -2944,7 +2949,6 @@ void_dweller_home_planet_setup = {
 				}
 				set_planet_flag = tec_food_habitat
 				add_district = district_tec_hab_food
-				add_district = district_tec_hab_food				
 			}
 		}
 
@@ -2971,11 +2975,9 @@ void_dweller_home_planet_setup = {
 					}
 					set_planet_flag = mining_habitat
 					add_district = district_hab_mining
-					add_district = district_hab_mining
 				}
 				else = {
 					set_planet_flag = tec_food_habitat
-					add_district = district_tec_hab_food
 					add_district = district_tec_hab_food
 				}				
 			}
@@ -2993,17 +2995,6 @@ void_dweller_home_planet_setup = {
 			random_system_planet = {
 				limit = {
 					has_planet_flag = void_dweller_habitat_1
-				}
-				if = {
-					limit = {
-						owner = {
-							tec_is_trade_gestalt = yes
-						}
-					}
-					add_district = district_hab_commercial
-				}
-				else = {
-					add_district = district_hab_energy
 				}
 				if = {
 					limit = {
@@ -3030,9 +3021,37 @@ void_dweller_home_planet_setup = {
 					set_planet_flag = tec_food_habitat
 					add_district = district_tec_hab_food
 				}
-				else = {
+				else_if = {
+					limit = {
+						OR = {
+							AND = {
+								owner = {
+									tec_is_organic_machine_empire = yes
+								}
+								event_target:tec_last_created_species = {
+									is_lithoid = yes
+								}
+							}
+							owner_main_species = {
+								has_trait = trait_tec_machine_clockwork
+							}
+						}
+
+					}
 					set_planet_flag = mining_habitat
 					add_district = district_hab_mining
+				}
+				else = {
+					set_planet_flag = mining_habitat
+					if = {
+						limit = {
+							owner = { tec_uses_trade_value = yes }
+						}
+						add_district = district_hab_commercial
+					}
+					else = {
+						add_district = district_hab_energy
+					}
 				}
 			}
 		}
