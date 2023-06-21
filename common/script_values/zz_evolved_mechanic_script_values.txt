@@ -354,52 +354,113 @@ tec_capital_tier = {
 	base = 1
 	modifier = {
 		tec_has_t2_capital = { cached = yes }
-		set = 1
-	}
-	modifier = {
-		tec_has_t3_capital = { cached = yes }
 		set = 2
 	}
 	modifier = {
-		tec_has_t4_capital = { cached = yes }
+		tec_has_t3_capital = { cached = yes }
 		set = 3
 	}
 	modifier = {
-		tec_has_t5_capital = { cached = yes }
+		tec_has_t4_capital = { cached = yes }
 		set = 4
 	}
 	modifier = {
-		tec_has_imperial_capital = { cached = yes }
+		tec_has_t5_capital = { cached = yes }
 		set = 5
 	}
+	modifier = {
+		tec_has_imperial_capital = { cached = yes }
+		set = 6
+	}
+	]
+}
+
+tec_capital_tier_generic_scaling = {
+	[[CACHED]
+	base = 1
+	modifier = {
+		is_variable_set = tec_cache_tec_capital_tier_generic_scaling
+		set = tec_cache_tec_capital_tier_generic_scaling # cache_variable
+	}
+	]
+	[[!CACHED]
+	base = -1
+	add = value:tec_capital_tier
+	min = 1
 	]
 }
 
 tec_prime_drone_scaling = {
 	base = 0.5
 	modifier = {
-		tec_has_t2_capital = { cached = yes }
-		set = 1.0
-	}
-	modifier = {
-		tec_has_t3_capital = { cached = yes }
-		set = 1.5
-	}
-	modifier = {
-		tec_has_t4_capital = { cached = yes }
-		set = 3.0
+		uses_habitat_capitals = no
+		set = value:tec_prime_drone_scaling_planet
 	}
 	modifier = {
 		uses_habitat_capitals = yes
-		add = -0.5 # Tone down t2 hab capital since it is considered t3
-	}
-	modifier = {
-		tec_has_t5_capital = { cached = yes }
-		set = 4.5
+		set = value:tec_prime_drone_scaling_habitat
 	}
 	modifier = {
 		tec_has_imperial_capital = { cached = yes }
 		set = 6
+	}
+}
+
+tec_prime_drone_scaling_habitat = {
+	base = 0.5
+	modifier = {
+		check_variable_arithmetic = {
+			which = value:tec_capital_tier|CACHED|yes|
+			value >= 3
+		}
+		num_pops >= @pops_t2
+		set = 1.0
+	}
+	modifier = {
+		check_variable_arithmetic = {
+			which = value:tec_capital_tier|CACHED|yes|
+			value >= 4
+		}
+		num_pops >= @pops_t3
+		set = 2.0
+	}
+}
+
+tec_prime_drone_scaling_planet = {
+	base = 0.5
+	modifier = {
+		check_variable_arithmetic = {
+			which = value:tec_capital_tier|CACHED|yes|
+			value >= 2
+		}
+		num_pops >= @pops_t2
+		set = 1.0
+	}
+	modifier = {
+
+		check_variable_arithmetic = {
+			which = value:tec_capital_tier|CACHED|yes|
+			value >= 3
+		}
+		num_pops >= @pops_t3
+		set = 1.5
+	}
+	modifier = {
+
+		check_variable_arithmetic = {
+			which = value:tec_capital_tier|CACHED|yes|
+			value >= 4
+		}
+		num_pops >= @pops_t4
+		set = 3.0
+	}
+	modifier = {
+		check_variable_arithmetic = {
+			which = value:tec_capital_tier|CACHED|yes|
+			value >= 5
+		}
+		num_pops >= @pops_t5
+		set = 4.5
 	}
 }
 
@@ -453,7 +514,7 @@ tec_master_assembler_tech_priest_output = {
 
 tec_reimaginator_assembly = {
 	base = 0
-	add = planet.value:tec_capital_tier
+	add = planet.value:tec_capital_tier_generic_scaling
 	divide = 2
 	add = 2.5
 }
