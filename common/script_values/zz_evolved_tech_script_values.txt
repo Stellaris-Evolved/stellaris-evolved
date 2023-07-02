@@ -1,8 +1,3 @@
-tec_tech_rare_tech_weight_bonus = {
-    base = 1
-    add = modifier:tec_tech_rare_draw_chance_mult
-}
-
 
 # Not using `has_trait_in_council` since it does not check for upgraded traits
 tec_tech_trait_in_council_weight_bonus = {
@@ -18,9 +13,39 @@ tec_tech_trait_in_council_weight_bonus = {
     }
 }
 
-tec_tech_relations_weight_bonus = {
+tec_tech_neighbour_tech_weight = {
+    base = 1.5
+    mult = value:scripted_modifier_mult|MODIFIER|tec_tech_blocks_neighbour_spread|
+}
+
+tec_tech_weight_bonus = {
     base = 1
+    # Neighbour spread
+    modifier = {
+        mult = value:tec_tech_neighbour_tech_weight
+        any_neighbor_country = {
+            has_technology = $TECH$
+            prev = {
+                has_intel = { who = prev intel = intel_tech_relative_power }
+            } # maybe not, could be interesting
+            check_variable_arithmetic = {
+                which = modifier:tec_tech_blocks_neighbour_spread
+                value = 0
+            }
+        }
+    }
+    # Galcom spread
+    modifier = {
+        mult = 1.5
+        always = no
+        is_galactic_community_member = yes
+        is_active_resolution = resolution_galacticstudies_cooperative_research_channels
+        any_galcom_member = {
+            has_technology = $TECH$
+        }
+    }
     [[RARE]
+        mult = value:scripted_modifier_mult|MODIFIER|tec_tech_rare_draw_chance_mult|
         modifier = {
             mult = @federation_perk_factor
             has_federation = yes
@@ -186,6 +211,99 @@ tec_tech_years_passed_weight = {
     }
 }
 
+tec_tech_military_years_passed_weight = {
+    modifier = {
+        factor = 0.1
+        NOT = { years_passed > $YEARS$ }
+    }
+    modifier = {
+        factor = 2
+        years_passed > @[ $YEARS$ + $OFFSET$]
+    }
+    modifier = {
+        factor = 3
+        years_passed > @[ $YEARS$ + $OFFSET$ + 5]
+    }
+    modifier = {
+        factor = 4
+        years_passed > @[ $YEARS$ + $OFFSET$ + 10]
+    }
+}
+
+tec_tech_military_ship_weight = {
+    modifier = {
+        factor = 1.25
+        has_tradition = tr_supremacy_adopt
+    }
+    modifier = {
+        factor = 1.25
+        has_tradition = tr_tec_might_adopt
+    }
+}
+
+tec_tech_starbase_weight = {
+    modifier = {
+        factor = 5
+        count_starbase_sizes = {
+            starbase_size = $SIZE$
+            count >= 3
+        }
+    }
+    modifier = {
+        factor = 1.25
+        has_tradition = tr_unyielding_adopt
+    }
+    modifier = {
+        factor = 10
+        has_modifier = agenda_impenetrable_border_finish
+    }
+}
+
+tec_tech_orbital_weight = {
+    modifier = {
+        factor = 5
+        count_starbase_sizes = {
+            starbase_size = $SIZE$
+            count >= 3
+        }
+    }
+    modifier = {
+        factor = 1.25
+        has_tradition = tr_expansion_adopt
+    }
+    modifier = {
+        factor = 1.25
+        has_tradition = tr_expansion_finish
+    }
+
+    modifier = {
+        factor = 1.25
+        has_tradition = tr_tec_artifice_adopt
+    }
+}
+
+tec_tech_military_ship_rubberband_weight = {
+    base = 1
+    modifier = {
+        factor = 10
+        any_neighbor_country = {
+            has_technology = $TECH$
+        }
+    }
+}
+
+tec_tech_military_weight = {
+    modifier = {
+        factor = 1.25
+        has_ethic = ethic_militarist
+    }
+    modifier = {
+        factor = 1.5
+        has_ethic = ethic_fanatic_militarist
+    }
+
+}
+
 tec_tech_specialization_weight = {
     base = 1
     modifier = {
@@ -257,19 +375,6 @@ tec_tech_research_resolution_weight = {
     }
 }
 
-tec_tech_military_weight = {
-    base = 1
-    modifier = {
-        mult = 1.25
-        has_ethic = ethic_militarist
-    }
-    modifier = {
-        mult = 1.5
-        has_ethic = ethic_fanatic_militarist
-    }
-    mult = value:tec_tech_specialization_weight|TYPE|bulwark|
-}
-
 tec_tech_preffered_weapon_weight = {
     base = 1
     modifier = {
@@ -281,6 +386,27 @@ tec_tech_preffered_weapon_weight = {
 tec_tech_defensive_module_weight = {
     base = 1
     modifier = {
+        mult = 1.25
+        has_ethic = ethic_militarist
+    }
+    modifier = {
+        mult = 1.5
+        has_ethic = ethic_fanatic_militarist
+    }
+    modifier = {
+        mult = 1.5
+        has_ascension_perk = ap_tec_castling
+    }
+    modifier = {
+        mult = 2
+        has_ascension_perk = ap_eternal_vigilance
+    }
+    mult = value:tec_tech_specialization_weight|TYPE|bulwark|
+}
+
+tec_tech_defensive_module_ai_weight = {
+    base = 1
+    modifier = {
         mult = 1.5
         has_ascension_perk = ap_tec_castling
     }
@@ -290,7 +416,7 @@ tec_tech_defensive_module_weight = {
     }
 }
 
-tec_tech_prooduction_module_weight = {
+tec_tech_production_module_weight = {
     base = 1
     modifier = {
         mult = 1.5
@@ -637,6 +763,14 @@ tec_tech_cloning_ai_weight = {
         mult = 2
         has_origin = origin_tec_clones
     }
+    modifier = {
+        factor = 2
+        has_ethic = ethic_fanatic_xenophobe
+    }
+    modifier = {
+        factor = 1.5
+        has_ethic = ethic_xenophobe
+    }
     modifier = {	#Helping AI a little
         mult = 5
         OR = {
@@ -649,6 +783,49 @@ tec_tech_cloning_ai_weight = {
 
 tec_tech_bioservant_weight = {
     base = 1
+    modifier = {
+        factor = 0
+        has_policy_flag = bioservants_outlawed
+    }
+    modifier = {
+        factor = 0
+        has_policy_flag = tec_purity_assembly
+    }
+    modifier = {
+        factor = 0.5
+        has_ethic = ethic_fanatic_xenophobe
+    }
+    modifier = {
+        factor = 0.75
+        has_ethic = ethic_xenophobe
+    }
+    modifier = {
+        factor = 1.25
+        has_ethic = ethic_xenophile
+    }
+    modifier = {
+        factor = 1.5
+        has_ethic = ethic_fanatic_xenophile
+    }
+    modifier = {
+        factor = 1.25
+        has_ethic = ethic_green
+    }
+    modifier = {
+        factor = 1.5
+        has_ethic = ethic_fanatic_green
+    }
+    modifier = {
+        factor = 5
+        OR = {
+            has_country_flag = found_presapients
+            any_planet_within_border = {
+                any_owned_species = {
+                    is_sapient = no
+                }
+            }
+        }
+    }
     modifier = {
         mult = 2
         OR = {
@@ -668,6 +845,22 @@ tec_tech_bioservant_ai_weight = {
             has_origin = origin_tec_bioservantempire
             has_origin = origin_tec_hive_bioservant
         }
+    }
+    modifier = {
+        factor = 0.5
+        has_ethic = ethic_fanatic_xenophobe
+    }
+    modifier = {
+        factor = 0.75
+        has_ethic = ethic_xenophobe
+    }
+    modifier = {
+        factor = 1.25
+        has_ethic = ethic_xenophile
+    }
+    modifier = {
+        factor = 1.5
+        has_ethic = ethic_fanatic_xenophile
     }
     modifier = {
         mult = 0
@@ -691,6 +884,12 @@ tec_tech_clinics_weight = {
     }
 }
 
+_tec_tech_clinics_ai_weight_sub = {
+    base = 0
+    add = value:tec_tech_cloning_ai_weight
+    min = value:tec_tech_bioservant_ai_weight
+}
+
 tec_tech_clinics_ai_weight = {
     base = 1
     modifier = {
@@ -702,13 +901,14 @@ tec_tech_clinics_ai_weight = {
             }
         }
     }
-    mult = value:tec_tech_cloning_ai_weight
-    mult = value:tec_tech_bioservant_ai_weight
+    mult = value:_tec_tech_clinics_ai_weight_sub
     modifier = {
         mult = 1.5
         tec_has_cybernetic_ascension_path = yes
     }
 }
+
+
 
 tec_tech_blocker_weight = {
     base = 2
@@ -913,4 +1113,66 @@ tec_tech_psionic_weight = {
         }
     }
     mult = value:tec_tech_trait_in_council_weight_bonus|TRAIT|leader_trait_maniacal|FACTOR|2|
+}
+
+tec_tech_doctrine_weight = {
+    base = 1
+    modifier = {
+        factor = 2
+        is_militarist = yes
+    }
+}
+
+tec_tech_doctrine_ai_weight = {
+    base = 1
+    modifier = {
+        factor = 2
+        is_militarist = yes
+    }
+}
+
+tec_tech_starbase_claims_cap_weight = {
+    modifier = {
+        factor = 2
+        num_communications > 2
+    }
+    modifier = {
+        factor = 2
+        num_communications > 3
+    }
+    modifier = {
+        factor = 2
+        num_communications > 4
+    }
+
+    modifier = {
+        factor = 0
+        num_communications < 1
+    }
+}
+
+tec_tech_starbase_claims_cap_ai_weight = {
+    modifier = {
+        factor = 2
+        is_militarist = yes
+    }
+}
+
+tec_tech_bureaucratic_weight = {
+    modifier = {
+        factor = 0.5
+        num_owned_planets < $PLANETS$
+    }
+    modifier = {
+        factor = 1.5
+        num_owned_planets > @[ $PLANETS$ ]
+    }
+    modifier = {
+        factor = 1.5
+        num_owned_planets > @[ $PLANETS$ + 1 ]
+    }
+    modifier = {
+        factor = 1.5
+        num_owned_planets > @[ $PLANETS$ + 2 ]
+    }
 }
