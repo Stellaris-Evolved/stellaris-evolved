@@ -34,13 +34,15 @@ def generate_resource_loc(resource: ResourceStr):
 
 
 class Writer:
-    def __init__(self, file: str):
+    def __init__(self, file: str, has_bom = True):
         self.file = file
         self._spacer = WriterSpacer(self)
+        self.has_bom = has_bom
 
     def __enter__(self):
         self.io: BinaryIO = open(self.file, 'wb')
-        self.io.write(codecs.BOM_UTF8)
+        if self.has_bom:
+            self.io.write(codecs.BOM_UTF8)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):

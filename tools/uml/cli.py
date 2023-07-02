@@ -51,7 +51,7 @@ def generate_loc(config: str, local_config: str, output: str, base_mod_path: str
     if 'missing_sprites' in cfg:
         missing_sprites_output = Path(missing_sprites_output).resolve()
         os.makedirs(os.path.dirname(missing_sprites_output), exist_ok=True)
-        with Writer(str(missing_sprites_output)) as writer:
+        with Writer(str(missing_sprites_output), has_bom=False) as writer:
             create_sprites_for_cleanup(writer, cfg['missing_sprites'])
 
 
