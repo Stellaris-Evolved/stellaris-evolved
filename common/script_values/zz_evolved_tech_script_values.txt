@@ -1,0 +1,1205 @@
+
+# Not using `has_trait_in_council` since it does not check for upgraded traits
+tec_tech_trait_in_council_weight_bonus = {
+    base = 1
+    modifier = {
+        mult = $FACTOR$
+        any_owned_leader = {
+            is_councilor = yes
+            has_trait = $TRAIT$
+            has_trait = $TRAIT$_2
+            has_trait = $TRAIT$_3
+        }
+    }
+}
+
+tec_tech_neighbour_tech_weight = {
+    base = 1.5
+    mult = value:scripted_modifier_mult|MODIFIER|tec_tech_blocks_neighbour_spread|
+}
+
+tec_tech_weight_bonus = {
+    base = 1
+    # Neighbour spread
+    modifier = {
+        mult = value:tec_tech_neighbour_tech_weight
+        any_neighbor_country = {
+            has_technology = $TECH$
+            prev = {
+                has_intel = { who = prev intel = intel_tech_relative_power }
+            } # maybe not, could be interesting
+            check_variable_arithmetic = {
+                which = modifier:tec_tech_blocks_neighbour_spread
+                value = 0
+            }
+        }
+    }
+    # Galcom spread
+    modifier = {
+        mult = 1.5
+        always = no
+        is_galactic_community_member = yes
+        is_active_resolution = resolution_galacticstudies_cooperative_research_channels
+        any_galcom_member = {
+            has_technology = $TECH$
+        }
+    }
+    # Espionage spread
+    modifier = {
+        mult = 1.5
+        always = no
+        any_spynetwork = {
+            target = {
+                has_country_flag = tec_has_research_syphoning_network
+                has_technology = $TECH$
+            }
+        }
+    }
+    [[RARE]
+        mult = value:scripted_modifier_mult|MODIFIER|tec_tech_rare_draw_chance_mult|
+        modifier = {
+            mult = @federation_perk_factor
+            has_federation = yes
+            federation = {
+                has_federation_perk = rare_tech_boost
+                any_member = { has_technology = $TECH$ }
+            }
+        }
+    ]
+}
+
+tec_tech_archeo_weight = {
+    base = 1
+    modifier = {
+        mult = 0.1
+        num_buildings = {
+            type = building_archaeostudies_faculty
+            value < 1
+            disabled = no
+            in_construction = no
+        }
+    }
+    modifier = {
+        mult = 0.3
+        NOT = {
+            has_ascension_perk = ap_archaeoengineers
+        }
+    }
+    modifier = {
+        mult = 0
+        has_ancrel = no
+    }
+}
+
+tec_tech_building_weight = {
+    base = 1
+    modifier = {
+        mult = 0.25
+        any_owned_planet = {
+            NOT = {
+                has_building = $BUILDING$
+            }
+        }
+    }
+    modifier = {
+        mult = 1.5
+        any_owned_planet = {
+            has_building = $BUILDING$
+        }
+    }
+}
+
+tec_tech_expertise_or_briliant_scientist_weight_negative = {
+    base = 1
+    modifier = {
+        mult = 0.5
+        NOR = {
+            has_trait_in_council = { TRAIT = leader_trait_maniacal }
+            has_trait_in_council = { TRAIT = leader_trait_maniacal_2 }
+            has_trait_in_council = { TRAIT = leader_trait_maniacal_3 }
+            has_trait_in_council = { TRAIT = leader_trait_spark_of_genius }
+            has_trait_in_council = { TRAIT = leader_trait_spark_of_genius_2 }
+            has_trait_in_council = { TRAIT = leader_trait_curator }
+            has_trait_in_council = { TRAIT = leader_trait_expertise_$CATEGORY$ }
+        }
+    }
+
+    [[NEVER] # mostly for type hint for $CATEGORY$ for IDE
+        modifier = {
+            mult = 1
+            can_copy_random_tech_from = {
+                category = $CATEGORY$
+                who = this
+            }
+        }
+    ]
+}
+
+tec_tech_expertise_or_curator_scientist_weight_negative = {
+    base = 1
+    modifier = {
+        mult = 0.25
+        NOR = {
+            has_modifier = "curator_insight"
+            has_trait_in_council = { TRAIT = leader_trait_curator }
+            has_trait_in_council = { TRAIT = leader_trait_expertise_$CATEGORY$ }
+        }
+    }
+
+    [[NEVER] # mostly for type hint for $CATEGORY$ for IDE
+        modifier = {
+            mult = 1
+            can_copy_random_tech_from = {
+                category = $CATEGORY$
+                who = this
+            }
+        }
+    ]
+}
+
+tec_tech_cannot_produce_strategic_weight = {
+    base = 1
+    modifier = {
+        mult = 0
+        tec_can_produce_$RESOURCE$ = no
+    }
+
+    [[NEVER] # mostly for type hint for $RESOURCE$ for IDE
+        modifier = {
+            mult = 1
+            can_buy_on_market = $RESOURCE$
+        }
+    ]
+}
+
+tec_tech_access_to_natural_strategic_mine_weight = {
+    base = 1
+    modifier = {
+        mult = 0
+        tec_has_access_to_natural_$RESOURCE$ = yes
+    }
+
+    [[NEVER] # mostly for type hint for RESOURCE for IDE
+        modifier = {
+            mult = 1
+            can_buy_on_market = $RESOURCE$
+        }
+    ]
+}
+
+tec_tech_access_to_natural_strategic_refine_weight = {
+    base = 1
+    modifier = {
+        mult = 1.25
+        tec_has_access_to_natural_$RESOURCE$ = yes
+    }
+
+    [[NEVER] # mostly for type hint for RESOURCE for IDE
+        modifier = {
+            mult = 1
+            can_buy_on_market = $RESOURCE$
+        }
+    ]
+}
+
+tec_tech_years_passed_weight = {
+    base = 1
+    modifier = {
+        mult = 2
+        years_passed > $YEARS$
+    }
+    modifier = {
+        mult = 2
+        years_passed > @\[ $YEARS$ + 5 ]
+    }
+    modifier = {
+        mult = 2
+        years_passed > @\[ $YEARS$ + 10 ]
+    }
+    modifier = {
+        mult = 2
+        years_passed > @\[ $YEARS$ + 15 ]
+    }
+}
+
+tec_tech_military_years_passed_weight = {
+    modifier = {
+        factor = 0.1
+        NOT = { years_passed > $YEARS$ }
+    }
+    modifier = {
+        factor = 2
+        years_passed > @\[ $YEARS$ + $OFFSET$ ]
+    }
+    modifier = {
+        factor = 3
+        years_passed > @\[ $YEARS$ + $OFFSET$ + 5 ]
+    }
+    modifier = {
+        factor = 4
+        years_passed > @\[ $YEARS$ + $OFFSET$ + 10 ]
+    }
+}
+
+tec_tech_military_ship_weight = {
+    modifier = {
+        factor = 1.25
+        has_tradition = tr_supremacy_adopt
+    }
+    modifier = {
+        factor = 1.25
+        has_tradition = tr_tec_might_adopt
+    }
+}
+
+tec_tech_starbase_weight = {
+    modifier = {
+        factor = 5
+        count_starbase_sizes = {
+            starbase_size = $SIZE$
+            count >= 3
+        }
+    }
+    modifier = {
+        factor = 1.25
+        has_tradition = tr_unyielding_adopt
+    }
+    modifier = {
+        factor = 10
+        has_modifier = agenda_impenetrable_border_finish
+    }
+}
+
+tec_tech_orbital_weight = {
+    modifier = {
+        factor = 5
+        count_starbase_sizes = {
+            starbase_size = $SIZE$
+            count >= 3
+        }
+    }
+    modifier = {
+        factor = 1.25
+        has_tradition = tr_expansion_adopt
+    }
+    modifier = {
+        factor = 1.25
+        has_tradition = tr_expansion_finish
+    }
+
+    modifier = {
+        factor = 1.25
+        has_tradition = tr_tec_artifice_adopt
+    }
+}
+
+tec_tech_military_ship_rubberband_weight = {
+    base = 1
+    modifier = {
+        factor = 10
+        any_neighbor_country = {
+            has_technology = $TECH$
+        }
+    }
+}
+
+tec_tech_military_weight = {
+    modifier = {
+        factor = 1.25
+        has_ethic = ethic_militarist
+    }
+    modifier = {
+        factor = 1.5
+        has_ethic = ethic_fanatic_militarist
+    }
+
+}
+
+tec_tech_specialization_weight = {
+    base = 1
+    modifier = {
+        mult = @tec_tech_specialization_tech_factor
+        is_specialist_subject_type = { TYPE = $TYPE$ }
+    }
+}
+
+tec_tech_assimilate_robots_weight = {
+    base = 0
+    complex_trigger_modifier = {
+        trigger = count_neighbor_country
+        parameters = {
+            limit = {
+                has_established_contact = root
+                OR = {
+                    has_country_flag = built_first_robot
+                    is_machine_empire = yes
+                }
+            }
+        }
+        mode = add
+    }
+    complex_trigger_modifier = {
+        trigger = count_owned_species
+        parameters = {
+            limit = {
+                OR = {
+                    has_trait = trait_mechanical
+                    has_trait = trait_machine_unit
+                }
+                NOT = { is_same_species = prev.built_species }
+            }
+        }
+        mode = add
+    }
+}
+
+tec_tech_research_resolution_weight = {
+    base = 1
+    modifier = {
+        mult = 1.25
+        is_galactic_community_member = yes
+        OR = {
+            is_active_resolution = resolution_galacticstudies_cooperative_research_channels
+            is_active_resolution = resolution_galacticstudies_astral_studies_network
+            is_active_resolution = resolution_galacticstudies_advanced_xenostudies
+            is_active_resolution = resolution_galacticstudies_ethical_guideline_refactoring
+            is_active_resolution = resolution_galacticstudies_extradimensional_experimentation
+        }
+    }
+    modifier = {
+        mult = 1.5
+        is_galactic_community_member = yes
+        OR = {
+            is_active_resolution = resolution_galacticstudies_astral_studies_network
+            is_active_resolution = resolution_galacticstudies_advanced_xenostudies
+            is_active_resolution = resolution_galacticstudies_ethical_guideline_refactoring
+            is_active_resolution = resolution_galacticstudies_extradimensional_experimentation
+        }
+    }
+    modifier = {
+        mult = 2
+        is_galactic_community_member = yes
+        OR = {
+            is_active_resolution = resolution_galacticstudies_ethical_guideline_refactoring
+            is_active_resolution = resolution_galacticstudies_extradimensional_experimentation
+        }
+    }
+}
+
+tec_tech_preffered_weapon_weight = {
+    base = 1
+    modifier = {
+        mult = 2
+        is_preferred_weapons = $TYPE$
+    }
+}
+
+tec_tech_defensive_module_weight = {
+    base = 1
+    modifier = {
+        mult = 1.25
+        has_ethic = ethic_militarist
+    }
+    modifier = {
+        mult = 1.5
+        has_ethic = ethic_fanatic_militarist
+    }
+    modifier = {
+        mult = 1.5
+        has_ascension_perk = ap_tec_castling
+    }
+    modifier = {
+        mult = 2
+        has_ascension_perk = ap_eternal_vigilance
+    }
+    mult = value:tec_tech_specialization_weight|TYPE|bulwark|
+}
+
+tec_tech_defensive_module_ai_weight = {
+    base = 1
+    modifier = {
+        mult = 1.5
+        has_ascension_perk = ap_tec_castling
+    }
+    modifier = {
+        mult = 2
+        has_ascension_perk = ap_eternal_vigilance
+    }
+}
+
+tec_tech_production_module_weight = {
+    base = 1
+    modifier = {
+        mult = 1.5
+        has_ascension_perk = ap_tec_castling
+    }
+    modifier = {
+        mult = 2
+        has_ascension_perk = ap_grasp_the_void
+    }
+}
+
+tec_tech_food_weight = {
+    base = 1
+    modifier = {
+        mult = 0.01
+        OR = {
+            is_machine_empire = yes
+            is_lithoid_empire = yes
+        }
+        NOR = {
+            has_country_flag = non_lithoid_subspecies
+            has_valid_civic = civic_machine_servitor
+            has_valid_civic = civic_machine_assimilator
+            owner_main_species = {
+                OR = {
+                    has_trait = trait_tec_machine_biobrain
+                    has_trait = trait_tec_machine_biomass
+                }
+            }
+            any_owned_planet = {
+                check_variable_arithmetic = {
+                    which = value:farming_combined_value
+                    value > 0
+                }
+            }
+        }
+    }
+    modifier = {
+        mult = 0.5
+        OR = {
+            is_machine_empire = yes
+            is_lithoid_empire = yes
+        }
+    }
+    modifier = {
+        mult = 1.25
+        has_ethic = ethic_pacifist
+    }
+    modifier = {
+        mult = 1.5
+        has_ethic = ethic_fanatic_pacifist
+    }
+    modifier = {
+        mult = 2
+        has_relic = r_pox_sample
+    }
+    modifier = {
+        mult = 1.25
+        tec_is_biohive = yes
+    }
+    modifier = {
+        mult =  1.25
+        tec_is_bioarch_empire = yes
+    }
+}
+
+tec_tech_food_ai_weight = {
+    base = 1
+    modifier = {
+        mult = 1.25
+        has_ethic = ethic_pacifist
+    }
+    modifier = {
+        mult = 1.5
+        has_ethic = ethic_fanatic_pacifist
+    }
+    modifier = {
+        mult = 2
+        tec_is_biohive = yes
+    }
+    modifier = {
+        mult = 2
+        tec_is_bioarch_empire = yes
+    }
+    modifier = {
+        mult = 1.5
+        is_catalytic_empire = yes
+    }
+    modifier = {
+        mult = 1.5
+        tec_is_aquatic_empire = yes
+        is_machine_empire = no
+        is_lithoid = no
+    }
+    modifier = {
+        factor = 0
+        country_uses_food = no
+    }
+    modifier = {
+        mult = 1.5
+        OR = {
+            has_policy_flag = consumer_goods_food
+            has_policy_flag = consumer_goods_mixed
+        }
+    }
+    modifier = {
+        mult = 1.5
+        has_deficit = food
+    }
+}
+
+tec_tech_minerals_weight = {
+    base = 1
+    modifier = {
+        mult = 1.25
+        is_lithoid = yes
+    }
+    modifier = {
+        mult = 1.5
+        has_valid_civic = civic_mining_guilds
+    }
+}
+
+tec_tech_minerals_ai_weight = {
+    base = 1
+    modifier = {
+        mult = 1.25
+        is_lithoid = yes
+    }
+    modifier = {
+        mult = 1.5
+        has_valid_civic = civic_mining_guilds
+    }
+    modifier = {
+        mult = 2
+        OR = {
+            has_ascension_perk = ap_arcology_project
+            has_ascension_perk = ap_mastery_of_nature
+            has_ascension_perk = ap_tec_sidereal_arcologies
+        }
+    }
+    modifier = {
+        mult = 1.5
+        has_deficit = minerals
+    }
+}
+
+tec_tech_energy_weight = {
+    base = 1
+    modifier = {
+        mult = 1.5
+        tec_is_quantum_alloys_empire = yes
+    }
+    modifier = {
+        mult = 1.5
+        tec_is_cyberarch_empire = yes
+    }
+}
+
+tec_tech_energy_ai_weight = {
+    modifier = {
+        mult = 1.5
+        OR = {
+            is_machine_empire = yes
+            tec_is_cyberhive = yes
+        }
+    }
+    modifier = {
+        mult = 1.5
+        tec_is_aquatic_empire = yes
+        is_machine_empire = yes
+    }
+    modifier = {
+        mult = 1.5
+        tec_is_quantum_alloys_empire = yes
+    }
+    modifier = {
+        mult = 1.5
+        has_deficit = energy
+    }
+    modifier = {
+        mult = 0.1
+        should_ai_focus_on_trade = yes
+    }
+}
+
+tec_tech_trade_weight = {
+    base = 1
+    modifier = {
+        factor = 1.25
+        has_tradition = tr_prosperity_adopt
+    }
+    modifier = {
+        factor = 1.25
+        has_tradition = tr_mercantile_adopt
+    }
+}
+
+
+tec_tech_robotics_weight = {
+    base = 1
+    modifier = {
+        mult = 0
+        has_policy_flag = robots_outlawed
+    }
+    modifier = {
+        mult = 2
+        has_origin = origin_mechanists
+    }
+    modifier = {
+        mult = 3
+        is_hive_empire = yes
+        tec_has_cybernetic_ascension_path = yes
+    }
+    modifier = {
+        mult = 3
+        is_regular_empire = yes
+        tec_has_synthetic_ascension_path = yes
+    }
+}
+
+tec_tech_main_robotics_weight = {
+    base = 1
+    modifier = {
+        mult = 0.5
+        is_spiritualist = yes
+        tec_is_robot_lover_spiritualist = no
+    }
+    modifier = {
+        mult = 2
+        is_materialist = yes
+    }
+    modifier = {
+        mult = 1.5
+        has_valid_civic = civic_tec_corporate_robocorp
+    }
+    modifier = {
+        mult = 1.5
+        tec_is_machine_cult = yes
+    }
+}
+
+tec_tech_robotics_ai_weight = {
+    base = 1
+    modifier = {
+        mult = 2
+        is_materialist = yes
+    }
+    modifier = {
+        mult = 0
+        NOR = {
+            has_ai_personality_behaviour = robot_exploiter
+            has_ai_personality_behaviour = robot_liberator
+        }
+    }
+    modifier = {
+        mult = 2
+        has_origin = origin_mechanists
+    }
+    modifier = {
+        mult = 1.5
+        has_valid_civic = civic_tec_corporate_robocorp
+    }
+    modifier = {
+        mult = 3
+        tec_is_machine_cult = yes
+    }
+    modifier = {	#Helping AI a little
+        mult = 5
+        OR = {
+            has_country_flag = tec_desires_to_build_robots
+            tec_has_synthetic_ascension_path = yes
+            tec_has_cybernetic_ascension_path = yes
+        }
+    }
+}
+
+tec_tech_genetic_weight = {
+    base = 1
+    modifier = {
+        factor = 1.25
+        is_hive_empire = yes
+    }
+    modifier = {
+        factor = 1.25
+        has_tradition = tr_supremacy_adopt
+    }
+    modifier = {
+        factor = 2
+        has_relic = r_pox_sample
+    }
+    modifier = {
+        factor = 1.25
+        has_origin = origin_necrophage
+        has_trait = trait_necrophage
+    }
+    modifier = {
+        factor = 2
+        has_relic = r_pox_sample
+    }
+}
+
+tec_tech_genetic_ai_weight = {
+    base = 1
+    modifier = {
+        factor = 1.25
+        has_origin = origin_necrophage
+        has_trait = trait_necrophage
+    }
+    modifier = {
+        mult = 2
+        OR = {
+            has_origin = origin_tec_clones
+            has_origin = origin_tec_bioservant
+            has_origin = origin_tec_bioservantempire
+            has_origin = origin_tec_hive_bioservant
+        }
+    }
+    modifier = {	#Helping AI a little
+        mult = 5
+        OR = {
+            has_country_flag = tec_desires_to_build_clones
+            tec_has_genetic_ascension_path = yes
+            tec_has_psionic_ascension_path = yes
+        }
+    }
+}
+
+tec_tech_cloning_weight = {
+    base = 1
+    modifier = {
+        mult = 2
+        has_origin = origin_tec_clones
+    }
+    modifier = {
+        mult = 3
+        tec_has_genetic_ascension_path = yes
+    }
+}
+
+tec_tech_cloning_ai_weight = {
+    base = 1
+    modifier = {
+        mult = 2
+        has_origin = origin_tec_clones
+    }
+    modifier = {
+        factor = 2
+        has_ethic = ethic_fanatic_xenophobe
+    }
+    modifier = {
+        factor = 1.5
+        has_ethic = ethic_xenophobe
+    }
+    modifier = {	#Helping AI a little
+        mult = 5
+        OR = {
+            has_country_flag = tec_desires_to_build_clones
+            tec_has_genetic_ascension_path = yes
+            tec_has_psionic_ascension_path = yes
+        }
+    }
+}
+
+tec_tech_bioservant_weight = {
+    base = 1
+    modifier = {
+        factor = 0
+        has_policy_flag = bioservants_outlawed
+    }
+    modifier = {
+        factor = 0
+        has_policy_flag = tec_purity_assembly
+    }
+    modifier = {
+        factor = 0.5
+        has_ethic = ethic_fanatic_xenophobe
+    }
+    modifier = {
+        factor = 0.75
+        has_ethic = ethic_xenophobe
+    }
+    modifier = {
+        factor = 1.25
+        has_ethic = ethic_xenophile
+    }
+    modifier = {
+        factor = 1.5
+        has_ethic = ethic_fanatic_xenophile
+    }
+    modifier = {
+        factor = 1.25
+        has_ethic = ethic_green
+    }
+    modifier = {
+        factor = 1.5
+        has_ethic = ethic_fanatic_green
+    }
+    modifier = {
+        factor = 5
+        OR = {
+            has_country_flag = found_presapients
+            any_planet_within_border = {
+                any_owned_species = {
+                    is_sapient = no
+                }
+            }
+        }
+    }
+    modifier = {
+        mult = 2
+        OR = {
+            has_origin = origin_tec_bioservant
+            has_origin = origin_tec_bioservantempire
+            has_origin = origin_tec_hive_bioservant
+        }
+    }
+}
+
+tec_tech_bioservant_ai_weight = {
+    base = 1
+    modifier = {
+        mult = 2
+        OR = {
+            has_origin = origin_tec_bioservant
+            has_origin = origin_tec_bioservantempire
+            has_origin = origin_tec_hive_bioservant
+        }
+    }
+    modifier = {
+        factor = 0.5
+        has_ethic = ethic_fanatic_xenophobe
+    }
+    modifier = {
+        factor = 0.75
+        has_ethic = ethic_xenophobe
+    }
+    modifier = {
+        factor = 1.25
+        has_ethic = ethic_xenophile
+    }
+    modifier = {
+        factor = 1.5
+        has_ethic = ethic_fanatic_xenophile
+    }
+    modifier = {
+        mult = 0
+        NOT = { has_country_flag = tec_desires_to_build_bio }
+    }
+    modifier = {	#Helping AI a little
+        mult = 5
+        has_country_flag = tec_desires_to_build_bio
+    }
+}
+
+tec_tech_clinics_weight = {
+    base = 1
+    modifier = {
+        factor = 1.25
+        has_tradition = tr_harmony_adopt
+    }
+    modifier = {
+        factor = 2
+        has_relic = r_pox_sample
+    }
+}
+
+_tec_tech_clinics_ai_weight_sub = {
+    base = 0
+    add = value:tec_tech_cloning_ai_weight
+    min = value:tec_tech_bioservant_ai_weight
+}
+
+tec_tech_clinics_ai_weight = {
+    base = 1
+    modifier = {
+        factor = 1.25
+        any_owned_planet = {
+            habitability = {
+                who = root
+                value < 0.8
+            }
+        }
+    }
+    mult = value:_tec_tech_clinics_ai_weight_sub
+    modifier = {
+        mult = 1.5
+        tec_has_cybernetic_ascension_path = yes
+    }
+}
+
+
+
+tec_tech_blocker_weight = {
+    base = 2
+    modifier = {
+        factor = 1.5
+        tec_is_terraformer_empire = yes
+    }
+    modifier = {
+        factor = 1.25
+        has_tradition = tr_expansion_adopt
+    }
+    modifier = {
+        factor = 4
+        has_ascension_perk = ap_mastery_of_nature
+    }
+    modifier = {
+        factor = 0
+        NOT = {
+            any_owned_planet = {
+                has_deposit = $DEPOSIT$
+            }
+        }
+    }
+    modifier = {
+        factor = 0
+        num_owned_planets < 2
+    }
+}
+
+tec_tech_blocker_ai_weight = {
+    base = 3
+    modifier = {
+        factor = 2
+        tec_is_terraformer_empire = yes
+    }
+}
+
+tec_tech_terraforming_weight = {
+    base = 1
+    modifier = {
+        factor = 0
+        is_lithoid_empire = yes
+        has_valid_civic = civic_hive_devouring_swarm
+    }
+    modifier = {
+        factor = 1.25
+        has_tradition = tr_expansion_adopt
+    }
+    modifier = { #if you're a fish, you're definitely gonna prioritise finding out how to make more oceans
+        factor = 1.25
+        OR = {
+            has_trait = trait_aquatic
+            has_trait = trait_tec_machine_aquatic
+            has_trait = trait_tec_advanced_aquatic
+        }
+    }
+    modifier = {
+        factor = 1.5
+        tec_has_gaia_world_origin = yes
+    }
+    modifier = {
+        factor = 1.25
+        tec_is_terraformer_empire = yes
+    }
+    modifier = {
+        factor = 1.25
+        is_ecologist = yes
+    }
+    modifier = {
+        factor = 1.25
+        has_ethic = ethic_gestalt_preservation
+    }
+}
+
+tec_tech_terraforming_ai_weight = {
+    base = 1
+    modifier = { #if you're a fish, you're definitely gonna prioritise finding out how to make more oceans
+        factor = 100
+        OR = {
+            has_trait = trait_aquatic
+            has_trait = trait_tec_machine_aquatic
+            has_trait = trait_tec_advanced_aquatic
+        }
+    }
+    modifier = {
+        factor = 100
+        tec_has_gaia_world_origin = yes
+    }
+    modifier = {
+        factor = 1.25
+        tec_is_terraformer_empire = yes
+    }
+    modifier = {
+        factor = 1.25
+        is_ecologist = yes
+    }
+    modifier = {
+        factor = 1.25
+        has_ethic = ethic_gestalt_preservation
+    }
+
+    modifier = {
+        factor = 2
+        is_xenophobe = yes
+    }
+    modifier = {
+        factor = 0
+        OR = {
+            has_origin = origin_shattered_ring
+            has_origin = origin_void_dwellers
+        }
+        is_ai = yes
+    }
+    modifier = {
+        factor = 5
+        OR = {
+            any_owned_planet = {
+                habitability = {
+                    who = root
+                    value < 0.5
+                }
+            }
+            any_system_within_border = {
+                any_system_planet = {
+                    is_planet_class = pc_nuked
+                }
+            }
+        }
+    }
+    modifier = {
+        factor = 2
+        is_ai = no #auto-research
+    }
+}
+
+tec_tech_habitability_weight = {
+    base = 1
+    modifier = {
+        factor = 0.7
+        OR = {
+            has_civic = civic_machine_servitor
+            has_civic = civic_machine_assimilator
+            has_trait = trait_tec_robot_unadaptable
+            has_ethic = ethic_gestalt_empathy
+        }
+    }
+}
+
+tec_tech_habitability_ai_weight = {
+    base = 1
+
+    modifier = {
+        factor = 1.25
+        OR = {
+            has_trait = trait_tec_robot_unadaptable
+            has_trait = trait_nonadaptive
+        }
+    }
+
+    modifier = {
+        factor = 1.25
+        any_system_within_border = {
+            any_system_planet = {
+                is_colonizable = yes
+                habitability = {
+                    who = root
+                    value < 0.5
+                }
+            }
+        }
+    }
+
+    modifier = {
+        factor = 1.25
+        any_owned_planet = {
+            habitability = {
+                who = root
+                value < 0.8
+            }
+        }
+    }
+}
+
+tec_tech_psionic_weight = {
+    base = 1
+    modifier = {
+        factor = 0
+        host_has_dlc = "Utopia" # Granted by Psionic Ascension Path
+    }
+    modifier = {
+        factor = 1.5
+        has_ethic = "ethic_spiritualist"
+    }
+    modifier = {
+        factor = 2
+        has_ethic = "ethic_fanatic_spiritualist"
+    }
+    modifier = {
+        factor = 3
+        any_owned_planet = {
+            has_modifier = pm_shroudwalker_teacher
+        }
+    }
+    mult = value:tec_tech_trait_in_council_weight_bonus|TRAIT|leader_trait_maniacal|FACTOR|2|
+}
+
+tec_tech_doctrine_weight = {
+    base = 1
+    modifier = {
+        factor = 2
+        is_militarist = yes
+    }
+}
+
+tec_tech_doctrine_ai_weight = {
+    base = 1
+    modifier = {
+        factor = 2
+        is_militarist = yes
+    }
+}
+
+tec_tech_starbase_claims_cap_weight = {
+    modifier = {
+        factor = 2
+        num_communications > 2
+    }
+    modifier = {
+        factor = 2
+        num_communications > 3
+    }
+    modifier = {
+        factor = 2
+        num_communications > 4
+    }
+
+    modifier = {
+        factor = 0
+        num_communications < 1
+    }
+}
+
+tec_tech_starbase_claims_cap_ai_weight = {
+    modifier = {
+        factor = 2
+        is_militarist = yes
+    }
+}
+
+tec_tech_bureaucratic_weight = {
+    modifier = {
+        factor = 0.5
+        num_owned_planets < $PLANETS$
+    }
+    modifier = {
+        factor = 1.5
+        num_owned_planets > @\[ $PLANETS$ ]
+    }
+    modifier = {
+        factor = 1.5
+        num_owned_planets > @\[ $PLANETS$ + 1 ]
+    }
+    modifier = {
+        factor = 1.5
+        num_owned_planets > @\[ $PLANETS$ + 2 ]
+    }
+}
+
+tec_tech_cloaking_weight = {
+    base = 1
+    modifier = {
+        factor = value:tech_weight_likelihood
+        has_trait_in_council = { TRAIT = leader_trait_curator }
+    }
+    modifier = {
+        factor = value:tech_weight_likelihood
+        has_trait_in_council = { TRAIT = leader_trait_fotd_scientist }
+    }
+    modifier = {
+        factor = 5
+        has_tradition = tr_subterfuge_adopt
+    }
+}
