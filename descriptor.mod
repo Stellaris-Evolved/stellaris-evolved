@@ -3,4 +3,5 @@ tags={
 	"Overhaul"
 }
 name="Stellaris Evolved - GIT"
-supported_version="3.7.*"
+supported_version="3.8.4"
+remote_file_id="2999572851"
