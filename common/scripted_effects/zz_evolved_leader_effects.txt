@@ -106,3 +106,51 @@ tec_country_leaders_handle_starting_modifiers = {
 		}
 	}
 }
+
+tec_leader_cache_portrait = {
+	save_global_event_target_as = tec_leader_to_cache_portait
+	if = {
+		limit = {
+			NOT = { exists = event_target:tec_leader_portrait_cache }
+		}
+		create_random_species = yes
+		event_target:global_event_country = {
+			create_saved_leader = {
+				class = envoy
+				creator = this
+				name = "Backup Portrait"
+				key = "tec_robot_portrait_leader"
+				species = last_created_species
+			}
+			last_created_leader = {
+				save_global_event_target_as = tec_leader_portrait_cache
+			}
+		}
+	}
+	event_target:tec_leader_portrait_cache.species = {
+		change_species_characteristics = {
+			portrait = event_target:tec_leader_to_cache_portait
+			can_change_leader = yes
+		}
+	}
+	clear_global_event_target = tec_leader_to_cache_portait
+}
+
+tec_leader_reset_to_cached_portrait = {
+	if = {
+		limit = {
+			exists = event_target:tec_leader_portrait_cache
+		}
+		change_leader_portrait = event_target:tec_leader_portrait_cache
+	}
+	else = {
+		log = "Tried to change leader to cached portrait, but cached portrait does not exist"
+	}
+}
+
+tec_leader_reset_portrait_on_assimilation_if_needed = {
+	if = {
+		limit = { tec_should_leader_change_portrait_on_assimilation = no }
+		tec_leader_reset_to_cached_portrait = yes
+	}
+}
