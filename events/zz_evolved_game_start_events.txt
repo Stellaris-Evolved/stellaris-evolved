@@ -4022,16 +4022,19 @@ country_event = {
 				is_fallen_empire = yes
 			}
 			add_modifier = {
-				modifier = tec_fallen_empire_might
+				modifier = modifier_tec_fallen_empire_might
 				mult = value:tec_difficulty_scaling|DIVIDE|0.5|
 			}
+			#country_event = {	# FE adjustments
+			#	id = tec_pve.10100
+			#}
 		}
 		else_if = {	# Leviathans
 			limit = {
 				is_guardian_country = yes
 			}
 			add_modifier = {
-				modifier = tec_leviathan_might
+				modifier = modifier_tec_leviathan_might
 				mult = value:tec_difficulty_scaling|DIVIDE|0.5|
 			}
 		}
@@ -4045,7 +4048,7 @@ country_event = {
 				}
 			}
 			add_modifier = {
-				modifier = tec_space_critter_might
+				modifier = modifier_tec_space_critter_might
 				mult = value:tec_difficulty_scaling|DIVIDE|0.5|
 			}
 		}
@@ -4060,12 +4063,722 @@ country_event = {
 				}
 			}
 			add_modifier = {
-				modifier = tec_space_critter_might
+				modifier = modifier_tec_space_critter_might
 				mult = value:tec_difficulty_scaling|DIVIDE|0.5|
 			}
 		}
 		else = {
 			break = yes
+		}
+	}
+}
+
+country_event = {	# FE adjustments
+	id = tec_pve.10100
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_global_flag = tec_test_fe_changes
+		#	set_global_flag = tec_test_fe_changes
+		NOR = {	# Gigas does its thing, better to avoid overlap
+			has_global_flag = giga_game_started
+			has_global_flag = gigastructures_enabled
+		}
+		capital_scope = {	# So machine fes don't get ravaged
+			is_artificial = no
+		}
+	}
+
+	immediate = {
+		# Fix fe starbases
+			# Subcomponents
+				give_technology = {
+					tech = tech_tec_sb_xxl_cannons
+					message = no
+				}
+				give_technology = {
+					tech = tech_tec_sb_xxl_hangars
+					message = no
+				}
+				give_technology = {
+					tech = tech_tec_sb_xxl_missiles
+					message = no
+				}
+			# /
+			every_owned_starbase = {
+				limit = {
+					has_starbase_size = starbase_citadel
+				}
+				tec_buff_fe_existing_starbases = yes
+			}
+		# /
+		# Orbital Rings
+			give_technology = {
+				tech = tech_orbital_ring_tier_1
+				message = no
+			}
+			# Capital gets an orbital ring
+				tec_generate_orbital_ring = {
+					SCOPE = capital_scope
+					OWNER = prev.owner
+					TIER = 3
+					DEFENSE = YES
+					ANCHORAGE = NO
+					SHIPYARD = NO
+					ECONOMIC = NO
+					EXTRA_EFFECT = "
+						while = {
+							count = 8
+							create_fallen_empire_platform = yes
+						}
+					"
+				}
+			# /
+			# 2 random planets get an orbital ring
+				while = {
+					count = 2
+					random_owned_planet = {
+						limit = {
+							is_colony = yes
+							is_artificial = no
+							is_moon = no
+							NOT = {
+								has_planet_flag = has_megastructure
+							}
+						}
+						save_event_target_as = tec_fe_ring_candidate
+						tec_generate_orbital_ring = {
+							SCOPE = event_target:tec_fe_ring_candidate
+							OWNER = prev.owner
+							TIER = 3
+							DEFENSE = YES
+							ANCHORAGE = NO
+							SHIPYARD = NO
+							ECONOMIC = NO
+							EXTRA_EFFECT = "
+								while = {
+									count = 8
+									create_fallen_empire_platform = yes
+								}
+							"
+						}
+					}
+				}
+			# /
+		# /
+		# Elysiums
+			give_technology = {
+				tech = tech_elysium_ring
+				message = no
+			}
+			# Capital gets an elysium
+				capital_scope = {
+					solar_system = {
+						spawn_megastructure = {
+							type = tec_elysian_ring_0
+							owner = root
+							planet = prev
+						}
+					}
+				}
+				every_owned_megastructure = {
+					limit = {
+						is_megastructure_type = tec_elysian_ring_0
+					}
+					upgrade_megastructure_to = tec_elysian_ring_1
+					finish_upgrade = yes
+				}
+				every_owned_megastructure = {
+					limit = {
+						is_megastructure_type = tec_elysian_ring_1
+					}
+					upgrade_megastructure_to = tec_elysian_ring_2
+					finish_upgrade = yes
+				}
+				random_planet_within_border = {
+					limit = {
+						is_planet_class = pc_tec_elysium
+					}
+					create_colony = {
+						owner = root
+					}
+					set_planet_flag = fallen_empire_world
+					set_planet_flag = colony_event
+
+					add_building = building_ancient_palace
+					# Adds buildings
+						while = {
+							count = 2
+							add_building = building_fe_stronghold
+						}
+						while = {
+							count = 2
+							add_building = building_class_4_singularity
+						}
+						while = {
+							count = 2
+							add_building = building_dimensional_fabricator
+						}
+						while = {
+							count = 2
+							add_building = building_nourishment_center
+						}
+						while = {
+							count = 2
+							add_building = building_affluence_center
+						}
+						while = {
+							count = 2
+							add_building = building_nano_forge
+						}
+					# /
+					# Adds pops
+						while = {
+							count = 30
+							create_pop = {
+								species = root
+							}
+						}
+						if = {
+							limit = {
+								owner = {
+									OR = {	# They use diff species
+										is_fallen_empire_xenophobe = yes
+										is_fallen_empire_materialist = yes
+									}
+								}
+							}
+							owner = {
+								random_owned_species = {
+									limit = {
+										OR = {
+											has_trait = trait_nerve_stapled
+											has_trait = trait_mechanical
+										}
+									}
+									save_event_target_as = tec_fe_subspecies
+								}
+							}
+							while = {
+								count = 50
+								create_pop = {
+									species = event_target:tec_fe_subspecies
+								}
+							}
+						}
+						else = {
+							while = {
+								count = 20
+								create_pop = {
+									species = root
+								}
+							}
+						}
+					# /
+					# Adds districts
+						while = {
+							count = 5
+							add_district = district_tec_elysium_arcology
+						}
+						while = {
+							count = 5
+							add_district = district_tec_elysium_leisure
+						}
+					# /
+				}
+			# /
+		# /
+
+		# Random minor megastructure in capital
+			random_list = {
+				10 = { # Research mega
+					modifier = {
+						factor = 1.5
+						is_fallen_empire_materialist = yes
+					}
+					modifier = {
+						factor = 100
+						has_global_flag = tec_debug_fe_mega_res
+					}
+					capital_scope = {
+						solar_system = {
+							random_system_planet = {
+								limit = {
+									is_capital = no
+									is_colony = no
+									is_colonizable = no
+									is_star = no
+									is_artificial = no
+									is_asteroid = no
+									is_moon = no
+									NOT = {
+										has_planet_flag = has_megastructure
+									}
+								}
+								save_event_target_as = tec_fe_minor_mega_planet
+							}
+							spawn_megastructure = {
+								type = think_tank_4
+								planet = event_target:tec_fe_minor_mega_planet
+								owner = root
+							}
+						}
+					}
+				}
+				10 = { # Unitee mega
+					modifier = {
+						factor = 1.5
+						is_fallen_empire_spiritualist = yes
+					}
+					modifier = {
+						factor = 100
+						has_global_flag = tec_debug_fe_mega_unity
+					}
+					capital_scope = {
+						solar_system = {
+							random_system_planet = {
+								limit = {
+									is_capital = no
+									is_colony = no
+									is_colonizable = no
+									is_star = no
+									is_artificial = no
+									is_asteroid = no
+									is_moon = no
+									NOT = {
+										has_planet_flag = has_megastructure
+									}
+								}
+								save_event_target_as = tec_fe_minor_mega_planet
+							}
+							spawn_megastructure = {
+								type = mega_art_installation_4
+								planet = event_target:tec_fe_minor_mega_planet
+								owner = root
+							}
+						}
+					}
+				}
+				10 = { # Strategic
+					modifier = {
+						factor = 1.5
+						is_fallen_empire_xenophobe = yes
+					}
+					modifier = {
+						factor = 0
+						is_fallen_empire_xenophile = yes
+					}
+					modifier = {
+						factor = 100
+						has_global_flag = tec_debug_fe_mega_strategic
+					}
+					capital_scope = {
+						solar_system = {
+							random_system_planet = {
+								limit = {
+									is_capital = no
+									is_colony = no
+									is_colonizable = no
+									is_star = no
+									is_artificial = no
+									is_asteroid = no
+									is_moon = no
+									NOT = {
+										has_planet_flag = has_megastructure
+									}
+								}
+								save_event_target_as = tec_fe_minor_mega_planet
+							}
+							spawn_megastructure = {
+								type = strategic_coordination_center_3
+								planet = event_target:tec_fe_minor_mega_planet
+								owner = root
+							}
+						}
+					}
+				}
+				10 = { # Diplo
+					modifier = {
+						factor = 0
+						is_fallen_empire_xenophobe = yes
+					}
+					modifier = {
+						factor = 1.5
+						is_fallen_empire_xenophile = yes
+					}
+					modifier = {
+						factor = 100
+						has_global_flag = tec_debug_fe_mega_diplo
+					}
+					capital_scope = {
+						solar_system = {
+							random_system_planet = {
+								limit = {
+									is_capital = no
+									is_colony = no
+									is_colonizable = no
+									is_star = no
+									is_artificial = no
+									is_asteroid = no
+									is_moon = no
+									NOT = {
+										has_planet_flag = has_megastructure
+									}
+								}
+								save_event_target_as = tec_fe_minor_mega_planet
+							}
+							spawn_megastructure = {
+								type = interstellar_assembly_4
+								planet = event_target:tec_fe_minor_mega_planet
+								owner = root
+							}
+						}
+					}
+				}
+			}
+		# /
+
+		# BIG megastructure
+			random_list = {
+				10 = { # Dyson
+					modifier = {
+						factor = 100
+						has_global_flag = tec_debug_fe_mega_dyson
+					}
+					random_system_within_border = {
+						limit = {
+							NOR = {
+								has_star_flag = fallen_shielded_1
+								has_star_flag = fallen_shielded_2
+								has_star_flag = fallen_shielded_3
+							}
+							star = {
+								NOR = {
+									is_binary_star = yes
+									is_trinary_star = yes
+									is_star_class = sc_black_hole
+									is_star_class = sc_neutron_star
+									is_star_class = sc_pulsar
+								}
+							}
+							NOT = {
+								any_system_planet = {
+									OR = {
+										is_colony = yes
+										is_colonizable = yes
+										has_planet_flag = crisis_vital_planet
+										has_planet_flag = fallen_shield_world
+									}
+								}
+							}
+						}
+						starbase = {
+							tec_buff_fe_new_starbase = yes
+						}
+						random_list = {
+							40 = {	# Is ruined
+								solar_system = {
+									spawn_megastructure = {
+										type = dyson_sphere_ruined
+										planet = prev.star
+										owner = prev.owner
+									}
+									create_ambient_object = {
+										type = "large_debris_object"
+										location = solar_system
+									}
+									create_ambient_object = {
+										type = "large_debris_object"
+										location = solar_system
+									}
+									create_ambient_object = {
+										type = "large_debris_object"
+										location = solar_system
+									}
+									create_ambient_object = {
+										type = "medium_debris_01_object"
+										location = solar_system
+									}
+									create_ambient_object = {
+										type = "medium_debris_02_object"
+										location = solar_system
+									}
+									create_ambient_object = {
+										type = "medium_debris_01_object"
+										location = solar_system
+									}
+									create_ambient_object = {
+										type = "medium_debris_02_object"
+										location = solar_system
+									}
+									create_ambient_object = {
+										type = "small_debris_object"
+										location = solar_system
+									}
+								}
+							}
+							50 = {	# Is operative
+								solar_system = {
+									spawn_megastructure = {
+										type = dyson_sphere_5
+										graphical_culture = mammalian_01
+										planet = prev.star
+										owner = prev.owner
+									}
+								}
+							}
+							10 = {	# Exploded
+								solar_system = {
+									spawn_megastructure = {
+										type = dyson_sphere_permanently_ruined
+										coords_from = prev.star
+										owner = prev.owner
+									}
+									set_star_class = sc_neutron_star
+									star = {
+										change_pc = pc_neutron_star
+										set_planet_size = 5
+										add_deposit = d_dark_matter_deposit_10
+										#add_modifier = {
+										#	modifier = pm_tec_anomalous_neutron_star
+										#}
+										create_ambient_object = {
+											type = "destroyed_system"
+											location = this
+										}
+										last_created_ambient_object = {
+											set_ambient_object_flag = destroyed_system_effect
+											set_location = {
+												target = prev
+												distance = 0
+												angle = random
+											}
+										}
+									}
+									every_system_planet = {
+										limit = { is_star = no }
+										remove_planet = yes
+									}
+									add_asteroid_belt = {
+										type = crystal_asteroid_belt
+										radius = 50
+									}
+									add_asteroid_belt = {
+										type = rocky_asteroid_belt
+										radius = 100
+									}
+									add_asteroid_belt = {
+										type = icy_asteroid_belt
+										radius = 150
+									}
+									add_asteroid_belt = {
+										type = icy_asteroid_belt
+										radius = 168
+									}
+								}
+							}
+						}
+					}
+				}
+				10 = { # Matter decompressor
+					modifier = {
+						factor = 100
+						has_global_flag = tec_debug_fe_mega_matter
+					}
+					random_system_within_border = {
+						limit = {
+							NOR = {
+								has_star_flag = fallen_shielded_1
+								has_star_flag = fallen_shielded_2
+								has_star_flag = fallen_shielded_3
+							}
+							star = {
+								NOR = {
+									is_binary_star = yes
+									is_trinary_star = yes
+									is_star_class = sc_black_hole
+									is_star_class = sc_neutron_star
+									is_star_class = sc_pulsar
+								}
+							}
+							NOT = {
+								any_system_planet = {
+									OR = {
+										is_colony = yes
+										is_colonizable = yes
+										has_planet_flag = crisis_vital_planet
+										has_planet_flag = fallen_shield_world
+									}
+								}
+							}
+						}
+						starbase = {
+							tec_buff_fe_new_starbase = yes
+						}
+						random_list = {
+							40 = {	# Is ruined
+								solar_system = {
+									set_star_class = sc_black_hole
+									star = {
+										change_pc = pc_black_hole
+										clear_deposits = yes
+									}
+									spawn_megastructure = {
+										type = matter_decompressor_ruined
+										planet = prev.star
+										owner = prev.owner
+									}
+									create_ambient_object = {
+										type = "large_debris_object"
+										location = solar_system
+									}
+									create_ambient_object = {
+										type = "large_debris_object"
+										location = solar_system
+									}
+									create_ambient_object = {
+										type = "large_debris_object"
+										location = solar_system
+									}
+									create_ambient_object = {
+										type = "medium_debris_01_object"
+										location = solar_system
+									}
+									create_ambient_object = {
+										type = "medium_debris_02_object"
+										location = solar_system
+									}
+									create_ambient_object = {
+										type = "medium_debris_01_object"
+										location = solar_system
+									}
+									create_ambient_object = {
+										type = "medium_debris_02_object"
+										location = solar_system
+									}
+									create_ambient_object = {
+										type = "small_debris_object"
+										location = solar_system
+									}
+								}
+							}
+							50 = {	# Is operative
+								solar_system = {
+									set_star_class = sc_black_hole
+									star = {
+										change_pc = pc_black_hole
+										clear_deposits = yes
+									}
+									spawn_megastructure = {
+										type = matter_decompressor_4
+										graphical_culture = mammalian_01
+										planet = prev.star
+										owner = prev.owner
+									}
+								}
+							}
+							10 = {	# Exploded
+								solar_system = {
+									set_star_class = sc_black_hole
+									star = {
+										change_pc = pc_black_hole
+										clear_deposits = yes
+										set_planet_size = 5
+										add_deposit = d_dark_matter_deposit_10
+										#add_modifier = {
+										#	modifier = pm_tec_anomalous_neutron_star
+										#}
+										create_ambient_object = {
+											type = "destroyed_system"
+											location = this
+										}
+									}
+									spawn_megastructure = {
+										type = matter_decompressor_permanently_ruined
+										coords_from = prev.star
+										owner = prev.owner
+									}
+								}
+							}
+						}
+					}
+				}
+				10 = { # Ringworld
+					modifier = {
+						factor = 100
+						has_global_flag = tec_debug_fe_mega_ring
+					}
+					random_system_within_border = {
+						limit = {
+							NOR = {
+								has_star_flag = fallen_shielded_1
+								has_star_flag = fallen_shielded_2
+								has_star_flag = fallen_shielded_3
+							}
+							star = {
+								NOR = {
+									is_binary_star = yes
+									is_trinary_star = yes
+									is_star_class = sc_black_hole
+									is_star_class = sc_neutron_star
+									is_star_class = sc_pulsar
+								}
+							}
+							NOT = {
+								any_system_planet = {
+									OR = {
+										is_colony = yes
+										is_colonizable = yes
+										has_planet_flag = crisis_vital_planet
+										has_planet_flag = fallen_shield_world
+									}
+								}
+							}
+						}
+						starbase = {
+							tec_buff_fe_new_starbase = yes
+						}
+						random_list = {
+							60 = {	# Is ruined
+								modifier = {
+									factor = 0
+									has_global_flag = tec_debug_fe_mega_ring_repaired
+								}
+								tec_generate_fe_ruined_ringworld = yes
+							}
+							40 = {	# Is operative
+								modifier = {
+									factor = 0
+									has_global_flag = tec_debug_fe_mega_ring_ruined
+								}
+								tec_generate_fe_operative_ringworld = yes
+							}
+						}
+					}
+				}
+			}
+		# /
+
+		tec_cache_everything = yes
+	}
+}
+
+
+planet_event = {
+	id = tec_pve.10105
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		set_capital = yes
+		owner = {
+			every_owned_fleet = {
+				limit = {
+					is_ship_class = shipclass_military
+				}
+				set_location = root
+			}
 		}
 	}
 }
