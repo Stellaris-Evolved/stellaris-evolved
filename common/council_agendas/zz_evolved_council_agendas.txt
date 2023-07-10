@@ -311,3 +311,63 @@
 # Espionage Agendas
 
 # /
+
+# AI Auths
+agenda_tec_aiauth_purge_traits = {
+	agenda_cost = @tec_base_ethic_agenda_cost
+	potential = {
+		tec_is_aiauth_empire = yes
+	}
+	allow = {
+		always = yes
+	}
+	modifiers = {
+		{
+			leaders_resources_sr_tec_ai_power_upkeep_mult = 0.1
+		}
+	}
+	finish_modifier = modifier_agenda_tec_aiauth_purge_traits_finish
+	effect = {
+		custom_tooltip = council_agenda_agenda_tec_aiauth_purge_traits_effect_desc
+		hidden_effect = {
+			set_country_flag = tec_force_allow_all_traits
+		}
+		every_owned_leader = {
+			if = {
+				# Remove Exp per Trait being removed.
+				limit = {
+					tec_is_aiauth_node = yes
+					num_leader_traits = {
+						value > 0
+						negative = yes	# Tiers don't matter in this check.
+					}
+				}
+				hidden_effect = {
+					add_experience = value:agenda_gestalt_purge_traits_exp_change_total  # -300 per trait, not counting tiers.
+
+					# Restore pending traits and tiers, so they'll come back eventually. But a 10% chance to reduce their numbers.
+					change_variable = { which = leader_pending_negative_traits_unmodified value = value:leader_num_negative_leader_trait_tiers }
+					if = {
+						limit = {
+							NOT = { is_variable_set = tec_aiauth_negative_traits_suppressed }
+						}
+						set_variable = { which = tec_aiauth_negative_traits_suppressed value = 0  }
+					}
+					change_variable = { which = tec_aiauth_negative_traits_suppressed value = value:leader_num_negative_leader_trait_tiers }
+
+					add_trait_no_notify = leader_trait_tec_aiauth_negative_behaviour_inhibitor
+					random = {
+						chance = 20
+						subtract_variable = { which = leader_pending_negative_traits_unmodified value = 1 }
+					}
+				}
+				remove_trait = all_negative
+			}
+		}
+
+		hidden_effect = {
+			remove_country_flag = tec_force_allow_all_traits
+		}
+	}
+}
+# /
