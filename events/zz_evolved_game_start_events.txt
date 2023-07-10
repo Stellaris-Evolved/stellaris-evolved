@@ -4027,6 +4027,7 @@ country_event = {
 			}
 			country_event = {	# FE adjustments
 				id = tec_pve.10100
+				days = 5
 			}
 		}
 		else_if = {	# Leviathans
@@ -4081,12 +4082,14 @@ country_event = {	# FE adjustments
 	trigger = {
 		#has_global_flag = tec_test_fe_changes
 		#	set_global_flag = tec_test_fe_changes
-		NOR = {	# Gigas does its thing, better to avoid overlap
-			has_global_flag = giga_game_started
-			has_global_flag = gigastructures_enabled
-		}
-		capital_scope = {	# So machine fes don't get ravaged
-			is_artificial = no
+		#NOR = {	# Gigas does its thing, better to avoid overlap
+		#	has_global_flag = giga_game_started
+		#	has_global_flag = gigastructures_enabled
+		#}
+		NOT = {
+			capital_scope = {	# So machine fes don't get ravaged
+				is_artificial = yes
+			}
 		}
 	}
 
@@ -4124,7 +4127,6 @@ country_event = {	# FE adjustments
 					limit = {
 						capital_scope = {
 							is_artificial = no
-							is_moon = no
 							NOT = {
 								has_planet_flag = has_megastructure
 							}
@@ -4185,12 +4187,41 @@ country_event = {	# FE adjustments
 				message = no
 			}
 			# Capital gets an elysium
-				capital_scope = {
-					solar_system = {
-						spawn_megastructure = {
-							type = tec_elysian_ring_0
-							owner = root
-							planet = prev
+				if = {
+					# Lets avoid gigas iffy interactions
+					limit = {
+						capital_scope = {
+							is_artificial = no
+							is_moon = no
+						}
+					}
+					capital_scope = {
+						solar_system = {
+							spawn_megastructure = {
+								type = tec_elysian_ring_0
+								owner = root
+								planet = prev
+							}
+						}
+					}
+				}
+				else = {
+					random_owned_planet = {
+						limit = {
+							is_capital = no
+							is_colony = yes
+							is_artificial = no
+							is_moon = no							
+						}
+						save_event_target_as = tec_fe_ely_planet
+					}
+					event_target:tec_fe_ely_planet = {
+						solar_system = {
+							spawn_megastructure = {
+								type = tec_elysian_ring_0
+								owner = root
+								planet = prev
+							}
 						}
 					}
 				}
