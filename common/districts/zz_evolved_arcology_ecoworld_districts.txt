@@ -81,26 +81,31 @@ district_tec_eco_arcology = {
 	}
 
 	# Modifiers
-		# Standard
-			planet_modifier = {
-				planet_housing_add = 10
-			}
-
-			inline_script = {
-				script = districts/inline_evolved_habitation_housing_modifiers
-				count = 2
-				trigger = ""
-			}
-			
-			inline_script = districts/effects/inline_evolved_tec_artifice_2
-		# /
-		# Civics
-			inline_script = districts/effects/inline_evolved_agrarian_idyll_city
-			inline_script = districts/effects/inline_evolved_tec_regular_eco_keepers_city
-			inline_script = districts/effects/inline_evolved_tec_tribalism_city
-			inline_script = districts/effects/inline_evolved_civic_tec_regular_social_prosperity
-			inline_script = districts/effects/inline_evolved_tec_consumerism
-		# /
+		planet_modifier = {
+			planet_housing_add = 10
+		}
+	# /
+	# Effect Types
+		inline_script = {
+			script = districts/type/inline_evolved_housing_generic
+			scale = 2
+			trigger = ""
+		}
+		inline_script = {
+			script = districts/type/inline_evolved_housing_city
+			scale = 2
+			trigger = ""
+		}
+		inline_script = {
+			script = districts/type/inline_evolved_housing_hive
+			scale = 2
+			trigger = ""
+		}
+		inline_script = {
+			script = districts/type/inline_evolved_housing_nexus
+			scale = 2
+			trigger = ""
+		}
 	# /
 	# Jobs
 		# Regular
@@ -112,13 +117,6 @@ district_tec_eco_arcology = {
 				trigger = ""
 			}
 
-			# Traditions
-				inline_script = {
-					script = districts/effects/inline_evolved_mercantile_trickle_up_economics
-					count = 2
-					trigger = ""
-				}
-			# /
 		# /
 		# Gestalt
 			inline_script = {
@@ -128,27 +126,9 @@ district_tec_eco_arcology = {
 				display = with_desc
 				trigger = ""
 			}
-
-			inline_script = {
-				script = districts/effects/inline_evolved_tech_housing_2_gestalt
-				count = 2
-				trigger = ""
-			}
-		# /
-		# Hive
-			# Bio/Lithospheric harmony
-				inline_script = districts/effects/inline_evolved_tec_hive_menial
-			# /
-		# /
-		# Machine
-			inline_script = districts/effects/inline_evolved_tec_machine_menial
 		# /
 	# /
 
-	inline_script = {
-		script = districts/compat/inline_evolved_starnet_housing_district
-		count = 2
-	}
 	inline_script = {
 		script = districts/inline_evolved_aibait_housing
 		has_building_slots = "
@@ -357,7 +337,7 @@ district_tec_eco_generator = {
 	inline_script = districts/convert_to/inline_evolved_trade_districts
 
 	resources = {
-		category = planet_districts
+		category = planet_districts_generator
 		cost = {
 			minerals = @tec_arc_cost
 			exotic_gases = @tec_arc_cost_sr_smol
@@ -368,55 +348,18 @@ district_tec_eco_generator = {
 		}
 		upkeep = {
 			trigger = {
-				exists = planet
-				planet = {
-					has_planet_flag = tec_eco_res_on
-				}
+				has_planet_flag = tec_eco_res_on
 			}
 			exotic_gases = @tec_arc_maintenance_sr
 		}
-
-		inline_script = districts/resources/inline_evolved_tec_syndical
-		# Automated production
-			inline_script = {
-				script = districts/resources/inline_evolved_tec_automation_energy
-				trigger = "
-					exists = owner
-					owner = { tec_is_automated_empire = yes }
-					planet = {
-						tec_planet_allows_automation = yes
-					}
-				"
-				base = 6
-			}
-		# /
-		inline_script = {
-			script = districts/resources/inline_evolved_tec_generate_basic_resources
-			resource = energy
-		}	
 	}
-	# overlord_resources = {
-	# 	category = planet_requisitioned_energy
-	# 	produces = {
-	# 		trigger = {
-	# 			planet = {
-	# 				exists = owner
-	# 				owner = { tec_is_automated_empire = yes }
-	# 				has_planet_flag = has_energy_requisitorium
-	# 				tec_planet_allows_automation = yes
-	# 			}
-	# 		}
-	# 		energy = @requisitorium_energy_overlord
-	# 	}
-	# }
+
+	inline_script = districts/type/inline_evolved_rural_generator
 
 	triggered_desc = {
 		trigger = {
-			exists = planet
-			planet = {
-				NOT = {
-					has_planet_flag = tec_eco_res_on
-				}
+			NOT = {
+				has_planet_flag = tec_eco_res_on
 			}
 		}
 		text = tec_upgradeable_district_jobs_research
@@ -427,42 +370,11 @@ district_tec_eco_generator = {
 		planet_housing_add = 1 # base one more housing
 	}
 
-	triggered_planet_modifier ={
+	triggered_planet_modifier = {
 		potential = {
 			has_planet_flag = tec_eco_res_on
 		}
 		planet_housing_add = 3
-	}
-
-	inline_script = districts/inline_evolved_rural_district_modifiers
-
-	inline_script = {
-		script = jobs/inline_evolved_technician
-		regular_count = 3
-		hive_count = 4
-		machine_count = 3
-		machine_aquatic_count = 0
-		mult = 1
-		display = with_desc
-		trigger = ""
-	}
-
-	inline_script = {
-		script = jobs/inline_evolved_technician
-		regular_count = -1
-		hive_count = -1
-		machine_count = -1
-		machine_aquatic_count = 0
-		mult = 1
-		display = no_desc
-		trigger = "
-			owner = {
-				tec_is_automated_empire = yes
-			}
-			planet = {
-				tec_planet_allows_automation = yes
-			}
-		"
 	}
 
 	inline_script = {
@@ -470,13 +382,11 @@ district_tec_eco_generator = {
 		regular_count = 1
 		hive_count = 1
 		machine_count = 1
-		machine_aquatic_count = 0
+		machine_aquatic_count = 1
 		mult = 1
 		display = no_desc
 		trigger = "
-			owner = {
-				tec_has_extra_menial_district_job = yes
-			}
+			has_research_designation = no
 		"
 	}
 
@@ -487,25 +397,7 @@ district_tec_eco_generator = {
 		mult = 1
 		display = with_desc
 		trigger = "
-			planet = {
-				has_planet_flag = tec_eco_res_on
-			}
-		"
-	}
-
-	
-	inline_script = {
-		script = jobs/inline_evolved_technician
-		regular_count = -1
-		hive_count = -1
-		machine_count = -1
-		machine_aquatic_count = 0
-		mult = 1
-		display = no_desc
-		trigger = "
-			planet = {
-				has_research_designation = yes
-			}
+			has_planet_flag = tec_eco_res_on
 		"
 	}
 
@@ -515,16 +407,8 @@ district_tec_eco_generator = {
 		mult = 1
 		display = no_desc
 		trigger = "
-			planet = {
-				has_research_designation = yes
-			}
+			has_research_designation = yes
 		"
-	}
-
-	# Starnet
-	inline_script = {
-		script = districts/compat/inline_evolved_starnet_generator_district
-		count = 1.5
 	}
 }
 
@@ -565,20 +449,8 @@ district_tec_eco_aqua_generator = {
 	inline_script = districts/convert_to/inline_evolved_research_districts
 	inline_script = districts/convert_to/inline_evolved_trade_districts
 
-	triggered_desc = {
-		trigger = {
-			exists = planet
-			planet = {
-				NOT = {
-					has_planet_flag = tec_eco_res_on
-				}
-			}
-		}
-		text = tec_upgradeable_district_jobs_research
-	}
-
 	resources = {
-		category = planet_districts
+		category = planet_districts_generator
 		cost = {
 			minerals = @tec_arc_cost
 			exotic_gases = @tec_arc_cost_sr_smol
@@ -590,107 +462,48 @@ district_tec_eco_aqua_generator = {
 		}
 		upkeep = {
 			trigger = {
-				exists = planet
-				planet = {
-					has_planet_flag = tec_eco_res_on
-				}
+				has_planet_flag = tec_eco_res_on
 			}
 			exotic_gases = @tec_arc_maintenance_sr
 		}
-
-		inline_script = districts/resources/inline_evolved_tec_syndical
-		# Automated production
-			inline_script = {
-				script = districts/resources/inline_evolved_tec_automation_energy
-				trigger = "
-					exists = owner
-					owner = { tec_is_automated_empire = yes }
-					planet = {
-						tec_planet_allows_automation = yes
-					}
-				"
-				base = 6
-			}
-		# /
-		inline_script = {
-			script = districts/resources/inline_evolved_tec_generate_basic_resources
-			resource = energy
-		}
 	}
 
-	# Overlord production for automated empires
-	# overlord_resources = {
-	# 	category = planet_requisitioned_energy
-	# 	produces = {
-	# 		trigger = {
-	# 			planet = {
-	# 				exists = owner
-	# 				owner = { tec_is_automated_empire = yes }
-	# 				has_planet_flag = has_energy_requisitorium
-	# 				tec_planet_allows_automation = yes
-	# 			}
-	# 		}
-	# 		energy = @requisitorium_energy_overlord
-	# 	}
-	# }
+
+	inline_script = districts/type/inline_evolved_rural_generator
+
+	triggered_desc = {
+		trigger = {
+			NOT = {
+				has_planet_flag = tec_eco_res_on
+			}
+		}
+		text = tec_upgradeable_district_jobs_research
+	}
+
 
 	planet_modifier = {
-		planet_housing_add = 1
+		planet_housing_add = 1 # base one more housing
 	}
 
-	triggered_planet_modifier ={
+	triggered_planet_modifier = {
 		potential = {
 			has_planet_flag = tec_eco_res_on
 		}
 		planet_housing_add = 3
 	}
 
-
-	inline_script = districts/inline_evolved_rural_district_modifiers
-
 	inline_script = {
 		script = jobs/inline_evolved_technician
-		regular_count = 0
-		hive_count = 0
-		machine_count = 0
-		machine_aquatic_count = 2 # change to 2 when adequate job is created
-		mult = 1
-		display = with_desc
-		trigger = ""
-	}
-
-	inline_script = {
-		script = jobs/inline_evolved_technician_swaps
+		regular_count = 1
+		hive_count = 1
 		machine_count = 1
-		mult = 1
-		display = with_desc
-		trigger = "
-			NAND = {
-				owner = {
-					tec_is_automated_empire = yes
-				}
-				planet = {
-					tec_planet_allows_automation = yes
-				}
-			}
-		"
-	}
-
-	inline_script = {
-		script = jobs/inline_evolved_technician
-		regular_count = 0
-		hive_count = 0
-		machine_count = 0
 		machine_aquatic_count = 1
 		mult = 1
 		display = no_desc
 		trigger = "
-			owner = {
-				tec_has_extra_menial_district_job = yes
-			}
+			has_research_designation = no
 		"
 	}
-
 
 	inline_script = {
 		script = jobs/inline_evolved_researcher_split
@@ -699,24 +512,7 @@ district_tec_eco_aqua_generator = {
 		mult = 1
 		display = with_desc
 		trigger = "
-			planet = {
-				has_planet_flag = tec_eco_res_on
-			}
-		"
-	}
-
-	inline_script = {
-		script = jobs/inline_evolved_technician
-		regular_count = -1
-		hive_count = -1
-		machine_count = -1
-		machine_aquatic_count = 0
-		mult = 1
-		display = no_desc
-		trigger = "
-			planet = {
-				has_research_designation = yes
-			}
+			has_planet_flag = tec_eco_res_on
 		"
 	}
 
@@ -726,16 +522,8 @@ district_tec_eco_aqua_generator = {
 		mult = 1
 		display = no_desc
 		trigger = "
-			planet = {
-				has_research_designation = yes
-			}
+			has_research_designation = yes
 		"
-	}
-
-	# Starnet
-	inline_script = {
-		script = districts/compat/inline_evolved_starnet_generator_district
-		count = 1.5
 	}
 }
 
@@ -772,7 +560,7 @@ district_tec_eco_mining = {
 	inline_script = districts/convert_to/inline_evolved_industrial_districts
 
 	resources = {
-		category = planet_districts
+		category = planet_districts_mining
 		cost = {
 			minerals = @tec_arc_cost
 			volatile_motes = @tec_arc_cost_sr_smol
@@ -783,49 +571,14 @@ district_tec_eco_mining = {
 		}
 		upkeep = {
 			trigger = {
-				exists = planet
-				planet = {
-					has_planet_flag = tec_eco_alloys_on
-				}
+				has_planet_flag = tec_eco_alloys_on
 			}
 			volatile_motes = @tec_arc_maintenance_sr
 		}
-
-		inline_script = districts/resources/inline_evolved_tec_syndical
-		inline_script = districts/resources/inline_evolved_mining_guilds
-		# Automated production
-			inline_script = {
-				script = districts/resources/inline_evolved_tec_automation_minerals
-				trigger = "
-					exists = owner
-					owner = { tec_is_automated_empire = yes }
-					planet = {
-						tec_planet_allows_automation = yes
-					}
-				"
-				base = 4
-			}
-			inline_script = districts/resources/inline_evolved_tec_automated_upkeep
-		# /
-		inline_script = {
-			script = districts/resources/inline_evolved_tec_generate_basic_resources
-			resource = minerals
-		}
 	}
-	# overlord_resources = {
-	# 	category = planet_requisitioned_minerals
-	# 	produces = {
-	# 		trigger = {
-	# 			planet = {
-	# 				exists = owner
-	# 				owner = { tec_is_automated_empire = yes }
-	# 				has_planet_flag = has_material_requisitorium
-	# 				tec_planet_allows_automation = yes
-	# 			}
-	# 		}
-	# 		minerals = @requisitorium_minerals_overlord
-	# 	}
-	# }
+
+	inline_script = districts/type/inline_evolved_rural_mining
+
 
 	triggered_desc = {
 		trigger = {
@@ -847,69 +600,19 @@ district_tec_eco_mining = {
 		planet_housing_add = 3
 	}
 
-
-	inline_script = districts/inline_evolved_rural_district_modifiers
-
-	inline_script = {
-		script = jobs/inline_evolved_miner
-		regular_count = 3
-		regular_aquatic_count = 0
-		hive_count = 4
-		hive_aquatic_count = 0
-		machine_count = 3
-		mult = 1
-		display = with_desc
-		trigger = ""
-	}
-	inline_script = {
-		script = jobs/inline_evolved_miner
-		regular_count = -1
-		regular_aquatic_count = 0
-		hive_count = -1
-		hive_aquatic_count = 0
-		machine_count = -1
-		mult = 1
-		display = no_desc
-		trigger = "
-			owner = {
-				tec_is_automated_empire = yes
-			}
-			planet = {
-				tec_planet_allows_automation = yes
-			}
-		"
-	}
-
 	inline_script = {
 		script = jobs/inline_evolved_miner
 		regular_count = 1
-		regular_aquatic_count = 0
+		regular_aquatic_count = 1
 		hive_count = 1
-		hive_aquatic_count = 0
+		hive_aquatic_count = 1
 		machine_count = 1
 		mult = 1
 		display = no_desc
 		trigger = "
-			owner = {
-				tec_has_extra_menial_district_job = yes
-			}
+			has_foundry_designation = no
 		"
 	}
-
-	inline_script = {
-		script = districts/effects/inline_evolved_agrarian_idyll_specific
-		trigger = "
-			owner = {
-				is_lithoid_empire = yes
-			}
-		"
-	}
-
-	inline_script = districts/effects/inline_evolved_tec_regular_eco_keepers_mining
-
-	inline_script = districts/effects/inline_evolved_mining_guilds
-
-	inline_script = districts/effects/inline_evolved_subterranean
 
 	inline_script = {
 		script = jobs/inline_evolved_foundry
@@ -917,25 +620,7 @@ district_tec_eco_mining = {
 		mult = 1
 		display = with_desc
 		trigger = "
-			planet = {
-				has_planet_flag = tec_eco_alloys_on
-			}
-		"
-	}
-
-	inline_script = {
-		script = jobs/inline_evolved_miner
-		regular_count = -1
-		regular_aquatic_count = 0
-		hive_count = -1
-		hive_aquatic_count = 0
-		machine_count = -1
-		mult = 1
-		display = no_desc
-		trigger = "
-			planet = {
-				has_foundry_designation = yes
-			}
+			has_planet_flag = tec_eco_alloys_on
 		"
 	}
 
@@ -945,16 +630,8 @@ district_tec_eco_mining = {
 		mult = 1
 		display = no_desc
 		trigger = "
-			planet = {
-				has_foundry_designation = yes
-			}
+			has_foundry_designation = yes
 		"
-	}
-
-	# Starnet
-	inline_script = {
-		script = districts/compat/inline_evolved_starnet_mining_district
-		count = 1.5
 	}
 }
 
@@ -992,7 +669,7 @@ district_tec_eco_aqua_mining = {
 	inline_script = districts/convert_to/inline_evolved_industrial_districts
 
 	resources = {
-		category = planet_districts
+		category = planet_districts_mining
 		cost = {
 			minerals = @tec_arc_cost
 			volatile_motes = @tec_arc_cost_sr_smol
@@ -1004,51 +681,14 @@ district_tec_eco_aqua_mining = {
 		}
 		upkeep = {
 			trigger = {
-				exists = planet
-				planet = {
-					has_planet_flag = tec_eco_alloys_on
-				}
+				has_planet_flag = tec_eco_alloys_on
 			}
 			volatile_motes = @tec_arc_maintenance_sr
 		}
-
-		inline_script = districts/resources/inline_evolved_tec_syndical
-		inline_script = districts/resources/inline_evolved_mining_guilds
-		# Automated production
-			inline_script = {
-				script = districts/resources/inline_evolved_tec_automation_minerals
-				trigger = "
-					exists = owner
-					owner = { tec_is_automated_empire = yes }
-					planet = {
-						tec_planet_allows_automation = yes
-					}
-				"
-				base = 4
-			}
-			inline_script = districts/resources/inline_evolved_tec_automated_upkeep
-		# /	
-		inline_script = {
-			script = districts/resources/inline_evolved_tec_generate_basic_resources
-			resource = minerals
-		}
 	}
 
-	# Overlord production for automated empires
-	# overlord_resources = {
-	# 	category = planet_requisitioned_minerals
-	# 	produces = {
-	# 		trigger = {
-	# 			planet = {
-	# 				exists = owner
-	# 				owner = { tec_is_automated_empire = yes }
-	# 				has_planet_flag = has_material_requisitorium
-	# 				tec_planet_allows_automation = yes
-	# 			}
-	# 		}
-	# 		minerals = @requisitorium_minerals_overlord
-	# 	}
-	# }
+	inline_script = districts/type/inline_evolved_rural_mining
+
 
 	triggered_desc = {
 		trigger = {
@@ -1070,69 +710,19 @@ district_tec_eco_aqua_mining = {
 		planet_housing_add = 3
 	}
 
-
-	inline_script = districts/inline_evolved_rural_district_modifiers
-
 	inline_script = {
 		script = jobs/inline_evolved_miner
-		regular_count = 0
-		regular_aquatic_count = 2
-		hive_count = 0
-		hive_aquatic_count = 3
-		machine_count = 0
-		mult = 1
-		display = with_desc
-		trigger = ""
-	}
-	inline_script = {
-		script = jobs/inline_evolved_miner_swaps
 		regular_count = 1
-		hive_count = 1
-		mult = 1
-		display = with_desc
-		trigger = "
-			NAND = {
-				owner = {
-					tec_is_automated_empire = yes
-				}
-				planet = {
-					tec_planet_allows_automation = yes
-				}
-			}
-		"
-	}
-
-	inline_script = {
-		script = jobs/inline_evolved_miner
-		regular_count = 0
 		regular_aquatic_count = 1
-		hive_count = 0
+		hive_count = 1
 		hive_aquatic_count = 1
-		machine_count = 0
+		machine_count = 1
 		mult = 1
 		display = no_desc
 		trigger = "
-			owner = {
-				tec_has_extra_menial_district_job = yes
-			}
+			has_foundry_designation = no
 		"
 	}
-
-	inline_script = {
-		script = districts/effects/inline_evolved_agrarian_idyll_specific
-		trigger = "
-			owner = {
-				is_lithoid_empire = yes
-			}
-		"
-	}
-
-	inline_script = districts/effects/inline_evolved_tec_regular_eco_keepers_mining
-
-	inline_script = districts/effects/inline_evolved_mining_guilds
-
-	inline_script = districts/effects/inline_evolved_subterranean
-
 
 	inline_script = {
 		script = jobs/inline_evolved_foundry
@@ -1140,25 +730,7 @@ district_tec_eco_aqua_mining = {
 		mult = 1
 		display = with_desc
 		trigger = "
-			planet = {
-				has_planet_flag = tec_eco_alloys_on
-			}
-		"
-	}
-
-	inline_script = {
-		script = jobs/inline_evolved_miner
-		regular_count = 0
-		regular_aquatic_count = -1
-		hive_count = 0
-		hive_aquatic_count = -1
-		machine_count = 0
-		mult = 1
-		display = no_desc
-		trigger = "
-			planet = {
-				has_foundry_designation = yes
-			}
+			has_planet_flag = tec_eco_alloys_on
 		"
 	}
 
@@ -1168,16 +740,8 @@ district_tec_eco_aqua_mining = {
 		mult = 1
 		display = no_desc
 		trigger = "
-			planet = {
-				has_foundry_designation = yes
-			}
+			has_foundry_designation = yes
 		"
-	}
-
-	# Starnet
-	inline_script = {
-		script = districts/compat/inline_evolved_starnet_mining_district
-		count = 1.5
 	}
 }
 
@@ -1217,7 +781,7 @@ district_tec_eco_farming = {
 	inline_script = districts/convert_to/inline_evolved_industrial_districts
 
 	resources = {
-		category = planet_districts
+		category = planet_districts_farming
 		cost = {
 			minerals = @tec_arc_cost
 			rare_crystals = @tec_arc_cost_sr_smol
@@ -1227,51 +791,16 @@ district_tec_eco_farming = {
 		}
 		upkeep = {
 			trigger = {
-				exists = planet
-				planet = {
-					has_planet_flag = tec_eco_cg_on
-				}
+				has_planet_flag = tec_eco_cg_on
 			}
 			rare_crystals = @tec_arc_maintenance_sr
 		}
-
-		inline_script = districts/resources/inline_evolved_tec_syndical
-		# Automated production
-			inline_script = {
-				script = districts/resources/inline_evolved_tec_automation_food
-				trigger = "
-					exists = owner
-					owner = { tec_is_automated_empire = yes }
-					planet = {
-						tec_planet_allows_automation = yes
-					}
-				"
-				base = 6
-			}
-			inline_script = districts/resources/inline_evolved_tec_automated_upkeep
-		# /
-		inline_script = {
-			script = districts/resources/inline_evolved_tec_generate_basic_resources
-			resource = food
-		}
 	}
 
-	# overlord_resources = {
-	# 	category = planet_requisitioned_food
-	# 	produces = {
-	# 		trigger = {
-	# 			planet = {
-	# 				has_planet_flag = has_produce_requisitorium
-	# 				tec_planet_allows_automation = yes
-	# 			}
-	# 		}
-	# 		food = @requisitorium_food_overlord
-	# 	}
-	# }
+	inline_script = districts/type/inline_evolved_rural_farming
 
 	triggered_desc = {
 		trigger = {
-			exists = planet
 			NOT = {
 				has_planet_flag = tec_eco_cg_on
 			}
@@ -1291,60 +820,17 @@ district_tec_eco_farming = {
 	}
 
 
-	inline_script = districts/inline_evolved_rural_district_modifiers
-
-	inline_script = {
-		script = jobs/inline_evolved_farmer
-		regular_count = 3
-		regular_aquatic_count = 0
-		hive_count = 4
-		hive_aquatic_count = 0
-		machine_count = 3
-		mult = 1
-		display = with_desc
-		trigger = ""
-	}
-	inline_script = {
-		script = jobs/inline_evolved_farmer
-		regular_count = -1
-		regular_aquatic_count = 0
-		hive_count = -1
-		hive_aquatic_count = 0
-		machine_count = -1
-		mult = 1
-		display = no_desc
-		trigger = "
-			owner = {
-				tec_is_automated_empire = yes
-			}
-			planet = {
-				tec_planet_allows_automation = yes
-			}
-		"
-	}
-
 	inline_script = {
 		script = jobs/inline_evolved_farmer
 		regular_count = 1
-		regular_aquatic_count = 0
+		regular_aquatic_count = 1
 		hive_count = 1
-		hive_aquatic_count = 0
+		hive_aquatic_count = 1
 		machine_count = 1
 		mult = 1
 		display = no_desc
 		trigger = "
-			owner = {
-				tec_has_extra_menial_district_job = yes
-			}
-		"
-	}
-
-	inline_script = {
-		script = districts/effects/inline_evolved_agrarian_idyll_specific
-		trigger = "
-			owner = {
-				is_lithoid_empire = no
-			}
+			has_factory_designation = no
 		"
 	}
 
@@ -1354,25 +840,7 @@ district_tec_eco_farming = {
 		mult = 1
 		display = with_desc
 		trigger = "
-			planet = {
-				has_planet_flag = tec_eco_cg_on
-			}
-		"
-	}
-
-	inline_script = {
-		script = jobs/inline_evolved_farmer
-		regular_count = -1
-		regular_aquatic_count = 0
-		hive_count = -1
-		hive_aquatic_count = 0
-		machine_count = -1
-		mult = 1
-		display = no_desc
-		trigger = "
-			planet = {
-				has_factory_designation = yes
-			}
+			has_planet_flag = tec_eco_cg_on
 		"
 	}
 
@@ -1382,16 +850,8 @@ district_tec_eco_farming = {
 		mult = 1
 		display = no_desc
 		trigger = "
-			planet = {
-				has_factory_designation = yes
-			}
+			has_factory_designation = yes
 		"
-	}
-
-	# Starnet
-	inline_script = {
-		script = districts/compat/inline_evolved_starnet_farming_district
-		count = 1.5
 	}
 }
 
@@ -1432,7 +892,7 @@ district_tec_eco_aqua_farming = {
 	inline_script = districts/convert_to/inline_evolved_industrial_districts
 	
 	resources = {
-		category = planet_districts
+		category = planet_districts_farming
 		cost = {
 			minerals = @tec_arc_cost
 			rare_crystals = @tec_arc_cost_sr_smol
@@ -1443,60 +903,23 @@ district_tec_eco_aqua_farming = {
 		}
 		upkeep = {
 			trigger = {
-				exists = planet
-				planet = {
-					has_planet_flag = tec_eco_cg_on
-				}
+				has_planet_flag = tec_eco_cg_on
 			}
 			rare_crystals = @tec_arc_maintenance_sr
 		}
-
-		inline_script = districts/resources/inline_evolved_tec_syndical
-		# Automated production
-			inline_script = {
-				script = districts/resources/inline_evolved_tec_automation_food
-				trigger = "
-					exists = owner
-					owner = { tec_is_automated_empire = yes }
-					planet = {
-						tec_planet_allows_automation = yes
-					}
-				"
-				base = 6
-			}
-			inline_script = districts/resources/inline_evolved_tec_automated_upkeep
-		# /
-		inline_script = {
-			script = districts/resources/inline_evolved_tec_generate_basic_resources
-			resource = food
-		}
 	}
 
-	# overlord_resources = {
-	# 	category = planet_requisitioned_food
-	# 	produces = {
-	# 		trigger = {
-	# 			planet = {
-	# 				exists = owner
-	# 				owner = { tec_is_automated_empire = yes }
-	# 				has_planet_flag = has_produce_requisitorium
-	# 				tec_planet_allows_automation = yes
-	# 			}
-	# 		}
-	# 		food = @requisitorium_food_overlord
-	# 	}
-	# }
+
+	inline_script = districts/type/inline_evolved_rural_farming
 
 	triggered_desc = {
 		trigger = {
-			exists = planet
 			NOT = {
 				has_planet_flag = tec_eco_cg_on
 			}
 		}
 		text = tec_upgradeable_district_jobs_cg
 	}
-
 
 	planet_modifier = {
 		planet_housing_add = 1
@@ -1509,59 +932,18 @@ district_tec_eco_aqua_farming = {
 		planet_housing_add = 3
 	}
 
-	inline_script = districts/inline_evolved_rural_district_modifiers
 
 	inline_script = {
 		script = jobs/inline_evolved_farmer
-		regular_count = 0
-		regular_aquatic_count = 2
-		hive_count = 0
-		hive_aquatic_count = 3
-		machine_count = 0
-		mult = 1
-		display = with_desc
-		trigger = ""
-	}
-	inline_script = {
-		script = jobs/inline_evolved_farmer_swaps
 		regular_count = 1
-		hive_count = 1
-		mult = 1
-		display = with_desc
-		trigger = "
-			NAND = {
-				owner = {
-					tec_is_automated_empire = yes
-				}
-				planet = {
-					tec_planet_allows_automation = yes
-				}
-			}
-		"
-	}
-
-	inline_script = {
-		script = jobs/inline_evolved_farmer
-		regular_count = 0
 		regular_aquatic_count = 1
-		hive_count = 0
+		hive_count = 1
 		hive_aquatic_count = 1
-		machine_count = 0
+		machine_count = 1
 		mult = 1
 		display = no_desc
 		trigger = "
-			owner = {
-				tec_has_extra_menial_district_job = yes
-			}
-		"
-	}
-
-	inline_script = {
-		script = districts/effects/inline_evolved_agrarian_idyll_specific
-		trigger = "
-			owner = {
-				is_lithoid_empire = no
-			}
+			has_factory_designation = no
 		"
 	}
 
@@ -1571,25 +953,7 @@ district_tec_eco_aqua_farming = {
 		mult = 1
 		display = with_desc
 		trigger = "
-			planet = {
-				has_planet_flag = tec_eco_cg_on
-			}
-		"
-	}
-
-	inline_script = {
-		script = jobs/inline_evolved_farmer
-		regular_count = 0
-		regular_aquatic_count = -1
-		hive_count = 0
-		hive_aquatic_count = -1
-		machine_count = 0
-		mult = 1
-		display = no_desc
-		trigger = "
-			planet = {
-				has_factory_designation = yes
-			}
+			has_planet_flag = tec_eco_cg_on
 		"
 	}
 
@@ -1599,15 +963,7 @@ district_tec_eco_aqua_farming = {
 		mult = 1
 		display = no_desc
 		trigger = "
-			planet = {
-				has_factory_designation = yes
-			}
+			has_factory_designation = yes
 		"
-	}
-
-	# Starnet
-	inline_script = {
-		script = districts/compat/inline_evolved_starnet_farming_district
-		count = 1.5
 	}
 }
