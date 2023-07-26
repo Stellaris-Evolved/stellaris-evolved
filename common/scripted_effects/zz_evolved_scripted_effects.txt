@@ -937,16 +937,11 @@ tec_country_aiauth_prepare_ai_species = {
 	}
 }
 
-tec_country_prepare_aiauth = {
-	# Sets variable
-	tec_country_aiauth_prepare_ai_species = yes
-}
-
 tec_country_create_aiauth_ruler  = {
 	set_country_flag = tec_force_councilor_traits
 	tec_country_aiauth_prepare_ai_species = yes
 	create_leader = {
-		class = governor
+		class = $CLASS|governor$
 		species = event_target:tec_ai_species
 		name = tec_aiauth_ruler
 		skill = 1
@@ -955,9 +950,9 @@ tec_country_create_aiauth_ruler  = {
 		skip_background_generation = yes
 		can_manually_change_location = no
 		can_see_in_list = yes
-		custom_description = councilor_tec_aiauth_desc
+		custom_description = councilor_tec_aiauth_ruler_desc
 		randomize_traits = yes
-		background_ethic = ethic_gestalt_consciousness
+		background_ethic = $ETHIC|ethic_gestalt_consciousness$
 		effect = {
 			save_event_target_as = tec_aiauth_ruler
 		}
@@ -993,7 +988,7 @@ tec_country_create_aiauth_ruler_replace = {
 		skip_background_generation = yes
 		can_manually_change_location = no
 		can_see_in_list = yes
-		custom_description = councilor_tec_aiauth_desc
+		custom_description = councilor_tec_aiauth_ruler_desc
 		randomize_traits = no
 		effect = {
 			save_event_target_as = tec_aiauth_ruler
@@ -1004,10 +999,7 @@ tec_country_create_aiauth_ruler_replace = {
 		set_leader_flag = tec_no_species_traits
 		change_background_job = none
 		change_leader_portrait = event_target:tec_ai_species
-		set_name = {
-			key = "TEC_AI_RULER_NAME"
-			variable_string = "[event_target:tec_replaced_ruler.GetName]"
-		}
+		set_name = event_target:tec_replaced_ruler
 		add_trait_no_notify = leader_trait_tec_aiauth_ruler
 		tec_leader_add_councilor_trait = yes
 		set_owner = prev
@@ -1022,6 +1014,74 @@ tec_country_create_aiauth_ruler_replace = {
 
 	event_target:tec_replaced_ruler = {
 		exile_leader_as = destitute_ruler_ai_auth
+	}
+}
+
+tec_country_refragment_aiauth_ruler  = {
+	if = {
+		limit = {
+			has_country_flag = tec_fragmenting_admiral
+		}
+		tec_country_create_aiauth_ruler = {
+			CLASS = admiral
+			ETHIC = $ETHIC|ethic_gestalt_consciousness$
+		}
+	}
+	else_if = {
+		limit = {
+			has_country_flag = tec_fragmenting_general
+		}
+		tec_country_create_aiauth_ruler = {
+			CLASS = general
+			ETHIC = $ETHIC|ethic_gestalt_consciousness$
+		}
+	}
+	else_if = {
+		limit = {
+			has_country_flag = tec_fragmenting_governor
+		}
+		tec_country_create_aiauth_ruler = {
+			CLASS = governor
+			ETHIC = $ETHIC|ethic_gestalt_consciousness$
+		}
+	}
+	else_if = {
+		limit = {
+			has_country_flag = tec_fragmenting_scientist
+		}
+		tec_country_create_aiauth_ruler = {
+			CLASS = scientist
+			ETHIC = $ETHIC|ethic_gestalt_consciousness$
+		}
+	}
+	event_target:tec_aiauth_ruler = {
+		if = {
+			limit = {
+				exists = event_target:tec_aiauth_pre_refragment
+			}
+			set_name = event_target:tec_aiauth_pre_refragment
+			change_leader_portrait = event_target:tec_aiauth_pre_refragment
+		}
+		if = {
+			limit = {
+				check_variable = {
+					which = prev.tec_aiauth_ruler_level
+					value < value:tec_value|VALUE|tec_leader_starting_skill_add|ADD|1|
+				}
+			}
+			set_variable = {
+				which = tec_difference
+				value = value:tec_value|VALUE|tec_leader_starting_skill_add|ADD|1|
+			}
+			subtract_variable = {
+				which = tec_difference
+				value = prev.tec_aiauth_ruler_level
+			}
+			while = {
+				count = tec_difference
+				add_skill_without_trait_selection = 1
+			}
+		}
 	}
 }
 
@@ -1142,6 +1202,7 @@ tec_country_create_aiauth_planetary_node = {
 }
 
 tec_country_refragment_aiauth_node = {
+	save_event_target_as = tec_aiauth_pre_refragment
 	switch = {
 		trigger = has_ethic
 		ethic_materialist = {

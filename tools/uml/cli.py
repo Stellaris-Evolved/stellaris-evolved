@@ -15,11 +15,11 @@ def cli():
 
 
 @cli.command()
-@click.option('--config', default=f'{BASE_PATH}/config.yml')
-@click.option('--local-config', default=f'{BASE_PATH}/local_config.yml')
-@click.option('--output', default=f'{BASE_PATH}/../../localisation/{{language}}/replace/zzzz_uml_modifier_l_{{language}}.yml')
-@click.option('--base-mod-path', default=f'{BASE_PATH}/../..')
-@click.option('--missing-sprites-output', default=f'{BASE_PATH}/../../interface/!!_missing_sprites_cleanup.gfx')
+@click.option('--config', default=Path(BASE_PATH) / 'config.yml')
+@click.option('--local-config', default=Path(BASE_PATH) / 'local_config.yml')
+@click.option('--output', default=Path(BASE_PATH) / f'../../localisation/{{language}}/replace/zzzz_uml_modifier_l_{{language}}.yml')
+@click.option('--base-mod-path', default=Path(BASE_PATH) / '../..')
+@click.option('--missing-sprites-output', default=Path(BASE_PATH) / '../../interface/!!_missing_sprites_cleanup.gfx')
 def generate_loc(config: str, local_config: str, output: str, base_mod_path: str, missing_sprites_output: str):
     base_mod_path = Path(base_mod_path).resolve()
     cfg = load_config(config)
