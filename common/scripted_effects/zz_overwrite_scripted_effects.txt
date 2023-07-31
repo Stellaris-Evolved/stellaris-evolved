@@ -792,16 +792,13 @@ tec_add_leader_traits_after_modification = {
 					has_trait = trait_machine_unit
 				}
 			}
+			tec_leader_cannot_take_species_traits = no
 			owner = {
 				OR = {
 					is_machine_empire = no
 					has_country_flag = tec_machine_synthetic_trait
 				}
 				NOT = { has_country_flag = tec_invalidates_synthetic_leader_trait }
-			}
-			OR = { # ai auth edge case
-				tec_is_aiauth_node = no
-				owner = { has_country_flag =  tec_synth_path_unlocked_tradition_1}
 			}
 		}
 		add_trait_no_notify = leader_trait_synthetic
@@ -1575,5 +1572,77 @@ machine_synthetic_leader_effect = {
 			tec_leader_cannot_take_species_traits = no
 		}
 		add_trait_no_notify = leader_trait_synthetic
+	}
+}
+
+make_pop_zombie = {
+	save_event_target_as = tec_pop_to_make_zombies
+	species = {
+		save_event_target_as = tec_species_to_make_zombies
+	}
+	if = {
+		limit = {
+			exists = owner
+			owner = {
+				any_galaxy_species = {
+					has_species_flag = tec_zombie_of_@event_target:tec_species_to_make_zombies
+				}
+			}
+		}
+		owner = {
+			random_galaxy_species = {
+				limit = {
+					has_species_flag = tec_zombie_of_@event_target:tec_species_to_make_zombies
+				}
+				save_event_target_as = tec_zombie_species_of_pop
+			}
+		}
+		change_species = event_target:tec_zombie_species_of_pop
+	}
+	else_if = {
+		limit = { has_trait = trait_nerve_stapled }
+		modify_species = {
+			species = this
+			remove_trait = trait_nerve_stapled
+			add_trait = trait_zombie
+			add_traits_at_start_of_list = yes
+			effect = {
+				set_species_flag = tec_zombie_of_@event_target:tec_species_to_make_zombies
+			}
+		}
+	}
+	else_if = {
+		limit = { has_trait = trait_syncretic_proles }
+		modify_species = {
+			species = this
+			remove_trait = trait_syncretic_proles
+			add_trait = trait_zombie
+			add_traits_at_start_of_list = yes
+			effect = {
+				set_species_flag = tec_zombie_of_@event_target:tec_species_to_make_zombies
+			}
+		}
+	}
+	else_if = {
+		limit = { has_trait = trait_tec_cyborg_mindless }
+		modify_species = {
+			species = this
+			remove_trait = trait_tec_cyborg_mindless
+			add_trait = trait_zombie
+			add_traits_at_start_of_list = yes
+			effect = {
+				set_species_flag = tec_zombie_of_@event_target:tec_species_to_make_zombies
+			}
+		}
+	}
+	else = {
+		modify_species = {
+			species = this
+			add_trait = trait_zombie
+			add_traits_at_start_of_list = yes
+			effect = {
+				set_species_flag = tec_zombie_of_@event_target:tec_species_to_make_zombies
+			}
+		}
 	}
 }

@@ -1,0 +1,186 @@
+# common\script_values\zz_evolved_civic_script_values.txt
+
+# Shared
+ # Leader scale
+	tec_script_planet_ascension = {
+		add = planet.trigger:has_planetary_ascension_tier
+		mult = $MULT$
+	}
+	tec_script_ruler_per_ascension = {
+		base = $BASE$
+		add = value:tec_script_planet_ascension|MULT|$ASCENSION_MULT$|
+		mult = $MULT$
+	}
+	tec_script_ruler_per_capital = {
+		base = $BASE$
+		add = planet.value:tec_capital_tier_generic_scaling|CACHED|yes|
+		mult = $MULT$
+	}
+	tec_script_ruler_per_capital_per_ascension = {
+		base = $BASE$
+		add = value:tec_script_ruler_per_ascension|BASE|1|ASCENSION_MULT|1|MULT|1|
+		add = planet.value:tec_script_ruler_per_capital|BASE|1|MULT|1|
+		mult = $MULT$
+	}
+
+	## Test
+	#	triggered_planet_modifier = {
+	#		potential = {
+	#			always = yes
+	#		}
+	#		job_tec_technocrat_add = 1
+	#		mult = value:tec_script_ruler_per_capital|MULT|1|
+	#	}
+	#	triggered_planet_modifier = {
+	#		potential = {
+	#			always = yes
+	#		}
+	#		job_head_researcher_add = 1
+	#		mult = value:tec_script_ruler_per_ascension|BASE|1|ASCENSION_MULT|1|MULT|1|
+	#	}
+	#	triggered_planet_modifier = {
+	#		potential = {
+	#			always = yes
+	#		}
+	#		job_supervisor_bureaucrat_add = 1
+	#		mult = value:tec_script_ruler_per_capital_per_ascension|MULT|1|
+	#	}
+	##/
+
+# /
+
+# Mechanics
+ # Hoarders
+	tec_vault_max_capacity = {
+		base = 0
+		add = modifier:country_resource_max_add
+	}
+
+	tec_vault_scale = {
+		base = 0
+		add = $VAR$
+		modifier = {
+			mult = 2
+			owner = {
+				tec_is_hoarder_empire = yes
+			}
+		}
+	}
+
+	# Stockpile management script values
+
+	tec_hoarder_get_vault_stockpile = {
+		modifier = {
+			has_planet_flag = tec_vault_manage_minerals
+			add = tec_minerals_stockpile
+		}
+		modifier = {
+			has_planet_flag = tec_vault_manage_food
+			add = tec_food_stockpile
+		}
+		modifier = {
+			has_planet_flag = tec_vault_manage_alloys
+			add = tec_alloys_stockpile
+		}
+		modifier = {
+			has_planet_flag = tec_vault_manage_consumer_goods
+			add = tec_consumer_goods_stockpile
+		}
+		modifier = {
+			has_planet_flag = tec_vault_manage_rare_crystals
+			add = tec_rare_crystals_stockpile
+		}
+		modifier = {
+			has_planet_flag = tec_vault_manage_exotic_gases
+			add = tec_exotic_gases_stockpile
+		}
+		modifier = {
+			has_planet_flag = tec_vault_manage_volatile_motes
+			add = tec_volatile_motes_stockpile
+		}
+		modifier = {
+			has_planet_flag = tec_vault_manage_minor_artifacts
+			add = tec_minor_artifacts_stockpile
+		}
+	}
+
+	tec_hoarders_get_resource_intermediary = {
+		base = 0
+		complex_trigger_modifier = {
+			trigger = resource_stockpile_compare
+			trigger_scope = owner
+			parameters = {
+				resource  = $RESOURCE$
+			}
+			mode = add
+		}
+	}
+
+
+	tec_hoarders_get_resource_stockpile = {
+		modifier = {
+			has_planet_flag = tec_vault_manage_minerals
+			add = value:tec_hoarders_get_resource_intermediary|RESOURCE|minerals|
+		}
+		modifier = {
+			has_planet_flag = tec_vault_manage_food
+			add = value:tec_hoarders_get_resource_intermediary|RESOURCE|food|
+		}
+		modifier = {
+			has_planet_flag = tec_vault_manage_alloys
+			add = value:tec_hoarders_get_resource_intermediary|RESOURCE|alloys|
+		}
+		modifier = {
+			has_planet_flag = tec_vault_manage_consumer_goods
+			add = value:tec_hoarders_get_resource_intermediary|RESOURCE|consumer_goods|
+		}
+		modifier = {
+			has_planet_flag = tec_vault_manage_rare_crystals
+			add = value:tec_hoarders_get_resource_intermediary|RESOURCE|rare_crystals|
+		}
+		modifier = {
+			has_planet_flag = tec_vault_manage_exotic_gases
+			add = value:tec_hoarders_get_resource_intermediary|RESOURCE|exotic_gases|
+		}
+		modifier = {
+			has_planet_flag = tec_vault_manage_volatile_motes
+			add = value:tec_hoarders_get_resource_intermediary|RESOURCE|volatile_motes|
+		}
+		modifier = {
+			has_planet_flag = tec_vault_manage_minor_artifacts
+			add = value:tec_hoarders_get_resource_intermediary|RESOURCE|minor_artifacts|
+		}
+	}
+
+
+	tec_hoarders_after_withdraw_balance = {
+		base = 0
+		add = value:tec_hoarder_get_vault_stockpile
+		subtract = $WITHDRAW$
+		add = tec_stockpile_change
+	}
+
+
+	tec_hoarders_after_deposit_balance = {
+		base = 0
+		add = value:tec_hoarders_get_resource_stockpile
+		subtract = $DEPOSIT$
+		subtract = tec_stockpile_change
+	}
+
+	tec_hoarders_after_deposit_remaining_capacity = {
+		base = 0
+		add = owner.modifier:country_resource_max_add
+		subtract = value:tec_hoarder_get_vault_stockpile
+		subtract = tec_stockpile_change
+		subtract = $DEPOSIT$
+	}
+
+	tec_hoarders_max_that_can_be_deposited = {
+		add = 0
+		min = value:tec_hoarders_after_deposit_balance|DEPOSIT|0|
+		max = value:tec_hoarders_after_deposit_remaining_capacity|DEPOSIT|0|
+		min = 0
+	}
+ # /
+# /
