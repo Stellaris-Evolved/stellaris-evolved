@@ -3603,10 +3603,22 @@ country_event = { # T1 picked
 						save_event_target_as = new_situation
 					}
 				}
-				event_target:new_situation = {
-					set_situation_locked = no
-					set_situation_approach = situation_approach_tec_synth_path_t1_standard
+				if = {
+					limit = {
+						has_technology = tech_synthetic_workers
+						has_technology = tech_synthetic_leaders
+					}
+					event_target:new_situation = {
+						set_situation_locked = no
+						set_situation_approach = situation_approach_tec_synth_path_t1_standard
+					}
+				} else = {
+					event_target:new_situation = {
+						set_situation_locked = no
+						set_situation_approach = situation_approach_tec_synth_path_t1_notech
+					}
 				}
+
 			}
 		}
 	}
@@ -7650,9 +7662,14 @@ country_event = {
 					has_ascension_perk = ap_tec_psionic_ascendance
 				}
 			}
-			check_variable = {
-				which = tec_obtained_psionic_traits
-				value < 3
+			OR = {
+				NOT = {
+					is_variable_set = tec_obtained_psionic_traits
+				}
+				check_variable = {
+					which = tec_obtained_psionic_traits
+					value < 3
+				}
 			}
 		}
 	}
@@ -7673,30 +7690,44 @@ country_event = {
 		}
 		
 		# checks times accessed the shroud
-		multiply_variable = {	# Shroud explored 5 times = 5 points
-			which = tec_psi_tr_chance_shroud
-			value = tec_regular_shroud_incursions
+		if = {
+			limit = {
+				is_variable_set = tec_regular_shroud_incursions
+			}
+			multiply_variable = {	# Shroud explored 5 times = 5 points
+				which = tec_psi_tr_chance_shroud
+				value = tec_regular_shroud_incursions
+			}
 		}
 		# checks times ascended
-		multiply_variable = {	# Ascended 5 times = 10 points
-			which = tec_psi_tr_chance_shroud
-			value = tec_psionic_ascension_number
+		if = {
+			limit = {
+				is_variable_set = tec_psionic_ascension_number
+			}
+			multiply_variable = { # Ascended 5 times = 10 points
+				which = tec_psi_tr_chance_shroud
+				value = tec_psionic_ascension_number
+			}
 		}
 
 		# Checks number of traits
-		set_variable = {
-			which = tec_temp_psionic_trait_handler
-			value = tec_obtained_psionic_traits
-		}
+		if = {
+			limit = {
+				is_variable_set = tec_obtained_psionic_traits
+			}
+			set_variable = {
+				which = tec_temp_psionic_trait_handler
+				value = tec_obtained_psionic_traits
+			}
+			multiply_variable = {	# 1 trait = 50%, 2 traits = 33% chance, 3 traits = 22% chance etc
+				which = tec_temp_psionic_trait_handler
+				value = 1.5
+			}
 
-		multiply_variable = {	# 1 trait = 50%, 2 traits = 33% chance, 3 traits = 22% chance etc
-			which = tec_temp_psionic_trait_handler
-			value = 1.5
-		}
-
-		divide_variable = {
-			which = tec_psi_tr_chance_shroud
-			value = tec_temp_psionic_trait_handler
+			divide_variable = {
+				which = tec_psi_tr_chance_shroud
+				value = tec_temp_psionic_trait_handler
+			}
 		}
 
 		# The result is the chance to get a trait after each year
