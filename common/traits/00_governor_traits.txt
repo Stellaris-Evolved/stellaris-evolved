@@ -768,7 +768,9 @@ leader_trait_trade_focus = {
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		owner = { is_gestalt = no }
+		owner = {
+			tec_uses_trade_value = yes
+		}
 		is_ruler = no
 	}
 	modifier = {
@@ -944,11 +946,17 @@ trait_ruler_investor = {
 		TIER = 1
 	}
 	triggered_modifier = {
-		potential = { trait_is_gestalt_check = no }
+		potential = {
+			exists = owner
+			owner = { tec_uses_trade_value = yes }
+		}
 		trade_value_mult = 0.1
 	}
 	triggered_modifier = {
-		potential = { trait_is_gestalt_check = yes }
+		potential = {
+			exists = owner
+			owner = { tec_uses_trade_value = no }
+		}
 		planet_jobs_produces_mult = 0.025
 	}
 	leader_potential_add = {
@@ -980,11 +988,17 @@ trait_ruler_investor_2 = {
 		TIER = 2
 	}
 	triggered_modifier = {
-		potential = { trait_is_gestalt_check = no }
+		potential = {
+			exists = owner
+			owner = { tec_uses_trade_value = yes }
+		}
 		trade_value_mult = 0.15
 	}
 	triggered_modifier = {
-		potential = { trait_is_gestalt_check = yes }
+		potential = {
+			exists = owner
+			owner = { tec_uses_trade_value = no }
+		}
 		planet_jobs_produces_mult = 0.05
 	}
 	leader_class = { governor }
@@ -1007,11 +1021,17 @@ trait_ruler_investor_3 = {
 		TIER = 3
 	}
 	triggered_modifier = {
-		potential = { trait_is_gestalt_check = no }
+		potential = {
+			exists = owner
+			owner = { tec_uses_trade_value = yes }
+		}
 		trade_value_mult = 0.25
 	}
 	triggered_modifier = {
-		potential = { trait_is_gestalt_check = yes }
+		potential = {
+			exists = owner
+			owner = { tec_uses_trade_value = no }
+		}
 		planet_jobs_produces_mult = 0.1
 	}
 	leader_potential_add = {
@@ -2476,7 +2496,11 @@ leader_trait_arbiter = {
 	leader_potential_add = {
 		has_paragon_dlc = yes
 		has_trait = subclass_governor_economist
-		has_ethic = ethic_authoritarian
+		OR = {
+			has_ethic = ethic_authoritarian
+			has_ethic = ethic_industrial
+		}
+
 	}
 	modifier = {
 		planet_jobs_worker_produces_mult = 0.5
@@ -2492,6 +2516,11 @@ leader_trait_arbiter = {
 			script = paragon/ethic_weight_mult
 			IS = authoritarian
 			NOT = egalitarian
+		}
+		inline_script = {
+			script = paragon/ethic_weight_mult
+			IS = industrial
+			NOT = green
 		}
 	}
 	destiny_background_icon = "GFX_leader_background_destiny_1"
@@ -2557,7 +2586,10 @@ leader_trait_utopian_idealist = {
 	leader_potential_add = {
 		has_paragon_dlc = yes
 		has_trait = subclass_governor_pioneer
-		has_ethic = ethic_egalitarian
+		OR = {
+			has_ethic = ethic_egalitarian
+			has_ethic = ethic_socialism
+		}
 	}
 	modifier = {
 		pop_happiness = 0.2
@@ -2589,16 +2621,7 @@ leader_trait_mediator = {
 		pop_growth_from_immigration = 0.2
 	}
 	triggered_modifier = {
-		potential = {
-			exists = planet
-		}
 		pop_job_amenities_mult = 0.01
-		mult = planet.value:species_on_planet
-	}
-	triggered_modifier = {
-		potential = {
-			exists = planet
-		}
 		pop_citizen_happiness = 0.01
 		mult = planet.value:species_on_planet
 	}
@@ -2657,6 +2680,9 @@ leader_trait_master_diplomat = {
 		owner = {
 			is_homicidal = no
 		}
+		tec_leader_already_exists_destiny_in_empire = {
+			trait = leader_trait_master_diplomat
+		}
 	}
 	leader_class = { governor }
 	opposites = {
@@ -2693,6 +2719,9 @@ leader_trait_supreme_organizer = {
 	leader_potential_add = {
 		has_paragon_dlc = yes
 		has_trait = subclass_governor_visionary
+		tec_leader_already_exists_destiny_in_empire = {
+			trait = leader_trait_supreme_organizer
+		}
 	}
 	leader_class = { governor }
 	selectable_weight = {
@@ -2701,6 +2730,11 @@ leader_trait_supreme_organizer = {
 			script = paragon/ethic_weight_mult
 			IS = xenophobe
 			NOT = xenophile
+		}
+		inline_script = {
+			script = paragon/ethic_weight_mult
+			IS = socialism
+			NOT = capitalism
 		}
 	}
 	destiny_background_icon = "GFX_leader_background_destiny_1"
@@ -2721,22 +2755,11 @@ leader_trait_galvanizer = {
 		has_trait = subclass_governor_visionary
 	}
 	modifier = {
-		pop_category_workers_unity_produces_add = 0.5
-		pop_category_specialists_unity_produces_add = 0.5
-		pop_category_rulers_unity_produces_add = 0.5
-		pop_category_workers_society_research_produces_add = 0.5
-		pop_category_specialists_society_research_produces_add = 0.5
-		pop_category_rulers_society_research_produces_add = 0.5
-	}
-	triggered_modifier = {
-		potential = {
-			exists = planet
-		}
-		trade_value_add = 0.25
-		mult = planet.value:employed_pops_with_trade_mult
+		pop_category_normal_resources_unity_produces_add = 0.5
+		pop_category_normal_resources_society_research_produces_add = 0.5
+		tec_pop_lifestyle_trade_value_add = 0.25
 	}
 	leader_class = { governor }
-	custom_tooltip = leader_trait_galvanizer_effect_non_gestalt
 	selectable_weight = @subclass_trait_weight
 	destiny_background_icon = "GFX_leader_background_destiny_1"
 }
@@ -2994,11 +3017,17 @@ leader_trait_insider_trading = {
 		TIER = 1
 	}
 	triggered_modifier = {
-		potential = { trait_is_gestalt_check = no }
+		potential = {
+			exists = owner
+			owner = { tec_uses_trade_value = yes }
+		}
 		trade_value_mult = -0.10
 	}
 	triggered_modifier = {
-		potential = { trait_is_gestalt_check = yes }
+		potential = {
+			exists = owner
+			owner = { tec_uses_trade_value = no }
+		}
 		planet_jobs_produces_mult = -0.05
 	}
 	leader_class = { governor }
@@ -3020,11 +3049,17 @@ leader_trait_insider_trading_2 = {
 		TIER = 2
 	}
 	triggered_modifier = {
-		potential = { trait_is_gestalt_check = no }
+		potential = {
+			exists = owner
+			owner = { tec_uses_trade_value = yes }
+		}
 		trade_value_mult = -0.25
 	}
 	triggered_modifier = {
-		potential = { trait_is_gestalt_check = yes }
+		potential = {
+			exists = owner
+			owner = { tec_uses_trade_value = no }
+		}
 		planet_jobs_produces_mult = -0.10
 	}
 	leader_class = { governor }

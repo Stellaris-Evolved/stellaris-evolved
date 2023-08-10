@@ -286,3 +286,48 @@ event = {
 		}
 	}
 }
+
+event = {
+	id = paragon_2.1135
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger= {
+		always = no
+	}
+
+	immediate = {
+		every_playable_country = {
+			# Reset counters
+			set_variable = { which = knowledge_masses_amount value = 0 }
+			create_variable_if_not_exists = {
+				VARIABLE = prev_knowledge_masses_amount
+				VALUE_IF_CREATED = 0
+			}
+
+			# Count how councilors have the trait
+			every_owned_leader = {
+				limit = {
+					is_councilor = yes
+					has_trait = leader_trait_knowledge_for_the_masses
+				}
+				prev = {
+					change_variable = { which = knowledge_masses_amount value = 1 }
+				}
+			}
+
+			# Scale value with number of pops
+			multiply_variable = {
+				which = knowledge_masses_amount
+				value = trigger:num_pops
+			}
+
+			# Update/remove modifier as needed
+			#update_modifier_amount_if_needed = {
+			#	MODIFIER = knowledge_for_the_masses_per_pop_effect
+			#	MULT_VAR = knowledge_masses_amount
+			#	PREV_MULT_VAR = prev_knowledge_masses_amount
+			#}
+		}
+	}
+}
