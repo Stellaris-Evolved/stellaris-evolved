@@ -1,937 +1,935 @@
 
 # Federation comm pacts
 # ------------------------------------------------------------
-tec_num_commercial_pacts_incl_fed = {
-	base = 0
-	modifier = {
-		add = trigger:num_commercial_pacts
+	tec_num_commercial_pacts_incl_fed = {
+		base = 0
+		modifier = {
+			add = trigger:num_commercial_pacts
+		}
+		complex_trigger_modifier = {
+			trigger_scope = federation
+			trigger = count_member
+			mode = add
+		}
 	}
-	complex_trigger_modifier = {
-		trigger_scope = federation
-		trigger = count_member
-		mode = add
-	}
-}
 
 # multiplier = value:tec_diplomatic_networking_calc|BASE|3|
-tec_diplomatic_networking_calc = {
-	base = 0
-	[[!BASE_VALUE]
-		add = $BASE$
-	]
-	[[BASE_VALUE]
-		add = value:$BASE_VALUE$|BASE|$BASE$|
-	]
-	modifier = {
-		diplomacy_weight >= 100
-		add = 1
+	tec_diplomatic_networking_calc = {
+		base = 0
+		[[!BASE_VALUE]
+			add = $BASE$
+		]
+		[[BASE_VALUE]
+			add = value:$BASE_VALUE$|BASE|$BASE$|
+		]
+		modifier = {
+			diplomacy_weight >= 100
+			add = 1
+		}
+		modifier = {
+			diplomacy_weight >= 500
+			add = 1
+		}
+		modifier = {
+			diplomacy_weight >= 1000
+			add = 1
+		}
+		modifier = {
+			diplomacy_weight >= 5000
+			add = 2
+		}
+		modifier = {
+			diplomacy_weight >= 10000
+			add = 2
+		}
 	}
-	modifier = {
-		diplomacy_weight >= 500
-		add = 1
-	}
-	modifier = {
-		diplomacy_weight >= 1000
-		add = 1
-	}
-	modifier = {
-		diplomacy_weight >= 5000
-		add = 2
-	}
-	modifier = {
-		diplomacy_weight >= 10000
-		add = 2
-	}
-}
 
 # Planed scaled trade value generated
 # ------------------------------------------------------------
-tec_planet_trade_value = {
-	base = 0
-	add = modifier:trade_value_add
-	mult = modifier:trade_value_mult
-}
+	tec_planet_trade_value = {
+		base = 0
+		add = modifier:trade_value_add
+		mult = modifier:trade_value_mult
+	}
 
 # Protoworld scaling cost
 # ------------------------------------------------------------
-tec_protoworld_cost = {
-	base = 0
-	modifier = {
-		exists = space_owner
-		space_owner = {
-			tec_is_variable_set_and_not_zero = { VARIABLE = tec_protoworlds_created }
+	tec_protoworld_cost = {
+		base = 0
+		modifier = {
+			exists = space_owner
+			space_owner = {
+				tec_is_variable_set_and_not_zero = { VARIABLE = tec_protoworlds_created }
+			}
+			add = space_owner.tec_protoworlds_created
 		}
-		add = space_owner.tec_protoworlds_created
+		add = owner.tec_protoworlds_created
+		#add = var:tec_protoworlds_created
+		#add = tec_protoworlds_created
+		mult = 0.5
+		add = 1
+		max = 5
 	}
-	add = owner.tec_protoworlds_created
-	#add = var:tec_protoworlds_created
-	#add = tec_protoworlds_created
-	mult = 0.5
-	add = 1
-	max = 5
-}
 
 # Leader production
 # ------------------------------------------------------------
-# Base
-tec_leader_scripted_production = {
-	base = 0
-	[[!BASE_VALUE] 
-		add = $BASE$
-	]
-	[[BASE_VALUE]
-		add = value:$BASE_VALUE$|BASE|$BASE$|
-	]
+ # Base
+	tec_leader_scripted_production = {
+		base = 0
+		[[!BASE_VALUE] 
+			add = $BASE$
+		]
+		[[BASE_VALUE]
+			add = value:$BASE_VALUE$|BASE|$BASE$|
+		]
 
-	modifier = { # Gestalts and oligarchics add 1 resource more
-		mult = 1.25
-		exists = owner
-		owner = {
-			is_oligarchy = yes
+		modifier = { # Gestalts and oligarchics add 1 resource more
+			mult = 1.25
+			exists = owner
+			owner = {
+				is_oligarchy = yes
+			}
+		}
+
+		modifier = { # Leader skill multiplier
+			mult = trigger:has_skill
 		}
 	}
 
-	modifier = { # Leader skill multiplier
-		mult = trigger:has_skill
+	tec_leader_level_output_scaling = {
+		base = 0.1
+		modifier = {
+			exists = owner
+			mult = trigger:has_skill
+		}
+		add = 1
+		# Level 6 leaders adds a mult of 1.6
 	}
-}
 
-tec_leader_level_output_scaling = {
-	base = 0.1
-	modifier = {
-		exists = owner
-		mult = trigger:has_skill
-	}
-	add = 1
-	# Level 6 leaders adds a mult of 1.6
-}
+	tec_leader_scripted_upkeep = {
+		base = 1
+		[[!BASE_VALUE] 
+			add = $BASE$
+		]
+		[[BASE_VALUE]
+			add = value:$BASE_VALUE$|BASE|$BASE$|
+		]
 
-tec_leader_scripted_upkeep = {
-	base = 1
-	[[!BASE_VALUE] 
-		add = $BASE$
-	]
-	[[BASE_VALUE]
-		add = value:$BASE_VALUE$|BASE|$BASE$|
-	]
+		modifier = { # Double production, double upkeep
+			mult = 2
+			exists = owner
+			owner = {
+				has_valid_civic = civic_tec_hive_anaxiomatic
+			}
+		}
 
-	modifier = { # Double production, double upkeep
-		mult = 2
-		exists = owner
-		owner = {
-			has_valid_civic = civic_tec_hive_anaxiomatic
+		modifier = { # Leader skill multiplier
+			mult = trigger:has_skill
 		}
 	}
 
-	modifier = { # Leader skill multiplier
-		mult = trigger:has_skill
-	}
-}
-
-tec_leader_add_per_tech_researched = {
-	base = 1
-	mult = $MULT$
-	# Old script
-		#modifier = {
-		#	exists = owner
-		#	add = owner.trigger:num_researched_techs
-		#}
-		#complex_trigger_modifier = {
-		#	trigger_scope = owner
-		#	trigger = num_researched_techs_of_tier
-		#	parameters = { tier = 0 }
-		#	mode = subtract
-		#}
-	# /
-	complex_trigger_modifier = {
-		trigger_scope = owner
-		trigger = num_researched_techs_of_tier
-		parameters = { tier = 1 }
-		mode = add
-		mult = 0.25
-	}
-	complex_trigger_modifier = {
-		trigger_scope = owner
-		trigger = num_researched_techs_of_tier
-		parameters = { tier = 2 }
-		mode = add
-		mult = 0.25
-	}
-	complex_trigger_modifier = {
-		trigger_scope = owner
-		trigger = num_researched_techs_of_tier
-		parameters = { tier = 3 }
-		mode = add
-		mult = 0.25
-	}
-	complex_trigger_modifier = {
-		trigger_scope = owner
-		trigger = num_researched_techs_of_tier
-		parameters = { tier = 4 }
-		mode = add
-		mult = 0.25
-	}
-	complex_trigger_modifier = {
-		trigger_scope = owner
-		trigger = num_researched_techs_of_tier
-		parameters = { tier >= 5 }
-		mode = add
-		mult = 0.25
-	}
-	# Each tech above level 0 adds $mult$
-}
-
-tec_leader_add_per_planet_ascension = {
-	base = 0
-	modifier = {
-		exists = sector.sector_capital
-		add = sector.sector_capital.trigger:has_planetary_ascension_tier
-	}
-	add = 1
-	mult = $MULT$
-}
-
-# Specific leaders
-tec_leader_governor_production = {
-	base = 1
-	mult = $MULT$
-	mult = value:tec_leader_add_per_planet_ascension|MULT|1|
-	mult = trigger:has_level
-	modifier = { # Gestalts and oligarchics add more
-		mult = 1.25
-		exists = owner
-		owner = {
-			is_oligarchy = yes
+	tec_leader_add_per_tech_researched = {
+		base = 1
+		mult = $MULT$
+		# Old script
+			#modifier = {
+			#	exists = owner
+			#	add = owner.trigger:num_researched_techs
+			#}
+			#complex_trigger_modifier = {
+			#	trigger_scope = owner
+			#	trigger = num_researched_techs_of_tier
+			#	parameters = { tier = 0 }
+			#	mode = subtract
+			#}
+		# /
+		complex_trigger_modifier = {
+			trigger_scope = owner
+			trigger = num_researched_techs_of_tier
+			parameters = { tier = 1 }
+			mode = add
+			mult = 0.25
 		}
-	}
-	# multiplier = value:tec_leader_governor_production|MULT|0.01|
-}
-
-tec_leader_scientist_production = {
-	base = 1
-	mult = $MULT$
-	mult = value:tec_leader_add_per_tech_researched|MULT|1|
-	mult = value:tec_leader_level_output_scaling
-	modifier = { # Gestalts and oligarchics add more
-		mult = 1.25
-		exists = owner
-		owner = {
-			is_oligarchy = yes
+		complex_trigger_modifier = {
+			trigger_scope = owner
+			trigger = num_researched_techs_of_tier
+			parameters = { tier = 2 }
+			mode = add
+			mult = 0.25
 		}
-	}
-	modifier = { # Anaxiomatic Splits
-		mult = 1.25
-		exists = owner
-		owner = {
-			has_valid_civic = civic_tec_hive_anaxiomatic
+		complex_trigger_modifier = {
+			trigger_scope = owner
+			trigger = num_researched_techs_of_tier
+			parameters = { tier = 3 }
+			mode = add
+			mult = 0.25
 		}
-	}
-	# multiplier = value:tec_leader_scientist_production|MULT|1|
-	# lvl 3 with 2 techs = 1x1x1x1.3 = 1.3
-	# Lvl 5 with 100 techs = 1x1x50x1.5 = 75
-	# Lvl 10 with 300 techs = 1x1x150x2 = 300
-}
-
-tec_leader_admiral_production = {
-	base = 1
-	mult = $MULT$
-	modifier = {
-		exists = fleet
-		add = fleet.trigger:fleet_size
-	}
-	mult = 0.5
-	mult = value:tec_leader_level_output_scaling
-	modifier = { # Gestalts and oligarchics add more
-		mult = 1.25
-		exists = owner
-		owner = {
-			is_oligarchy = yes
+		complex_trigger_modifier = {
+			trigger_scope = owner
+			trigger = num_researched_techs_of_tier
+			parameters = { tier = 4 }
+			mode = add
+			mult = 0.25
 		}
+		complex_trigger_modifier = {
+			trigger_scope = owner
+			trigger = num_researched_techs_of_tier
+			parameters = { tier >= 5 }
+			mode = add
+			mult = 0.25
+		}
+		# Each tech above level 0 adds $mult$
 	}
-	# multiplier = value:tec_leader_admiral_production|MULT|1|
-	# lvl 1 with 10 size fleet = 1x1x10x1.1 = 11
-	# lvl 3 with 30 size fleet = 1x1x30x1.3 = 33
-	# Lvl 5 with 50 size fleet = 1x1x50x1.5 = 75
-	# Lvl 10 with 250 s. fleet = 1x1x250x2 = 500
-}
 
+	tec_leader_add_per_planet_ascension = {
+		base = 0
+		modifier = {
+			exists = sector.sector_capital
+			add = sector.sector_capital.trigger:has_planetary_ascension_tier
+		}
+		add = 1
+		mult = $MULT$
+	}
+ # /
+ # Specific leaders
+	tec_leader_governor_production = {
+		base = 1
+		mult = $MULT$
+		mult = value:tec_leader_add_per_planet_ascension|MULT|1|
+		mult = trigger:has_level
+		modifier = { # Gestalts and oligarchics add more
+			mult = 1.25
+			exists = owner
+			owner = {
+				is_oligarchy = yes
+			}
+		}
+		# multiplier = value:tec_leader_governor_production|MULT|0.01|
+	}
+
+	tec_leader_scientist_production = {
+		base = 1
+		mult = $MULT$
+		mult = value:tec_leader_add_per_tech_researched|MULT|1|
+		mult = value:tec_leader_level_output_scaling
+		modifier = { # Gestalts and oligarchics add more
+			mult = 1.25
+			exists = owner
+			owner = {
+				is_oligarchy = yes
+			}
+		}
+		modifier = { # Anaxiomatic Splits
+			mult = 1.25
+			exists = owner
+			owner = {
+				has_valid_civic = civic_tec_hive_anaxiomatic
+			}
+		}
+		# multiplier = value:tec_leader_scientist_production|MULT|1|
+		# lvl 3 with 2 techs = 1x1x1x1.3 = 1.3
+		# Lvl 5 with 100 techs = 1x1x50x1.5 = 75
+		# Lvl 10 with 300 techs = 1x1x150x2 = 300
+	}
+
+	tec_leader_admiral_production = {
+		base = 1
+		mult = $MULT$
+		modifier = {
+			exists = fleet
+			add = fleet.trigger:fleet_size
+		}
+		mult = 0.5
+		mult = value:tec_leader_level_output_scaling
+		modifier = { # Gestalts and oligarchics add more
+			mult = 1.25
+			exists = owner
+			owner = {
+				is_oligarchy = yes
+			}
+		}
+		# multiplier = value:tec_leader_admiral_production|MULT|1|
+		# lvl 1 with 10 size fleet = 1x1x10x1.1 = 11
+		# lvl 3 with 30 size fleet = 1x1x30x1.3 = 33
+		# Lvl 5 with 50 size fleet = 1x1x50x1.5 = 75
+		# Lvl 10 with 250 s. fleet = 1x1x250x2 = 500
+	}
+ # /
 # Industrial count
 # ------------------------------------------------------------
-tec_industrial_district_count = {
-	base = 0
-	add = value:industrial_districts_value
-}
+	tec_industrial_district_count = {
+		base = 0
+		add = value:industrial_districts_value
+	}
 
 
 # Assembly Values
 # ------------------------------------------------------------
-
-tec_capital_tier = {
-	[[CACHED]
-	base = 1
-	modifier = {
-		is_variable_set = tec_cache_tec_capital_tier
-		set = tec_cache_tec_capital_tier # cache_variable
-	}
-	]
-	[[!CACHED]
-	base = 1
-	modifier = {
-		tec_has_t2_capital = { cached = yes }
-		set = 2
-	}
-	modifier = {
-		tec_has_t3_capital = { cached = yes }
-		set = 3
-	}
-	modifier = {
-		tec_has_t4_capital = { cached = yes }
-		set = 4
-	}
-	modifier = {
-		tec_has_t5_capital = { cached = yes }
-		set = 5
-	}
-	modifier = {
-		tec_has_imperial_capital = { cached = yes }
-		set = 6
-	}
-	]
-
-	[[NEVER]
-		add = value:tec_type_hint_bool|PARAM|$CACHED$|
-	]
-}
-
-tec_capital_tier_generic_scaling = {
-	[[CACHED]
-	base = 1
-	modifier = {
-		is_variable_set = tec_cache_tec_capital_tier_generic_scaling
-		set = tec_cache_tec_capital_tier_generic_scaling # cache_variable
-	}
-	]
-	[[!CACHED]
-	base = -1
-	add = value:tec_capital_tier
-	min = 1
-	]
-
-	[[NEVER]
-		add = value:tec_type_hint_bool|PARAM|$CACHED$|
-	]
-}
-
-tec_prime_drone_scaling = {
-	base = 0.5
-	modifier = {
-		uses_habitat_capitals = no
-		set = value:tec_prime_drone_scaling_planet
-	}
-	modifier = {
-		uses_habitat_capitals = yes
-		set = value:tec_prime_drone_scaling_habitat
-	}
-	modifier = {
-		tec_has_imperial_capital = { cached = yes }
-		set = 6
-	}
-}
-
-tec_prime_drone_scaling_habitat = {
-	base = 0.5
-	modifier = {
-		check_variable_arithmetic = {
-			which = value:tec_capital_tier|CACHED|yes|
-			value >= 3
+	tec_capital_tier = {
+		[[CACHED]
+		base = 1
+		modifier = {
+			is_variable_set = tec_cache_tec_capital_tier
+			set = tec_cache_tec_capital_tier # cache_variable
 		}
-		num_pops >= @pops_t2
-		set = 1.0
-	}
-	modifier = {
-		check_variable_arithmetic = {
-			which = value:tec_capital_tier|CACHED|yes|
-			value >= 4
+		]
+		[[!CACHED]
+		base = 1
+		modifier = {
+			tec_has_t2_capital = { cached = yes }
+			set = 2
 		}
-		num_pops >= @pops_t3
-		set = 2.0
-	}
-}
-
-tec_prime_drone_scaling_planet = {
-	base = 0.5
-	modifier = {
-		check_variable_arithmetic = {
-			which = value:tec_capital_tier|CACHED|yes|
-			value >= 2
+		modifier = {
+			tec_has_t3_capital = { cached = yes }
+			set = 3
 		}
-		num_pops >= @pops_t2
-		set = 1.0
-	}
-	modifier = {
-
-		check_variable_arithmetic = {
-			which = value:tec_capital_tier|CACHED|yes|
-			value >= 3
+		modifier = {
+			tec_has_t4_capital = { cached = yes }
+			set = 4
 		}
-		num_pops >= @pops_t3
-		set = 1.5
-	}
-	modifier = {
-
-		check_variable_arithmetic = {
-			which = value:tec_capital_tier|CACHED|yes|
-			value >= 4
+		modifier = {
+			tec_has_t5_capital = { cached = yes }
+			set = 5
 		}
-		num_pops >= @pops_t4
-		set = 3.0
-	}
-	modifier = {
-		check_variable_arithmetic = {
-			which = value:tec_capital_tier|CACHED|yes|
-			value >= 5
+		modifier = {
+			tec_has_imperial_capital = { cached = yes }
+			set = 6
 		}
-		num_pops >= @pops_t5
-		set = 4.5
+		]
+
+		[[NEVER]
+			add = value:tec_type_hint_bool|PARAM|$CACHED$|
+		]
 	}
-}
 
-tec_building_upkeep_modifiers = {
-	base = 1
-	add = modifier:planet_buildings_upkeep_mult
-	add = modifier:planet_structures_upkeep_mult
-}
+	tec_capital_tier_generic_scaling = {
+		[[CACHED]
+		base = 1
+		modifier = {
+			is_variable_set = tec_cache_tec_capital_tier_generic_scaling
+			set = tec_cache_tec_capital_tier_generic_scaling # cache_variable
+		}
+		]
+		[[!CACHED]
+		base = -1
+		add = value:tec_capital_tier
+		min = 1
+		]
 
-tec_assembly_cost_scaling_building = {
-	base = 1
-	divide = value:tec_building_upkeep_modifiers
-	mult = value:scripted_modifier_mult|MODIFIER|planet_pop_assemblers_upkeep_mult|
-	min = 0
-}
+		[[NEVER]
+			add = value:tec_type_hint_bool|PARAM|$CACHED$|
+		]
+	}
 
-tec_assembly_building_tier = {
-	base = 3
-	modifier = { # T2 assembly
-		add = 1.5
-		exists = planet
-		planet = {
-			tec_has_t2_assembly_building = yes
+	tec_prime_drone_scaling = {
+		base = 0.5
+		modifier = {
+			uses_habitat_capitals = no
+			set = value:tec_prime_drone_scaling_planet
+		}
+		modifier = {
+			uses_habitat_capitals = yes
+			set = value:tec_prime_drone_scaling_habitat
+		}
+		modifier = {
+			tec_has_imperial_capital = { cached = yes }
+			set = 6
 		}
 	}
-	modifier = { # T3 assembly
-		add = 3
-		exists = planet
-		planet = {
-			tec_has_t3_assembly_building = yes
+
+	tec_prime_drone_scaling_habitat = {
+		base = 0.5
+		modifier = {
+			check_variable_arithmetic = {
+				which = value:tec_capital_tier|CACHED|yes|
+				value >= 3
+			}
+			num_pops >= @pops_t2
+			set = 1.0
+		}
+		modifier = {
+			check_variable_arithmetic = {
+				which = value:tec_capital_tier|CACHED|yes|
+				value >= 4
+			}
+			num_pops >= @pops_t3
+			set = 2.0
 		}
 	}
-	
-}
 
-tec_master_assembler_research_output = {
-	base = 1
-	# 3 to 6
-	mult = value:tec_assembly_building_tier
-	# Research bonuses
-	mult = value:job_total_research_output_modifier|JOB|researcher|
-}
+	tec_prime_drone_scaling_planet = {
+		base = 0.5
+		modifier = {
+			check_variable_arithmetic = {
+				which = value:tec_capital_tier|CACHED|yes|
+				value >= 2
+			}
+			num_pops >= @pops_t2
+			set = 1.0
+		}
+		modifier = {
 
-tec_master_assembler_tech_priest_output = {
-	base = 1
-	# 3 to 6
-	mult = value:tec_assembly_building_tier
-	# Unity bonuses
-	mult = value:job_total_output_modifier|JOB|priest|RESOURCE|unity|
-}
+			check_variable_arithmetic = {
+				which = value:tec_capital_tier|CACHED|yes|
+				value >= 3
+			}
+			num_pops >= @pops_t3
+			set = 1.5
+		}
+		modifier = {
 
-tec_master_assembler_ai_capacity_output = {
-	base = 1
-	mult = value:tec_assembly_building_tier
-	divide = 3
-	mult = value:job_total_output_modifier|JOB|tec_ai_operator|RESOURCE|unity|
-}
+			check_variable_arithmetic = {
+				which = value:tec_capital_tier|CACHED|yes|
+				value >= 4
+			}
+			num_pops >= @pops_t4
+			set = 3.0
+		}
+		modifier = {
+			check_variable_arithmetic = {
+				which = value:tec_capital_tier|CACHED|yes|
+				value >= 5
+			}
+			num_pops >= @pops_t5
+			set = 4.5
+		}
+	}
 
-tec_reimaginator_assembly = {
-	base = 0
-	add = planet.value:tec_capital_tier_generic_scaling
-	divide = 2
-	add = 2.5
-}
+	tec_building_upkeep_modifiers = {
+		base = 1
+		add = modifier:planet_buildings_upkeep_mult
+		add = modifier:planet_structures_upkeep_mult
+	}
+
+	tec_assembly_cost_scaling_building = {
+		base = 1
+		divide = value:tec_building_upkeep_modifiers
+		mult = value:scripted_modifier_mult|MODIFIER|planet_pop_assemblers_upkeep_mult|
+		min = 0
+	}
+
+	tec_assembly_building_tier = {
+		base = 3
+		modifier = { # T2 assembly
+			add = 1.5
+			exists = planet
+			planet = {
+				tec_has_t2_assembly_building = yes
+			}
+		}
+		modifier = { # T3 assembly
+			add = 3
+			exists = planet
+			planet = {
+				tec_has_t3_assembly_building = yes
+			}
+		}
+		
+	}
+
+	tec_master_assembler_research_output = {
+		base = 1
+		# 3 to 6
+		mult = value:tec_assembly_building_tier
+		# Research bonuses
+		mult = value:job_total_research_output_modifier|JOB|researcher|
+	}
+
+	tec_master_assembler_tech_priest_output = {
+		base = 1
+		# 3 to 6
+		mult = value:tec_assembly_building_tier
+		# Unity bonuses
+		mult = value:job_total_output_modifier|JOB|priest|RESOURCE|unity|
+	}
+
+	tec_master_assembler_ai_capacity_output = {
+		base = 1
+		mult = value:tec_assembly_building_tier
+		divide = 3
+		mult = value:job_total_output_modifier|JOB|tec_ai_operator|RESOURCE|unity|
+	}
+
+	tec_reimaginator_assembly = {
+		base = 0
+		add = planet.value:tec_capital_tier_generic_scaling
+		divide = 2
+		add = 2.5
+	}
 
 
 # Ascension Scaling
 # ------------------------------------------------------------
-
-tec_ascension_scaling = {
-	base = 0.25
-	mult = planet.trigger:has_planetary_ascension_tier 
-	mult = planet.owner.value:scripted_modifier_mult|MODIFIER|planetary_ascension_effect_mult|
-	add = 1
-}
+	tec_ascension_scaling = {
+		base = 0.25
+		mult = planet.trigger:has_planetary_ascension_tier 
+		mult = planet.owner.value:scripted_modifier_mult|MODIFIER|planetary_ascension_effect_mult|
+		add = 1
+	}
 
 
 # Land of Opportunity
 # ------------------------------------------------------------
 
-tec_land_of_plenty_base_scale = {
-	modifier = {
-		tec_has_councilor = {
-			COUNCILOR = councilor_civic_tec_corporate_land_of_opportunity
+	tec_land_of_plenty_base_scale = {
+		modifier = {
+			tec_has_councilor = {
+				COUNCILOR = councilor_civic_tec_corporate_land_of_opportunity
+			}
+			add = value:councilor_level|TYPE|councilor_civic_tec_corporate_land_of_opportunity|
 		}
-		add = value:councilor_level|TYPE|councilor_civic_tec_corporate_land_of_opportunity|
-	}
-	modifier = {
-		tec_has_councilor = {
-			COUNCILOR = councilor_civic_tec_regular_land_of_plenty
+		modifier = {
+			tec_has_councilor = {
+				COUNCILOR = councilor_civic_tec_regular_land_of_plenty
+			}
+			add = value:councilor_level|TYPE|councilor_civic_tec_regular_land_of_plenty|
 		}
-		add = value:councilor_level|TYPE|councilor_civic_tec_regular_land_of_plenty|
+		mult = @councilor_civic_tec_regular_land_of_plenty_bonus
+		add = 1
 	}
-	mult = @councilor_civic_tec_regular_land_of_plenty_bonus
-	add = 1
-}
 
-tec_land_of_opportunity_trade_value = {
-	set = value:tec_land_of_plenty_base_scale
-	mult = value:tec_ascension_scaling
-	mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-}
+	tec_land_of_opportunity_trade_value = {
+		set = value:tec_land_of_plenty_base_scale
+		mult = value:tec_ascension_scaling
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
+	}
 
 # Living Standard Values
 # ------------------------------------------------------------
-tec_pop_lifestyle_trade_value = {
-	base = 0
-	add = modifier:tec_pop_lifestyle_trade_value_add
-	[[CATEGORY]add = modifier:tec_$CATEGORY$_lifestyle_trade_value_add]
-	mult = value:scripted_modifier_mult|MODIFIER|pop_lifestyle_trade_mult|
+	tec_pop_lifestyle_trade_value = {
+		base = 0
+		add = modifier:tec_pop_lifestyle_trade_value_add
+		[[CATEGORY]add = modifier:tec_$CATEGORY$_lifestyle_trade_value_add]
+		mult = value:scripted_modifier_mult|MODIFIER|pop_lifestyle_trade_mult|
 
 
-	[[NEVER]
-		add = value:tec_type_hint_pop_category|PARAM|$CATEGORY$|
-	]
-}
+		[[NEVER]
+			add = value:tec_type_hint_pop_category|PARAM|$CATEGORY$|
+		]
+	}
 
 # Clerks
 # ------------------------------------------------------------
-tec_job_clerk_trade_value_add = {
-	add = modifier:tec_job_clerk_trade_value_add
-	mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-}
+	tec_job_clerk_trade_value_add = {
+		add = modifier:tec_job_clerk_trade_value_add
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
+	}
 
-tec_job_clerk_amenities_add = {
-	add = modifier:tec_job_clerk_amenities_add
-	mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
-}
+	tec_job_clerk_amenities_add = {
+		add = modifier:tec_job_clerk_amenities_add
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
 
 # Hired
 
-tec_hired_job_trade_add = {
-	add = modifier:tec_hired_job_trade_add
-	mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-}
+	tec_hired_job_trade_add = {
+		add = modifier:tec_hired_job_trade_add
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
+	}
 
-tec_hired_job_amenities_with_modifiers_mult = {
-	base = 1
-	add = modifier:tec_hired_job_base_production_mult
-	mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
-}
+	tec_hired_job_amenities_with_modifiers_mult = {
+		base = 1
+		add = modifier:tec_hired_job_base_production_mult
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
 
 # Broodqueen
 # ------------------------------------------------------------
-tec_broodlord_count = {
-	base = 0
-	complex_trigger_modifier = {
-		trigger = num_assigned_jobs
-		parameters = {
-			job = tec_broodlord_drone
+	tec_broodlord_count = {
+		base = 0
+		complex_trigger_modifier = {
+			trigger = num_assigned_jobs
+			parameters = {
+				job = tec_broodlord_drone
+			}
+			mode = add
 		}
-		mode = add
+		mult = $MULT$
 	}
-}
 
 # Habitat Housing
 # ------------------------------------------------------------
-tec_habitat_district_housing = {
-	base = $BASE|0$
-	modifier = {
-		add = 1
-		planet = {
-			tec_is_upgraded_habitat = yes
+	tec_habitat_district_housing = {
+		base = $BASE|0$
+		modifier = {
+			add = 1
+			planet = {
+				tec_is_upgraded_habitat = yes
+			}
+		}
+		modifier = {
+			add = 1
+			planet = {
+				tec_is_fully_upgraded_habitat = yes
+			}
 		}
 	}
-	modifier = {
-		add = 1
-		planet = {
-			tec_is_fully_upgraded_habitat = yes
-		}
-	}
-}
 
 # Environment Decision Scaling
 # ------------------------------------------------------------
+	tec_environment_decision_mult = {
+		base = 0
+		modifier = {
+			calc_true_if = {
+				has_modifier = "dangerous_wildlife"
+				has_modifier = "hazardous_weather"
+				has_modifier = "weak_magnetic_field"
+				has_modifier = "unstable_tectonics"
+				has_modifier = @gpm_unstable_tectonics_2
+				has_modifier = "tidal_locked"
+				has_modifier = "high_gravity"
+				has_modifier = "mineral_poor"
+				has_modifier = "atmospheric_aphrodisiac"
+				has_modifier = "atmospheric_hallucinogen"
+				has_modifier = "bleak_planet"
+				has_modifier = "irradiated_planet"
+				has_modifier = @gpm_global_thunderstorms
+				has_modifier = @gpm_thin_atmospheres
+				has_modifier = @gpm_strong_volcanism
+				has_modifier = @gpm_high_gravity_2
+				has_modifier = @gpm_hostile_flora
+				has_modifier = @gpm_toxic_gas
+				has_modifier = @gpm_titanic_predators
+				has_modifier = @gpm_unusual_seasons
+				has_modifier = @gpm_simple_organisms
+				has_modifier = @gpm_unusual_formations
+				has_modifier = @gpm_great_temperature_variation
+				has_modifier = @gpm_ice_age
+				has_modifier = @gpm_locust_plagues
+				has_modifier = @gpm_resilent_parasites
+				has_modifier = @gpm_trubbles
+				has_modifier = @gpm_arachnophobia
+				has_modifier = @gpm_giant_worm
+				has_modifier = @gpm_sandstorms
+				has_modifier = @gpm_quicksand
+				has_modifier = @gpm_blizzards
+				has_modifier = @gpm_abominable_predators
+				has_modifier = @gpm_giant_ocean_snakes
+				has_modifier = @gpm_cursed_world
+				has_modifier = @gpm_asteroid_impacts_2
+				has_modifier = @gpm_strange_alien_eggs
+				has_modifier = @gpm_living_planet
 
-tec_environment_decision_mult = {
-	base = 0
-	modifier = {
-		calc_true_if = {
-			has_modifier = "dangerous_wildlife"
-			has_modifier = "hazardous_weather"
-			has_modifier = "weak_magnetic_field"
-			has_modifier = "unstable_tectonics"
-			has_modifier = @gpm_unstable_tectonics_2
-			has_modifier = "tidal_locked"
-			has_modifier = "high_gravity"
-			has_modifier = "mineral_poor"
-			has_modifier = "atmospheric_aphrodisiac"
-			has_modifier = "atmospheric_hallucinogen"
-			has_modifier = "bleak_planet"
-			has_modifier = "irradiated_planet"
-			has_modifier = @gpm_global_thunderstorms
-			has_modifier = @gpm_thin_atmospheres
-			has_modifier = @gpm_strong_volcanism
-			has_modifier = @gpm_high_gravity_2
-			has_modifier = @gpm_hostile_flora
-			has_modifier = @gpm_toxic_gas
-			has_modifier = @gpm_titanic_predators
-			has_modifier = @gpm_unusual_seasons
-			has_modifier = @gpm_simple_organisms
-			has_modifier = @gpm_unusual_formations
-			has_modifier = @gpm_great_temperature_variation
-			has_modifier = @gpm_ice_age
-			has_modifier = @gpm_locust_plagues
-			has_modifier = @gpm_resilent_parasites
-			has_modifier = @gpm_trubbles
-			has_modifier = @gpm_arachnophobia
-			has_modifier = @gpm_giant_worm
-			has_modifier = @gpm_sandstorms
-			has_modifier = @gpm_quicksand
-			has_modifier = @gpm_blizzards
-			has_modifier = @gpm_abominable_predators
-			has_modifier = @gpm_giant_ocean_snakes
-			has_modifier = @gpm_cursed_world
-			has_modifier = @gpm_asteroid_impacts_2
-			has_modifier = @gpm_strange_alien_eggs
-			has_modifier = @gpm_living_planet
-
-			amount > 0 
+				amount > 0 
+			}
+			add = 1
 		}
-		add = 1
-	}
-	modifier = {
-		calc_true_if = {
-			has_modifier = "dangerous_wildlife"
-			has_modifier = "hazardous_weather"
-			has_modifier = "weak_magnetic_field"
-			has_modifier = "unstable_tectonics"
-			has_modifier = @gpm_unstable_tectonics_2
-			has_modifier = "tidal_locked"
-			has_modifier = "high_gravity"
-			has_modifier = "mineral_poor"
-			has_modifier = "atmospheric_aphrodisiac"
-			has_modifier = "atmospheric_hallucinogen"
-			has_modifier = "bleak_planet"
-			has_modifier = "irradiated_planet"
-			has_modifier = @gpm_global_thunderstorms
-			has_modifier = @gpm_thin_atmospheres
-			has_modifier = @gpm_strong_volcanism
-			has_modifier = @gpm_high_gravity_2
-			has_modifier = @gpm_hostile_flora
-			has_modifier = @gpm_toxic_gas
-			has_modifier = @gpm_titanic_predators
-			has_modifier = @gpm_unusual_seasons
-			has_modifier = @gpm_simple_organisms
-			has_modifier = @gpm_unusual_formations
-			has_modifier = @gpm_great_temperature_variation
-			has_modifier = @gpm_ice_age
-			has_modifier = @gpm_locust_plagues
-			has_modifier = @gpm_resilent_parasites
-			has_modifier = @gpm_trubbles
-			has_modifier = @gpm_arachnophobia
-			has_modifier = @gpm_giant_worm
-			has_modifier = @gpm_sandstorms
-			has_modifier = @gpm_quicksand
-			has_modifier = @gpm_blizzards
-			has_modifier = @gpm_abominable_predators
-			has_modifier = @gpm_giant_ocean_snakes
-			has_modifier = @gpm_cursed_world
-			has_modifier = @gpm_asteroid_impacts_2
-			has_modifier = @gpm_strange_alien_eggs
-			has_modifier = @gpm_living_planet
+		modifier = {
+			calc_true_if = {
+				has_modifier = "dangerous_wildlife"
+				has_modifier = "hazardous_weather"
+				has_modifier = "weak_magnetic_field"
+				has_modifier = "unstable_tectonics"
+				has_modifier = @gpm_unstable_tectonics_2
+				has_modifier = "tidal_locked"
+				has_modifier = "high_gravity"
+				has_modifier = "mineral_poor"
+				has_modifier = "atmospheric_aphrodisiac"
+				has_modifier = "atmospheric_hallucinogen"
+				has_modifier = "bleak_planet"
+				has_modifier = "irradiated_planet"
+				has_modifier = @gpm_global_thunderstorms
+				has_modifier = @gpm_thin_atmospheres
+				has_modifier = @gpm_strong_volcanism
+				has_modifier = @gpm_high_gravity_2
+				has_modifier = @gpm_hostile_flora
+				has_modifier = @gpm_toxic_gas
+				has_modifier = @gpm_titanic_predators
+				has_modifier = @gpm_unusual_seasons
+				has_modifier = @gpm_simple_organisms
+				has_modifier = @gpm_unusual_formations
+				has_modifier = @gpm_great_temperature_variation
+				has_modifier = @gpm_ice_age
+				has_modifier = @gpm_locust_plagues
+				has_modifier = @gpm_resilent_parasites
+				has_modifier = @gpm_trubbles
+				has_modifier = @gpm_arachnophobia
+				has_modifier = @gpm_giant_worm
+				has_modifier = @gpm_sandstorms
+				has_modifier = @gpm_quicksand
+				has_modifier = @gpm_blizzards
+				has_modifier = @gpm_abominable_predators
+				has_modifier = @gpm_giant_ocean_snakes
+				has_modifier = @gpm_cursed_world
+				has_modifier = @gpm_asteroid_impacts_2
+				has_modifier = @gpm_strange_alien_eggs
+				has_modifier = @gpm_living_planet
 
-			amount > 1 
+				amount > 1 
+			}
+			add = 1
 		}
-		add = 1
-	}
 
-	modifier = {
-		calc_true_if = {
-			has_modifier = "dangerous_wildlife"
-			has_modifier = "hazardous_weather"
-			has_modifier = "weak_magnetic_field"
-			has_modifier = "unstable_tectonics"
-			has_modifier = @gpm_unstable_tectonics_2
-			has_modifier = "tidal_locked"
-			has_modifier = "high_gravity"
-			has_modifier = "mineral_poor"
-			has_modifier = "atmospheric_aphrodisiac"
-			has_modifier = "atmospheric_hallucinogen"
-			has_modifier = "bleak_planet"
-			has_modifier = "irradiated_planet"
-			has_modifier = @gpm_global_thunderstorms
-			has_modifier = @gpm_thin_atmospheres
-			has_modifier = @gpm_strong_volcanism
-			has_modifier = @gpm_high_gravity_2
-			has_modifier = @gpm_hostile_flora
-			has_modifier = @gpm_toxic_gas
-			has_modifier = @gpm_titanic_predators
-			has_modifier = @gpm_unusual_seasons
-			has_modifier = @gpm_simple_organisms
-			has_modifier = @gpm_unusual_formations
-			has_modifier = @gpm_great_temperature_variation
-			has_modifier = @gpm_ice_age
-			has_modifier = @gpm_locust_plagues
-			has_modifier = @gpm_resilent_parasites
-			has_modifier = @gpm_trubbles
-			has_modifier = @gpm_arachnophobia
-			has_modifier = @gpm_giant_worm
-			has_modifier = @gpm_sandstorms
-			has_modifier = @gpm_quicksand
-			has_modifier = @gpm_blizzards
-			has_modifier = @gpm_abominable_predators
-			has_modifier = @gpm_giant_ocean_snakes
-			has_modifier = @gpm_cursed_world
-			has_modifier = @gpm_asteroid_impacts_2
-			has_modifier = @gpm_strange_alien_eggs
-			has_modifier = @gpm_living_planet
+		modifier = {
+			calc_true_if = {
+				has_modifier = "dangerous_wildlife"
+				has_modifier = "hazardous_weather"
+				has_modifier = "weak_magnetic_field"
+				has_modifier = "unstable_tectonics"
+				has_modifier = @gpm_unstable_tectonics_2
+				has_modifier = "tidal_locked"
+				has_modifier = "high_gravity"
+				has_modifier = "mineral_poor"
+				has_modifier = "atmospheric_aphrodisiac"
+				has_modifier = "atmospheric_hallucinogen"
+				has_modifier = "bleak_planet"
+				has_modifier = "irradiated_planet"
+				has_modifier = @gpm_global_thunderstorms
+				has_modifier = @gpm_thin_atmospheres
+				has_modifier = @gpm_strong_volcanism
+				has_modifier = @gpm_high_gravity_2
+				has_modifier = @gpm_hostile_flora
+				has_modifier = @gpm_toxic_gas
+				has_modifier = @gpm_titanic_predators
+				has_modifier = @gpm_unusual_seasons
+				has_modifier = @gpm_simple_organisms
+				has_modifier = @gpm_unusual_formations
+				has_modifier = @gpm_great_temperature_variation
+				has_modifier = @gpm_ice_age
+				has_modifier = @gpm_locust_plagues
+				has_modifier = @gpm_resilent_parasites
+				has_modifier = @gpm_trubbles
+				has_modifier = @gpm_arachnophobia
+				has_modifier = @gpm_giant_worm
+				has_modifier = @gpm_sandstorms
+				has_modifier = @gpm_quicksand
+				has_modifier = @gpm_blizzards
+				has_modifier = @gpm_abominable_predators
+				has_modifier = @gpm_giant_ocean_snakes
+				has_modifier = @gpm_cursed_world
+				has_modifier = @gpm_asteroid_impacts_2
+				has_modifier = @gpm_strange_alien_eggs
+				has_modifier = @gpm_living_planet
 
-			amount > 2 
+				amount > 2 
+			}
+			add = 1
 		}
-		add = 1
-	}
-	modifier = {
-		calc_true_if = {
-			has_modifier = "dangerous_wildlife"
-			has_modifier = "hazardous_weather"
-			has_modifier = "weak_magnetic_field"
-			has_modifier = "unstable_tectonics"
-			has_modifier = @gpm_unstable_tectonics_2
-			has_modifier = "tidal_locked"
-			has_modifier = "high_gravity"
-			has_modifier = "mineral_poor"
-			has_modifier = "atmospheric_aphrodisiac"
-			has_modifier = "atmospheric_hallucinogen"
-			has_modifier = "bleak_planet"
-			has_modifier = "irradiated_planet"
-			has_modifier = @gpm_global_thunderstorms
-			has_modifier = @gpm_thin_atmospheres
-			has_modifier = @gpm_strong_volcanism
-			has_modifier = @gpm_high_gravity_2
-			has_modifier = @gpm_hostile_flora
-			has_modifier = @gpm_toxic_gas
-			has_modifier = @gpm_titanic_predators
-			has_modifier = @gpm_unusual_seasons
-			has_modifier = @gpm_simple_organisms
-			has_modifier = @gpm_unusual_formations
-			has_modifier = @gpm_great_temperature_variation
-			has_modifier = @gpm_ice_age
-			has_modifier = @gpm_locust_plagues
-			has_modifier = @gpm_resilent_parasites
-			has_modifier = @gpm_trubbles
-			has_modifier = @gpm_arachnophobia
-			has_modifier = @gpm_giant_worm
-			has_modifier = @gpm_sandstorms
-			has_modifier = @gpm_quicksand
-			has_modifier = @gpm_blizzards
-			has_modifier = @gpm_abominable_predators
-			has_modifier = @gpm_giant_ocean_snakes
-			has_modifier = @gpm_cursed_world
-			has_modifier = @gpm_asteroid_impacts_2
-			has_modifier = @gpm_strange_alien_eggs
-			has_modifier = @gpm_living_planet
+		modifier = {
+			calc_true_if = {
+				has_modifier = "dangerous_wildlife"
+				has_modifier = "hazardous_weather"
+				has_modifier = "weak_magnetic_field"
+				has_modifier = "unstable_tectonics"
+				has_modifier = @gpm_unstable_tectonics_2
+				has_modifier = "tidal_locked"
+				has_modifier = "high_gravity"
+				has_modifier = "mineral_poor"
+				has_modifier = "atmospheric_aphrodisiac"
+				has_modifier = "atmospheric_hallucinogen"
+				has_modifier = "bleak_planet"
+				has_modifier = "irradiated_planet"
+				has_modifier = @gpm_global_thunderstorms
+				has_modifier = @gpm_thin_atmospheres
+				has_modifier = @gpm_strong_volcanism
+				has_modifier = @gpm_high_gravity_2
+				has_modifier = @gpm_hostile_flora
+				has_modifier = @gpm_toxic_gas
+				has_modifier = @gpm_titanic_predators
+				has_modifier = @gpm_unusual_seasons
+				has_modifier = @gpm_simple_organisms
+				has_modifier = @gpm_unusual_formations
+				has_modifier = @gpm_great_temperature_variation
+				has_modifier = @gpm_ice_age
+				has_modifier = @gpm_locust_plagues
+				has_modifier = @gpm_resilent_parasites
+				has_modifier = @gpm_trubbles
+				has_modifier = @gpm_arachnophobia
+				has_modifier = @gpm_giant_worm
+				has_modifier = @gpm_sandstorms
+				has_modifier = @gpm_quicksand
+				has_modifier = @gpm_blizzards
+				has_modifier = @gpm_abominable_predators
+				has_modifier = @gpm_giant_ocean_snakes
+				has_modifier = @gpm_cursed_world
+				has_modifier = @gpm_asteroid_impacts_2
+				has_modifier = @gpm_strange_alien_eggs
+				has_modifier = @gpm_living_planet
 
-			amount > 3 
+				amount > 3 
+			}
+			add = 1
 		}
-		add = 1
+		min = 1
+		max = 4
 	}
-	min = 1
-	max = 4
-}
 
 # Capital scripted values
 # ------------------------------------------------------------
-tec_capital_production_mult = {
-	base = 0
-	modifier = {
-		exists = owner
-		owner = {
-			has_technology = tech_capital_productivity_1
+	tec_capital_production_mult = {
+		base = 0
+		modifier = {
+			exists = owner
+			owner = {
+				has_technology = tech_capital_productivity_1
+			}
+			add = 1
 		}
-		add = 1
-	}
-	modifier = {
-		exists = owner
-		owner = {
-			has_technology = tech_capital_productivity_2
+		modifier = {
+			exists = owner
+			owner = {
+				has_technology = tech_capital_productivity_2
+			}
+			add = 1
 		}
-		add = 1
-	}
-	modifier = {
-		exists = owner
-		owner = {
-			has_technology = tech_capital_productivity_3
+		modifier = {
+			exists = owner
+			owner = {
+				has_technology = tech_capital_productivity_3
+			}
+			add = 1
 		}
-		add = 1
-	}
-	modifier = {
-		exists = owner
-		owner = {
-			has_technology = tech_tec_capital_productivity_4
+		modifier = {
+			exists = owner
+			owner = {
+				has_technology = tech_tec_capital_productivity_4
+			}
+			add = 1
 		}
-		add = 1
+		min = 0
+		max = $max$
 	}
-	min = 0
-	max = $max$
-}
 
-tec_machine_capital_assembly_scaling = {
-	base = $base$
-	modifier = {
-		num_pops >= @pops_t3
-		add = 1
+	tec_machine_capital_assembly_scaling = {
+		base = $base$
+		modifier = {
+			num_pops >= @pops_t3
+			add = 1
+		}
+		modifier = {
+			num_pops >= @pops_t4
+			add = 1
+		}
+		modifier = {
+			num_pops >= @pops_t5
+			add = 1
+		}
+		modifier = {
+			exists = owner
+			owner = { has_civic = civic_machine_assimilator }
+			add = -1
+		}
+		modifier = {
+			has_designation = col_crucible
+			add = -1
+		}
+		min = 0
+		max = $max$
 	}
-	modifier = {
-		num_pops >= @pops_t4
-		add = 1
-	}
-	modifier = {
-		num_pops >= @pops_t5
-		add = 1
-	}
-	modifier = {
-		exists = owner
-		owner = { has_civic = civic_machine_assimilator }
-		add = -1
-	}
-	modifier = {
-		has_designation = col_crucible
-		add = -1
-	}
-	min = 0
-	max = $max$
-}
 
-tec_machine_capital_assembly_upkeep_scaling = {
-	base = 0
-	add = value:tec_machine_capital_assembly_scaling|max|@tec_capital_machine_max_assembly_t$tier$|base|@tec_capital_machine_base_assembly_t$tier$|
-	mult = value:tec_assembly_cost_scaling_building
-}
+	tec_machine_capital_assembly_upkeep_scaling = {
+		base = 0
+		add = value:tec_machine_capital_assembly_scaling|max|@tec_capital_machine_max_assembly_t$tier$|base|@tec_capital_machine_base_assembly_t$tier$|
+		mult = value:tec_assembly_cost_scaling_building
+	}
 
 # Catalytic Production
 # ------------------------------------------------------------
-tec_catalytic_production_mult = {
-	base = 0
-	modifier = {
-		exists = owner
-		owner = {
-			has_technology = tech_eco_simulation
+	tec_catalytic_production_mult = {
+		base = 0
+		modifier = {
+			exists = owner
+			owner = {
+				has_technology = tech_eco_simulation
+			}
+			add = 1
 		}
-		add = 1
-	}
-	modifier = {
-		exists = owner
-		owner = {
-			has_technology = tech_gene_crops
+		modifier = {
+			exists = owner
+			owner = {
+				has_technology = tech_gene_crops
+			}
+			add = 1
 		}
-		add = 1
-	}
-	modifier = {
-		exists = owner
-		owner = {
-			has_technology = tech_nano_vitality_crops
+		modifier = {
+			exists = owner
+			owner = {
+				has_technology = tech_nano_vitality_crops
+			}
+			add = 1
 		}
-		add = 1
-	}
-	modifier = {
-		exists = owner
-		owner = {
-			has_technology = tech_nutrient_replication
+		modifier = {
+			exists = owner
+			owner = {
+				has_technology = tech_nutrient_replication
 
+			}
+			add = 1
 		}
-		add = 1
+		min = 0
+		max = $max$
 	}
-	min = 0
-	max = $max$
-}
 
 # Quantum Production
 # ------------------------------------------------------------
-tec_quantum_production_mult = {
-	base = 0
-	modifier = {
-		exists = owner
-		owner = {
-			has_technology = tech_power_plant_2
+	tec_quantum_production_mult = {
+		base = 0
+		modifier = {
+			exists = owner
+			owner = {
+				has_technology = tech_power_plant_2
+			}
+			add = 1
 		}
-		add = 1
-	}
-	modifier = {
-		exists = owner
-		owner = {
-			has_technology = tech_power_plant_3
+		modifier = {
+			exists = owner
+			owner = {
+				has_technology = tech_power_plant_3
+			}
+			add = 1
 		}
-		add = 1
-	}
-	modifier = {
-		exists = owner
-		owner = {
-			has_technology = tech_power_plant_4
+		modifier = {
+			exists = owner
+			owner = {
+				has_technology = tech_power_plant_4
+			}
+			add = 1
 		}
-		add = 1
-	}
-	modifier = {
-		exists = owner
-		owner = {
-			has_technology = tech_tec_power_hub_3
+		modifier = {
+			exists = owner
+			owner = {
+				has_technology = tech_tec_power_hub_3
 
+			}
+			add = 1
 		}
-		add = 1
+		min = 0
+		max = $max$
 	}
-	min = 0
-	max = $max$
-}
 
 # Biopsi converged mult
 # ------------------------------------------------------------
-tec_biopsionic_convergence_trait_scaling = {
-    base = 0
-    modifier = {
-       has_modifier = tec_converged_pop
-       add = owner.tec_biopsionic_convergence_count
-    }
-    mult = 0.05
-    add = 1
-}
+	tec_biopsionic_convergence_trait_scaling = {
+		base = 0
+		modifier = {
+		has_modifier = tec_converged_pop
+		add = owner.tec_biopsionic_convergence_count
+		}
+		mult = 0.05
+		add = 1
+	}
 
 # Cyberpsi entropy
 # ------------------------------------------------------------
-tec_cyberpsionic_entropy_scaling = {
-	base = 0
-	add = owner.value:scripted_modifier_mult|MODIFIER|tec_entropy|
-	square_root = yes
-}
+	tec_cyberpsionic_entropy_scaling = {
+		base = 0
+		add = owner.value:scripted_modifier_mult|MODIFIER|tec_entropy|
+		square_root = yes
+	}
 
-tec_cyberpsionic_entropy_scaling_display = {
-	base = 0
-	add = owner.value:scripted_modifier_mult|MODIFIER|tec_entropy|
-	square_root = yes
-	round_to = 0.01
-}
+	tec_cyberpsionic_entropy_scaling_display = {
+		base = 0
+		add = owner.value:scripted_modifier_mult|MODIFIER|tec_entropy|
+		square_root = yes
+		round_to = 0.01
+	}
 
-tec_cyberpsionic_entropy_total_display = {
-	base = 0
-	add = owner.modifier:tec_entropy
-	mult = 100
-	round = yes
-}
+	tec_cyberpsionic_entropy_total_display = {
+		base = 0
+		add = owner.modifier:tec_entropy
+		mult = 100
+		round = yes
+	}
 
 # Pop Upkeep
 # ------------------------------------------------------------
@@ -943,136 +941,136 @@ tec_cyberpsionic_entropy_total_display = {
 
 # This method assured the least amount of checks for `has_x_upkeep`
 
-tec_pop_food_upkeep = {
-	base = 1
-	# Reductions
-	modifier = {
-		exists = species
-		is_phototrophic = yes
-		add = -0.5
-	}
-	modifier = {
-		exists = species
-		tec_is_lithotrophic = yes
-		add = -0.5
-	}
-	# Negate reductions if no upkeep
-	modifier = {
-		exists = species
-		has_food_upkeep = no 
-		mult = 0
-	}
-	# Additions
-	# Mult
-	modifier = {
-		exists = species
-		mult = value:scripted_modifier_mult|MODIFIER|tec_pop_upkeep_base_add|
-	}
-
-	min = 0
-}
-
-tec_pop_minerals_upkeep = {
-	base = 1
-	# Reductions
-	modifier = {
-		exists = species
-		is_phototrophic = yes
-		add = -0.5
-	}
-	# Negate reductions if no upkeep
-	modifier = {
-		exists = species
-		has_mineral_upkeep = no 
-		mult = 0
-	}
-	# Additions
-	modifier = {
-		exists = species
-		tec_is_lithotrophic = yes
-		add = 0.5
-	}
-	# Mult
-	modifier = {
-		exists = species
-		mult = value:scripted_modifier_mult|MODIFIER|tec_pop_upkeep_base_add|
-	}
-
-	min = 0
-}
-
-tec_pop_energy_upkeep = {
-	base = 1
-	# Reductions
-	# Negate reductions if no upkeep
-	modifier = {
-		exists = species
-		has_energy_upkeep = no 
-		mult = 0
-	}
-	# Additions
-	modifier = {
-		exists = species
-		has_phototrophic_energy_upkeep = yes
-		add = 0.5
-	}
-	# Mult
-	modifier = {
-		exists = species
-		mult = value:scripted_modifier_mult|MODIFIER|tec_pop_upkeep_base_add|
-	}
-
-	min = 0
-}
-
-
-tec_terraformer_enhancing_deposits = {
-	modifier = {
-		tec_is_standard_like_planet = yes
-		set = 2
-	}
-	modifier = {
-		tec_is_standard_like_planet = yes
-		OR = {
-			tec_is_perfect_planet = yes
-			tec_is_ecoworld = yes
-			is_capital = yes
+	tec_pop_food_upkeep = {
+		base = 1
+		# Reductions
+		modifier = {
+			exists = species
+			is_phototrophic = yes
+			add = -0.5
 		}
-		set = 4
+		modifier = {
+			exists = species
+			tec_is_lithotrophic = yes
+			add = -0.5
+		}
+		# Negate reductions if no upkeep
+		modifier = {
+			exists = species
+			has_food_upkeep = no 
+			mult = 0
+		}
+		# Additions
+		# Mult
+		modifier = {
+			exists = species
+			mult = value:scripted_modifier_mult|MODIFIER|tec_pop_upkeep_base_add|
+		}
+
+		min = 0
 	}
-}
 
-tec_geologist_output = {
-	add = value:$VALUE$
-	max = value:tec_max_district_count
-}
+	tec_pop_minerals_upkeep = {
+		base = 1
+		# Reductions
+		modifier = {
+			exists = species
+			is_phototrophic = yes
+			add = -0.5
+		}
+		# Negate reductions if no upkeep
+		modifier = {
+			exists = species
+			has_mineral_upkeep = no 
+			mult = 0
+		}
+		# Additions
+		modifier = {
+			exists = species
+			tec_is_lithotrophic = yes
+			add = 0.5
+		}
+		# Mult
+		modifier = {
+			exists = species
+			mult = value:scripted_modifier_mult|MODIFIER|tec_pop_upkeep_base_add|
+		}
 
-tec_faction_free_haven_mult = {
-	complex_trigger_modifier = {
-		trigger = count_owned_pop_species
-		parameters = {
-			limit = {
-				is_sapient = yes
+		min = 0
+	}
+
+	tec_pop_energy_upkeep = {
+		base = 1
+		# Reductions
+		# Negate reductions if no upkeep
+		modifier = {
+			exists = species
+			has_energy_upkeep = no 
+			mult = 0
+		}
+		# Additions
+		modifier = {
+			exists = species
+			has_phototrophic_energy_upkeep = yes
+			add = 0.5
+		}
+		# Mult
+		modifier = {
+			exists = species
+			mult = value:scripted_modifier_mult|MODIFIER|tec_pop_upkeep_base_add|
+		}
+
+		min = 0
+	}
+
+
+	tec_terraformer_enhancing_deposits = {
+		modifier = {
+			tec_is_standard_like_planet = yes
+			set = 2
+		}
+		modifier = {
+			tec_is_standard_like_planet = yes
+			OR = {
+				tec_is_perfect_planet = yes
+				tec_is_ecoworld = yes
+				is_capital = yes
 			}
+			set = 4
 		}
-		mode = add
 	}
-	subtract = 1
-	min = 0
-	max = 10
-}
 
-tec_basic_resource_councilor_scale = {
-	modifier = {
-		tec_has_councilor = {
-			COUNCILOR = councilor_civic_tec_regular_computerized_extraction
+	tec_geologist_output = {
+		add = value:$VALUE$
+		max = value:tec_max_district_count
+	}
+
+	tec_faction_free_haven_mult = {
+		complex_trigger_modifier = {
+			trigger = count_owned_pop_species
+			parameters = {
+				limit = {
+					is_sapient = yes
+				}
+			}
+			mode = add
 		}
-		add = value:councilor_level|TYPE|councilor_civic_tec_regular_computerized_extraction|
+		subtract = 1
+		min = 0
+		max = 10
 	}
-	mult = @councilor_civic_tec_regular_computerized_extraction_bonus
-	add = 1
-}
 
-tec_basic_resource_councilor_scale = {
-	add = value:tec_councilor_level_multiplier|MULT|@councilor_civic_tec_regular_computerized_extraction_bonus|COUNCILOR|councilor_civic_tec_regular_computerized_extraction|
-}
+	tec_basic_resource_councilor_scale = {
+		modifier = {
+			tec_has_councilor = {
+				COUNCILOR = councilor_civic_tec_regular_computerized_extraction
+			}
+			add = value:councilor_level|TYPE|councilor_civic_tec_regular_computerized_extraction|
+		}
+		mult = @councilor_civic_tec_regular_computerized_extraction_bonus
+		add = 1
+	}
+
+	tec_basic_resource_councilor_scale = {
+		add = value:tec_councilor_level_multiplier|MULT|@councilor_civic_tec_regular_computerized_extraction_bonus|COUNCILOR|councilor_civic_tec_regular_computerized_extraction|
+	}
