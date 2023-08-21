@@ -697,49 +697,75 @@ building_tec_commercial_flagship = {
 		}
 	}
 
-	planet_modifier = {
-		trade_value_mult = 0.10
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				has_valid_civic = civic_tec_regular_consumerism
+	# Modifiers
+		planet_modifier = {
+			trade_value_mult = 0.10
+		}
+		triggered_planet_modifier = {	# Ascension effect
+			potential = {
+				always = yes
 			}
+			trade_value_mult = 0.01
+			mult = planet.trigger:has_planetary_ascension_tier
 		}
-		modifier = {
-			trade_value_add = 5
-		}
-	}
 
-	inline_script = {
-		script = jobs/inline_evolved_job
-		job = merchant
-		count = 2
-		mult = 1
-		display = with_desc
-		trigger = ""
-	}
-
-	inline_script = {
-		script = districts/effects/inline_evolved_mercantile_commercial_enterprise
-		count = 1
-		trigger = ""
-	}
-
-	inline_script = {
-		script = buildings/inline_evolved_aibait
-		trigger = "
-			OR = {
-				has_trade_designation = yes
-				check_variable_arithmetic = {
-					which = value:trade_combined_value
-					value >= 3
+		triggered_planet_modifier = {
+			potential = {
+				exists = owner
+				owner = {
+					has_valid_civic = civic_tec_regular_consumerism
 				}
 			}
-		"
-	}
+			modifier = {
+				trade_value_add = 5
+			}
+		}
+	# /
+
+	# Jobs
+		inline_script = {
+			script = jobs/inline_evolved_job
+			job = merchant
+			count = 2
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+
+		inline_script = {	# +1 merchant
+			script = districts/effects/inline_evolved_mercantile_commercial_enterprise
+			count = 1
+			trigger = ""
+		}
+
+		# ADD per Ascension
+			inline_script = {	# merchant
+				script = jobs/inline_evolved_job
+				job = merchant
+				count = 1
+				mult = planet.value:tec_script_add_per_ascension|BASE|0|ASCENSION_BASE|0|ASCENSION_MULT|@tec_per_planet_ascension_mult_high|MULT|1|ROUND|yes|
+				display = no_desc
+				trigger = "
+					always = yes
+				"
+			}
+		# /
+	# /
+
+	# AI
+		inline_script = {
+			script = buildings/inline_evolved_aibait
+			trigger = "
+				OR = {
+					has_trade_designation = yes
+					check_variable_arithmetic = {
+						which = value:trade_combined_value
+						value >= 3
+					}
+				}
+			"
+		}
+	# /
 }
 
 building_galactic_stock_exchange = {

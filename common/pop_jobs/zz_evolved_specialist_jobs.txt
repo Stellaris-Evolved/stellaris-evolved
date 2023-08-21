@@ -1525,6 +1525,253 @@
 	}
  # /
 # /
+
+ # ------------------------------------------------- Pleasure Givers
+	tec_pleasure_giver = {
+		category = specialist
+		condition_string = SPECIALIST_JOB_TRIGGER
+		building_icon = building_holo_theatres
+		clothes_texture_index = 3
+		icon = job_servant
+	
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+	
+		possible = {
+			entertainer_job_check_trigger = yes
+		}
+		
+		resources = {
+			category = planet_entertainers
+			produces = {
+				unity = 6
+			}
+		}
+		
+		# Trade & Amenities
+			triggered_planet_modifier = {	# Amenity upkeep
+				potential = {
+					exists = owner
+					owner = {
+						is_megacorp = no
+					}
+				}
+				planet_amenities_add = -2
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+			triggered_planet_modifier = {	# Trade Upkeep
+				potential = {
+					exists = owner
+					owner = {
+						is_megacorp = yes
+					}
+				}
+				trade_value_add = -2
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+		# /
+
+		# Modifiers
+			triggered_planet_modifier = {
+				potential = {
+					always = yes
+				}
+				pop_happiness = 0.025
+			}
+			inline_script = jobs/effects/inline_evolved_pleasure_seeker_entertainer
+			inline_script = jobs/effects/inline_evolved_councilor_corporate_hedonism
+		# /
+
+		# Specific job effect
+			triggered_planet_modifier = {	# Capital
+				potential = {
+					exists = planet
+					planet = {
+						OR = {
+							has_designation = col_capital
+							has_designation = col_fe_capital
+						}
+					}
+				}
+				planet_jobs_upkeep_mult = -0.025
+			}
+			triggered_planet_modifier = {	# Rural
+				potential = {
+					exists = planet
+					planet = {
+						OR = {
+							has_rural_designation = yes
+							has_generator_designation = yes
+							has_mining_designation = yes
+							has_farming_designation = yes
+						}
+					}
+				}
+				planet_jobs_worker_produces_mult = 0.05
+			}
+			triggered_planet_modifier = {	# Research
+				potential = {
+					exists = planet
+					planet = {
+						has_research_designation = yes
+					}
+				}
+				planet_researchers_upkeep_mult = -0.025
+			}
+			triggered_planet_modifier = {	# Unity
+				potential = {
+					exists = planet
+					planet = {
+						has_unity_designation = yes
+					}
+				}
+				planet_administrators_upkeep_mult = -0.025
+			}
+			triggered_planet_modifier = {	# Industrial
+				potential = {
+					exists = planet
+					planet = {
+						has_industrial_designation = yes
+					}
+				}
+				planet_metallurgists_upkeep_mult = -0.025
+				planet_artisans_upkeep_mult = -0.025
+			}
+			triggered_planet_modifier = {	# Foundry
+				potential = {
+					exists = planet
+					planet = {
+						has_foundry_designation = yes
+					}
+				}
+				planet_metallurgists_upkeep_mult = -0.05
+			}
+			triggered_planet_modifier = {	# Factory
+				potential = {
+					exists = planet
+					planet = {
+						has_factory_designation = yes
+					}
+				}
+				planet_artisans_upkeep_mult = -0.05
+			}
+			triggered_planet_modifier = {	# Strategic
+				potential = {
+					exists = planet
+					planet = {
+						has_refinery_designation = yes
+					}
+				}
+				planet_chemists_upkeep_mult = -0.025
+				planet_refiners_upkeep_mult = -0.025
+				planet_translucers_upkeep_mult = -0.025
+			}
+			triggered_planet_modifier = {	# Trade
+				potential = {
+					exists = planet
+					planet = {
+						has_trade_designation = yes
+						exists = owner
+						owner = {
+							is_megacorp = no
+						}
+					}
+				}
+				trade_value_add = 2
+				mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
+			}
+			triggered_planet_modifier = {	# Trade (corp)
+				potential = {
+					exists = planet
+					planet = {
+						has_trade_designation = yes
+						exists = owner
+						owner = {
+							is_megacorp = yes
+						}
+					}
+				}
+				planet_amenities_add = 2
+				mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+			}
+			triggered_planet_modifier = {	# Fortress
+				potential = {
+					exists = planet
+					planet = {
+						has_fortress_designation = yes
+					}
+				}
+				country_naval_cap_add = 1
+				mult = value:scripted_modifier_mult|MODIFIER|pop_job_naval_mult|
+			}
+		# /
+
+		weight = {
+			# Specialist job Weight
+			weight = @high_prio_specialist_job_weight
+			mult = value:job_weights_modifier|JOB|entertainer|RESOURCE|unity|FACTOR|0.25|
+			mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+			modifier = {
+				factor = 1.5
+				has_job = entertainer
+			}
+	
+			# Living standard weight
+			modifier = {
+				factor = 3
+				has_trait = trait_robot_domestic_protocols
+				OR = {
+					tec_is_non_sapient_robot = { cached = yes }
+					tec_is_shackled_robot = { cached = yes }
+				}
+			}
+			modifier = {
+				factor = 0.2
+				has_citizenship_rights = no
+				NOR = {
+					tec_has_trait_slave = yes
+				}
+			}
+			modifier = {
+				factor = 0.1
+				can_take_servant_job = yes
+			}
+	
+			modifier = {
+				factor = 0.1
+				NOT = { has_job = entertainer }
+				exists = planet
+				planet = {
+					free_amenities > 5
+				}
+			}
+			modifier = {
+				factor = 2
+				NOT = { has_job = entertainer }
+				exists = planet
+				planet = {
+					free_amenities < 2
+					has_available_jobs = entertainer
+				}
+			}
+	
+			modifier = {
+				add = 500
+				exists = planet
+				planet = {
+					has_modifier = artistic_boom
+				}
+			}
+		}
+	}
+ # /
+
+# /
+
 # ------------ Assembly jobs ---------------
 	tec_master_roboticist = {
 		icon = roboticist

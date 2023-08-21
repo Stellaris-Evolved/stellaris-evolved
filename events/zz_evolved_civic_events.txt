@@ -1,7 +1,185 @@
 # events\zz_evolved_civic_events.txt
 
-# Dread armies - reanimators
 # ------------------------------------------------------------
+# MISC
+# ------------------------------------------------------------
+
+# ------------------------------------------------- Traits
+namespace = tec_trait
+	#traitchecker
+	planet_event = {
+		id = tec_trait.10
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			always = yes
+		}
+
+		immediate = {
+			# Cryptobiotic
+			planet_event = {
+				id = tec_trait.11
+				#extra delay to ensure it works well
+				days = 1
+			}
+		}
+	}
+
+	#Cryptobiotic
+	planet_event = {
+		id = tec_trait.11
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			any_owned_pop = {
+				has_trait = trait_tec_cryptobiotic
+			}
+		}
+
+		immediate = {
+			root = {
+				random_owned_pop = {
+					limit = {
+						has_trait = trait_tec_cryptobiotic
+					}
+					root = {
+						create_pop = {
+							species = prev
+						}
+					}
+				}
+			}
+		}
+	}
+
+
+	# Lithoid sedimentary
+	planet_event = {
+		id = tec_trait.15
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			NOT = {
+				has_planet_flag = tec_recent_sedimentary_colonization
+			}
+			any_owned_pop = {
+				has_trait = trait_tec_lithoid_sedimentary
+			}
+		}
+
+		immediate = {
+			root = {
+				set_timed_planet_flag = {
+					flag = tec_recent_sedimentary_colonization
+					years = 25
+				}
+				random_list = {
+					25 = {
+						while = {
+							count = 1
+							add_deposit = d_tec_sedimented_lithoids
+						}
+					}
+					25 = {
+						while = {
+							count = 2
+							add_deposit = d_tec_sedimented_lithoids
+						}
+					}
+					25 = {
+						while = {
+							count = 3
+							add_deposit = d_tec_sedimented_lithoids
+						}
+					}
+					#25 = {
+					#	while = {
+					#		count = 5
+					#		add_deposit = d_tec_sedimented_lithoids
+					#	}
+					#}
+				}
+			}
+		}
+	}
+
+	# Metamorphosis
+	pop_event = {
+		id = tec_trait.20
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			has_trait = trait_tec_metamorphosis
+		}
+
+		immediate = {
+			hidden_effect = {
+				set_timed_pop_flag = {
+					flag = tec_metamorphosis_phase_0
+					years = 10
+				}
+				set_timed_pop_flag = {
+					flag = tec_metamorphosis_phase_1
+					years = 20
+				}
+			}
+		}
+	}
+
+	# If the robot is mammalian, it changes to a mammalian appeal controlled via policy
+	# If the robot has a mammalian appeal, fall backs to mammalian robot if trait is out
+	# Synthetic skin/Nanite swarm appearance 
+	country_event = {
+		id = tec_trait.1000
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			always = no
+			from = {
+				OR = {
+					has_trait = @trait_tec_robot_liquid
+					has_trait = @trait_tec_robot_nanitebody
+				}
+			}
+		}
+
+		immediate = {
+			every_owned_leader = {
+				limit = {
+					is_same_species = from
+				}
+				tec_machine_organic_camouflage = yes
+			}
+			if = {
+				limit = {
+					ruler = {
+						species = {
+							is_same_species = from
+						}
+					}
+				}
+				ruler = {
+					tec_machine_organic_camouflage = yes
+				}
+			}
+		}
+	}
+# /
+
+# ------------------------------------------------------------
+# SHARED
+# ------------------------------------------------------------
+# ------------------------------------------------- Dread armies - reanimators
 namespace = tec_reanimator
 
 	#on_army_killed_in_combat
@@ -1839,8 +2017,7 @@ namespace = tec_reanimator
 	}
 # /
 
-# Envoy Civics
-# ------------------------------------------------------------
+# ------------------------------------------------- Envoy Civics
 namespace = tec_envoy
 
 	leader_event = {	# Envoy is assigned on_leader_assigned
@@ -1950,251 +2127,7 @@ namespace = tec_envoy
 
 # /
 
-# Imperial cult
-# ------------------------------------------------------------
-namespace = tec_imperial_cult
-
-# marks the leader when the civic is added
-
-# unmarks the leader when the civic is removed, but preserves choices
-
-# intro
-
-# growing in power
-
-# 
-
-
-# path a - sanguine reign
-# - Ruler uses the life of others for itself
-# path b - clone reign
-# - Ruler perpetuates itself via cloning, with a inherited dynasty
-# path c - benevolent reign
-# - Ruler is just an uninteresting character
-# path d - cyborg god
-# - Ruler uses specific cybernetic augmentations and a throne to keep himself tied up
-# path e - power of the old ones
-# - Ruler uses minor artifacts to empower himself
-
-# path f - Chosen one (override)
-# /
-
-# Percussive Hiveminds
-# ------------------------------------------------------------
-namespace = tec_percuhive
-
-	# Executed as a leader has died
-	# This = Country
-	# From = Leader
-	#on_leader_death = {
-	country_event = {
-		id = tec_percuhive.10
-		is_triggered_only = yes
-		hide_window = yes
-
-		trigger = {
-			has_valid_civic = civic_tec_hive_percussive
-			NOT = {
-				has_country_flag = tec_percussive_cd
-			}
-			from = {
-				leader_class = admiral
-			}
-		}
-
-		immediate = {
-			# Adds country flag
-			set_timed_country_flag = {
-				flag = tec_percussive_cd
-				months = 12
-			}
-			# Apply effect
-			add_modifier = {
-				modifier = modifier_tec_percussive_modifier_good
-				multiplier = from.trigger:has_skill
-				months = 2
-			}
-		}
-	}
-# /
-
-# -------------------------------------------------------
-#Trait events
-
-namespace = tec_trait
-	#traitchecker
-	planet_event = {
-		id = tec_trait.10
-		hide_window = yes
-
-		is_triggered_only = yes
-
-		trigger = {
-			always = yes
-		}
-
-		immediate = {
-			# Cryptobiotic
-			planet_event = {
-				id = tec_trait.11
-				#extra delay to ensure it works well
-				days = 1
-			}
-		}
-	}
-
-	#Cryptobiotic
-	planet_event = {
-		id = tec_trait.11
-		hide_window = yes
-
-		is_triggered_only = yes
-
-		trigger = {
-			any_owned_pop = {
-				has_trait = trait_tec_cryptobiotic
-			}
-		}
-
-		immediate = {
-			root = {
-				random_owned_pop = {
-					limit = {
-						has_trait = trait_tec_cryptobiotic
-					}
-					root = {
-						create_pop = {
-							species = prev
-						}
-					}
-				}
-			}
-		}
-	}
-
-
-	# Lithoid sedimentary
-	planet_event = {
-		id = tec_trait.15
-		hide_window = yes
-
-		is_triggered_only = yes
-
-		trigger = {
-			NOT = {
-				has_planet_flag = tec_recent_sedimentary_colonization
-			}
-			any_owned_pop = {
-				has_trait = trait_tec_lithoid_sedimentary
-			}
-		}
-
-		immediate = {
-			root = {
-				set_timed_planet_flag = {
-					flag = tec_recent_sedimentary_colonization
-					years = 25
-				}
-				random_list = {
-					25 = {
-						while = {
-							count = 1
-							add_deposit = d_tec_sedimented_lithoids
-						}
-					}
-					25 = {
-						while = {
-							count = 2
-							add_deposit = d_tec_sedimented_lithoids
-						}
-					}
-					25 = {
-						while = {
-							count = 3
-							add_deposit = d_tec_sedimented_lithoids
-						}
-					}
-					#25 = {
-					#	while = {
-					#		count = 5
-					#		add_deposit = d_tec_sedimented_lithoids
-					#	}
-					#}
-				}
-			}
-		}
-	}
-
-	# Metamorphosis
-	pop_event = {
-		id = tec_trait.20
-		hide_window = yes
-
-		is_triggered_only = yes
-
-		trigger = {
-			has_trait = trait_tec_metamorphosis
-		}
-
-		immediate = {
-			hidden_effect = {
-				set_timed_pop_flag = {
-					flag = tec_metamorphosis_phase_0
-					years = 10
-				}
-				set_timed_pop_flag = {
-					flag = tec_metamorphosis_phase_1
-					years = 20
-				}
-			}
-		}
-	}
-
-	# If the robot is mammalian, it changes to a mammalian appeal controlled via policy
-	# If the robot has a mammalian appeal, fall backs to mammalian robot if trait is out
-	# Synthetic skin/Nanite swarm appearance 
-	country_event = {
-		id = tec_trait.1000
-		hide_window = yes
-
-		is_triggered_only = yes
-
-		trigger = {
-			always = no
-			from = {
-				OR = {
-					has_trait = @trait_tec_robot_liquid
-					has_trait = @trait_tec_robot_nanitebody
-				}
-			}
-		}
-
-		immediate = {
-			every_owned_leader = {
-				limit = {
-					is_same_species = from
-				}
-				tec_machine_organic_camouflage = yes
-			}
-			if = {
-				limit = {
-					ruler = {
-						species = {
-							is_same_species = from
-						}
-					}
-				}
-				ruler = {
-					tec_machine_organic_camouflage = yes
-				}
-			}
-		}
-	}
-# /
-
-
-# Cost swaps
-# ------------------------------------------------------------
+# ------------------------------------------------- Cost swaps
 namespace = tec_cost_swap_civic
 	# Organic architecture hidden modifier
 	country_event = {
@@ -2251,8 +2184,761 @@ namespace = tec_cost_swap_civic
 	}
 # /
 
-# Hive Everevolving
+# ------------------------------------------------- Hoarders
+namespace = tec_hoarders
+
+	planet_event = {
+		id = tec_hoarders.1
+		title = "tec_hoarders.1.title"
+		desc = "tec_hoarders.1.desc"
+		picture = GFX_evt_metropolis
+
+		is_triggered_only = yes
+
+		trigger = {
+			has_building = building_tec_vault_of_plenty
+		}
+
+		immediate = {
+			save_event_target_as = tec_hoarders_managed_planet
+			set_variable = {
+				which = tec_stockpile_change
+				value = 0
+			}
+			remove_planet_flag = tec_vault_manage_minerals
+			remove_planet_flag = tec_vault_manage_food
+			remove_planet_flag = tec_vault_manage_alloys
+			remove_planet_flag = tec_vault_manage_consumer_goods
+			remove_planet_flag = tec_vault_manage_rare_crystals
+			remove_planet_flag = tec_vault_manage_exotic_gases
+			remove_planet_flag = tec_vault_manage_volatile_motes
+			remove_planet_flag = tec_vault_manage_minor_artifacts
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_manage_option
+			resource = minerals 
+		}
+		
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_manage_option
+			resource = food 
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_manage_option
+			resource = alloys 
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_manage_option
+			resource = consumer_goods
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_manage_option
+			resource = rare_crystals 
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_manage_option
+			resource = exotic_gases 
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_manage_option
+			resource = volatile_motes 
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_manage_option
+			resource = minor_artifacts 
+		}
+
+		option = {
+			name = "tec_hoarders.1.withdraw"
+			hidden_effect = {
+				tec_hoarders_withdraw_resource = { RESOURCE = minerals }
+				tec_hoarders_withdraw_resource = { RESOURCE = food }
+				tec_hoarders_withdraw_resource = { RESOURCE = alloys }
+				tec_hoarders_withdraw_resource = { RESOURCE = consumer_goods }
+				tec_hoarders_withdraw_resource = { RESOURCE = rare_crystals }
+				tec_hoarders_withdraw_resource = { RESOURCE = exotic_gases }
+				tec_hoarders_withdraw_resource = { RESOURCE = volatile_motes }
+				tec_hoarders_withdraw_resource = { RESOURCE = minor_artifacts }
+			}
+		}
+
+		option = {
+			name = "tec_hoarders.1.exit"
+		}
+	}
+
+	planet_event = {
+		id = tec_hoarders.2
+		title = "tec_hoarders.2.title"
+		desc = "tec_hoarders.2.desc"
+		picture = GFX_evt_metropolis
+
+		is_triggered_only = yes
+
+		option = {
+			name = "tec_hoarders.2.max"
+			hidden_effect = {
+				change_variable = {
+					which = tec_stockpile_change
+					value = value:tec_hoarders_max_that_can_be_deposited
+				}
+				planet_event = {
+					id = tec_hoarders.2
+				}
+			}
+			allow = {
+				custom_tooltip = {
+					fail_text = tec_hoarders.2.not_enough_resources
+					check_variable_arithmetic = {
+						which = value:tec_hoarders_after_deposit_balance|DEPOSIT|0|
+						value >= 0
+					}
+				}
+				custom_tooltip = {
+					fail_text = tec_hoarders.2.not_enough_vault_cap
+					check_variable_arithmetic = {
+						which = value:tec_hoarders_after_deposit_remaining_capacity|DEPOSIT|0|
+						value >= 0
+					}
+				}
+				owner = {
+					tec_is_hoarder_empire = yes
+				}
+			}
+		}
+		
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_deposit_option
+			count = 10000
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_deposit_option
+			count = 1000
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_deposit_option
+			count = 500
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_deposit_option
+			count = 100
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_withdraw_option
+			count = 100
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_withdraw_option
+			count = 500
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_withdraw_option
+			count = 1000
+		}
+
+		inline_script = {
+			script = events/inline_evolved_tec_hoarder_withdraw_option
+			count = 10000
+		}
+
+		option = {
+			name = "tec_hoarders.2.withdraw"
+			hidden_effect = {
+				set_variable = {
+					which = tec_stockpile_change
+					value = value:tec_hoarder_get_vault_stockpile
+				}
+				multiply_variable = {
+					which = tec_stockpile_change
+					value = -1
+				}
+				planet_event = {
+					id = tec_hoarders.2
+				}
+			}
+			allow = {
+				custom_tooltip = {
+					fail_text = tec_hoarders.2.not_enough_stockpile
+					check_variable_arithmetic = {
+						which = value:tec_hoarder_get_vault_stockpile
+						value > 0
+					}
+				}
+			}
+		}
+
+		option = {
+			name = "tec_hoarders.2.clear"
+			hidden_effect = {
+				set_variable = {
+					which = tec_stockpile_change
+					value = 0
+				} 
+				planet_event = {
+					id = tec_hoarders.2
+				}
+			}
+		}
+
+		option = {
+			name = "tec_hoarders.2.complete"
+			hidden_effect = {
+				tec_hoarders_manage_resource = { RESOURCE = minerals }
+				tec_hoarders_manage_resource = { RESOURCE = food }
+				tec_hoarders_manage_resource = { RESOURCE = alloys }
+				tec_hoarders_manage_resource = { RESOURCE = consumer_goods }
+				tec_hoarders_manage_resource = { RESOURCE = rare_crystals }
+				tec_hoarders_manage_resource = { RESOURCE = exotic_gases }
+				tec_hoarders_manage_resource = { RESOURCE = volatile_motes }
+				tec_hoarders_manage_resource = { RESOURCE = minor_artifacts }
+				set_variable = {
+					which = tec_stockpile_change
+					value = 0
+				} 
+				planet_event = {
+					id = tec_hoarders.1
+				}
+			}
+			allow = {
+				custom_tooltip = {
+					fail_text = tec_hoarders.2.not_enough_resources
+					check_variable_arithmetic = {
+						which = value:tec_hoarders_after_deposit_balance|DEPOSIT|0|
+						value >= 0
+					}
+				}
+				custom_tooltip = {
+					fail_text = tec_hoarders.2.not_enough_vault_cap
+					check_variable_arithmetic = {
+						which = value:tec_hoarders_after_deposit_remaining_capacity|DEPOSIT|0|
+						value >= 0
+					}
+				}
+				custom_tooltip = {
+					fail_text = tec_hoarders.2.not_enough_stockpile
+					check_variable_arithmetic = {
+						which = value:tec_hoarders_after_withdraw_balance|WITHDRAW|0|
+						value >= 0
+					}
+				}
+			}
+		}
+	}
+
+	pop_event  = {
+		id = tec_hoarders.3
+
+		is_triggered_only = yes
+		hide_window = yes
+
+		trigger = {
+			exists = from.owner
+			exists = root.planet.owner
+			root.planet.owner = {
+				tec_is_hoarder_empire = yes
+			}
+			# from = { # commented for future balancing
+			# 	planet_devastation > 50 
+			# }
+		}
+
+		immediate = {
+			random_list = {
+				8 = {
+					random_list = {
+						1 = {
+							root.planet.owner = {
+								add_resource = {
+									minerals = 250
+								}
+							}
+							from.owner = {
+								add_resource = {
+									minerals = -250
+								}
+							}
+							modifier = {
+								factor = 0
+								exists = from
+								from.owner = { 
+									resource_stockpile_compare = {
+										resource = minerals
+										value < 1000
+									}
+								}
+							}
+						}
+						1 = {
+							root.planet.owner = {
+								add_resource = {
+									food = 250
+								}
+							}
+							from.owner = {
+								add_resource = {
+									food = -250
+								}
+							}
+							modifier = {
+								factor = 0
+								exists = from
+								from.owner = { 
+									resource_stockpile_compare = {
+										resource = food
+										value < 1000
+									}
+								}
+							}
+						}
+					}
+				}
+				3 = {
+					random_list = {
+						1 = {
+							root.planet.owner = {
+								add_resource = {
+									alloys = 250
+								}
+							}
+							from.owner = {
+								add_resource = {
+									alloys = -250
+								}
+							}
+							modifier = {
+								factor = 0
+								exists = from
+								from.owner = { 
+									resource_stockpile_compare = {
+										resource = alloys
+										value < 1000
+									}
+								}
+							}
+						}
+						1 = {
+							root.planet.owner = {
+								add_resource = {
+									consumer_goods = 250
+								}
+							}
+							from.owner = {
+								add_resource = {
+									consumer_goods = -250
+								}
+							}
+							modifier = {
+								factor = 0
+								exists = from
+								from.owner = { 
+									resource_stockpile_compare = {
+										resource = consumer_goods
+										value < 1000
+									}
+								}
+							}
+						}
+					}
+				}
+				2 = {
+					random_list = {
+						1 = {
+							root.planet.owner = {
+								add_resource = {
+									rare_crystals = 100
+								}
+							}
+							from.owner = {
+								add_resource = {
+									rare_crystals = -100
+								}
+							}
+							modifier = {
+								factor = 0
+								exists = from
+								from.owner = { 
+									resource_stockpile_compare = {
+										resource = rare_crystals
+										value < 300
+									}
+								}
+							}
+						}
+						1 = {
+							root.planet.owner = {
+								add_resource = {
+									exotic_gases = 100
+								}
+							}
+							from.owner = {
+								add_resource = {
+									exotic_gases = -100
+								}
+							}
+							modifier = {
+								factor = 0
+								exists = from
+								from.owner = { 
+									resource_stockpile_compare = {
+										resource = exotic_gases
+										value < 300
+									}
+								}
+							}
+						}
+						1 = {
+							root.planet.owner = {
+								add_resource = {
+									volatile_motes = 100
+								}
+							}
+							from.owner = {
+								add_resource = {
+									volatile_motes = -100
+								}
+							}
+							modifier = {
+								factor = 0
+								exists = from
+								from.owner = { 
+									resource_stockpile_compare = {
+										resource = volatile_motes
+										value < 300
+									}
+								}
+							}
+						}
+					}
+				}
+				1 = {
+					root.planet.owner = {
+						add_resource = {
+							minor_artifacts = 50
+						}
+					}
+					from.owner = {
+						add_resource = {
+							minor_artifacts = -50
+						}
+					}
+					modifier = {
+						factor = 0
+						exists = from
+						from.owner = { 
+							resource_stockpile_compare = {
+								resource = minor_artifacts
+								value < 100
+							}
+						}
+					}
+				}
+				8 = {} # 40% chance of nothing being gotten
+			}
+		}
+	}
+# /
+
+# ------------------------------------------------- Eco Exploiters
+namespace = tec_eco_exploiters
+# /
+
+# ------------------------------------------------- Eco Keepers
+namespace = tec_eco_keepers
+# /
+
+# ------------------------------------------------- Eco Rangers
+namespace = tec_eco_rangers
+# /
+
+# ------------------------------------------------- Eco Environmentalists
+namespace = tec_eco_environmentalists
+
+ # Created Ecosite, cyclic
+	planet_event = {
+		id = tec_eco_environmentalists.10
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			is_artificial = no
+		}
+
+		immediate = {
+			planet_event = {
+				id = tec_eco_environmentalists.10
+				days = 7200
+			}
+			# Per planet type
+			if = {	# Space Arcology
+				limit = {
+					is_artificial = yes
+				}
+				if = {		# Habs
+					limit = {
+						tec_is_habitat = yes
+					}
+					tec_add_artificial_natural_blocker = {
+						SIMPLE = YES
+						#COUNT = 2
+					}
+				}
+				else_if = {	# Ely & RW
+					limit = {
+						OR = {
+							tec_is_ringworld = yes
+							tec_is_elysium = yes
+						}
+					}
+					tec_add_artificial_natural_blocker = {
+						SIMPLE = NO
+						#COUNT = 1
+					}
+				}
+				else = {	# Other cases
+					tec_add_artificial_natural_blocker = {
+						SIMPLE = YES
+						#COUNT = 2
+					}
+				}
+			}
+			else_if = {	# Ecus
+				limit = {
+					tec_is_city_world = yes
+				}
+				tec_add_artificial_natural_blocker = {
+					SIMPLE = NO
+					#COUNT = 2
+				}
+			}
+			else_if = {	# Regular/gaias
+				limit = {
+					tec_is_habitable_regular_planet = yes
+				}
+				tec_add_regular_natural_blocker = {
+					SIMPLE = YES
+					#COUNT = 2
+				}
+			}
+			else = {	# Generic Case
+				tec_add_artificial_natural_blocker = {
+					SIMPLE = NO
+					#COUNT = 2
+				}
+			}
+		}
+	}
+ # /
+
+# /
+
+# ------------------------------------------------- Eco Terraformers
+namespace = tec_eco_terraformers
+
+ # Upgraded terrasculpt site, cyclic
+	planet_event = {
+		id = tec_eco_terraformers.5
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			has_building = building_tec_eco_engineers_terrasculptor_active
+		}
+
+		immediate = {
+			set_saved_date = {
+				key = tec_terrasculpting_timer
+				days_from_present = 360
+				expires = 360
+			}
+			set_timed_planet_flag = {
+				flag = anti_cheese_tec_terrasculpting
+				days = 359
+			}
+			planet_event = {
+				id = tec_eco_terraformers.10
+				days = 360
+			}
+		}
+	}
+	planet_event = {
+		id = tec_eco_terraformers.10
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			NOT = {
+				has_planet_flag = anti_cheese_idyllic_bloom_flag
+			}
+		}
+
+		immediate = {
+			set_saved_date = {
+				key = tec_terrasculpting_timer
+				days_from_present = 360
+				expires = 360
+			}
+			set_timed_planet_flag = {
+				flag = anti_cheese_tec_terrasculpting
+				days = 359
+			}
+
+			planet_event = {	# Autocycle
+				id = tec_eco_terraformers.10
+				days = 360
+			}
+			# Per planet type
+			if = {	# Space Arcology
+				limit = {
+					is_artificial = yes
+				}
+				if = {		# Habs
+					limit = {
+						tec_is_habitat = yes
+					}
+					tec_add_artificial_engineered_deposit = {
+						SIMPLE = yes
+						#COUNT = 1
+					}
+				}
+				else_if = {	# Ely & RW
+					limit = {
+						OR = {
+							tec_is_ringworld = yes
+							tec_is_elysium = yes
+						}
+					}
+					tec_add_artificial_engineered_deposit = {
+						SIMPLE = no
+						#COUNT = 1
+					}
+				}
+				else = {	# Other cases
+					tec_add_artificial_engineered_deposit = {
+						SIMPLE = yes
+						#COUNT = 1
+					}
+				}
+			}
+			else_if = {	# Ecus
+				limit = {
+					tec_is_city_world = yes
+				}
+				tec_add_artificial_engineered_deposit = {
+					SIMPLE = NO
+					#COUNT = 1
+				}
+			}
+			else_if = {	# Regular/gaias
+				limit = {
+					tec_is_habitable_regular_planet = yes
+				}
+				tec_add_artificial_engineered_deposit = {
+					SIMPLE = yes
+					#COUNT = 1
+				}
+			}
+			else = {	# Generic Case
+				tec_add_artificial_engineered_deposit = {
+					SIMPLE = no
+					#COUNT = 1
+				}
+			}
+		}
+	}
+ # /
+
+# /
+
 # ------------------------------------------------------------
+# REGULAR
+# ------------------------------------------------------------
+# ------------------------------------------------- Imperial cult
+namespace = tec_imperial_cult
+
+	# marks the leader when the civic is added
+
+	# unmarks the leader when the civic is removed, but preserves choices
+
+	# intro
+
+	# growing in power
+
+	# 
+
+
+	# path a - sanguine reign
+	# - Ruler uses the life of others for itself
+	# path b - clone reign
+	# - Ruler perpetuates itself via cloning, with a inherited dynasty
+	# path c - benevolent reign
+	# - Ruler is just an uninteresting character
+	# path d - cyborg god
+	# - Ruler uses specific cybernetic augmentations and a throne to keep himself tied up
+	# path e - power of the old ones
+	# - Ruler uses minor artifacts to empower himself
+
+	# path f - Chosen one (override)
+# /
+
+# ------------------------------------------------------------
+# CORP
+# ------------------------------------------------------------
+
+# ------------------------------------------------------------
+# HIVE
+# ------------------------------------------------------------
+# ------------------------------------------------- Percussive Hiveminds
+namespace = tec_percuhive
+
+	# Executed as a leader has died
+	# This = Country
+	# From = Leader
+	#on_leader_death = {
+	country_event = {
+		id = tec_percuhive.10
+		is_triggered_only = yes
+		hide_window = yes
+
+		trigger = {
+			has_valid_civic = civic_tec_hive_percussive
+			NOT = {
+				has_country_flag = tec_percussive_cd
+			}
+			from = {
+				leader_class = admiral
+			}
+		}
+
+		immediate = {
+			# Adds country flag
+			set_timed_country_flag = {
+				flag = tec_percussive_cd
+				months = 12
+			}
+			# Apply effect
+			add_modifier = {
+				modifier = modifier_tec_percussive_modifier_good
+				multiplier = from.trigger:has_skill
+				months = 2
+			}
+		}
+	}
+# /
+
+# ------------------------------------------------- Hive Everevolving
 namespace = tec_hive_everevolving
 
 	# Everevolving hive events - 1000-1100
@@ -2552,8 +3238,7 @@ namespace = tec_hive_everevolving
 	}
 # /
 
-# Hive Cordyceptic
-# ------------------------------------------------------------
+# ------------------------------------------------- Hive Cordyceptic
 namespace = tec_hive_cordyceptic
 	# Cordyceptic gamestart change
 	country_event = {
@@ -2582,8 +3267,12 @@ namespace = tec_hive_cordyceptic
 	}
 # /
 
-# Servitors
+
 # ------------------------------------------------------------
+# MACHINE
+# ------------------------------------------------------------
+
+# ------------------------------------------------- Servitors
 namespace = tec_machine_servitor
 	# Servitor branch migration mechanic
 
@@ -2735,8 +3424,7 @@ namespace = tec_machine_servitor
 	# will do soon tm ^_^
 # /
 
-# Query Proposers
-# ------------------------------------------------------------
+# ------------------------------------------------- Query Proposers
 namespace = tec_machine_pompous
 
 	country_event = {
@@ -2784,8 +3472,7 @@ namespace = tec_machine_pompous
 	}
 # /
 
-# Impersonation Protocol
-# ------------------------------------------------------------
+# ------------------------------------------------- Impersonation Protocol
 namespace = tec_machine_impersonation
 	# Impersonation protocol events - 2000
 	# manager - on 5 year pulse
@@ -3587,471 +4274,3 @@ namespace = tec_machine_impersonation
 	}
 # /
 
-
-# Hoarders
-
-namespace = tec_hoarders
-
-	planet_event = {
-		id = tec_hoarders.1
-		title = "tec_hoarders.1.title"
-		desc = "tec_hoarders.1.desc"
-		picture = GFX_evt_metropolis
-
-		is_triggered_only = yes
-
-		trigger = {
-			has_building = building_tec_vault_of_plenty
-		}
-
-		immediate = {
-			save_event_target_as = tec_hoarders_managed_planet
-			set_variable = {
-				which = tec_stockpile_change
-				value = 0
-			}
-			remove_planet_flag = tec_vault_manage_minerals
-			remove_planet_flag = tec_vault_manage_food
-			remove_planet_flag = tec_vault_manage_alloys
-			remove_planet_flag = tec_vault_manage_consumer_goods
-			remove_planet_flag = tec_vault_manage_rare_crystals
-			remove_planet_flag = tec_vault_manage_exotic_gases
-			remove_planet_flag = tec_vault_manage_volatile_motes
-			remove_planet_flag = tec_vault_manage_minor_artifacts
-		}
-
-		inline_script = {
-			script = events/inline_evolved_tec_hoarder_manage_option
-			resource = minerals 
-		}
-		
-		inline_script = {
-			script = events/inline_evolved_tec_hoarder_manage_option
-			resource = food 
-		}
-
-		inline_script = {
-			script = events/inline_evolved_tec_hoarder_manage_option
-			resource = alloys 
-		}
-
-		inline_script = {
-			script = events/inline_evolved_tec_hoarder_manage_option
-			resource = consumer_goods
-		}
-
-		inline_script = {
-			script = events/inline_evolved_tec_hoarder_manage_option
-			resource = rare_crystals 
-		}
-
-		inline_script = {
-			script = events/inline_evolved_tec_hoarder_manage_option
-			resource = exotic_gases 
-		}
-
-		inline_script = {
-			script = events/inline_evolved_tec_hoarder_manage_option
-			resource = volatile_motes 
-		}
-
-		inline_script = {
-			script = events/inline_evolved_tec_hoarder_manage_option
-			resource = minor_artifacts 
-		}
-
-		option = {
-			name = "tec_hoarders.1.withdraw"
-			hidden_effect = {
-				tec_hoarders_withdraw_resource = { RESOURCE = minerals }
-				tec_hoarders_withdraw_resource = { RESOURCE = food }
-				tec_hoarders_withdraw_resource = { RESOURCE = alloys }
-				tec_hoarders_withdraw_resource = { RESOURCE = consumer_goods }
-				tec_hoarders_withdraw_resource = { RESOURCE = rare_crystals }
-				tec_hoarders_withdraw_resource = { RESOURCE = exotic_gases }
-				tec_hoarders_withdraw_resource = { RESOURCE = volatile_motes }
-				tec_hoarders_withdraw_resource = { RESOURCE = minor_artifacts }
-			}
-		}
-
-		option = {
-			name = "tec_hoarders.1.exit"
-		}
-	}
-
-	planet_event = {
-		id = tec_hoarders.2
-		title = "tec_hoarders.2.title"
-		desc = "tec_hoarders.2.desc"
-		picture = GFX_evt_metropolis
-
-		is_triggered_only = yes
-
-		option = {
-			name = "tec_hoarders.2.max"
-			hidden_effect = {
-				change_variable = {
-					which = tec_stockpile_change
-					value = value:tec_hoarders_max_that_can_be_deposited
-				}
-				planet_event = {
-					id = tec_hoarders.2
-				}
-			}
-			allow = {
-				custom_tooltip = {
-					fail_text = tec_hoarders.2.not_enough_resources
-					check_variable_arithmetic = {
-						which = value:tec_hoarders_after_deposit_balance|DEPOSIT|0|
-						value >= 0
-					}
-				}
-				custom_tooltip = {
-					fail_text = tec_hoarders.2.not_enough_vault_cap
-					check_variable_arithmetic = {
-						which = value:tec_hoarders_after_deposit_remaining_capacity|DEPOSIT|0|
-						value >= 0
-					}
-				}
-				owner = {
-					tec_is_hoarder_empire = yes
-				}
-			}
-		}
-		
-		inline_script = {
-			script = events/inline_evolved_tec_hoarder_deposit_option
-			count = 10000
-		}
-
-		inline_script = {
-			script = events/inline_evolved_tec_hoarder_deposit_option
-			count = 1000
-		}
-
-		inline_script = {
-			script = events/inline_evolved_tec_hoarder_deposit_option
-			count = 500
-		}
-
-		inline_script = {
-			script = events/inline_evolved_tec_hoarder_deposit_option
-			count = 100
-		}
-
-		inline_script = {
-			script = events/inline_evolved_tec_hoarder_withdraw_option
-			count = 100
-		}
-
-		inline_script = {
-			script = events/inline_evolved_tec_hoarder_withdraw_option
-			count = 500
-		}
-
-		inline_script = {
-			script = events/inline_evolved_tec_hoarder_withdraw_option
-			count = 1000
-		}
-
-		inline_script = {
-			script = events/inline_evolved_tec_hoarder_withdraw_option
-			count = 10000
-		}
-
-		option = {
-			name = "tec_hoarders.2.withdraw"
-			hidden_effect = {
-				set_variable = {
-					which = tec_stockpile_change
-					value = value:tec_hoarder_get_vault_stockpile
-				}
-				multiply_variable = {
-					which = tec_stockpile_change
-					value = -1
-				}
-				planet_event = {
-					id = tec_hoarders.2
-				}
-			}
-			allow = {
-				custom_tooltip = {
-					fail_text = tec_hoarders.2.not_enough_stockpile
-					check_variable_arithmetic = {
-						which = value:tec_hoarder_get_vault_stockpile
-						value > 0
-					}
-				}
-			}
-		}
-
-		option = {
-			name = "tec_hoarders.2.clear"
-			hidden_effect = {
-				set_variable = {
-					which = tec_stockpile_change
-					value = 0
-				} 
-				planet_event = {
-					id = tec_hoarders.2
-				}
-			}
-		}
-
-		option = {
-			name = "tec_hoarders.2.complete"
-			hidden_effect = {
-				tec_hoarders_manage_resource = { RESOURCE = minerals }
-				tec_hoarders_manage_resource = { RESOURCE = food }
-				tec_hoarders_manage_resource = { RESOURCE = alloys }
-				tec_hoarders_manage_resource = { RESOURCE = consumer_goods }
-				tec_hoarders_manage_resource = { RESOURCE = rare_crystals }
-				tec_hoarders_manage_resource = { RESOURCE = exotic_gases }
-				tec_hoarders_manage_resource = { RESOURCE = volatile_motes }
-				tec_hoarders_manage_resource = { RESOURCE = minor_artifacts }
-				set_variable = {
-					which = tec_stockpile_change
-					value = 0
-				} 
-				planet_event = {
-					id = tec_hoarders.1
-				}
-			}
-			allow = {
-				custom_tooltip = {
-					fail_text = tec_hoarders.2.not_enough_resources
-					check_variable_arithmetic = {
-						which = value:tec_hoarders_after_deposit_balance|DEPOSIT|0|
-						value >= 0
-					}
-				}
-				custom_tooltip = {
-					fail_text = tec_hoarders.2.not_enough_vault_cap
-					check_variable_arithmetic = {
-						which = value:tec_hoarders_after_deposit_remaining_capacity|DEPOSIT|0|
-						value >= 0
-					}
-				}
-				custom_tooltip = {
-					fail_text = tec_hoarders.2.not_enough_stockpile
-					check_variable_arithmetic = {
-						which = value:tec_hoarders_after_withdraw_balance|WITHDRAW|0|
-						value >= 0
-					}
-				}
-			}
-		}
-	}
-
-	pop_event  = {
-		id = tec_hoarders.3
-
-		is_triggered_only = yes
-		hide_window = yes
-
-		trigger = {
-			exists = from.owner
-			exists = root.planet.owner
-			root.planet.owner = {
-				tec_is_hoarder_empire = yes
-			}
-			# from = { # commented for future balancing
-			# 	planet_devastation > 50 
-			# }
-		}
-
-		immediate = {
-			random_list = {
-				8 = {
-					random_list = {
-						1 = {
-							root.planet.owner = {
-								add_resource = {
-									minerals = 250
-								}
-							}
-							from.owner = {
-								add_resource = {
-									minerals = -250
-								}
-							}
-							modifier = {
-								factor = 0
-								exists = from
-								from.owner = { 
-									resource_stockpile_compare = {
-										resource = minerals
-										value < 1000
-									}
-								}
-							}
-						}
-						1 = {
-							root.planet.owner = {
-								add_resource = {
-									food = 250
-								}
-							}
-							from.owner = {
-								add_resource = {
-									food = -250
-								}
-							}
-							modifier = {
-								factor = 0
-								exists = from
-								from.owner = { 
-									resource_stockpile_compare = {
-										resource = food
-										value < 1000
-									}
-								}
-							}
-						}
-					}
-				}
-				3 = {
-					random_list = {
-						1 = {
-							root.planet.owner = {
-								add_resource = {
-									alloys = 250
-								}
-							}
-							from.owner = {
-								add_resource = {
-									alloys = -250
-								}
-							}
-							modifier = {
-								factor = 0
-								exists = from
-								from.owner = { 
-									resource_stockpile_compare = {
-										resource = alloys
-										value < 1000
-									}
-								}
-							}
-						}
-						1 = {
-							root.planet.owner = {
-								add_resource = {
-									consumer_goods = 250
-								}
-							}
-							from.owner = {
-								add_resource = {
-									consumer_goods = -250
-								}
-							}
-							modifier = {
-								factor = 0
-								exists = from
-								from.owner = { 
-									resource_stockpile_compare = {
-										resource = consumer_goods
-										value < 1000
-									}
-								}
-							}
-						}
-					}
-				}
-				2 = {
-					random_list = {
-						1 = {
-							root.planet.owner = {
-								add_resource = {
-									rare_crystals = 100
-								}
-							}
-							from.owner = {
-								add_resource = {
-									rare_crystals = -100
-								}
-							}
-							modifier = {
-								factor = 0
-								exists = from
-								from.owner = { 
-									resource_stockpile_compare = {
-										resource = rare_crystals
-										value < 300
-									}
-								}
-							}
-						}
-						1 = {
-							root.planet.owner = {
-								add_resource = {
-									exotic_gases = 100
-								}
-							}
-							from.owner = {
-								add_resource = {
-									exotic_gases = -100
-								}
-							}
-							modifier = {
-								factor = 0
-								exists = from
-								from.owner = { 
-									resource_stockpile_compare = {
-										resource = exotic_gases
-										value < 300
-									}
-								}
-							}
-						}
-						1 = {
-							root.planet.owner = {
-								add_resource = {
-									volatile_motes = 100
-								}
-							}
-							from.owner = {
-								add_resource = {
-									volatile_motes = -100
-								}
-							}
-							modifier = {
-								factor = 0
-								exists = from
-								from.owner = { 
-									resource_stockpile_compare = {
-										resource = volatile_motes
-										value < 300
-									}
-								}
-							}
-						}
-					}
-				}
-				1 = {
-					root.planet.owner = {
-						add_resource = {
-							minor_artifacts = 50
-						}
-					}
-					from.owner = {
-						add_resource = {
-							minor_artifacts = -50
-						}
-					}
-					modifier = {
-						factor = 0
-						exists = from
-						from.owner = { 
-							resource_stockpile_compare = {
-								resource = minor_artifacts
-								value < 100
-							}
-						}
-					}
-				}
-				8 = {} # 40% chance of nothing being gotten
-			}
-		}
-	}
-# /

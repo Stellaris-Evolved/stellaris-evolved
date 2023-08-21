@@ -1,0 +1,59 @@
+# common\scripted_effects\zz_evolved_agenda_effects.txt
+
+# Genetic Ascendancy
+	tec_genetic_ascendancy_effect = {
+		#LEADER_COUNT = 1
+		#EXP_MULT = 1
+		optimize_memory
+		while = {
+			count = $LEADER_COUNT$
+			# Checks if the ruler
+			random_owned_leader = {
+				limit = {
+					num_leader_traits = {
+						value > 0
+						negative = yes	# Tiers don't matter in this check.
+					}
+				}
+				weights = {
+					base = 1
+					modifier = {
+						factor = 100
+						is_ruler = yes
+						num_leader_traits = {	# Extra check to be sure
+							value > 0
+							negative = yes	# Tiers don't matter in this check.
+						}
+					}
+					modifier = {
+						factor = 50
+						is_councilor = yes
+						num_leader_traits = {	# Extra check to be sure
+							value > 0
+							negative = yes	# Tiers don't matter in this check.
+						}
+					}
+				}
+				# Debug things
+				#every_owned_leader = {
+				#	add_experience = 10000
+				#}
+				#every_pool_leader = {
+				#	add_experience = 10000
+				#}
+				hidden_effect = {
+					add_experience = value:agenda_tec_genetic_ascendancy_xp_change|BASE|-500|MULT|$EXP_MULT$|
+					# -500 per trait, not counting tiers.
+
+					# Restore pending traits and tiers, so they'll come back eventually. But a 10% chance to reduce their numbers.
+					change_variable = { which = leader_pending_negative_traits_unmodified value = value:leader_num_negative_leader_trait_tiers }
+					random = {
+						chance = 10
+						subtract_variable = { which = leader_pending_negative_traits_unmodified value = 1 }
+					}
+				}
+				remove_trait = all_negative
+			}
+		}
+	}
+# /
