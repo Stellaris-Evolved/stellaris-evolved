@@ -45,6 +45,7 @@ ap_archaeoengineers = {
 
 	modifier = {
 		weapon_archaeotech_weapon_damage_mult = 0.33
+		starbase_shipyard_build_minor_artifacts_cost_mult = -0.10
 	}
 
 	ai_weight = {
@@ -58,7 +59,7 @@ ap_archaeoengineers = {
 		complex_trigger_modifier = {
 			trigger = count_archaeological_site
 			parameters = {
-				limit = { 
+				limit = {
 					is_owned_by = root
 					is_site_completed = yes
 				}
@@ -243,6 +244,10 @@ ap_become_the_crisis = {
 					has_ascension_perk = ap_become_the_crisis
 				}
 			}
+		}
+		modifier = {
+			factor = 0
+			blocks_disruptive_gameplay = yes
 		}
 	}
 }
@@ -1588,8 +1593,9 @@ ap_shared_destiny = {
 ap_voidborn = {
 	potential = {
 		host_has_dlc = "Utopia"
-		NOT = {
+		NOR = {
 			has_ascension_perk = ap_voidborn
+			has_origin = origin_void_dwellers
 		}
 	}
 
@@ -1619,17 +1625,20 @@ ap_voidborn = {
 	}
 
 	modifier = {
-		pc_habitat_habitability = 0.2
+		megastructures_habitat_cost_mult = -0.20
+		habitat_districts_building_slots_add = 0.25
+		habitat_district_jobs_add = 1
+		#pc_habitat_habitability = 0.2	# Caelum
 
-		# PD - will now show in ui if not
-		pc_pd_barren_hab_habitability = 0.2
-		pc_pd_barren_cold_hab_habitability = 0.2
-		pc_pd_frozen_hab_habitability = 0.2
-		pc_pd_molten_hab_habitability = 0.2
-		pc_pd_hothouse_hab_habitability = 0.2
-		pc_pd_toxic_hab_habitability = 0.2
-		pc_pd_gas_giant_hab_habitability = 0.2
-		pc_pd_asteroid_hab_habitability = 0.2
+		## PD - will now show in ui if not
+		#pc_pd_barren_hab_habitability = 0.2
+		#pc_pd_barren_cold_hab_habitability = 0.2
+		#pc_pd_frozen_hab_habitability = 0.2
+		#pc_pd_molten_hab_habitability = 0.2
+		#pc_pd_hothouse_hab_habitability = 0.2
+		#pc_pd_toxic_hab_habitability = 0.2
+		#pc_pd_gas_giant_hab_habitability = 0.2
+		#pc_pd_asteroid_hab_habitability = 0.2
 	}
 
 	ai_weight = {
@@ -1641,10 +1650,6 @@ ap_voidborn = {
 			}
 			mode = add
 			mult = 2
-		}
-		modifier = {
-			add = @tec_force_ap_weight
-			has_origin = origin_void_dwellers
 		}
 		modifier = { 
 			add = 2
@@ -1677,8 +1682,12 @@ ap_voidborn = {
 		}
 
 		modifier = {
-			add = 5
-			has_origin = origin_toxic_knights
+			factor = 100
+			OR = {
+				has_origin = origin_toxic_knights
+				has_country_flag = payback_habitat
+				has_valid_civic = civic_void_hive
+			}
 		}
 		
 		# disablers
@@ -2483,13 +2492,9 @@ ap_detox = {
 ap_arcology_project = {
 	potential = {
 		host_has_dlc = "Megacorp"
-	#	is_regular_empire = yes
 		NOR = {
 			tec_is_agrarian_idyll_empire = yes
 			has_ethic = ethic_fanatic_green
-		}
-		NOT = {
-			has_ascension_perk = ap_arcology_project
 		}
 	}
 
@@ -2501,13 +2506,6 @@ ap_arcology_project = {
 		custom_tooltip = {
 			fail_text = "requires_ascension_perks_2"
 			num_ascension_perks > 1
-		}
-
-		custom_tooltip = {
-			fail_text = tec_ap_deactivated
-			NOT = {
-				has_ascension_perk = ap_tec_sidereal_arcologies
-			}
 		}
 	}
 
@@ -2731,5 +2729,68 @@ ap_xeno_compatibility = {
 
 	ai_weight = {
 		factor = 0
+	}
+}
+
+# - - - - - - - - - - - - - - - - - - - - - 
+# MECHROMANCY ASCENSION PERK
+# - - - - - - - - - - - - - - - - - - - - - 
+
+ap_mechromancy = {	# Caelum
+	potential = {
+		has_necroids = yes
+		has_authority = auth_machine_intelligence
+		NOT = {
+			has_ascension_perk = ap_mechromancy
+		}
+	}
+
+	modifier = {
+		l_slot_weapon_damage_mult = 0.15
+		x_slot_weapon_damage_mult = 0.15
+		t_slot_weapon_damage_mult = 0.15
+	}
+
+	on_enabled = {
+		custom_tooltip = "ap_mechromancy_tt"
+		hidden_effect = {
+			country_event = { id = necroids.20 }
+		}
+	}
+
+	ai_weight = {
+		factor = 4
+		modifier = {
+			factor = 0
+			has_valid_civic = civic_machine_servitor
+		}
+		modifier = {
+			factor = 2
+			has_valid_civic = civic_machine_assimilator
+		}
+		modifier = {
+			factor = 0
+			has_ai_personality = exterminators
+		}
+		modifier = {
+			factor = 10
+			any_neighbor_country = {
+				is_regular_empire = yes
+				OR = {
+					has_origin = origin_here_be_dragons
+					any_system_within_border = {
+						any_ship_in_system = {
+							OR = {
+								is_ship_size = space_dragon_blue
+								is_ship_size = space_dragon_red
+								is_ship_size = leviathan_01_elder_tiyanki
+								is_ship_size = leviathan_01_voidspawn
+							}
+						}
+					}
+				}
+
+			}
+		}
 	}
 }
