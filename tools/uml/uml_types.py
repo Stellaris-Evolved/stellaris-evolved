@@ -56,5 +56,6 @@ class Config(TypedDict):
     languages: dict[LanguageStr, LanguageConfig]
     resources: list[ResourceStr]
     paths: Paths
+    mod_paths: Paths
     missing_sprites: Optional[MissingSpritesConfig]
 
