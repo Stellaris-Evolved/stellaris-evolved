@@ -1,4 +1,5 @@
-# OVERWRITE
+# common\opinion_modifiers\00_opinion_modifiers.txt
+# DUPL
 
 # - - - - - - - - - - - - - - - - - - - - - 
 # OPINION MODIFIERS
@@ -804,6 +805,12 @@ opinion_rivalry = {
 			OR = {
 				is_country_type = fallen_empire
 				is_country_type = awakened_fallen_empire
+			}
+		}
+		modifier = {
+			add = -100
+			FROM = {
+				has_policy_flag = diplo_stance_animosity
 			}
 		}
 	}
@@ -2790,6 +2797,13 @@ triggered_opinion_xenophobes = {
 	trigger = {
 		from = { is_xenophobe = yes }
 		exists = from.species
+		NAND = {
+			is_same_species_class = from
+			OR = {
+				from = { has_valid_civic = civic_selective_kinship }
+				has_valid_civic = civic_selective_kinship
+			}
+		}
 	}
 	opinion = {
 		base = 0
@@ -2965,6 +2979,13 @@ triggered_opinion_xenophiles = {
 triggered_opinion_xenophobia = {
 	trigger = {
 		from = { is_xenophile = yes }
+		NAND = {
+			is_same_species_class = from
+			OR = {
+				from = { has_valid_civic = civic_selective_kinship }
+				has_valid_civic = civic_selective_kinship
+			}
+		}
 	}
 	opinion = {
 		base = 0
@@ -3355,38 +3376,19 @@ triggered_opinion_of_authoritarian = {
 	}
 }
 
-# It's people!
 triggered_opinion_xenophage = {
 	trigger = {
-		NOT = { is_country_type = fallen_empire }
-		is_xenophobe = no
+		NOR = {
+			is_country_type = fallen_empire
+			is_xenophobe = yes
+			is_xenophage = yes # i.e. consumes one or more of its constituent Species
+		}
 		from = {
 			OR = {
 				allows_slavery = yes
 				allows_purge = yes
 			}
-			any_owned_species = {
-				is_sapient = yes
-				OR = {
-					AND = {
-						has_citizenship_type = { country = from type = citizenship_slavery }
-						OR = {
-							has_slavery_type = { country = from type = slavery_livestock }
-							has_slavery_type = { country = from type = slavery_matrix }
-						}
-					}
-					AND = {
-						OR = {
-							has_citizenship_type = { country = from type = citizenship_purge_machine }
-							has_citizenship_type = { country = from type = citizenship_purge }
-						}
-						OR = {
-							has_purge_type = { country = from type = purge_processing }
-							has_purge_type = { country = from type = purge_matrix }
-						}
-					}
-				}
-			}
+			is_xenophage = yes # i.e. consumes one or more of its constituent Species
 		}
 	}
 	opinion = {
@@ -3857,6 +3859,26 @@ opinion_crime_corp_branch_offices = {
 	}
 }
 
+opinion_voted_to_kill_tiyanki = {
+	opinion = {
+		base = -20
+	}
+
+	decay = {
+		base = 1
+	}
+}
+
+opinion_voted_to_help_tiyanki = {
+	opinion = {
+		base = 20
+	}
+
+	decay = {
+		base = 1
+	}
+}
+
 opinion_killed_tiyanki_fleet_1 = {
 	opinion = {
 		base = -10
@@ -3959,11 +3981,118 @@ contact_with_MSI_02 = {
 	}
 }
 
+
+opinion_caught_spying = {
+	opinion = {
+		base = -200
+	}
+	decay = {
+		base = 1.5
+		modifier = {
+			factor = value:negative_opinion_decay_rate
+		}
+	}
+}
+
+opinion_life_of_the_party = {
+	opinion = {
+		base = 150
+	}
+	decay = {
+		base = 0.5
+		modifier = {
+			factor = value:positive_opinion_decay_rate
+		}
+	}
+}
+
+opinion_double_rejection_party = {
+	opinion = {
+		base = -250
+	}
+	decay = {
+		base = 0.5
+		modifier = {
+			factor = value:negative_opinion_decay_rate
+		}
+	}
+}
+
+opinion_wet_towel_party = {
+	opinion = {
+		base = -100
+	}
+	decay = {
+		base = 1.5
+		modifier = {
+			factor = value:negative_opinion_decay_rate
+		}
+	}
+}
+
+opinion_could_not_eat_the_food_party = {
+	opinion = {
+		base = 25
+	}
+	decay = {
+		base = 0.5
+		modifier = {
+			factor = value:negative_opinion_decay_rate
+		}
+	}
+}
+
 opinion_has_sensitive_information_about_us = {
 	opinion = {
 		base = -25
 	}
 	decay = {
 		base = 1
+	}
+}
+
+
+opinion_nice_forests = {
+	unique = yes
+	opinion = {
+		base = 50
+	}	
+}
+
+opinion_cut_our_forests = {
+	opinion = {
+		base = -50
+	}
+	accumulative = yes
+
+	decay = {
+		base = 0.5
+	}
+}
+
+triggered_selective_kinship = {
+	trigger = {
+		OR = {
+			has_valid_civic = civic_selective_kinship
+			from = { has_valid_civic = civic_selective_kinship }
+		}
+		exists = from.species
+		is_same_species_class = from
+	}
+
+	opinion = {
+		base = 100
+	}
+}
+
+triggered_selective_kinship_hates = {
+	trigger = {
+		has_valid_civic = civic_selective_kinship
+		exists = from.species
+		NOT = { is_same_species_class = from }
+	}
+
+	opinion = {
+		base = -50
 	}
 }

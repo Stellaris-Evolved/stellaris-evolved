@@ -1,6 +1,86 @@
 # - - - - - - - - - - - - - - - - - - - - - ##
 # Basic Jobs
 # - - - - - - - - - - - - - - - - - - - - - ##
+colonist = {
+	category = worker
+	exempt_from_ai_amenity_prioritization = yes
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_colony_shelter
+	clothes_texture_index = 3
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_worker_job
+
+	resources = {
+		category = planet_colonists
+		produces = {
+			trigger = {
+				is_lithoid = no
+			}
+			food = 1
+		}
+		produces = {
+			trigger = {
+				is_lithoid = yes
+			}
+			minerals = 1
+		}
+
+		inline_script = jobs/resources/inline_evolved_tec_outreach_1_resources
+	}
+
+	planet_modifier = {
+		planet_building_build_speed_mult = 0.10
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
+		}
+		planet_amenities_add = 3
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	inline_script = jobs/effects/inline_evolved_tec_corporate_settlers
+	
+	weight = {
+		# Specialist weight
+		weight = @colonist_job_weight # Higher prio
+		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.5
+			has_job = colonist
+		}
+		modifier = {
+			factor = 0
+			NOT = { has_job = colonist }
+			exists = planet
+			planet = {
+				owner = { is_ai = yes }
+				count_owned_pop = { limit = { is_sapient = yes }count < 4 }
+				any_owned_pop = {
+					has_job = colonist
+				}
+			}
+		}
+
+		modifier = {
+			factor = 0.8
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+	}
+}
 
 clerk = {
 	category = worker
@@ -30,7 +110,7 @@ clerk = {
 		potential = {
 			always = yes
 		}
-		trade_value_add = 4
+		trade_value_add = 3
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
 	}
 
@@ -38,7 +118,7 @@ clerk = {
 		potential = {
 			always = yes
 		}
-		planet_amenities_add = 2
+		planet_amenities_add = 3
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
 
@@ -1088,7 +1168,7 @@ ranger = {
 	possible_precalc = can_fill_worker_job
 
 	resources = {
-		category = planet_culture_workers
+		category = planet_rangers
 		produces = {
 			society_research = 2
 		}

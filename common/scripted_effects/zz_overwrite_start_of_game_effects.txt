@@ -2623,7 +2623,7 @@ generate_start_pops = {
 				has_origin = origin_clone_army
 			}
 		}
-		planet_event = { id = clones.10 days = 1095 random = 730 }
+		planet_event = { id = clones.10 days = 1095 random = 720 }
 	}
 
 	if = {
@@ -2636,7 +2636,464 @@ generate_start_pops = {
 	}
 }
 
-void_dweller_home_planet_setup = {
+void_dweller_home_planet_setup = {	# Caelum
+	optimize_memory
+	set_planet_flag = habitat_level_2
+	set_planet_flag = advanced_habitat
+	owner = {
+		save_event_target_as = void_dweller_owner
+	}
+	solar_system = { # Generates the orbitals
+		random_system_planet = {
+			limit = { has_planet_flag = habitat_1_planet }
+			save_event_target_as = habitat_1_planet
+		}
+		spawn_megastructure = {
+			type = "major_orbital"
+			planet = event_target:habitat_1_planet
+			coords_from = event_target:habitat_1_planet
+			owner = event_target:void_dweller_owner
+			graphical_culture = event_target:void_dweller_owner
+		}
+		random_system_planet = {
+			limit = { has_planet_flag = habitat_2_planet }
+			save_event_target_as = habitat_2_planet
+		}
+		spawn_megastructure = {
+			type = "major_orbital"
+			planet = event_target:habitat_2_planet
+			coords_from = event_target:habitat_2_planet
+			owner = event_target:void_dweller_owner
+			graphical_culture = event_target:void_dweller_owner
+		}
+		random_system_planet = {
+			limit = { has_planet_flag = habitat_3_planet }
+			save_event_target_as = habitat_3_planet
+		}
+		spawn_megastructure = {
+			type = "major_orbital"
+			planet = event_target:habitat_3_planet
+			coords_from = event_target:habitat_3_planet
+			owner = event_target:void_dweller_owner
+			graphical_culture = event_target:void_dweller_owner
+		}
+		every_system_planet = {
+			limit = { has_planet_flag = mining_planet }
+			create_mining_station = { owner = event_target:void_dweller_owner }
+		}
+
+		# Change starting pre-scripted ideal into inhabitable worlds
+		# First pre-sripted is a research system
+		closest_system = {
+			limit = { has_star_flag = neighbor_t1_first_colony }
+			set_star_flag = ideal_habitat_t1
+			max_steps = 3
+			random_system_planet = {
+				limit = {
+					is_colonizable = yes
+					is_colony = no
+					has_planet_flag = prescripted_ideal
+				}
+				change_pc = pc_frozen
+				set_deposit = d_engineering_3
+			}
+			while = {
+				count = 3
+				random_system_planet = {
+					limit = {
+						is_star = no
+						has_deposit = no
+						has_anomaly = no
+					}
+					random_list = {
+						5 = { set_deposit = d_physics_1 }
+						5 = { set_deposit = d_society_1 }
+						5 = { set_deposit = d_engineering_1 }
+						1 = { set_deposit = d_physics_2 }
+						1 = { set_deposit = d_society_2 }
+						1 = { set_deposit = d_engineering_2 }
+					}
+				}
+			}
+		}
+		# Second pre-sripted is a resource system
+		closest_system = {
+			limit = { has_star_flag = neighbor_t2_second_colony }
+			set_star_flag = ideal_habitat_t2
+			max_steps = 6
+			random_system_planet = {
+				limit = {
+					is_colonizable = yes
+					is_colony = no
+					has_planet_flag = prescripted_ideal
+				}
+				remove_planet_flag = prescripted_ideal
+				change_pc = pc_molten
+				set_deposit = d_alloys_3
+				add_deposit = d_minerals_4
+			}
+			while = {
+				count = 3
+				random_system_planet = {
+					limit = {
+						is_star = no
+						has_deposit = no
+						has_anomaly = no
+					}
+					random_list = {
+						5 = { set_deposit = d_minerals_1 }
+						5 = { set_deposit = d_energy_1 }
+						1 = { set_deposit = d_minerals_2 }
+						1 = { set_deposit = d_energy_2 }
+					}
+				}
+			}
+		}
+	}
+	owner = {
+		give_starting_resources_effect = yes
+		give_technology = {
+			tech = tech_habitat_1
+			message = no
+		}
+		add_research_option = tech_habitat_2
+
+		if = {
+			limit = {
+				OR = {
+					is_lithoid_empire = no
+					OR = {
+						is_machine_empire = no
+						is_catalytic_empire = yes
+						has_valid_civic = civic_machine_assimilator
+						has_valid_civic = civic_machine_servitor
+					}
+				}
+			}
+			give_technology = {
+				tech = tech_eco_simulation
+				message = no
+			}
+			give_technology = {
+				tech = tech_hydroponics
+				message = no
+			}
+			#Note: removed this as those serve a diff purpose in evolved
+			#root.solar_system.starbase = {
+			#	remove_starbase_building = {
+			#		slot = 1
+			#	}
+			#	set_starbase_building = {
+			#		slot = 1
+			#		building = hydroponics_bay
+			#	}
+			#}
+		}
+		else = {
+			give_technology = {
+				tech = tech_powered_exoskeletons
+				message = no
+			}
+			give_technology = {
+				tech = tech_space_mining_1
+				message = no
+			}
+			#Note: removed this as those serve a diff purpose in evolved
+			#root.solar_system.starbase = {
+			#	remove_starbase_building = {
+			#		slot = 1
+			#	}
+			#	set_starbase_building = {
+			#		slot = 1
+			#		building = mining_bay
+			#	}
+			#}
+		}
+		if = {
+			limit = {
+				has_valid_civic = civic_private_healthcare_corporate
+			}
+			give_technology = { message = no tech = tech_frontier_health }
+			add_research_option = tech_subdermal_stimulation
+		}
+	}
+	#tec_start_hab_pops_spawn = {
+	#	count = 10
+	#	eager_count = 6
+	#}
+	# Distributing pops
+		#if = {
+		#	limit = {
+		#		is_eager_explorer_empire = yes
+		#	}
+		#	set_variable = {
+		#		which = tec_starting_pops_mult
+		#		value = 0.65
+		#	}
+		#}
+		#else = {	
+		#	set_variable = {
+		#		which = tec_starting_pops_mult
+		#		value = 1
+		#	}
+		#}
+		# Secondary Species
+			if = {
+				limit = {
+					owner = {
+						OR = {
+							has_valid_civic = civic_machine_servitor
+							has_valid_civic = civic_machine_assimilator
+						}
+					}
+				}
+				if = {
+					limit = {
+						owner = {
+							has_valid_civic = civic_machine_servitor
+						}
+					}
+					last_created_species = {
+						modify_species = {
+							species = this
+							change_scoped_species = no
+							ideal_planet_class = pc_habitat
+							add_traits_at_start_of_list = yes
+							add_trait = trait_void_dweller_1
+							effect = {
+								set_species_flag = tec_original_biotrophy_@root.owner
+								tec_save_last_species = yes
+								set_citizenship_type = {
+									country = root.owner
+									type = citizenship_organic_trophy
+								}
+								set_living_standard = {
+									country = root.owner
+									type = living_standard_organic_trophy
+								}
+							}
+						}
+					}
+					#if = {
+						#	limit = {
+						#		owner = {
+						#			is_eager_explorer_empire = no
+						#		}
+						#	}
+						#	# 28 > 10
+						#	while = {
+						#		count = 10
+						#		create_pop = {
+						#			species = event_target:tec_last_created_species
+						#			ethos = random
+						#		}
+						#		last_created_pop = {
+						#			clear_ethos = yes
+						#		}
+						#	}
+						#}
+						#else = {
+						#	# 18 > 6
+						#	while = {
+						#		count = 6
+						#		create_pop = {
+						#			species = event_target:tec_last_created_species
+						#			ethos = random
+						#		}
+						#		last_created_pop = {
+						#			clear_ethos = yes
+						#		}
+						#	}
+					#}
+				}
+		
+				if = {
+					limit = {
+						owner = {
+							has_valid_civic = civic_machine_assimilator
+						}
+					}
+					last_created_species = {
+						modify_species = {
+							species = this
+							change_scoped_species = no
+							ideal_planet_class = pc_habitat
+							add_traits_at_start_of_list = yes
+							add_trait = trait_void_dweller_1
+							effect = {
+								set_species_flag = cyborg_assimilated@root.owner
+								tec_save_last_species = yes
+								set_citizenship_type = {
+									country = root.owner
+									type = citizenship_full_machine
+								}
+								set_living_standard = {
+									country = root.owner
+									type = living_standard_hive_mind
+								}
+							}
+						}
+					}
+				}
+			}
+
+			# Add support for other things like syncretic
+			while = {
+				count = owner.value:tec_start_pops_secondary_count
+				create_pop = {
+					species = event_target:tec_last_created_species
+					ethos = random
+				}
+			}
+		# /
+		# Main species
+			while = {
+				limit = { num_pops < owner.value:tec_start_pops_count }
+				create_pop = {
+					species = owner_main_species
+					ethos = random
+				}
+			}
+		# /
+		# Secondary species
+
+		# /
+	# /
+
+	if = {
+		limit = {
+			owner = {
+				has_valid_civic = civic_permanent_employment
+			}
+		}
+		while = {
+			count = 4
+			random_owned_pop = {
+				limit = {
+					OR = {
+						has_job = clerk
+						has_job = technician
+						has_job = miner
+						has_job = tec_reef_miner
+						has_job = farmer
+						has_job = angler
+						# Gestalt
+						has_job = maintenance_drone
+						has_job = technician_drone
+						has_job = mining_drone
+						has_job = tec_reef_drone
+						has_job = agri_drone
+						has_job = tec_aqua_drone
+					}
+					is_robotic_species = no
+				}
+				modify_species = {
+					species = this
+					add_trait = trait_zombie
+					add_traits_at_start_of_list = yes
+				}
+				if = {
+					limit = {
+						has_trait = trait_syncretic_proles
+					}
+					modify_species = {
+						species = this
+						remove_trait = trait_syncretic_proles
+					}
+				}
+			}
+		}
+	}
+
+	set_planet_entity = {
+		entity = "habitat_phase_03_entity"
+		graphical_culture = owner
+	}
+	set_planet_size = 6
+
+	#deposit
+	add_deposit = d_tec_arcane_replicator
+	add_deposit = d_tec_minor_arcane_replicator
+
+	# Districts
+	while = {
+		count = 2
+		add_district = {
+			district_type = district_hab_housing
+			ignore_cap = yes
+		}
+	}
+	add_district = {
+		district_type = district_hab_industrial
+		ignore_cap = yes
+	}
+	while = {
+		count = 2
+		add_district = {
+			district_type = district_hab_mining
+			ignore_cap = yes
+		}
+	}
+	add_district = {
+		district_type = district_hab_energy
+		ignore_cap = yes
+	}
+	if = {
+		limit = {
+			owner = {
+				is_catalytic_empire = no
+			}
+		}
+		set_planet_flag = mining_habitat
+		add_district = district_hab_mining
+	}
+	else = {
+		set_planet_flag = tec_food_habitat
+		add_district = district_tec_hab_food
+	}
+	#buildings
+	tec_start_add_major_habitat_capital = yes
+	if = {
+		limit = {
+			owner = {
+				is_eager_explorer_empire = no
+			}
+		}
+		add_district = {
+			district_type = district_hab_science
+			ignore_cap = yes
+		}
+	}
+	if = {
+		limit = {
+			owner = {
+				OR = {
+					is_lithoid_empire = no
+					is_catalytic_empire = yes
+				}
+			}
+		}
+		add_building = building_hydroponics_farm
+	}
+	
+	tec_start_add_unity_building = yes
+	tec_start_add_amenities_building = yes
+	tec_start_add_assembly_building = yes
+
+	tec_start_hab_try_add_aux = yes
+
+	tec_start_hab_aquatic_flood_effect = yes
+	validate_and_repair_planet_buildings_and_districts = yes
+	# Cache triggers
+	owner = { 
+		every_owned_planet = {
+			tec_cache_planet_type_triggers = yes
+			tec_cache_capital_triggers = yes
+		}
+	}
+}
+
+OLD_void_dweller_home_planet_setup = {
 	owner = {
 		give_starting_resources_effect = yes
 		save_event_target_as = void_dweller_owner
@@ -3229,7 +3686,6 @@ generate_home_planet_final_pass = {
 				add_deposit = d_buried_lithoids
 				add_deposit = d_buried_lithoids
 				add_deposit = d_buried_lithoids
-				add_modifier = { modifier = lithoid_crater }
 			}
 		}
 	}
@@ -3237,11 +3693,25 @@ generate_home_planet_final_pass = {
 		limit = {
 			owner = {
 				has_origin = origin_lost_colony
+				is_gestalt = no
 			}
 		}
 		owner = {
 			capital_scope = {
 				add_modifier = { modifier = colonial_spirit_mod }
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			owner = {
+				has_origin = origin_lost_colony
+				is_gestalt = yes
+			}
+		}
+		owner = {
+			capital_scope = {
+				add_modifier = { modifier = colonial_spirit_gestalt_mod }
 			}
 		}
 	}
