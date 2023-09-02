@@ -438,7 +438,18 @@ country_event = {
 	is_triggered_only = yes
 
 	option = {
-		name = OK
+		name = {
+			trigger = {
+				tec_is_worker_coop_empire = no
+			}
+			text = OK
+		}
+		name = {
+			trigger = {
+				tec_is_worker_coop_empire = yes
+			}
+			text = UNDERSTOOD
+		}
 		tooltip = { end_event_chain = market_founding_chain }
 	}
 }
@@ -1271,6 +1282,353 @@ leader_event = {
 # Galatron activated for the first time - fired from the r_galatron relic - unlocks the CB to steal it
 #country_event = {
 #	id = action.650
+
+# Reset colony type upon colonization if this was a former pre-ftl world.
+# Scope = Planet
+#planet_event = {
+#	id = action.655
+
+# Void hive shenanigans
+
+event = {
+	id = action.720
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_lithoids = yes
+		any_playable_country = {
+			# Evolved
+			tec_is_void_builder_empire = yes
+		}
+	}
+
+	immediate = {
+		every_playable_country = {
+			limit = {
+				# Evolved
+				tec_is_void_builder_empire = yes
+				NOT = { has_country_flag = void_hive_cooldown }
+			}
+			random_system_within_border = {
+				limit = {
+					any_system_planet = {
+						NOT = {
+							has_planet_flag = has_megastructure
+						}
+						OR = {
+							AND = {
+								has_deposit_for = shipclass_mining_station
+								has_mining_station = no
+							}
+							AND = {
+								has_deposit_for = shipclass_research_station
+								has_research_station = no
+							}
+						}
+					}
+				}
+				system_event = { id = action.725 }
+			}
+			set_timed_country_flag = {
+				flag = void_hive_cooldown
+				days = 95
+			}
+		}
+	}
+}
+
+system_event = {
+	id = action.725
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		random_system_planet = {
+			limit = {
+				NOT = {
+					has_planet_flag = has_megastructure
+				}
+				OR = {
+					AND = {
+						has_deposit_for = shipclass_mining_station
+						has_mining_station = no
+					}
+					AND = {
+						has_deposit_for = shipclass_research_station
+						has_research_station = no
+					}
+				}
+			}
+			if = {
+				limit = {
+					has_deposit_for = shipclass_mining_station
+				}
+				create_mining_station = { owner = space_owner }
+				if = {
+					limit = {
+						has_resource = { type = exotic_gases amount > 0 }
+						space_owner = {
+							NOR = {
+								has_technology = tech_mine_exotic_gases
+								has_modifier = reduce_gas_output
+							}
+						}
+					}
+					space_owner = {
+						add_modifier = { modifier = reduce_gas_output }
+					}
+				}
+				if = {
+					limit = {
+						has_resource = { type = rare_crystals amount > 0 }
+						space_owner = {
+							NOR = {
+								has_technology = tech_mine_rare_crystals
+								has_modifier = reduce_crystal_output
+							}
+						}
+					}
+					space_owner = {
+						add_modifier = { modifier = reduce_crystal_output }
+					}
+				}
+				if = {
+					limit = {
+						has_resource = { type = volatile_motes amount > 0 }
+						space_owner = {
+							NOR = {
+								has_technology = tech_mine_volatile_motes
+								has_modifier = reduce_motes_output
+							}
+						}
+					}
+					space_owner = {
+						add_modifier = { modifier = reduce_motes_output }
+					}
+				}
+				if = {
+					limit = {
+						has_resource = { type = sr_living_metal amount > 0 }
+						space_owner = {
+							NOR = {
+								has_technology = tech_mine_living_metal
+								has_modifier = reduce_living_metal_output
+							}
+						}
+					}
+					space_owner = {
+						add_modifier = { modifier = reduce_living_metal_output }
+					}
+				}
+			}
+			else = {
+				create_research_station = { owner = space_owner }
+				if = {
+					limit = {
+						has_resource = { type = sr_zro amount > 0 }
+						space_owner = {
+							NOR = {
+								has_technology = tech_mine_zro
+								has_modifier = reduce_zro_output
+							}
+						}
+					}
+					space_owner = {
+						add_modifier = { modifier = reduce_zro_output }
+					}
+				}
+				if = {
+					limit = {
+						has_resource = { type = sr_dark_matter amount > 0 }
+						space_owner = {
+							NOR = {
+								has_technology = tech_mine_dark_matter
+								has_modifier = reduce_dark_matter_output
+							}
+						}
+					}
+					space_owner = {
+						add_modifier = { modifier = reduce_dark_matter_output }
+					}
+				}
+			}
+		}
+	}
+}
+
+# A country has increased the level of a tech, use last_increased_tech trigger to check tech and level.
+# This = Country
+country_event = {
+	id = action.730
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		# Evolved
+		tec_is_void_builder_empire = yes
+		OR = {
+			last_increased_tech = tech_mine_exotic_gases
+			last_increased_tech = tech_mine_rare_crystals
+			last_increased_tech = tech_mine_volatile_motes
+			last_increased_tech = tech_mine_zro
+			last_increased_tech = tech_mine_dark_matter
+			last_increased_tech = tech_mine_living_metal
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				last_increased_tech = tech_mine_exotic_gases
+			}
+			remove_modifier = reduce_gas_output
+		}
+		if = {
+			limit = {
+				last_increased_tech = tech_mine_rare_crystals
+			}
+			remove_modifier = reduce_crystal_output
+		}
+		if = {
+			limit = {
+				last_increased_tech = tech_mine_volatile_motes
+			}
+			remove_modifier = reduce_motes_output
+		}
+		if = {
+			limit = {
+				last_increased_tech = tech_mine_zro
+			}
+			remove_modifier = reduce_zro_output
+		}
+		if = {
+			limit = {
+				last_increased_tech = tech_mine_dark_matter
+			}
+			remove_modifier = reduce_dark_matter_output
+		}
+		if = {
+			limit = {
+				last_increased_tech = tech_mine_living_metal
+			}
+			remove_modifier = reduce_living_metal_output
+		}
+	}
+}
+
+country_event = {
+	id = action.735
+	is_triggered_only = yes
+	hide_window = yes
+	trigger = {
+		NOT = {
+			# Evolved
+			tec_is_void_builder_empire = yes
+		}
+		OR = {
+			has_modifier = reduce_gas_output
+			has_modifier = reduce_crystal_output
+			has_modifier = reduce_motes_output
+			has_modifier = reduce_zro_output
+			has_modifier = reduce_dark_matter_output
+			has_modifier = reduce_living_metal_output
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				has_modifier = reduce_gas_output
+			}
+			every_planet_within_border = {
+				limit = {
+					has_mining_station = yes
+					has_resource = { type = exotic_gases amount > 0 }
+				}
+				mining_station = {
+					dismantle = yes
+				}
+			}
+			remove_modifier = reduce_gas_output
+		}
+		if = {
+			limit = {
+				has_modifier = reduce_crystal_output
+			}
+			every_planet_within_border = {
+				limit = {
+					has_mining_station = yes
+					has_resource = { type = rare_crystals amount > 0 }
+				}
+				mining_station = {
+					dismantle = yes
+				}
+			}
+			remove_modifier = reduce_crystal_output
+		}
+		if = {
+			limit = {
+				has_modifier = reduce_motes_output
+			}
+			every_planet_within_border = {
+				limit = {
+					has_mining_station = yes
+					has_resource = { type = volatile_motes amount > 0 }
+				}
+				mining_station = {
+					dismantle = yes
+				}
+			}
+			remove_modifier = reduce_motes_output
+		}
+		if = {
+			limit = {
+				has_modifier = reduce_zro_output
+			}
+			every_planet_within_border = {
+				limit = {
+					has_mining_station = yes
+					has_resource = { type = sr_zro amount > 0 }
+				}
+				mining_station = {
+					dismantle = yes
+				}
+			}
+			remove_modifier = reduce_zro_output
+		}
+		if = {
+			limit = {
+				has_modifier = reduce_dark_matter_output
+			}
+			every_planet_within_border = {
+				limit = {
+					has_mining_station = yes
+					has_resource = { type = sr_dark_matter amount > 0 }
+				}
+				mining_station = {
+					dismantle = yes
+				}
+			}
+			remove_modifier = reduce_dark_matter_output
+		}
+		if = {
+			limit = {
+				has_modifier = reduce_living_metal_output
+			}
+			every_planet_within_border = {
+				limit = {
+					has_mining_station = yes
+					has_resource = { type = sr_living_metal amount > 0 }
+				}
+				mining_station = {
+					dismantle = yes
+				}
+			}
+			remove_modifier = reduce_living_metal_output
+		}
+	}
+}
 
 
 
