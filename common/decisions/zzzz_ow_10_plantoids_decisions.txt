@@ -1,0 +1,105 @@
+# common\decisions\zzzz_ow_10_plantoids_decisions.txt
+
+decision_uproot_weed = {
+	owned_planets_only = yes
+	sound = event_administrative_work
+	icon = decision_arid_planet
+
+	resources = {
+		category = decisions
+		cost = {
+			energy = 500
+		}
+	}
+	
+	enactment_time = 180
+
+	potential = {
+		has_seeded_modifier = yes
+	}
+
+	effect = {
+		switch = {
+			trigger = has_modifier
+			seeded_planet_1_modifier = {
+				remove_modifier = seeded_planet_1_modifier
+			}
+			seeded_planet_2_modifier = {
+				remove_modifier = seeded_planet_2_modifier
+			}
+			seeded_planet_3_modifier = {
+				remove_modifier = seeded_planet_3_modifier
+			}
+		}
+
+		# Update optinion modifiers for owner and the Fruitful empire
+		random_playable_country = {
+			limit = {
+				has_country_flag = seed_on_planet@root
+				NOT = { is_same_value = root.owner }
+			}
+			save_event_target_as = seeds_owner
+		}
+		if = {
+			limit = {
+				exists = event_target:seeds_owner
+			}
+			event_target:seeds_owner = {
+				add_opinion_modifier = {
+					modifier = opinion_cut_our_forests
+					who = root.owner
+				}
+			}
+			root.owner = {
+				remove_opinion_modifier = {
+					modifier = opinion_nice_forests
+					who = event_target:seeds_owner
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+
+		# will destroy the trees if they're xenophobes/homicidal...
+		modifier = {
+			add = 10
+			owner = {
+				OR = {
+					is_homicidal = yes
+					is_xenophobe = yes
+				}
+			}
+		}
+
+		# ...or if they hate the Fruitful empire (only checking for neighbors to be a bit more efficient)
+		modifier = {
+			add = 10
+			owner = {
+				any_neighbor_country = { # Evolved
+					tec_is_fruitful_empire = yes
+					has_country_flag = seed_on_planet@root
+					OR = {
+						is_unfriendly_to = prev
+						is_rival = prev
+					}
+				}
+			}
+		}
+
+		# or if they're at war with the seeds owner
+		modifier = {
+			add = 20
+			owner = {
+				any_war = {
+					any_war_participant = { # Evolved
+						NOT = { is_same_value = owner }
+						tec_is_fruitful_empire = yes
+						has_country_flag = seed_on_planet@root
+					}
+				}
+			}
+		}
+	}
+}
