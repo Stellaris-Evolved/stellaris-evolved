@@ -330,3 +330,178 @@ namespace = tec_habitats
 		}
 	}
 # /
+
+# ------------------------------------------------- Machine Worlds
+namespace = tec_machine_world
+	# Autoassembler event
+	planet_event = {	# Selects the type of orbital on assembly
+		id = tec_machine_world.200
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			# Test
+			has_building = building_tec_hab_orbital_autobuilder
+		}
+
+		immediate = {
+			# Test
+			if = {	#Checks if there is a candidate for an orbital
+				limit = {
+					solar_system = {
+						count_system_planet = {
+							count > 0
+							limit = {
+								# fail_text = "requires_no_anomaly"
+								NOT = { has_anomaly = yes }
+								# fail_text = "requires_no_existing_megastructure"
+								NOR = {
+									has_planet_flag = megastructure
+									has_planet_flag = has_megastructure
+								}
+								# fail_text = "requires_no_orbital_debris"
+								NOT = {
+									has_planet_flag = has_orbital_debris
+								}
+								tec_has_constructors_in_orbit = {
+									NUM = 0
+								}
+							}
+						}
+					}
+				}
+				log = "autoassembler found orbital"
+				random_list = {
+					50 = {
+						modifier = {	# No available minor orbital slots
+							factor = 0
+							solar_system = {
+								count_system_planet = {
+									count = 0
+									limit = {
+										# fail_text = "requires_no_anomaly"
+										NOT = { has_anomaly = yes }
+										# fail_text = "requires_no_existing_megastructure"
+										NOR = {
+											has_planet_flag = megastructure
+											has_planet_flag = has_megastructure
+										}
+										# fail_text = "requires_no_orbital_debris"
+										NOT = {
+											has_planet_flag = has_orbital_debris
+										}
+										OR = {
+											is_asteroid = yes
+											is_moon = yes
+										}
+										#tec_has_constructors_in_orbit = {
+										#	NUM = 0
+										#}
+									}
+								}
+							}
+						}
+						modifier = {	# Focus on minor orbitals
+							factor = 10
+							has_planet_flag = tec_orbital_autobuilder_focus_minor
+						}
+						log = "autoassembler constructs minor (random)"
+						planet_event = {
+							id = tec_habitats.20010
+							days = 120
+							# Note: Reduced from 180 to mimic megastructure cost reductions
+						}
+						planet = {
+							set_timed_planet_flag = {
+								flag = tec_building_minor_orbital
+								months = 4
+								#months = 6
+							}
+							set_saved_date = {
+								key = tec_building_minor_orbital_timer
+								days_from_present = 120
+								expires = 120
+								#days_from_present = 180
+								#expires = 180
+							}
+						}
+					}
+					50 = {
+						modifier = {	# No available major orbital slots
+							factor = 0
+							solar_system = {
+								count_system_planet = {
+									count = 0
+									limit = {
+										# fail_text = "requires_no_anomaly"
+										NOT = { has_anomaly = yes }
+										# fail_text = "requires_no_existing_megastructure"
+										NOR = {
+											has_planet_flag = megastructure
+											has_planet_flag = has_megastructure
+										}
+										# fail_text = "requires_no_orbital_debris"
+										NOT = {
+											has_planet_flag = has_orbital_debris
+										}
+										NOR = {
+											is_asteroid = yes
+											is_moon = yes
+										}
+										#tec_has_constructors_in_orbit = {
+										#	NUM = 0
+										#}
+									}
+								}
+							}
+						}
+						modifier = {	# Focus on major orbitals
+							factor = 10
+							has_planet_flag = tec_orbital_autobuilder_focus_major
+						}
+						log = "autoassembler constructs major (random)"
+						planet_event = {
+							id = tec_habitats.20020
+							days = 480
+							# Note: reduced from 720 to mimic megastructure cost reductions
+						}
+						planet = {
+							set_timed_planet_flag = {
+								flag = tec_building_major_orbital
+								months = 16
+								#months = 24
+							}
+							set_saved_date = {
+								key = tec_building_major_orbital_timer
+								days_from_present = 480
+								expires = 480
+								#days_from_present = 720
+								#expires = 720
+							}
+						}
+					}
+				}
+			}
+			else = {
+				log = "autoassembler found no orbitals"
+				# TO DO toast of the assembler being deactivated
+				set_timed_planet_flag = {
+					flag = tec_building_no_orbital
+					months = 4
+					#months = 6
+				}
+				set_saved_date = {
+					key = tec_building_no_orbital_timer
+					days_from_present = 360
+					expires = 360
+					#days_from_present = 180
+					#expires = 180
+				}
+				planet_event = {	# Repeats itself a year after for checking
+					id = tec_habitats.200
+					days = 360
+				}
+			}
+		}
+	}
+# /
