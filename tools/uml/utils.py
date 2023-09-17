@@ -16,6 +16,12 @@ def load_config(path: str) -> Config:
         ret = yaml.load(f, FullLoader)
         if 'paths' in ret:
             ret['paths'] = [Path(os.path.expanduser(path)).resolve() for path in ret['paths']]
+        else:
+            ret['paths'] = []
+        if 'mod_paths' in ret:
+            ret['mod_paths'] = [Path(os.path.expanduser(path)).resolve() for path in ret['mod_paths']]
+        else:
+            ret['mod_paths'] = []
         return ret
 
 
