@@ -2231,37 +2231,6 @@ namespace = tec_envoy
 
 # /
 
-# ------------------------------------------------- Netrunner Civics
-namespace = tec_netrunner
-
-	## Refreshes the modifier
-	#country_event = {
-	#	id = tec_netrunner.1
-	#	hide_window = yes
-	#
-	#	is_triggered_only = yes
-	#
-	#	trigger = {
-	#		tec_is_netrunner_empire = yes
-	#	}
-	#
-	#	immediate = {
-	#		if = {
-	#			limit = {
-	#				has_modifier = modifier_tec_netrunner_country
-	#			}
-	#			calculate_modifier = modifier_tec_netrunner_country
-	#		}
-	#		else = {
-	#			add_modifier = {
-	#				modifier = modifier_tec_netrunner_country
-	#				mult = from.tec_count_spynetworks
-	#			}
-	#		}
-	#	}
-	#}
-# /
-
 # ------------------------------------------------- Cost swaps
 namespace = tec_cost_swap_civic
 	# Organic architecture hidden modifier
@@ -2997,7 +2966,7 @@ namespace = tec_eco_terraformers
 
 # /
 
-# ------------------------------------------------- Eco Terraformers
+# ------------------------------------------------- Ascensionists
 namespace = tec_ascensionists
 
 	# on_planet_transfer / on_colonized
@@ -3021,6 +2990,131 @@ namespace = tec_ascensionists
 		}
 	}
 # /
+
+# ------------------------------------------------- Netrunners
+namespace = tec_netrunners
+
+	# on_game_start_country / on_post_government_changed
+	country_event = {
+		id = tec_netrunners.10
+		is_triggered_only = yes
+		hide_window = yes
+
+		trigger = {
+			OR = {
+				# Not has modifier
+				AND = {
+					has_valid_civic = civic_tec_regular_netrunners
+					NOT = {
+						has_modifier = country_modifier_tec_civic_tec_regular_netrunners
+					}
+				}
+				AND = {
+					has_valid_civic = civic_tec_corporate_netrunners
+					NOT = {
+						has_modifier = country_modifier_tec_civic_tec_corporate_netrunners
+					}
+				}
+				# Has modifier but not netrunner
+				AND = {
+					NOT = { tec_is_netrunner_empire = yes }
+					OR = {
+						has_modifier = country_modifier_tec_civic_tec_regular_netrunners
+						has_modifier = country_modifier_tec_civic_tec_corporate_netrunners
+					}
+				}
+			}
+		}
+
+		immediate = {
+			# Not has modifier
+			if = {
+				limit = {
+					has_valid_civic = civic_tec_regular_netrunners
+					NOT = {
+						has_modifier = country_modifier_tec_civic_tec_regular_netrunners
+					}
+				}
+				add_modifier = {
+					modifier = country_modifier_tec_civic_tec_regular_netrunners
+					multiplier = tec_count_spynetworks
+				}
+			}
+			if = {
+				limit = {
+					has_valid_civic = civic_tec_corporate_netrunners
+					NOT = {
+						has_modifier = modifier_tec_civic_tec_corporate_netrunners
+					}
+				}
+				add_modifier = {
+					modifier = country_modifier_tec_civic_tec_corporate_netrunners
+					multiplier = tec_count_spynetworks
+				}
+			}
+			# Has modifier but its not adequate
+			if = {
+				limit = {
+					NOT = { tec_is_netrunner_empire = yes }
+					OR = {
+						has_modifier = country_modifier_tec_civic_tec_regular_netrunners
+						has_modifier = country_modifier_tec_civic_tec_corporate_netrunners
+					}
+				}
+				if = {
+					limit = {
+						has_modifier = country_modifier_tec_civic_tec_regular_netrunners
+					}
+					remove_modifier = modifier_tec_civic_tec_regular_netrunners
+				}
+				if = {
+					limit = {
+						has_modifier = country_modifier_tec_civic_tec_corporate_netrunners
+					}
+					remove_modifier = country_modifier_tec_civic_tec_corporate_netrunners
+				}
+			}
+		}
+	}
+
+	# on_tec_spynetwork_open / on_tec_spynetwork_closed
+	# Updates the modifier
+	country_event = {
+		id = tec_netrunners.20
+		is_triggered_only = yes
+		hide_window = yes
+
+		trigger = {
+			tec_is_netrunner_empire = yes
+		}
+
+		immediate = {
+			# Regular
+			if = {
+				limit = {
+					has_valid_civic = civic_tec_regular_netrunners
+				}
+				remove_modifier = country_modifier_tec_civic_tec_regular_netrunners
+				add_modifier = {
+					modifier = country_modifier_tec_civic_tec_regular_netrunners
+					multiplier = tec_count_spynetworks
+				}
+			}
+			# Corp
+			if = {
+				limit = {
+					has_valid_civic = civic_tec_corporate_netrunners
+				}
+				remove_modifier = country_modifier_tec_civic_tec_corporate_netrunners
+				add_modifier = {
+					modifier = country_modifier_tec_civic_tec_regular_netrunners
+					multiplier = tec_count_spynetworks
+				}
+			}
+		}
+	}
+# /
+
 
 # ------------------------------------------------------------
 # REGULAR

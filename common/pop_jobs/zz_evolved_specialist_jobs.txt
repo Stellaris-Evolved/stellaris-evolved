@@ -1,6 +1,7 @@
 # ----------------------------------
 # Specialist Jobs
 # ----------------------------------
+ # Specific civics
 	tec_minor_archivist = {
 		category = specialist
 		condition_string = SPECIALIST_JOB_TRIGGER
@@ -117,7 +118,7 @@
 			}
 		}
 	}
-
+ # /
  # Priests
 	tec_minor_occultist = {
 		category = specialist
@@ -504,8 +505,10 @@
 		inline_script = jobs/inline_evolved_disabled
 	}
  # /
+ # Enforcers
 # /
 # Other categories
+ # Ecologist jobs
 	tec_geoengineer = {
 		category = specialist
 		condition_string = SPECIALIST_JOB_TRIGGER
@@ -755,7 +758,8 @@
 			}
 		}
 	}
-
+ # /
+ # Unsorted
 	deep_miner = {					# Unused
 		category = specialist
 		condition_string = SPECIALIST_JOB_TRIGGER
@@ -1178,6 +1182,7 @@
 			}
 		}
 	}
+ # /
  # /
  # Researcher swaps
 	tec_psychohistorian = {			# Psychohistorians
@@ -1771,7 +1776,213 @@
 		}
 	}
  # /
+ # ------------------------------------------------- Netrunners
+	tec_netrunner_enforcer = {
+		icon = enforcer
+		category = specialist
+		condition_string = BATTLE_THRALL_JOB_TRIGGER
+		building_icon = building_tec_netrunner_center
+		clothes_texture_index = 5
 
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+
+		# Note: More complex than enforcers
+		possible_precalc = can_fill_specialist_job
+		possible = {
+			complex_specialist_job_check_trigger = yes
+		}
+
+		resources = {
+			category = planet_enforcers
+			inline_script = jobs/resources/inline_evolved_anticrime_campaign_upkeep
+			produces = {
+				trigger = { always = yes }
+				physics_research = 4
+				engineering_research = 2
+				multiplier = value:tec_netrunner_efficiency|BASE|1|MULT|0.2|
+				#EXTRA_MULT|modifier:planet_researchers_physics_research_produces_mult|
+			}
+		}
+
+		# Trade & Amenities
+			triggered_planet_modifier = {	# Amenity upkeep
+				potential = {
+					exists = owner
+					owner = {
+						is_megacorp = no
+					}
+				}
+				planet_amenities_add = -2
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+			triggered_planet_modifier = {	# Trade Upkeep
+				potential = {
+					exists = owner
+					owner = {
+						is_megacorp = yes
+					}
+				}
+				trade_value_add = -2
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+		# /
+
+		planet_modifier = {
+			planet_crime_add = -30
+			planet_stability_add = 1
+		}
+
+		triggered_country_modifier = {
+			potential = {
+				always = yes
+			}
+			tec_espionage_technological_defense_mult = 0.05
+			tec_espionage_technological_effect_mult = 0.025
+		}
+
+		inline_script = jobs/effects/type/inline_evolved_enforcer_effect
+
+		weight = {
+			# Specialist job Weight
+			weight = @specialist_job_weight
+			modifier = {
+				mult = value:job_weights_modifier|JOB|tec_netrunner_enforcer|RESOURCE|unity|FACTOR|0.25|
+				owner = { has_active_tradition = tr_domination_judgment_corps }
+			}
+			modifier = {
+				factor = 5
+				# cool job
+			}
+			modifier = {
+				factor = 10
+				has_job = tec_netrunner_enforcer
+			}
+
+			# Living standard weight
+			modifier = {
+				factor = 10
+				is_enslaved = yes
+				has_slavery_type = { type = slavery_military }
+			}
+			modifier = {
+				factor = 0.8
+				is_enslaved = yes
+				has_slavery_type = { type = slavery_indentured }
+			}
+			modifier = {
+				factor = 0.2
+				has_citizenship_rights = no
+				NOR = {
+					tec_has_trait_slave = yes
+				}
+			}
+			modifier = {
+				factor = 0.1
+				can_take_servant_job = yes
+			}
+		}
+	}
+	tec_netrunner_criminal = {
+		icon = criminal
+		category = specialist
+		condition_string = BATTLE_THRALL_JOB_TRIGGER
+		building_icon = building_tec_netrunner_center
+		clothes_texture_index = 5
+
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+
+		# Note: More complex than enforcers
+		possible_precalc = can_fill_specialist_job
+		possible = {
+			complex_specialist_job_check_trigger = yes
+		}
+
+		resources = {
+			category = planet_jobs_productive
+			inline_script = jobs/resources/inline_evolved_anticrime_campaign_upkeep
+			produces = {
+				trigger = { always = yes }
+				physics_research = 6
+				engineering_research = 3
+				multiplier = value:tec_netrunner_efficiency|BASE|1|MULT|0.2|
+				#EXTRA_MULT|modifier:planet_researchers_physics_research_produces_mult|
+			}
+		}
+
+		# Crime upkeep
+			triggered_planet_modifier = {	# Amenity upkeep
+				potential = {
+					exists = owner
+					owner = {
+						is_megacorp = no
+					}
+				}
+				planet_crime_add = 5
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+		# /
+
+		triggered_country_modifier = {
+			potential = {
+				always = yes
+			}
+			tec_espionage_technological_defense_mult = 0.05
+			tec_espionage_technological_effect_mult = 0.05
+		}
+
+		inline_script = jobs/effects/type/inline_evolved_enforcer_effect
+
+		weight = {
+			# Specialist job Weight
+			weight = @specialist_job_weight
+			modifier = {
+				mult = value:job_weights_modifier|JOB|tec_netrunner_enforcer|RESOURCE|unity|FACTOR|0.25|
+				owner = { has_active_tradition = tr_domination_judgment_corps }
+			}
+			modifier = {
+				factor = 5
+				# cool job
+			}
+			modifier = {
+				factor = 10
+				has_job = tec_netrunner_enforcer
+			}
+
+			# Living standard weight
+			modifier = {
+				factor = 10
+				is_enslaved = yes
+				has_slavery_type = { type = slavery_military }
+			}
+			modifier = {
+				factor = 0.8
+				is_enslaved = yes
+				has_slavery_type = { type = slavery_indentured }
+			}
+			modifier = {
+				factor = 0.2
+				has_citizenship_rights = no
+				NOR = {
+					tec_has_trait_slave = yes
+				}
+			}
+			modifier = {
+				factor = 0.1
+				can_take_servant_job = yes
+			}
+		}
+	}
+ # /
 # /
 
 # ------------ Assembly jobs ---------------
