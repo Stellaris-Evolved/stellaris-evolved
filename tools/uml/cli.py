@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import itertools
 import os
 import re
 from pathlib import Path
@@ -88,6 +89,26 @@ def copy_placeholder_loc(placeholder_file: str, config: str, local_config: str, 
         replace_keys(
             Path(placeholder_file.format(language=language)).resolve(), keys_to_replace, replace_string
         )
+
+
+@cli.command()
+@click.option('--config', default=Path(BASE_PATH) / 'config.yml')
+@click.option('--local-config', default=Path(BASE_PATH) / 'local_config.yml')
+@click.option('--base-mod-path', default=Path(BASE_PATH) / '../..')
+def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
+    cfg = load_config(config)
+    local_cfg = load_config(local_config)
+    cfg |= local_cfg
+    base_mod_path = Path(base_mod_path).resolve()
+
+    inlines = cfg['addons']['inlines']
+    suffixes = cfg['addons']['suffixes']
+
+    for inline, suffix in itertools.product(inlines, suffixes):
+        print(inline, suffix)
+        os.makedirs(os.path.dirname(base_mod_path / f"common/inline_scripts/evolved_support/{inline}_{suffix}.txt"), exist_ok=True)
+        (base_mod_path / f"common/inline_scripts/evolved_support/{inline}_{suffix}.txt").touch()
+
 
 
 if __name__ == '__main__':
