@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import itertools
-import os
+import os, shutil
 import re
 from pathlib import Path
 
@@ -104,8 +104,10 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
     inlines = cfg['addons']['inlines']
     suffixes = cfg['addons']['suffixes']
 
+    if (base_mod_path / f"common/inline_scripts/evolved_support").exists():
+        shutil.rmtree(base_mod_path / f"common/inline_scripts/evolved_support")
+
     for inline, suffix in itertools.product(inlines, suffixes):
-        print(inline, suffix)
         os.makedirs(os.path.dirname(base_mod_path / f"common/inline_scripts/evolved_support/{inline}_{suffix}.txt"), exist_ok=True)
         (base_mod_path / f"common/inline_scripts/evolved_support/{inline}_{suffix}.txt").touch()
 
