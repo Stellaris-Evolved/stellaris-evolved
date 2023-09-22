@@ -61,3 +61,139 @@ tec_ai_starbase_soldiers_in_system = {
 	}
 	[[FACTOR] mult = $FACTOR$]
 }
+
+tec_ai_leader_is_councilor = {
+	base = 0
+	modifier = {
+		add = 20
+		is_councilor = yes
+	}
+}
+
+tec_ai_leader_is_ruler = {
+	base = 0
+	modifier = {
+		add = 20
+		is_ruler = yes
+	}
+}
+
+tec_ai_leader_is_fleet_admiral = {
+	base = 0
+	modifier = {
+		add = 10
+		exists = fleet
+	}
+}
+
+tec_ai_leader_wants_aggressive_admiral_traits = {
+	base = 0
+	modifier = {
+		add = 5
+		exists = fleet
+		exists = owner
+		owner = {
+			any_neighbor_country = {
+				is_rival = prev.owner
+			}
+		}
+	}
+}
+
+tec_ai_leader_wants_defensive_admiral_traits = {
+	base = 0
+	modifier = {
+		add = 5
+		exists = fleet
+		exists = owner
+		owner = {
+			any_neighbor_country = {
+				OR = {
+					AND = {
+						relative_power = {
+							category = fleet
+							who = prev
+							value < equivalent
+						}
+						tec_is_default_country = yes
+					}
+					is_homicidal = yes
+				}
+			}
+		}
+	}
+}
+
+tec_ai_leader_has_ship_matching_naval_cap = {
+	base = 0
+	complex_trigger_modifier = {
+		trigger = count_owned_ship
+		trigger_scope = owner
+		parameters = {
+			limit = {
+				$TRIGGER$ = yes
+			}
+		}
+		mode = add
+	}
+	divide = owner.trigger:used_naval_capacity_integer
+	mult = $MULT|1$
+}
+
+tec_ai_leader_has_ship_matching_flat = {
+	base = 0
+	complex_trigger_modifier = {
+		trigger = count_owned_ship
+		trigger_scope = owner
+		parameters = {
+			limit = {
+				$TRIGGER$ = yes
+			}
+		}
+		mode = add
+	}
+	mult = owner.trigger:count_owned_ship
+	mult = $MULT|1$
+}
+
+tec_ai_leader_years_passed = {
+	base = 0
+	modifier = {
+		add = 2
+		NOT = { years_passed > $YEARS$ }
+	}
+	modifier = {
+		add = 2
+		years_passed > @\[ $YEARS$ + $OFFSET$ ]
+	}
+	modifier = {
+		add = 3
+		years_passed > @\[ $YEARS$ + $OFFSET$ + 5 ]
+	}
+	modifier = {
+		add = 4
+		years_passed > @\[ $YEARS$ + $OFFSET$ + 10 ]
+	}
+}
+
+tec_ai_leader_xp_trait_mult = {
+	base = @tec_max_leader_skill_defines
+	subtract = trigger:has_skill
+	divide = @tec_max_leader_skill_defines
+}
+
+tec_ai_leader_avoid_stack_councilor_trait = {
+	base = 1
+	modifier = {
+		mult = 0.5
+		tec_leader_already_exists_in_empire = {
+			trait = $TRAIT$
+		}
+	}
+}
+
+tec_ai_leader_trait_intimidator = {
+	base = 0
+	add = owner.trigger:used_naval_capacity_integer
+	divide = owner.trigger:empire_size
+}
