@@ -63,9 +63,9 @@ tec_ai_starbase_soldiers_in_system = {
 }
 
 tec_ai_leader_is_councilor = {
-	base = 0.01
+	base = @tec_block_trait_weight_mult
 	modifier = {
-		add = 1.99
+		add = @[2 - tec_block_trait_weight_mult]
 		is_councilor = yes
 	}
 }
@@ -79,13 +79,13 @@ tec_ai_leader_is_ruler = {
 }
 
 tec_ai_leader_is_fleet_admiral = {
-	base = 0.01
+	base = @tec_block_trait_weight_mult
 	modifier = {
-		add = 0.99
+		set = 1
 		exists = fleet
 	}
 	modifier = {
-		mult = 0.1
+		mult = @tec_block_trait_weight_mult
 		is_councilor = yes
 	}
 }
@@ -93,7 +93,7 @@ tec_ai_leader_is_fleet_admiral = {
 tec_ai_leader_wants_aggressive_traits = {
 	base = 0
 	modifier = {
-		add = 5
+		add = @tec_reduced_trait_weight
 		exists = owner
 		owner = {
 			OR = {
@@ -105,14 +105,14 @@ tec_ai_leader_wants_aggressive_traits = {
 		}
 	}
 	modifier = {
-		add = 5
+		add = @tec_reduced_trait_weight
 		exists = owner
 		owner = {
 			has_country_flag = tec_empire_aggro_skilled
 		}
 	}
 	modifier = {
-		add = 3
+		add = @tec_small_increase_trait_weight
 		exists = owner
 		owner = {
 			OR = {
@@ -127,7 +127,7 @@ tec_ai_leader_wants_aggressive_traits = {
 tec_ai_leader_wants_defensive_traits = {
 	base = 0
 	modifier = {
-		add = 5
+		add = @tec_reduced_trait_weight
 		exists = owner
 		owner = {
 			OR = {
@@ -149,14 +149,14 @@ tec_ai_leader_wants_defensive_traits = {
 		}
 	}
 	modifier = {
-		add = 5
+		add = @tec_reduced_trait_weight
 		exists = owner
 		owner = {
 			has_country_flag = tec_empire_aggro_turtle
 		}
 	}
 	modifier = {
-		add = 3
+		add = @tec_small_increase_trait_weight
 		exists = owner
 		owner = {
 			OR = {
@@ -166,34 +166,29 @@ tec_ai_leader_wants_defensive_traits = {
 		}
 	}
 	modifier = {
-		add = 5
-		is_specialist_subject_type = {
-			TYPE = bulwark
-		}
-	}
-}
-
-tec_ai_leader_has_ship_matching_naval_cap = {
-	base = 0
-	complex_trigger_modifier = {
-		trigger = count_owned_ship
-		trigger_scope = owner
-		parameters = {
-			limit = {
-				$TRIGGER$ = yes
+		add = @tec_reduced_trait_weight
+		exists = owner
+		owner = {
+			is_specialist_subject_type = {
+				TYPE = bulwark
 			}
 		}
-		mode = add
 	}
-	divide = owner.trigger:used_naval_capacity_integer
-	mult = $MULT|1$
 }
 
 tec_ai_leader_has_ship_matching_flat = {
 	base = 0
+	modifier = {
+		add = fleet.value:_tec_ai_leader_has_ship_matching_flat|TRIGGER|$TRIGGER$|
+		exists = fleet
+	}
+	mult = $MULT|1$
+}
+
+_tec_ai_leader_has_ship_matching_flat = {
+	base = 0
 	complex_trigger_modifier = {
 		trigger = count_owned_ship
-		trigger_scope = fleet
 		parameters = {
 			limit = {
 				$TRIGGER$ = yes
@@ -201,26 +196,25 @@ tec_ai_leader_has_ship_matching_flat = {
 		}
 		mode = add
 	}
-	divide = fleet.trigger:fleet_size
-	mult = $MULT|1$
+	divide = trigger:count_owned_ship
 }
 
 tec_ai_leader_years_passed = {
 	base = 0
 	modifier = {
-		add = 2
+		add = @tec_small_increase_trait_weight
 		NOT = { years_passed > $YEARS$ }
 	}
 	modifier = {
-		add = 2
+		add = @tec_small_increase_trait_weight
 		years_passed > @\[ $YEARS$ + $OFFSET$ ]
 	}
 	modifier = {
-		add = 3
+		add = @tec_small_increase_trait_weight
 		years_passed > @\[ $YEARS$ + $OFFSET$ + 5 ]
 	}
 	modifier = {
-		add = 4
+		add = @tec_small_increase_trait_weight
 		years_passed > @\[ $YEARS$ + $OFFSET$ + 10 ]
 	}
 }
@@ -231,15 +225,16 @@ tec_ai_leader_xp_trait_mult = {
 	divide = @tec_max_leader_skill_defines
 }
 
-tec_ai_leader_avoid_stack_trait = {
+tec_ai_leader_avoid_stack_trait_mult = {
 	base = $MULT|0.75$
 	complex_trigger_modifier = {
 		trigger = count_owned_leader
 		trigger_scope = owner
 		parameters = {
 			limit = {
-				tec_leader_already_exists_in_empire = {
+				tec_leader_trait_already_exists_in_empire = {
 					trait = $TRAIT$
+					tiers = $TIERS|1$
 				}
 			}
 		}
@@ -247,30 +242,36 @@ tec_ai_leader_avoid_stack_trait = {
 	}
 }
 
-tec_ai_leader_trait_intimidator = {
+tec_ai_leader_trait_intimidator_mult = {
 	base = 0
-	add = owner.trigger:used_naval_capacity_integer
-	divide = owner.trigger:empire_size
+	modifier = {
+		add = owner.trigger:used_naval_capacity_integer
+		exists = owner
+	}
+	modifier = {
+		divide = owner.trigger:empire_size
+		exists = owner
+	}
 }
 
 tec_ai_leader_is_army_general = {
-	base = 0.01
+	base = @tec_block_trait_weight_mult
 	modifier = {
-		add = 0.99
+		set = 1
 		OR = {
 			exists = fleet
 		}
 	}
 	modifier = {
-		mult = 0.1
+		mult = @tec_block_trait_weight_mult
 		is_councilor = yes
 	}
 }
 
 tec_ai_leader_is_planet_general = {
-	base = 0.01
+	base = @tec_block_trait_weight_mult
 	modifier = { 
-		add = 0.99
+		set = 1
 		exists = planet
 		planet = {
 			exists = army_leader
@@ -280,7 +281,7 @@ tec_ai_leader_is_planet_general = {
 		}
 	}
 	modifier = {
-		mult = 0.1
+		mult = @tec_block_trait_weight_mult
 		is_councilor = yes
 	}
 }
@@ -288,7 +289,7 @@ tec_ai_leader_is_planet_general = {
 tec_ai_leader_wants_diplomatic_traits = {
 	base = 0
 	modifier = {
-		add = 3
+		add = @tec_small_increase_trait_weight
 		exists = owner
 		owner = {
 			OR = {
@@ -298,21 +299,21 @@ tec_ai_leader_wants_diplomatic_traits = {
 		}
 	}
 	modifier = {
-		add = 2
+		add = @tec_small_increase_trait_weight
 		exists = owner
 		owner = {
 			has_ethic = ethic_fanatic_xenophile
 		}
 	}
 	modifier = {
-		add = 5
+		add = @tec_reduced_trait_weight
 		exists = owner
 		owner = {
 			has_ascension_perk = ap_shared_destiny
 		}
 	}
 	modifier = {
-		add = 5
+		add = @tec_reduced_trait_weight
 		exists = owner
 		owner = {
 			tec_has_diplomatic_civic = yes
@@ -320,7 +321,7 @@ tec_ai_leader_wants_diplomatic_traits = {
 	}
 
 	modifier = {
-		subtract = 10
+		subtract = @tec_base_trait_weight
 		exists = owner
 		owner = {
 			is_homicidal = yes
@@ -331,28 +332,28 @@ tec_ai_leader_wants_diplomatic_traits = {
 tec_ai_leader_wants_overlord_traits = {
 	base = 0
 	modifier = {
-		add = 3
+		add = @tec_small_increase_trait_weight
 		exists = owner
 		owner = {
 			is_authoritarian = yes
 		}
 	}
 	modifier = {
-		add = 2
+		add = @tec_small_increase_trait_weight
 		exists = owner
 		owner = {
 			has_ethic = ethic_fanatic_authoritarian
 		}
 	}
 	modifier = {
-		add = 5
+		add = @tec_reduced_trait_weight
 		exists = owner
 		owner = {
 			has_ascension_perk = ap_shared_destiny
 		}
 	}
 	modifier = {
-		add = -20
+		subtract = @tec_good_trait_weight
 		exists = owner
 		owner = { is_overlord = no }
 	}
@@ -361,14 +362,14 @@ tec_ai_leader_wants_overlord_traits = {
 		trigger_scope = owner
 		parameters = { limit = { always = yes } }
 		mode = add
-		mult = 3
+		mult = @tec_small_increase_trait_weight
 	}
 }
 
 tec_ai_leader_wants_fight_effect_traits = {
 	base = 0
 	modifier = {
-		add = 10
+		add = @tec_base_trait_weight
 		exists = owner
 		owner = {
 			OR = {
@@ -384,14 +385,14 @@ tec_ai_leader_wants_fight_effect_traits = {
 tec_ai_leader_wants_spy_traits = {
 	base = 0
 	modifier = {
-		add = 5
+		add = @tec_reduced_trait_weight
 		exists = owner
 		owner = {
 			has_tradition = tr_subterfuge_adopt
 		}
 	}
 	modifier = {
-		add = 5
+		add = @tec_reduced_trait_weight
 		exists = owner
 		owner = {
 			tec_has_spy_civic = yes
@@ -402,14 +403,14 @@ tec_ai_leader_wants_spy_traits = {
 tec_ai_leader_wants_slaver_traits = {
 	base = 0
 	modifier = {
-		add = 2
+		add = @tec_small_increase_trait_weight
 		exists = owner
 		owner = {
 			is_slaver = yes
 		}
 	}
 	modifier = {
-		add = 5
+		add = @tec_reduced_trait_weight
 		exists = owner
 		owner = {
 			tec_has_slaver_civic = yes
@@ -422,7 +423,7 @@ tec_ai_leader_wants_slaver_traits = {
 	}
 
 	modifier = {
-		add = -10
+		subtract = @tec_base_trait_weight
 		is_councilor = no
 		exists = planet
 		planet = {
@@ -447,13 +448,13 @@ _tec_ai_leader_planet_slaves_perc = {
 		mode = add
 	}
 	divide = trigger:num_pops
-	mult = 10
+	mult = @tec_base_trait_weight
 }
 
 tec_ai_leader_wants_scrap_traits = {
 	base = 0
 	modifier = {
-		add = 10
+		add = @tec_base_trait_weight
 		exists = owner
 		owner = {
 			is_scavenger = yes
@@ -461,7 +462,7 @@ tec_ai_leader_wants_scrap_traits = {
 	}
 }
 
-tec_ai_leader_needs_naval_cap = {
+tec_ai_leader_needs_naval_cap_mult = {
 	base = 1
 	modifier = {
 		add = 1
@@ -475,7 +476,7 @@ tec_ai_leader_needs_naval_cap = {
 	}
 }
 
-tec_ai_leader_is_behind_tech = {
+tec_ai_leader_is_behind_tech_mult = {
 	base = 0.5
 	modifier = {
 		add = 0.5
@@ -495,7 +496,7 @@ tec_ai_leader_is_behind_tech = {
 tec_ai_leader_wants_anticrime_traits = {
 	base = 0
 	modifier = {
-		add = 10
+		add = @tec_base_trait_weight
 		is_councilor = yes
 		exists = owner
 		owner = {
@@ -514,7 +515,7 @@ tec_ai_leader_wants_anticrime_traits = {
 		}
 	}
 	modifier = {
-		add = 5
+		add = @tec_reduced_trait_weight
 		exists = owner
 		owner = {
 			OR = {
@@ -524,7 +525,7 @@ tec_ai_leader_wants_anticrime_traits = {
 	}
 
 	modifier = {
-		add = 5
+		add = @tec_reduced_trait_weight
 		exists = planet
 		planet = {
 			planet_crime > 50
@@ -535,7 +536,7 @@ tec_ai_leader_wants_anticrime_traits = {
 tec_ai_leader_wants_soldier_traits = {
 	base = 0
 	modifier = {
-		add = 5
+		add = @tec_reduced_trait_weight
 		exists = owner
 		owner = {
 			OR = {
@@ -546,13 +547,14 @@ tec_ai_leader_wants_soldier_traits = {
 	}
 
 	modifier = {
-		add = value:tec_soldier_jobs_value|FACTOR|0.5|
+		add = planet.value:tec_soldier_jobs_value|FACTOR|@tec_job_scale_planet_trait_weight_mult|
 		exists = planet
 	}
 
 	modifier = {
-		add = value:tec_soldier_jobs_value|FACTOR|0.1|
+		add = owner.value:tec_soldier_jobs_value|FACTOR|@tec_job_scale_country_trait_weight_mult|
 		NOT = { exists = planet }
+		exists = owner
 		is_councilor = yes
 	}
 }
@@ -560,22 +562,25 @@ tec_ai_leader_wants_soldier_traits = {
 tec_ai_leader_wants_resource_production_traits = {
 	base = 0
 	modifier = {
-		add = 5
+		add = @tec_reduced_trait_weight
 		OR = {
 			leader_class = general
 			leader_class = governor
 		}
 	}
 	modifier = {
-		add = 5
+		add = @tec_reduced_trait_weight
 		years_passed < 20
 	}
 	modifier = {
-		add = 5
-		has_deficit = $RESOURCE$
+		add = @tec_reduced_trait_weight
+		exists = owner
+		owner = {
+			has_deficit = $RESOURCE$
+		}
 	}
 	modifier = {
-		add = -20
+		subtract = @tec_good_trait_weight
 		OR = {
 			leader_class = admiral
 			leader_class = scientist
@@ -584,27 +589,30 @@ tec_ai_leader_wants_resource_production_traits = {
 }
 
 tec_ai_leader_is_planet_governor = {
-	base = 0.01
+	base = @tec_block_trait_weight_mult
 	modifier = {
-		add = 0.99
+		set = 1
 		exists = planet
 	}
 	modifier = {
-		mult = 0.1
+		mult = @tec_block_trait_weight_mult
 		is_councilor = yes
 	}
 }
 
 tec_ai_leader_wants_blocker_traits = {
 	base = 0
-	add = trigger:num_uncleared_blockers
-	mult = 3
+	modifier = {
+		add = planet.trigger:num_uncleared_blockers
+		exists = planet
+	}
+	mult = @tec_small_increase_trait_weight
 }
 
 tec_ai_leader_is_exploring = {
-	base = 0.01
+	base = @tec_block_trait_weight_mult
 	modifier = {
-		add = 0.99
+		set = 1
 		exists = fleet
 		fleet = {
 			OR = {
@@ -620,15 +628,15 @@ tec_ai_leader_is_exploring = {
 		}
 	}
 	modifier = {
-		mult = 0.1
+		mult = @tec_block_trait_weight_mult
 		is_councilor = yes
 	}
 }
 
 tec_ai_leader_is_assisting_research = {
-	base = 0.01
+	base = @tec_block_trait_weight_mult
 	modifier = {
-		add = 0.99
+		set = 1
 		exists = fleet
 		fleet = {
 			OR = {
@@ -637,7 +645,7 @@ tec_ai_leader_is_assisting_research = {
 		}
 	}
 	modifier = {
-		mult = 0.1
+		mult = @tec_block_trait_weight_mult
 		is_councilor = yes
 	}
 }
@@ -645,7 +653,7 @@ tec_ai_leader_is_assisting_research = {
 tec_ai_leader_wants_councilor_destiny_trait = {
 	base = 1
 	modifier = {
-		subtract = 0.99
+		set = @tec_block_trait_weight_mult
 		is_councilor = yes
 	}
 }
