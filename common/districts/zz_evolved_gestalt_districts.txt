@@ -11,44 +11,35 @@
 #
 #@tec_base_cost = 300
 
+@base_cost = 300
+@city_cost = 500
 # Hive worlds
 # --------------- Biohive
 # Biohives
-# district_tec_biohive_housing
-# district_tec_biohive_industrial
-# district_tec_biohive_assembly
-# district_tec_biohive_extraction
-# district_tec_biohive_biomass
+	# Group 1
+	district_tec_biohive_housing = {
+		icon = district_hive
 
-@base_cost = 300
-@city_cost = 500
-
-# Hive worlds
-	district_tec_hive_world_housing_gestalt = {
 		base_buildtime = 480
 		is_capped_by_modifier = no
 		exempt_from_ai_planet_specialization = yes
-		
+
 		show_on_uncolonized = {
 			exists = from
 			from = {
-				is_gestalt = yes
+				tec_is_biohive = yes
 			}
-			tec_is_hive_world = yes
-			# TEST
-			has_planet_flag = tec_test_hiveworlds
+			tec_has_standard_habitation_district = yes
 		}
-		
+
 		potential = {
 			exists = owner
 			owner = {
-				is_gestalt = yes
+				tec_is_biohive = yes
 			}
-			tec_is_hive_world = yes
-			# TEST
-			has_planet_flag = tec_test_hiveworlds
+			tec_has_standard_habitation_district = yes
 		}
-		
+
 		allow = {
 			tec_disallow_urban_districts = no
 			tec_ai_allow_housing_district = {
@@ -59,7 +50,7 @@
 				"
 			}
 		}
-		
+
 		inline_script = districts/convert_to/inline_evolved_housing_districts
 
 		resources = {
@@ -110,26 +101,651 @@
 			"
 		}
 	}
-	#district_tec_hive_world_housing_regular
+	# Group 2
+	district_tec_biohive_assembly = {
+		icon = district_tec_hive_world_assembly
 
-	#district_tec_hive_world_assembly
+		base_buildtime = 480
+		is_capped_by_modifier = yes
 
-	#district_tec_hive_world_industrial
+		show_on_uncolonized = {
+			exists = from
+			from = {
+				tec_is_biohive = yes
+			}
+			tec_is_hive_world = no
+		}
 
-	district_tec_hive_world_generator = {
-		base_buildtime = 240
-		icon = district_generator
+		potential = {
+			exists = owner
+			owner = {
+				tec_is_biohive = yes
+			}
+			tec_is_hive_world = no
+		}
+
+		inline_script = districts/convert_to/inline_evolved_industrial_districts
+
+		resources = {
+			category = planet_districts_cities
+			cost = {
+				minerals = @city_cost
+			}
+			upkeep = {
+				energy = 2
+			}
+		}
+	
+		# Standard
+			planet_modifier = {
+				planet_housing_add = 2
+			}
+			# TO DO adjust to arcologies too
+		# /
+	}
+	district_tec_biohive_industrial = {
+		icon = district_tec_hive_world_industrial
+
+		base_buildtime = 480
 		is_capped_by_modifier = no
+	
+		prerequisites = {
+			tech_basic_industry
+		}
+
+		show_tech_unlock_if = {
+			always = no
+		}
+	
+		show_on_uncolonized = {
+			exists = from
+			from = {
+				tec_is_biohive = yes
+			}
+			tec_has_standard_industrial_district = yes
+		}
+
+		potential = {
+			exists = owner
+			owner = {
+				tec_is_biohive = yes
+			}
+			tec_has_standard_industrial_district = yes
+		}
+		
+		allow = {
+			tec_disallow_urban_districts = no
+		}
+		
+		inline_script = districts/convert_to/inline_evolved_industrial_districts
+	
+		resources = {
+			category = planet_districts_industrial
+			cost = {
+				minerals = @city_cost
+			}
+			upkeep = {
+				energy = 2
+			}
+	
+			inline_script = districts/resources/inline_evolved_tec_unleashed_industrialization_resources
+			inline_script = districts/resources/inline_evolved_industrial_maintenance_upkeep
+		}
+	
+		# Text
+			triggered_desc = {
+				trigger = {
+					exists = owner
+				}
+				text = tec_planet_spec_change_jobs_district
+			}
+		# /
+	
+		# Standard
+			planet_modifier = {
+				planet_housing_add = 2
+			}
+		# /
+	
+		# Traditions
+			inline_script = districts/effects/inline_evolved_tec_artifice_final_1
+		# /
+		# Civics
+			inline_script = districts/effects/inline_evolved_tec_unleashed_industrialization
+		# /
+		# Edicts
+			inline_script = districts/effects/inline_evolved_industrial_maintenance
+		# /
+	
+		inline_script = {
+			script = districts/inline_evolved_industrial_split_jobs
+			count = 1
+			mult = 1
+			trigger = ""
+			display = with_desc
+		}
+	}
+	# Group 3
+	district_tec_biohive_generator = {
+		icon = district_tec_hive_world_generator
+
+		expansion_planner = no
+
+		base_buildtime = 240
+		is_capped_by_modifier = yes
+
+		show_on_uncolonized = {
+			# Note: They are shown with 0, better displaying the normal ones
+			always = no
+		}
+
+		potential = {
+			exists = owner
+			owner = {
+				tec_district_organic_swap = no
+				tec_is_biohive = yes
+				tec_generator_aqua_district_swap = no
+				tec_has_infinite_generator_district = no
+			}
+			tec_district_ecoworld_swap = no
+			uses_district_set = standard
+		}
+
+		allow = {
+			tec_disallow_menial_districts = no
+			tec_ai_allow_generator_district = yes
+			tec_ai_allow_rural_district = yes
+		}
+
+		destroy_trigger = {
+			tec_ai_allow_generator_district = no
+			tec_ai_allow_rural_district= no
+		}
+
+		conversion_ratio = 1
+		inline_script = districts/convert_to/inline_evolved_generator_districts
+		inline_script = districts/convert_to/inline_evolved_trade_districts
+
+		resources = {
+			category = planet_districts_generator
+			cost = {
+				minerals = @base_cost
+			}
+			upkeep = {
+				energy = 1
+			}
+		}
+
+		# Modifiers
+			inline_script = districts/type/inline_evolved_rural_generator
+			# Hive World
+			 # Young
+
+			 # /
+			 # Mature
+
+			 # /
+			 # Old
+
+			 # /
+			 # Ancient
+
+			 # /
+			# /
+		# /
+	}
+	district_tec_biohive_mining = {
+		icon = district_tec_hive_world_mining
+
+		expansion_planner = no
+
+		base_buildtime = 240
+		is_capped_by_modifier = yes
+
+		prerequisites = {
+			tech_mechanized_mining
+		}
+
+		show_tech_unlock_if = {
+			always = no
+		}
+
+		show_on_uncolonized = {
+			# Note: They are shown with 0, better displaying the normal ones
+			always = no
+		}
+		
+		potential = {
+			exists = owner
+			owner = {
+				tec_district_organic_swap = no
+				tec_is_biohive = yes
+				tec_mining_aqua_district_swap = no
+				tec_has_infinite_mining_district = no
+			}
+			tec_district_ecoworld_swap = no
+			uses_district_set = standard
+		}
+
+		allow = {
+			tec_disallow_menial_districts = no
+			tec_ai_allow_rural_district = yes
+		}
+
+		destroy_trigger = {
+			tec_ai_allow_rural_district= no
+		}
+
+		conversion_ratio = 1
+		inline_script = districts/convert_to/inline_evolved_mining_districts
+
+		resources = {
+			category = planet_districts_mining
+			cost = {
+				minerals = @base_cost
+			}
+			upkeep = {
+				energy = 1
+			}
+		}
+
+		# Modifiers
+			inline_script = districts/type/inline_evolved_rural_mining
+			# Hive World
+			 # Young
+
+			 # /
+			 # Mature
+
+			 # /
+			 # Old
+
+			 # /
+			 # Ancient
+
+			 # /
+			# /
+		# /
+	}
+	district_tec_biohive_farming = {
+		icon = district_tec_hive_world_farming
+
+		expansion_planner = no
+
+		base_buildtime = 240
+		is_capped_by_modifier = yes
+
+		show_on_uncolonized = {
+			# Note: They are shown with 0, better displaying the normal ones
+			always = no
+		}
+		
+		potential = {
+			exists = owner
+			owner = {
+				tec_district_organic_swap = no
+				tec_is_biohive = yes
+				tec_farming_aqua_district_swap = no
+				tec_has_infinite_farming_district = no
+			}
+			tec_district_ecoworld_swap = no
+			uses_district_set = standard
+			NOR = {
+				# TEST HIVEWORLDS
+				has_planet_flag = tec_test_hiveworlds
+				has_planet_flag = tec_test_machineworlds
+			}
+		}
+
+		allow = {
+			tec_disallow_menial_districts = no
+			tec_ai_allow_rural_district = yes
+			tec_ai_allow_farming_district = yes
+		}
+
+		destroy_trigger = {
+			tec_ai_allow_rural_district = no
+			tec_ai_allow_farming_district = no
+		}
+
+		conversion_ratio = 1
+		inline_script = districts/convert_to/inline_evolved_farming_districts
+
+		resources = {
+			category = planet_districts_farming
+			cost = {
+				minerals = @base_cost
+			}
+			upkeep = {
+				energy = 1
+			}
+		}
+
+		# Modifiers
+			inline_script = districts/type/inline_evolved_rural_farming
+			# Hive World
+			 # Young
+
+			 # /
+			 # Mature
+
+			 # /
+			 # Old
+
+			 # /
+			 # Ancient
+
+			 # /
+			# /
+		# /
+	}
+# /
+
+# Hive worlds
+	# Group 1
+	district_tec_hive_world_housing_gestalt = {
+		icon = district_hive
+
+		base_buildtime = 480
+		is_capped_by_modifier = no
+		exempt_from_ai_planet_specialization = yes
+
+		show_on_uncolonized = {
+			exists = from
+			from = {
+				is_gestalt = yes
+			}
+			tec_is_hive_world = yes
+			# TEST HIVEWORLDS
+			has_planet_flag = tec_test_hiveworlds
+		}
+
+		potential = {
+			exists = owner
+			owner = {
+				is_gestalt = yes
+			}
+			tec_is_hive_world = yes
+			# TEST HIVEWORLDS
+			has_planet_flag = tec_test_hiveworlds
+		}
+
+		allow = {
+			tec_disallow_urban_districts = no
+			tec_ai_allow_housing_district = {
+				housing = 2
+				has_building_slots = "always = yes"
+				use_for_jobs = "
+					tec_has_maintenance_drone_jobs_available = no
+				"
+			}
+		}
+
+		inline_script = districts/convert_to/inline_evolved_housing_districts
+
+		resources = {
+			category = planet_districts_cities
+			cost = {
+				minerals = @city_cost
+			}
+			upkeep = {
+				energy = 2
+			}
+		}
+
+		# Modifiers
+			planet_modifier = {
+				planet_housing_add = 6
+				# 6+6
+				planet_max_buildings_add = 1
+			}
+		# /
+		# Effect Types
+			inline_script = {
+				script = districts/type/inline_evolved_housing_generic
+				scale = 1
+				trigger = ""
+			}
+			inline_script = {
+				script = districts/type/inline_evolved_housing_hive
+				scale = 1
+				trigger = ""
+			}
+
+		# /
+		# Jobs
+			inline_script = {
+				script = jobs/inline_evolved_maintenance_drone
+				count = 6
+				mult = 1
+				display = with_desc
+				trigger = ""
+			}
+			# 3+3
+		# /
+
+		inline_script = {
+			script = districts/inline_evolved_aibait_housing
+			has_building_slots = "
+				always = yes
+			"
+		}
+	}
+	district_tec_hive_world_housing_regular = {
+		icon = district_hive
+
+		base_buildtime = 480
+		is_capped_by_modifier = no
+		exempt_from_ai_planet_specialization = yes
+
+		show_on_uncolonized = {
+			exists = from
+			from = {
+				is_gestalt = no
+			}
+			tec_is_hive_world = yes
+			# TEST HIVEWORLDS
+			has_planet_flag = tec_test_hiveworlds
+		}
+
+		potential = {
+			exists = owner
+			owner = {
+				is_gestalt = no
+			}
+			tec_is_hive_world = yes
+			# TEST HIVEWORLDS
+			has_planet_flag = tec_test_hiveworlds
+		}
+
+		allow = {
+			tec_disallow_urban_districts = no
+			tec_ai_allow_housing_district = {
+				housing = 2
+				has_building_slots = "always = yes"
+				use_for_jobs = "
+					tec_has_clerk_jobs_available = no
+				"
+			}
+		}
+
+		inline_script = districts/convert_to/inline_evolved_housing_districts
+		
+		resources = {
+			category = planet_districts_cities
+			cost = {
+				minerals = @city_cost
+			}
+			upkeep = {
+				energy = 2
+			}
+		}
+
+		# Modifiers
+			planet_modifier = {
+				planet_housing_add = 5
+				planet_max_buildings_add = 1
+			}
+		# /
+		# Effect Types
+			inline_script = {
+				script = districts/type/inline_evolved_housing_generic
+				scale = 1
+				trigger = ""
+			}
+			inline_script = {
+				script = districts/type/inline_evolved_housing_city
+				scale = 1
+				trigger = ""
+			}
+		# /
+
+		# Jobs
+			# Base
+				inline_script = {
+					script = jobs/inline_evolved_clerk
+					count = 1
+					mult = 1
+					display = with_desc
+					trigger = ""
+				}
+			# /
+		# /
+
+		inline_script = {
+			script = districts/inline_evolved_aibait_housing
+			has_building_slots = "
+				always = yes
+			"
+		}
+	}
+	# Group 2
+	district_tec_hive_world_assembly = {
+		base_buildtime = 480
+		is_capped_by_modifier = yes
 
 		show_on_uncolonized = {
 			tec_is_hive_world = yes
-			# TEST
+			# TEST HIVEWORLDS
 			has_planet_flag = tec_test_hiveworlds
 		}
 
 		potential = {
 			tec_is_hive_world = yes
-			# TEST
+			# TEST HIVEWORLDS
+			has_planet_flag = tec_test_hiveworlds
+		}
+
+		inline_script = districts/convert_to/inline_evolved_industrial_districts
+
+		resources = {
+			category = planet_districts_cities
+			cost = {
+				minerals = @city_cost
+			}
+			upkeep = {
+				energy = 2
+			}
+		}
+	
+		# Standard
+			planet_modifier = {
+				planet_housing_add = 2
+			}
+		# /
+	}
+	district_tec_hive_world_industrial = {
+		base_buildtime = 480
+		is_capped_by_modifier = no
+	
+		prerequisites = {
+			tech_basic_industry
+		}
+
+		show_tech_unlock_if = {
+			always = no
+		}
+	
+		show_on_uncolonized = {
+			tec_is_hive_world = yes
+			# TEST HIVEWORLDS
+			has_planet_flag = tec_test_hiveworlds
+		}
+
+		potential = {
+			tec_is_hive_world = yes
+			# TEST HIVEWORLDS
+			has_planet_flag = tec_test_hiveworlds
+		}
+		
+		allow = {
+			tec_disallow_urban_districts = no
+		}
+		
+		inline_script = districts/convert_to/inline_evolved_industrial_districts
+	
+		resources = {
+			category = planet_districts_industrial
+			cost = {
+				minerals = @city_cost
+			}
+			upkeep = {
+				energy = 2
+			}
+	
+			inline_script = districts/resources/inline_evolved_tec_unleashed_industrialization_resources
+			inline_script = districts/resources/inline_evolved_industrial_maintenance_upkeep
+		}
+	
+		# Text
+			triggered_desc = {
+				trigger = {
+					exists = owner
+				}
+				text = tec_planet_spec_change_jobs_district
+			}
+		# /
+	
+		# Standard
+			planet_modifier = {
+				planet_housing_add = 2
+			}
+		# /
+	
+		# Traditions
+			inline_script = districts/effects/inline_evolved_tec_artifice_final_1
+		# /
+		# Civics
+			inline_script = districts/effects/inline_evolved_tec_unleashed_industrialization
+		# /
+		# Edicts
+			inline_script = districts/effects/inline_evolved_industrial_maintenance
+		# /
+	
+		inline_script = {
+			script = districts/inline_evolved_industrial_split_jobs
+			count = 1
+			mult = 1
+			trigger = ""
+			display = with_desc
+		}
+	}
+	# Group 3
+	district_tec_hive_world_generator = {
+		expansion_planner = yes
+
+		base_buildtime = 240
+		is_capped_by_modifier = no
+
+		show_on_uncolonized = {
+			tec_is_hive_world = yes
+			# TEST HIVEWORLDS
+			has_planet_flag = tec_test_hiveworlds
+		}
+
+		potential = {
+			tec_is_hive_world = yes
+			# TEST HIVEWORLDS
 			has_planet_flag = tec_test_hiveworlds
 		}
 
@@ -176,7 +792,6 @@
 			# /
 		# /
 	}
-
 	district_tec_hive_world_mining = {
 		expansion_planner = yes
 
@@ -187,15 +802,19 @@
 			tech_mechanized_mining
 		}
 
+		show_tech_unlock_if = {
+			always = no
+		}
+
 		show_on_uncolonized = {
 			tec_is_hive_world = yes
-			# TEST
+			# TEST HIVEWORLDS
 			has_planet_flag = tec_test_hiveworlds
 		}
 
 		potential = {
 			tec_is_hive_world = yes
-			# TEST
+			# TEST HIVEWORLDS
 			has_planet_flag = tec_test_hiveworlds
 		}
 
@@ -239,7 +858,6 @@
 			# /
 		# /
 	}
-
 	district_tec_hive_world_farming = {
 		expansion_planner = yes
 
@@ -248,13 +866,13 @@
 
 		show_on_uncolonized = {
 			tec_is_hive_world = yes
-			# TEST
+			# TEST HIVEWORLDS
 			has_planet_flag = tec_test_hiveworlds
 		}
 
 		potential = {
 			tec_is_hive_world = yes
-			# TEST
+			# TEST HIVEWORLDS
 			has_planet_flag = tec_test_hiveworlds
 		}
 
