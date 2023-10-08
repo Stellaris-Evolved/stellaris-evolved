@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import glob
 import itertools
 import os, shutil
 import re
@@ -101,7 +102,19 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
     cfg |= local_cfg
     base_mod_path = Path(base_mod_path).resolve()
 
-    inlines = cfg['addons']['inlines']
+    inlines = []
+
+    for filename in glob.iglob(str(base_mod_path / f"common/inline_scripts/**/**"), recursive=True):
+        if ('inline_evolved' in filename
+                and '.txt' in filename
+                and 'evolved_support' not in filename
+                and 'mod_support/inline_evolved_inlines_include' not in filename):
+            with open(filename, 'r') as f:
+                for line in f.readlines():
+                    matches = re.match(f"\\s*include_script\\s*=\\s*\"?([a-z_A-Z\\d/]*)\"?", line)
+                    if matches and matches.group(1):
+                        inlines.append(matches.group(1))
+
     suffixes = cfg['addons']['suffixes']
 
     if (base_mod_path / f"common/inline_scripts/evolved_support").exists():
