@@ -118,15 +118,14 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
     inlines = list(set(inlines))
     inlines.sort()
 
-    scripted_triggers = []
+    scripted_triggers = {}
 
     for filename in glob.iglob(str(base_mod_path / f"common/scripted_triggers/**/**"), recursive=True):
         if '.txt' in filename:
             with open(filename, 'r') as f:
                 should_look_for_trigger = False
-                i = 0
-                for line in f.readlines():
-                    i += 1
+                lines = f.readlines()
+                for i, line in enumerate(lines):
                     if not should_look_for_trigger:
                         matches = re.match("\\s*tec_trigger_mod_support\\s*=\\s*{", line)
                         should_look_for_trigger = matches
@@ -134,9 +133,14 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                         should_look_for_trigger = False
                         matches = re.match(f"\\s*trigger\\s*=\\s*\"?([a-z_A-Z\\d]*)\"?", line)
                         if matches and matches.group(1):
-                            scripted_triggers.append((matches.group(1), filename[len(str(base_mod_path)) + 1:], i))
+                            scripted_triggers[matches.group(1)] = (filename[len(str(base_mod_path)) + 1:], i + 1)
 
-    scripted_triggers.sort()
+                for i, line in enumerate(lines):
+                    for s in scripted_triggers:
+                        matches = re.match(f"\\s*{s}\\s*=\\s*{{", line)
+                        if matches:
+                            scripted_triggers[s] = (filename[len(str(base_mod_path)) + 1:], i + 1)
+
 
     suffixes = cfg['addons']['suffixes']
     scripted_trigger_defaults = cfg['addons'].get('scripted_trigger_defaults', [])
@@ -187,8 +191,8 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
             f.write(textwrap.dedent(f"""\
                 inline_script = {{
                     script = mod_support/inline_evolved_trigger_placeholders
-                    trigger = {s[0]}
-                    default = {'yes' if s[0] in scripted_trigger_defaults else 'no'}
+                    trigger = {s}
+                    default = {'yes' if s in scripted_trigger_defaults else 'no'}
                 }}
             """))
 
@@ -202,7 +206,7 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
             
             ## Current supported scripted_triggers
             
-            {new_line.join(f"            * [{s[0]}]({s[1]}#L{s[2]})" for s in scripted_triggers).strip()}
+            {new_line.join(f"            * [{s}]({scripted_triggers[s][0]}#L{scripted_triggers[s][1]})" for s in scripted_triggers).strip()}
             
             ## Current supported inline_scripts
             
