@@ -125,6 +125,7 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
             with open(filename, 'r') as f:
                 should_look_for_trigger = False
                 lines = f.readlines()
+                found_triggers = []
                 for i, line in enumerate(lines):
                     if not should_look_for_trigger:
                         matches = re.match("\\s*tec_trigger_mod_support\\s*=\\s*{", line)
@@ -133,10 +134,10 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                         should_look_for_trigger = False
                         matches = re.match(f"\\s*trigger\\s*=\\s*\"?([a-z_A-Z\\d]*)\"?", line)
                         if matches and matches.group(1):
-                            scripted_triggers[matches.group(1)] = (filename[len(str(base_mod_path)) + 1:], i + 1)
+                            found_triggers.append(matches.group(1))
 
                 for i, line in enumerate(lines):
-                    for s in scripted_triggers:
+                    for s in found_triggers:
                         matches = re.match(f"\\s*{s}\\s*=\\s*{{", line)
                         if matches:
                             scripted_triggers[s] = (filename[len(str(base_mod_path)) + 1:], i + 1)
