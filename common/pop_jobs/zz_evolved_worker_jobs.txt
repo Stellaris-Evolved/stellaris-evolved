@@ -621,7 +621,7 @@
 
 	tec_labrat = {				# Creative Testing
 		category = worker
-		condition_string = SPECIALIST_JOB_TRIGGER
+		condition_string = WORKER_JOB_TRIGGER
 		building_icon = building_research_lab_1
 		clothes_texture_index = 3
 
@@ -757,6 +757,117 @@
 			modifier = {
 				factor = 0.1
 				can_take_servant_job = yes
+			}
+		}
+	}
+
+	tec_scrapper = {			# Scrappers
+		category = worker
+		condition_string = WORKER_JOB_TRIGGER
+		building_icon = building_tec_scavenge_center
+		clothes_texture_index = 2
+	
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+	
+		possible_precalc = can_fill_worker_job
+		possible = {
+			hidden_trigger = { exists = owner }
+			owner = {
+				is_gestalt = no
+			}
+		}
+		
+		resources = {
+			category = planet_metallurgists
+			produces = {
+				alloys = 2
+			}
+	
+			inline_script = {
+				script = jobs/resources/inline_evolved_alloy_and_refinery_job_upkeep
+				minerals = 3
+				multiplier = 1
+				trigger = "
+					exists = owner
+					owner = {
+						OR = {
+							is_catalytic_empire = yes
+							tec_is_quantum_alloys_empire = yes
+						}
+						tec_is_dystopian_empire = no
+					}
+				"
+			}
+			# No requisition as the job is criminal :D
+		}
+	
+		inline_script = jobs/effects/type/inline_evolved_foundry_effect
+
+		# Trade & Amenities
+			triggered_planet_modifier = {	# Amenity upkeep
+				potential = {
+					exists = owner
+					owner = {
+						is_megacorp = no
+						is_catalytic_empire = no
+						tec_is_quantum_alloys_empire = no
+						tec_is_dystopian_empire = no
+					}
+				}
+				planet_amenities_add = -2
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+
+			triggered_planet_modifier = {	# Trade Upkeep
+				potential = {
+					exists = owner
+					owner = {
+						is_megacorp = yes
+						is_catalytic_empire = no
+						tec_is_quantum_alloys_empire = no
+						tec_is_dystopian_empire = no
+					}
+				}
+				trade_value_add = -2
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+		# /
+
+		# Crime upkeep
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						tec_is_dystopian_empire = no
+					}
+				}
+				planet_crime_add = 2
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						tec_is_dystopian_empire = yes
+					}
+				}
+				planet_crime_add = 5
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+		# /
+
+		weight = {
+			# Specialist job Weight
+			weight = @specialist_job_weight
+			mult = value:job_weights_modifier|JOB|tec_scrapper|RESOURCE|alloys|
+			modifier = {
+				factor = 5
+				has_job = tec_scrapper
 			}
 		}
 	}
