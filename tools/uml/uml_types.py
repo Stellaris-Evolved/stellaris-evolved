@@ -54,7 +54,7 @@ class MissingSpritesConfig(TypedDict):
 
 
 class Addons(TypedDict):
-    inlines: list[str]
+    scripted_trigger_defaults: list[str]
     suffixes: list[str]
 
 class Config(TypedDict):
