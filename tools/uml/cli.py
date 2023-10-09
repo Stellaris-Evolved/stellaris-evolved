@@ -115,6 +115,9 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                     if matches and matches.group(1):
                         inlines.append(matches.group(1))
 
+    inlines = list(set(inlines))
+    inlines.sort()
+
     scripted_triggers = []
 
     for filename in glob.iglob(str(base_mod_path / f"common/scripted_triggers/**/**"), recursive=True):
@@ -130,6 +133,8 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                         matches = re.match(f"\\s*trigger\\s*=\\s*\"?([a-z_A-Z\\d]*)\"?", line)
                         if matches and matches.group(1):
                             scripted_triggers.append(matches.group(1))
+
+    scripted_triggers.sort()
 
     suffixes = cfg['addons']['suffixes']
     scripted_trigger_defaults = cfg['addons'].get('scripted_trigger_defaults', [])
