@@ -45,6 +45,11 @@ robot_servant = {
 		# Early bailout
 		has_trait = trait_mechanical
 		# Next
+		OR = {
+			tec_is_shackled_robot = { cached = yes }
+			tec_is_non_sapient_robot = { cached = yes }
+		}
+
 		exists = owner
 		owner = {
 			# Machines do not enslave ais
@@ -53,10 +58,6 @@ robot_servant = {
 			tec_is_radical_hive = no
 			# Food in a less gastronomical way (organic hives)
 			tec_is_biohive = no
-		}
-		OR = {
-			tec_is_shackled_robot = { cached = yes }
-			tec_is_non_sapient_robot = { cached = yes }
 		}
 	}
 
@@ -82,7 +83,7 @@ robot_servant = {
 
 	# Pop/trait modifiers
 		# Per pop
-		inline_script = pop_categories/inline_evolved_per_pop
+		inline_script = pop_categories/inline_evolved_pop_modifiers
 	# /
 	
 	# Resources
@@ -140,41 +141,23 @@ slave = {
 		}
 	# /
 
-	# Pop/trait modifiers
-		
-		
+	# Pop/trait modifiers		
 		# Per pop
-		inline_script = pop_categories/inline_evolved_per_pop
-		
-		
-		# Cyberdictatorship
-			triggered_pop_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_valid_civic = civic_tec_cyber_dictatorship
-					}
-					OR = {
-						has_ethic = ethic_materialist
-						has_ethic = ethic_authoritarian
-					}
-				}
-				species_empire_size_mult = -0.5
+		inline_script = pop_categories/inline_evolved_pop_modifiers
+		inline_script = pop_categories/inline_evolved_pop_regular_modifiers
+		inline_script = pop_categories/inline_evolved_pop_slave_modifiers
+	# /
+
+	# TRADE MODIFIERS
+		triggered_planet_modifier = {
+			potential = {
+				can_generate_trade_value = yes
 			}
-		# /
-		# Consecrated Ideals
-			triggered_pop_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_valid_civic = civic_tec_consecrated_democracy
-					}
-					has_ethic = ethic_spiritualist
-				}
-				planet_jobs_produces_mult = 0.05
-				pop_happiness = 0.1
-			}
-		# /
+			trade_value_add = 1
+			mult = value:tec_pop_lifestyle_trade_value|CATEGORY|slave|
+		}
+
+		inline_script = pop_categories/inline_evolved_pop_trade
 	# /
 	
 	resources = {
@@ -240,7 +223,7 @@ bio_trophy = {
 		
 		
 		# Per pop
-		inline_script = pop_categories/inline_evolved_per_pop
+		inline_script = pop_categories/inline_evolved_pop_modifiers
 		
 		
 		# Galcom
@@ -347,8 +330,24 @@ criminal = {
 	}
 
 	# Pop/trait modifiers
-		
-		inline_script = pop_categories/inline_evolved_per_pop
+		inline_script = pop_categories/inline_evolved_pop_modifiers
+
+		triggered_planet_modifier = {
+			potential = {
+				exists = owner
+				owner = { tec_is_dystopian_empire = yes }
+				planet = {
+					OR = {
+						has_branch_office = no
+						branch_office_owner = {
+							is_criminal_syndicate = no
+						}
+					}
+				}
+			}
+			planet_crime_add = 2
+			planet_stability_add = -2
+		}
 	# /
 
 	# Trade modifiers
@@ -357,7 +356,7 @@ criminal = {
 				can_generate_trade_value = yes
 			}
 			trade_value_add = 1
-			mult = value:tec_pop_lifestyle_trade_value|CATEGORY|worker|
+			mult = value:tec_pop_lifestyle_trade_value|CATEGORY|criminal|
 		}
 
 		inline_script = pop_categories/inline_evolved_pop_trade
@@ -553,30 +552,30 @@ precursor = {
 
 	# Pop/trait modifiers
 		# Per pop
-		inline_script = pop_categories/inline_evolved_per_pop
+		inline_script = pop_categories/inline_evolved_pop_modifiers
 		
 		
 		# Cyberdictatorship
-			triggered_pop_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_valid_civic = civic_tec_cyber_dictatorship
-					}
-					OR = {
-						has_ethic = ethic_materialist
-						has_ethic = ethic_authoritarian
-					}
-				}
-				species_empire_size_mult = -0.5
-			}
+			#triggered_pop_modifier = {
+			#	potential = {
+			#		exists = owner
+			#		owner = {
+			#			has_valid_civic = civic_tec_regular_cyber_dictatorship
+			#		}
+			#		OR = {
+			#			has_ethic = ethic_materialist
+			#			has_ethic = ethic_authoritarian
+			#		}
+			#	}
+			#	species_empire_size_mult = -0.5
+			#}
 		# /
 		# Consecrated Ideals
 			triggered_pop_modifier = {
 				potential = {
 					exists = owner
 					owner = {
-						has_valid_civic = civic_tec_consecrated_democracy
+						has_valid_civic = civic_tec_regular_consecrated_democracy
 					}
 					has_ethic = ethic_spiritualist
 				}
@@ -640,30 +639,30 @@ xeno_ward = {
 
 	# Pop/trait modifiers
 		# Per pop
-		inline_script = pop_categories/inline_evolved_per_pop
+		inline_script = pop_categories/inline_evolved_pop_modifiers
 		
 		
 		# Cyberdictatorship
-			triggered_pop_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						has_valid_civic = civic_tec_cyber_dictatorship
-					}
-					OR = {
-						has_ethic = ethic_materialist
-						has_ethic = ethic_authoritarian
-					}
-				}
-				species_empire_size_mult = -0.5
-			}
+			#triggered_pop_modifier = {
+			#	potential = {
+			#		exists = owner
+			#		owner = {
+			#			has_valid_civic = civic_tec_regular_cyber_dictatorship
+			#		}
+			#		OR = {
+			#			has_ethic = ethic_materialist
+			#			has_ethic = ethic_authoritarian
+			#		}
+			#	}
+			#	species_empire_size_mult = -0.5
+			#}
 		# /
 		# Consecrated Ideals
 			triggered_pop_modifier = {
 				potential = {
 					exists = owner
 					owner = {
-						has_valid_civic = civic_tec_consecrated_democracy
+						has_valid_civic = civic_tec_regular_consecrated_democracy
 					}
 					has_ethic = ethic_spiritualist
 				}
@@ -718,7 +717,7 @@ pre_sapients = {
 		
 		
 		# Per pop
-		inline_script = pop_categories/inline_evolved_per_pop
+		inline_script = pop_categories/inline_evolved_pop_modifiers
 		
 		
 	# /

@@ -1,10 +1,10 @@
-# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
-# Collectivist Socialists Faction
-# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
+# common\pop_faction_types\zz_evolved_socialists.txt
 
+# ------------------------------------------------- Cooperative Faction
 socialists = {
 	election_header = "GFX_faction_header_yellow"
 	guiding_ethic = ethic_socialism
+	visual_ethic = "tec_cooperative_visual_ethic"
 	
 	unique = yes
 	support_multiplier = 1
@@ -12,41 +12,19 @@ socialists = {
 	resources = {
 		category = pop_factions
 		produces = {
-			unity = @tec_fac_infl_produce
+			unity = @faction_base_unity
 		}
-		produces = {	# Political virtue
-			trigger = {
-				exists = owner
-				owner = {
-					has_valid_civic = civic_tec_political_virtue
-				}
-				pop_faction = {
-					faction_approval >= 0.5
-				}
-			}
-			energy = 0.5
+		inline_script = {
+			script = pop_faction_types/inline_evolved_tec_political_virtue
+			ethic = socialism
+			resource_1 = energy
+			count_1 = @tec_fac_political_virtue_basic
+			resource_2 = "#"
+			count_2 = 0
+			resource_3 = "#"
+			count_3 = 0
 		}
-		produces = {	# Political virtue
-			trigger = {
-				exists = owner
-				owner = {
-					has_valid_civic = civic_tec_political_virtue
-					is_cooperative = yes
-				}
-				pop_faction = {
-					faction_approval >= 0.5
-				}
-			}
-			energy = 0.1
-		}
-		produces = {	# Idealistic foundation
-			trigger = {
-				owner = {
-					has_valid_civic = civic_idealistic_foundation
-				}
-			}
-			influence = 0.005
-		}
+		inline_script = pop_faction_types/inline_evolved_tec_idealistic_foundation
 	}
 
 	#Note: number of potential or actual members is checked by POP_FACTION_MIN_POTENTIAL_MEMBERS define
@@ -71,7 +49,7 @@ socialists = {
 	can_join_faction = {
 		NOT = { tec_is_shackled_robot = { cached = yes } }
 		NOT = { tec_is_shackled_bioservant = { cached = yes } }
-		NOT = { tec_has_stapled_trait = { cached = yes } }
+		NOT = { tec_has_stapled_trait ={ cached = yes } }
 	}
 
 	attraction = {
@@ -82,7 +60,7 @@ socialists = {
 			exists = from
 			from = {
 				exists = leader
-				leader = { leader_class = ruler }
+				leader = { is_ruler = yes }
 			}
 		}
 		
@@ -106,7 +84,7 @@ socialists = {
 
 		modifier = {
 			factor = 0
-			leader_class = ruler
+			is_ruler = yes
 			owner = { has_authority = auth_imperial }
 		}
 
@@ -127,7 +105,7 @@ socialists = {
 	inline_script = {
 		script = pop_faction_types/demand_faction_pleased
 		FLAG = galcom_resolution_passed_pro_cooperative
-	}	
+	}
 	
 	# Evolved: List of demands
 		# Socialists want the good for everyone
@@ -143,9 +121,9 @@ socialists = {
 		# Pos scaling
 			# Stablished reserves (food or min)
 			demand = {	# POS - RESERVES
-				title = "TEC_FAC_SOC_RESERVES1"
-				unfulfilled_title = "TEC_FAC_SOC_NO_RESERVES1"
-				desc = "TEC_FAC_SOC_RESERVES1_DESC"
+				title = "TEC_FAC_COOP_RESERVES1"
+				unfulfilled_title = "TEC_FAC_COOP_NO_RESERVES1"
+				desc = "TEC_FAC_COOP_RESERVES1_DESC"
 				fulfilled_effect = 5
 				unfulfilled_effect = 0
 				potential = {
@@ -183,9 +161,9 @@ socialists = {
 				}
 			}
 			demand = {	# POS - RESERVES
-				title = "TEC_FAC_SOC_RESERVES2"
-				unfulfilled_title = "TEC_FAC_SOC_NO_RESERVES2"
-				desc = "TEC_FAC_SOC_RESERVES2_DESC"
+				title = "TEC_FAC_COOP_RESERVES2"
+				unfulfilled_title = "TEC_FAC_COOP_NO_RESERVES2"
+				desc = "TEC_FAC_COOP_RESERVES2_DESC"
 				fulfilled_effect = 10
 				unfulfilled_effect = 0
 				potential = {
@@ -225,9 +203,9 @@ socialists = {
 				}
 			}
 			demand = {	# POS - RESERVES
-				title = "TEC_FAC_SOC_RESERVES3"
-				unfulfilled_title = "TEC_FAC_SOC_NO_RESERVES3"
-				desc = "TEC_FAC_SOC_RESERVES3_DESC"
+				title = "TEC_FAC_COOP_RESERVES3"
+				unfulfilled_title = "TEC_FAC_COOP_NO_RESERVES3"
+				desc = "TEC_FAC_COOP_RESERVES3_DESC"
 				fulfilled_effect = 15
 				unfulfilled_effect = 0
 				potential = {
@@ -270,9 +248,9 @@ socialists = {
 		# Pos
 			# Welfare State
 			demand = {	# POS - SOC WELFARE
-				title = "TEC_FAC_SOC_WELFARE"
-				unfulfilled_title = "TEC_FAC_SOC_NO_WELFARE"
-				desc = "TEC_FAC_SOC_WELFARE_DESC"
+				title = "TEC_FAC_COOP_WELFARE"
+				unfulfilled_title = "TEC_FAC_COOP_NO_WELFARE"
+				desc = "TEC_FAC_COOP_WELFARE_DESC"
 				fulfilled_effect = 10
 				unfulfilled_effect = 0
 				potential = {
@@ -292,6 +270,14 @@ socialists = {
 										country = prev
 									}
 									has_living_standard = {
+										type = living_standard_worker_ownership
+										country = prev
+									}
+									has_living_standard = {
+										type = living_standard_tec_shared_ownership
+										country = prev
+									}
+									has_living_standard = {
 										type = living_standard_decadent
 										country = prev
 									}
@@ -301,10 +287,10 @@ socialists = {
 									}
 									# Excludes presapient and enslaved crafted species
 									is_sapient = no
-									owner = {
+									prev = {
 										species_rights_robot_full_rights_check_pop_faction = no
 									}
-									owner = {
+									prev = {
 										tec_species_rights_bioservant_full_rights_check_pop_faction = no
 									}
 								}
@@ -316,32 +302,32 @@ socialists = {
 				}
 			}
 			# Planned market
-			demand = {	# NEG - PLANNED MARKET
-				title = "TEC_FAC_SOC_PLANNED_MARKET"
-				unfulfilled_title = "TEC_FAC_SOC_NO_PLANNED_MARKET"
-				desc = "TEC_FAC_SOC_PLANNED_MARKET_DESC"
-				fulfilled_effect = 10
-				unfulfilled_effect = 0
-				potential = {
-					exists = owner
-					owner = {
-						can_set_policy = {
-							policy = economic_stance
-							option = economic_stance_planned
-						}
-					}
-				}
-				trigger = {
-					owner = {
-						has_policy_flag = economic_stance_planned
-					}
-				}
-			}
+			#demand = {	# NEG - PLANNED MARKET
+			#	title = "TEC_FAC_COOP_PLANNED_MARKET"
+			#	unfulfilled_title = "TEC_FAC_COOP_NO_PLANNED_MARKET"
+			#	desc = "TEC_FAC_COOP_PLANNED_MARKET_DESC"
+			#	fulfilled_effect = 10
+			#	unfulfilled_effect = 0
+			#	potential = {
+			#		exists = owner
+			#		owner = {
+			#			can_set_policy = {
+			#				policy = economic_stance
+			#				option = economic_stance_planned
+			#			}
+			#		}
+			#	}
+			#	trigger = {
+			#		owner = {
+			#			has_policy_flag = economic_stance_planned
+			#		}
+			#	}
+			#}	# OLD POLICY
 			# Developed Socialism
 			demand = {	# NEG - COOPERATIVE CIVICS
-				title = "TEC_FAC_SOC_DEVELOPED_SOCIALISM"
-				unfulfilled_title = "TEC_FAC_SOC_NO_DEVELOPED_SOCIALISM"
-				desc = "TEC_FAC_SOC_DEVELOPED_SOCIALISM_DESC"
+				title = "TEC_FAC_COOP_DEVELOPED_SOCIALISM"
+				unfulfilled_title = "TEC_FAC_COOP_NO_DEVELOPED_SOCIALISM"
+				desc = "TEC_FAC_COOP_DEVELOPED_SOCIALISM_DESC"
 				fulfilled_effect = 5
 				unfulfilled_effect = 0
 				potential = {
@@ -350,11 +336,11 @@ socialists = {
 				trigger = {
 					owner = {
 						OR = {
-							has_civic = civic_tec_syndical
-							has_civic = civic_tec_labour_unions
+							has_civic = civic_tec_regular_syndical
+							has_civic = civic_tec_regular_labour_unions
 							has_civic = civic_shared_burden
 							has_civic = civic_tec_corporate_comunistcorp
-							has_civic = civic_tec_enlightened_civilization
+							has_civic = civic_tec_regular_enlightened_civilization
 							has_civic = civic_tec_corporate_enlightment
 							has_civic = civic_tec_corporate_unions
 						}
@@ -363,9 +349,9 @@ socialists = {
 			}
 			# Statecraft traditions
 			demand = {	# NEG - STATECRAFT TRADITIONS
-				title = "TEC_FAC_SOC_STATECRAFT"
-				unfulfilled_title = "TEC_FAC_SOC_NO_STATECRAFT"
-				desc = "TEC_FAC_SOC_STATECRAFT_DESC"
+				title = "TEC_FAC_COOP_STATECRAFT"
+				unfulfilled_title = "TEC_FAC_COOP_NO_STATECRAFT"
+				desc = "TEC_FAC_COOP_STATECRAFT_DESC"
 				fulfilled_effect = 5
 				unfulfilled_effect = 0
 				potential = {
@@ -382,32 +368,32 @@ socialists = {
 		# /
 		# Neut
 			# State media
-			demand = {	# NEUT - STATE MEDIA
-				title = "TEC_FAC_SOC_STATEMEDIA"
-				unfulfilled_title = "TEC_FAC_SOC_NO_STATEMEDIA"
-				desc = "TEC_FAC_SOC_STATEMEDIA_DESC"
-				fulfilled_effect = 5
-				unfulfilled_effect = -5
-				potential = {
-					exists = owner
-					owner = {
-						can_set_policy = {
-							policy = interstellar_media
-							option = state_media
-						}
-					}
-				}
-				trigger = {
-					owner = {
-						has_policy_flag = state_media
-					}
-				}
-			}
+			#demand = {	# NEUT - STATE MEDIA
+			#	title = "TEC_FAC_COOP_STATEMEDIA"
+			#	unfulfilled_title = "TEC_FAC_COOP_NO_STATEMEDIA"
+			#	desc = "TEC_FAC_COOP_STATEMEDIA_DESC"
+			#	fulfilled_effect = 5
+			#	unfulfilled_effect = -5
+			#	potential = {
+			#		exists = owner
+			#		owner = {
+			#			can_set_policy = {
+			#				policy = interstellar_media
+			#				option = state_media
+			#			}
+			#		}
+			#	}
+			#	trigger = {
+			#		owner = {
+			#			has_policy_flag = state_media
+			#		}
+			#	}
+			#}	# OLD POLICY
 			# Social development
 			demand = {	# NEUT - SOCIAL TRADE
-				title = "TEC_FAC_SOC_SOCIALTRADE"
-				unfulfilled_title = "TEC_FAC_SOC_NO_SOCIALTRADE"
-				desc = "TEC_FAC_SOC_SOCIALTRADE_DESC"
+				title = "TEC_FAC_COOP_SOCIALTRADE"
+				unfulfilled_title = "TEC_FAC_COOP_NO_SOCIALTRADE"
+				desc = "TEC_FAC_COOP_SOCIALTRADE_DESC"
 				fulfilled_effect = 5
 				unfulfilled_effect = -5
 				potential = {
@@ -435,9 +421,9 @@ socialists = {
 		# Bad
 			# No public services
 			#demand = {	# NEG - PUBLIC SERVICES
-			#	title = "TEC_FAC_SOC_PUBLICSERVICES"
-			#	unfulfilled_title = "TEC_FAC_SOC_NO_PUBLICSERVICES"
-			#	desc = "TEC_FAC_SOC_PUBLICSERVICES_DESC"
+			#	title = "TEC_FAC_COOP_PUBLICSERVICES"
+			#	unfulfilled_title = "TEC_FAC_COOP_NO_PUBLICSERVICES"
+			#	desc = "TEC_FAC_COOP_PUBLICSERVICES_DESC"
 			#	fulfilled_effect = 0
 			#	unfulfilled_effect = -15
 			#	potential = {
@@ -467,29 +453,29 @@ socialists = {
 			#	}
 			#}
 			# Free market
-			demand = {	# NEUT - SOCIAL TRADE
-				title = "TEC_FAC_SOC_NOFREEMARKET"
-				unfulfilled_title = "TEC_FAC_SOC_NO_NOFREEMARKET"
-				desc = "TEC_FAC_SOC_NOFREEMARKET_DESC"
-				fulfilled_effect = 0
-				unfulfilled_effect = -15
-				potential = {
-					exists = owner
-					owner = {
-						can_set_policy = {
-							policy = bureaucracy
-							option = economic_stance_mixed
-						}
-					}
-				}
-				trigger = {
-					owner = {
-						NOT = {
-							has_policy_flag = economic_stance_market
-						}
-					}
-				}
-			}
+			#demand = {	# NEUT - SOCIAL TRADE
+			#	title = "TEC_FAC_COOP_NOFREEMARKET"
+			#	unfulfilled_title = "TEC_FAC_COOP_NO_NOFREEMARKET"
+			#	desc = "TEC_FAC_COOP_NOFREEMARKET_DESC"
+			#	fulfilled_effect = 0
+			#	unfulfilled_effect = -15
+			#	potential = {
+			#		exists = owner
+			#		owner = {
+			#			can_set_policy = {
+			#				policy = bureaucracy
+			#				option = economic_stance_mixed
+			#			}
+			#		}
+			#	}
+			#	trigger = {
+			#		owner = {
+			#			NOT = {
+			#				has_policy_flag = economic_stance_market
+			#			}
+			#		}
+			#	}
+			#}	# OLD POLICY
 		# /
 		demand = {	# NEG - FACTION NEGATIVE ECONOMY
 			title = "TEC_FACTION_NO_NEGATIVE_ECONOMY"
@@ -521,6 +507,19 @@ socialists = {
 			}
 		}
 	# /
+
+	# Faction Demands for Ruler and Council positions.
+	inline_script = {
+		script = "factions/inline_evolved_global_faction_demands"
+		ETHIC = ethic_socialism
+		ETHIC_FANATIC = ethic_fanatic_socialism
+		ETHIC_OPPOSED = ethic_capitalism
+		EXTRA_POTENTIAL = "
+			exists = owner
+			owner = { tec_is_aiauth_empire = no }
+		"
+	} 
+
 	
 	on_create = {
 		pop_faction_event = { id = factions.1 }
@@ -542,195 +541,9 @@ socialists = {
 	}
 
 
-	actions = {
-		embrace_faction = {
-			title = "EMBRACE_FACTION"
-			description = "EMBRACE_FACTION_DESC"
-			
-			cost = {
-				influence = @tec_fac_embrace_cost
-			}
-			
-			potential = {
-				exists = owner
-				owner = {
-					OR = {
-						is_subject = no
-						NOT = { any_agreement = { agreement_preset = preset_dominion } }
-					}
-				}
-			}
-			
-			valid = {
-				custom_tooltip = {
-					fail_text = EMBRACE_FACTION_COOLDOWN
-					parameter:empire = {
-						NOT = { has_modifier = embraced_faction_timer }
-					}
-				}
-				support > @tec_fac_embrace_min_support
-				parameter:empire = {
-					NOT = { has_ethic = "ethic_fanatic_socialism" }
-				}
-			}
-
-			effect = {
-				add_modifier = { modifier = embraced_faction days = @tec_fac_embrace_cd}
-				parameter:empire = {
-					shift_ethic = ethic_socialism
-					hidden_effect = {
-						add_modifier = { modifier = embraced_faction_timer days = @tec_fac_embrace_cd}
-						every_pop_faction = {
-							limit = { NOT = { is_same_value = root } }
-							add_modifier = { modifier = embraced_another_faction days = @tec_fac_embrace_cd}
-						}
-					}
-				}
-				hidden_effect = {
-					save_event_target_as = TargetFaction
-					parameter:empire = {
-						every_relation = {
-							limit = {
-								is_ai = no
-								tec_is_default_country = yes
-								has_communications = prev
-								has_intel_level = {
-									who = prev
-									category = government
-									level >= 1
-								}
-							}
-							country_event = { id = factions.2000 }
-						}
-					}
-				}
-			}
-			
-			ai_weight = {
-				base = 1
-				modifier = {
-					factor = 0
-					support < 0.50
-					owner = {
-						has_ethic = ethic_socialism
-					}
-				}
-				modifier = {
-					factor = 0
-					owner = { has_valid_civic = civic_fanatic_purifiers }
-				}
-				modifier = {
-					factor = 0
-					NOT = {
-						owner = {
-							exists = ruler
-							ruler = {
-								leader_of_faction = socialists
-							}
-						}
-					}
-				}
-				modifier = {
-					factor = 0
-					owner = {
-						count_pop_faction = {
-							count < 4
-						}
-					}
-				}
-			}
-		}
-		promote_faction = {
-			title = "PROMOTE_FACTION"
-			description = "PROMOTE_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					NOR = {
-						has_modifier = suppressed_socialism
-						has_modifier = promoted_socialism
-					}
-				}
-			}
-
-			effect = {
-				parameter:empire = {
-					add_modifier = { modifier = promoted_socialism days = -1 }
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
-		cancel_promote_faction = {
-			title = "CANCEL_PROMOTE_FACTION"
-			description = "CANCEL_PROMOTE_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					has_modifier = promoted_socialism
-				}
-			}
-
-			effect = {
-				parameter:empire = {
-					remove_modifier = promoted_socialism
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
-		suppress_faction = {
-			title = "SUPPRESS_FACTION"
-			description = "SUPPRESS_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					NOR = {
-						has_modifier = suppressed_socialism
-						has_modifier = promoted_socialism 
-					}
-				}
-			}
-
-			effect = {
-				add_modifier = { modifier = suppressed_faction days = -1 }
-				parameter:empire = {
-					add_modifier = { modifier = suppressed_socialism days = -1 }
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
-		cancel_suppress_faction = {
-			title = "CANCEL_SUPPRESS_FACTION"
-			description = "CANCEL_SUPPRESS_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					has_modifier = suppressed_socialism
-				}
-			}
-
-			effect = {
-				remove_modifier = suppressed_faction
-				parameter:empire = {
-					remove_modifier = suppressed_socialism
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
+	inline_script = { 
+			script = factions/inline_evolved_actions
+			ETHIC = socialism
+		
 	}
 }

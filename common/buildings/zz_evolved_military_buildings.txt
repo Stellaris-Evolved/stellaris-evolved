@@ -7,7 +7,9 @@
 building_military_academy = {
 	base_buildtime = @b2_time
 	base_cap_amount = 1
+	can_be_ruined = no
 	position_priority = 105		# Army
+	ai_estimate_without_unemployment = yes
 
 	category = army
 
@@ -24,7 +26,7 @@ building_military_academy = {
 		exists = owner
 		owner = { NOT = { tec_is_reanimator_empire = yes } }
 		
-		tec_ai_destroy_milacademy_building = yes
+		tec_ai_destroy_milacademy_building = no
 	}
 
 	allow = {
@@ -63,12 +65,16 @@ building_military_academy = {
 		display = with_desc
 		trigger = ""
 	}
+
+	inline_script =  buildings/effects/type/inline_evolved_military_academy
 }
 
 building_dread_encampment = {
 	base_buildtime = @b2_time
 	base_cap_amount = 1
+	can_be_ruined = no
 	position_priority = 105		# Army
+	ai_estimate_without_unemployment = yes
 
 	category = army
 
@@ -92,12 +98,7 @@ building_dread_encampment = {
 			script = buildings/resources/inline_evolved_resource_cost
 			tier = 2
 		}
-		inline_script = {
-			script = buildings/resources/inline_evolved_aibait
-			trigger = ""
-			building = building_dread_encampment
-		}
-	}	
+	}
 
 	army_modifier = {
 		army_starting_experience_add = 100
@@ -106,13 +107,19 @@ building_dread_encampment = {
 	inline_script = {
 		script = jobs/inline_evolved_job
 		job = necromancer
-		display = no_desc
+		display = with_desc
 		count = 1
 		mult = 1
 		trigger = ""
 	}
 
 	inline_script = buildings/effects/inline_evolved_tec_mortgage_edict
+	inline_script =  buildings/effects/type/inline_evolved_military_academy
+
+	inline_script = {
+		script = buildings/inline_evolved_aibait
+		trigger = ""
+	}
 }
 
 # ARMY
@@ -121,6 +128,7 @@ building_dread_encampment = {
 building_stronghold = {
 	base_buildtime = 240
 	position_priority = 150		# Army
+	can_be_ruined = no
 
 	category = army
 	exempt_from_ai_planet_specialization = no
@@ -130,12 +138,8 @@ building_stronghold = {
 	}
 
 	show_tech_unlock_if = {
-		owner = {
-			NOT = {
-				has_valid_civic = civic_reanimated_armies
-			}
-			tec_is_biohive = no
-		}
+		tec_is_biohive = no
+		tec_has_stronghold_buildings_swap = no
 	}
 	
 	upgrades = {
@@ -144,18 +148,13 @@ building_stronghold = {
 
 	potential = {
 		owner = {
-			NOR = {
-				has_valid_civic = civic_reanimated_armies
-				tec_is_biohive = yes
-			}
+			tec_is_biohive = no
+			tec_has_stronghold_buildings_swap = no
 		}
 		tec_ai_destroy_fortress_building = no
 	}
 
-	convert_to = {
-		building_tec_dread_stronghold
-		building_tec_biohive_stronghold
-	}
+	inline_script = buildings/convert_to/inline_evolved_stronghold_1
 	
 	resources = {
 		category = planet_buildings_strongholds
@@ -184,12 +183,19 @@ building_stronghold = {
 		display = with_desc
 		trigger = ""
 	}
+
+	inline_script = {
+		script = buildings/effects/type/inline_evolved_fortress
+		tier = 1
+		type = all
+	}
 }
 
 building_fortress = {
 	base_buildtime = @b1_time
 	can_build = no
 	planetary_ftl_inhibitor = yes
+	can_be_ruined = no
 	position_priority = 150		# Army
 
 	category = army
@@ -203,12 +209,16 @@ building_fortress = {
 		building_tec_bastion
 	}
 
+	show_tech_unlock_if = {
+		tec_is_biohive = no
+		tec_has_stronghold_buildings_swap = no
+	}
+
+
 	potential = {
 		owner = {
-			NOR = {
-				has_valid_civic = civic_reanimated_armies
-				tec_is_biohive = yes
-			}
+			tec_is_biohive = no
+			tec_has_stronghold_buildings_swap = no
 		}
 		tec_ai_destroy_fortress_building = no
 	}
@@ -217,10 +227,7 @@ building_fortress = {
 		has_upgraded_capital = yes
 	}
 
-	convert_to = {
-		building_tec_dread_fortress
-		building_tec_biohive_fortress
-	}
+	inline_script = buildings/convert_to/inline_evolved_stronghold_2
 
 	resources = {
 		category = planet_buildings_strongholds
@@ -254,12 +261,35 @@ building_fortress = {
 		display = with_desc
 		trigger = ""
 	}
+
+	inline_script = {
+		script = buildings/effects/type/inline_evolved_fortress
+		tier = 2
+		type = all
+	}
+
+	inline_script = {
+		script = buildings/inline_evolved_aibait_upgrade
+		job = soldier
+		trigger = "
+			owner = { is_regular_empire = yes }
+		"
+	}
+
+	inline_script = {
+		script = buildings/inline_evolved_aibait_upgrade
+		job = warrior_drone
+		trigger = "
+			owner = { is_gestalt = yes }
+		"
+	}
 }
 
 building_tec_bastion = {
 	base_buildtime = @b2_time
 	can_build = no
 	planetary_ftl_inhibitor = yes
+	can_be_ruined = no
 	position_priority = 150		# Army
 
 	category = army
@@ -268,12 +298,15 @@ building_tec_bastion = {
 		"tech_global_defense_grid_2"
 	}
 
+	show_tech_unlock_if = {
+		tec_is_biohive = no
+		tec_has_stronghold_buildings_swap = no
+	}
+
 	potential = {
 		owner = {
-			NOR = {
-				has_valid_civic = civic_reanimated_armies
-				tec_is_biohive = yes
-			}
+			tec_is_biohive = no
+			tec_has_stronghold_buildings_swap = no
 		}
 		tec_ai_destroy_fortress_building = no
 	}
@@ -281,12 +314,8 @@ building_tec_bastion = {
 	allow = {
 		has_upgraded_capital = yes
 	}
-	
-	convert_to = {
-		building_tec_dread_fortress
-		building_tec_biohive_fortress
-	}
 
+	inline_script = buildings/convert_to/inline_evolved_stronghold_3
 	
 	resources = {
 		category = planet_buildings_strongholds
@@ -320,11 +349,34 @@ building_tec_bastion = {
 		display = with_desc
 		trigger = ""
 	}
+
+	inline_script = {
+		script = buildings/effects/type/inline_evolved_fortress
+		tier = 3
+		type = all
+	}
+
+	inline_script = {
+		script = buildings/inline_evolved_aibait_upgrade
+		job = soldier
+		trigger = "
+			owner = { is_regular_empire = yes }
+		"
+	}
+
+	inline_script = {
+		script = buildings/inline_evolved_aibait_upgrade
+		job = warrior_drone
+		trigger = "
+			owner = { is_gestalt = yes }
+		"
+	}
 }
 
 # Dread Armies
 building_tec_dread_stronghold = {
 	base_buildtime = 240
+	can_be_ruined = no
 	position_priority = 150		# Army
 
 	category = army
@@ -334,10 +386,7 @@ building_tec_dread_stronghold = {
 	}
 
 	show_tech_unlock_if = {
-		owner = {
-			has_valid_civic = civic_reanimated_armies
-			tec_is_biohive = no
-		}
+		has_valid_civic = civic_reanimated_armies
 	}
 	
 	upgrades = {
@@ -351,11 +400,8 @@ building_tec_dread_stronghold = {
 		tec_ai_destroy_fortress_building = no
 	}
 
-	convert_to = {
-		building_stronghold
-		building_tec_biohive_stronghold
-	}
-	
+	inline_script = buildings/convert_to/inline_evolved_stronghold_1
+
 	resources = {
 		category = planet_buildings_strongholds
 		inline_script = {
@@ -369,31 +415,27 @@ building_tec_dread_stronghold = {
 	}
 
 	inline_script = {
-		script = jobs/inline_evolved_job
-		job = tec_necromonger
-		count = 1
+		script = jobs/inline_evolved_soldier
+		count = @b1_jobs
 		mult = 1
 		display = with_desc
+		trigger = ""
+	}
+
+	inline_script = {
+		script = buildings/effects/type/inline_evolved_fortress
+		tier = 1
+		type = regular
+	}
+
+	inline_script = {
+		script = buildings/inline_evolved_aibait
 		trigger = "
 			exists = owner
-			owner = { is_gestalt = no }
+			owner = {
+				used_naval_capacity_percent >= 1
+			}
 		"
-	}
-
-	inline_script = {
-		script = jobs/inline_evolved_soldier
-		count = @[ b1_jobs - 1 ]
-		mult = 1
-		display = with_desc
-		trigger = ""
-	}
-
-	inline_script = {
-		script = jobs/inline_evolved_warrior_drone
-		count = @[ b1_jobs - 1 ]
-		mult = 1
-		display = with_desc
-		trigger = ""
 	}
 }
 
@@ -401,6 +443,7 @@ building_tec_dread_fortress = {
 	base_buildtime = @b1_time
 	can_build = no
 	planetary_ftl_inhibitor = yes
+	can_be_ruined = no
 	position_priority = 150		# Army
 
 	category = army
@@ -410,10 +453,7 @@ building_tec_dread_fortress = {
 	}
 
 	show_tech_unlock_if = {
-		owner = {
-			has_valid_civic = civic_reanimated_armies
-			tec_is_biohive = no
-		}
+		has_valid_civic = civic_reanimated_armies
 	}
 
 	upgrades = {
@@ -431,10 +471,7 @@ building_tec_dread_fortress = {
 		has_upgraded_capital = yes
 	}
 
-	convert_to = {
-		building_fortress
-		building_tec_biohive_fortress
-	}
+	inline_script = buildings/convert_to/inline_evolved_stronghold_2
 	
 	resources = {
 		category = planet_buildings_strongholds
@@ -454,39 +491,41 @@ building_tec_dread_fortress = {
 	}
 
 	inline_script = {
-		script = jobs/inline_evolved_job
-		job = tec_necromonger
-		count = 1
+		script = jobs/inline_evolved_soldier
+		count = @b2_jobs
 		mult = 1
 		display = with_desc
+		trigger = ""
+	}
+
+	inline_script = {
+		script = buildings/effects/type/inline_evolved_fortress
+		tier = 2
+		type = regular
+	}
+
+	inline_script = {
+		script = buildings/inline_evolved_aibait_upgrade
+		job = tec_necromonger
+		trigger = ""
+	}
+
+	inline_script = {
+		script = buildings/inline_evolved_aibait
 		trigger = "
 			exists = owner
-			owner = { is_gestalt = no }
+			owner = {
+				used_naval_capacity_percent >= 1
+			}
 		"
 	}
-
-	inline_script = {
-		script = jobs/inline_evolved_soldier
-		count = @[ b2_jobs - 1 ]
-		mult = 1
-		display = with_desc
-		trigger = ""
-	}
-
-	inline_script = {
-		script = jobs/inline_evolved_warrior_drone
-		count = @[ b2_jobs - 1 ]
-		mult = 1
-		display = with_desc
-		trigger = ""
-	}
-
 }
 
 building_tec_dread_bastion = {
 	base_buildtime = @b2_time
 	can_build = no
 	planetary_ftl_inhibitor = yes
+	can_be_ruined = no
 	position_priority = 150		# Army
 
 	category = army
@@ -496,15 +535,12 @@ building_tec_dread_bastion = {
 	}
 
 	show_tech_unlock_if = {
-		owner = {
-			has_valid_civic = civic_reanimated_armies
-		}
+		has_valid_civic = civic_reanimated_armies
 	}
 
 	potential = {
 		owner = {
 			has_valid_civic = civic_reanimated_armies
-			tec_is_biohive = no
 		}
 		tec_ai_destroy_fortress_building = no
 	}
@@ -512,11 +548,8 @@ building_tec_dread_bastion = {
 	allow = {
 		has_upgraded_capital = yes
 	}
-	
-	convert_to = {
-		building_fortress
-		building_tec_biohive_fortress
-	}
+
+	inline_script = buildings/convert_to/inline_evolved_stronghold_3
 
 	resources = {
 		category = planet_buildings_strongholds
@@ -536,297 +569,550 @@ building_tec_dread_bastion = {
 	}
 
 	inline_script = {
-		script = jobs/inline_evolved_job
-		job = tec_necromonger
-		count = 2
+		script = jobs/inline_evolved_soldier
+		count = @b3_jobs
 		mult = 1
 		display = with_desc
+		trigger = ""
+	}
+
+	inline_script = {
+		script = buildings/effects/type/inline_evolved_fortress
+		tier = 3
+		type = regular
+	}
+
+	inline_script = {
+		script = buildings/inline_evolved_aibait_upgrade
+		job = tec_necromonger
+		trigger = ""
+	}
+
+	inline_script = {
+		script = buildings/inline_evolved_aibait
 		trigger = "
 			exists = owner
-			owner = { is_gestalt = no }
+			owner = {
+				used_naval_capacity_percent >= 1
+			}
 		"
-	}
-
-	inline_script = {
-		script = jobs/inline_evolved_soldier
-		count = @[ b3_jobs - 2 ]
-		mult = 1
-		display = with_desc
-		trigger = ""
-	}
-
-	inline_script = {
-		script = jobs/inline_evolved_warrior_drone
-		count = @[ b3_jobs - 2 ]
-		mult = 1
-		display = with_desc
-		trigger = ""
 	}
 }
 
 # NAVAL
 # -----------------------------------------
-# Regular
-building_tec_naval_academy = {
-	base_buildtime = @b1_time
-	position_priority = 150		# Army
+	# Regular
+	building_tec_naval_academy_1 = {
+		base_buildtime = @b1_time
+		position_priority = 150		# Army
 
-	category = army
-			
-	prerequisites = {
-		"tech_global_defense_grid"
-	}
-
-	upgrades = {
-		building_tec_naval_academy_2
-	}
-
-	show_tech_unlock_if = {
-		owner = {
-			is_gestalt = no
+		category = army
+				
+		prerequisites = {
+			"tech_planetary_defenses"
 		}
-	}
 
-	potential = {
-		owner = {
-			is_gestalt = no
+		upgrades = {
+			building_tec_naval_academy_2
 		}
-		tec_ai_destroy_fortress_building = no
-	}
 
-	allow = {
-		has_upgraded_capital = yes
-	}
+		show_tech_unlock_if = {
+			is_gestalt = no
+			tec_has_naval_academy_buildings_swap = no
+		}
 
-	convert_to = {
-		building_tec_naval_gestalt
-		building_tec_biohive_naval
-	}
+		potential = {
+			owner = {
+				is_gestalt = no
+				tec_has_naval_academy_buildings_swap = no
+			}
+		}
 
-	resources = {
-		category = planet_buildings
+		allow = {
+			has_upgraded_capital = yes
+		}
+
+		inline_script = buildings/convert_to/inline_evolved_naval_academy_1
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 1
+			}
+		}
+
 		inline_script = {
-			script = buildings/resources/inline_evolved_resource_cost
+			script = jobs/inline_evolved_tec_naval_operator
+			count = @b1_jobs
+			mult = 1
+			display = with_desc
+			trigger = "" 
+		}
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_naval_academy
+			tier = 1
+			type = regular
+		}
+
+		inline_script = {
+			script = buildings/inline_evolved_aibait
+			trigger = "
+				exists = owner
+				owner = {
+					used_naval_capacity_percent >= 1
+					NOT = { tec_has_soldier_swap = { cached = yes } }
+				}
+			"
+		}
+	}
+
+	building_tec_naval_academy_2 = {
+		base_buildtime = @b2_time
+		can_build = no
+		planetary_ftl_inhibitor = yes
+		position_priority = 150		# Army
+
+		category = army
+		
+		prerequisites = {
+			"tech_interstellar_fleet_traditions"
+		}
+
+		upgrades = {
+			building_tec_naval_academy_3
+		}
+
+		show_tech_unlock_if = {
+			is_gestalt = no
+			tec_has_naval_academy_buildings_swap = no
+		}
+
+		potential = {
+			owner = {
+				is_gestalt = no
+				tec_has_naval_academy_buildings_swap = no
+			}
+		}
+
+		allow = {
+			has_upgraded_capital = yes
+		}
+
+		inline_script = buildings/convert_to/inline_evolved_naval_academy_2
+
+		resources = {
+			category = planet_buildings_strongholds
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
+			}
+			inline_script = {
+				script = buildings/resources/inline_evolved_rare_resource_cost
+				tier = 2
+				rare = rare_crystals
+			}
+		}
+
+		inline_script = {
+			script = jobs/inline_evolved_tec_naval_operator
+			count = @b2_jobs
+			mult = 1
+			display = with_desc
+			trigger = "" 
+		}
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_naval_academy
 			tier = 2
+			type = regular
 		}
+
 		inline_script = {
-			script = buildings/resources/inline_evolved_rare_resource_cost
-			tier = 2
-			rare = volatile_motes
+			script = buildings/inline_evolved_aibait_upgrade
+			job = tec_naval_operator
+			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/inline_evolved_aibait
+			trigger = "
+				exists = owner
+				owner = {
+					used_naval_capacity_percent >= 1
+					NOT = { tec_has_soldier_swap = { cached = yes } }
+				}
+			"
 		}
 	}
-	
-	planet_modifier = {
-		planet_housing_add = 2
-	}
 
-	inline_script = {
-		script = jobs/inline_evolved_cadet
-		count = @b1_jobs
-		mult = 1
-		display = with_desc
-		trigger = "" 
-	}
-}
+	building_tec_naval_academy_3 = {
+		base_buildtime = @b4_time
+		can_build = no
+		planetary_ftl_inhibitor = yes
+		position_priority = 150		# Army
 
-building_tec_naval_academy_2 = {
-	base_buildtime = @b2_time
-	can_build = no
-	planetary_ftl_inhibitor = yes
-	position_priority = 150		# Army
+		category = army
+		
+		prerequisites = {
+			"tech_command_matrix"
+		}
 
-	category = army
-	
-	prerequisites = {
-		"tech_global_defense_grid_2"
-	}
-
-	show_tech_unlock_if = {
-		owner = {
+		show_tech_unlock_if = {
 			is_gestalt = no
+			tec_has_naval_academy_buildings_swap = no
 		}
-	}
 
-	potential = {
-		owner = {
-			is_gestalt = no
+		potential = {
+			owner = {
+				is_gestalt = no
+				tec_has_naval_academy_buildings_swap = no
+			}
 		}
-		tec_ai_destroy_fortress_building = no
-	}
 
-	allow = {
-		has_upgraded_capital = yes
-	}
+		allow = {
+			has_upgraded_capital = yes
+		}
 
-	convert_to = {
-		building_tec_naval_gestalt_2
-		building_tec_biohive_naval_2
-	}
+		inline_script = buildings/convert_to/inline_evolved_naval_academy_3
 
-	
-	resources = {
-		category = planet_buildings_strongholds
+		resources = {
+			category = planet_buildings_strongholds
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 3
+			}
+			inline_script = {
+				script = buildings/resources/inline_evolved_rare_resource_cost
+				tier = 3
+				rare = rare_crystals
+			}
+		}
+
 		inline_script = {
-			script = buildings/resources/inline_evolved_resource_cost
-			tier = 3
+			script = jobs/inline_evolved_tec_naval_operator
+			count = @b3_jobs
+			mult = 1
+			display = with_desc
+			trigger = "" 
 		}
+
 		inline_script = {
-			script = buildings/resources/inline_evolved_rare_resource_cost
+			script = buildings/effects/type/inline_evolved_naval_academy
 			tier = 3
-			rare = volatile_motes
+			type = regular
+		}
+
+		inline_script = {
+			script = buildings/inline_evolved_aibait_upgrade
+			job = tec_naval_operator
+			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/inline_evolved_aibait
+			trigger = "
+				exists = owner
+				owner = {
+					used_naval_capacity_percent >= 1
+					NOT = { tec_has_soldier_swap = { cached = yes } }
+				}
+			"
 		}
 	}
-	
-	planet_modifier = {
-		planet_housing_add = @b2_jobs
-	}
 
-	inline_script = {
-		script = jobs/inline_evolved_cadet
-		count = @b2_jobs
-		mult = 1
-		display = with_desc
-		trigger = "" 
-	}
-}
+	# Gestalt
+	building_tec_naval_gestalt_1 = {
+		base_buildtime = @b1_time
+		position_priority = 150		# Army
+		icon = building_tec_naval_academy_1
 
-# Gestalt
-building_tec_naval_gestalt = {
-	base_buildtime = @b1_time
-	position_priority = 150		# Army
-	icon = building_tec_naval_academy
+		category = army
+				
+		prerequisites = {
+			"tech_planetary_defenses"
+		}
 
-	category = army
-			
-	prerequisites = {
-		"tech_global_defense_grid"
-	}
+		upgrades = {
+			building_tec_naval_gestalt_2
+		}
 
-	upgrades = {
-		building_tec_naval_gestalt_2
-	}
-
-	show_tech_unlock_if = {
-		owner = {
+		show_tech_unlock_if = {
 			is_gestalt = yes
 			tec_is_biohive = no
+			tec_has_naval_academy_buildings_swap = no
+		}
+
+		potential = {
+			owner = {
+				is_gestalt = yes
+				tec_is_biohive = no
+				tec_has_naval_academy_buildings_swap = no
+			}
+		}
+
+		allow = {
+			has_upgraded_capital = yes
+		}
+
+		inline_script = buildings/convert_to/inline_evolved_naval_academy_1
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 1
+			}
+		}
+
+		inline_script = {
+			script = jobs/inline_evolved_tec_naval_operator
+			count = @b1_jobs
+			mult = 1
+			display = with_desc
+			trigger = "" 
+		}
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_naval_academy
+			tier = 1
+			type = gestalt
+		}
+
+		inline_script = {
+			script = buildings/inline_evolved_aibait
+			trigger = "
+				exists = owner
+				owner = {
+					used_naval_capacity_percent >= 1
+					NOT = { tec_has_soldier_swap = { cached = yes } }
+				}
+			"
 		}
 	}
 
-	potential = {
-		owner = {
+	building_tec_naval_gestalt_2 = {
+		base_buildtime = @b2_time
+		can_build = no
+		planetary_ftl_inhibitor = yes
+		position_priority = 150		# Army
+		icon = building_tec_naval_academy_2
+
+		category = army
+		
+		prerequisites = {
+			"tech_interstellar_fleet_traditions"
+		}
+
+		upgrades = {
+			building_tec_naval_gestalt_3
+		}
+
+		show_tech_unlock_if = {
 			is_gestalt = yes
 			tec_is_biohive = no
+			tec_has_naval_academy_buildings_swap = no
 		}
-		tec_ai_destroy_fortress_building = no
-	}
 
-	allow = {
-		has_upgraded_capital = yes
-	}
+		potential = {
+			owner = {
+				is_gestalt = yes
+				tec_is_biohive = no
+				tec_has_naval_academy_buildings_swap = no
+			}
+		}
 
-	convert_to = {
-		building_tec_naval_academy
-		building_tec_biohive_naval
-	}
+		allow = {
+			has_upgraded_capital = yes
+		}
 
-	resources = {
-		category = planet_buildings
+		inline_script = buildings/convert_to/inline_evolved_naval_academy_2
+
+		resources = {
+			category = planet_buildings_strongholds
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
+			}
+			inline_script = {
+				script = buildings/resources/inline_evolved_rare_resource_cost
+				tier = 2
+				rare = rare_crystals
+			}
+		}
+
 		inline_script = {
-			script = buildings/resources/inline_evolved_resource_cost
+			script = jobs/inline_evolved_tec_naval_operator
+			count = @b2_jobs
+			mult = 1
+			display = with_desc
+			trigger = "" 
+		}
+
+		inline_script = {
+			script = buildings/inline_evolved_aibait_upgrade
+			job = tec_naval_operator_drone
+			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_naval_academy
 			tier = 2
+			type = gestalt
 		}
+
 		inline_script = {
-			script = buildings/resources/inline_evolved_rare_resource_cost
-			tier = 2
-			rare = volatile_motes
+			script = buildings/inline_evolved_aibait
+			trigger = "
+				exists = owner
+				owner = {
+					used_naval_capacity_percent >= 1
+					NOT = { tec_has_soldier_swap = { cached = yes } }
+				}
+			"
 		}
 	}
-	
-	planet_modifier = {
-		planet_housing_add = 2
-	}
-	
-	inline_script = {
-		script = jobs/inline_evolved_cadet
-		count = @b1_jobs
-		mult = 1
-		display = with_desc
-		trigger = "" 
-	}
 
-}
+	building_tec_naval_gestalt_3 = {
+		base_buildtime = @b4_time
+		can_build = no
+		planetary_ftl_inhibitor = yes
+		position_priority = 150		# Army
+		icon = building_tec_naval_academy_3
 
-building_tec_naval_gestalt_2 = {
-	base_buildtime = @b2_time
-	can_build = no
-	planetary_ftl_inhibitor = yes
-	position_priority = 150		# Army
-	icon = building_tec_naval_academy_2
+		category = army
+		
+		prerequisites = {
+			"tech_command_matrix"
+		}
 
-	category = army
-	
-	prerequisites = {
-		"tech_global_defense_grid_2"
-	}
-
-	show_tech_unlock_if = {
-		owner = {
+		show_tech_unlock_if = {
 			is_gestalt = yes
 			tec_is_biohive = no
+			tec_has_naval_academy_buildings_swap = no
 		}
-	}
 
-	potential = {
-		owner = {
-			is_gestalt = yes
-			tec_is_biohive = no
+		potential = {
+			owner = {
+				is_gestalt = yes
+				tec_is_biohive = no
+				tec_has_naval_academy_buildings_swap = no
+			}
 		}
-		tec_ai_destroy_fortress_building = no
-	}
 
-	allow = {
-		has_upgraded_capital = yes
-	}
+		allow = {
+			has_upgraded_capital = yes
+		}
 
-	convert_to = {
-		building_tec_naval_academy_2 
-		building_tec_biohive_naval_2
-	}
+		inline_script = buildings/convert_to/inline_evolved_naval_academy_3
 
-	
-	resources = {
-		category = planet_buildings_strongholds
+		resources = {
+			category = planet_buildings_strongholds
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 3
+			}
+			inline_script = {
+				script = buildings/resources/inline_evolved_rare_resource_cost
+				tier = 3
+				rare = rare_crystals
+			}
+		}
+
 		inline_script = {
-			script = buildings/resources/inline_evolved_resource_cost
-			tier = 3
+			script = jobs/inline_evolved_tec_naval_operator
+			count = @b3_jobs
+			mult = 1
+			display = with_desc
+			trigger = "" 
 		}
+
 		inline_script = {
-			script = buildings/resources/inline_evolved_rare_resource_cost
+			script = buildings/effects/type/inline_evolved_naval_academy
 			tier = 3
-			rare = volatile_motes
+			type = gestalt
 		}
-	}
-	
-	planet_modifier = {
-		planet_housing_add = @b2_jobs
+
+		inline_script = {
+			script = buildings/inline_evolved_aibait_upgrade
+			job = tec_naval_operator_drone
+			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/inline_evolved_aibait
+			trigger = "
+				exists = owner
+				owner = {
+					used_naval_capacity_percent >= 1
+					NOT = { tec_has_soldier_swap = { cached = yes } }
+				}
+			"
+		}
 	}
 
-	inline_script = {
-		script = jobs/inline_evolved_cadet
-		count = @b2_jobs
-		mult = 1
-		display = with_desc
-		trigger = "" 
+	# Biohive
+	building_tec_naval_biohive_1 = {
+		icon = building_capital
+		category = research
+		potential = {
+			always = no
+		}
+		allow = {
+			always = no
+		}
+		resources = {
+			category = planet_buildings
+			cost = {
+				minerals = 1
+			}
+		}
 	}
-}
+
+	building_tec_naval_biohive_2 = {
+		icon = building_capital
+		category = research
+		potential = {
+			always = no
+		}
+		allow = {
+			always = no
+		}
+		resources = {
+			category = planet_buildings
+			cost = {
+				minerals = 1
+			}
+		}
+	}
+
+	building_tec_naval_biohive_3 = {
+		icon = building_capital
+		category = research
+		potential = {
+			always = no
+		}
+		allow = {
+			always = no
+		}
+		resources = {
+			category = planet_buildings
+			cost = {
+				minerals = 1
+			}
+		}
+	}
+# /
 
 # OTHER
 # -----------------------------------------
 building_planetary_shield_generator = {
 	base_buildtime = @b3_time	
 	base_cap_amount = 1
+	can_be_ruined = no
 	position_priority = 150		# Army
+	ai_estimate_without_unemployment = yes
 
 	category = army
 	
@@ -899,7 +1185,7 @@ building_planetary_shield_generator = {
 #		}
 #		produces = {
 #			trigger = {
-#				owner = { has_valid_civic = civic_tec_secured_domain }
+#				owner = { has_valid_civic = civic_tec_regular_secured_domain }
 #			}
 #			unity = 4
 #		}

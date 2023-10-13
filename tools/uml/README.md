@@ -13,7 +13,7 @@ Python can be installed from `https://www.python.org/downloads/` or be installed
 Run in therminal the following command, from root folder:
 
 ```
-pip install -r .\tools\uml\requirements.txt
+pip install -r ./tools/uml/requirements.txt
 ```
 
 ## Running the Tool
@@ -33,5 +33,16 @@ python -m tools.uml.cli generate-loc --config <path to config> --output <path to
 For Stellaris Evolved I would recommand doing:
 
 ```
-python -m tools.uml.cli generate-loc --config .\tools\uml\config.yml --output .\localisation\english\replace\zzzz_uml_modifier_l_english.yml
+python -m tools.uml.cli generate-loc --config ./tools/uml/config.yml --output ./localisation/english/replace/zzzz_uml_modifier_l_english.yml --base-mod-path . --missing-sprites-output
+```
+
+or for linux
+
+```bash
+python -m tools.uml.cli generate-loc --config ./tools/uml/config.yml --output ./localisation/english/replace/zzzz_uml_modifier_l_english.yml --base-mod-path . --missing-sprites-output "./interface/\!\!_missing_sprites_cleanup.gfx"
+```
+## Generating moddability support
+
+```bash
+python -m tools.uml.cli create-compat-inlines --config ./tools/uml/config.yml  
 ```

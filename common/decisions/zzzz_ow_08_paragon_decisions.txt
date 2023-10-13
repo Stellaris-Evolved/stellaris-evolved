@@ -1,0 +1,104 @@
+######################
+# PARAGON DECISIONS #
+######################
+#decision_deploy_beholder
+
+decision_psi_inoculate_pops = {	# Altered to count evolved traits
+	owned_planets_only = yes
+	sound = event_activating_unknown_technology
+	icon = decision_psi_inoculate_pops
+
+	enactment_time = 180
+
+	resources = {
+		category = decisions
+		cost = { sr_zro = 100 }
+	}
+
+	allow = {
+		custom_tooltip = {
+			fail_text = no_organic_pops_on_planet
+			any_owned_pop = {
+				is_organic_species = yes
+				is_being_assimilated = no
+				NOR = {
+					tec_is_cyborg_species_no_repl = yes
+					tec_is_total_psionic_species = yes
+				}
+			}
+		}
+	}
+
+	potential = {
+		exists = event_target:beholder_leader
+		has_building = building_the_beholder
+	}
+
+	
+	on_queued = {
+		# Set flag to prevent Temple of Whispers deployment
+		set_planet_flag = psi_inoculating_pops
+	}
+
+	abort_trigger = {
+		NOT = { exists = event_target:beholder_leader }
+	}
+
+	on_unqueued = {
+		# Remove Temple of Whispers deployment-prevention flag
+		remove_planet_flag = psi_inoculating_pops
+	}
+
+	abort_effect = {
+		# Remove Temple of Whispers deployment-prevention flag
+		remove_planet_flag = psi_inoculating_pops
+	}
+
+	effect = {
+		custom_tooltip = decision_psi_inoculate_pops_custom_tooltip
+		hidden_effect = {
+			random_owned_pop = {
+				limit = {
+					is_organic_species = yes
+					is_being_assimilated = no
+					NOR = {
+						tec_is_total_psionic_species = yes
+						tec_is_cyborg_species_no_repl = yes
+					}
+				}
+				modify_species = {
+					remove_trait = trait_latent_psionic
+					add_trait = trait_psionic
+				}
+			}
+			
+			# Remove Temple of Whispers deployment-prevention flag
+			remove_planet_flag = psi_inoculating_pops
+			create_message = {
+				type = MESSAGE_POPS_INOCULATED
+				localization = MESSAGE_POPS_INOCULATED_DESC
+				days = 20
+				target = root
+				variable = {
+					type = name
+					localization = PLANET
+					scope = root
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 2
+	}
+}
+
+##decision_paragon_origin_cybernetic
+
+##decision_paragon_origin_synthetic
+
+##decision_paragon_origin_genetic
+
+#decision_paragon_origin_immortal_throne
+
+#decision_paragon_origin_subdue_reformists

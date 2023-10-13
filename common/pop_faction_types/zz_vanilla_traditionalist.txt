@@ -1,10 +1,10 @@
-# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
-# Traditionalist Faction
-# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
+# common\pop_faction_types\zz_vanilla_traditionalist.txt
 
+# ------------------------------------------------- Spiritualist Faction
 traditionalist = {
 	election_header = "GFX_faction_header_yellow"
 	guiding_ethic = ethic_spiritualist
+	visual_ethic = "traditionalist_visual_ethic"
 	
 	unique = yes
 	support_multiplier = 1
@@ -12,39 +12,19 @@ traditionalist = {
 	resources = {
 		category = pop_factions
 		produces = {
-			unity = @tec_fac_infl_produce
+			unity = @faction_base_unity
 		}
-		produces = {	# Political virtue
-			trigger = {
-				owner = {
-					has_valid_civic = civic_tec_political_virtue
-				}
-				pop_faction = {
-					faction_approval >= 0.5
-				}
-			}
-			unity = 0.20
+		inline_script = {
+			script = pop_faction_types/inline_evolved_tec_political_virtue
+			ethic = spiritualist
+			resource_1 = unity
+			count_1 = @tec_fac_political_virtue_advanced
+			resource_2 = "#"
+			count_2 = 0
+			resource_3 = "#"
+			count_3 = 0
 		}
-		produces = {	# Political virtue
-			trigger = {
-				owner = {
-					has_valid_civic = civic_tec_political_virtue
-					is_spiritualist = yes
-				}
-				pop_faction = {
-					faction_approval >= 0.5
-				}
-			}
-			unity = 0.05
-		}
-		produces = {	# Idealistic foundation
-			trigger = {
-				owner = {
-					has_valid_civic = civic_idealistic_foundation
-				}
-			}
-			influence = 0.005
-		}
+		inline_script = pop_faction_types/inline_evolved_tec_idealistic_foundation
 	}
 
 	#Note: number of potential or actual members is checked by POP_FACTION_MIN_POTENTIAL_MEMBERS define
@@ -76,7 +56,7 @@ traditionalist = {
 		}
 		NOT = { tec_is_shackled_robot = { cached = yes } }
 		NOT = { tec_is_shackled_bioservant = { cached = yes } }
-		NOT = { tec_has_stapled_trait = { cached = yes } }
+		NOT = { tec_has_stapled_trait ={ cached = yes } }
 	}
 	
 	attraction = {
@@ -87,7 +67,7 @@ traditionalist = {
 			exists = from
 			from = {
 				exists = leader
-				leader = { leader_class = ruler }
+				leader = { is_ruler = yes }
 			}
 		}
 		
@@ -244,7 +224,12 @@ traditionalist = {
 				}
 				trigger = {
 					owner = {
-						tec_has_psionic_ascension_path = yes
+						OR = {
+							tec_has_psionic_ascension_path = yes
+							has_ascension_perk = ap_tec_psionic_ascendance
+							has_ascension_perk = ap_tec_cyberpsionic
+							has_ascension_perk = ap_tec_biopsionic
+						}
 					}
 				}
 			}
@@ -287,7 +272,7 @@ traditionalist = {
 					owner = {
 						tec_is_robot_lover_spiritualist = yes
 						NOT = {
-							has_civic = civic_tec_occultist
+							has_civic = civic_tec_regular_occultist
 						}
 						num_ascension_perks > 1
 						has_technology = tech_droid_workers
@@ -306,30 +291,30 @@ traditionalist = {
 				}
 			}
 			# Focused cult
-			demand = { # POS - FOCUS CULT
-				title = "TEC_FAC_SPI_FOCUSCULT"
-				unfulfilled_title = "TEC_FAC_SPI_NO_FOCUSCULT"
-				desc = "TEC_FAC_SPI_FOCUSCULT_DESC"
-				fulfilled_effect = 5
-				unfulfilled_effect = 0
-				potential = {
-					exists = owner
-					owner = {
-						is_spiritualist = yes
-						can_set_policy = {
-							policy = religious_cult_policy
-							option = free_religious_cult
-						}
-					}
-				}
-				trigger = {
-					owner = {
-						NOR = {
-							has_policy_flag = free_religious_cult
-						}
-					}
-				}
-			}
+			#demand = { # POS - FOCUS CULT
+			#	title = "TEC_FAC_SPI_FOCUSCULT"
+			#	unfulfilled_title = "TEC_FAC_SPI_NO_FOCUSCULT"
+			#	desc = "TEC_FAC_SPI_FOCUSCULT_DESC"
+			#	fulfilled_effect = 5
+			#	unfulfilled_effect = 0
+			#	potential = {
+			#		exists = owner
+			#		owner = {
+			#			is_spiritualist = yes
+			#			can_set_policy = {
+			#				policy = religious_cult_policy
+			#				option = free_religious_cult
+			#			}
+			#		}
+			#	}
+			#	trigger = {
+			#		owner = {
+			#			NOR = {
+			#				has_policy_flag = free_religious_cult
+			#			}
+			#		}
+			#	}
+			#}	# OLD POLICY
 			# Theocracy government
 			demand = { # NEUT - THEOCRACY
 				title = "TEC_FAC_SPI_THEOCRACY"
@@ -346,7 +331,7 @@ traditionalist = {
 							has_authority = auth_tec_theocracy
 							AND = {
 								has_authority = auth_oligarchic
-								has_valid_civic = civic_tec_divine_circle
+								has_valid_civic = civic_tec_regular_divine_circle
 							}
 							has_civic = civic_imperial_cult
 						}
@@ -442,7 +427,7 @@ traditionalist = {
 						is_spiritualist = yes
 						tec_is_robot_lover_spiritualist = no
 						NOT = {
-							has_civic = civic_tec_occultist
+							has_civic = civic_tec_regular_occultist
 						}
 					}
 				}
@@ -464,7 +449,7 @@ traditionalist = {
 						is_spiritualist = yes
 						tec_is_robot_lover_spiritualist = yes
 						NOT = {
-							has_civic = civic_tec_occultist
+							has_civic = civic_tec_regular_occultist
 						}
 					}
 				}
@@ -684,6 +669,18 @@ traditionalist = {
 			}
 		}
 	# /
+
+	# Faction Demands for Ruler and Council positions.
+	inline_script = {
+		script = "factions/inline_evolved_global_faction_demands"
+		ETHIC = ethic_spiritualist
+		ETHIC_FANATIC = ethic_fanatic_spiritualist
+		ETHIC_OPPOSED = ethic_materialist
+		EXTRA_POTENTIAL = "
+			exists = owner
+			owner = { tec_is_aiauth_empire = no }
+		"
+	} 
 	
 	on_create = {
 		pop_faction_event = { id = factions.1 }
@@ -704,212 +701,9 @@ traditionalist = {
 		}
 	}
 	
-	actions = {
-		embrace_faction = {
-			title = "EMBRACE_FACTION"
-			description = "EMBRACE_FACTION_DESC"
-			
-			cost = {
-				influence = @tec_fac_embrace_cost
-			}
-			
-			potential = {
-				exists = owner
-				owner = {
-					OR = {
-						is_subject = no
-						NOT = { any_agreement = { agreement_preset = preset_dominion } }
-					}
-				}
-			}
-			
-			valid = {
-				custom_tooltip = {
-					fail_text = EMBRACE_FACTION_COOLDOWN
-					parameter:empire = {
-						NOT = { has_modifier = embraced_faction_timer }
-					}
-				}
-				support > @tec_fac_embrace_min_support
-				parameter:empire = {
-					NOT = { has_ethic = "ethic_fanatic_spiritualist" }
-				}
-			}
-
-			effect = {
-				add_modifier = { modifier = embraced_faction days = @tec_fac_embrace_cd}
-				parameter:empire = {
-					shift_ethic = ethic_spiritualist
-					hidden_effect = {
-						add_modifier = { modifier = embraced_faction_timer days = @tec_fac_embrace_cd}
-						every_pop_faction = {
-							limit = { NOT = { is_same_value = root } }
-							add_modifier = { modifier = embraced_another_faction days = @tec_fac_embrace_cd}
-						}
-					}
-				}
-				hidden_effect = {
-					save_event_target_as = TargetFaction
-					parameter:empire = {
-						every_relation = {
-							limit = {
-								is_ai = no
-								tec_is_default_country = yes
-								has_communications = prev
-								has_intel_level = {
-									who = prev
-									category = government
-									level >= 1
-								}
-							}
-							country_event = { id = factions.2000 }
-						}
-					}
-				}
-			}
-			
-			ai_weight = {
-				base = 1
-				modifier = {
-					factor = 0
-					support < 0.50
-					owner = {
-						has_ethic = ethic_spiritualist
-					}
-				}
-				modifier = {
-					factor = 0
-					owner = { has_valid_civic = civic_fanatic_purifiers }
-				}
-				modifier = {
-					factor = 0
-					NOT = {
-						owner = {
-							exists = ruler
-							ruler = {
-								leader_of_faction = traditionalist
-							}
-						}
-					}
-				}
-				modifier = {
-					factor = 0
-					owner = {
-						count_pop_faction = {
-							count < 4
-						}
-					}
-				}
-			}
-		}
-		promote_faction = {
-			title = "PROMOTE_FACTION"
-			description = "PROMOTE_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					NOR = {
-						has_modifier = suppressed_spiritualist
-						has_modifier = promoted_spiritualist
-					}
-				}
-			}
-
-			effect = {
-				parameter:empire = {
-					add_modifier = { modifier = promoted_spiritualist days = -1 }
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
-		cancel_promote_faction = {
-			title = "CANCEL_PROMOTE_FACTION"
-			description = "CANCEL_PROMOTE_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					has_modifier = promoted_spiritualist
-				}
-			}
-
-			effect = {
-				parameter:empire = {
-					remove_modifier = promoted_spiritualist
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
-		suppress_faction = {
-			title = "SUPPRESS_FACTION"
-			description = "SUPPRESS_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					NOR = {
-						has_modifier = suppressed_spiritualist
-						has_modifier = promoted_spiritualist
-					}
-				}
-			}
-
-			effect = {
-				add_modifier = { modifier = suppressed_faction days = -1 }
-				parameter:empire = {
-					add_modifier = { modifier = suppressed_spiritualist days = -1 }
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
-		cancel_suppress_faction = {
-			title = "CANCEL_SUPPRESS_FACTION"
-			description = "CANCEL_SUPPRESS_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					has_modifier = suppressed_spiritualist
-				}
-			}
-
-			effect = {
-				remove_modifier = suppressed_faction
-				parameter:empire = {
-					remove_modifier = suppressed_spiritualist
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
-		# Evolved
-			# Note: For ALL - Bribe takes a 25% of your total tv to keep the faction happy
-			#tec_faction_action_bribe
-			#tec_faction_action_bribe_cancel
-			# Note: For ALL - Concedes a planet to the faction, giving massive eth act/restrictions
-			#tec_faction_action_concesion
-			#tec_faction_action_concesion_cancel
-			# Note: For OLI - Boosts faction leader with a trait/xp gain
-			#tec_faction_action_boostleader
-			#tec_faction_action_boostleader_cancel
-			# Note: For OLI - Consumes a % of the empire tv and makes the fact produces more
-			#tec_faction_action_incentivize
-			#tec_faction_action_incentivize_cancel
-			# Note: For OLI - to do
-			#tec_faction_action_incentivize
-			#tec_faction_action_incentivize_cancel
-		# /
+	inline_script = { 
+			script = factions/inline_evolved_actions
+			ETHIC = spiritualist
+		
 	}
 }

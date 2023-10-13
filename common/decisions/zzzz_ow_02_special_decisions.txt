@@ -1,0 +1,1353 @@
+# common\decisions\zzzz_ow_02_special_decisions.txt
+
+# - - - - - - - - - - - - - - - - - - - - - 
+# O V E R W R I T E			02_special_decisions.txt
+# - - - - - - - - - - - - - - - - - - - - - 
+
+# Lithoid terravore special decision
+decision_lithoid_swarm_consume_world = {
+	icon = decision_burning_settlement
+	sound = event_structural_collapse
+
+	#enactment_time = 360
+	resources = {
+		category = decisions
+	}
+	owned_planets_only = yes
+
+	potential = {
+		owner = {
+			is_lithoid_devouring_swarm = yes
+		}
+		OR = {
+			can_have_habitable_deposits = yes
+			uses_district_set = tec_protoworld
+		}
+		is_capital = no
+		NOT = {
+			has_planet_flag = being_devoured
+		}
+	}
+
+	effect = {
+		custom_tooltip = decision_lithoid_swarm_consume_world_effect_desc
+		set_timed_planet_flag = {
+			days = 360
+			flag = recently_eaten_planet
+		}
+		hidden_effect = {
+			set_planet_flag = colony_event
+			set_planet_flag = being_devoured
+			add_modifier = {
+				modifier = being_devoured_modifier
+				days = -1
+			}
+			export_trigger_value_to_variable = {
+				trigger = planet_size
+				variable = num_districts_terravore
+			}
+			export_trigger_value_to_variable = {
+				trigger = count_deposits
+				parameters = {
+					type = d_lithoid_devastation
+				}
+				variable = num_lithoid_blockers
+			}
+			subtract_variable = {
+				which = num_districts_terravore
+				value = num_lithoid_blockers
+			}
+		}
+		owner = {
+			start_situation = {
+				type = situation_terravore_consume_planet
+				target = root
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 5
+
+		# don't wreck worlds you want to keep
+		modifier = {
+			factor = 0
+			is_lithoid_devouring_swarm_consumption_world = no
+		}
+	}
+}
+
+# Advanced Habitat
+decision_upgrade_habitat = {
+	owned_planets_only = yes
+	icon = decision_satellite_in_orbit
+
+	enactment_time = 540 #720
+	resources = {
+		category = decisions
+		cost = {
+			#influence = 50
+			influence = 25
+			#alloys = 500
+			alloys = 1000
+			mult = owner.value:habitat_build_cost_mult
+		}
+	}
+
+	potential = {
+		is_planet_class = pc_habitat
+		NOT = {
+			has_planet_flag = advanced_habitat
+		}
+		exists = owner
+		owner = {
+			has_technology = tech_habitat_2
+		}
+	}
+
+	allow = {
+		custom_tooltip = {
+			fail_text = requires_orbital
+			solar_system = {
+				any_ship_in_system = {
+					is_ship_class = shipclass_habitat_station
+				}
+			}
+		}
+	}
+
+	effect = {
+		custom_tooltip = decision_upgrade_habitat_effects_short
+		hidden_effect = {
+			#set_planet_entity = {
+			#	entity = "habitat_phase_02_entity"
+			#	graphical_culture = owner
+			#}
+			set_planet_flag = advanced_habitat
+			increase_habitat_level_effect = yes
+
+			if = {
+				limit = {
+					owner = {
+						has_ascension_perk = ap_voidborn
+						NOT = { has_technology = tech_habitat_3 }
+						NOT = { has_tech_option = tech_habitat_3 }
+					}
+				}
+				owner = {
+					add_research_option = tech_habitat_3
+				}
+			}
+		}	
+	}
+
+	ai_weight = {
+		weight = 1000
+	}
+}
+
+decision_upgrade_habitat_2 = {
+	owned_planets_only = yes
+	icon = decision_satellite_in_orbit
+
+	enactment_time = 1080 #1440
+	resources = {
+		category = decisions
+		cost = {
+			influence = 50
+			#alloys = 1000
+			alloys = 1500
+			mult = owner.value:habitat_build_cost_mult
+		}
+	}
+
+	potential = {
+		is_planet_class = pc_habitat
+		has_planet_flag = advanced_habitat
+		NOT = {
+			has_planet_flag = advanced_habitat_2
+		}
+		exists = owner
+		owner = {
+			has_technology = tech_habitat_3
+		}
+	}
+
+	allow = {
+		has_major_upgraded_capital = yes
+		custom_tooltip = {
+			fail_text = requires_orbital
+			solar_system = {
+				any_ship_in_system = {
+					is_ship_class = shipclass_habitat_station
+				}
+			}
+		}
+	}
+
+	effect = {
+		custom_tooltip = decision_upgrade_habitat_2_effects_short
+		hidden_effect = {
+			#set_planet_entity = {
+			#	entity = "habitat_phase_03_entity"
+			#	graphical_culture = owner
+			#}
+			set_planet_flag = advanced_habitat_2
+			increase_habitat_level_effect = yes
+		}
+	}
+
+	ai_weight = {
+		weight = 1000
+	}
+}
+
+@expand_planetary_sea_length = 720
+decision_flood_habitat = {
+	owned_planets_only = yes
+	icon = decision_satellite_in_orbit
+
+	enactment_time = @expand_planetary_sea_length
+
+	potential = {
+		exists = owner
+		OR = {
+			tec_is_habitat = yes
+			tec_is_ringworld = yes
+			tec_is_elysium = yes
+			tec_is_wet_planet_exceptions = { owner = owner }
+			tec_is_gaia_world = yes
+		}
+		owner = {
+			has_ascension_perk = ap_hydrocentric
+		}
+		tec_is_flooded = no
+	}
+
+	allow = {
+		custom_tooltip = {
+			fail_text = requires_free_ice_mining_station
+			owner = {
+				any_owned_starbase = {
+					has_starbase_building = ice_mining_station
+					solar_system = {
+						NOT = { has_star_flag = ice_mining_in_progress }
+					}
+				}
+			}
+		}
+	}
+
+	resources = {
+		category = decisions
+		cost = {
+			influence = 50
+			energy = 1000
+		}
+		cost = {
+			influence = 50
+			energy = 1000
+			trigger = {
+				tec_is_elysium = yes
+			}
+		}
+		cost = {
+			influence = 100
+			energy = 2000
+			trigger = {
+				tec_is_ringworld = yes
+			}
+		}
+	}
+
+	on_queued = {
+		set_variable = {
+			which = decision_length
+			value = @expand_planetary_sea_length
+		}
+		export_modifier_to_variable = {
+			modifier = planet_decision_enact_speed_mult
+			variable = decision_mult_var
+		}
+		change_variable = {
+			which = decision_mult_var
+			value = 1
+		}
+		divide_variable = {
+			which = decision_length
+			value = decision_mult_var
+		}
+		change_variable = { #ideally, may as well refer to this in the final effect
+			which = decision_length
+			value = 1
+		}
+
+		owner = {
+			random_owned_starbase = {
+				limit = {
+					has_starbase_building = ice_mining_station
+					solar_system = {
+						NOT = { has_star_flag = ice_mining_in_progress }
+					}
+				}
+				solar_system = {
+					set_timed_star_flag = {
+						flag = ice_mining_in_progress
+						days = root.decision_length
+					}
+					set_timed_star_flag = {
+						flag = ice_mining@root
+						days = root.decision_length
+					}
+				}
+			}
+		}
+		clear_variable = decision_length
+		clear_variable = decision_mult_var
+	}
+
+	abort_trigger = {
+		NOT = {
+			owner = {
+				any_owned_starbase = {
+					has_starbase_building = ice_mining_station
+				}
+			}
+		}
+	}
+
+	on_unqueued = {
+		owner = {
+			random_owned_starbase = {
+				limit = {
+					solar_system = {
+						has_star_flag = ice_mining@root
+					}
+				}
+				solar_system = {
+					remove_star_flag = ice_mining@root
+					remove_star_flag = ice_mining_in_progress
+				}
+			}
+		}
+	}
+
+	abort_effect = {
+		owner = {
+			random_owned_starbase = {
+				limit = {
+					solar_system = {
+						has_star_flag = ice_mining@root
+					}
+				}
+				solar_system = {
+					remove_star_flag = ice_mining@root
+					remove_star_flag = ice_mining_in_progress
+				}
+			}
+		}
+		create_message = {
+			type = ICE_MINING_INTERRUPTED
+			localization = ICE_MINING_INTERRUPTED_HABITAT_DESC
+			days = 20
+			target = root
+		}
+	}
+
+	effect = {
+		custom_tooltip = decision_flood_habitat_tooltip
+		hidden_effect = {
+			add_modifier = {
+				modifier = flooded_habitat
+				days = -1
+			}
+			ice_mining_depletion_effect = yes
+
+			if = {
+				limit = {
+					has_planet_flag = temp_ice_mine_exhausted_flag
+				}
+				event_target:mined_system.starbase = {
+					remove_starbase_building = {
+						building = ice_mining_station
+					}
+				}
+				create_message = {
+					type = ICE_MINING_HABITAT_SUCCESS
+					localization = ICE_MINING_HABITAT_SUCCESS_BUT_EXHAUSTED_DESC
+					days = 20
+					target = root
+					variable = {
+						type = name
+						localization = SYSTEM
+						scope = event_target:mined_system
+					}
+				}
+			}
+			else = {
+				create_message = {
+					type = ICE_MINING_HABITAT_SUCCESS
+					localization = ICE_MINING_HABITAT_SUCCESS_DESC
+					days = 20
+					target = root
+					variable = {
+						type = name
+						localization = SYSTEM
+						scope = event_target:mined_system
+					}
+				}
+			}
+			change_variable = {
+				which = ice_dumping_happened
+				value = 1
+			}
+		}
+	}
+	ai_weight = {
+		weight = 1
+	}
+}
+
+# Arcology Project
+decision_arcology_project = {
+	owned_planets_only = yes
+	icon = decision_arcology_project
+
+	enactment_time = 2700 #3600 2700
+	resources = {
+		category = decisions_ecu
+		cost = {
+			influence = 200
+			minerals = 20000
+		}
+	}
+
+	potential = {
+		exists = owner
+		tec_arcology_project_potential = yes
+		owner = { tec_is_urbancorp = no }
+	}
+
+	allow = {
+		tec_arcology_project_allow = yes
+	}
+
+	effect = {
+		# Make city-planet
+		custom_tooltip = decision_arcology_project_effects
+		hidden_effect = {
+			tec_ecu_logic_start = { change_pc = pc_city }
+			
+			tec_set_focus_flags_effect = yes
+			relic_world_conversion_effect = {
+				DISTRICT = district_arcology_housing
+				VARIABLE = num_housing_districts
+			}
+			relic_world_conversion_effect = {
+				DISTRICT = district_arcology_arms_industry
+				VARIABLE = num_industrial_districts
+			}
+			tec_industrial_split_effect = {
+				FOUNDRY = district_tec_rw_forge
+				FACTORY = district_tec_rw_industry
+			}
+
+			owner = {
+				country_event = { id = distar.201 } # port for living planet distar.197, triggers in event
+			}
+			planet_event = { id = mega.200 }
+			
+			tec_ecu_logic_finish = yes
+		}
+	}
+
+	ai_weight = {
+		weight = 100
+		modifier = {
+			add = 5
+			OR = {
+				tec_is_nuked_world = yes
+			}
+		}
+		modifier = {
+			add = 3 
+			exists = owner
+			owner = {
+				OR = {
+					is_industrialist = yes
+					has_ethic = ethic_gestalt_disregard
+				}
+			}
+			is_capital = yes # industrialist ais make capital ecus
+		}
+		modifier = {
+			add = 2
+			exists = owner
+			owner = {
+				OR = {
+					is_industrialist = yes
+					has_ethic = ethic_gestalt_disregard
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			tec_ai_can_ecu = no
+		}
+	}
+}
+
+# Arcology Project (Relic Worlds)
+decision_arcology_project_relic = {
+	owned_planets_only = yes
+	icon = decision_arcology_project
+
+	enactment_time = 2700 #3600 2700
+	resources = {
+		category = decisions_ecu
+		cost = {
+			influence = 200
+			minerals = 20000
+		}
+	}
+
+	potential = {
+		exists = owner
+		tec_arcology_project_relic_potential = yes
+		owner = { tec_is_urbancorp = no }
+	}
+
+	allow = {
+		tec_arcology_project_relic_allow = yes
+	}
+
+	effect = {
+		# Make city-planet
+		custom_tooltip = decision_arcology_project_effects
+		hidden_effect = {
+			tec_ecu_logic_start = { change_pc = pc_city relic = yes }
+			
+			tec_set_focus_flags_effect = yes
+			relic_world_conversion_effect = {
+				DISTRICT = district_arcology_housing
+				VARIABLE = num_housing_districts
+			}
+			relic_world_conversion_effect = {
+				DISTRICT = district_arcology_arms_industry
+				VARIABLE = num_industrial_districts
+			}
+
+			set_ecu_industrial_districts_effect = yes
+			
+			planet_event = { 
+				id = mega.201 
+			}
+			
+			tec_ecu_logic_finish = { relic = yes }
+		}
+	}
+	ai_weight = {
+		weight = 100
+	}
+}
+
+# Repair Shattered Ring
+decision_shattered_ring_project = {
+	owned_planets_only = yes
+	icon = decision_arcology_project
+
+	enactment_time = 2700
+	resources = {
+		category = decisions
+		cost = {
+			alloys = 7500
+		}
+	}
+
+	potential = {
+		is_planet_class = pc_shattered_ring_habitable
+		exists = owner
+	}
+
+	allow = {
+		num_uncleared_blockers < 1
+		owner = { has_technology = tech_mega_engineering }
+	}
+
+	effect = {
+		# Make ringworld
+		custom_tooltip = decision_shattered_ring_project_effects
+		hidden_effect = {
+			clear_deposits = yes
+			change_pc = pc_ringworld_habitable
+
+			set_planet_entity = {
+				entity = "ringworld_seam_entity_01_entity"
+				graphical_culture = owner
+			}
+			solar_system = {
+				every_system_planet = {
+					limit = { is_planet_class = pc_ringworld_tech }
+					set_planet_entity = {
+						entity = ringworld_tech_entity_01_entity
+						graphical_culture = root.owner
+					}
+				}
+				every_system_planet = {
+					limit = { is_planet_class = pc_ringworld_seam }
+					set_planet_entity = {
+						entity = ringworld_seam_entity_01_entity
+						graphical_culture = root.owner
+					}
+				}
+			}
+
+			# Remove Scrap Processing Buildings
+			if = {
+				limit = { has_building = building_mineral_purification_plant }
+				remove_building = building_mineral_purification_plant
+			}
+
+			if = {
+				limit = { has_building = building_mineral_purification_hub }
+				remove_building = building_mineral_purification_hub
+			}
+
+			if = {
+				limit = { has_building = building_mineral_purification_complex }
+				remove_building = building_mineral_purification_complex
+			}
+
+			# This removes the extra districts when fixing the ring world.
+			if = {
+				limit = {
+					owner = { is_regular_empire = yes }
+				}
+				shattered_ring_world_conversion_effect = {
+					DISTRICT = district_rw_city
+					VARIABLE = num_housing_districts
+				}
+			}
+
+			if = {
+				limit = {
+					owner = { is_hive_empire = yes }
+				}
+				shattered_ring_world_conversion_effect = {
+					DISTRICT = district_rw_hive
+					VARIABLE = num_housing_districts
+				}
+			}
+
+			if = {
+				limit = {
+					owner = { is_machine_empire = yes }
+				}
+				shattered_ring_world_conversion_effect = {
+					DISTRICT = district_rw_nexus
+					VARIABLE = num_housing_districts
+				}
+			}
+
+			# All empire types get farming and industrial districts
+			shattered_ring_world_conversion_effect = {
+				DISTRICT = district_tec_rw_replicator
+				VARIABLE = num_generator_districts
+			}
+
+			shattered_ring_world_conversion_effect = {
+				DISTRICT = district_rw_generator
+				VARIABLE = num_generator_districts
+			}
+
+			shattered_ring_world_conversion_effect = {
+				DISTRICT = district_rw_farming
+				VARIABLE = num_farming_districts
+			}
+			shattered_ring_world_conversion_effect = {
+				DISTRICT = district_rw_industrial
+				VARIABLE = num_industrial_districts
+			}
+			# Finally, bring it in line with ringworld sizes
+			set_planet_size = 10
+			# And set the country flag so you can take Galactic Wonders
+			owner = { set_country_flag = has_built_or_repaired_megastructure }
+		}
+	}
+
+	ai_weight = {
+		weight = 100
+	}
+}
+
+
+decision_consecrated_worlds = {
+	resources = {
+		category = decisions
+		cost = {
+			unity = 500
+		}
+	}
+
+	potential = {
+		exists = from
+		from = {
+			has_ascension_perk = ap_consecrated_worlds
+		}
+		exists = space_owner
+		space_owner = { is_same_value = from }
+		if = {
+			limit = {
+				space_owner = {
+					tec_is_cycle_cult = no
+					tec_is_starseeker_cult = no
+				}
+			}
+			is_star = no
+		}
+		is_artificial = no
+		is_ringworld = no
+		NOR = {
+			has_planet_flag = consecrated@from
+			has_modifier = consecrated_quality_1
+			has_modifier = consecrated_quality_2
+			has_modifier = consecrated_quality_3
+			has_modifier = consecrated_quality_4
+		}
+	}
+
+	allow = {
+		custom_tooltip = {
+			from = {
+				check_variable = {
+					which = num_consecrated_worlds
+					value < 3
+				}
+			}
+			fail_text = consecrated_worlds_too_many
+		}
+		custom_tooltip = {
+			NOT = { exists = owner }
+			fail_text = consecrated_worlds_planet_owned
+		}
+	}
+
+	effect = {
+		custom_tooltip = decision_consecrated_worlds_effects_custom
+		# determine quality tier, set variable
+		hidden_effect = {
+			set_planet_flag = consecrated@from
+			from = {
+				if = {
+					limit = { check_variable = { which = num_consecrated_worlds value < 1 }	}
+					set_variable = {
+						which = num_consecrated_worlds
+						value = 0
+					}
+				}
+				change_variable = {
+					which = num_consecrated_worlds
+					value = 1
+				}
+				if = {
+					limit = {
+						check_variable = {
+							which = consecrated_variable
+							value < 1
+						}
+					}
+					set_variable = {
+						which = consecrated_variable
+						value = 0
+					}
+				}
+			}
+			if = {
+				limit = {
+					OR = {
+						has_planet_flag = holy_world_1
+						has_planet_flag = holy_world_2
+						has_planet_flag = holy_world_3
+						has_planet_flag = holy_world_4
+					}
+					any_country = { has_country_flag = fallen_empire_2 }
+				}
+				random_country = {
+					limit = { has_country_flag = fallen_empire_2 }
+					add_opinion_modifier = {
+						who = from
+						modifier = opinion_worships_our_holy_world
+					}
+				}
+			}
+			random_list = {
+				0 = {
+					modifier = {
+						add = value:tec_consacrate_quality_1_weight
+						always = yes
+					}
+					add_modifier = {
+						modifier = consecrated_quality_1
+						days = -1
+					}
+
+					from = {
+						change_variable = {
+							which = consecrated_variable
+							value = 1
+						}
+					}
+				}
+				0 = {
+					modifier = {
+						add = value:tec_consacrate_quality_2_weight
+						always = yes
+					}
+					add_modifier = {
+						modifier = consecrated_quality_2
+						days = -1
+					}
+					create_ambient_object = {
+						type = consecrated_planet_stage_1_object
+						location = this
+
+						use_3d_location = yes
+						entity_scale_to_size = yes
+					}
+
+					from = {
+						change_variable = {
+							which = consecrated_variable
+							value = 2
+						}
+					}
+				}
+				0 = {
+					modifier = {
+						add = value:tec_consacrate_quality_3_weight
+						always = yes
+					}
+					add_modifier = {
+						modifier = consecrated_quality_3
+						days = -1
+					}
+					create_ambient_object = {
+						type = consecrated_planet_stage_2_object
+						location = this
+
+						use_3d_location = yes
+						entity_scale_to_size = yes
+					}
+
+					from = {
+						change_variable = {
+							which = consecrated_variable
+							value = 3
+						}
+					}
+				}
+				0 = {
+					modifier = {
+						add = value:tec_consacrate_quality_4_weight
+						always = yes
+					}
+					add_modifier = {
+						modifier = consecrated_quality_4
+						days = -1
+					}
+					create_ambient_object = {
+						type = consecrated_planet_stage_3_object
+						location = this
+
+						use_3d_location = yes
+						entity_scale_to_size = yes
+					}
+
+					from = {
+						change_variable = {
+							which = consecrated_variable
+							value = 4
+						}
+					}
+				}
+			}
+			#if = {
+			#	limit = {
+			#		OR = {
+			#			is_planet_class = pc_asteroid
+			#			is_planet_class = pc_gas_giant
+			#			is_planet_class = pc_shielded
+			#			is_planet_class = pc_ai
+			#			tec_is_nuked_world = yes
+			#			tec_is_hive_world = yes
+			#			tec_is_machine_world = yes
+			#			tec_is_city_world = yes
+			#			tec_is_relic_world = yes
+			#		}
+			#	}
+			#	custom_tooltip = consecrated_worlds_unsuitable
+			#	random_list = {
+			#		80 = {
+			#			modifier = {
+			#				factor = 10
+			#				OR = {
+			#					is_planet_class = pc_ai
+			#					tec_is_hive_world = yes
+			#					tec_is_machine_world = yes
+			#					tec_is_city_world = yes
+			#					tec_is_relic_world = yes
+			#				}
+			#			}
+			#			modifier = {
+			#				factor = 0.01
+			#				root.space_owner = {
+			#					tec_is_memorialist_empire = yes
+			#				}
+			#				OR = {
+			#					tec_is_city_world = yes
+			#					tec_is_relic_world = yes
+			#					is_planet_class = pc_shielded
+			#				}
+			#			}
+			#			modifier = {
+			#				factor = 0.01
+			#				root.space_owner = {
+			#					tec_is_machine_cult = yes
+			#				}
+			#				OR = {
+			#					tec_is_machine_world = yes
+			#					is_planet_class = pc_ai
+			#				}
+			#			}
+			#			add_modifier = {
+			#				modifier = consecrated_quality_1
+			#				days = -1
+			#			}
+			#
+			#			from = {
+			#				change_variable = {
+			#					which = consecrated_variable
+			#					value = 1
+			#				}
+			#			}
+			#		}
+			#		20 = {
+			#			add_modifier = {
+			#				modifier = consecrated_quality_2
+			#				days = -1
+			#			}
+			#			create_ambient_object = {
+			#				type = consecrated_planet_stage_1_object
+			#				location = this
+			#
+			#				use_3d_location = yes
+			#				entity_scale_to_size = yes
+			#			}
+			#
+			#			from = {
+			#				change_variable = {
+			#					which = consecrated_variable
+			#					value = 2
+			#				}
+			#			}
+			#		}
+			#		0 = {
+			#			modifier = {
+			#				add = 70
+			#				root.space_owner = {
+			#					tec_is_memorialist_empire = yes
+			#				}
+			#				OR = {
+			#					tec_is_city_world = yes
+			#					tec_is_relic_world = yes
+			#					is_planet_class = pc_shielded
+			#				}
+			#			}
+			#			modifier = {
+			#				add = 70
+			#				root.space_owner = {
+			#					tec_is_machine_cult = yes
+			#				}
+			#				OR = {
+			#					tec_is_machine_world = yes
+			#					is_planet_class = pc_ai
+			#				}
+			#			}
+			#			add_modifier = {
+			#				modifier = consecrated_quality_3
+			#				days = -1
+			#			}
+			#			create_ambient_object = {
+			#				type = consecrated_planet_stage_2_object
+			#				location = this
+			#
+			#				use_3d_location = yes
+			#				entity_scale_to_size = yes
+			#			}
+			#
+			#			from = {
+			#				change_variable = {
+			#					which = consecrated_variable
+			#					value = 3
+			#				}
+			#			}
+			#		}
+			#		0 = {
+			#			modifier = {
+			#				add = 20
+			#				root.space_owner = {
+			#					tec_is_memorialist_empire = yes
+			#				}
+			#				OR = {
+			#					tec_is_city_world = yes
+			#					tec_is_relic_world = yes
+			#					is_planet_class = pc_shielded
+			#				}
+			#			}
+			#			modifier = {
+			#				add = 20
+			#				root.space_owner = {
+			#					tec_is_machine_cult = yes
+			#				}
+			#				OR = {
+			#					tec_is_machine_world = yes
+			#					is_planet_class = pc_ai
+			#				}
+			#			}
+			#			add_modifier = {
+			#				modifier = consecrated_quality_4
+			#				days = -1
+			#			}
+			#			create_ambient_object = {
+			#				type = consecrated_planet_stage_3_object
+			#				location = this
+			#
+			#				use_3d_location = yes
+			#				entity_scale_to_size = yes
+			#			}
+			#
+			#			from = {
+			#				change_variable = {
+			#					which = consecrated_variable
+			#					value = 4
+			#				}
+			#			}
+			#		}
+			#	}
+			#}
+			#else_if = {
+			#	limit = { uninhabitable_regular_planet = yes }
+			#	custom_tooltip = consecrated_worlds_unsuitable
+			#	random_list = {
+			#		10 = {
+			#			add_modifier = {
+			#				modifier = consecrated_quality_1
+			#				days = -1
+			#			}
+			#
+			#			from = {
+			#				change_variable = {
+			#					which = consecrated_variable
+			#					value = 1
+			#				}
+			#			}
+			#		}
+			#		70 = {
+			#			add_modifier = {
+			#				modifier = consecrated_quality_2
+			#				days = -1
+			#			}
+			#			create_ambient_object = {
+			#				type = consecrated_planet_stage_1_object
+			#				location = this
+			#
+			#				use_3d_location = yes
+			#				entity_scale_to_size = yes
+			#			}
+			#
+			#			from = {
+			#				change_variable = {
+			#					which = consecrated_variable
+			#					value = 2
+			#				}
+			#			}
+			#		}
+			#		20 = {
+			#			modifier = {
+			#				add = 20
+			#				AND = {
+			#					root.space_owner = {
+			#						has_origin = origin_toxic_knights
+			#					}
+			#					is_planet_class = pc_toxic
+			#				}
+			#				is_planet_class = pc_toxic
+			#			}
+			#			add_modifier = {
+			#				modifier = consecrated_quality_3
+			#				days = -1
+			#			}
+			#			create_ambient_object = {
+			#				type = consecrated_planet_stage_2_object
+			#				location = this
+			#
+			#				use_3d_location = yes
+			#				entity_scale_to_size = yes
+			#			}
+			#
+			#			from = {
+			#				change_variable = {
+			#					which = consecrated_variable
+			#					value = 3
+			#				}
+			#			}
+			#		}
+			#		0 = {
+			#			modifier = {
+			#				add = 20
+			#				AND = {
+			#					root.space_owner = {
+			#						has_origin = origin_toxic_knights
+			#					}
+			#					is_planet_class = pc_toxic
+			#				}
+			#			}
+			#			add_modifier = {
+			#				modifier = consecrated_quality_4
+			#				days = -1
+			#			}
+			#			create_ambient_object = {
+			#				type = consecrated_planet_stage_3_object
+			#				location = this
+			#
+			#				use_3d_location = yes
+			#				entity_scale_to_size = yes
+			#			}
+			#
+			#			from = {
+			#				change_variable = {
+			#					which = consecrated_variable
+			#					value = 4
+			#				}
+			#			}
+			#		}
+			#	}
+			#}
+			#else_if = {
+			#	limit = {
+			#		habitable_planet = yes
+			#		tec_is_gaia_world = no
+			#	}
+			#	custom_tooltip = consecrated_worlds_suitable
+			#	random_list = {
+			#		0 = {
+			#			add_modifier = {
+			#				modifier = consecrated_quality_1
+			#				days = -1
+			#			}
+			#
+			#			from = {
+			#				change_variable = {
+			#					which = consecrated_variable
+			#					value = 1
+			#				}
+			#			}
+			#		}
+			#		50 = {
+			#			add_modifier = {
+			#				modifier = consecrated_quality_2
+			#				days = -1
+			#			}
+			#			create_ambient_object = {
+			#				type = consecrated_planet_stage_1_object
+			#				location = this
+			#
+			#				use_3d_location = yes
+			#				entity_scale_to_size = yes
+			#			}
+			#
+			#			from = {
+			#				change_variable = {
+			#					which = consecrated_variable
+			#					value = 2
+			#				}
+			#			}
+			#		}
+			#		40 = {
+			#			modifier = {
+			#				add = 30
+			#				root.space_owner = {
+			#					OR = {
+			#						has_origin = origin_ocean_paradise
+			#						tec_is_aquatic_empire = yes
+			#						has_ascension_perk = ap_hydrocentric
+			#					}
+			#				}
+			#				# pd support would be easy as they will no longer have planet classes ffor subclasses
+			#				is_planet_class = pc_ocean
+			#			}
+			#			add_modifier = {
+			#				modifier = consecrated_quality_3
+			#				days = -1
+			#			}
+			#			create_ambient_object = {
+			#				type = consecrated_planet_stage_2_object
+			#				location = this
+			#
+			#				use_3d_location = yes
+			#				entity_scale_to_size = yes
+			#			}
+			#
+			#			from = {
+			#				change_variable = {
+			#					which = consecrated_variable
+			#					value = 3
+			#				}
+			#			}
+			#		}
+			#		10 = {
+			#			modifier = {
+			#				add = 20
+			#				root.space_owner = {
+			#					OR = {
+			#						has_origin = origin_ocean_paradise
+			#						tec_is_aquatic_empire = yes
+			#						has_ascension_perk = ap_hydrocentric
+			#					}
+			#				}
+			#				# pd support would be easy as they will no longer have planet classes ffor subclasses
+			#				is_planet_class = pc_ocean
+			#			}
+			#			add_modifier = {
+			#				modifier = consecrated_quality_4
+			#				days = -1
+			#			}
+			#			create_ambient_object = {
+			#				type = consecrated_planet_stage_3_object
+			#				location = this
+			#
+			#				use_3d_location = yes
+			#				entity_scale_to_size = yes
+			#			}
+			#
+			#			from = {
+			#				change_variable = {
+			#					which = consecrated_variable
+			#					value = 4
+			#				}
+			#			}
+			#		}
+			#	}
+			#}
+			#else_if = {
+			#	limit = {
+			#		tec_is_gaia_world = yes
+			#	}
+			#	custom_tooltip = consecrated_worlds_perfect
+			#	random_list = {
+			#		0 = {
+			#			add_modifier = {
+			#				modifier = consecrated_quality_1
+			#				days = -1
+			#			}
+			#			from = {
+			#				change_variable = {
+			#					which = consecrated_variable
+			#					value = 1
+			#				}
+			#			}
+			#		}
+			#		0 = {
+			#			add_modifier = {
+			#				modifier = consecrated_quality_2
+			#				days = -1
+			#			}
+			#			create_ambient_object = {
+			#				type = consecrated_planet_stage_1_object
+			#				location = this
+			#
+			#				use_3d_location = yes
+			#				entity_scale_to_size = yes
+			#			}
+			#			from = {
+			#				change_variable = {
+			#					which = consecrated_variable
+			#					value = 2
+			#				}
+			#			}
+			#		}
+			#		0 = {
+			#			add_modifier = {
+			#				modifier = consecrated_quality_3
+			#				days = -1
+			#			}
+			#			create_ambient_object = {
+			#				type = consecrated_planet_stage_2_object
+			#				location = this
+			#
+			#				use_3d_location = yes
+			#				entity_scale_to_size = yes
+			#			}
+			#			from = {
+			#				change_variable = {
+			#					which = consecrated_variable
+			#					value = 3
+			#				}
+			#			}
+			#		}
+			#		100 = {
+			#			add_modifier = {
+			#				modifier = consecrated_quality_4
+			#				days = -1
+			#			}
+			#			create_ambient_object = {
+			#				type = consecrated_planet_stage_3_object
+			#				location = this
+			#
+			#				use_3d_location = yes
+			#				entity_scale_to_size = yes
+			#			}
+			#			from = {
+			#				change_variable = {
+			#					which = consecrated_variable
+			#					value = 4
+			#				}
+			#			}
+			#		}
+			#	}
+			#}
+			## fallback
+			#else = {
+			#	add_modifier = {
+			#		modifier = consecrated_quality_1
+			#		days = -1
+			#	}
+			#	from = {
+			#		change_variable = {
+			#			which = consecrated_variable
+			#			value = 1
+			#		}
+			#	}
+			#}
+			# recalculate modifier
+			from = {
+				recalculate_consecrated_world_modifier = yes
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+		modifier = {
+			weight = 10
+			habitable_planet = yes
+			NOT = {
+				space_owner = {
+					any_owned_species = {
+						prevprev = { habitability = { who = prev value > 0.35 }	}
+					}
+				}
+			}
+		}
+	}
+}

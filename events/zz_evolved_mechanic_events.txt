@@ -1,0 +1,1495 @@
+# events\zz_evolved_mechanic_events.txt
+
+# ------------------------------------------------------------
+# MECHANICS
+# ------------------------------------------------------------
+
+# ------------------------------------------------- Habitats
+namespace = tec_habitats
+	# Specialize events
+	planet_event = {
+		id = tec_habitats.100
+		title = tec_habitats.100.name
+		desc = tec_habitats.100.desc
+		picture = GFX_evt_habitat
+		show_sound = notification
+		is_triggered_only = yes
+		location = this
+		
+		immediate = {
+			hidden_effect = {
+				set_planet_flag = tec_habitat_picking_spec
+			}
+		}
+
+		# Exit
+			option = {
+				name = tec_habitats.100_exit
+				custom_tooltip = tec_habitats.100_exit
+				hidden_effect = {
+					remove_planet_flag = tec_habitat_picking_spec
+				}
+			}
+		# /
+		option = { # Separator
+			name = tec_habitats.100_separator_extraction
+			allow = {
+				hidden_trigger = {
+					always = no
+				}
+			}
+		}
+		# Extraction block (dynamic)
+			option = {	# Energy
+				name = tec_habitats.100_extraction_energy
+				custom_tooltip = tec_habitats.100_extraction_energy_tooltip
+				icon = {
+					icon = GFX_resource_energy_large
+					icon_background = GFX_situation_approach_bg_green
+					text = BLANK_STRING
+				}
+				trigger = {
+					NOT = {
+						has_planet_flag = energy_habitat
+					}
+					#check_modifier_value = {	Always available
+					#	modifier = district_generator_max
+					#	value > 0
+					#}
+				}
+				allow = {
+					hidden_trigger = {
+						NOT = {
+							has_planet_flag = energy_habitat
+						}
+					}
+					custom_tooltip = {
+						fail_text = tec_habitats.100_max_extraction_reached
+						check_variable = {
+							which = tec_hab_menial_districts
+							value < 3
+						}
+					}
+					owner = {
+						resource_stockpile_compare = {
+							resource = alloys
+							value >= 150
+							mult = root.tec_hab_menial_districts
+						}
+						resource_stockpile_compare = {
+							resource = energy
+							value >= 100
+						}
+					}
+				}
+				# Cost
+					owner = {
+						add_resource = {
+							alloys = -150
+							mult = root.tec_hab_menial_districts
+						}
+						add_resource = {
+							energy = -100
+						}
+					}
+				# /
+				hidden_effect = {
+					set_planet_flag = energy_habitat
+					change_variable = {
+						which = tec_hab_menial_districts
+						value = 1
+					}
+					# Exports extraction districts and swaps them
+						if = {
+							limit = {
+								check_variable = {
+									which = tec_hab_menial_districts
+									value = 3
+								}
+							}
+							tec_convert_district = {
+								BASE_DISTRICT = district_tec_hab_extraction
+								DISTRICT = district_hab_energy
+								RATE = 1
+							}
+						}
+						else = {
+							tec_convert_district = {
+								BASE_DISTRICT = district_tec_hab_extraction
+								DISTRICT = district_hab_energy
+								RATE = 0.35
+							}
+						}
+					# /
+				}
+				planet_event = {
+					id = tec_habitats.100
+				}
+
+				ai_chance = {
+					modifier = {
+						factor = 2
+						check_modifier_value = {
+							modifier = district_hab_energy_max
+							value >= 6
+						}
+					}
+					modifier = {
+						factor = 8
+						check_modifier_value = {
+							modifier = district_hab_energy_max
+							value >= 12
+						}
+					}
+				}
+			}
+			option = {	# Energy (remove)
+				name = tec_habitats.100_extraction_energy_remove
+				custom_tooltip = tec_habitats.100_extraction_energy_remove_tooltip
+				icon = {
+					icon = GFX_resource_energy_large
+					icon_background = GFX_situation_approach_bg_red
+					text = BLANK_STRING
+				}
+				trigger = {
+					has_planet_flag = energy_habitat
+				}
+				hidden_effect = {
+					remove_planet_flag = energy_habitat
+					change_variable = {
+						which = tec_hab_menial_districts
+						value = -1
+					}
+					# Exports extraction districts and swaps them
+						tec_convert_district = {
+							BASE_DISTRICT = district_hab_energy
+							DISTRICT = district_tec_hab_extraction
+							RATE = 1
+						}
+					# /
+				}
+				planet_event = {
+					id = tec_habitats.100
+				}
+			}
+			option = {	# Minerals
+				name = tec_habitats.100_extraction_minerals
+				custom_tooltip = tec_habitats.100_extraction_minerals_tooltip
+				icon = {
+					icon = GFX_resource_minerals_large
+					icon_background = GFX_situation_approach_bg_green
+					text = BLANK_STRING
+				}
+				trigger = {
+					NOT = {
+						has_planet_flag = mining_habitat
+					}
+					check_modifier_value = {
+						modifier = district_hab_mining_max
+						value > 0
+					}
+				}
+				allow = {
+					hidden_trigger = {
+						NOT = {
+							has_planet_flag = mining_habitat
+						}
+					}
+					custom_tooltip = {
+						fail_text = tec_habitats.100_max_extraction_reached
+						check_variable = {
+							which = tec_hab_menial_districts
+							value < 3
+						}
+					}
+					owner = {
+						resource_stockpile_compare = {
+							resource = alloys
+							value >= 150
+							mult = root.tec_hab_menial_districts
+						}
+						resource_stockpile_compare = {
+							resource = minerals
+							value >= 100
+						}
+					}
+				}
+				# Cost
+					owner = {
+						add_resource = {
+							alloys = -150
+							mult = root.tec_hab_menial_districts
+						}
+						add_resource = {
+							minerals = -100
+						}
+					}
+				# /
+				hidden_effect = {
+					set_planet_flag = mining_habitat
+					change_variable = {
+						which = tec_hab_menial_districts
+						value = 1
+					}
+					# Exports extraction districts and swaps them
+						if = {
+							limit = {
+								check_variable = {
+									which = tec_hab_menial_districts
+									value = 3
+								}
+							}
+							tec_convert_district = {
+								BASE_DISTRICT = district_tec_hab_extraction
+								DISTRICT = district_hab_mining
+								RATE = 1
+							}
+						}
+						else = {
+							tec_convert_district = {
+								BASE_DISTRICT = district_tec_hab_extraction
+								DISTRICT = district_hab_mining
+								RATE = 0.35
+							}
+						}
+					# /
+				}
+				planet_event = {
+					id = tec_habitats.100
+				}
+				ai_chance = {
+					modifier = {
+						factor = 3
+						check_modifier_value = {
+							modifier = district_hab_mining_max
+							value >= 6
+						}
+					}
+					modifier = {
+						factor = 12
+						check_modifier_value = {
+							modifier = district_hab_mining_max
+							value >= 12
+						}
+					}
+				}
+			}
+			option = {	# Minerals (remove)
+				name = tec_habitats.100_extraction_minerals_remove
+				custom_tooltip = tec_habitats.100_extraction_minerals_remove_tooltip
+				icon = {
+					icon = GFX_resource_minerals_large
+					icon_background = GFX_situation_approach_bg_red
+					text = BLANK_STRING
+				}
+				trigger = {
+					has_planet_flag = mining_habitat
+				}
+				hidden_effect = {
+					remove_planet_flag = mining_habitat
+					change_variable = {
+						which = tec_hab_menial_districts
+						value = -1
+					}
+					# Exports extraction districts and swaps them
+						tec_convert_district = {
+							BASE_DISTRICT = district_hab_mining
+							DISTRICT = district_tec_hab_extraction
+							RATE = 1
+						}
+					# /
+				}
+				planet_event = {
+					id = tec_habitats.100
+				}
+			}
+			option = {	# Food
+				name = tec_habitats.100_extraction_food
+				custom_tooltip = tec_habitats.100_extraction_food_tooltip
+				icon = {
+					icon = GFX_resource_food_large
+					icon_background = GFX_situation_approach_bg_green
+					text = BLANK_STRING
+				}
+				trigger = {
+					NOT = {
+						has_planet_flag = tec_food_habitat
+					}
+					#check_modifier_value = {	Always available
+					#	modifier = district_tec_hab_food_max
+					#	value > 0
+					#}
+				}
+				allow = {
+					hidden_trigger = {
+						NOT = {
+							has_planet_flag = tec_food_habitat
+						}
+					}
+					custom_tooltip = {
+						fail_text = tec_habitats.100_max_extraction_reached
+						check_variable = {
+							which = tec_hab_menial_districts
+							value < 3
+						}
+					}
+					owner = {
+						resource_stockpile_compare = {
+							resource = alloys
+							value >= 150
+							mult = root.tec_hab_menial_districts
+						}
+						resource_stockpile_compare = {
+							resource = food
+							value >= 100
+						}
+					}
+				}
+				# Cost
+					owner = {
+						add_resource = {
+							alloys = -150
+							mult = root.tec_hab_menial_districts
+						}
+						add_resource = {
+							food = -100
+						}
+					}
+				# /
+				hidden_effect = {
+					set_planet_flag = tec_food_habitat
+					change_variable = {
+						which = tec_hab_menial_districts
+						value = 1
+					}
+					# Exports extraction districts and swaps them
+						if = {
+							limit = {
+								check_variable = {
+									which = tec_hab_menial_districts
+									value = 3
+								}
+							}
+							tec_convert_district = {
+								BASE_DISTRICT = district_tec_hab_extraction
+								DISTRICT = district_tec_hab_food
+								RATE = 1
+							}
+						}
+						else = {
+							tec_convert_district = {
+								BASE_DISTRICT = district_tec_hab_extraction
+								DISTRICT = district_tec_hab_food
+								RATE = 0.35
+							}
+						}
+					# /
+				}
+				planet_event = {
+					id = tec_habitats.100
+				}
+			}
+			option = {	# Food (remove)
+				name = tec_habitats.100_extraction_food_remove
+				custom_tooltip = tec_habitats.100_extraction_food_remove_tooltip
+				icon = {
+					icon = GFX_resource_food_large
+					icon_background = GFX_situation_approach_bg_red
+					text = BLANK_STRING
+				}
+				trigger = {
+					has_planet_flag = tec_food_habitat
+				}
+				hidden_effect = {
+					remove_planet_flag = tec_food_habitat
+					change_variable = {
+						which = tec_hab_menial_districts
+						value = -1
+					}
+					# Exports extraction districts and swaps them
+						tec_convert_district = {
+							BASE_DISTRICT = district_tec_hab_food
+							DISTRICT = district_tec_hab_extraction
+							RATE = 1
+						}
+					# /
+				}
+				planet_event = {
+					id = tec_habitats.100
+				}
+			}
+			option = {	# Amenities
+				name = tec_habitats.100_extraction_amenities
+				custom_tooltip = tec_habitats.100_extraction_amenities_tooltip
+				icon = {
+					icon = GFX_situation_approach_amenities
+					icon_background = GFX_situation_approach_bg_green
+					text = BLANK_STRING
+				}
+				trigger = {
+					NOT = {
+						has_planet_flag = tec_leisure_habitat
+					}
+					#check_modifier_value = {	Always available
+					#	modifier = district_hab_cultural
+					#	value > 0
+					#}
+				}
+				allow = {
+					hidden_trigger = {
+						NOT = {
+							has_planet_flag = tec_leisure_habitat
+						}
+					}
+					custom_tooltip = {
+						fail_text = tec_habitats.100_max_extraction_reached
+						check_variable = {
+							which = tec_hab_menial_districts
+							value < 3
+						}
+					}
+					owner = {
+						resource_stockpile_compare = {
+							resource = alloys
+							value >= 200
+							mult = root.tec_hab_menial_districts
+						}
+					}
+				}
+				# Cost
+					owner = {
+						add_resource = {
+							alloys = -200
+							mult = root.tec_hab_menial_districts
+						}
+					}
+				# /
+				hidden_effect = {
+					set_planet_flag = tec_leisure_habitat
+					change_variable = {
+						which = tec_hab_menial_districts
+						value = 1
+					}
+					# Exports extraction districts and swaps them
+						if = {
+							limit = {
+								check_variable = {
+									which = tec_hab_menial_districts
+									value = 3
+								}
+							}
+							tec_convert_district = {
+								BASE_DISTRICT = district_tec_hab_extraction
+								DISTRICT = district_hab_cultural
+								RATE = 1
+							}
+						}
+						else = {
+							tec_convert_district = {
+								BASE_DISTRICT = district_tec_hab_extraction
+								DISTRICT = district_hab_cultural
+								RATE = 0.35
+							}
+						}
+					# /
+				}
+				planet_event = {
+					id = tec_habitats.100
+				}
+				ai_chance = {
+					modifier = {
+						factor = 2
+						num_pops >= 40
+					}
+					modifier = {
+						factor = 5
+						num_pops >= 80
+					}
+				}
+			}
+			option = {	# Amenities (remove)
+				name = tec_habitats.100_extraction_amenities_remove
+				custom_tooltip = tec_habitats.100_extraction_amenities_remove_tooltip
+				icon = {
+					icon = GFX_situation_approach_amenities
+					icon_background = GFX_situation_approach_bg_red
+					text = BLANK_STRING
+				}
+				trigger = {
+					has_planet_flag = tec_leisure_habitat
+				}
+				hidden_effect = {
+					remove_planet_flag = tec_leisure_habitat
+					change_variable = {
+						which = tec_hab_menial_districts
+						value = -1
+					}
+					# Exports extraction districts and swaps them
+						tec_convert_district = {
+							BASE_DISTRICT = district_hab_cultural
+							DISTRICT = district_tec_hab_extraction
+							RATE = 1
+						}
+					# /
+				}
+				planet_event = {
+					id = tec_habitats.100
+				}
+			}
+		# /
+		option = { # Separator
+			name = tec_habitats.100_separator_utility
+			allow = {
+				hidden_trigger = {
+					always = no
+				}
+			}
+		}
+		# Utility block (swap)
+			option = {	# Research
+				name = tec_habitats.100_utility_research
+				custom_tooltip = tec_habitats.100_utility_research_tooltip
+				icon = {
+					icon = GFX_resource_physics
+					icon_background = GFX_situation_approach_bg_tec_blue
+					text = BLANK_STRING
+				}
+				trigger = {
+					check_modifier_value = {
+						modifier = district_hab_science_max
+						value > 0
+					}
+				}
+				allow = {
+					hidden_trigger = {
+						NOR = {
+							has_planet_flag = tec_research_habitat
+							has_planet_flag = research_habitat
+						}
+					}
+					owner = {
+						resource_stockpile_compare = {
+							resource = alloys
+							value >= 300
+						}
+					}
+				}
+				# Cost
+					owner = {
+						add_resource = {
+							alloys = -300
+						}
+					}
+				# /
+				hidden_effect = {
+					set_planet_flag = tec_research_habitat
+					# Doubledip
+					set_planet_flag = research_habitat
+					# Removes other flags
+						#remove_planet_flag = tec_research_habitat
+						#remove_planet_flag = research_habitat
+						remove_planet_flag = tec_unity_habitat
+						remove_planet_flag = tec_trade_habitat
+						remove_planet_flag = commercial_habitat
+						remove_planet_flag = tec_military_habitat
+					# /
+					# District swaps
+						if = {
+							limit = {
+								has_district = district_tec_hab_utility
+							}
+							# Exports extraction districts and swaps them
+							tec_convert_district = {
+								BASE_DISTRICT = district_tec_hab_utility
+								DISTRICT = district_hab_science
+								RATE = 1
+							}
+						}
+						if = {
+							limit = {
+								has_district = district_tec_hab_unity
+							}
+							# Exports extraction districts and swaps them
+							tec_convert_district = {
+								BASE_DISTRICT = district_tec_hab_unity
+								DISTRICT = district_hab_science
+								RATE = 1
+							}
+						}
+						if = {
+							limit = {
+								has_district = district_hab_commercial
+							}
+							# Exports extraction districts and swaps them
+							tec_convert_district = {
+								BASE_DISTRICT = district_hab_commercial
+								DISTRICT = district_hab_science
+								RATE = 1
+							}
+						}
+						if = {
+							limit = {
+								has_district = district_tec_hab_military
+							}
+							# Exports extraction districts and swaps them
+							tec_convert_district = {
+								BASE_DISTRICT = district_tec_hab_military
+								DISTRICT = district_hab_science
+								RATE = 1
+							}
+						}
+					# /
+				}
+				planet_event = {
+					id = tec_habitats.100
+				}
+				
+				ai_chance = {
+					modifier = {
+						factor = 2
+						check_modifier_value = {
+							modifier = district_hab_science_max
+							value >= 3
+						}
+					}
+					modifier = {
+						factor = 3
+						check_modifier_value = {
+							modifier = district_hab_science_max
+							value >= 6
+						}
+					}
+					modifier = {
+						factor = 12
+						check_modifier_value = {
+							modifier = district_hab_science_max
+							value >= 12
+						}
+					}
+				}
+			}
+			option = {	# Unity
+				name = tec_habitats.100_utility_unity
+				custom_tooltip = tec_habitats.100_utility_unity_tooltip
+				icon = {
+					icon = GFX_resource_unity
+					icon_background = GFX_situation_approach_bg_tec_blue
+					text = BLANK_STRING
+				}
+				allow = {
+					custom_tooltip = {
+						fail_text = decision_tec_hab_arcology_level_low
+						OR = {
+							has_planet_flag = advanced_habitat
+							has_planet_flag = payback_habitat
+						}
+					}
+					hidden_trigger = {
+						NOT = {
+							has_planet_flag = tec_unity_habitat
+						}
+					}
+					owner = {
+						resource_stockpile_compare = {
+							resource = alloys
+							value >= 300
+						}
+					}
+				}
+				# Cost
+					owner = {
+						add_resource = {
+							alloys = -300
+						}
+					}
+				# /
+				hidden_effect = {
+					set_planet_flag = tec_unity_habitat
+					# Removes other flags
+						remove_planet_flag = tec_research_habitat
+						remove_planet_flag = research_habitat
+						#remove_planet_flag = tec_unity_habitat
+						remove_planet_flag = tec_trade_habitat
+						remove_planet_flag = commercial_habitat
+						remove_planet_flag = tec_military_habitat
+					# /
+					# District swaps
+						if = {
+							limit = {
+								has_district = district_tec_hab_utility
+							}
+							# Exports extraction districts and swaps them
+							tec_convert_district = {
+								BASE_DISTRICT = district_tec_hab_utility
+								DISTRICT = district_tec_hab_unity
+								RATE = 1
+							}
+						}
+						if = {
+							limit = {
+								has_district = district_hab_science
+							}
+							# Exports extraction districts and swaps them
+							tec_convert_district = {
+								BASE_DISTRICT = district_hab_science
+								DISTRICT = district_tec_hab_unity
+								RATE = 1
+							}
+						}
+						if = {
+							limit = {
+								has_district = district_hab_commercial
+							}
+							# Exports extraction districts and swaps them
+							tec_convert_district = {
+								BASE_DISTRICT = district_hab_commercial
+								DISTRICT = district_tec_hab_unity
+								RATE = 1
+							}
+						}
+						if = {
+							limit = {
+								has_district = district_tec_hab_military
+							}
+							# Exports extraction districts and swaps them
+							tec_convert_district = {
+								BASE_DISTRICT = district_tec_hab_military
+								DISTRICT = district_tec_hab_unity
+								RATE = 1
+							}
+						}
+					# /
+				}
+				planet_event = {
+					id = tec_habitats.100
+				}
+			}
+			option = {	# Trade
+				name = tec_habitats.100_utility_trade
+				custom_tooltip = tec_habitats.100_utility_trade_tooltip
+				icon = {
+					icon = GFX_trade_value
+					icon_background = GFX_situation_approach_bg_tec_blue
+					text = BLANK_STRING
+				}
+				trigger = {
+					hidden_trigger = {
+						exists = owner
+						owner = {
+							tec_uses_trade_value = yes
+						}
+					}
+				}
+				allow = {
+					hidden_trigger = {
+						NOR = {
+							has_planet_flag = tec_trade_habitat
+							has_planet_flag = commercial_habitat
+						}
+					}
+					owner = {
+						resource_stockpile_compare = {
+							resource = alloys
+							value >= 300
+						}
+					}
+				}
+				# Cost
+					owner = {
+						add_resource = {
+							alloys = -300
+						}
+					}
+				# /
+				hidden_effect = {
+					set_planet_flag = tec_trade_habitat
+					set_planet_flag = commercial_habitat
+					# Removes other flags
+						remove_planet_flag = tec_research_habitat
+						remove_planet_flag = research_habitat
+						remove_planet_flag = tec_unity_habitat
+						#remove_planet_flag = tec_trade_habitat
+						#remove_planet_flag = commercial_habitat
+						remove_planet_flag = tec_military_habitat
+					# /
+					# District swaps
+						if = {
+							limit = {
+								has_district = district_tec_hab_utility
+							}
+							# Exports extraction districts and swaps them
+							tec_convert_district = {
+								BASE_DISTRICT = district_tec_hab_utility
+								DISTRICT = district_hab_commercial
+								RATE = 1
+							}
+						}
+						if = {
+							limit = {
+								has_district = district_hab_science
+							}
+							# Exports extraction districts and swaps them
+							tec_convert_district = {
+								BASE_DISTRICT = district_hab_science
+								DISTRICT = district_hab_commercial
+								RATE = 1
+							}
+						}
+						if = {
+							limit = {
+								has_district = district_tec_hab_unity
+							}
+							# Exports extraction districts and swaps them
+							tec_convert_district = {
+								BASE_DISTRICT = district_tec_hab_unity
+								DISTRICT = district_hab_commercial
+								RATE = 1
+							}
+						}
+						if = {
+							limit = {
+								has_district = district_tec_hab_military
+							}
+							# Exports extraction districts and swaps them
+							tec_convert_district = {
+								BASE_DISTRICT = district_tec_hab_military
+								DISTRICT = district_hab_commercial
+								RATE = 1
+							}
+						}
+					# /
+				}
+				planet_event = {
+					id = tec_habitats.100
+				}
+				
+				modifier = {
+					factor = 2
+					exists = owner
+					
+				}
+			}
+			option = {	# Military
+				name = tec_habitats.100_utility_military
+				custom_tooltip = tec_habitats.100_utility_military_tooltip
+				icon = {
+					icon = GFX_situation_approach_sword
+					icon_background = GFX_situation_approach_bg_tec_blue
+					text = BLANK_STRING
+				}
+				allow = {
+					custom_tooltip = {
+						fail_text = decision_tec_hab_arcology_level_low
+						OR = {
+							has_planet_flag = advanced_habitat
+							has_planet_flag = payback_habitat
+						}
+					}
+					hidden_trigger = {
+						NOT = {
+							has_planet_flag = tec_military_habitat
+						}
+					}
+					owner = {
+						resource_stockpile_compare = {
+							resource = alloys
+							value >= 300
+						}
+					}
+				}
+				# Cost
+					owner = {
+						add_resource = {
+							alloys = -300
+						}
+					}
+				# /
+				hidden_effect = {
+					set_planet_flag = tec_military_habitat
+					# Removes other flags
+						remove_planet_flag = tec_research_habitat
+						remove_planet_flag = research_habitat
+						remove_planet_flag = tec_unity_habitat
+						remove_planet_flag = tec_trade_habitat
+						remove_planet_flag = commercial_habitat
+						#remove_planet_flag = tec_military_habitat
+					# /
+					# District swaps
+						if = {
+							limit = {
+								has_district = district_tec_hab_utility
+							}
+							# Exports extraction districts and swaps them
+							tec_convert_district = {
+								BASE_DISTRICT = district_tec_hab_utility
+								DISTRICT = district_tec_hab_military
+								RATE = 1
+							}
+						}
+						if = {
+							limit = {
+								has_district = district_hab_science
+							}
+							# Exports extraction districts and swaps them
+							tec_convert_district = {
+								BASE_DISTRICT = district_hab_science
+								DISTRICT = district_tec_hab_military
+								RATE = 1
+							}
+						}
+						if = {
+							limit = {
+								has_district = district_tec_hab_unity
+							}
+							# Exports extraction districts and swaps them
+							tec_convert_district = {
+								BASE_DISTRICT = district_tec_hab_unity
+								DISTRICT = district_tec_hab_military
+								RATE = 1
+							}
+						}
+						if = {
+							limit = {
+								has_district = district_hab_commercial
+							}
+							# Exports extraction districts and swaps them
+							tec_convert_district = {
+								BASE_DISTRICT = district_hab_commercial
+								DISTRICT = district_tec_hab_military
+								RATE = 1
+							}
+						}
+					# /
+				}
+				planet_event = {
+					id = tec_habitats.100
+				}
+			}
+		# /
+	}
+	# Autoassembler event
+	planet_event = {	# Selects the type of orbital on assembly
+		id = tec_habitats.200
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			# Test
+			has_building = building_tec_hab_orbital_autobuilder
+		}
+
+		immediate = {
+			# Test
+			if = {	#Checks if there is a candidate for an orbital
+				limit = {
+					solar_system = {
+						count_system_planet = {
+							count > 0
+							limit = {
+								# fail_text = "requires_no_anomaly"
+								NOT = { has_anomaly = yes }
+								# fail_text = "requires_no_existing_megastructure"
+								NOR = {
+									has_planet_flag = megastructure
+									has_planet_flag = has_megastructure
+								}
+								# fail_text = "requires_no_orbital_debris"
+								NOT = {
+									has_planet_flag = has_orbital_debris
+								}
+								# Does not has a primitive
+								NAND = {
+									exists = owner
+									owner = {
+										is_primitive = yes
+									}
+								}
+								tec_has_constructors_in_orbit = {
+									NUM = 0
+								}
+							}
+						}
+					}
+				}
+				log = "autoassembler found orbital"
+				random_list = {
+					50 = {
+						modifier = {	# No available minor orbital slots
+							factor = 0
+							solar_system = {
+								count_system_planet = {
+									count = 0
+									limit = {
+										# fail_text = "requires_no_anomaly"
+										NOT = { has_anomaly = yes }
+										# fail_text = "requires_no_existing_megastructure"
+										NOR = {
+											has_planet_flag = megastructure
+											has_planet_flag = has_megastructure
+										}
+										# fail_text = "requires_no_orbital_debris"
+										NOT = {
+											has_planet_flag = has_orbital_debris
+										}
+										OR = {
+											is_asteroid = yes
+											is_moon = yes
+										}
+										#tec_has_constructors_in_orbit = {
+										#	NUM = 0
+										#}
+									}
+								}
+							}
+						}
+						modifier = {	# Focus on minor orbitals
+							factor = 10
+							has_planet_flag = tec_orbital_autobuilder_focus_minor
+						}
+						log = "autoassembler constructs minor (random)"
+						planet_event = {
+							id = tec_habitats.20010
+							days = 120
+							# Note: Reduced from 180 to mimic megastructure cost reductions
+						}
+						planet = {
+							set_timed_planet_flag = {
+								flag = tec_building_minor_orbital
+								months = 4
+								#months = 6
+							}
+							set_saved_date = {
+								key = tec_building_minor_orbital_timer
+								days_from_present = 120
+								expires = 120
+								#days_from_present = 180
+								#expires = 180
+							}
+						}
+					}
+					50 = {
+						modifier = {	# No available major orbital slots
+							factor = 0
+							solar_system = {
+								count_system_planet = {
+									count = 0
+									limit = {
+										# fail_text = "requires_no_anomaly"
+										NOT = { has_anomaly = yes }
+										# fail_text = "requires_no_existing_megastructure"
+										NOR = {
+											has_planet_flag = megastructure
+											has_planet_flag = has_megastructure
+										}
+										# fail_text = "requires_no_orbital_debris"
+										NOT = {
+											has_planet_flag = has_orbital_debris
+										}
+										NOR = {
+											is_asteroid = yes
+											is_moon = yes
+										}
+										#tec_has_constructors_in_orbit = {
+										#	NUM = 0
+										#}
+									}
+								}
+							}
+						}
+						modifier = {	# Focus on major orbitals
+							factor = 10
+							has_planet_flag = tec_orbital_autobuilder_focus_major
+						}
+						log = "autoassembler constructs major (random)"
+						planet_event = {
+							id = tec_habitats.20020
+							days = 480
+							# Note: reduced from 720 to mimic megastructure cost reductions
+						}
+						planet = {
+							set_timed_planet_flag = {
+								flag = tec_building_major_orbital
+								months = 16
+								#months = 24
+							}
+							set_saved_date = {
+								key = tec_building_major_orbital_timer
+								days_from_present = 480
+								expires = 480
+								#days_from_present = 720
+								#expires = 720
+							}
+						}
+					}
+				}
+			}
+			else = {
+				log = "autoassembler found no orbitals"
+				# TO DO toast of the assembler being deactivated
+				set_timed_planet_flag = {
+					flag = tec_building_no_orbital
+					months = 4
+					#months = 6
+				}
+				set_saved_date = {
+					key = tec_building_no_orbital_timer
+					days_from_present = 360
+					expires = 360
+					#days_from_present = 180
+					#expires = 180
+				}
+				planet_event = {	# Repeats itself a year after for checking
+					id = tec_habitats.200
+					days = 360
+				}
+			}
+		}
+	}
+	planet_event = {	# Assembles minor orbital
+		id = tec_habitats.20010
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			# Test
+			always = yes
+			#has_building = building_tec_hab_orbital_autobuilder
+		}
+
+		immediate = {
+			solar_system = {
+				random_system_planet = {
+					limit = {
+						# Surveyed one is worthless
+						# fail_text = "requires_no_anomaly"
+						NOT = { has_anomaly = yes }
+						# fail_text = "requires_no_existing_megastructure"
+						NOR = {
+							has_planet_flag = megastructure
+							has_planet_flag = has_megastructure
+						}
+						# fail_text = "requires_no_orbital_debris"
+						NOT = {
+							has_planet_flag = has_orbital_debris
+						}
+						NAND = {
+							exists = owner
+							owner = {
+								is_primitive = yes
+							}
+						}
+						OR = {
+							is_asteroid = yes
+							is_moon = yes
+						}
+						#tec_has_constructors_in_orbit = {
+						#	NUM = 0
+						#}
+					}
+					save_event_target_as = tec_minor_orbital_target
+					prev = {
+						spawn_megastructure = {
+							type = "minor_orbital"
+							planet = event_target:tec_minor_orbital_target
+							coords_from = event_target:tec_minor_orbital_target
+							owner = root.owner
+							graphical_culture = root.owner
+						}
+					}
+				}
+			}
+			planet_event = {	# Repeats itself
+				id = tec_habitats.200
+			}
+		}
+	}
+	planet_event = {	# Assembles major orbital
+		id = tec_habitats.20020
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			# Test
+			always = yes
+			#has_building = building_tec_hab_orbital_autobuilder
+		}
+
+		immediate = {
+			if = {	# Toxic knights
+				limit = {
+					OR = {
+						has_building = building_order_castle
+						has_building = building_order_keep
+					}
+					exists = owner
+					owner = {
+						has_origin = origin_toxic_knights
+						has_relic = r_toxic_god
+					}
+				}
+				solar_system = {
+					random_system_planet = {
+						limit = {
+							# Surveyed one is worthless
+							# fail_text = "requires_no_anomaly"
+							NOT = { has_anomaly = yes }
+							# fail_text = "requires_no_existing_megastructure"
+							NOR = {
+								has_planet_flag = megastructure
+								has_planet_flag = has_megastructure
+							}
+							# fail_text = "requires_no_orbital_debris"
+							NOT = {
+								has_planet_flag = has_orbital_debris
+							}
+							NOR = {
+								is_asteroid = yes
+								is_moon = yes
+							}
+							NAND = {
+								exists = owner
+								owner = {
+									is_primitive = yes
+								}
+							}
+							#tec_has_constructors_in_orbit = {
+							#	NUM = 0
+							#}
+						}
+						save_event_target_as = tec_major_orbital_target
+						prev = {
+							spawn_megastructure = {
+								type = "major_orbital_knights"
+								planet = event_target:tec_major_orbital_target
+								coords_from = event_target:tec_major_orbital_target
+								owner = root.owner
+								graphical_culture = root.owner
+							}
+						}
+					}
+				}
+			}
+			else = {
+				solar_system = {
+					random_system_planet = {
+						limit = {
+							# Surveyed one is worthless
+							# fail_text = "requires_no_anomaly"
+							NOT = { has_anomaly = yes }
+							# fail_text = "requires_no_existing_megastructure"
+							NOR = {
+								has_planet_flag = megastructure
+								has_planet_flag = has_megastructure
+							}
+							# fail_text = "requires_no_orbital_debris"
+							NOT = {
+								has_planet_flag = has_orbital_debris
+							}
+							NOR = {
+								is_asteroid = yes
+								is_moon = yes
+							}
+							NAND = {
+								exists = owner
+								owner = {
+									is_primitive = yes
+								}
+							}
+							#tec_has_constructors_in_orbit = {
+							#	NUM = 0
+							#}
+						}
+						save_event_target_as = tec_major_orbital_target
+						prev = {
+							spawn_megastructure = {
+								type = "major_orbital"
+								planet = event_target:tec_major_orbital_target
+								coords_from = event_target:tec_major_orbital_target
+								owner = root.owner
+								graphical_culture = root.owner
+							}
+						}
+					}
+				}
+			}
+			planet_event = {	# Repeats itself
+				id = tec_habitats.200
+			}
+		}
+	}
+# /
+
+# ------------------------------------------------- Machine Worlds
+namespace = tec_machine_world
+	# Autoassembler event
+	planet_event = {	# Selects the type of orbital on assembly
+		id = tec_machine_world.200
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			# Test
+			has_building = building_tec_hab_orbital_autobuilder
+		}
+
+		immediate = {
+			# Test
+			if = {	#Checks if there is a candidate for an orbital
+				limit = {
+					solar_system = {
+						count_system_planet = {
+							count > 0
+							limit = {
+								# fail_text = "requires_no_anomaly"
+								NOT = { has_anomaly = yes }
+								# fail_text = "requires_no_existing_megastructure"
+								NOR = {
+									has_planet_flag = megastructure
+									has_planet_flag = has_megastructure
+								}
+								# fail_text = "requires_no_orbital_debris"
+								NOT = {
+									has_planet_flag = has_orbital_debris
+								}
+								tec_has_constructors_in_orbit = {
+									NUM = 0
+								}
+							}
+						}
+					}
+				}
+				log = "autoassembler found orbital"
+				random_list = {
+					50 = {
+						modifier = {	# No available minor orbital slots
+							factor = 0
+							solar_system = {
+								count_system_planet = {
+									count = 0
+									limit = {
+										# fail_text = "requires_no_anomaly"
+										NOT = { has_anomaly = yes }
+										# fail_text = "requires_no_existing_megastructure"
+										NOR = {
+											has_planet_flag = megastructure
+											has_planet_flag = has_megastructure
+										}
+										# fail_text = "requires_no_orbital_debris"
+										NOT = {
+											has_planet_flag = has_orbital_debris
+										}
+										OR = {
+											is_asteroid = yes
+											is_moon = yes
+										}
+										#tec_has_constructors_in_orbit = {
+										#	NUM = 0
+										#}
+									}
+								}
+							}
+						}
+						modifier = {	# Focus on minor orbitals
+							factor = 10
+							has_planet_flag = tec_orbital_autobuilder_focus_minor
+						}
+						log = "autoassembler constructs minor (random)"
+						planet_event = {
+							id = tec_habitats.20010
+							days = 120
+							# Note: Reduced from 180 to mimic megastructure cost reductions
+						}
+						planet = {
+							set_timed_planet_flag = {
+								flag = tec_building_minor_orbital
+								months = 4
+								#months = 6
+							}
+							set_saved_date = {
+								key = tec_building_minor_orbital_timer
+								days_from_present = 120
+								expires = 120
+								#days_from_present = 180
+								#expires = 180
+							}
+						}
+					}
+					50 = {
+						modifier = {	# No available major orbital slots
+							factor = 0
+							solar_system = {
+								count_system_planet = {
+									count = 0
+									limit = {
+										# fail_text = "requires_no_anomaly"
+										NOT = { has_anomaly = yes }
+										# fail_text = "requires_no_existing_megastructure"
+										NOR = {
+											has_planet_flag = megastructure
+											has_planet_flag = has_megastructure
+										}
+										# fail_text = "requires_no_orbital_debris"
+										NOT = {
+											has_planet_flag = has_orbital_debris
+										}
+										NOR = {
+											is_asteroid = yes
+											is_moon = yes
+										}
+										#tec_has_constructors_in_orbit = {
+										#	NUM = 0
+										#}
+									}
+								}
+							}
+						}
+						modifier = {	# Focus on major orbitals
+							factor = 10
+							has_planet_flag = tec_orbital_autobuilder_focus_major
+						}
+						log = "autoassembler constructs major (random)"
+						planet_event = {
+							id = tec_habitats.20020
+							days = 480
+							# Note: reduced from 720 to mimic megastructure cost reductions
+						}
+						planet = {
+							set_timed_planet_flag = {
+								flag = tec_building_major_orbital
+								months = 16
+								#months = 24
+							}
+							set_saved_date = {
+								key = tec_building_major_orbital_timer
+								days_from_present = 480
+								expires = 480
+								#days_from_present = 720
+								#expires = 720
+							}
+						}
+					}
+				}
+			}
+			else = {
+				log = "autoassembler found no orbitals"
+				# TO DO toast of the assembler being deactivated
+				set_timed_planet_flag = {
+					flag = tec_building_no_orbital
+					months = 4
+					#months = 6
+				}
+				set_saved_date = {
+					key = tec_building_no_orbital_timer
+					days_from_present = 360
+					expires = 360
+					#days_from_present = 180
+					#expires = 180
+				}
+				planet_event = {	# Repeats itself a year after for checking
+					id = tec_habitats.200
+					days = 360
+				}
+			}
+		}
+	}
+# /

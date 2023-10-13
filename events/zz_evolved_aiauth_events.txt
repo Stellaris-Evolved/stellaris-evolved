@@ -1,0 +1,2167 @@
+# events\zz_evolved_aiauth_events.txt
+
+# AI authorities
+# ------------------------------------------------------------
+namespace = tec_aiauth
+
+country_event = {	# Change ruler to the appropiate portrait - gamestart
+	id = tec_aiauth.1
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		tec_is_aiauth_empire = yes
+	}
+
+	immediate = {
+		tec_country_create_aiauth_ruler_replace = {
+			RULER = ruler
+		}
+
+		# Create council
+		tec_country_unlock_council_selection = yes
+		tec_country_create_aiauth_councilor = {
+			CLASS = scientist
+			NAME = councilor_tec_aiauth_development
+			COUNCIL_POS = councilor_tec_aiauth_development
+			DESC = councilor_tec_aiauth_development_desc
+		}
+		tec_country_create_aiauth_councilor = {
+			CLASS = admiral
+			NAME = councilor_tec_aiauth_firewall
+			COUNCIL_POS = councilor_tec_aiauth_firewall
+			DESC = councilor_tec_aiauth_firewall_desc
+		}
+	}
+}
+
+country_event = {	# Experience gain
+	id = tec_aiauth.2
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		tec_is_aiauth_empire = yes
+	}
+
+	immediate = {
+		every_owned_leader = {
+			limit = {
+				tec_is_aiauth_node = yes
+			}
+			add_experience = value:tec_aiauth_experience_per_month_with_exp_gain
+		}
+	}
+}
+
+country_event = {  # Clear stockpile
+	id = tec_aiauth.3
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		tec_is_aiauth_empire = yes
+	}
+
+	immediate = {
+		add_resource = {
+			sr_tec_ai_power = -1
+			multiplier = value:tec_resource_stockpile|RESOURCE|sr_tec_ai_power|SUBTRACT|1000|MIN|0|
+		}
+	}
+}
+
+country_event = { # AI Nodes Nodes: Update portraits at level 4 and 8.
+	id = tec_aiauth.4
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		FROM = {
+			tec_is_aiauth_node = yes
+			is_ruler = no
+		}
+	}
+
+	immediate = {
+		FROM = {
+			set_gestalt_node_protrait_effect = yes
+		}
+	}
+}
+
+
+country_event = {	# Saves and Restores ruler on ruler death
+	id = tec_aiauth.5
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		tec_is_aiauth_empire = yes
+		NOT = { has_country_flag = tec_aiauth_block_ruler_reforming }
+		from = {
+			is_ruler = yes
+			tec_is_aiauth_node = yes
+		}
+	}
+
+	immediate = {
+		hidden_effect = {
+			clone_leader = {
+				target = from
+			}
+		}
+		last_created_leader = {
+			set_leader_flag = tec_aiauth_ruler_@root
+			copy_flags_and_variables_from = from
+		}
+		set_leader = last_created_leader
+	}
+}
+
+country_event = {	# Removes ruler and nodes when the aiauth is removed
+	id = tec_aiauth.10
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		tec_is_aiauth_empire = no
+		exists = ruler
+		ruler = { tec_is_aiauth_node = yes }
+	}
+
+	immediate = {
+		every_owned_leader = {
+			limit = {
+				tec_is_aiauth_node = yes
+			}
+			kill_leader = {
+				show_notification = no
+			}
+		}
+		tec_country_unlock_council_selection = yes
+		ordered_owned_leader = {
+			limit = {
+				OR = {
+					leader_class = governor
+					leader_class = scientist
+				}
+				is_councilor = no
+			}
+			position = 0
+			order_by = trigger:has_skill
+			set_council_position = councilor_research
+		}
+		ordered_owned_leader = {
+			limit = {
+				OR = {
+					leader_class = admiral
+					leader_class = governor
+				}
+				is_councilor = no
+			}
+			position = 0
+			order_by = trigger:has_skill
+			set_council_position = councilor_defense
+		}
+	}
+}
+
+country_event = {	# Creates leader when the aiauth is added - POST
+	id = tec_aiauth.15
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		tec_is_aiauth_empire = yes
+		exists = ruler
+		ruler = { tec_is_aiauth_node = no }
+	}
+
+	immediate = {
+		# Create ruler
+		ruler = {
+			save_event_target_as = tec_prev_ai_auth
+		}
+		tec_country_create_aiauth_ruler = yes
+
+		# Create council
+		tec_country_unlock_council_selection = yes
+		tec_country_create_aiauth_councilor = {
+			CLASS = scientist
+			NAME = councilor_tec_aiauth_development
+			COUNCIL_POS = councilor_tec_aiauth_development
+			DESC = councilor_tec_aiauth_development_desc
+		}
+		tec_country_create_aiauth_councilor = {
+			CLASS = admiral
+			NAME = councilor_tec_aiauth_firewall
+			COUNCIL_POS = councilor_tec_aiauth_firewall
+			DESC = councilor_tec_aiauth_firewall_desc
+		}
+	}
+}
+
+country_event = { # Recruit councilor node
+	id = tec_aiauth.20
+	title = "tec_aiauth.20.name"
+	desc = "tec_aiauth.20.desc"
+	show_sound = par_portrait_01
+	is_triggered_only = yes
+	
+	picture = GFX_leader_recruitment_bg_renowned
+	auto_opens = yes
+
+	event_window_type = leader_recruit
+
+	immediate = {
+		event_target:tec_aiauth_councilor = {
+			exile_leader_as = tec_aiauth_councilor
+			set_leader_flag = is_in_recruit_window
+		}
+		set_country_flag = tec_fragmenting_node
+
+	}
+
+	picture_event_data = {
+		portrait = event_target:tec_aiauth_councilor
+		room = machine_room
+	}
+
+	option = {
+		name = DISMISS
+		tag = dismiss_leader
+		hidden_effect = {
+			event_target:tec_aiauth_councilor = {
+				kill_leader = { show_notification = no }
+			}
+			
+			remove_country_flag = tec_fragmenting_node
+		}
+	}
+
+	option = {
+		name = TEC_REFRAGMENT_NODE
+		inline_script = events/inline_evolved_tec_aiauth_node_refragment_option
+		custom_tooltip = tec_cui_aiauth_refragment_node
+		hidden_effect = {
+			event_target:tec_aiauth_councilor = {
+				save_event_target_as = tec_aiauth_node_old
+				tec_country_refragment_aiauth_node = {
+					FRAGMENT_EFFECT = tec_country_refragment_aiauth_councilor
+				}
+			}
+			event_target:tec_aiauth_node_old = {
+				kill_leader = { show_notification = no }
+			}
+			country_event = {
+				id = tec_aiauth.20
+			}
+		}
+	}
+
+	inline_script = {
+		script = events/inline_evolved_tec_aiauth_node_all_ethic_options
+		TARGET = event_target:tec_aiauth_councilor
+		EVENT_ID = tec_aiauth.20
+	}
+
+	option = {
+		name = TEC_FRAGMENT_NODE
+		tag = hire_leader
+		allow = {
+			tec_country_aiauth_has_enough_unity_to_fragment = yes
+		}
+		custom_tooltip = tec_cui_aiauth_finish_fragmenting_node
+		hidden_effect = {
+			event_target:tec_aiauth_councilor = {
+				set_owner = prev
+				remove_leader_flag = is_in_recruit_window
+				tec_leader_force_update_modifiers = yes
+			}
+			remove_country_flag = tec_fragmenting_node
+			remove_country_flag = tec_fragmenting_admiral
+			remove_country_flag = tec_fragmenting_general
+			remove_country_flag = tec_fragmenting_governor
+			remove_country_flag = tec_fragmenting_scientist
+		}
+	}
+}
+
+country_event = { # Recruit node,
+	id = tec_aiauth.21
+	title = "tec_aiauth.21.name"
+	desc = "tec_aiauth.21.desc"
+	show_sound = par_portrait_01
+	is_triggered_only = yes
+
+	picture = GFX_leader_recruitment_bg_renowned
+	auto_opens = yes
+
+	event_window_type = leader_recruit
+
+	immediate = {
+		event_target:tec_aiauth_planetary_node = {
+			exile_leader_as = tec_aiauth_planetary_node
+			set_leader_flag = is_in_recruit_window
+		}
+		set_country_flag = tec_fragmenting_node
+
+	}
+
+	picture_event_data = {
+		portrait = event_target:tec_aiauth_planetary_node
+		room = machine_room
+		planet_background = event_target:tec_aiauth_planetary_node_planet
+	}
+
+	location = event_target:tec_aiauth_planetary_node_planet
+
+	option = {
+		name = DISMISS
+		tag = dismiss_leader
+		custom_tooltip = tec_cui_aiauth_planetary_dismiss
+		hidden_effect = {
+			event_target:tec_aiauth_planetary_node = {
+				kill_leader = { show_notification = no }
+			}
+
+			remove_country_flag = tec_fragmenting_node
+
+			event_target:tec_aiauth_planetary_node_planet = {
+				remove_building = building_tec_planetary_node_center
+			}
+		}
+	}
+
+	option = {
+		name = TEC_REFRAGMENT_NODE
+		inline_script = events/inline_evolved_tec_aiauth_node_refragment_option
+		custom_tooltip = tec_cui_aiauth_refragment_node
+		hidden_effect = {
+			event_target:tec_aiauth_planetary_node = {
+				save_event_target_as = tec_aiauth_node_old
+				tec_country_refragment_aiauth_node = {
+					FRAGMENT_EFFECT = tec_country_create_aiauth_planetary_node
+				}
+			}
+			event_target:tec_aiauth_node_old = {
+				kill_leader = { show_notification = no }
+			}
+			country_event = {
+				id = tec_aiauth.21
+			}
+		}
+	}
+
+	inline_script = {
+		script = events/inline_evolved_tec_aiauth_node_all_ethic_options
+		TARGET = event_target:tec_aiauth_planetary_node
+		EVENT_ID = tec_aiauth.21
+	}
+
+	option = {
+		name = TEC_FRAGMENT_NODE
+		tag = hire_leader
+		custom_tooltip = tec_cui_aiauth_finish_fragmenting_node
+		hidden_effect = {
+			event_target:tec_aiauth_planetary_node_planet = {
+				assign_leader = event_target:tec_aiauth_planetary_node
+			}
+			event_target:tec_aiauth_planetary_node = {
+				set_owner = event_target:tec_aiauth_planetary_node_planet.owner
+				set_cooldown = 360000
+				remove_leader_flag = is_in_recruit_window
+				set_name = {
+					key = "tec_aiauth_planetary_governor"
+					variable_string = "\\[tec_aiauth_planetary_governor_planet\\]"
+				}
+				tec_leader_force_update_modifiers = yes
+			}
+			remove_country_flag = tec_fragmenting_node
+			remove_country_flag = tec_fragmenting_governor
+		}
+	}
+}
+
+country_event = { # Recruit node,
+	id = tec_aiauth.22
+	title = "tec_aiauth.22.name"
+	desc = "tec_aiauth.22.desc"
+	show_sound = par_portrait_01
+	is_triggered_only = yes
+
+	picture = GFX_leader_recruitment_bg_renowned
+	auto_opens = yes
+	event_window_type = leader_recruit
+
+	immediate = {
+		event_target:tec_aiauth_ruler = {
+			set_leader_flag = is_in_recruit_window
+		}
+		set_country_flag = tec_fragmenting_node
+	}
+
+	picture_event_data = {
+		portrait = event_target:tec_aiauth_ruler
+		room = machine_room
+	}
+
+	option = {
+		name = DISMISS
+		tag = dismiss_leader
+		allow = {
+			custom_tooltip = {
+				fail_text = tec_cui_aiauth_ruler_dismiss
+				always = no
+			}
+		}
+	}
+
+	option = {
+		name = TEC_REFRAGMENT_NODE
+
+		inline_script = events/inline_evolved_tec_aiauth_node_refragment_option
+		custom_tooltip = tec_cui_aiauth_refragment_node
+		hidden_effect = {
+			event_target:tec_aiauth_ruler = {
+				save_event_target_as = tec_aiauth_node_old
+				tec_country_refragment_aiauth_node = {
+					FRAGMENT_EFFECT = tec_country_refragment_aiauth_ruler
+				}
+			}
+			event_target:tec_aiauth_node_old = {
+				kill_leader = { show_notification = no }
+			}
+			country_event = {
+				id = tec_aiauth.22
+			}
+		}
+	}
+
+	inline_script = {
+		script = events/inline_evolved_tec_aiauth_node_all_class_options
+		TARGET = event_target:tec_aiauth_ruler
+		EVENT_ID = tec_aiauth.22
+		FRAGMENT_EFFECT = tec_country_refragment_aiauth_ruler
+	}
+
+	inline_script = {
+		script = events/inline_evolved_tec_aiauth_node_all_ethic_options
+		TARGET = event_target:tec_aiauth_ruler
+		EVENT_ID = tec_aiauth.22
+	}
+
+	option = {
+		name = TEC_FRAGMENT_NODE
+		tag = hire_leader
+		custom_tooltip = tec_cui_aiauth_finish_fragmenting_node
+		hidden_effect = {
+			event_target:tec_aiauth_ruler = {
+				set_owner = prev
+				remove_leader_flag = is_in_recruit_window
+				tec_leader_force_update_modifiers = yes
+			}
+			remove_country_flag = tec_fragmenting_node
+			remove_country_flag = tec_fragmenting_admiral
+			remove_country_flag = tec_fragmenting_general
+			remove_country_flag = tec_fragmenting_governor
+			remove_country_flag = tec_fragmenting_scientist
+			remove_country_flag = tec_aiauth_block_ruler_reforming
+		}
+	}
+}
+
+
+country_event = { # Handle node ascension traits
+	id = tec_aiauth.25
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		FROM = {
+			tec_is_aiauth_node = yes
+			OR = {
+				is_ruler = yes
+				tec_is_aiauth_councilor_node = no
+			}
+		}
+	}
+
+	immediate = {
+		set_country_flag = tec_force_allow_all_traits
+		FROM = {
+			remove_trait = leader_trait_synthetic # I don't know what adds it REEEEEEEEEE
+			if = {
+				limit = {
+					root = { has_country_flag = tec_psionics_t2_completed }
+				}
+				add_trait_no_notify = leader_trait_tec_aiauth_psionic
+			}
+			else_if = {
+				limit = {
+					root = { has_country_flag = tec_biopsionic_path_finished }
+				}
+				add_trait_no_notify = leader_trait_tec_aiauth_biopsionic_main
+			}
+			else_if = {
+				limit = {
+					root = { has_country_flag = tec_cyberpsionic_path_finished }
+				}
+				add_trait_no_notify = leader_trait_tec_aiauth_cyberpsionic_main
+			}
+			else_if = {
+				limit = {
+					root = { has_country_flag = tec_gene_path_finished }
+				}
+				add_trait_no_notify = leader_trait_tec_aiauth_gene_mix
+			}
+			else_if = {
+				limit = {
+					root = { has_country_flag = tec_replicant_path_finished }
+				}
+				add_trait_no_notify = leader_trait_tec_aiauth_replicant_main
+			}
+			else_if = {
+				limit = {
+					root = { has_country_flag = tec_cybernetic_t2_path_finished }
+				}
+				add_trait_no_notify = leader_trait_tec_aiauth_superior_cybernetics_main
+			}
+			else_if = {
+				limit = {
+					root = { has_country_flag = tec_synth_path_unlocked_tradition_1 }
+				}
+				add_trait_no_notify = leader_trait_tec_aiauth_synthetic
+			}
+		}
+		remove_country_flag = tec_force_allow_all_traits
+	}
+}
+
+country_event = { # Handle node ascension traits
+	id = tec_aiauth.30
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		tec_is_aiauth_empire = yes
+	}
+
+	immediate = {
+		every_owned_leader = {
+			limit = {
+				tec_is_aiauth_node = yes
+			}
+			root = {
+				country_event = {
+					id = tec_aiauth.25
+					scopes = {
+						from = prev
+					}
+				}
+			}
+		}
+		every_pool_leader = {
+			limit = {
+				tec_is_aiauth_node = yes
+			}
+			root = {
+				country_event = {
+					id = tec_aiauth.25
+					scopes = {
+						from = prev
+					}
+				}
+			}
+		}
+	}
+}
+
+# country_event = {	# Manages the traits per year
+# 	id = tec_aiauth.20
+# 	is_triggered_only = yes
+# 	hide_window = yes
+
+# 	trigger = {
+# 		tec_is_aiauth_empire = yes
+# 	}
+
+# 	immediate = {
+# 		hidden_effect = {
+# 			export_resource_stockpile_to_variable = {
+# 				resource = sr_tec_ai_power
+# 				variable = tec_aiauth_program_stored
+# 			}
+# 			# Checks Threshholds
+# 			if = {	# T1
+# 				# First time?
+# 				limit = {
+# 					check_variable = {
+# 						which = tec_aiauth_program_stored
+# 						value >= tec_aiauth_program_cost
+# 					}
+# 				}
+# 				# Adapts the new cost
+# 				multiply_variable = {
+# 					which = tec_aiauth_program_cost
+# 					value = 2
+# 				}
+# 				# This makes cost go from 500 to 1000, 2000, 4000, 8000, etc
+# 				# Ruler gets a trait
+# 				ruler = {
+# 					if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_0
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_0
+# 						add_trait = leader_trait_aiauth_ruler_checker_1
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_1
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_1
+# 						add_trait = leader_trait_aiauth_ruler_checker_2
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_2
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_2
+# 						add_trait = leader_trait_aiauth_ruler_checker_3
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_3
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_3
+# 						add_trait = leader_trait_aiauth_ruler_checker_4
+# 					}
+# 					else = {
+# 						break = yes
+# 					}
+# 				}
+# 			}
+# 		}
+# 	}
+# }
+
+situation_event = {
+	id = tec_aiauth.200
+	title = tec_aiauth.200.name
+	desc = {
+		text = tec_aiauth.200.desc
+		trigger = { always = yes }
+	}
+
+	picture = GFX_evt_deficit
+	show_sound = event_bad_omen
+	is_triggered_only = yes
+	situation = this
+
+	abort_trigger = {
+		situation_progress >= 100
+	}
+
+	immediate = {
+		owner = {
+			ordered_owned_planet = {
+				limit = { is_capital = no }
+				order_by = value:research_combined_value
+				position = 0
+				save_event_target_as = tec_repurposed_planet
+			}
+			if = {
+				limit = {
+					NOT = { exists = event_target:tec_repurposed_planet }
+				}
+				capital_scope = {
+					save_event_target_as = tec_repurposed_planet
+				}
+			}
+		}
+	}
+
+	option = {
+		name = tec_aiauth.200.A
+		owner = {
+			event_target:tec_repurposed_planet = {
+				add_modifier = {
+					modifier = pm_tec_repurpose_research_to_ai_power
+					years = 2
+				}
+			}
+		}
+	}
+	option = {
+		name = tec_aiauth.200.B
+	}
+}
+
+
+situation_event = {
+	id = tec_aiauth.210
+	title = BANKRUPTCY
+	desc = {
+		text = deficit.110.desc
+		trigger = {
+			owner = { is_regular_empire = yes }
+		}
+	}
+	desc = {
+		text = deficit.110.desc.gestalt
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+	}
+	picture = GFX_evt_deficit
+	show_sound = event_life_support_fail
+	is_triggered_only = yes
+	situation = this
+	force_open = yes
+
+	option = {
+		name = UNFORTUNATE
+
+		owner = {
+			tec_country_defaulted_aiauth_ai_power_effect = yes
+		}
+	}
+	after = {
+		destroy_situation = this
+	}
+}
+
+
+# event = {
+# 	id = tec_aiauth.24
+# 	is_triggered_only = yes
+# 	hide_window = yes
+
+# 	immediate = {
+# 		every_playable_country = {
+# 			limit = {
+# 				tec_is_aiauth_empire = yes
+# 			}
+# 			country_event = {
+# 				id = tec_aiauth.25
+# 			}
+# 		}
+# 	}
+# }
+
+# country_event = {	# Recalculates
+# 	id = tec_aiauth.25
+# 	is_triggered_only = yes
+# 	hide_window = yes
+
+# 	trigger = {
+# 		tec_is_aiauth_empire = yes
+# 	}
+
+# 	immediate = {
+# 		hidden_effect = {
+# 			export_resource_stockpile_to_variable = {
+# 				resource = sr_tec_ai_power
+# 				variable = tec_aiauth_program_stored
+# 			}
+# 			# Creates 4 variants of the current cost
+# 			# Adds a slot visually per slot availabe
+# 			set_variable = {
+# 				which = tec_aiauth_program_cost_temp
+# 				value = tec_aiauth_program_cost
+# 			}
+# 			#2 - 500 is 1000
+# 			set_variable = {
+# 				which = tec_aiauth_program_cost_temp_x2
+# 				value = tec_aiauth_program_cost_temp
+# 			}
+# 			multiply_variable = {
+# 				which = tec_aiauth_program_cost_temp_x2
+# 				value = 2
+# 			}
+
+# 			#3 - 500 is 2000
+# 			set_variable = {
+# 				which = tec_aiauth_program_cost_temp_x3
+# 				value = tec_aiauth_program_cost_temp
+# 			}
+# 			multiply_variable = {
+# 				which = tec_aiauth_program_cost_temp_x3
+# 				value = 4
+# 			}
+# 			# 4 - 500 is 4000
+# 			set_variable = {
+# 				which = tec_aiauth_program_cost_temp_x4
+# 				value = tec_aiauth_program_cost_temp
+# 			}
+# 			multiply_variable = {
+# 				which = tec_aiauth_program_cost_temp_x4
+# 				value = 8
+# 			}
+# 			if = {	# 4
+# 				limit = {
+# 					check_variable = {
+# 						which = tec_aiauth_program_stored
+# 						value >= tec_aiauth_program_cost_temp_x4
+# 					}
+# 				}
+# 				ruler = {
+# 					if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_3
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_3
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_2
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_2
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_1
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_1
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_0
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_0
+# 					}
+# 					add_trait = leader_trait_aiauth_ruler_checker_4
+# 				}
+# 				set_variable = {
+# 					which = tec_aiauth_program_slots
+# 					value = 4
+# 				}
+# 			}
+# 			else_if = {	# 3
+# 				limit = {
+# 					check_variable = {
+# 						which = tec_aiauth_program_stored
+# 						value >= tec_aiauth_program_cost_temp_x3
+# 					}
+# 				}
+# 				ruler = {
+# 					if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_4
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_4
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_2
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_2
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_1
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_1
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_0
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_0
+# 					}
+# 					add_trait = leader_trait_aiauth_ruler_checker_3
+# 				}
+# 				set_variable = {
+# 					which = tec_aiauth_program_slots
+# 					value = 3
+# 				}
+# 			}
+# 			else_if = {	# 2
+# 				limit = {
+# 					check_variable = {
+# 						which = tec_aiauth_program_stored
+# 						value >= tec_aiauth_program_cost_temp_x2
+# 					}
+# 				}
+# 				ruler = {
+# 					if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_4
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_4
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_3
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_3
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_1
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_1
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_0
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_0
+# 					}
+# 					add_trait = leader_trait_aiauth_ruler_checker_2
+# 				}
+# 				set_variable = {
+# 					which = tec_aiauth_program_slots
+# 					value = 2
+# 				}
+# 			}
+# 			else_if = {	# 1
+# 				limit = {
+# 					check_variable = {
+# 						which = tec_aiauth_program_stored
+# 						value >= tec_aiauth_program_cost
+# 					}
+# 				}
+# 				ruler = {
+# 					if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_4
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_4
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_3
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_3
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_2
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_2
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_0
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_0
+# 					}
+# 					add_trait = leader_trait_aiauth_ruler_checker_1
+# 				}
+# 				set_variable = {
+# 					which = tec_aiauth_program_slots
+# 					value = 1
+# 				}
+# 			}
+# 			else = {	# No programs?
+# 				ruler = {
+# 					if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_4
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_4
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_3
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_3
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_2
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_2
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_trait = leader_trait_aiauth_ruler_checker_1
+# 						}
+# 						remove_trait = leader_trait_aiauth_ruler_checker_1
+# 					}
+# 					add_trait = leader_trait_aiauth_ruler_checker_0
+# 				}
+# 				set_variable = {
+# 					which = tec_aiauth_program_slots
+# 					value = 0
+# 				}
+# 			}
+# 		}
+# 	}
+# 	after = {
+# 		clear_variable = tec_aiauth_program_cost_temp
+# 		clear_variable = tec_aiauth_program_cost_temp_x2
+# 		clear_variable = tec_aiauth_program_cost_temp_x3
+# 		clear_variable = tec_aiauth_program_cost_temp_x4
+# 	}
+# }
+# tec_aiauth.25 # Recalculates
+
+# SELECT TRAITS ON DEMAND
+# country_event = {
+# 	id = tec_aiauth.100
+# 	title = "tec_aiauth.100.name"
+
+# 	desc = {
+# 		trigger = {
+# 			always = yes
+# 		}
+# 		text = "tec_aiauth.100.desc"
+# 	}
+
+# 	diplomatic = yes
+# 	diplomatic_title = BLANK_STRING
+# 	is_triggered_only = yes
+
+# 	picture_event_data = {
+# 		portrait = ruler
+# 		room = room_selector
+# 		planet_background = root.capital_scope
+# 	}
+
+# 	immediate = {
+# 		# failsafe
+# 		hidden_effect = {
+# 			set_country_flag = tec_active_aiauth_window
+# 			country_event = {	# recalculates
+# 				id = tec_aiauth.25
+# 			}
+# 			export_resource_stockpile_to_variable = {
+# 				resource = sr_tec_ai_power
+# 				variable = tec_aiauth_program_stored
+# 			}
+# 			set_variable = {
+# 				which = tec_aiauth_program_cost_minus
+# 				value = tec_aiauth_program_cost
+# 			}
+# 			multiply_variable = {
+# 				which = tec_aiauth_program_cost_minus
+# 				value = -1
+# 			}
+# 		}
+# 	}
+
+# 	option = {
+# 		name = tec_aiauth.100.main
+# 		custom_tooltip = tec_aiauth.100.main.tooltip
+# 		hidden_effect = {
+# 			country_event = {
+# 				id = tec_aiauth.110
+# 			}
+# 			country_event = {	# recalculates
+# 				id = tec_aiauth.25
+# 			}
+# 		}
+# 	}
+# 	option = {
+# 		name = tec_aiauth.100.minor
+# 		custom_tooltip = tec_aiauth.100.minor.tooltip
+# 		hidden_effect = {
+# 			country_event = {
+# 				id = tec_aiauth.120
+# 			}
+# 			country_event = {	# recalculates
+# 				id = tec_aiauth.25
+# 			}
+# 		}
+# 	}
+# 	option = {
+# 		name = tec_aiauth.100.levelup
+# 		custom_tooltip = tec_aiauth.100.levelup.tooltip
+# 		allow = {
+# 			hidden_trigger = {
+# 				check_variable = {
+# 					which = tec_aiauth_program_cost
+# 					value < tec_aiauth_program_stored
+# 				} 
+# 			}
+# 		}
+# 		ruler = {
+# 			add_skill_without_trait_selection = 1
+# 		}
+# 		hidden_effect = {
+# 			add_resource = {
+# 				sr_tec_ai_power = 1
+# 				mult = tec_aiauth_program_cost_minus
+# 			}
+# 			multiply_variable = {
+# 				which = tec_aiauth_program_cost
+# 				value = 2
+# 			}
+# 			clear_variable = tec_aiauth_program_cost_minus
+# 			country_event = {
+# 				id = tec_aiauth.100
+# 			}
+# 			country_event = {	# recalculates
+# 				id = tec_aiauth.25
+# 			}
+# 		}
+# 	}
+# 	option = {
+# 		name = tec_aiauth.100.exit
+# 		custom_tooltip = tec_aiauth.100.exit.tooltip
+# 		hidden_effect = {
+# 			remove_country_flag = tec_active_aiauth_window
+# 		}
+# 	}
+# }
+
+# country_event = {
+# 	id = tec_aiauth.110
+# 	title = "tec_aiauth.110.name"
+
+# 	desc = {
+# 		trigger = {
+# 			always = yes
+# 		}
+# 		text = "tec_aiauth.110.desc"
+# 	}
+
+# 	diplomatic = yes
+# 	diplomatic_title = BLANK_STRING
+# 	is_triggered_only = yes
+
+# 	picture_event_data = {
+# 		portrait = ruler
+# 		room = room_selector
+# 		planet_background = root.capital_scope
+# 	}
+
+# 	immediate = {
+# 		# failsafe
+# 		hidden_effect = {
+# 			set_country_flag = tec_active_aiauth_window
+# 			export_resource_stockpile_to_variable = {
+# 				resource = sr_tec_ai_power
+# 				variable = tec_aiauth_program_stored
+# 			}
+# 			set_variable = {
+# 				which = tec_aiauth_program_cost_minus
+# 				value = tec_aiauth_program_cost
+# 			}
+# 			multiply_variable = {
+# 				which = tec_aiauth_program_cost_minus
+# 				value = -1
+# 			}
+# 		}
+# 	}
+
+# 	option = {
+# 		name = tec_aiauth.110.back
+# 		custom_tooltip = tec_aiauth.110.back.tooltip
+# 		allow = {
+# 			hidden_trigger = {
+# 				always = yes
+# 			}
+# 		}
+# 		hidden_effect = {
+# 			country_event = {
+# 				id = tec_aiauth.100
+# 			}
+# 		}
+# 	}
+# 	# Research option
+# 	option = {
+# 		name = tec_aiauth.110.research_on
+# 		custom_tooltip = tec_aiauth.110.research_on.tooltip
+# 		ruler = {
+# 			add_trait = leader_trait_aiauth_ruler_research_program
+# 		}
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					NOT = {
+# 						has_trait = leader_trait_aiauth_ruler_research_program
+# 					}
+# 				}
+# 				check_variable = {	# Has no used programs
+# 					which = tec_aiauth_main_programs
+# 					value = 0
+# 				}
+# 			}
+# 		}
+# 		allow = {
+# 			hidden_trigger = {
+# 				check_variable = {	# Has 2 slot levels
+# 					which = tec_aiauth_program_slots
+# 					value >= 2
+# 				}
+# 				check_variable = {	# Has no used programs
+# 					which = tec_aiauth_main_programs
+# 					value = 0
+# 				}
+# 				check_variable = {	# Has no more than 1 protocol
+# 					which = tec_aiauth_minor_programs
+# 					value < 2
+# 				}
+# 			}
+# 		}
+# 		hidden_effect = {
+# 			change_variable = {
+# 				which = tec_aiauth_main_programs
+# 				value = 1
+# 			}
+# 			change_variable = {
+# 				which = tec_aiauth_program_slots
+# 				value = -2
+# 			}
+# 			add_resource = {
+# 				sr_tec_ai_power = 2
+# 				mult = tec_aiauth_program_cost_minus
+# 			}
+# 			clear_variable = tec_aiauth_program_cost_minus
+# 			multiply_variable = {
+# 				which = tec_aiauth_program_cost
+# 				value = 2
+# 			}
+# 			country_event = {	# recalculates
+# 				id = tec_aiauth.25
+# 			}
+# 			country_event = {	# Shows the event again
+# 				id = tec_aiauth.110
+# 			}
+# 		}
+# 	}
+# 	option = {
+# 		name = tec_aiauth.110.research_off
+# 		custom_tooltip = tec_aiauth.110.research_off.tooltip
+# 		ruler = {
+# 			remove_trait = leader_trait_aiauth_ruler_research_program
+# 		}
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					has_trait = leader_trait_aiauth_ruler_research_program
+# 				}
+# 			}
+# 		}
+# 		hidden_effect = {
+# 			change_variable = {
+# 				which = tec_aiauth_main_programs
+# 				value = -1
+# 			}
+# 			country_event = {	# recalculates
+# 				id = tec_aiauth.25
+# 			}
+# 			country_event = {	# Shows the event again
+# 				id = tec_aiauth.110
+# 			}
+# 		}
+# 	}
+# 	option = {
+# 		name = tec_aiauth.110.research_unav
+# 		custom_tooltip = tec_aiauth.110.research_unav.tooltip
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					NOT = {
+# 						has_trait = leader_trait_aiauth_ruler_research_program
+# 					}
+# 				}
+# 				OR = {
+# 					check_variable = {	# Has a used programs
+# 						which = tec_aiauth_main_programs
+# 						value = 1
+# 					}
+# 					check_variable = {	# Has more than 1 protocol
+# 					which = tec_aiauth_minor_programs
+# 					value > 1
+# 				}
+# 				}
+# 			}
+# 		}
+# 		allow = {
+# 			hidden_trigger = {
+# 				always = no
+# 			}
+# 		}
+# 	}
+
+# 	# Industrial
+# 	option = {
+# 		name = tec_aiauth.110.industrial_on
+# 		custom_tooltip = tec_aiauth.110.industrial_on.tooltip
+# 		ruler = {
+# 			add_trait = leader_trait_aiauth_ruler_industrial_program
+# 		}
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					NOT = {
+# 						has_trait = leader_trait_aiauth_ruler_industrial_program
+# 					}
+# 				}
+# 				check_variable = {	# Has no used programs
+# 					which = tec_aiauth_main_programs
+# 					value = 0
+# 				}
+# 			}
+# 		}
+# 		allow = {
+# 			hidden_trigger = {
+# 				check_variable = {	# Has 2 slot levels
+# 					which = tec_aiauth_program_slots
+# 					value >= 2
+# 				}
+# 				check_variable = {	# Has no used programs
+# 					which = tec_aiauth_main_programs
+# 					value = 0
+# 				}
+# 				check_variable = {	# Has no more than 1 protocol
+# 					which = tec_aiauth_minor_programs
+# 					value < 2
+# 				}
+# 			}
+# 		}
+# 		hidden_effect = {
+# 			change_variable = {
+# 				which = tec_aiauth_main_programs
+# 				value = 1
+# 			}
+# 			change_variable = {
+# 				which = tec_aiauth_program_slots
+# 				value = -2
+# 			}
+# 			add_resource = {
+# 				sr_tec_ai_power = 2
+# 				mult = tec_aiauth_program_cost_minus
+# 			}
+# 			clear_variable = tec_aiauth_program_cost_minus
+# 			multiply_variable = {
+# 				which = tec_aiauth_program_cost
+# 				value = 2
+# 			}
+# 			country_event = {	# recalculates
+# 				id = tec_aiauth.25
+# 			}
+# 			country_event = {	# Shows the event again
+# 				id = tec_aiauth.110
+# 			}
+# 		}
+# 	}
+# 	option = {
+# 		name = tec_aiauth.110.industrial_off
+# 		custom_tooltip = tec_aiauth.110.industrial_off.tooltip
+# 		ruler = {
+# 			remove_trait = leader_trait_aiauth_ruler_industrial_program
+# 		}
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					has_trait = leader_trait_aiauth_ruler_industrial_program
+# 				}
+# 			}
+# 		}
+# 		hidden_effect = {
+# 			change_variable = {
+# 				which = tec_aiauth_main_programs
+# 				value = -1
+# 			}
+# 			country_event = {	# recalculates
+# 				id = tec_aiauth.25
+# 			}
+# 			country_event = {	# Shows the event again
+# 				id = tec_aiauth.110
+# 			}
+# 		}
+# 	}
+# 	option = {
+# 		name = tec_aiauth.110.industrial_unav
+# 		custom_tooltip = tec_aiauth.110.industrial_unav.tooltip
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					NOT = {
+# 						has_trait = leader_trait_aiauth_ruler_industrial_program
+# 					}
+# 				}
+# 				OR = {
+# 					check_variable = {	# Has a used programs
+# 						which = tec_aiauth_main_programs
+# 						value = 1
+# 					}
+# 					check_variable = {	# Has more than 1 protocol
+# 					which = tec_aiauth_minor_programs
+# 					value > 1
+# 				}
+# 				}
+# 			}
+# 		}
+# 		allow = {
+# 			hidden_trigger = {
+# 				always = no
+# 			}
+# 		}
+# 	}
+
+# 	# Unity
+# 	option = {
+# 		name = tec_aiauth.110.unity_on
+# 		custom_tooltip = tec_aiauth.110.unity_on.tooltip
+# 		ruler = {
+# 			add_trait = leader_trait_aiauth_ruler_unity_program
+# 		}
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					NOT = {
+# 						has_trait = leader_trait_aiauth_ruler_unity_program
+# 					}
+# 				}
+# 				check_variable = {	# Has no used programs
+# 					which = tec_aiauth_main_programs
+# 					value = 0
+# 				}
+# 			}
+# 		}
+# 		allow = {
+# 			hidden_trigger = {
+# 				check_variable = {	# Has 2 slot levels
+# 					which = tec_aiauth_program_slots
+# 					value >= 2
+# 				}
+# 				check_variable = {	# Has no used programs
+# 					which = tec_aiauth_main_programs
+# 					value = 0
+# 				}
+# 				check_variable = {	# Has no more than 1 protocol
+# 					which = tec_aiauth_minor_programs
+# 					value < 2
+# 				}
+# 			}
+# 		}
+# 		hidden_effect = {
+# 			change_variable = {
+# 				which = tec_aiauth_main_programs
+# 				value = 1
+# 			}
+# 			change_variable = {
+# 				which = tec_aiauth_program_slots
+# 				value = -2
+# 			}
+# 			add_resource = {
+# 				sr_tec_ai_power = 2
+# 				mult = tec_aiauth_program_cost_minus
+# 			}
+# 			clear_variable = tec_aiauth_program_cost_minus
+# 			multiply_variable = {
+# 				which = tec_aiauth_program_cost
+# 				value = 2
+# 			}
+# 			country_event = {	# recalculates
+# 				id = tec_aiauth.25
+# 			}
+# 			country_event = {	# Shows the event again
+# 				id = tec_aiauth.110
+# 			}
+# 		}
+# 	}
+# 	option = {
+# 		name = tec_aiauth.110.unity_off
+# 		custom_tooltip = tec_aiauth.110.unity_off.tooltip
+# 		ruler = {
+# 			remove_trait = leader_trait_aiauth_ruler_unity_program
+# 		}
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					has_trait = leader_trait_aiauth_ruler_unity_program
+# 				}
+# 			}
+# 		}
+# 		hidden_effect = {
+# 			change_variable = {
+# 				which = tec_aiauth_main_programs
+# 				value = -1
+# 			}
+# 			country_event = {	# recalculates
+# 				id = tec_aiauth.25
+# 			}
+# 			country_event = {	# Shows the event again
+# 				id = tec_aiauth.110
+# 			}
+# 		}
+# 	}
+# 	option = {
+# 		name = tec_aiauth.110.unity_unav
+# 		custom_tooltip = tec_aiauth.110.unity_unav.tooltip
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					NOT = {
+# 						has_trait = leader_trait_aiauth_ruler_unity_program
+# 					}
+# 				}
+# 				OR = {
+# 					check_variable = {	# Has a used programs
+# 						which = tec_aiauth_main_programs
+# 						value = 1
+# 					}
+# 					check_variable = {	# Has more than 1 protocol
+# 					which = tec_aiauth_minor_programs
+# 					value > 1
+# 				}
+# 				}
+# 			}
+# 		}
+# 		allow = {
+# 			hidden_trigger = {
+# 				always = no
+# 			}
+# 		}
+# 	}
+
+# 	#option = {
+# 		#	name = tec_rebalance.611.space
+# 		#	allow = {
+# 		#		hidden_trigger = {
+# 		#			always = no
+# 		#		}
+# 		#	}
+# 	#}
+# 	option = {
+# 		name = tec_aiauth.100.exit
+# 		custom_tooltip = tec_aiauth.100.exit.tooltip
+# 		hidden_effect = {
+# 			remove_country_flag = tec_active_aiauth_window
+# 		}
+# 	}
+# }
+
+# country_event = {
+# 	id = tec_aiauth.120
+# 	title = "tec_aiauth.120.name"
+
+# 	desc = {
+# 		trigger = {
+# 			always = yes
+# 		}
+# 		text = "tec_aiauth.120.desc"
+# 	}
+
+# 	diplomatic = yes
+# 	diplomatic_title = BLANK_STRING
+# 	is_triggered_only = yes
+
+# 	picture_event_data = {
+# 		portrait = ruler
+# 		room = room_selector
+# 		planet_background = root.capital_scope
+# 	}
+
+# 	immediate = {
+# 		# failsafe
+# 		hidden_effect = {
+# 			set_country_flag = tec_active_aiauth_window
+# 			export_resource_stockpile_to_variable = {
+# 				resource = sr_tec_ai_power
+# 				variable = tec_aiauth_program_stored
+# 			}
+# 			set_variable = {
+# 				which = tec_aiauth_program_cost_minus
+# 				value = tec_aiauth_program_cost
+# 			}
+# 			multiply_variable = {
+# 				which = tec_aiauth_program_cost_minus
+# 				value = -1
+# 			}
+# 		}
+# 	}
+
+# 	option = {
+# 		name = tec_aiauth.110.back
+# 		custom_tooltip = tec_aiauth.110.back.tooltip
+# 		allow = {
+# 			hidden_trigger = {
+# 				always = yes
+# 			}
+# 		}
+# 		hidden_effect = {
+# 			country_event = {
+# 				id = tec_aiauth.100
+# 			}
+# 		}
+# 	}
+
+# 	# Amenity option
+# 	option = {
+# 		name = tec_aiauth.120.caring_on
+# 		custom_tooltip = tec_aiauth.120.caring_on.tooltip
+# 		ruler = {
+# 			add_trait = leader_trait_aiauth_ruler_caring_protocols
+# 		}
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					NOT = {
+# 						has_trait = leader_trait_aiauth_ruler_caring_protocols
+# 					}
+# 				}
+# 				OR = {
+# 					AND = {
+# 						check_variable = {	# Has 1 programs
+# 							which = tec_aiauth_main_programs
+# 							value = 1
+# 						}
+# 						check_variable = {	# Has no used minor programs
+# 							which = tec_aiauth_minor_programs
+# 							value = 0
+# 						}
+# 					}
+# 					AND = {
+# 						check_variable = {	# Has no used programs
+# 							which = tec_aiauth_main_programs
+# 							value = 0
+# 						}
+# 						check_variable = {	# Has less than 3 minor programs
+# 							which = tec_aiauth_minor_programs
+# 							value < 3
+# 						}
+# 					}
+# 				}
+# 			}
+# 		}
+# 		allow = {
+# 			hidden_trigger = {
+# 				check_variable = {	# Has 1 slot levels
+# 					which = tec_aiauth_program_slots
+# 					value >= 1
+# 				}
+# 			}
+# 		}
+# 		hidden_effect = {
+# 			change_variable = {
+# 				which = tec_aiauth_minor_programs
+# 				value = 1
+# 			}
+# 			change_variable = {
+# 				which = tec_aiauth_program_slots
+# 				value = -1
+# 			}
+# 			add_resource = {
+# 				sr_tec_ai_power = 1
+# 				mult = tec_aiauth_program_cost_minus
+# 			}
+# 			clear_variable = tec_aiauth_program_cost_minus
+# 			multiply_variable = {
+# 				which = tec_aiauth_program_cost
+# 				value = 2
+# 			}
+# 			country_event = {	# recalculates
+# 				id = tec_aiauth.25
+# 			}
+# 			country_event = {	# Shows the event again
+# 				id = tec_aiauth.120
+# 			}
+# 		}
+# 	}
+# 	option = {
+# 		name = tec_aiauth.120.caring_off
+# 		custom_tooltip = tec_aiauth.120.caring_off.tooltip
+# 		ruler = {
+# 			remove_trait = leader_trait_aiauth_ruler_caring_protocols
+# 		}
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					has_trait = leader_trait_aiauth_ruler_caring_protocols
+# 				}
+# 			}
+# 		}
+# 		hidden_effect = {
+# 			change_variable = {
+# 				which = tec_aiauth_minor_programs
+# 				value = -1
+# 			}
+# 			country_event = {	# recalculates
+# 				id = tec_aiauth.25
+# 			}
+# 			country_event = {	# Shows the event again
+# 				id = tec_aiauth.120
+# 			}
+# 		}
+# 	}
+# 	option = {
+# 		name = tec_aiauth.120.caring_unav
+# 		custom_tooltip = tec_aiauth.120.caring_unav.tooltip
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					NOT = {
+# 						has_trait = leader_trait_aiauth_ruler_caring_protocols
+# 					}
+# 				}
+# 				OR = {
+# 					AND = {
+# 						check_variable = {	# Has 1 programs
+# 							which = tec_aiauth_main_programs
+# 							value = 1
+# 						}
+# 						check_variable = {	# Has 1 used minor programs
+# 							which = tec_aiauth_minor_programs
+# 							value = 1
+# 						}
+# 					}
+# 					AND = {
+# 						check_variable = {	# Has no used programs
+# 							which = tec_aiauth_main_programs
+# 							value = 0
+# 						}
+# 						check_variable = {	# Has 3 minor programs
+# 							which = tec_aiauth_minor_programs
+# 							value = 3
+# 						}
+# 					}
+# 				}
+# 			}
+# 		}
+# 		allow = {
+# 			hidden_trigger = {
+# 				always = no
+# 			}
+# 		}
+# 	}
+
+# 	# Pop sprawl option
+# 	option = {
+# 		name = tec_aiauth.120.monitoring_on
+# 		custom_tooltip = tec_aiauth.120.monitoring_on.tooltip
+# 		ruler = {
+# 			add_trait = leader_trait_aiauth_ruler_monitoring_protocols
+# 		}
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					NOT = {
+# 						has_trait = leader_trait_aiauth_ruler_monitoring_protocols
+# 					}
+# 				}
+# 				OR = {
+# 					AND = {
+# 						check_variable = {	# Has 1 programs
+# 							which = tec_aiauth_main_programs
+# 							value = 1
+# 						}
+# 						check_variable = {	# Has no used minor programs
+# 							which = tec_aiauth_minor_programs
+# 							value = 0
+# 						}
+# 					}
+# 					AND = {
+# 						check_variable = {	# Has no used programs
+# 							which = tec_aiauth_main_programs
+# 							value = 0
+# 						}
+# 						check_variable = {	# Has less than 3 minor programs
+# 							which = tec_aiauth_minor_programs
+# 							value < 3
+# 						}
+# 					}
+# 				}
+# 			}
+# 		}
+# 		allow = {
+# 			hidden_trigger = {
+# 				check_variable = {	# Has 1 slot levels
+# 					which = tec_aiauth_program_slots
+# 					value >= 1
+# 				}
+# 			}
+# 		}
+# 		hidden_effect = {
+# 			change_variable = {
+# 				which = tec_aiauth_minor_programs
+# 				value = 1
+# 			}
+# 			change_variable = {
+# 				which = tec_aiauth_program_slots
+# 				value = -1
+# 			}
+# 			add_resource = {
+# 				sr_tec_ai_power = 1
+# 				mult = tec_aiauth_program_cost_minus
+# 			}
+# 			clear_variable = tec_aiauth_program_cost_minus
+# 			multiply_variable = {
+# 				which = tec_aiauth_program_cost
+# 				value = 2
+# 			}
+# 			country_event = {	# recalculates
+# 				id = tec_aiauth.25
+# 			}
+# 			country_event = {	# Shows the event again
+# 				id = tec_aiauth.120
+# 			}
+# 		}
+# 	}
+# 	option = {
+# 		name = tec_aiauth.120.monitoring_off
+# 		custom_tooltip = tec_aiauth.120.monitoring_off.tooltip
+# 		ruler = {
+# 			remove_trait = leader_trait_aiauth_ruler_monitoring_protocols
+# 		}
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					has_trait = leader_trait_aiauth_ruler_monitoring_protocols
+# 				}
+# 			}
+# 		}
+# 		hidden_effect = {
+# 			change_variable = {
+# 				which = tec_aiauth_minor_programs
+# 				value = -1
+# 			}
+# 			country_event = {	# recalculates
+# 				id = tec_aiauth.25
+# 			}
+# 			country_event = {	# Shows the event again
+# 				id = tec_aiauth.120
+# 			}
+# 		}
+# 	}
+# 	option = {
+# 		name = tec_aiauth.120.monitoring_unav
+# 		custom_tooltip = tec_aiauth.120.monitoring_unav.tooltip
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					NOT = {
+# 						has_trait = leader_trait_aiauth_ruler_monitoring_protocols
+# 					}
+# 				}
+# 				OR = {
+# 					AND = {
+# 						check_variable = {	# Has 1 programs
+# 							which = tec_aiauth_main_programs
+# 							value = 1
+# 						}
+# 						check_variable = {	# Has 1 used minor programs
+# 							which = tec_aiauth_minor_programs
+# 							value = 1
+# 						}
+# 					}
+# 					AND = {
+# 						check_variable = {	# Has no used programs
+# 							which = tec_aiauth_main_programs
+# 							value = 0
+# 						}
+# 						check_variable = {	# Has 3 minor programs
+# 							which = tec_aiauth_minor_programs
+# 							value = 3
+# 						}
+# 					}
+# 				}
+# 			}
+# 		}
+# 		allow = {
+# 			hidden_trigger = {
+# 				always = no
+# 			}
+# 		}
+# 	}
+
+# 	# Builslot option
+# 	option = {
+# 		name = tec_aiauth.120.development_on
+# 		custom_tooltip = tec_aiauth.120.development_on.tooltip
+# 		ruler = {
+# 			add_trait = leader_trait_aiauth_ruler_development_protocols
+# 		}
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					NOT = {
+# 						has_trait = leader_trait_aiauth_ruler_development_protocols
+# 					}
+# 				}
+# 				OR = {
+# 					AND = {
+# 						check_variable = {	# Has 1 programs
+# 							which = tec_aiauth_main_programs
+# 							value = 1
+# 						}
+# 						check_variable = {	# Has no used minor programs
+# 							which = tec_aiauth_minor_programs
+# 							value = 0
+# 						}
+# 					}
+# 					AND = {
+# 						check_variable = {	# Has no used programs
+# 							which = tec_aiauth_main_programs
+# 							value = 0
+# 						}
+# 						check_variable = {	# Has less than 3 minor programs
+# 							which = tec_aiauth_minor_programs
+# 							value < 3
+# 						}
+# 					}
+# 				}
+# 			}
+# 		}
+# 		allow = {
+# 			hidden_trigger = {
+# 				check_variable = {	# Has 1 slot levels
+# 					which = tec_aiauth_program_slots
+# 					value >= 1
+# 				}
+# 			}
+# 		}
+# 		hidden_effect = {
+# 			change_variable = {
+# 				which = tec_aiauth_minor_programs
+# 				value = 1
+# 			}
+# 			change_variable = {
+# 				which = tec_aiauth_program_slots
+# 				value = -1
+# 			}
+# 			add_resource = {
+# 				sr_tec_ai_power = 1
+# 				mult = tec_aiauth_program_cost_minus
+# 			}
+# 			clear_variable = tec_aiauth_program_cost_minus
+# 			multiply_variable = {
+# 				which = tec_aiauth_program_cost
+# 				value = 2
+# 			}
+# 			country_event = {	# recalculates
+# 				id = tec_aiauth.25
+# 			}
+# 			country_event = {	# Shows the event again
+# 				id = tec_aiauth.120
+# 			}
+# 		}
+# 	}
+# 	option = {
+# 		name = tec_aiauth.120.development_off
+# 		custom_tooltip = tec_aiauth.120.development_off.tooltip
+# 		ruler = {
+# 			remove_trait = leader_trait_aiauth_ruler_development_protocols
+# 		}
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					has_trait = leader_trait_aiauth_ruler_development_protocols
+# 				}
+# 			}
+# 		}
+# 		hidden_effect = {
+# 			change_variable = {
+# 				which = tec_aiauth_minor_programs
+# 				value = -1
+# 			}
+# 			country_event = {	# recalculates
+# 				id = tec_aiauth.25
+# 			}
+# 			country_event = {	# Shows the event again
+# 				id = tec_aiauth.120
+# 			}
+# 		}
+# 	}
+# 	option = {
+# 		name = tec_aiauth.120.development_unav
+# 		custom_tooltip = tec_aiauth.120.development_unav.tooltip
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					NOT = {
+# 						has_trait = leader_trait_aiauth_ruler_development_protocols
+# 					}
+# 				}
+# 				OR = {
+# 					AND = {
+# 						check_variable = {	# Has 1 programs
+# 							which = tec_aiauth_main_programs
+# 							value = 1
+# 						}
+# 						check_variable = {	# Has 1 used minor programs
+# 							which = tec_aiauth_minor_programs
+# 							value = 1
+# 						}
+# 					}
+# 					AND = {
+# 						check_variable = {	# Has no used programs
+# 							which = tec_aiauth_main_programs
+# 							value = 0
+# 						}
+# 						check_variable = {	# Has 3 minor programs
+# 							which = tec_aiauth_minor_programs
+# 							value = 3
+# 						}
+# 					}
+# 				}
+# 			}
+# 		}
+# 		allow = {
+# 			hidden_trigger = {
+# 				always = no
+# 			}
+# 		}
+# 	}
+
+# 	# Ethics option
+# 	option = {
+# 		name = tec_aiauth.120.compliance_on
+# 		custom_tooltip = tec_aiauth.120.compliance_on.tooltip
+# 		ruler = {
+# 			add_trait = leader_trait_aiauth_ruler_compliance_protocols
+# 		}
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					NOT = {
+# 						has_trait = leader_trait_aiauth_ruler_compliance_protocols
+# 					}
+# 				}
+# 				OR = {
+# 					AND = {
+# 						check_variable = {	# Has 1 programs
+# 							which = tec_aiauth_main_programs
+# 							value = 1
+# 						}
+# 						check_variable = {	# Has no used minor programs
+# 							which = tec_aiauth_minor_programs
+# 							value = 0
+# 						}
+# 					}
+# 					AND = {
+# 						check_variable = {	# Has no used programs
+# 							which = tec_aiauth_main_programs
+# 							value = 0
+# 						}
+# 						check_variable = {	# Has less than 3 minor programs
+# 							which = tec_aiauth_minor_programs
+# 							value < 3
+# 						}
+# 					}
+# 				}
+# 			}
+# 		}
+# 		allow = {
+# 			hidden_trigger = {
+# 				check_variable = {	# Has 1 slot levels
+# 					which = tec_aiauth_program_slots
+# 					value >= 1
+# 				}
+# 			}
+# 		}
+# 		hidden_effect = {
+# 			change_variable = {
+# 				which = tec_aiauth_minor_programs
+# 				value = 1
+# 			}
+# 			change_variable = {
+# 				which = tec_aiauth_program_slots
+# 				value = -1
+# 			}
+# 			add_resource = {
+# 				sr_tec_ai_power = 1
+# 				mult = tec_aiauth_program_cost_minus
+# 			}
+# 			clear_variable = tec_aiauth_program_cost_minus
+# 			multiply_variable = {
+# 				which = tec_aiauth_program_cost
+# 				value = 2
+# 			}
+# 			country_event = {	# recalculates
+# 				id = tec_aiauth.25
+# 			}
+# 			country_event = {	# Shows the event again
+# 				id = tec_aiauth.120
+# 			}
+# 		}
+# 	}
+# 	option = {
+# 		name = tec_aiauth.120.compliance_off
+# 		custom_tooltip = tec_aiauth.120.compliance_off.tooltip
+# 		ruler = {
+# 			remove_trait = leader_trait_aiauth_ruler_compliance_protocols
+# 		}
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					has_trait = leader_trait_aiauth_ruler_compliance_protocols
+# 				}
+# 			}
+# 		}
+# 		hidden_effect = {
+# 			change_variable = {
+# 				which = tec_aiauth_minor_programs
+# 				value = -1
+# 			}
+# 			country_event = {	# recalculates
+# 				id = tec_aiauth.25
+# 			}
+# 			country_event = {	# Shows the event again
+# 				id = tec_aiauth.120
+# 			}
+# 		}
+# 	}
+# 	option = {
+# 		name = tec_aiauth.120.compliance_unav
+# 		custom_tooltip = tec_aiauth.120.compliance_unav.tooltip
+# 		trigger = {
+# 			hidden_trigger = {
+# 				ruler = {
+# 					NOT = {
+# 						has_trait = leader_trait_aiauth_ruler_compliance_protocols
+# 					}
+# 				}
+# 				OR = {
+# 					AND = {
+# 						check_variable = {	# Has 1 programs
+# 							which = tec_aiauth_main_programs
+# 							value = 1
+# 						}
+# 						check_variable = {	# Has 1 used minor programs
+# 							which = tec_aiauth_minor_programs
+# 							value = 1
+# 						}
+# 					}
+# 					AND = {
+# 						check_variable = {	# Has no used programs
+# 							which = tec_aiauth_main_programs
+# 							value = 0
+# 						}
+# 						check_variable = {	# Has 3 minor programs
+# 							which = tec_aiauth_minor_programs
+# 							value = 3
+# 						}
+# 					}
+# 				}
+# 			}
+# 		}
+# 		allow = {
+# 			hidden_trigger = {
+# 				always = no
+# 			}
+# 		}
+# 	}
+
+# 	option = {
+# 		name = tec_aiauth.100.exit
+# 		custom_tooltip = tec_aiauth.100.exit.tooltip
+# 		hidden_effect = {
+# 			remove_country_flag = tec_active_aiauth_window
+# 		}
+# 	}
+# }
+
+
+ #Annotation ---------------------------------------------
+					#check_modifier_value = {
+					#	modifier = country_ethic_sr_tec_ai_power_produces_add
+					#	value = 500
+					#}
+ # -------------------------------------------------------
+
+# Trait pickers

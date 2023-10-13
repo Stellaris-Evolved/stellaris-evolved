@@ -1,3 +1,5 @@
+# common\districts\zz_ow_00_urban_districts.txt
+
 # NOTE: District sorting
 	# qualities
 	# potential/possible
@@ -51,18 +53,21 @@ district_crashed_slaver_ship = {
 	}
 
 	allow = {
-		NOR = {
-			has_modifier = resort_colony
-			has_modifier = slave_colony
-		}
+		tec_disallow_urban_districts = no
 	}
 
 	inline_script = districts/convert_to/inline_evolved_housing_districts
 	
 	resources = {
 		category = planet_districts_cities
-		upkeep = {
-			energy = 2
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = 0
+			upkeep = @tec_district_upkeep
 		}
 	}
 
@@ -74,19 +79,15 @@ district_crashed_slaver_ship = {
 			}
 		# /
 		inline_script = {
-			script = districts/inline_evolved_habitation_housing_modifiers
-			count = 1
+			script = districts/type/inline_evolved_housing_generic
+			scale = 1
 			trigger = ""
 		}
-		inline_script = districts/effects/inline_evolved_tec_artifice_2
-
-		# Civics
-			inline_script = districts/effects/inline_evolved_agrarian_idyll_city
-			inline_script = districts/effects/inline_evolved_tec_eco_keepers_city
-			inline_script = districts/effects/inline_evolved_tec_tribalism_city
-			inline_script = districts/effects/inline_evolved_tec_social_prosperity
-			inline_script = districts/effects/inline_evolved_tec_consumerism
-		# /
+		inline_script = {
+			script = districts/type/inline_evolved_housing_city
+			scale = 1
+			trigger = ""
+		}
 	# /
 
 	# Jobs
@@ -113,22 +114,8 @@ district_crashed_slaver_ship = {
 					owner = { has_country_flag = origin_broken_shackles_crashed_slaver_ship_depleted }
 				"
 			}
-
-			# Traditions
-				inline_script = {
-					script = districts/effects/inline_evolved_mercantile_trickle_up_economics
-					count = 1
-					trigger = ""
-				}
-			# /
-		# /
-		# Socialguards
 		# /
 	# /
-	inline_script = {
-		script = districts/compat/inline_evolved_starnet_housing_district
-		count = 1
-	}
 
 	inline_script = {
 		script = districts/inline_evolved_aibait_housing
@@ -137,7 +124,6 @@ district_crashed_slaver_ship = {
 		"
 	}
 }
-
 
 # --------------- Habitation
 district_city = {
@@ -171,43 +157,48 @@ district_city = {
 	}
 	
 	allow = {
-		NOT = { has_modifier = resort_colony }
-		NOT = { has_modifier = slave_colony }
+		tec_disallow_urban_districts = no
+		tec_ai_allow_housing_district = {
+			housing = 2
+			has_building_slots = "always = yes"
+			use_for_jobs = "
+				tec_has_clerk_jobs_available = no
+			"
+		}
 	}
 
 	inline_script = districts/convert_to/inline_evolved_housing_districts
 	
 	resources = {
 		category = planet_districts_cities
-		cost = {
-			minerals = @city_cost
-		}
-		upkeep = {
-			energy = 2
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_cost_high
+			upkeep = @tec_district_upkeep
 		}
 	}
 	
 	# Modifiers
-		# Standard
-			planet_modifier = {
-				planet_housing_add = 5
-				planet_max_buildings_add = 1
-			}
-		# /
+		planet_modifier = {
+			planet_housing_add = 5
+			planet_max_buildings_add = 1
+		}
+	# /
+	# Effect Types
 		inline_script = {
-			script = districts/inline_evolved_habitation_housing_modifiers
-			count = 1
+			script = districts/type/inline_evolved_housing_generic
+			scale = 1
 			trigger = ""
 		}
-		inline_script = districts/effects/inline_evolved_tec_artifice_2
-
-		# Civics
-			inline_script = districts/effects/inline_evolved_agrarian_idyll_city
-			inline_script = districts/effects/inline_evolved_tec_eco_keepers_city
-			inline_script = districts/effects/inline_evolved_tec_tribalism_city
-			inline_script = districts/effects/inline_evolved_tec_social_prosperity
-			inline_script = districts/effects/inline_evolved_tec_consumerism
-		# /
+		inline_script = {
+			script = districts/type/inline_evolved_housing_city
+			scale = 1
+			trigger = ""
+		}
 	# /
 
 	# Jobs
@@ -219,22 +210,8 @@ district_city = {
 				display = with_desc
 				trigger = ""
 			}
-
-			# Traditions
-				inline_script = {
-					script = districts/effects/inline_evolved_mercantile_trickle_up_economics
-					count = 1
-					trigger = ""
-				}
-			# /
-		# /
-		# Socialguards
 		# /
 	# /
-	inline_script = {
-		script = districts/compat/inline_evolved_starnet_housing_district
-		count = 1
-	}
 
 	inline_script = {
 		script = districts/inline_evolved_aibait_housing
@@ -251,19 +228,30 @@ district_hive = {
 	
 	show_on_uncolonized = {
 		exists = from
-		from = { is_hive_empire = yes }
+		from = {
+			is_hive_empire = yes
+			tec_is_biohive = no
+		}
 		tec_has_standard_habitation_district = yes
 	}
 	
 	potential = {
 		exists = owner
-		owner = { is_hive_empire = yes }
+		owner = {
+			is_hive_empire = yes
+			tec_is_biohive = no
+		}
 		tec_has_standard_habitation_district = yes
 	}
 	
 	allow = {
-		NOT = {
-			has_modifier = resort_colony
+		tec_disallow_urban_districts = no
+		tec_ai_allow_housing_district = {
+			housing = 2
+			has_building_slots = "always = yes"
+			use_for_jobs = "
+				tec_has_maintenance_drone_jobs_available = no
+			"
 		}
 	}
 	
@@ -271,40 +259,44 @@ district_hive = {
 
 	resources = {
 		category = planet_districts_cities
-		cost = {
-			minerals = @city_cost
-		}
-		upkeep = {
-			energy = 2
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_cost_high
+			upkeep = @tec_district_upkeep
 		}
 	}
-	
-	
 
 	# Modifiers
-		# Standard
-			planet_modifier = {
-				planet_housing_add = 6
-				planet_max_buildings_add = 1
-			}
-		# /
+		planet_modifier = {
+			planet_housing_add = 6
+			planet_max_buildings_add = 1
+		}
 		# Planet
 			triggered_planet_modifier = {
 				potential = {
-					is_planet_class = pc_hive
+					tec_is_hive_world = yes
 				}
 				modifier = {
 					planet_housing_add = 6
 				}
 			}
 		# /
-
+	# /
+	# Effect Types
 		inline_script = {
-			script = districts/inline_evolved_habitation_housing_modifiers
-			count = 1
+			script = districts/type/inline_evolved_housing_generic
+			scale = 1
 			trigger = ""
 		}
-		inline_script = districts/effects/inline_evolved_tec_artifice_2
+		inline_script = {
+			script = districts/type/inline_evolved_housing_hive
+			scale = 1
+			trigger = ""
+		}
 
 	# /
 	# Jobs
@@ -321,23 +313,10 @@ district_hive = {
 			mult = 1
 			display = no_desc
 			trigger = "
-				is_planet_class = pc_hive
+				tec_is_hive_world = yes
 			"
 		}
-		inline_script = {
-			script = districts/effects/inline_evolved_tech_housing_2_gestalt
-			count = 1
-			trigger = ""
-		}
-		# Bio/Lithospheric harmony
-			inline_script = districts/effects/inline_evolved_tec_hive_menial
-		# /
 	# /
-	
-	inline_script = {
-		script = districts/compat/inline_evolved_starnet_housing_district
-		count = 1
-	}
 
 	inline_script = {
 		script = districts/inline_evolved_aibait_housing
@@ -354,20 +333,28 @@ district_nexus = {
 	
 	show_on_uncolonized = {
 		exists = from
-		from = { is_machine_empire = yes }
+		from = {
+			is_machine_empire = yes
+		}
 		tec_has_standard_habitation_district = yes
 	}
 	
 	potential = {
 		exists = owner
-		owner = { is_machine_empire = yes }
+		owner = {
+			is_machine_empire = yes
+		}
 		tec_has_standard_habitation_district = yes
 	}
 	
 	allow = {
-		NOR = {
-			has_modifier = resort_colony
-			tec_has_machine_extraction_capital = yes
+		tec_disallow_urban_districts = no
+		tec_ai_allow_housing_district = {
+			housing = 2
+			has_building_slots = "always = yes"
+			use_for_jobs = "
+				tec_has_maintenance_drone_jobs_available = no
+			"
 		}
 	}
 
@@ -375,28 +362,34 @@ district_nexus = {
 
 	resources = {
 		category = planet_districts_cities
-		cost = {
-			minerals = @city_cost
-		}
-		upkeep = {
-			energy = 2
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_cost_high
+			upkeep = @tec_district_upkeep
 		}
 	}
 	
 	# Modifiers
-		# Standard
-			planet_modifier = {
-				planet_housing_add = 5
-				planet_max_buildings_add = 1
-			}
-
-			inline_script = {
-				script = districts/inline_evolved_habitation_housing_modifiers
-				count = 1
-				trigger = ""
-			}
-			inline_script = districts/effects/inline_evolved_tec_artifice_2
-		# /
+		planet_modifier = {
+			planet_housing_add = 5
+			planet_max_buildings_add = 1
+		}
+	# /
+	# Effect Types
+		inline_script = {
+			script = districts/type/inline_evolved_housing_generic
+			scale = 1
+			trigger = ""
+		}
+		inline_script = {
+			script = districts/type/inline_evolved_housing_nexus
+			scale = 1
+			trigger = ""
+		}
 	# /
 
 	# Jobs
@@ -407,20 +400,7 @@ district_nexus = {
 			display = with_desc
 			trigger = ""
 		}
-		inline_script = {
-			script = districts/effects/inline_evolved_tech_housing_2_gestalt
-			count = 1
-			trigger = ""
-		}
-		# Civics
-			inline_script = districts/effects/inline_evolved_tec_machine_menial
-		# /
 	# /
-	
-	inline_script = {
-		script = districts/compat/inline_evolved_starnet_housing_district
-		count = 1
-	}
 
 	inline_script = {
 		script = districts/inline_evolved_aibait_housing
@@ -441,35 +421,36 @@ district_industrial = {
 
 	show_on_uncolonized = {
 		exists = from
+		from = {
+			tec_is_biohive = no
+		}
 		tec_has_standard_industrial_district = yes
 	}
 	
 	potential = {
 		exists = owner
+		owner = {
+			tec_is_biohive = no
+		}
 		tec_has_standard_industrial_district = yes
 	}
 	
 	allow = {
-		NOR = {
-			has_modifier = resort_colony 
-			has_modifier = slave_colony 
-
-			has_planet_flag = tec_ecumenopolis_spec_militarized
-			has_planet_flag = tec_ecumenopolis_spec_science
-			has_planet_flag = tec_ecumenopolis_spec_admin
-			tec_has_machine_extraction_capital = yes
-		}
+		tec_disallow_urban_districts = no
 	}
 	
 	inline_script = districts/convert_to/inline_evolved_industrial_districts
 
 	resources = {
 		category = planet_districts_industrial
-		cost = {
-			minerals = @city_cost
-		}
-		upkeep = {
-			energy = 2
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_cost_high
+			upkeep = @tec_district_upkeep_high
 		}
 
 		inline_script = districts/resources/inline_evolved_tec_unleashed_industrialization_resources
@@ -519,7 +500,7 @@ district_srw_commercial = {
 
 	show_on_uncolonized = {
 		exists = from
-		from = { 
+		from = {
 			tec_uses_trade_value = yes
 		}
 		uses_district_set = shattered_ring_world
@@ -527,14 +508,14 @@ district_srw_commercial = {
 
 	potential = {
 		exists = owner
-		owner = { 
+		owner = {
 			tec_uses_trade_value = yes
 		}
 		uses_district_set = shattered_ring_world
 	}
 
 	allow = {
-		NOT = { has_modifier = resort_colony }
+		tec_disallow_urban_districts = no
 	}
 
 	inline_script = districts/convert_to/inline_evolved_trade_districts
@@ -542,11 +523,14 @@ district_srw_commercial = {
 
 	resources = {
 		category = planet_districts
-		cost = {
-			minerals = @base_cost
-		}
-		upkeep = {
-			energy = 1
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_cost_high
+			upkeep = @tec_district_upkeep_high
 		}
 	}
 
@@ -556,9 +540,17 @@ district_srw_commercial = {
 		}
 	# /
 
+	# Effect Type
+		inline_script = {
+			script = districts/type/inline_evolved_trade
+			trader_scale = 1
+			trader_trigger = ""
+		}
+	# /
+
 	# Jobs
 		inline_script = {
-			script = jobs/inline_evolved_clerk
+			script = jobs/inline_evolved_trader
 			count = 1
 			mult = 1
 			display = with_desc
@@ -572,18 +564,9 @@ district_srw_commercial = {
 			display = with_desc
 			trigger = "
 				owner = {
-					OR = {
-						is_regular_empire = yes
-						has_origin = origin_fear_of_the_dark
-					}
+					is_regular_empire = yes
 				}
 			"
-		}
-
-		inline_script = {
-			script = districts/effects/inline_evolved_mercantile_commercial_enterprise
-			trigger = ""
-			count = 1
 		}
 
 		# Machine gestalt
@@ -600,12 +583,6 @@ district_srw_commercial = {
 					tec_is_trade_gestalt = yes
 				}
 			"
-		}
-
-		inline_script = {
-			script = districts/effects/inline_evolved_tec_mercantile_commercial_enterprise_gestalt
-			trigger = ""
-			count = 1
 		}
 	# /
 }

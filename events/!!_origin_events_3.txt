@@ -1,5 +1,5 @@
+# events\!!_origin_events_3.txt
 
-# 
 namespace = origin
 
 		# Evolved review non hiveminds
@@ -139,5 +139,171 @@ planet_event = {
 		add_deposit = d_buried_lithoids
 		add_deposit = d_buried_lithoids
 		add_modifier = { modifier = lithoid_crater }
+	}
+}
+
+
+# -------------------------- Fear of the Dark
+#Turns you into a purifier
+country_event = {
+	id = origin.6165
+	title = origin.6165.name
+	desc = origin.6165.desc
+
+	show_sound = event_screams
+	picture = GFX_evt_fear_of_the_dark
+	show_sound = evn_fc_disunity_origin
+
+	is_triggered_only = yes
+
+	location = fromfrom
+
+	option = {
+		allow = {
+			is_galactic_custodian = no
+			is_galactic_emperor = no
+		}
+		name = origin.6165.a
+		icon = {
+			icon = GFX_fanatic_purifier
+			text = WILL_TURN_TO_PURIFIER
+		}
+		#Evolved - materialist or spiritualist
+		if = {
+			limit = {
+				is_spiritualist = yes
+			}
+			clear_ethos = yes
+			country_add_ethic = ethic_fanatic_xenophobe
+			country_add_ethic = ethic_fanatic_militarist
+			country_add_ethic = ethic_spiritualist
+		}
+		else = {
+			clear_ethos = yes
+			country_add_ethic = ethic_fanatic_xenophobe
+			country_add_ethic = ethic_fanatic_militarist
+			country_add_ethic = ethic_materialist
+		}
+
+		if = {
+			limit = {
+				is_megacorp = yes
+			}
+			hidden_effect = {
+				tec_country_swap_all_civics_regular_megacorp_effect = {
+					reverse = yes
+				}
+			}
+			if = {
+				limit = {
+					tec_is_aiauth_empire = yes
+				}
+				change_government = {
+					cooldown = no
+					authority = auth_tec_ai
+					remove_invalid_civics = yes
+				}
+			}
+			else_if = {
+				limit = {
+					has_authority = auth_tec_patrocorporate
+				}
+				change_government = {
+					cooldown = no
+					authority = auth_imperial
+					remove_invalid_civics = yes
+				}
+			}
+			else = {
+				change_government = {
+					cooldown = no
+					authority = auth_oligarchic
+					remove_invalid_civics = yes
+				}
+			}
+		}
+
+		force_add_civic = civic_fanatic_purifiers
+		set_country_flag = dark_forest_achievement
+
+		event_target:fotd_seperatist_planet@root = {
+			owner = {
+				every_owned_fleet = {
+					set_owner = root
+				}
+			}
+			set_owner = root
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					has_civic = civic_barbaric_despoilers
+				}
+				force_remove_civic = civic_barbaric_despoilers
+			}
+			remove_xuracorp_trades = yes
+			remove_riggan_trades = yes
+			remove_muutagan_trades = yes
+			if = {
+				limit = {
+					has_modifier = enclave_artist_patron
+				}
+				remove_modifier = enclave_artist_patron
+			}
+			if = {
+				limit = {
+					has_modifier = curator_insight
+				}
+				remove_modifier = curator_insight
+			}
+			if = {
+				limit = {
+					has_modifier = salvager_insight
+				}
+				remove_modifier = salvager_insight
+			}
+			every_playable_country = {
+				limit = {
+					exists = overlord
+					overlord = {
+						is_same_value = root
+					}
+				}
+				release_subject = yes
+			}
+			if = {
+				limit = {
+					exists = overlord
+					NOT = {
+						is_same_species = root.species
+					}
+				}
+				release_subject = yes
+			}
+			every_envoy = {
+				limit = {
+					has_envoy_task = {
+						task = improve_relations
+					}
+				}
+				unassign_leader = this
+			}
+			every_playable_country = {
+				limit = {
+					NOT = {
+						species = {
+							is_same_species = root.species
+						}
+					}
+				}
+				end_all_treaties_with = root
+			}
+			remove_from_galactic_community = yes
+		}
+	}
+
+	option = {
+		name = origin.6165.b
+		add_resource = { unity = 5000 }
 	}
 }

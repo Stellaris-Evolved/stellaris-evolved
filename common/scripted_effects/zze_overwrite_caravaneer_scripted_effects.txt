@@ -1,0 +1,220 @@
+cara_generate_deal2 = {
+	if = {
+		# repeat existing price for 1 year, otherwise refresh flag
+		limit = {
+			NOR = {
+				has_country_flag = fleet2deal1 # Numistic Shrine
+				has_country_flag = fleet2deal2 # Corporate Drones
+				has_country_flag = fleet2deal3 # Edict that lowers consumer goods
+				has_country_flag = fleet2deal4 # Technology
+				has_country_flag = fleet2deal5 # Spiritual Leader
+				has_country_flag = fleet2deal6 # Selling pops for crystals
+				has_country_flag = fleet2deal7 # Cruiser
+				has_country_flag = fleet2deal8 # Unique Planetary Deposit
+				has_country_flag = fleet2deal9 # MI Upkeep Mod
+				has_country_flag = fleet2deal10 # MI Decision
+				has_country_flag = fleet2deal11.a # Repeatable Cruiser
+				has_country_flag = fleet2deal11.b # Repeatable Exotic Gases
+				has_country_flag = fleet2deal11.c # Repeatable Energy
+				has_country_flag = fleet2deal12 # Minor Artifacts
+			}
+		}
+		random_list = {
+			100 = { # Numistic Shrine
+				modifier = {
+					factor = 0
+					OR = {
+						tec_uses_trade_value = no
+						has_country_flag = nuumismatic_shrine
+						any_owned_planet = {
+							OR = {
+								has_building = building_nuumismatic_shrine
+								has_building_construction = building_nuumismatic_shrine
+							}
+						}
+					}
+				}
+				set_timed_country_flag = { flag = fleet2deal1 days = @fleet2dealdecay }
+			}
+			100 = { # Buy Corporate Drones
+				set_timed_country_flag = { flag = fleet2deal2 days = @fleet2dealdecay }
+				modifier = {
+					factor = 0
+					has_ethic = ethic_gestalt_consciousness
+					NOT = { has_civic = civic_machine_servitor }
+					NOT = { has_ethic = ethic_gestalt_empathy }
+				}
+				modifier = {
+					factor = 0.005
+					has_country_flag = bought_numistic_pops
+				}
+				modifier = {
+					factor = 0
+					NOT = { exists = event_target:fleet2_recent_pop_species }
+				}
+			}
+			100 = { # Edict
+				modifier = {
+					factor = 0
+					has_ethic = ethic_gestalt_consciousness
+					NOT = { has_civic = civic_machine_servitor }
+					NOT = { has_ethic = ethic_gestalt_empathy }
+				}
+				modifier = {
+					factor = 0
+					has_country_flag = nuumismatic_visualization
+				}
+				set_timed_country_flag = { flag = fleet2deal3 days = @fleet2dealdecay }
+			}
+			100 = { # tech
+				modifier = {
+					factor = 0
+					OR = {
+						has_technology = tech_prescient_data_modeling
+						tec_uses_trade_value = no
+					}
+				}
+				set_timed_country_flag = { flag = fleet2deal4 days = @fleet2dealdecay }
+			}
+			100 = {
+				modifier = { # leader
+					factor = 0
+					OR = {
+						any_owned_leader = {
+							has_leader_flag = nuumismatic_priest
+						}
+						has_ethic = ethic_gestalt_consciousness
+					}
+				}
+				set_timed_country_flag = { flag = fleet2deal5 days = @fleet2dealdecay }
+			}
+			100 = { # Selling pops for crystals
+				set_timed_country_flag = { flag = fleet2deal6 days = @fleet2dealdecay }
+				modifier = {
+					factor = 0
+					has_ethic = ethic_gestalt_consciousness
+				}
+				modifier = {
+					factor = 0.005
+					has_country_flag = sold_pops_for_crystals
+				}
+			}
+			100 = { # Cruiser
+				set_timed_country_flag = { flag = fleet2deal7 days = @fleet2dealdecay }
+				modifier = {
+					factor = 0
+					has_country_flag = bought_numistic_cruiser
+				}
+			}
+			100 = {
+				modifier = {
+					factor = 0.1
+					NOT = { has_ethic = ethic_gestalt_consciousness }
+				}
+				modifier = {
+					factor = 0.01
+					any_owned_planet = {
+						has_deposit = d_numas_breath
+					}
+				}
+				modifier = {
+					factor = 0
+					NOT = {
+						any_owned_planet = { habitable_planet = yes }
+					}
+				}
+				set_timed_country_flag = { flag = fleet2deal8 days = @fleet2dealdecay }
+			}
+			100 = {
+				modifier = {
+					factor = 0
+					NOT = { has_authority = auth_machine_intelligence }
+				}
+				modifier = {
+					factor = 0
+					NOT = {
+						any_owned_planet = {
+							NOT = { has_modifier = numistic_magnetostrips }
+						}
+					}
+				}
+				set_timed_country_flag = { flag = fleet2deal9 days = @fleet2dealdecay }
+			}
+			100 = { # MI Decision
+				modifier = {
+					factor = 0
+					OR = {
+						NOT = { has_authority = auth_machine_intelligence }
+						has_country_flag = divine_algorithm
+					}
+				}
+				set_timed_country_flag = { flag = fleet2deal10 days = @fleet2dealdecay }
+			}
+			100 = { # Minor Artifacts
+				set_timed_country_flag = { flag = fleet2deal12 days = @fleet2dealdecay }
+			}
+			1 = { # Repeatable deal when all other deals have been taken
+
+				set_timed_country_flag = { flag = fleet2deal11.a days = @fleet2dealdecay }
+			}
+			1 = { # Repeatable deal when all other deals have been taken
+				set_timed_country_flag = { flag = fleet2deal11.b days = @fleet2dealdecay }
+			}
+			1 = { # Repeatable deal when all other deals have been taken
+				set_timed_country_flag = { flag = fleet2deal11.c days = @fleet2dealdecay }
+			}
+		}
+	}
+	# Get planet tar for Deal 8
+	if = {
+		limit = { has_country_flag = fleet2deal8 }
+		random_owned_planet = {
+			limit = {
+				habitable_planet = yes
+			}
+			weights = {
+				base = 1
+				modifier = {
+					factor = 100
+					OR = {
+						NOT = { has_deposit = d_geothermal_vent }
+						NOT = { has_deposit = d_underwater_vent }
+						OR = {
+							is_planet_class = pc_arctic
+							is_planet_class = pc_tundra
+							is_planet_class = pc_savannah
+							is_planet_class = pc_desert
+							is_planet_class = pc_arid
+						}
+						num_districts = { type = district_generator value < 3 }
+					}
+				}
+			}
+			set_timed_planet_flag = { flag = fleet2deal8planet days = @fleet2dealdecay }
+			save_event_target_as = fleet2deal8planet
+		}
+	}
+	# Get planet tar for Deal 9
+	random_owned_planet = {
+		limit = {
+			num_pops > 0
+		}
+		weights = {
+			base = 1
+			modifier = {
+				factor = 10
+				num_pops > 15
+			}
+			modifier = {
+				factor = 10
+				num_pops > 30
+			}
+			modifier = {
+				factor = 10
+				num_pops > 50
+			}
+		}
+		set_timed_planet_flag = { flag = fleet2deal9planet days = @fleet2dealdecay }
+		save_event_target_as = fleet2deal9planet
+	}
+}

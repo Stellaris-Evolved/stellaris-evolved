@@ -1,1917 +1,2362 @@
 # --------------- Regular civics
-labour_hero = {				# 
-	category = worker
-	condition_string = WORKER_JOB_TRIGGER
-	building_icon = building_capital
-	clothes_texture_index = 2
+	tec_labour_hero = {			# 
+		category = worker
+		condition_string = WORKER_JOB_TRIGGER
+		building_icon = building_capital
+		clothes_texture_index = 2
 
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+
+		possible_precalc = can_fill_worker_job
+		possible = {
+			complex_specialist_job_check_trigger = yes
+			hidden_trigger = { exists = owner }
+			owner = {
+				is_gestalt = no
+			}
+		}
+
+		resources = {
+			category  = planet_tec_labour_heroes
+			# Minerals
+			produces = {
+				trigger = {
+					planet = {
+						has_farming_designation = no
+						has_generator_designation = no
+					}
+				}
+				minerals = 3
+			}
+			produces = {
+				trigger = {
+					planet = {
+						has_mining_designation = yes
+					}
+				}
+				minerals = 9
+			}
+
+			# food
+			produces = {
+				trigger = {
+					planet = {
+						has_mining_designation = no
+						has_generator_designation = no
+					}
+				}
+				food = 3
+			}
+			produces = {
+				trigger = {
+					planet = {
+						has_farming_designation = yes
+					}
+				}
+				food = 9
+			}
+
+			# energy
+			produces = {
+				trigger = {
+					planet = {
+						has_mining_designation = no
+						has_farming_designation = no
+					}
+				}
+				energy = 3
+			}
+			produces = {
+				trigger = {
+					planet = {
+						has_generator_designation = yes
+					}
+				}
+				energy = 9
+			}
+			produces = {
+				unity = 2
+			}
+		}
+
+		triggered_planet_modifier = {	# Amenity Upkeep
+			potential = {
+				exists = owner
+				owner = {
+					tec_is_trade_gestalt = no
+				}
+			}
+			planet_amenities_no_happiness_add = -2
+			mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+		}
+		triggered_planet_modifier = {	# Trade Upkeep
+			potential = {
+				exists = owner
+				owner = {
+					tec_is_trade_gestalt = yes
+				}
+			}
+			trade_value_add = -2
+			mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+		}
+
+		weight = {
+			weight = @worker_job_weight
+			factor = 5 # Important job
+			modifier = {
+				factor = 1.5
+				has_job = tec_labour_hero
+			}
+
+			modifier = {
+				factor = 100
+				#fancy job
+			}
+
+			modifier = {
+				factor = 0.25
+				can_take_servant_job = yes
+			}
+		}
 	}
 
-	possible_precalc = can_fill_worker_job
-	possible = {
-		complex_specialist_job_check_trigger = yes
-		hidden_trigger = { exists = owner }
-		owner = {
-			is_gestalt = no
+	gladiator = {				# Unused
+		category = worker
+		condition_string = WORKER_JOB_TRIGGER
+		building_icon = building_holo_theatres #building_colliseum
+		clothes_texture_index = 3
+
+		possible_pre_triggers = {
+			has_owner = yes
+			is_enslaved = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+
+		possible_precalc = can_fill_worker_job
+		possible = {
+			hidden_trigger = { exists = owner }
+			owner = {
+				is_gestalt = no
+			}
+		}
+
+		resources = {
+			category = planet_entertainers
+			upkeep = {
+				alloys = 1
+			}
+		}
+
+		pop_modifier = {
+			pop_defense_armies_add = 2
+		}
+
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			planet_amenities_add = 6
+			mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+		}
+
+		triggered_country_modifier = {	# Navalcap rework
+			potential = {
+				always = yes
+			}
+			country_naval_cap_add = 1
+			mult = value:scripted_modifier_mult|MODIFIER|pop_job_naval_mult|
+		}
+
+		weight = {
+			weight = @soldier_job_weight
+			mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+			factor = 2
+			modifier = {
+				factor = 0
+				species = {
+					can_be_soldier = no
+				}
+			}
+
+			modifier = {
+				factor = 1.5
+				has_job = gladiator
+			}
+
+			modifier = {
+				factor = 10
+				exists = planet
+				planet = { has_modifier = martial_law }
+			}
+
+
+			modifier = {
+				factor = 2
+				exists = owner
+				owner = {
+					OR = {
+						has_valid_civic = civic_citizen_service
+						has_valid_civic = civic_tec_regular_martial_brotherhood
+					}
+				}
+			}
+
+			modifier = {
+				factor = 0.1
+				is_enslaved = yes
+				NOT = { has_slavery_type = { type = slavery_military } }
+			}
+			modifier = {
+				factor = 10
+				is_enslaved = yes
+				has_slavery_type = { type = slavery_military }
+			}
+			modifier = {
+				factor = 0.1
+				can_take_servant_job = yes
+			}
+
+			# Produce armies
+			modifier = {
+				factor = 2
+				tec_greatly_boost_armies = yes
+			}
+			modifier = {
+				factor = 1.5
+				tec_boost_armies = yes
+			}
+			modifier = {
+				factor = 0.5
+				tec_reduces_armies = yes
+			}
+			modifier = {
+				factor = 0.25
+				tec_greatly_reduces_armies = yes
+			}
+
+			#Prioritize serving species
+			modifier = {
+				factor = 1.05
+				OR = {
+					tec_has_stapled_trait ={ cached = yes }
+				}
+			}
 		}
 	}
 
-	resources = {
-		category  = planet_tec_labour_heroes
-		# Minerals
-		produces = {
-			trigger = {
-				planet = {
-					has_farming_designation = no
-					has_generator_designation = no
-				}
-			}
-			minerals = 3
-		}
-		produces = {
-			trigger = {
-				planet = {
-					has_mining_designation = yes
-				}
-			}
-			minerals = 6
-		}
+	tec_druid = {				# 
+		category = worker
+		condition_string = WORKER_JOB_TRIGGER
+		building_icon = building_executive_retreat
+		clothes_texture_index = 3
 
-		# food
-		produces = {
-			trigger = {
-				planet = {
-					has_mining_designation = no
-					has_generator_designation = no
-				}
-			}
-			food = 3
-		}
-		produces = {
-			trigger = {
-				planet = {
-					has_farming_designation = yes
-				}
-			}
-			food = 6
-		}
-
-		# energy
-		produces = {
-			trigger = {
-				planet = {
-					has_mining_designation = no
-					has_farming_designation = no
-				}
-			}
-			energy = 3
-		}
-		produces = {
-			trigger = {
-				planet = {
-					has_generator_designation = yes
-				}
-			}
-			energy = 6
-		}
-		produces = {
-			unity = 2
-		}
-	}
-
-	weight = {
-		weight = @worker_job_weight
-		factor = 5 # Important job
-		modifier = {
-			factor = 1.5
-			has_job = labour_hero
-		}
-
-		modifier = {
-			factor = 100
-			#fancy job
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
 		}
 		
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			can_take_servant_job = no
-		}
-		modifier = {
-			factor = 0.25
-			can_take_servant_job = yes
-		}
-
-		# Crafted pops modifier
-		modifier = {
-			factor = 2
-			tec_is_crafted_sentient_pop = yes
-		}
-	}
-}
-
-gladiator = {				# Unused
-	category = worker
-	condition_string = WORKER_JOB_TRIGGER
-	building_icon = building_holo_theatres #building_colliseum
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_enslaved = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_worker_job
-	possible = {
-		hidden_trigger = { exists = owner }
-		owner = {
-			is_gestalt = no
-		}
-	}
-
-	resources = {
-		category = planet_entertainers
-		upkeep = {
-			alloys = 1
-		}
-	}
-
-	pop_modifier = {
-		pop_defense_armies_add = 2
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		planet_amenities_add = 6
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
-	}
-
-	country_modifier = {
-		country_naval_cap_add = 1
-	}
-
-	weight = {
-		weight = @soldier_job_weight
-		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
-		factor = 2
-		modifier = {
-			factor = 0
-			species = {
-				can_be_soldier = no
-			}
-		}
-
-		modifier = {
-			factor = 1.5
-			has_job = gladiator
-		}
-
-		modifier = {
-			factor = 10
-			exists = planet
-			planet = { has_modifier = martial_law }
-		}
-
-
-		modifier = {
-			factor = 2
-			exists = owner
+		possible_precalc = can_fill_worker_job
+		possible = {
+			hidden_trigger = { exists = owner }
 			owner = {
-				OR = {
-					has_valid_civic = civic_citizen_service
-					has_valid_civic = civic_tec_martial_brotherhood
-				}
+				is_gestalt = no
 			}
-		}
-
-		modifier = {
-			factor = 0.1
-			is_enslaved = yes
-			NOT = { has_slavery_type = { type = slavery_military } }
-		}
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_military }
-		}
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-
-		# Produce armies
-		modifier = {
-			factor = 2
-			tec_greatly_boost_armies = yes
-		}
-		modifier = {
-			factor = 1.5
-			tec_boost_armies = yes
-		}
-		modifier = {
-			factor = 0.5
-			tec_reduces_armies = yes
-		}
-		modifier = {
-			factor = 0.25
-			tec_greatly_reduces_armies = yes
-		}
-
-		#Prioritize serving species
-		modifier = {
-			factor = 1.05
-			OR = {
-				tec_has_stapled_trait = { cached = yes }
-			}
-		}
-	}
-}
-
-druid = {					# 
-	category = worker
-	condition_string = WORKER_JOB_TRIGGER
-	building_icon = building_executive_retreat
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-	
-	possible_precalc = can_fill_worker_job
-	possible = {
-		hidden_trigger = { exists = owner }
-		owner = {
-			is_gestalt = no
-		}
-	}
-	
-	resources = {
-		category = planet_priests
-		produces = {
-			unity = 4
-		}
-	}
-	
-	planet_modifier = {
-		pop_environment_tolerance = 0.05
-	}
-	
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		planet_amenities_add = 3
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
-	}
-
-	inline_script = jobs/effects/type/inline_evolved_priest_effect
-	
-	weight = {
-		weight = @worker_job_weight
-		mult = value:job_weights_modifier|JOB|druid|RESOURCE|unity|
-		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
-		factor = 2 # important
-		modifier = {
-			factor = 1.5
-			has_job = druid
-		}
-
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no
-			NOR = {
-				tec_has_trait_slave = yes
-			}
-		}
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-
-		modifier = {
-			factor = 1.2
-			has_ethic = ethic_spiritualist
-		}
-		modifier = {
-			factor = 0.1
-			has_ethic = ethic_materialist
-			NOT = { has_job = druid }
 		}
 		
-
-		modifier = {
-			factor = 2
-			owner = { has_civic = civic_exalted_priesthood }
-		}
-	}
-}
-
-tec_peasant = {				# 
-	category = worker
-	icon = primitive_laborer
-	condition_string = WORKER_JOB_TRIGGER
-	building_icon = building_residence
-	clothes_texture_index = 2
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_worker_job
-	possible = {
-		hidden_trigger = { exists = owner }
-		owner = {
-			is_gestalt = no
-		}
-	}
-
-	resources = {				
-		category = planet_clerks
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		planet_amenities_add = 6
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
-	}
-
-	inline_script = jobs/effects/type/inline_evolved_clerk_effect
-
-	weight = {
-		weight = @clerk_job_weight
-		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
-		modifier = {
-			factor = 2
-			OR = {
-				tec_is_non_sapient_robot = { cached = yes }
-				tec_is_shackled_robot = { cached = yes }
-				tec_is_non_sapient_bioservant = { cached = yes }
-				tec_is_shackled_bioservant = { cached = yes }
+		resources = {
+			category = planet_tec_druids
+			produces = {
+				unity = 5
 			}
-			can_take_servant_job = no
 		}
 		
-		modifier = {
-			factor = 10
-			can_take_servant_job = yes
+		planet_modifier = {
+			pop_environment_tolerance = 0.05
 		}
-	
-		# AI takes out clerk jobs to favor other resources if conditions are met
-		modifier = {
-			factor = 2
-			planet = {
-				free_amenities < 0
-			}
-		}
-		modifier = {
-			factor = 0.5
-			owner = {
-				OR = {
-					has_monthly_income = {
-						resource = minerals
-						value < 200
-					}
-					has_monthly_income = {
-						resource = food
-						value < 200
-					}
-					has_monthly_income = {
-						resource = energy
-						value < 200
-					}
-				}
-			}
-		}
-		modifier = {
-			factor = 0.1
-			owner = {
-				OR = {
-					has_monthly_income = {
-						resource = minerals
-						value < 50
-					}
-					has_monthly_income = {
-						resource = food
-						value < 50
-					}
-					has_monthly_income = {
-						resource = energy
-						value < 50
-					}
-				}
-			}
-		}
-		modifier = {
-			factor = 0.01
-			owner = {
-				OR = {
-					has_monthly_income = {
-						resource = minerals
-						value < 0
-					}
-					has_monthly_income = {
-						resource = food
-						value < 0
-					}
-					has_monthly_income = {
-						resource = energy
-						value < 0
-					}
-				}
-			}
-		}
-	}
-}
-
-tec_minor_roboticist = {	# 
-	icon = roboticist
-	category = worker
-	condition_string = WORKER_JOB_TRIGGER
-	building_icon = building_robot_assembly_plant
-	clothes_texture_index = 3
 		
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_worker_job
-	possible = {
-		hidden_trigger = { exists = owner }
-		owner = {
-			is_gestalt = no
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			planet_amenities_add = 3
+			mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 		}
-	}
 
-	resources = {
-		category = planet_pop_assemblers
-		upkeep = {
-			alloys = 0.5
-		}
-	}
+		inline_script = jobs/effects/type/inline_evolved_administrator_effect
+		inline_script = jobs/effects/type/inline_evolved_priest_effect
+		
+		weight = {
+			weight = @worker_job_weight
+			mult = value:job_weights_modifier|JOB|tec_druid|RESOURCE|unity|
+			mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+			factor = 2 # important
+			modifier = {
+				factor = 1.5
+				has_job = tec_druid
+			}
 
-	planet_modifier = {
-		planet_pop_assembly_add = 0.2
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			planet = {
-				exists = assembling_species
-				assembling_species = {
-					is_robotic_species = no
+			modifier = {
+				factor = 0.2
+				has_citizenship_rights = no
+				NOR = {
+					tec_has_trait_slave = yes
 				}
 			}
-		}
-		planet_pop_assembly_add = -0.2
-		planet_pop_assembly_organic_add = 0.2
-	}
+			modifier = {
+				factor = 0.1
+				can_take_servant_job = yes
+			}
 
-	triggered_planet_modifier = {	# Capitalized innovation
-		potential = {
-			always = yes
-		}
-		trade_value_add = 5
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
+			modifier = {
+				factor = 1.2
+				has_ethic = ethic_spiritualist
+			}
+			modifier = {
+				factor = 0.1
+				has_ethic = ethic_materialist
+				NOT = { has_job = tec_druid }
+			}
+			
 
-	weight = {
-		weight = 500
-	}
-}
-
-tec_labrat = {				# Creative Testing
-	category = worker
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_research_lab_1
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-	possible = {
-		complex_specialist_job_check_trigger = yes
-	}
-
-	resources = {
-		category = planet_researchers
-		produces = {
-			physics_research = 4
-			engineering_research = 4
-			society_research = 4
-		}
-		upkeep = {
-			consumer_goods = 2
-		}
-		inline_script = {
-			script = jobs/resources/inline_evolved_science_requisition_resources
-			consumer_goods = 1
-			energy = 0
-			mult = 1
-		}
-	}
-
-	overlord_resources = {
-		category = planet_requisitioned_research
-		inline_script = {
-			script = jobs/resources/inline_evolved_science_requisition_overlord_resources
-			research = 2
-			mult = 1
-		}
-	}
-
-	inline_script = jobs/effects/type/inline_evolved_researcher_effect
-	
-	weight = {
-		# Specialist weight
-		weight = @specialist_job_weight
-		mult = value:job_weights_research_modifier|JOB|researcher|
-
-		modifier = {
-			factor = 1.5
-			has_job = researcher
-		}
-
-		# Living standard weight
-		modifier = {
-			factor = 2
-			has_living_standard = { type = living_standard_academic_privilege }
-		}
-		modifier = {
-			factor = 0.8
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_indentured }
-		}
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no
-			NOR = {
-				tec_has_trait_slave = yes
+			modifier = {
+				factor = 2
+				owner = { has_civic = civic_exalted_priesthood }
 			}
 		}
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-	}
-}
-
-tec_reef_miner = {			# Aquatic
-	category = worker
-	icon = tec_reef_drone
-	condition_string = WORKER_JOB_TRIGGER
-	building_icon = building_mineral_purification_plant
-	clothes_texture_index = 2
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
 	}
 
-	possible_precalc = can_fill_worker_job
-	possible = {
-		hidden_trigger = { exists = owner }
-		owner = {
-			is_gestalt = no
-		}
-	}
+	tec_peasant = {				# Feudal civics
+		category = worker
+		icon = primitive_laborer
+		condition_string = WORKER_JOB_TRIGGER
+		building_icon = building_residence
+		clothes_texture_index = 2
 
-	resources = {
-		category = planet_miners
-		produces = {
-			minerals = 6
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
 		}
-		# Species bonuses/maluses
-			#produces = {
-			#	trigger = {
-			#		is_lithoid = yes
-			#	}
-			#	minerals = 1
-			#}
+
+		possible_precalc = can_fill_worker_job
+		possible = {
+			hidden_trigger = { exists = owner }
+			owner = {
+				is_gestalt = no
+			}
+		}
+
+		resources = {
+			category  = planet_tec_peasants
+			# Minerals
+			produces = {
+				trigger = {
+					planet = {
+						has_mining_designation = yes
+					}
+				}
+				minerals = 4
+			}
+			# food
+			produces = {
+				trigger = {
+					planet = {
+						has_farming_designation = yes
+					}
+				}
+				food = 6
+			}
+			# energy
+			produces = {
+				trigger = {
+					planet = {
+						has_generator_designation = yes
+					}
+				}
+				energy = 6
+			}
+			# Fallback
+			produces = {
+				trigger = {
+					planet = {
+						NOR = {
+							has_mining_designation = yes
+							has_generator_designation = yes
+							has_farming_designation = yes
+						}
+					}
+					owner = {
+						is_lithoid_empire = no
+					}
+				}
+				food = 6
+			}
+			produces = {
+				trigger = {
+					planet = {
+						NOR = {
+							has_mining_designation = yes
+							has_generator_designation = yes
+							has_farming_designation = yes
+						}
+					}
+					owner = {
+						is_lithoid_empire = yes
+					}
+				}
+				minerals = 4
+			}
+		}
+
+		# Trade & Amenities
+			triggered_planet_modifier = {	# Amenity upkeep
+				potential = {
+					exists = owner
+					owner = {
+						is_megacorp = no
+					}
+				}
+				planet_amenities_add = -2
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+				#triggered_planet_modifier = {	# Generates trade
+				#	potential = {
+				#		exists = owner
+				#		owner = {
+				#			is_megacorp = no
+				#		}
+				#	}
+				#	trade_value_add = 4
+				#	mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
+				#}
+
+			triggered_planet_modifier = {	# Trade Upkeep
+				potential = {
+					exists = owner
+					owner = {
+						is_megacorp = yes
+					}
+				}
+				trade_value_add = -2
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+				#triggered_planet_modifier = {	# Generate Amenities
+				#	potential = {
+				#		exists = owner
+				#		owner = {
+				#			is_megacorp = yes
+				#		}
+				#	}
+				#	planet_amenities_add = 4
+				#	mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+				#}
 		# /
-		inline_script = {
-			script = jobs/resources/inline_evolved_material_miner_requisition_resources
-			minerals = @requisitorium_minerals_reduction
-			mult = 1
-		}
-	}
 
-	overlord_resources = {
-		category = planet_requisitioned_minerals
-		produces = {
-			trigger = {
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			planet_jobs_ruler_produces_mult = 0.05
+		}
+
+		weight = {
+			weight = @specialist_job_weight
+
+			modifier = {
+				factor = 5
+				always = yes
+			}
+
+			modifier = {
+				factor = 2
+				OR = {
+					tec_is_non_sapient_robot = { cached = yes }
+					tec_is_shackled_robot = { cached = yes }
+					tec_is_non_sapient_bioservant = { cached = yes }
+					tec_is_shackled_bioservant = { cached = yes }
+				}
+				can_take_servant_job = no
+			}
+			
+			modifier = {
+				factor = 10
+				can_take_servant_job = yes
+			}
+		
+			# AI takes out clerk jobs to favor other resources if conditions are met
+			modifier = {
+				factor = 2
 				planet = {
-					has_planet_flag = has_material_requisitorium
+					free_amenities < 0
 				}
 			}
-			minerals = @requisitorium_minerals_overlord
+			modifier = {
+				factor = 0.5
+				owner = {
+					OR = {
+						has_monthly_income = {
+							resource = minerals
+							value < 200
+						}
+						has_monthly_income = {
+							resource = food
+							value < 200
+						}
+						has_monthly_income = {
+							resource = energy
+							value < 200
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.1
+				owner = {
+					OR = {
+						has_monthly_income = {
+							resource = minerals
+							value < 50
+						}
+						has_monthly_income = {
+							resource = food
+							value < 50
+						}
+						has_monthly_income = {
+							resource = energy
+							value < 50
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.01
+				owner = {
+					OR = {
+						has_monthly_income = {
+							resource = minerals
+							value < 0
+						}
+						has_monthly_income = {
+							resource = food
+							value < 0
+						}
+						has_monthly_income = {
+							resource = energy
+							value < 0
+						}
+					}
+				}
+			}
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		trade_value_add = 2
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
-
-	inline_script = jobs/effects/type/inline_evolved_miner_effect
-
-	weight = {
-		weight = @worker_job_weight
-		mult = value:job_weights_modifier|JOB|tec_reef_miner|RESOURCE|minerals|
-		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
-
-
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			can_take_servant_job = no
-		}
-		modifier = {
-			factor = 0.25
-			can_take_servant_job = yes
+	tec_minor_roboticist = {	# 
+		icon = roboticist
+		category = worker
+		condition_string = WORKER_JOB_TRIGGER
+		building_icon = building_robot_assembly_plant
+		clothes_texture_index = 3
+			
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
 		}
 
-		#Prioritize serving species
-		modifier = {
-			factor = 3
-			OR = {
-				tec_has_stapled_trait = { cached = yes }
-			}
-		}
-
-		# low income modifier
-		modifier = {
-			factor = 1.1
-
-			OR = {
-				is_unemployed = yes
-				has_job = tec_reef_miner
-			}
-			exists = planet
-			planet = {
-				has_available_jobs = tec_reef_miner
-			}
+		possible_precalc = can_fill_worker_job
+		possible = {
+			hidden_trigger = { exists = owner }
 			owner = {
-				has_monthly_income = {
-					resource = minerals
-					value < 30
+				is_gestalt = no
+			}
+		}
+
+		resources = {
+			category = planet_pop_assemblers
+			upkeep = {
+				alloys = 0.5
+			}
+		}
+
+		planet_modifier = {
+			planet_pop_assembly_add = 0.2
+		}
+
+		triggered_planet_modifier = {
+			potential = {
+				planet = {
+					exists = assembling_species
+					assembling_species = {
+						is_robotic_species = no
+					}
+				}
+			}
+			planet_pop_assembly_add = -0.2
+			planet_pop_assembly_organic_add = 0.2
+		}
+
+		triggered_planet_modifier = {	# Capitalized innovation
+			potential = {
+				always = yes
+			}
+			trade_value_add = 5
+			mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
+		}
+
+		weight = {
+			weight = 500
+		}
+	}
+
+	tec_labrat = {				# Creative Testing
+		category = worker
+		condition_string = WORKER_JOB_TRIGGER
+		building_icon = building_research_lab_1
+		clothes_texture_index = 3
+
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+
+		possible = {
+			OR = {
+				has_slavery_type = {
+					type = slavery_livestock
+					country = owner
+				}
+				can_fill_worker_job = yes
+			}
+		}
+
+		resources = {
+			category = planet_tec_labrats
+			produces = {
+				physics_research = 2.5
+				engineering_research = 2.5
+				society_research = 2.5
+			}
+			# Free from requisition
+			inline_script = jobs/resources/inline_evolved_councilor_civic_tec_regular_researchers_labrat
+		}
+		overlord_resources = {
+			category = planet_requisitioned_research
+			inline_script = {
+				script = jobs/resources/inline_evolved_science_requisition_overlord_resources
+				research = 1
+				mult = 1
+			}
+		}
+
+		inline_script = jobs/effects/type/inline_evolved_researcher_effect
+
+		# Trade & Amenities
+			triggered_planet_modifier = {	# Amenity upkeep
+				potential = {
+					exists = owner
+					owner = {
+						is_megacorp = no
+					}
+				}
+				planet_amenities_add = -2
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+
+			triggered_planet_modifier = {	# Trade Upkeep
+				potential = {
+					exists = owner
+					owner = {
+						is_megacorp = yes
+					}
+				}
+				trade_value_add = -2
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+		# /
+
+		# Self Modifier
+			triggered_pop_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						tec_is_dystopian_empire = no
+					}
+					NOT = {
+						planet = {
+							any_owned_species = {
+								is_livestock = yes
+							}
+						}
+					}
+				}
+				pop_happiness = -0.50
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						tec_is_dystopian_empire = yes
+					}
+					NOT = {
+						planet = {
+							any_owned_species = {
+								is_livestock = yes
+							}
+						}
+					}
+				}
+				planet_crime_add = 5
+			}
+		# /
+
+		weight = {
+			# Specialist weight
+			weight = @specialist_job_weight
+			mult = value:job_weights_research_modifier|JOB|researcher|
+
+			modifier = {
+				factor = 1.5
+				has_job = tec_labrat
+			}
+
+			# Living standard weight
+			modifier = {
+				factor = 2
+				has_living_standard = { type = living_standard_academic_privilege }
+			}
+			modifier = {
+				factor = 1.5
+				is_enslaved = yes
+				has_slavery_type = { type = slavery_indentured }
+			}
+			modifier = {
+				factor = 5
+				is_enslaved = yes
+				is_livestock = no
+			}
+			modifier = {
+				factor = 0.2
+				has_citizenship_rights = no
+				NOR = {
+					tec_has_trait_slave = yes
+				}
+			}
+			modifier = {
+				factor = 0.1
+				can_take_servant_job = yes
+			}
+		}
+	}
+
+	tec_scrapper = {			# Scrappers
+		category = worker
+		condition_string = WORKER_JOB_TRIGGER
+		building_icon = building_tec_scavenge_center
+		clothes_texture_index = 2
+	
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+	
+		possible_precalc = can_fill_worker_job
+		possible = {
+			hidden_trigger = { exists = owner }
+			owner = {
+				is_gestalt = no
+			}
+		}
+		
+		resources = {
+			category = planet_metallurgists
+			produces = {
+				alloys = 2
+			}
+	
+			inline_script = {
+				script = jobs/resources/inline_evolved_alloy_and_refinery_job_upkeep
+				minerals = 3
+				multiplier = 1
+				trigger = "
+					exists = owner
+					owner = {
+						OR = {
+							is_catalytic_empire = yes
+							tec_is_quantum_alloys_empire = yes
+						}
+						tec_is_dystopian_empire = no
+					}
+				"
+			}
+			# No requisition as the job is criminal :D
+		}
+	
+		inline_script = jobs/effects/type/inline_evolved_foundry_effect
+
+		# Trade & Amenities
+			triggered_planet_modifier = {	# Amenity upkeep
+				potential = {
+					exists = owner
+					owner = {
+						is_megacorp = no
+						is_catalytic_empire = no
+						tec_is_quantum_alloys_empire = no
+						tec_is_dystopian_empire = no
+					}
+				}
+				planet_amenities_add = -2
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+
+			triggered_planet_modifier = {	# Trade Upkeep
+				potential = {
+					exists = owner
+					owner = {
+						is_megacorp = yes
+						is_catalytic_empire = no
+						tec_is_quantum_alloys_empire = no
+						tec_is_dystopian_empire = no
+					}
+				}
+				trade_value_add = -2
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+		# /
+
+		# Crime upkeep
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						tec_is_dystopian_empire = no
+					}
+				}
+				planet_crime_add = 2
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						tec_is_dystopian_empire = yes
+					}
+				}
+				planet_crime_add = 5
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+		# /
+
+		weight = {
+			# Specialist job Weight
+			weight = @specialist_job_weight
+			mult = value:job_weights_modifier|JOB|tec_scrapper|RESOURCE|alloys|
+			modifier = {
+				factor = 5
+				has_job = tec_scrapper
+			}
+		}
+	}
+
+	tec_reef_miner = {			# Aquatic
+		category = worker
+		icon = tec_reef_drone
+		condition_string = WORKER_JOB_TRIGGER
+		building_icon = building_mineral_purification_plant
+		clothes_texture_index = 2
+
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+
+		possible_precalc = can_fill_worker_job
+		possible = {
+			hidden_trigger = { exists = owner }
+			owner = {
+				is_gestalt = no
+			}
+		}
+
+		resources = {
+			category = planet_miners
+			produces = {
+				minerals = 6
+			}
+			inline_script = jobs/resources/inline_evolved_councilor_anglers_miner
+			# Species bonuses/maluses
+				#produces = {
+				#	trigger = {
+				#		is_lithoid = yes
+				#	}
+				#	minerals = 1
+				#}
+			# /
+			inline_script = {
+				script = jobs/resources/inline_evolved_material_miner_requisition_resources
+				minerals = @requisitorium_minerals_reduction
+				mult = 1
+			}
+		}
+
+		overlord_resources = {
+			category = planet_requisitioned_minerals
+			produces = {
+				trigger = {
+					planet = {
+						has_planet_flag = has_material_requisitorium
+					}
+				}
+				minerals = @requisitorium_minerals_overlord
+			}
+		}
+
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			trade_value_add = 2
+			mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
+		}
+
+		inline_script = jobs/effects/type/inline_evolved_miner_effect
+
+		weight = {
+			weight = @worker_job_weight
+			mult = value:job_weights_modifier|JOB|tec_reef_miner|RESOURCE|minerals|
+			mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
+
+
+			modifier = {
+				factor = 10
+				is_enslaved = yes
+				can_take_servant_job = no
+			}
+			modifier = {
+				factor = 0.25
+				can_take_servant_job = yes
+			}
+
+			#Prioritize serving species
+			modifier = {
+				factor = 3
+				OR = {
+					tec_has_stapled_trait ={ cached = yes }
+				}
+			}
+
+			# low income modifier
+			modifier = {
+				factor = 1.1
+
+				OR = {
+					is_unemployed = yes
+					has_job = tec_reef_miner
+				}
+				exists = planet
+				planet = {
+					has_available_jobs = tec_reef_miner
+				}
+				owner = {
+					has_monthly_income = {
+						resource = minerals
+						value < 30
+					}
 				}
 			}
 		}
 	}
-}
 
-# --------------- Traditions
-tec_planner = {				# Outreach
-	category = worker
-	condition_string = WORKER_JOB_TRIGGER
-	building_icon = building_tec_outreach_platform
-	icon = herder
+	tec_memorialist = {			# Memorialist
+		icon = death_chronicler
+		category = worker
+		condition_string = WORKER_JOB_TRIGGER
+		building_icon = building_tec_memorialist_site_1
+		clothes_texture_index = 2
 
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_worker_job
-
-	resources = {
-		category = planet_colonists
-		produces = {
-			unity = 4
-		}
-		inline_script = jobs/resources/inline_evolved_tec_planner_resources
-		upkeep = {
-			consumer_goods = 2
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		planet_amenities_add = 3
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
-	}
-
-	inline_script = jobs/effects/inline_evolved_tec_corporate_settlers
-
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {	# Important job
-			factor = 10
-		}
-		modifier = {
-			factor = 5
-			has_job = tec_planner
-		}
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			can_take_servant_job = no
-		}
-		modifier = {
-			factor = 0.25
-			can_take_servant_job = yes
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
 		}
 
-		# Crafted pops modifier
-		modifier = {
-			factor = 2
-			tec_is_crafted_sentient_pop = yes
-		}
-		modifier = {
-			factor = 200
-			tec_is_crafted_nonsapient_pop = yes
+		possible_precalc = can_fill_worker_job
+		possible = {
+			hidden_trigger = { exists = owner }
+			owner = {
+				is_gestalt = no
+			}
 		}
 
-		#Prioritize serving species
-		modifier = {
-			factor = 3
-			OR = {
-				tec_has_stapled_trait = { cached = yes }
+		resources = {
+			category = planet_administrators
+			produces = {
+				unity = 3
+				society_research = 1
+			}
+		}
+		triggered_planet_modifier = {	# Amenity Upkeep
+			potential = {
+				exists = owner
+				owner = {
+					is_megacorp = no
+				}
+			}
+			planet_amenities_add = -1
+			mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+		}
+
+		triggered_planet_modifier = {	# Trade Upkeep
+			potential = {
+				exists = owner
+				owner = {
+					is_megacorp = yes
+				}
+			}
+			trade_value_add = -1
+			mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+		}
+
+		inline_script = jobs/effects/type/inline_evolved_administrator_effect
+
+		inline_script = jobs/effects/type/inline_evolved_bureaucrat_effect
+	
+		weight = {
+			weight = @worker_job_weight
+			mult = value:job_weights_modifier|JOB|tec_memorialist|RESOURCE|unity|
+			modifier = {
+				factor = 1.5
+				has_job = tec_memorialist
+			}
+	
+			modifier = {
+				factor = 2
+				has_trait = trait_robot_propaganda_machines
+				OR = {
+					tec_is_non_sapient_robot = { cached = yes }
+					tec_is_shackled_robot = { cached = yes }
+				}
+			}
+			modifier = {
+				factor = 2
+				is_enslaved = yes
+				OR = {
+					has_slavery_type = {
+						type = slavery_indentured
+					}
+					has_slavery_type = {
+						type = slavery_normal
+					}
+				}
+			}
+			modifier = {
+				factor = 0.2
+				has_citizenship_rights = no
+				NOR = {
+					tec_has_trait_slave = yes
+				}
+			}
+			modifier = {
+				factor = 0.1
+				can_take_servant_job = yes
 			}
 		}
 	}
-}
+
+# /
 
 # --------------- Ethics
-tec_hired_miner = {
-	icon = miner
-	category = worker
-	condition_string = WORKER_JOB_TRIGGER
-	building_icon = building_mineral_purification_hub
-	clothes_texture_index = 2
+ # Competitive
+	tec_hired_miner = {
+		icon = miner
+		category = worker
+		condition_string = WORKER_JOB_TRIGGER
+		building_icon = building_mineral_purification_hub
+		clothes_texture_index = 2
 
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_worker_job
-	possible = {
-		hidden_trigger = { exists = owner }
-		owner = {
-			is_gestalt = no
-		}
-	}
-
-	resources = {
-		category = planet_miners
-		produces = {
-			minerals = 2
-			multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
 		}
 
-		inline_script = {
-			script = jobs/resources/inline_evolved_material_miner_requisition_resources
-			minerals = @[ requisitorium_minerals_reduction / 2 ]
-			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
-		}
-	}
-
-	overlord_resources = {
-		category = planet_requisitioned_minerals
-		inline_script = {
-			script = jobs/resources/inline_evolved_material_miner_requisition_overlord_resources
-			minerals = @[ requisitorium_minerals_overlord / 2 ]
-			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		trade_value_add = 2
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		trade_value_add = 1
-		mult = modifier:tec_hired_job_trade_add
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
-
-	inline_script = jobs/effects/type/inline_evolved_miner_effect
-
-	weight = {
-		weight = @worker_job_weight
-		mult = value:job_weights_modifier|JOB|tec_hired_miner|RESOURCE|minerals|FACTOR|0.75|
-		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			can_take_servant_job = no
-			NOT = { has_slavery_type = { type = slavery_indentured } }
-		}
-		modifier = {
-			factor = 0.25
-			can_take_servant_job = yes
-		}
-	
-		# Crafted pops modifier
-		modifier = {
-			factor = 2
-			tec_is_crafted_sentient_pop = yes
-		}
-		modifier = {
-			factor = 200
-			tec_is_crafted_nonsapient_pop = yes
-		}
-
-		# low income modifier
-		modifier = {
-			factor = 1.1
-
-			exists = planet
-			planet = {
-				has_available_jobs = "tec_hired_miner"
-			}
+		possible_precalc = can_fill_worker_job
+		possible = {
+			hidden_trigger = { exists = owner }
 			owner = {
-				has_monthly_income = {
-					resource = minerals
-					value < 30
-				}
-			}
-		}
-	}
-}
-
-tec_hired_farmer = {
-	icon = farmer
-	category = worker
-	condition_string = WORKER_JOB_TRIGGER
-	building_icon = building_food_processing_facility
-	clothes_texture_index = 2
-	
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_worker_job
-	possible = {
-		hidden_trigger = { exists = owner }
-		owner = {
-			is_gestalt = no
-		}
-	}
-
-	resources = {
-		category = planet_farmers
-		produces = {
-			food = 3
-			multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
-		}
-
-		inline_script = {
-			script = jobs/resources/inline_evolved_produce_farmer_requisition_resources
-			food = @[ requisitorium_food_reduction / 2]
-			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
-		}
-	}
-
-	overlord_resources = {
-		category = planet_requisitioned_food
-		inline_script = {
-			script = jobs/resources/inline_evolved_produce_farmer_requisition_overlord_resources
-			food = @[ requisitorium_food_overlord / 2 ]
-			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		trade_value_add = 2
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		trade_value_add = 1
-		mult = modifier:tec_hired_job_trade_add
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-		
-	}
-
-	inline_script = jobs/effects/type/inline_evolved_farmer_effect
-	
-	weight = {
-		weight = @worker_job_weight
-		mult = value:job_weights_modifier|JOB|tec_hired_farmer|RESOURCE|food|FACTOR|0.75|
-		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
-		modifier = {
-			factor = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
-			owner = { has_valid_civic = civic_agrarian_idyll }
-		}
-
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			can_take_servant_job = no
-			NOT = { has_slavery_type = { type = slavery_indentured } }
-		}
-		modifier = {
-			factor = 0.25
-			can_take_servant_job = yes
-		}
-		
-		# Crafted pops modifier
-		modifier = {
-			factor = 2
-			tec_is_crafted_sentient_pop = yes
-		}
-		modifier = {
-			factor = 200
-			tec_is_crafted_nonsapient_pop = yes
-		}
-
-		#Prioritize serving species
-		modifier = {
-			factor = 3
-			OR = {
-				tec_has_stapled_trait = { cached = yes }
+				is_gestalt = no
 			}
 		}
 
-		# low income modifier
-		modifier = {
-			factor = 1.2
-			exists = planet
-			planet = {
-				has_available_jobs = tec_hired_farmer
+		resources = {
+			category = planet_miners
+			produces = {
+				minerals = 2
+				multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
 			}
-			owner = {
-				has_monthly_income = {
-					resource = food
-					value < 0
-				}
-			}
-		}
 
-		modifier = {
-			factor = 0.5
-			has_trait = trait_lithoid
-
-			owner = {
-				is_lithoid_empire = yes
-				has_monthly_income = {
-					resource = food
-					value >= 0
-				}
-			}
-		}
-	}
-}
-
-tec_hired_technician = {
-	icon = technician
-	category = worker
-	condition_string = WORKER_JOB_TRIGGER
-	building_icon = building_power_plant
-	clothes_texture_index = 2
-	
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_worker_job
-	possible = {
-		hidden_trigger = { exists = owner }
-		owner = {
-			is_gestalt = no
-		}
-	}
-
-	resources = {
-		category = planet_technician
-		produces = {
-			energy = 3
-			multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
-		}
-
-
-		inline_script = {
-			script = jobs/resources/inline_evolved_energy_requisition_resources
-			energy = @[ requisitorium_energy_reduction / 2 ]
-			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
-		}
-	}
-
-	overlord_resources = {
-		category = planet_requisitioned_energy
-		inline_script = {
-			script = jobs/resources/inline_evolved_energy_requisition_overlord_resources
-			energy = @[ requisitorium_energy_overlord / 2 ]
-			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		trade_value_add = 2
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		trade_value_add = 1
-		mult = modifier:tec_hired_job_trade_add
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-		
-	}
-
-	inline_script = jobs/effects/type/inline_evolved_technician_effect
-
-	weight = {
-		weight = @worker_job_weight
-		mult = value:job_weights_modifier|JOB|tec_hired_technician|RESOURCE|energy|FACTOR|0.75|
-		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
-		modifier = {
-			factor = 8
-			is_enslaved = yes
-			can_take_servant_job = no
-			NOR = {
-				tec_boost_15_energy = yes
-				tec_boost_10_basic = yes
-			}
-		}
-		modifier = {
-			factor = 100
-			OR = {
-				tec_is_non_sapient_robot = { cached = yes }
-				tec_is_shackled_robot = { cached = yes }
-			}
-			can_take_servant_job = no
-			can_fill_specialist_job = no
-		}
-
-		modifier = {
-			factor = 2
-			OR = {
-				tec_is_non_sapient_robot = { cached = yes }
-				tec_is_shackled_robot = { cached = yes }
-				tec_is_non_sapient_bioservant = { cached = yes }
-				tec_is_shackled_bioservant = { cached = yes }
-			}
-			can_take_servant_job = no
-		}
-		modifier = {
-			factor = 0.25
-			can_take_servant_job = yes
-		}
-		
-		# low income modifier
-		modifier = {
-			factor = 1.5
-			exists = planet
-			planet = {
-				has_available_jobs = "tec_hired_technician"
-			}
-			owner = {
-				has_monthly_income = {
-					resource = energy
-					value < 0
-				}
-			}
-		}
-	}
-}
-
-tec_hired_soldier = {
-	icon = soldier
-	category = worker
-	condition_string = WORKER_JOB_TRIGGER	
-	building_icon = building_stronghold
-	clothes_texture_index = 4
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible = {
-		worker_job_check_trigger = yes
-		owner = { is_gestalt = no }
-	}
-
-	resources = {
-		category = planet_soldiers
-		produces = {
-			unity = 1
-			multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
-		}
-	}
-
-	triggered_pop_modifier = {
-		potential = {
-			always = yes
-		}
-		pop_defense_armies_add = 1
-		mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
-	}
-
-	triggered_country_modifier = {
-		potential = {
-			always = yes
-		}
-		country_naval_cap_add = 2
-		mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		trade_value_add = 2
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		trade_value_add = 1
-		mult = modifier:tec_hired_job_trade_add
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
-	
-	inline_script = jobs/effects/type/inline_evolved_soldier_effect
-
-	weight = {
-		weight = @soldier_job_weight
-		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
-		factor = 0.8
-		modifier = {
-			factor = 0
-			species = {
-				can_be_soldier = no
-			}
-		}
-
-		modifier = {
-			factor = 10
-			exists = planet
-			planet = { has_modifier = martial_law }
-		}
-
-		modifier = {
-			factor = 2
-			exists = owner
-			owner = {
-				OR = {
-					has_valid_civic = civic_citizen_service
-					has_valid_civic = civic_tec_martial_brotherhood
-				}
-			}
-		}
-
-		modifier = {
-			factor = 0.1
-			is_enslaved = yes
-			NOT = { has_slavery_type = { type = slavery_military } }
-		}
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_military }
-		}
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-
-		# Produce armies
-		modifier = {
-			factor = 2
-			tec_greatly_boost_armies = yes
-		}
-		modifier = {
-			factor = 1.5
-			tec_boost_armies = yes
-		}
-		modifier = {
-			factor = 0.5
-			tec_reduces_armies = yes
-		}
-		modifier = {
-			factor = 0.25
-			tec_greatly_reduces_armies = yes
-		}
-
-		#Prioritize serving species
-		modifier = {
-			factor = 1.05
-			OR = {
-				tec_has_stapled_trait = { cached = yes }
-			}
-		}
-	}
-}
-
-tec_hired_foundry = {
-	icon = foundry
-	category = worker
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_foundry_1
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-	possible = {
-		hidden_trigger = { exists = owner }
-		owner = {
-			is_gestalt = no
-		}
-	}
-	
-	resources = {
-		category = planet_metallurgists
-		produces = {
-			alloys = 1.5
-			multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
-		}
-		upkeep = {
-			minerals = 3
-			multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
-		}
-	
-		# Quantum alloys
 			inline_script = {
-				script = jobs/resources/inline_evolved_tec_quantum_alloys
-				minerals = 1.5
-				energy = 2.5
+				script = jobs/resources/inline_evolved_material_miner_requisition_resources
+				minerals = @[ requisitorium_minerals_reduction / 2 ]
+				mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+			}
+		}
+
+		overlord_resources = {
+			category = planet_requisitioned_minerals
+			inline_script = {
+				script = jobs/resources/inline_evolved_material_miner_requisition_overlord_resources
+				minerals = @[ requisitorium_minerals_overlord / 2 ]
+				mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+			}
+		}
+
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			trade_value_add = 2
+			mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
+		}
+
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			trade_value_add = 1
+			mult = value:tec_hired_job_trade_add
+		}
+
+		inline_script = jobs/effects/type/inline_evolved_miner_effect
+
+		weight = {
+			weight = @worker_job_weight
+			mult = value:job_weights_modifier|JOB|tec_hired_miner|RESOURCE|minerals|FACTOR|0.75|
+			mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
+			modifier = {
+				factor = 10
+				is_enslaved = yes
+				can_take_servant_job = no
+				NOT = { has_slavery_type = { type = slavery_indentured } }
+			}
+			modifier = {
+				factor = 0.25
+				can_take_servant_job = yes
+			}
+		
+			# Crafted pops modifier
+			modifier = {
+				factor = 2
+				tec_is_crafted_sentient_pop = yes
+			}
+			modifier = {
+				factor = 200
+				tec_is_crafted_nonsapient_pop = yes
+			}
+
+			# low income modifier
+			modifier = {
+				factor = 1.1
+
+				exists = planet
+				planet = {
+					has_available_jobs = "tec_hired_miner"
+				}
+				owner = {
+					has_monthly_income = {
+						resource = minerals
+						value < 30
+					}
+				}
+			}
+		}
+	}
+
+	tec_hired_farmer = {
+		icon = farmer
+		category = worker
+		condition_string = WORKER_JOB_TRIGGER
+		building_icon = building_food_processing_facility
+		clothes_texture_index = 2
+		
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+
+		possible_precalc = can_fill_worker_job
+		possible = {
+			hidden_trigger = { exists = owner }
+			owner = {
+				is_gestalt = no
+			}
+		}
+
+		resources = {
+			category = planet_farmers
+			produces = {
+				food = 3
+				multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+			}
+
+			inline_script = {
+				script = jobs/resources/inline_evolved_produce_farmer_requisition_resources
+				food = @[ requisitorium_food_reduction / 2]
+				mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+			}
+		}
+
+		overlord_resources = {
+			category = planet_requisitioned_food
+			inline_script = {
+				script = jobs/resources/inline_evolved_produce_farmer_requisition_overlord_resources
+				food = @[ requisitorium_food_overlord / 2 ]
+				mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+			}
+		}
+
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			trade_value_add = 2
+			mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
+		}
+
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			trade_value_add = 1
+			mult = value:tec_hired_job_trade_add
+		}
+
+		inline_script = jobs/effects/type/inline_evolved_farmer_effect
+		
+		weight = {
+			weight = @worker_job_weight
+			mult = value:job_weights_modifier|JOB|tec_hired_farmer|RESOURCE|food|FACTOR|0.75|
+			mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
+			modifier = {
+				factor = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+				owner = { has_valid_civic = civic_agrarian_idyll }
+			}
+
+			modifier = {
+				factor = 10
+				is_enslaved = yes
+				can_take_servant_job = no
+				NOT = { has_slavery_type = { type = slavery_indentured } }
+			}
+			modifier = {
+				factor = 0.25
+				can_take_servant_job = yes
+			}
+			
+			# Crafted pops modifier
+			modifier = {
+				factor = 2
+				tec_is_crafted_sentient_pop = yes
+			}
+			modifier = {
+				factor = 200
+				tec_is_crafted_nonsapient_pop = yes
+			}
+
+			#Prioritize serving species
+			modifier = {
+				factor = 3
+				OR = {
+					tec_has_stapled_trait ={ cached = yes }
+				}
+			}
+
+			# low income modifier
+			modifier = {
+				factor = 1.2
+				exists = planet
+				planet = {
+					has_available_jobs = tec_hired_farmer
+				}
+				owner = {
+					has_monthly_income = {
+						resource = food
+						value < 0
+					}
+				}
+			}
+
+			modifier = {
+				factor = 0.5
+				has_trait = trait_lithoid
+
+				owner = {
+					is_lithoid_empire = yes
+					has_monthly_income = {
+						resource = food
+						value >= 0
+					}
+				}
+			}
+		}
+	}
+
+	tec_hired_technician = {
+		icon = technician
+		category = worker
+		condition_string = WORKER_JOB_TRIGGER
+		building_icon = building_power_plant
+		clothes_texture_index = 2
+		
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+
+		possible_precalc = can_fill_worker_job
+		possible = {
+			hidden_trigger = { exists = owner }
+			owner = {
+				is_gestalt = no
+			}
+		}
+
+		resources = {
+			category = planet_technician
+			produces = {
+				energy = 3
+				multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+			}
+
+
+			inline_script = {
+				script = jobs/resources/inline_evolved_energy_requisition_resources
+				energy = @[ requisitorium_energy_reduction / 2 ]
+				mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+			}
+		}
+
+		overlord_resources = {
+			category = planet_requisitioned_energy
+			inline_script = {
+				script = jobs/resources/inline_evolved_energy_requisition_overlord_resources
+				energy = @[ requisitorium_energy_overlord / 2 ]
+				mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+			}
+		}
+
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			trade_value_add = 2
+			mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
+		}
+
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			trade_value_add = 1
+			mult = value:tec_hired_job_trade_add
+		}
+
+		inline_script = jobs/effects/type/inline_evolved_technician_effect
+
+		weight = {
+			weight = @worker_job_weight
+			mult = value:job_weights_modifier|JOB|tec_hired_technician|RESOURCE|energy|FACTOR|0.75|
+			mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
+			modifier = {
+				factor = 8
+				is_enslaved = yes
+				can_take_servant_job = no
+				NOR = {
+					tec_boost_15_energy = yes
+					tec_boost_10_basic = yes
+				}
+			}
+			modifier = {
+				factor = 100
+				OR = {
+					tec_is_non_sapient_robot = { cached = yes }
+					tec_is_shackled_robot = { cached = yes }
+				}
+				can_take_servant_job = no
+				can_fill_specialist_job = no
+			}
+
+			modifier = {
+				factor = 2
+				OR = {
+					tec_is_non_sapient_robot = { cached = yes }
+					tec_is_shackled_robot = { cached = yes }
+					tec_is_non_sapient_bioservant = { cached = yes }
+					tec_is_shackled_bioservant = { cached = yes }
+				}
+				can_take_servant_job = no
+			}
+			modifier = {
+				factor = 0.25
+				can_take_servant_job = yes
+			}
+			
+			# low income modifier
+			modifier = {
+				factor = 1.5
+				exists = planet
+				planet = {
+					has_available_jobs = "tec_hired_technician"
+				}
+				owner = {
+					has_monthly_income = {
+						resource = energy
+						value < 0
+					}
+				}
+			}
+		}
+	}
+
+	tec_hired_soldier = {
+		icon = soldier
+		category = worker
+		condition_string = WORKER_JOB_TRIGGER	
+		building_icon = building_stronghold
+		clothes_texture_index = 4
+
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+
+		possible = {
+			worker_job_check_trigger = yes
+			owner = { is_gestalt = no }
+		}
+
+		resources = {
+			category = planet_soldiers
+			produces = {
+				unity = 1
+				multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+			}
+		}
+
+		triggered_pop_modifier = {
+			potential = {
+				always = yes
+			}
+			pop_defense_armies_add = 1
+			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+		}
+
+		triggered_country_modifier = {
+			potential = {
+				always = yes
+			}
+			country_naval_cap_add = 2
+			mult = value:tec_scripted_modifier_mult_versatile|MODIFIER|pop_job_naval_mult|MODIFIER_2|tec_hired_job_base_production_mult|
+		}
+
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			trade_value_add = 2
+			mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
+		}
+
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			trade_value_add = 1
+			mult = value:tec_hired_job_trade_add
+		}
+
+		inline_script = jobs/effects/type/inline_evolved_soldier_effect
+
+		weight = {
+			weight = @soldier_job_weight
+			mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
+			factor = 0.8
+			modifier = {
+				factor = 0
+				species = {
+					can_be_soldier = no
+				}
+			}
+
+			modifier = {
+				factor = 10
+				exists = planet
+				planet = { has_modifier = martial_law }
+			}
+
+			modifier = {
+				factor = 2
+				exists = owner
+				owner = {
+					OR = {
+						has_valid_civic = civic_citizen_service
+						has_valid_civic = civic_tec_regular_martial_brotherhood
+					}
+				}
+			}
+
+			modifier = {
+				factor = 0.1
+				is_enslaved = yes
+				NOT = { has_slavery_type = { type = slavery_military } }
+			}
+			modifier = {
+				factor = 10
+				is_enslaved = yes
+				has_slavery_type = { type = slavery_military }
+			}
+			modifier = {
+				factor = 0.1
+				can_take_servant_job = yes
+			}
+
+			# Produce armies
+			modifier = {
+				factor = 2
+				tec_greatly_boost_armies = yes
+			}
+			modifier = {
+				factor = 1.5
+				tec_boost_armies = yes
+			}
+			modifier = {
+				factor = 0.5
+				tec_reduces_armies = yes
+			}
+			modifier = {
+				factor = 0.25
+				tec_greatly_reduces_armies = yes
+			}
+
+			#Prioritize serving species
+			modifier = {
+				factor = 1.05
+				OR = {
+					tec_has_stapled_trait ={ cached = yes }
+				}
+			}
+		}
+	}
+
+	tec_hired_foundry = {
+		icon = foundry
+		category = worker
+		condition_string = SPECIALIST_JOB_TRIGGER
+		building_icon = building_foundry_1
+		clothes_texture_index = 3
+
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+
+		possible_precalc = can_fill_specialist_job
+		possible = {
+			hidden_trigger = { exists = owner }
+			owner = {
+				is_gestalt = no
+			}
+		}
+		
+		resources = {
+			category = planet_metallurgists
+			produces = {
+				alloys = 1.5
+				multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+			}
+
+			inline_script = {
+				script = jobs/resources/inline_evolved_alloy_and_refinery_job_upkeep
+				minerals = 3
+				multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+				trigger = ""
+			}
+
+			inline_script = {
+				script = jobs/resources/inline_evolved_material_foundry_requisition_resources
+				minerals = 1
+				alloys = @[ requisitorium_alloys_reduction / 2 ]
+				mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+			}
+		}
+
+		overlord_resources = {
+			category = planet_requisitioned_alloys
+			inline_script = {
+				script = jobs/resources/inline_evolved_material_foundry_requisition_overlord_resources
+				alloys = @[ requisitorium_alloys_overlord / 2 ]
+				mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+			}
+		}
+
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			trade_value_add = 2
+			mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
+		}
+
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			trade_value_add = 1
+			mult = value:tec_hired_job_trade_add
+		}
+
+		inline_script = jobs/effects/type/inline_evolved_foundry_effect
+
+		weight = {
+			# Specialist job Weight
+			weight = @worker_job_weight
+			mult = value:job_weights_modifier|JOB|foundry|RESOURCE|alloys|FACTOR|0.75|
+			mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
+			modifier = {
+				factor = 2
+				has_job = tec_hired_foundry
+			}
+		}
+	}
+
+	tec_hired_catalytic = {
+		icon = catalytic_technician
+		category = worker
+		condition_string = SPECIALIST_JOB_TRIGGER
+		building_icon = building_foundry_1
+		clothes_texture_index = 3
+
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+
+		possible_precalc = can_fill_specialist_job
+		possible = {
+			hidden_trigger = { exists = owner }
+			owner = {
+				is_gestalt = no
+			}
+		}
+		
+		resources = {
+			category = planet_metallurgists
+			produces = {
+				alloys = 1.5
+				multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+			}
+
+			upkeep = {
+				food = @[3 * tec_catalytic_conversion_rate]
+				multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+			}
+
+			inline_script = {
+				script = jobs/resources/inline_evolved_material_foundry_requisition_resources
+				minerals = 1
+				alloys = @[ requisitorium_alloys_reduction / 2 ]
+				mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+			}
+		}
+
+		overlord_resources = {
+			category = planet_requisitioned_alloys
+			inline_script = {
+				script = jobs/resources/inline_evolved_material_foundry_requisition_overlord_resources
+				alloys = @[ requisitorium_alloys_overlord / 2]
+				mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+			}
+		}
+
+		
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			trade_value_add = 2
+			mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
+		}
+
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			trade_value_add = 1
+			mult = value:tec_hired_job_trade_add
+		}
+
+		inline_script = jobs/effects/type/inline_evolved_foundry_effect
+
+		weight = {
+			# Specialist job Weight
+			weight = @worker_job_weight
+			mult = value:job_weights_modifier|JOB|foundry|RESOURCE|alloys|FACTOR|0.75|
+			mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
+			modifier = {
+				factor = 2
+				has_job = tec_hired_catalytic
+			}
+		}
+	}
+
+	tec_hired_artisan = {
+		icon = artisan
+		category = worker
+		condition_string = SPECIALIST_JOB_TRIGGER
+		building_icon = building_factory_1
+		clothes_texture_index = 3
+
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+
+		possible_precalc = can_fill_specialist_job
+		possible = {
+			hidden_trigger = { exists = owner }
+			owner = {
+				is_gestalt = no
+			}
+		}
+		
+		resources = {
+			category = planet_artisans
+			produces = {
+				consumer_goods = 3
+				multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+			}
+			# Note: this is done now mixed production is handled by policy
+			inline_script = {
+				script = jobs/resources/inline_evolved_cg_job_upkeep
+				upkeep = 3
 				mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
 				trigger = ""
 			}
-		# /
 
-		inline_script = {
-			script = jobs/resources/inline_evolved_material_foundry_requisition_resources
-			minerals = 1
-			food = 0
-			alloys = @[ requisitorium_alloys_reduction / 2 ]
-			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
-		}
-	}
-
-	overlord_resources = {
-		category = planet_requisitioned_alloys
-		inline_script = {
-			script = jobs/resources/inline_evolved_material_foundry_requisition_overlord_resources
-			alloys = @[ requisitorium_alloys_overlord / 2]
-			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		trade_value_add = 2
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		trade_value_add = 1
-		mult = modifier:tec_hired_job_trade_add
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
-	
-	inline_script = jobs/effects/type/inline_evolved_foundry_effect
-
-	weight = {
-		# Specialist job Weight
-		weight = @worker_job_weight
-		mult = value:job_weights_modifier|JOB|foundry|RESOURCE|alloys|FACTOR|0.75|
-		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
-		modifier = {
-			factor = 2
-			has_job = tec_hired_foundry
-		}
-	}
-}
-
-tec_hired_catalytic = {
-	icon = catalytic_technician
-	category = worker
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_foundry_1
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-	possible = {
-		hidden_trigger = { exists = owner }
-		owner = {
-			is_gestalt = no
-		}
-	}
-	
-	resources = {
-		category = planet_metallurgists
-		produces = {
-			alloys = 1.5
-			multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
-		}
-
-		upkeep = {
-			food = 4
-			multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
-		}
-
-		inline_script = {
-			script = jobs/resources/inline_evolved_material_foundry_requisition_resources
-			minerals = 0
-			food = 1.5
-			alloys = @[ requisitorium_alloys_reduction / 2 ]
-			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
-		}
-	}
-
-	overlord_resources = {
-		category = planet_requisitioned_alloys
-		inline_script = {
-			script = jobs/resources/inline_evolved_material_foundry_requisition_overlord_resources
-			alloys = @[ requisitorium_alloys_overlord / 2]
-			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
-		}
-	}
-
-	
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		trade_value_add = 2
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		trade_value_add = 1
-		mult = modifier:tec_hired_job_trade_add
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
-
-	inline_script = jobs/effects/type/inline_evolved_foundry_effect
-
-	weight = {
-		# Specialist job Weight
-		weight = @worker_job_weight
-		mult = value:job_weights_modifier|JOB|foundry|RESOURCE|alloys|FACTOR|0.75|
-		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
-		modifier = {
-			factor = 2
-			has_job = tec_hired_catalytic
-		}
-	}
-}
-
-tec_hired_artisan = {
-	icon = artisan
-	category = worker
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_factory_1
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-	possible = {
-		hidden_trigger = { exists = owner }
-		owner = {
-			is_gestalt = no
-		}
-	}
-	
-	resources = {
-		category = planet_artisans
-		produces = {
-			consumer_goods = 3
-			multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
-		}
-		# Note: this is done now mixed production is handled by policy
-		inline_script = {
-			script = jobs/resources/inline_evolved_cg_job_upkeep
-			upkeep = 3
-			multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
-			trigger = ""
-		}
-
-		inline_script = {
-			script = jobs/resources/inline_evolved_produce_artisan_requisition_resources
-			minerals = 0.5
-			consumer_goods = @[ requisitorium_consumer_goods_reduction / 2 ]
-			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
-		}
-	}
-
-	overlord_resources = {
-		category = planet_requisitioned_consumer_goods
-		inline_script = {
-			script = jobs/resources/inline_evolved_produce_artisan_requisition_overlord_resources
-			consumer_goods = @[ requisitorium_consumer_goods_overlord / 2 ]
-			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
-		}
-	}
-	
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		trade_value_add = 2
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		trade_value_add = 1
-		mult = modifier:tec_hired_job_trade_add
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
-
-	inline_script = jobs/effects/type/inline_evolved_artisan_effect
-	
-
-	weight = {
-		# Specialist job Weight
-		weight = @worker_job_weight
-		mult = value:job_weights_modifier|JOB|artisan|RESOURCE|consumer_goods|FACTOR|0.75|
-		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
-		modifier = {
-			factor = 2
-			has_job = artisan
-		}
-
-		# low income modifier
-		modifier = {
-			factor = 1.2
-			exists = planet
-			planet = {
-				has_available_jobs = "tec_hired_artisan"
+			inline_script = {
+				script = jobs/resources/inline_evolved_produce_artisan_requisition_resources
+				minerals = 0.5
+				consumer_goods = @[ requisitorium_consumer_goods_reduction / 2 ]
+				mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
 			}
+		}
+
+		overlord_resources = {
+			category = planet_requisitioned_consumer_goods
+			inline_script = {
+				script = jobs/resources/inline_evolved_produce_artisan_requisition_overlord_resources
+				consumer_goods = @[ requisitorium_consumer_goods_overlord / 2 ]
+				mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+			}
+		}
+		
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			trade_value_add = 2
+			mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
+		}
+
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			trade_value_add = 1
+			mult = value:tec_hired_job_trade_add
+		}
+
+		inline_script = jobs/effects/type/inline_evolved_artisan_effect
+		
+
+		weight = {
+			# Specialist job Weight
+			weight = @worker_job_weight
+			mult = value:job_weights_modifier|JOB|artisan|RESOURCE|consumer_goods|FACTOR|0.75|
+			mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
+			modifier = {
+				factor = 2
+				has_job = artisan
+			}
+
+			# low income modifier
+			modifier = {
+				factor = 1.2
+				exists = planet
+				planet = {
+					has_available_jobs = "tec_hired_artisan"
+				}
+				exists = owner
+				owner = {
+					is_ai = yes
+					has_monthly_income = {
+						resource = consumer_goods
+						value < 5
+					}
+				}
+			}
+		}
+	}
+
+	tec_hired_researcher = {
+		icon = researcher
+		category = worker
+		condition_string = SPECIALIST_JOB_TRIGGER
+		building_icon = building_research_lab_1
+		clothes_texture_index = 3
+
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+
+		possible_precalc = can_fill_specialist_job
+		possible = {
+			complex_specialist_job_check_trigger = yes
+		}
+
+		resources = {
+			category = planet_researchers
+			produces = {
+				physics_research = 2
+				engineering_research = 2
+				society_research = 2
+				multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+			}
+			upkeep = {
+				consumer_goods = 1
+				multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+			}
+			inline_script = {
+				script = jobs/resources/inline_evolved_science_requisition_resources
+				consumer_goods = 0.5
+				energy = 0
+				mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+			}
+		}
+
+		overlord_resources = {
+			category = planet_requisitioned_research
+			inline_script = {
+				script = jobs/resources/inline_evolved_science_requisition_overlord_resources
+				research = 1
+				mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+			}
+		}
+
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			trade_value_add = 2
+			mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
+		}
+
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			trade_value_add = 1
+			mult = value:tec_hired_job_trade_add
+		}
+		
+		inline_script = jobs/effects/type/inline_evolved_researcher_effect
+		
+		weight = {
+			# Specialist weight
+			weight = @worker_job_weight
+			mult = value:job_weights_research_modifier|JOB|tec_hired_researcher|
+			mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
+			modifier = {
+				factor = 1.5
+				has_job = tec_hired_researcher
+			}
+
+			# Living standard weight
+			modifier = {
+				factor = 2
+				has_living_standard = { type = living_standard_academic_privilege }
+			}
+			modifier = {
+				factor = 0.8
+				is_enslaved = yes
+				has_slavery_type = { type = slavery_indentured }
+			}
+			modifier = {
+				factor = 0.2
+				has_citizenship_rights = no
+				NOR = {
+					tec_has_trait_slave = yes
+				}
+			}
+			modifier = {
+				factor = 0.1
+				can_take_servant_job = yes
+			}
+		}
+	}
+
+	tec_hired_entertainer = {
+		icon = entertainer
+		category = worker
+		condition_string = SPECIALIST_JOB_TRIGGER
+		building_icon = building_holo_theatres
+		clothes_texture_index = 3
+
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+
+		possible = {
+			entertainer_job_check_trigger = yes
+		}
+		
+		resources = {
+			category = planet_entertainers
+			produces = {
+				unity = 1
+				multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
+			}
+			upkeep = {
+				consumer_goods = 0.5
+				multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+			}
+		}
+		
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			planet_amenities_add = 4
+			mult = value:tec_hired_job_amenities_with_modifiers_mult
+		}
+
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			trade_value_add = 2
+			mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
+		}
+
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			trade_value_add = 1
+			mult = value:tec_hired_job_trade_add
+		}
+
+		inline_script = jobs/effects/type/inline_evolved_entertainer_effect
+
+		weight = {
+			# Specialist job Weight
+			weight = @worker_job_weight
+			mult = value:job_weights_modifier|JOB|tec_hired_entertainer|RESOURCE|unity|FACTOR|0.15|
+			mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+			modifier = {
+				factor = 1.5
+				has_job = tec_hired_entertainer
+			}
+
+			# Living standard weight
+			modifier = {
+				factor = 3
+				has_trait = trait_robot_domestic_protocols
+				OR = {
+					tec_is_non_sapient_robot = { cached = yes }
+					tec_is_shackled_robot = { cached = yes }
+				}
+			}
+			modifier = {
+				factor = 0.2
+				has_citizenship_rights = no
+				NOR = {
+					tec_has_trait_slave = yes
+				}
+			}
+			modifier = {
+				factor = 0.1
+				can_take_servant_job = yes
+			}
+
+			modifier = {
+				factor = 0.1
+				NOT = { has_job = entertainer }
+				exists = planet
+				planet = {
+					free_amenities > 5
+				}
+			}
+			modifier = {
+				factor = 2
+				NOT = { has_job = entertainer }
+				exists = planet
+				planet = {
+					free_amenities < 2
+				}
+			}
+		}
+	}
+ # /
+ # Cooperative
+	tec_state_worker = {
+		category = worker
+		is_capped_by_modifier = no
+		building_icon = building_luxury_residence
+		clothes_texture_index = 2
+
+		possible_pre_triggers = {
+			is_sapient = yes
+		}
+
+		possible = {
 			exists = owner
 			owner = {
-				is_ai = yes
-				has_monthly_income = {
-					resource = consumer_goods
-					value < 5
+				is_cooperative = yes
+			}
+			# This is done to avoid them appearing in masse at game start, somehow
+			days_passed > 1
+			if = {
+				limit = {
+					owner = {
+						has_policy_flag = policy_option_tec_cooperative_state_workers_restrict
+					}
+					
 				}
+				always = no
+				# Note: No buildings yet
+				#OR = {
+				#	has_building = building_tec_cooperative_state_agency
+				#	has_building = building_tec_cooperative_aid_agency
+				#	has_building = building_tec_cooperative_education_agency
+				#}
+			}
+			else = {
+				always = yes
+			}
+		}
+		
+		resources = {
+			category = planet_tec_state_workers
+			produces = {
+				unity = 2
+			}
+			produces = {
+				trigger = {
+					exists = owner
+					owner = {
+						has_ethic = ethic_fanatic_socialism
+					}
+				}
+				unity = 1
+			}
+		}
+		
+		triggered_pop_modifier = {
+			potential = {
+				always = yes
+			}
+			pop_amenities_usage_add = 1
+		}
+			
+		weight = {
+			weight = 0.0001 # even lower than @special_job_weight
+			#weight = @special_job_weight
+			modifier = {	# This is because base job weights
+				always = yes
+				add = -3
 			}
 		}
 	}
-}
-
-tec_hired_researcher = {
-	icon = researcher
-	category = worker
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_research_lab_1
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-	possible = {
-		complex_specialist_job_check_trigger = yes
-	}
-
-	resources = {
-		category = planet_researchers
-		produces = {
-			physics_research = 2
-			engineering_research = 2
-			society_research = 2
-			multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
-		}
-		upkeep = {
-			consumer_goods = 1
-			multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
-		}
-		inline_script = {
-			script = jobs/resources/inline_evolved_science_requisition_resources
-			consumer_goods = 0.5
-			energy = 0
-			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
-		}
-	}
-
-	overlord_resources = {
-		category = planet_requisitioned_research
-		inline_script = {
-			script = jobs/resources/inline_evolved_science_requisition_overlord_resources
-			research = 1
-			mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		trade_value_add = 2
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		trade_value_add = 1
-		mult = modifier:tec_hired_job_trade_add
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
-	
-	inline_script = jobs/effects/type/inline_evolved_researcher_effect
-	
-	weight = {
-		# Specialist weight
-		weight = @worker_job_weight
-		mult = value:job_weights_research_modifier|JOB|tec_hired_researcher|
-		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
-		modifier = {
-			factor = 1.5
-			has_job = tec_hired_researcher
-		}
-
-		# Living standard weight
-		modifier = {
-			factor = 2
-			has_living_standard = { type = living_standard_academic_privilege }
-		}
-		modifier = {
-			factor = 0.8
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_indentured }
-		}
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no
-			NOR = {
-				tec_has_trait_slave = yes
-			}
-		}
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-	}
-}
-
-tec_hired_entertainer = {
-	icon = entertainer
-	category = worker
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_holo_theatres
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible = {
-		entertainer_job_check_trigger = yes
-	}
-	
-	resources = {
-		category = planet_entertainers
-		produces = {
-			unity = 1
-			multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
-		}
-		upkeep = {
-			consumer_goods = 0.5
-			multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
-		}
-	}
-	
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		planet_amenities_add = 4
-		mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		trade_value_add = 2
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		trade_value_add = 1
-		mult = modifier:tec_hired_job_trade_add
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
-
-	inline_script = jobs/effects/inline_evolved_pleasure_seeker_entertainer
-
-	weight = {
-		# Specialist job Weight
-		weight = @worker_job_weight
-		mult = value:job_weights_modifier|JOB|tec_hired_entertainer|RESOURCE|unity|FACTOR|0.15|
-		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
-		modifier = {
-			factor = 1.5
-			has_job = tec_hired_entertainer
-		}
-
-		# Living standard weight
-		modifier = {
-			factor = 3
-			has_trait = trait_robot_domestic_protocols
-			OR = {
-				tec_is_non_sapient_robot = { cached = yes }
-				tec_is_shackled_robot = { cached = yes }
-			}
-		}
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no
-			NOR = {
-				tec_has_trait_slave = yes
-			}
-		}
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-
-		modifier = {
-			factor = 0.1
-			NOT = { has_job = entertainer }
-			exists = planet
-			planet = {
-				free_amenities > 5
-			}
-		}
-		modifier = {
-			factor = 2
-			NOT = { has_job = entertainer }
-			exists = planet
-			planet = {
-				free_amenities < 2
-			}
-		}
-	}
-}
+ # /
 
 # --------------- Origins
-tec_matterminer = {			# Ringworld/Matter Synthesis
-	icon = geoengineer
-	category = worker
-	condition_string = WORKER_JOB_TRIGGER
-	building_icon = building_mineral_purification_complex
-	clothes_texture_index = 2
+	tec_matterminer = {			# Ringworld/Matter Synthesis
+		icon = tec_geoengineer
+		category = worker
+		condition_string = WORKER_JOB_TRIGGER
+		building_icon = building_mineral_purification_complex
+		clothes_texture_index = 2
 
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_worker_job
-	possible = {
-		hidden_trigger = { exists = owner }
-		owner = {
-			is_gestalt = no
-		}
-	}
-
-	resources = {
-		category = planet_miners
-		produces = {
-			minerals = 6
-		}
-		upkeep = {
-			energy = 2
-		}
-		inline_script = {
-			script = jobs/resources/inline_evolved_material_miner_requisition_resources
-			minerals = @requisitorium_minerals_reduction
-			mult = 1
-		}
-	}
-
-	overlord_resources = {
-		category = planet_requisitioned_minerals
-		inline_script = {
-			script = jobs/resources/inline_evolved_material_miner_requisition_overlord_resources
-			minerals = @requisitorium_minerals_overlord
-			mult = 1
-		}
-	}
-
-	inline_script = jobs/effects/type/inline_evolved_miner_effect
-	
-	weight = {
-		weight = @worker_job_weight
-		mult = value:job_weights_modifier|JOB|tec_matterminer|RESOURCE|minerals|
-
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			can_take_servant_job = no
-		}
-		modifier = {
-			factor = 0.25
-			can_take_servant_job = yes
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
 		}
 
-		# Crafted pops modifier
-		modifier = {
-			factor = 2
-			tec_is_crafted_sentient_pop = yes
-		}
-		modifier = {
-			factor = 200
-			tec_is_crafted_nonsapient_pop = yes
-		}
-
-		# low income modifier
-		modifier = {
-			factor = 1.1
-
-			OR = {
-				is_unemployed = yes
-				has_job = "tec_matterminer"
-			}
-			exists = planet
-			planet = {
-				has_available_jobs = "tec_matterminer"
-			}
+		possible_precalc = can_fill_worker_job
+		possible = {
+			hidden_trigger = { exists = owner }
 			owner = {
-				has_monthly_income = {
-					resource = minerals
-					value < 30
+				is_gestalt = no
+			}
+		}
+
+		resources = {
+			category = planet_miners
+			produces = {
+				minerals = 6
+			}
+			upkeep = {
+				energy = 2
+			}
+			inline_script = {
+				script = jobs/resources/inline_evolved_material_miner_requisition_resources
+				minerals = @requisitorium_minerals_reduction
+				mult = 1
+			}
+		}
+
+		overlord_resources = {
+			category = planet_requisitioned_minerals
+			inline_script = {
+				script = jobs/resources/inline_evolved_material_miner_requisition_overlord_resources
+				minerals = @requisitorium_minerals_overlord
+				mult = 1
+			}
+		}
+
+		inline_script = jobs/effects/type/inline_evolved_miner_effect
+		
+		weight = {
+			weight = @worker_job_weight
+			mult = value:job_weights_modifier|JOB|tec_matterminer|RESOURCE|minerals|
+
+			modifier = {
+				factor = 10
+				is_enslaved = yes
+				can_take_servant_job = no
+			}
+			modifier = {
+				factor = 0.25
+				can_take_servant_job = yes
+			}
+
+			# Crafted pops modifier
+			modifier = {
+				factor = 2
+				tec_is_crafted_sentient_pop = yes
+			}
+			modifier = {
+				factor = 200
+				tec_is_crafted_nonsapient_pop = yes
+			}
+
+			# low income modifier
+			modifier = {
+				factor = 1.1
+
+				OR = {
+					is_unemployed = yes
+					has_job = "tec_matterminer"
+				}
+				exists = planet
+				planet = {
+					has_available_jobs = "tec_matterminer"
+				}
+				owner = {
+					has_monthly_income = {
+						resource = minerals
+						value < 30
+					}
+				}
+			}
+			# low energy
+			modifier = {
+				factor = 0.5
+				owner = {
+					has_monthly_income = {
+						resource = minerals
+						value < 0
+					}
 				}
 			}
 		}
-		# low energy
-		modifier = {
-			factor = 0.5
-			owner = {
-				has_monthly_income = {
-					resource = minerals
-					value < 0
+	}
+
+	tec_scavenger = {			# Wastelanders
+		category = worker
+		condition_string = WORKER_JOB_TRIGGER
+		building_icon = building_tec_scavenge_center
+		icon = herder
+
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+
+		possible_precalc = can_fill_worker_job
+
+		resources = {
+			category = planet_jobs_productive
+			inline_script = jobs/resources/inline_evolved_tec_scavanger_resources
+			upkeep = {
+				consumer_goods = 1
+			}
+		}
+
+		weight = {
+			weight = @specialist_job_weight
+			modifier = {	# Important job
+				factor = 10
+			}
+			modifier = {
+				factor = 5
+				has_job = tec_scavenger
+			}
+			modifier = {
+				factor = 10
+				is_enslaved = yes
+				can_take_servant_job = no
+			}
+			modifier = {
+				factor = 0.25
+				can_take_servant_job = yes
+			}
+
+			# Crafted pops modifier
+			modifier = {
+				factor = 2
+				tec_is_crafted_sentient_pop = yes
+			}
+			modifier = {
+				factor = 200
+				tec_is_crafted_nonsapient_pop = yes
+			}
+
+			#Prioritize serving species
+			modifier = {
+				factor = 3
+				OR = {
+					tec_has_stapled_trait ={ cached = yes }
 				}
 			}
 		}
 	}
-}
+# /
 
-tec_scavenger = {			# Wastelanders
-	category = worker
-	condition_string = WORKER_JOB_TRIGGER
-	building_icon = building_tec_scavenge_center
-	icon = herder
+# --------------- Traditions
+	tec_planner = {				# Outreach
+		category = worker
+		condition_string = WORKER_JOB_TRIGGER
+		building_icon = building_tec_outreach_platform
+		icon = herder
 
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_worker_job
-
-	resources = {
-		category = planet_jobs_productive
-		inline_script = jobs/resources/inline_evolved_tec_scavanger_resources
-		upkeep = {
-			consumer_goods = 1
-		}
-	}
-
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {	# Important job
-			factor = 10
-		}
-		modifier = {
-			factor = 5
-			has_job = tec_scavenger
-		}
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			can_take_servant_job = no
-		}
-		modifier = {
-			factor = 0.25
-			can_take_servant_job = yes
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
 		}
 
-		# Crafted pops modifier
-		modifier = {
-			factor = 2
-			tec_is_crafted_sentient_pop = yes
-		}
-		modifier = {
-			factor = 200
-			tec_is_crafted_nonsapient_pop = yes
+		possible_precalc = can_fill_worker_job
+
+		resources = {
+			category = planet_colonists
+			produces = {
+				unity = 4
+			}
+			inline_script = jobs/resources/inline_evolved_tec_planner_resources
+			upkeep = {
+				consumer_goods = 2
+			}
 		}
 
-		#Prioritize serving species
-		modifier = {
-			factor = 3
-			OR = {
-				tec_has_stapled_trait = { cached = yes }
+		triggered_planet_modifier = {
+			potential = {
+				always = yes
+			}
+			planet_amenities_add = 3
+			mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+		}
+
+		inline_script = jobs/effects/inline_evolved_tec_corporate_settlers
+
+		weight = {
+			weight = @specialist_job_weight
+			modifier = {	# Important job
+				factor = 10
+			}
+			modifier = {
+				factor = 5
+				has_job = tec_planner
+			}
+			modifier = {
+				factor = 10
+				is_enslaved = yes
+				can_take_servant_job = no
+			}
+			modifier = {
+				factor = 0.25
+				can_take_servant_job = yes
+			}
+
+			# Crafted pops modifier
+			modifier = {
+				factor = 2
+				tec_is_crafted_sentient_pop = yes
+			}
+			modifier = {
+				factor = 200
+				tec_is_crafted_nonsapient_pop = yes
+			}
+
+			#Prioritize serving species
+			modifier = {
+				factor = 3
+				OR = {
+					tec_has_stapled_trait ={ cached = yes }
+				}
 			}
 		}
 	}
-}
+# /

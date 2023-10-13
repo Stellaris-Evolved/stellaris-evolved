@@ -1,5 +1,6 @@
-# O V E R W R I T E
-# Custom districts are on zz_tec_ringworld_districts
+# common\districts\zz_ow_04_ringworld_districts.txt
+
+# Note: Custom districts are on zz_tec_ringworld_districts
 
 # NOTE: District sorting
 	# qualities
@@ -41,7 +42,7 @@ district_rw_city = {	# Regular
 		tec_uses_ringworld_districts = yes
 		exists = from
 		from = {
-			is_regular_empire = yes 
+			is_regular_empire = yes
 		}
 		tec_is_precursor_ringworld = no
 	}
@@ -50,21 +51,34 @@ district_rw_city = {	# Regular
 		tec_uses_ringworld_districts = yes
 		exists = owner
 		owner = {
-			is_regular_empire = yes 
+			is_regular_empire = yes
 		}
 		tec_is_precursor_ringworld = no
+	}
+
+	allow = {
+		tec_ai_allow_housing_district = {
+			housing = 10
+			has_building_slots = "always = no"
+			use_for_jobs = "
+				tec_has_clerk_jobs_available = no
+			"
+		}
 	}
 
 	conversion_ratio = 1
 	inline_script = districts/convert_to/inline_evolved_housing_districts
 
 	resources = {
-		category = planet_districts
-		cost = {
-			minerals = @rw_cost
-		}
-		upkeep = {
-			energy = @rw_maintenance
+		category = planet_districts_cities
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_rw_cost
+			upkeep = @tec_district_rw_upkeep
 		}
 	}
 
@@ -111,17 +125,26 @@ district_rw_city = {	# Regular
 				}
 			}
 		# /
+	# /
+	# Effect Types
 		inline_script = {
-			script = districts/inline_evolved_habitation_housing_modifiers
-			count = 5
+			script = districts/type/inline_evolved_housing_generic
+			scale = 5
 			trigger = "
 				NOT = {
 					has_deposit = d_tec_rw_minor_structural_damage
 				}
 			"
 		}
-		
-		inline_script = districts/effects/inline_evolved_tec_artifice_2
+		inline_script = {
+			script = districts/type/inline_evolved_housing_city
+			scale = 5
+			trigger = "
+				NOT = {
+					has_deposit = d_tec_rw_minor_structural_damage
+				}
+			"
+		}
 	# /
 	# Jobs
 		inline_script = {
@@ -163,23 +186,7 @@ district_rw_city = {	# Regular
 				has_deposit = d_tec_rw_major_structural_damage
 			"
 		}
-
-
-		inline_script = {
-			script = districts/effects/inline_evolved_mercantile_trickle_up_economics
-			count = 3
-			trigger = "
-				NOT = {
-					has_deposit = d_tec_rw_minor_structural_damage
-				}
-			"
-		}
 	# /
-
-	inline_script = {
-		script = districts/compat/inline_evolved_starnet_housing_district
-		count = 5
-	}
 
 	inline_script = {
 		script = districts/inline_evolved_aibait_housing
@@ -210,16 +217,29 @@ district_rw_hive = {	# Hivemind
 		tec_is_precursor_ringworld = no
 	}
 
+	allow = {
+		tec_ai_allow_housing_district = {
+			housing = 10
+			has_building_slots = "always = no"
+			use_for_jobs = "
+				tec_has_maintenance_drone_jobs_available = no
+			"
+		}
+	}
+
 	conversion_ratio = 1
 	inline_script = districts/convert_to/inline_evolved_housing_districts
 
 	resources = {
 		category = planet_districts
-		cost = {
-			minerals = @rw_cost
-		}
-		upkeep = {
-			energy = @rw_maintenance
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_rw_cost
+			upkeep = @tec_district_rw_upkeep
 		}
 	}
 
@@ -268,22 +288,26 @@ district_rw_hive = {	# Hivemind
 				}
 			}
 		# /
+	# /
+	# Effect Types
 		inline_script = {
-			script = districts/inline_evolved_habitation_housing_modifiers
-			count = 5
+			script = districts/type/inline_evolved_housing_generic
+			scale = 5
 			trigger = "
 				NOT = {
 					has_deposit = d_tec_rw_minor_structural_damage
 				}
 			"
 		}
-		
-		inline_script = districts/effects/inline_evolved_tec_artifice_2
-
-		# Origins
-		# /
-		# Civics
-		# /
+		inline_script = {
+			script = districts/type/inline_evolved_housing_hive
+			scale = 5
+			trigger = "
+				NOT = {
+					has_deposit = d_tec_rw_minor_structural_damage
+				}
+			"
+		}
 	# /
 	# Jobs
 		inline_script = {
@@ -311,25 +335,7 @@ district_rw_hive = {	# Hivemind
 				has_deposit = d_tec_rw_major_structural_damage
 			"
 		}
-
-		inline_script = {
-			script = districts/effects/inline_evolved_tech_housing_2_gestalt
-			count = 3
-			trigger = "
-				NOT = {
-					has_deposit = d_tec_rw_minor_structural_damage
-				}
-			"
-		}
-
-		# Bio/Lithospheric harmony
-			inline_script = districts/effects/inline_evolved_tec_hive_menial
-		#/
 	# /
-	inline_script = {
-		script = districts/compat/inline_evolved_starnet_housing_district
-		count = 5
-	}
 	inline_script = {
 		script = districts/inline_evolved_aibait_housing
 		has_building_slots = "
@@ -347,7 +353,7 @@ district_rw_nexus = {	# Machine
 		tec_uses_ringworld_districts = yes
 		exists = from
 		from = {
-			is_machine_empire = yes 
+			is_machine_empire = yes
 		}
 		tec_is_precursor_ringworld = no
 	}
@@ -356,9 +362,19 @@ district_rw_nexus = {	# Machine
 		tec_uses_ringworld_districts = yes
 		exists = owner
 		owner = {
-			is_machine_empire = yes 
+			is_machine_empire = yes
 		}
 		tec_is_precursor_ringworld = no
+	}
+
+	allow = {
+		tec_ai_allow_housing_district = {
+			housing = 10
+			has_building_slots = "always = no"
+			use_for_jobs = "
+				tec_has_maintenance_drone_jobs_available = no
+			"
+		}
 	}
 
 	conversion_ratio = 1
@@ -366,11 +382,14 @@ district_rw_nexus = {	# Machine
 
 	resources = {
 		category = planet_districts
-		cost = {
-			minerals = @rw_cost
-		}
-		upkeep = {
-			energy = @rw_maintenance
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_rw_cost
+			upkeep = @tec_district_rw_upkeep
 		}
 	}
 
@@ -417,23 +436,28 @@ district_rw_nexus = {	# Machine
 				}
 			}
 		# /
+	# /
+	# Effect Types
 		inline_script = {
-			script = districts/inline_evolved_habitation_housing_modifiers
-			count = 5
+			script = districts/type/inline_evolved_housing_generic
+			scale = 5
 			trigger = "
 				NOT = {
 					has_deposit = d_tec_rw_minor_structural_damage
 				}
 			"
 		}
-
-		inline_script = districts/effects/inline_evolved_tec_artifice_2
-		# /
-		# Origins
-		# /
-		# Civics
-		# /
+		inline_script = {
+			script = districts/type/inline_evolved_housing_nexus
+			scale = 5
+			trigger = "
+				NOT = {
+					has_deposit = d_tec_rw_minor_structural_damage
+				}
+			"
+		}
 	# /
+
 	# Jobs
 		inline_script = {
 			script = jobs/inline_evolved_maintenance_drone
@@ -473,9 +497,11 @@ district_rw_nexus = {	# Machine
 		inline_script = {
 			script = jobs/inline_evolved_technician
 			regular_count = 0
+			regular_secondary_count = 0
 			hive_count = 0
+			hive_secondary_count = 0
 			machine_count = 2
-			machine_aquatic_count = 2
+			machine_secondary_count = 2
 			mult = 1
 			display = with_desc
 			trigger = "
@@ -486,29 +512,27 @@ district_rw_nexus = {	# Machine
 		inline_script = {
 			script = jobs/inline_evolved_technician
 			regular_count = 0
+			regular_secondary_count = 0
 			hive_count = 0
+			hive_secondary_count = 0
 			machine_count = 3
-			machine_aquatic_count = 3
+			machine_secondary_count = 3
 			mult = 1
 			display = no_desc
 			trigger = "
 				has_deposit = d_tec_rw_major_structural_damage
 			"
 		}
-
-		inline_script = districts/effects/inline_evolved_tec_machine_menial
 	# /
 
-	inline_script = {
-		script = districts/compat/inline_evolved_starnet_housing_district
-		count = 5
-	}
-	inline_script = {
-		script = districts/inline_evolved_aibait_housing
-		has_building_slots = "
-			always = no
-		"
-	}
+	# Ai
+		inline_script = {
+			script = districts/inline_evolved_aibait_housing
+			has_building_slots = "
+				always = no
+			"
+		}
+	# /
 }
 
 # --------------- Industrial
@@ -538,16 +562,25 @@ district_rw_industrial = {
 
 	resources = {
 		category = planet_districts
-		cost = {
-			minerals = @rw_cost
-			volatile_motes = @rw_cost_sr_smol
-			rare_crystals = @rw_cost_sr_smol
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_rw_cost
+			upkeep = @tec_district_rw_upkeep
 		}
-		upkeep = {
-			energy = @rw_maintenance
-			volatile_motes = @rw_maintenance_sr_smol
-			rare_crystals = @rw_maintenance_sr_smol
+		inline_script = {
+			script = districts/resources/inline_evolved_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				always = yes
+			"
+			rare = rare_crystals
+			rare_cost = @tec_district_rw_sr_cost
+			rare_upkeep = @tec_district_rw_sr_upkeep
 		}
+
 		inline_script = districts/resources/inline_evolved_industrial_maintenance_upkeep
 	}
 
@@ -628,15 +661,27 @@ district_rw_generator = {
 	inline_script = districts/convert_to/inline_evolved_generator_districts
 
 	resources = {
-		category = planet_districts
-		cost = {
-			minerals = @rw_cost
-			exotic_gases = @rw_cost_sr
+		category = planet_districts_rw_generator
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_rw_cost
+			upkeep = @tec_district_rw_upkeep
 		}
-		upkeep = {
-			energy = @rw_maintenance
-			exotic_gases = @rw_maintenance_sr
+		inline_script = {
+			script = districts/resources/inline_evolved_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				always = yes
+			"
+			rare = exotic_gases
+			rare_cost = @tec_district_rw_sr_cost
+			rare_upkeep = @tec_district_rw_sr_upkeep
 		}
+		# Improved Technician Empire Upkeep
+		inline_script = districts/resources/inline_evolved_improved_technician_empire_upkeep
 	}
 	
 	triggered_desc = {
@@ -656,14 +701,29 @@ district_rw_generator = {
 			}
 			inline_script = districts/effects/inline_evolved_tec_ringworld_damaged_section_menial
 		# /
+		# Planet
+			triggered_planet_modifier = {
+				potential = {
+					NOT = {
+						has_deposit = d_tec_rw_major_structural_damage
+					}
+				}
+				planets_energy_produces_mult = 0.05
+			}
+		# /
+		
+		# Improved Technician Empire Modifier
+		inline_script = districts/effects/inline_evolved_improved_technician_empire_bonus
 	# /
 	# Jobs
 		inline_script = {
 			script = jobs/inline_evolved_technician
 			regular_count = 15
+			regular_secondary_count = 10
 			hive_count = 20
+			hive_secondary_count = 15
 			machine_count = 15
-			machine_aquatic_count = 10
+			machine_secondary_count = 10
 			mult = 1
 			display = with_desc
 			trigger = ""
@@ -671,9 +731,11 @@ district_rw_generator = {
 		inline_script = {
 			script = jobs/inline_evolved_technician
 			regular_count = -2
+			regular_secondary_count = -1
 			hive_count = -2
+			hive_secondary_count = -1
 			machine_count = -2
-			machine_aquatic_count = -1
+			machine_secondary_count = -1
 			mult = 1
 			display = no_desc
 			trigger = "
@@ -684,9 +746,11 @@ district_rw_generator = {
 		inline_script = {
 			script = jobs/inline_evolved_technician
 			regular_count = -3
+			regular_secondary_count = -1
 			hive_count = -8
+			hive_secondary_count = -6
 			machine_count = -3
-			machine_aquatic_count = -1
+			machine_secondary_count = -1
 			mult = 1
 			display = no_desc
 			trigger = "
@@ -695,7 +759,9 @@ district_rw_generator = {
 		}
 
 		inline_script = {
-			script = jobs/inline_evolved_technician_swaps
+			script = jobs/inline_evolved_technician_secondary
+			regular_count = 5
+			hive_count = 5
 			machine_count = 5
 			mult = 1
 			display = with_desc
@@ -703,7 +769,9 @@ district_rw_generator = {
 		}
 
 		inline_script = {
-			script = jobs/inline_evolved_technician_swaps
+			script = jobs/inline_evolved_technician_secondary
+			regular_count = -1
+			hive_count = -1
 			machine_count = -1
 			mult = 1
 			display = no_desc
@@ -713,23 +781,15 @@ district_rw_generator = {
 		}
 
 		inline_script = {
-			script = jobs/inline_evolved_technician_swaps
+			script = jobs/inline_evolved_technician_secondary
+			regular_count = -2
+			hive_count = -2
 			machine_count = -2
 			mult = 1
 			display = no_desc
 			trigger = "
 				has_deposit = d_tec_rw_major_structural_damage 
 			"
-		}
-	# /
-	# Planet
-		triggered_planet_modifier = {
-			potential = {
-				NOT = {
-					has_deposit = d_tec_rw_major_structural_damage
-				}
-			}
-			planets_energy_produces_mult = 0.05
 		}
 	# /
 
@@ -761,15 +821,28 @@ district_rw_farming = {
 	inline_script = districts/convert_to/inline_evolved_farming_districts
 
 	resources = {
-		category = planet_districts
-		cost = {
-			minerals = @rw_cost
-			volatile_motes = @rw_cost_sr
+		category = planet_districts_rw_farming
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_rw_cost
+			upkeep = @tec_district_rw_upkeep
 		}
-		upkeep = {
-			energy = @rw_maintenance
-			volatile_motes = @rw_maintenance_sr
+		inline_script = {
+			script = districts/resources/inline_evolved_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				always = yes
+			"
+			rare = volatile_motes
+			rare_cost = @tec_district_rw_sr_cost
+			rare_upkeep = @tec_district_rw_sr_upkeep
 		}
+
+		# Improved Farming Empire Upkeep
+		inline_script = districts/resources/inline_evolved_improved_farming_empire_upkeep
 	}
 
 	triggered_desc = {
@@ -789,16 +862,30 @@ district_rw_farming = {
 			}
 			inline_script = districts/effects/inline_evolved_tec_ringworld_damaged_section_menial
 		# /
+		# Planet
+			triggered_planet_modifier = {
+				potential = {
+					NOT = {
+						has_deposit = d_tec_rw_major_structural_damage
+					}
+				}
+				planets_food_produces_mult = 0.05
+			}
+		# /
+
+		# Improved Farming Empire Modifier
+		inline_script = districts/effects/inline_evolved_improved_farming_empire_bonus
 	# /
 	
 	# Jobs
 		inline_script = {
 			script = jobs/inline_evolved_farmer
 			regular_count = 15
-			regular_aquatic_count = 10
+			regular_secondary_count = 10
 			hive_count = 20
-			hive_aquatic_count = 15
+			hive_secondary_count = 15
 			machine_count = 15
+			machine_secondary_count = 10
 			mult = 1
 			display = with_desc
 			trigger = ""
@@ -806,10 +893,11 @@ district_rw_farming = {
 		inline_script = {
 			script = jobs/inline_evolved_farmer
 			regular_count = -2
-			regular_aquatic_count = -1
+			regular_secondary_count = -1
 			hive_count = -2
-			hive_aquatic_count = -1
+			hive_secondary_count = -1
 			machine_count = -2
+			machine_secondary_count = -1
 			mult = 1
 			display = no_desc
 			trigger = "
@@ -819,10 +907,11 @@ district_rw_farming = {
 		inline_script = {
 			script = jobs/inline_evolved_farmer
 			regular_count = -3
-			regular_aquatic_count = -1
+			regular_secondary_count = -1
 			hive_count = -8 # include hive extra jobs
-			hive_aquatic_count = -6 # include hive extra jobs
+			hive_secondary_count = -6 # include hive extra jobs
 			machine_count = -3
+			machine_secondary_count = -1
 			mult = 1
 			display = no_desc
 			trigger = "
@@ -830,17 +919,19 @@ district_rw_farming = {
 			"
 		}
 		inline_script = {
-			script = jobs/inline_evolved_farmer_swaps
+			script = jobs/inline_evolved_farmer_secondary
 			regular_count = 5
 			hive_count = 5
+			machine_count = 5
 			mult = 1
 			display = with_desc
 			trigger = ""
 		}
 		inline_script = {
-			script = jobs/inline_evolved_farmer_swaps
+			script = jobs/inline_evolved_farmer_secondary
 			regular_count = -1
 			hive_count = -1
+			machine_count = -1
 			mult = 1
 			display = no_desc
 			trigger = "
@@ -848,9 +939,10 @@ district_rw_farming = {
 			"
 		}
 		inline_script = {
-			script = jobs/inline_evolved_farmer_swaps
+			script = jobs/inline_evolved_farmer_secondary
 			regular_count = -2
 			hive_count = -2
+			machine_count = -2
 			mult = 1
 			display = no_desc
 			trigger = "
@@ -858,22 +950,13 @@ district_rw_farming = {
 			"
 		}
 	# /
-	# Planet
-		triggered_planet_modifier = {
-			potential = {
-				NOT = {
-					has_deposit = d_tec_rw_major_structural_damage
-				}
-			}
-			planets_food_produces_mult = 0.05
-		}
-	# /
 
 	# Starnet
-	inline_script = {
-		script = districts/compat/inline_evolved_starnet_farming_district
-		count = 4
-	}
+		inline_script = {
+			script = districts/compat/inline_evolved_starnet_farming_district
+			count = 4
+		}
+	# /
 }
 
 # --------------- SPEC II - Science

@@ -1,0 +1,161 @@
+# common\scripted_effects\zz_evolved_leader_effects.txt
+
+# Trait flags
+tec_roll_cerebrate_leader_trait_flags = {
+	if = {
+		limit = { leader_class = admiral }
+		# TO DO new variants
+	}
+	else_if = {
+		limit = { leader_class = scientist }
+		random_list = {
+			1 = {
+				set_leader_flag = tec_sci_roll_assist
+			}
+			1 = {
+				set_leader_flag = tec_sci_roll_phy
+			}
+			1 = {
+				set_leader_flag = tec_sci_roll_soc
+			}
+			1 = {
+				set_leader_flag = tec_sci_roll_eng
+			}
+			1 = {
+				set_leader_flag = tec_sci_roll_uni
+			}
+		}
+	}
+	else_if = {
+		limit = { leader_class = general }
+	}
+	else_if = {
+		limit = { leader_class = governor }
+		random_list = {
+			1 = {
+				set_leader_flag = tec_gov_roll_sta
+			}
+			1 = {
+				set_leader_flag = tec_gov_roll_pop
+			}
+		}
+	}
+	else = {
+		break = yes
+	}
+}
+
+# scope: leader
+tec_leader_add_councilor_trait = {
+	if = {
+		limit = {
+			has_paragon_dlc = yes
+		}
+		switch = {
+			trigger = leader_class
+			admiral = {
+				add_trait_no_notify = subclass_admiral_strategist
+			}
+			scientist = {
+				add_trait_no_notify = subclass_scientist_researcher
+			}
+			general = {
+				add_trait_no_notify = subclass_general_marshall
+			}
+			governor = {
+				add_trait_no_notify = subclass_governor_visionary
+			}
+		}
+	}
+}
+
+
+# scope: leader
+tec_leader_remove_psionic_traits = {
+	remove_trait = leader_trait_psionic
+	remove_trait = leader_trait_tec_cyberpsionic_main
+	remove_trait = leader_trait_tec_biopsionic_main
+
+	remove_trait = leader_trait_tec_aiauth_psionic
+	remove_trait = leader_trait_tec_aiauth_cyberpsionic_main
+	remove_trait = leader_trait_tec_aiauth_biopsionic_main
+	# remove_trait = leader_trait_tec_robot_shroud
+	# remove_trait = leader_trait_tec_hive_psionic
+}
+
+# scope: leader
+# from: country
+tec_leader_handle_starting_modifiers = {
+	$from$ = {
+		fire_on_action = {
+			on_action = tec_leader_starting_actions
+			scopes = {
+				from = prev
+			}
+		}
+	}
+	set_leader_flag = tec_first_leader_handle_starting_modifiers_done
+}
+
+# scope: country
+tec_country_leaders_handle_starting_modifiers = {
+	every_owned_leader = {
+		tec_leader_handle_starting_modifiers = {
+			from = prev
+		}
+	}
+	every_pool_leader = {
+		tec_leader_handle_starting_modifiers = {
+			from = prev
+		}
+	}
+}
+
+tec_leader_cache_portrait = {
+	save_global_event_target_as = tec_leader_to_cache_portait
+	if = {
+		limit = {
+			NOT = { exists = event_target:tec_leader_portrait_cache }
+		}
+		event_target:global_event_country = {
+			create_random_species = yes
+
+			last_created_species = {
+				save_global_event_target_as = tec_leader_portrait_cache
+			}
+		}
+	}
+	event_target:tec_leader_portrait_cache = {
+		change_species_characteristics = {
+			portrait = event_target:tec_leader_to_cache_portait
+			can_change_leader = no
+		}
+	}
+	clear_global_event_target = tec_leader_to_cache_portait
+}
+
+tec_leader_reset_to_cached_portrait = {
+	if = {
+		limit = {
+			exists = event_target:tec_leader_portrait_cache
+		}
+		change_leader_portrait = event_target:tec_leader_portrait_cache
+	}
+	else = {
+		log = "Tried to change leader to cached portrait, but cached portrait does not exist"
+	}
+}
+
+tec_leader_reset_portrait_on_assimilation_if_needed = {
+	if = {
+		limit = { tec_should_leader_change_portrait_on_assimilation = no }
+		tec_leader_reset_to_cached_portrait = yes
+	}
+}
+
+tec_leader_force_update_modifiers = {
+	add_trait_no_notify = leader_trait_tec_debug_councilor
+	add_trait_no_notify = leader_trait_tec_debug_non_councilor
+	remove_trait = leader_trait_tec_debug_councilor
+	remove_trait = leader_trait_tec_debug_non_councilor
+}

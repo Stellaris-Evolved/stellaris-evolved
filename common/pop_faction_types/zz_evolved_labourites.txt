@@ -1,10 +1,10 @@
-# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
-# Egalitarian Labourite Faction
-# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
+# common\pop_faction_types\zz_evolved_labourites.txt
 
+# ------------------------------------------------- Pluralist Faction
 labourites = {
 	election_header = "GFX_faction_header_yellow"
 	guiding_ethic = ethic_pluralist
+	visual_ethic = "tec_pluralist_visual_ethic"
 	
 	unique = yes
 	support_multiplier = 1
@@ -12,41 +12,19 @@ labourites = {
 	resources = {
 		category = pop_factions
 		produces = {
-			unity = @tec_fac_infl_produce
+			unity = @faction_base_unity
 		}
-		produces = {	# Political virtue
-			trigger = {
-				exists = owner
-				owner = {
-					has_valid_civic = civic_tec_political_virtue
-				}
-				pop_faction = {
-					faction_approval >= 0.5
-				}
-			}
-			energy = 0.5
+		inline_script = {
+			script = pop_faction_types/inline_evolved_tec_political_virtue
+			ethic = pluralist
+			resource_1 = energy
+			count_1 = @tec_fac_political_virtue_basic
+			resource_2 = "#"
+			count_2 = 0
+			resource_3 = "#"
+			count_3 = 0
 		}
-		produces = {	# Political virtue
-			trigger = {
-				exists = owner
-				owner = {
-					has_valid_civic = civic_tec_political_virtue
-					is_pluralist = yes
-				}
-				pop_faction = {
-					faction_approval >= 0.5
-				}
-			}
-			energy = 0.1
-		}
-		produces = {	# Idealistic foundation
-			trigger = {
-				owner = {
-					has_valid_civic = civic_idealistic_foundation
-				}
-			}
-			influence = 0.005
-		}
+		inline_script = pop_faction_types/inline_evolved_tec_idealistic_foundation
 	}
 	
 	#Note: number of potential or actual members is checked by POP_FACTION_MIN_POTENTIAL_MEMBERS define
@@ -71,7 +49,7 @@ labourites = {
 	can_join_faction = {
 		NOT = { tec_is_shackled_robot = { cached = yes } }
 		NOT = { tec_is_shackled_bioservant = { cached = yes } }
-		NOT = { tec_has_stapled_trait = { cached = yes } }
+		NOT = { tec_has_stapled_trait ={ cached = yes } }
 	}
 	
 	attraction = {
@@ -82,7 +60,7 @@ labourites = {
 			exists = from
 			from = {
 				exists = leader
-				leader = { leader_class = ruler }
+				leader = { is_ruler = yes }
 			}
 		}
 		
@@ -105,7 +83,7 @@ labourites = {
 		base = 100
 		modifier = {
 			factor = 0
-			leader_class = ruler
+			is_ruler = yes
 			owner = { has_authority = auth_imperial }
 		}
 		
@@ -126,6 +104,18 @@ labourites = {
 		script = pop_faction_types/demand_faction_pleased
 		FLAG = galcom_resolution_passed_pro_pluralist
 	}
+
+	# Faction Demands for Ruler and Council positions.
+	inline_script = {
+		script = "factions/inline_evolved_global_faction_demands"
+		ETHIC = ethic_pluralist
+		ETHIC_FANATIC = ethic_fanatic_pluralist
+		ETHIC_OPPOSED = ethic_elitist
+		EXTRA_POTENTIAL = "
+			exists = owner
+			owner = { tec_is_aiauth_empire = no }
+		"
+	} 
 	
 	# Evolved: List of demands
 		# Pluralists want workers to be good and treated well
@@ -163,15 +153,15 @@ labourites = {
 							limit = {
 								has_modifier = planet_luxuries_boost
 							}
-							count >=1
+							count >= 1
 						}
 					}
 				}
 			}
 			demand = {	# POS - DISTRIGOODS
-				title = "TEC_FAC_PLU_DISTRIBUTEDGOODS1"
-				unfulfilled_title = "TEC_FAC_PLU_NO_DISTRIBUTEDGOODS1"
-				desc = "TEC_FAC_PLU_DISTRIBUTEDGOODS1_DESC"
+				title = "TEC_FAC_PLU_DISTRIBUTEDGOODS2"
+				unfulfilled_title = "TEC_FAC_PLU_NO_DISTRIBUTEDGOODS2"
+				desc = "TEC_FAC_PLU_DISTRIBUTEDGOODS2_DESC"
 				fulfilled_effect = 10
 				unfulfilled_effect = 0
 				potential = {
@@ -203,9 +193,9 @@ labourites = {
 				}
 			}
 			demand = {	# POS - DISTRIGOODS
-				title = "TEC_FAC_PLU_DISTRIBUTEDGOODS1"
-				unfulfilled_title = "TEC_FAC_PLU_NO_DISTRIBUTEDGOODS1"
-				desc = "TEC_FAC_PLU_DISTRIBUTEDGOODS1_DESC"
+				title = "TEC_FAC_PLU_DISTRIBUTEDGOODS3"
+				unfulfilled_title = "TEC_FAC_PLU_NO_DISTRIBUTEDGOODS3"
+				desc = "TEC_FAC_PLU_DISTRIBUTEDGOODS3_DESC"
 				fulfilled_effect = 15
 				unfulfilled_effect = 0
 				potential = {
@@ -244,7 +234,7 @@ labourites = {
 				}
 				trigger = {
 					owner = {
-						has_edict = tec_equality_edict
+						has_edict = tec_equal_opportunities
 					}
 				}
 			}
@@ -272,15 +262,23 @@ labourites = {
 										country = prev
 									}
 									has_living_standard = {
+										type = living_standard_worker_ownership
+										country = prev
+									}
+									has_living_standard = {
+										type = living_standard_tec_shared_ownership
+										country = prev
+									}
+									has_living_standard = {
 										type = living_standard_decadent
 										country = prev
 									}
 									# Excludes presapient and enslaved crafted species
 									is_sapient = no
-									owner = {
+									prev = {
 										species_rights_robot_full_rights_check_pop_faction = no
 									}
-									owner = {
+									prev = {
 										tec_species_rights_bioservant_full_rights_check_pop_faction = no
 									}
 								}
@@ -303,7 +301,7 @@ labourites = {
 					owner = {
 						OR = {
 							has_valid_civic = civic_meritocracy
-							has_valid_civic = civic_tec_patronage
+							has_valid_civic = civic_tec_regular_patronage
 							has_valid_civic = civic_shared_burden
 							has_valid_civic = civic_tec_corporate_comunistcorp
 						}
@@ -311,27 +309,27 @@ labourites = {
 				}
 			}
 			# Minimal wage
-			demand = {	# POS - WAGE
-				title = "TEC_FAC_PLU_WAGE"
-				unfulfilled_title = "TEC_FAC_PLU_NO_WAGE"
-				desc = "TEC_FAC_PLU_WAGE_DESC"
-				fulfilled_effect = 5
-				unfulfilled_effect = 0
-				potential = {
-					exists = owner
-					owner = {
-						can_set_policy = {
-							policy = minimal_wage
-							option = minimal_wage_increased
-						}
-					}
-				}
-				trigger = {
-					owner = {
-						has_policy_flag = minimal_wage_increased
-					}
-				}
-			}
+			#demand = {	# POS - WAGE
+			#	title = "TEC_FAC_PLU_WAGE"
+			#	unfulfilled_title = "TEC_FAC_PLU_NO_WAGE"
+			#	desc = "TEC_FAC_PLU_WAGE_DESC"
+			#	fulfilled_effect = 5
+			#	unfulfilled_effect = 0
+			#	potential = {
+			#		exists = owner
+			#		owner = {
+			#			can_set_policy = {
+			#				policy = minimal_wage
+			#				option = minimal_wage_increased
+			#			}
+			#		}
+			#	}
+			#	trigger = {
+			#		owner = {
+			#			has_policy_flag = minimal_wage_increased
+			#		}
+			#	}
+			#}	# OLD POLICY
 		# /
 		# Neut
 			# Democracy
@@ -385,57 +383,57 @@ labourites = {
 				}
 			}
 			# Public education
-			demand = {	# NEUT - PUBLIC EDUCATION
-				title = "TEC_FAC_PLU_FREEDUCATION"
-				unfulfilled_title = "TEC_FAC_PLU_NO_FREEDUCATION"
-				desc = "TEC_FAC_PLU_FREEDUCATION_DESC"
-				fulfilled_effect = 5
-				unfulfilled_effect = -5
-				potential = {
-					exists = owner
-					owner = {
-						can_set_policy = {
-							policy = education
-							option = public_education
-						}
-					}
-				}
-				trigger = {
-					owner = {
-						OR = {
-							has_policy_flag = mixed_education
-							has_policy_flag = public_education
-						}
-					}
-				}
-			}
+			#demand = {	# NEUT - PUBLIC EDUCATION
+			#	title = "TEC_FAC_PLU_FREEDUCATION"
+			#	unfulfilled_title = "TEC_FAC_PLU_NO_FREEDUCATION"
+			#	desc = "TEC_FAC_PLU_FREEDUCATION_DESC"
+			#	fulfilled_effect = 5
+			#	unfulfilled_effect = -5
+			#	potential = {
+			#		exists = owner
+			#		owner = {
+			#			can_set_policy = {
+			#				policy = education
+			#				option = public_education
+			#			}
+			#		}
+			#	}
+			#	trigger = {
+			#		owner = {
+			#			OR = {
+			#				has_policy_flag = mixed_education
+			#				has_policy_flag = public_education
+			#			}
+			#		}
+			#	}
+			#}	# OLD POLICY
 		# /
 
 		# Bad
 			# No reduced wage
-			demand = {	# POS - REDUCED WAGE
-				title = "TEC_FAC_PLU_REDUCED_WAGE"
-				unfulfilled_title = "TEC_FAC_PLU_REDUCED_WAGE_IS_BAD"
-				desc = "TEC_FAC_PLU_REDUCED_WAGE_DESC"
-				fulfilled_effect = 0
-				unfulfilled_effect = -5
-				potential = {
-					exists = owner
-					owner = {
-						can_set_policy = {
-							policy = minimal_wage
-							option = minimal_wage_increased
-						}
-					}
-				}
-				trigger = {
-					owner = {
-						NOT = {
-							has_policy_flag = minimal_wage_reduced
-						}
-					}
-				}
-			}
+			#demand = {	# POS - REDUCED WAGE
+			#	title = "TEC_FAC_PLU_REDUCED_WAGE"
+			#	unfulfilled_title = "TEC_FAC_PLU_REDUCED_WAGE_IS_BAD"
+			#	desc = "TEC_FAC_PLU_REDUCED_WAGE_DESC"
+			#	fulfilled_effect = 0
+			#	unfulfilled_effect = -5
+			#	potential = {
+			#		exists = owner
+			#		owner = {
+			#			can_set_policy = {
+			#				policy = minimal_wage
+			#				option = minimal_wage_increased
+			#			}
+			#		}
+			#	}
+			#	trigger = {
+			#		owner = {
+			#			NOT = {
+			#				has_policy_flag = minimal_wage_reduced
+			#			}
+			#		}
+			#	}
+			#}	# OLD POLICY
 			# No slavery
 			demand = {	# POS - NO SLAVERY
 				title = "TEC_FAC_PLU_NOSLAVERY"
@@ -461,29 +459,29 @@ labourites = {
 				}
 			}
 			# No private education
-			demand = {	# NEG - NOPRIVEDU
-				title = "TEC_FAC_PLU_NOPRIVEDU"
-				unfulfilled_title = "TEC_FAC_PLU_NO_NOPRIVEDU"
-				desc = "TEC_FAC_PLU_NOPRIVEDU_DESC"
-				fulfilled_effect = 0
-				unfulfilled_effect = -5
-				potential = {
-					exists = owner
-					owner = {
-						can_set_policy = {
-							policy = education
-							option = private_education
-						}
-					}
-				}
-				trigger = {
-					owner = {
-						NOT = {
-							has_policy_flag = private_education
-						}
-					}
-				}
-			}
+			#demand = {	# NEG - NOPRIVEDU
+			#	title = "TEC_FAC_PLU_NOPRIVEDU"
+			#	unfulfilled_title = "TEC_FAC_PLU_NO_NOPRIVEDU"
+			#	desc = "TEC_FAC_PLU_NOPRIVEDU_DESC"
+			#	fulfilled_effect = 0
+			#	unfulfilled_effect = -5
+			#	potential = {
+			#		exists = owner
+			#		owner = {
+			#			can_set_policy = {
+			#				policy = education
+			#				option = private_education
+			#			}
+			#		}
+			#	}
+			#	trigger = {
+			#		owner = {
+			#			NOT = {
+			#				has_policy_flag = private_education
+			#			}
+			#		}
+			#	}
+			#}	# OLD POLICY
 			# No democracy
 			demand = {	# POS - NO DEMOCRACY
 				title = "TEC_FAC_PLU_NODEMOCRATIC"
@@ -579,190 +577,9 @@ labourites = {
 		}
 	}
 	
-	actions = {
-		embrace_faction = {
-			title = "EMBRACE_FACTION"
-			description = "EMBRACE_FACTION_DESC"
-			
-			cost = {
-				influence = @tec_fac_embrace_cost
-			}
-			
-			potential = {
-				exists = owner
-				owner = {
-					OR = {
-						is_subject = no
-						NOT = { any_agreement = { agreement_preset = preset_dominion } }
-					}
-				}
-			}
-			
-			valid = {
-				custom_tooltip = {
-					fail_text = EMBRACE_FACTION_COOLDOWN
-					parameter:empire = {
-						NOT = { has_modifier = embraced_faction_timer }
-					}
-				}
-				support > @tec_fac_embrace_min_support
-				parameter:empire = {
-					NOT = { has_ethic = "ethic_fanatic_pluralist" }
-				}
-			}
-
-			effect = {
-				add_modifier = { modifier = embraced_faction days = @tec_fac_embrace_cd}
-				parameter:empire = {
-					shift_ethic = ethic_pluralist
-					hidden_effect = {
-						add_modifier = { modifier = embraced_faction_timer days = @tec_fac_embrace_cd}
-						every_pop_faction = {
-							limit = { NOT = { is_same_value = root } }
-							add_modifier = { modifier = embraced_another_faction days = @tec_fac_embrace_cd}
-						}
-					}
-				}
-				hidden_effect = {
-					save_event_target_as = TargetFaction
-					parameter:empire = {
-						every_relation = {
-							limit = {
-								is_ai = no
-								tec_is_default_country = yes
-								has_communications = prev
-							}
-							country_event = { id = factions.2000 }
-						}
-					}
-				}
-			}
-			
-			ai_weight = {
-				base = 1
-				modifier = {
-					factor = 0
-					support < 0.50
-					owner = {
-						has_ethic = ethic_pluralist
-					}
-				}
-				modifier = {
-					factor = 0
-					owner = { has_valid_civic = civic_fanatic_purifiers }
-				}
-				modifier = {
-					factor = 0
-					NOT = {
-						owner = {
-							exists = ruler
-							ruler = {
-								leader_of_faction = labourites
-							}
-						}
-					}
-				}
-				modifier = {
-					factor = 0
-					owner = {
-						count_pop_faction = {
-							count < 4
-						}
-					}
-				}
-			}
-		}
-		promote_faction = {
-			title = "PROMOTE_FACTION"
-			description = "PROMOTE_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					NOR = {
-						has_modifier = suppressed_pluralist
-						has_modifier = promoted_pluralist 
-					}
-				}
-			}
-
-			effect = {
-				parameter:empire = {
-					add_modifier = { modifier = promoted_pluralist days = -1 }
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
-		cancel_promote_faction = {
-			title = "CANCEL_PROMOTE_FACTION"
-			description = "CANCEL_PROMOTE_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					has_modifier = promoted_pluralist
-				}
-			}
-
-			effect = {
-				parameter:empire = {
-					remove_modifier = promoted_pluralist
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
-		suppress_faction = {
-			title = "SUPPRESS_FACTION"
-			description = "SUPPRESS_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					NOR = {
-						has_modifier = suppressed_pluralist
-						has_modifier = promoted_pluralist 
-					}
-				}
-			}
-
-			effect = {
-				add_modifier = { modifier = suppressed_faction days = -1 }
-				parameter:empire = {
-					add_modifier = { modifier = suppressed_pluralist days = -1 }
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
-		cancel_suppress_faction = {
-			title = "CANCEL_SUPPRESS_FACTION"
-			description = "CANCEL_SUPPRESS_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					has_modifier = suppressed_pluralist
-				}
-			}
-
-			effect = {
-				remove_modifier = suppressed_faction
-				parameter:empire = {
-					remove_modifier = suppressed_pluralist
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
+	inline_script = { 
+			script = factions/inline_evolved_actions
+			ETHIC = pluralist
+		
 	}
 }

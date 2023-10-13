@@ -35,10 +35,8 @@
 @tec_arc_hab_maintenance_sr = 1
 
 # Specs
-	# Base : 		Habitation + Industrial + Generator + leisure
 	# Industrial: 	Habitation + Alloys + CG + Secondary
 	# Civil:		Habitation + Research + Admin + Secondary
-	# Refinery: 	Habitation + Generator + Refinery + Secondary
 
 # --------------- Habitation
 district_tec_hab_arcology_housing = {
@@ -55,16 +53,32 @@ district_tec_hab_arcology_housing = {
 		tec_is_arcology_habitat = yes
 	}
 
+	allow = {
+		tec_ai_allow_housing_district = {
+			housing = 5
+			has_building_slots = "always = yes"
+			use_for_jobs = "
+			tec_has_maintenance_drone_jobs_available = no
+			"
+		}
+	}
+
 	conversion_ratio = 1.5
 	inline_script = districts/convert_to/inline_evolved_housing_districts
 
 	resources = {
-		category = planet_districts
-		cost = {
-			minerals = @tec_arc_hab_cost
+		category = planet_districts_cities
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_arc_cost
+			upkeep = @tec_district_arc_upkeep
 		}
 		upkeep = {
-			energy = @tec_arc_hab_maintenance
+			alloys = @tec_district_hab_upkeep_alloys_high
 		}
 	}
 
@@ -112,11 +126,6 @@ district_tec_hab_arcology_housing = {
 	# /
 
 	inline_script = {
-		script = districts/compat/inline_evolved_starnet_housing_district
-		count = 2
-	}
-
-	inline_script = {
 		script = districts/inline_evolved_aibait_housing
 		has_building_slots = "
 			always = yes
@@ -125,7 +134,6 @@ district_tec_hab_arcology_housing = {
 }
 
 # --------------- Auxiliary
-
 district_tec_hab_arcology_trade = {
 	icon = district_hab_commercial
 	base_buildtime = 600
@@ -153,24 +161,43 @@ district_tec_hab_arcology_trade = {
 	inline_script = districts/convert_to/inline_evolved_housing_districts
 
 	resources = {
-		category = planet_districts
-		cost = {
-			minerals = @tec_arc_hab_cost
-			rare_crystals = @tec_arc_hab_cost_sr
+		category = planet_districts_hab_trade
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_arc_cost
+			upkeep = @tec_district_arc_upkeep
+		}
+		inline_script = {
+			script = districts/resources/inline_evolved_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				always = yes
+			"
+			rare = rare_crystals
+			rare_cost = @tec_district_arc_sr_cost
+			rare_upkeep = @tec_district_arc_sr_upkeep
 		}
 		upkeep = {
-			energy = @tec_arc_hab_maintenance
-			rare_crystals = @tec_arc_hab_maintenance_sr
+			alloys = @tec_district_hab_upkeep_alloys_high
 		}
 	}
 
 	# Modifiers
-		# Standard
-			planet_modifier = {
-				planet_housing_add = 5
-				trade_value_add = 10
-			}
-		# /
+		planet_modifier = {
+			planet_housing_add = 5
+			trade_value_add = 10
+		}
+	# /
+	# Effect Types
+		inline_script = {
+			script = districts/type/inline_evolved_trade
+			trader_scale = 1
+			trigger = ""
+			trader_trigger = ""
+		}
 	# /
 	# Jobs
 		# Regular
@@ -183,30 +210,11 @@ district_tec_hab_arcology_trade = {
 			}
 			
 			inline_script = {
-				script = districts/effects/inline_evolved_mercantile_trickle_up_economics
-				count = 1
-				trigger = ""
-			}
-
-			
-			inline_script = {
-				script = jobs/inline_evolved_job
-				job = merchant
+				script = jobs/inline_evolved_trader
 				count = 1
 				mult = 1
 				display = with_desc
-				trigger = "
-					exists = owner
-					owner = {
-						is_regular_empire = yes
-					}
-				"
-			}
-
-			inline_script = {
-				script = districts/effects/inline_evolved_mercantile_commercial_enterprise
 				trigger = ""
-				count = 1
 			}
 		# /
 		# Gestalt
@@ -231,17 +239,9 @@ district_tec_hab_arcology_trade = {
 					}
 				"
 			}
-
-			inline_script = {
-				script = districts/effects/inline_evolved_tec_mercantile_commercial_enterprise_gestalt
-				trigger = ""
-				count = 1
-			}
 		# /
 	# /
 }
-
-
 
 # --------------- Production
 district_tec_hab_arcology_foundry = {
@@ -264,17 +264,28 @@ district_tec_hab_arcology_foundry = {
 
 	resources = {
 		category = planet_districts_hab_industrial
-		cost = {
-			minerals = @tec_arc_hab_cost
-			volatile_motes = @tec_arc_hab_cost_sr
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_arc_cost
+			upkeep = @tec_district_arc_upkeep
+		}
+		inline_script = {
+			script = districts/resources/inline_evolved_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				always = yes
+			"
+			rare = volatile_motes
+			rare_cost = @tec_district_arc_sr_cost
+			rare_upkeep = @tec_district_arc_sr_upkeep
 		}
 		upkeep = {
-			energy = @tec_arc_hab_maintenance
-			volatile_motes = @tec_arc_hab_maintenance_sr
+			alloys = @tec_district_hab_upkeep_alloys_high
 		}
-		produces = {
-			alloys = 5
-		}
+
 		inline_script = districts/resources/inline_evolved_industrial_maintenance_upkeep
 	}
 
@@ -318,17 +329,28 @@ district_tec_hab_arcology_industry = {
 
 	resources = {
 		category = planet_districts_hab_industrial
-		cost = {
-			minerals = @tec_arc_hab_cost
-			rare_crystals = @tec_arc_hab_cost_sr
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_arc_cost
+			upkeep = @tec_district_arc_upkeep
+		}
+		inline_script = {
+			script = districts/resources/inline_evolved_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				always = yes
+			"
+			rare = rare_crystals
+			rare_cost = @tec_district_arc_sr_cost
+			rare_upkeep = @tec_district_arc_sr_upkeep
 		}
 		upkeep = {
-			energy = @tec_arc_hab_maintenance
-			rare_crystals = @tec_arc_hab_maintenance_sr
+			alloys = @tec_district_hab_upkeep_alloys_high
 		}
-		produces = {
-			consumer_goods = 5
-		}
+
 		inline_script = districts/resources/inline_evolved_industrial_maintenance_upkeep
 	}
 
@@ -367,25 +389,42 @@ district_tec_hab_arcology_research = {
 		has_planet_flag = tec_civil_habitat
 	}
 
+	allow = {
+		tec_allow_research_buildings_and_districts = yes
+	}
+
 	conversion_ratio = 1
 	inline_script = districts/convert_to/inline_evolved_research_districts
 	inline_script = districts/convert_to/inline_evolved_industrial_districts
 
 	resources = {
-		category = planet_districts_hab_industrial
-		cost = {
-			minerals = @tec_arc_hab_cost
-			exotic_gases = @tec_arc_hab_cost_sr
+		category = planet_districts_hab_research
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_arc_cost
+			upkeep = @tec_district_arc_upkeep
+		}
+		inline_script = {
+			script = districts/resources/inline_evolved_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				always = yes
+			"
+			rare = exotic_gases
+			rare_cost = @tec_district_arc_sr_cost
+			rare_upkeep = @tec_district_arc_sr_upkeep
 		}
 		upkeep = {
-			energy = @tec_arc_hab_maintenance
-			exotic_gases = @tec_arc_hab_maintenance_sr
+			alloys = @tec_district_hab_upkeep_alloys_high
 		}
 
 		produces = {
-			physics_research = 10
-			society_research = 10
-			engineering_research = 10
+			physics_research = 5
+			society_research = 5
+			engineering_research = 5
 		}
 	}
 
@@ -417,11 +456,19 @@ district_tec_hab_arcology_administration = {
 	show_on_uncolonized = {
 		tec_is_arcology_habitat = yes
 		has_planet_flag = tec_civil_habitat
+		exists = from
+		from = {
+			NOT = { has_valid_civic = civic_machine_servitor }
+		}
 	}
 	
 	potential = {
 		tec_is_arcology_habitat = yes
 		has_planet_flag = tec_civil_habitat
+		exists = owner
+		owner = {
+			NOT = { has_valid_civic = civic_machine_servitor }
+		}
 	}
 
 	conversion_ratio = 1
@@ -429,18 +476,31 @@ district_tec_hab_arcology_administration = {
 	inline_script = districts/convert_to/inline_evolved_industrial_districts
 	
 	resources = {
-		category = planet_districts
-		cost = {
-			minerals = @tec_arc_hab_cost
-			rare_crystals = @tec_arc_hab_cost_sr
+		category = planet_districts_hab_leisure
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_arc_cost
+			upkeep = @tec_district_arc_upkeep
+		}
+		inline_script = {
+			script = districts/resources/inline_evolved_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				always = yes
+			"
+			rare = rare_crystals
+			rare_cost = @tec_district_arc_sr_cost
+			rare_upkeep = @tec_district_arc_sr_upkeep
 		}
 		upkeep = {
-			energy = @tec_arc_hab_maintenance
-			rare_crystals = @tec_arc_hab_maintenance_sr
+			alloys = @tec_district_hab_upkeep_alloys_high
 		}
 
 		produces = {
-			unity = 10
+			unity = 5
 		}
 	}
 	
@@ -529,13 +589,37 @@ district_tec_hab_arcology_leisure = {
 
 	show_on_uncolonized = {
 		tec_is_arcology_habitat = yes
+		exists = from
+		from = {
+			OR = {
+				is_regular_empire = yes
+				has_valid_civic = civic_machine_servitor
+			}
+		}
 	}
 
 	potential = {
 		tec_is_arcology_habitat = yes
+		exists = owner
+		owner = {
+			OR = {
+				is_regular_empire = yes
+				has_valid_civic = civic_machine_servitor
+			}
+		}
 		NOR = {
 			has_building = building_order_keep
 			has_building = building_order_castle
+		}
+	}
+
+	allow = {
+		tec_ai_allow_leisure_district = yes
+	}
+
+	destroy_trigger = {
+		tec_ai_destroy_leisure_district = {
+			amenities = 40
 		}
 	}
 
@@ -545,13 +629,26 @@ district_tec_hab_arcology_leisure = {
 
 	resources = {
 		category = planet_districts_hab_leisure
-		cost = {
-			minerals = @tec_arc_hab_cost
-			exotic_gases = @tec_arc_hab_cost_sr
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_arc_cost
+			upkeep = @tec_district_arc_upkeep
+		}
+		inline_script = {
+			script = districts/resources/inline_evolved_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				always = yes
+			"
+			rare = exotic_gases
+			rare_cost = @tec_district_arc_sr_cost
+			rare_upkeep = @tec_district_arc_sr_upkeep
 		}
 		upkeep = {
-			energy = @tec_arc_hab_maintenance
-			exotic_gases = @tec_arc_hab_maintenance_sr
+			alloys = @tec_district_hab_upkeep_alloys_high
 		}
 	}
 
@@ -579,44 +676,36 @@ district_tec_hab_arcology_leisure = {
 	# Jobs
 		# Regular
 			inline_script = {
-				script = jobs/inline_evolved_entertainer
-				count = 5
-				mult = 1
-				display = with_desc
-				trigger = ""
-			}
-		# /
-		# Gestalt 
-			inline_script = {
-				script = jobs/inline_evolved_maintenance_drone
+				script = jobs/inline_evolved_enforcer
 				count = 3
-				mult = 1
-				display = with_desc
-				trigger = ""
-			}
-		# / 
-		# Hive
-			inline_script = {
-				script = jobs/inline_evolved_synapse
-				count = 2
-				mult = 1
-				display = with_desc
-				trigger = ""
-			}
-		# /
-		# Machine
-			inline_script = {
-				script = jobs/inline_evolved_coordinator
-				count = 2
 				mult = 1
 				display = with_desc
 				trigger = "
 					owner = {
-						NOT = {
-							has_valid_civic = civic_machine_servitor
-						}
+						tec_is_dystopian_empire = yes
 					}
 				"
+			}
+
+			inline_script = {
+				script = jobs/inline_evolved_entertainer
+				count = 5
+				mult = 1
+				display = with_desc
+				trigger = "
+					owner = {
+						tec_is_dystopian_empire = no
+					}
+				"
+			}
+		# /
+		# Machine
+			inline_script = {
+				script = jobs/inline_evolved_maintenance_drone
+				count = 2
+				mult = 1
+				display = with_desc
+				trigger = ""
 			}
 
 			inline_script = {
@@ -645,7 +734,9 @@ district_tec_hab_arcology_maintenance = {
 		tec_is_arcology_habitat = yes
 		exists = from
 		from = {
+			is_gestalt = yes
 			tec_uses_trade_value = no
+			NOT = { has_valid_civic = civic_machine_servitor }
 		}
 	}
 
@@ -653,7 +744,19 @@ district_tec_hab_arcology_maintenance = {
 		tec_is_arcology_habitat = yes
 		exists = owner
 		owner = {
+			is_gestalt = yes
 			tec_uses_trade_value = no
+			NOT = { has_valid_civic = civic_machine_servitor }
+		}
+	}
+
+	allow = {
+		tec_ai_allow_leisure_district = yes
+	}
+
+	destroy_trigger = {
+		tec_ai_destroy_leisure_district = {
+			amenities = 30
 		}
 	}
 
@@ -662,12 +765,22 @@ district_tec_hab_arcology_maintenance = {
 	inline_script = districts/convert_to/inline_evolved_housing_districts
 
 	resources = {
-		category = planet_districts
-		cost = {
-			minerals = @tec_arc_hab_cost
+		category = planet_districts_hab_leisure
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_arc_cost
+			upkeep = @tec_district_arc_upkeep_low
 		}
+		upkeep = {
+			alloys = @tec_district_hab_upkeep_alloys_high
+		}
+
 		produces = {
-			energy = 10
+			energy = 5
 		}
 	}
 
@@ -688,6 +801,7 @@ district_tec_hab_arcology_maintenance = {
 				display = with_desc
 				trigger = ""
 			}
+
 			inline_script = {
 				script = jobs/inline_evolved_maintenance_drone
 				count = 2
@@ -699,9 +813,11 @@ district_tec_hab_arcology_maintenance = {
 			inline_script = {
 				script = jobs/inline_evolved_technician
 				regular_count = 2
+				regular_secondary_count = 2
 				hive_count = 2
+				hive_secondary_count = 2
 				machine_count = 2
-				machine_aquatic_count = 2
+				machine_secondary_count = 2
 				mult = 1
 				display = with_desc
 				trigger = ""
@@ -710,8 +826,9 @@ district_tec_hab_arcology_maintenance = {
 	# /
 
 	# Starnet
-	inline_script = {
-		script = districts/compat/inline_evolved_starnet_generator_district
-		count = 1
-	}
+		inline_script = {
+			script = districts/compat/inline_evolved_starnet_generator_district
+			count = 1
+		}
+	# /
 }

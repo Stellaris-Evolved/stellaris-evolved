@@ -1,10 +1,10 @@
-# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
-# Individualists Bankers Faction
-# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
+# common\pop_faction_types\zz_evolved_bankers.txt
 
+# ------------------------------------------------- Competitive Faction
 bankers = {
 	election_header = "GFX_faction_header_yellow"
 	guiding_ethic = ethic_capitalism
+	visual_ethic = "tec_competitive_visual_ethic"
 	
 	unique = yes
 	support_multiplier = 1
@@ -12,41 +12,19 @@ bankers = {
 	resources = {
 		category = pop_factions
 		produces = {
-			unity = @tec_fac_infl_produce
+			unity = @faction_base_unity
 		}
-		produces = {	# Political virtue
-			trigger = {
-				exists = owner
-				owner = {
-					has_valid_civic = civic_tec_political_virtue
-				}
-				pop_faction = {
-					faction_approval >= 0.5
-				}
-			}
-			energy = 0.5
+		inline_script = {
+			script = pop_faction_types/inline_evolved_tec_political_virtue
+			ethic = capitalism
+			resource_1 = energy
+			count_1 = @tec_fac_political_virtue_basic
+			resource_2 = "#"
+			count_2 = 0
+			resource_3 = "#"
+			count_3 = 0
 		}
-		produces = {	# Political virtue
-			trigger = {
-				exists = owner
-				owner = {
-					has_valid_civic = civic_tec_political_virtue
-					is_competitive = yes
-				}
-				pop_faction = {
-					faction_approval >= 0.5
-				}
-			}
-			energy = 0.1
-		}
-		produces = {	# Idealistic foundation
-			trigger = {
-				owner = {
-					has_valid_civic = civic_idealistic_foundation
-				}
-			}
-			influence = 0.005
-		}
+		inline_script = pop_faction_types/inline_evolved_tec_idealistic_foundation
 	}
 
 	#Note: number of potential or actual members is checked by POP_FACTION_MIN_POTENTIAL_MEMBERS define
@@ -71,7 +49,7 @@ bankers = {
 	can_join_faction = {
 		NOT = { tec_is_shackled_robot = { cached = yes } }
 		NOT = { tec_is_shackled_bioservant = { cached = yes } }
-		NOT = { tec_has_stapled_trait = { cached = yes } }
+		NOT = { tec_has_stapled_trait ={ cached = yes } }
 	}
 	
 	attraction = {
@@ -82,7 +60,7 @@ bankers = {
 			exists = from
 			from = {
 				exists = leader
-				leader = { leader_class = ruler }
+				leader = { is_ruler = yes }
 			}
 		}
 		
@@ -106,7 +84,7 @@ bankers = {
 
 		modifier = {
 			factor = 0
-			leader_class = ruler
+			is_ruler = yes
 			owner = { has_authority = auth_imperial }
 		}
 
@@ -127,6 +105,18 @@ bankers = {
 		script = pop_faction_types/demand_faction_pleased
 		FLAG = galcom_resolution_passed_pro_competitive
 	}
+
+	# Faction Demands for Ruler and Council positions.
+	inline_script = {
+		script = "factions/inline_evolved_global_faction_demands"
+		ETHIC = ethic_capitalism
+		ETHIC_FANATIC = ethic_fanatic_capitalism
+		ETHIC_OPPOSED = ethic_socialism
+		EXTRA_POTENTIAL = "
+			exists = owner
+			owner = { tec_is_aiauth_empire = no }
+		"
+	} 
 
 	# ----------------------- D E M A N D S -----------------------
 		# Pos scaling
@@ -404,6 +394,15 @@ bankers = {
 											}
 											has_living_standard = { type = living_standard_decadent country = prev }
 										}
+										AND = {	# Dystopian is ofc also allowed
+											prev = {
+												tec_is_dystopian_empire = yes
+											}
+											OR = {
+												has_living_standard = { type = living_standard_dystopian_society country = prev }
+												has_living_standard = { type = living_standard_tec_chemical_dystopian_society country = prev }
+											}
+										}
 									}
 								}
 							}
@@ -417,8 +416,8 @@ bankers = {
 							}
 							# Has specific civic
 							has_civic = civic_slaver_guilds
-							has_civic = civic_tec_forced_reeducation
-							has_civic = civic_tec_caste_system
+							has_civic = civic_tec_regular_forced_reeducation
+							has_civic = civic_tec_regular_caste_system
 						}
 					}
 				}
@@ -472,27 +471,27 @@ bankers = {
 				}
 			}
 			# No planned economy
-			demand = {	# NEG - NO PLANNED ECONOMY
-				title = "TEC_FAC_COMP_NO_PLANNED_ECO"
-				unfulfilled_title = "TEC_FAC_COMP_PLANNED_ECO_IS_BAD"
-				desc = "TEC_FAC_COMP_NO_PLANNED_ECO_DESC"
-				fulfilled_effect = 0
-				unfulfilled_effect = -25
-				potential = {
-					exists = owner
-					owner = {
-						can_set_policy = {
-							policy = economic_stance
-							option = economic_stance_planned
-						}
-					}
-				}
-				trigger = {
-					owner = {
-						has_policy_flag = economic_stance_planned
-					}
-				}
-			}
+			#demand = {	# NEG - NO PLANNED ECONOMY
+			#	title = "TEC_FAC_COMP_NO_PLANNED_ECO"
+			#	unfulfilled_title = "TEC_FAC_COMP_PLANNED_ECO_IS_BAD"
+			#	desc = "TEC_FAC_COMP_NO_PLANNED_ECO_DESC"
+			#	fulfilled_effect = 0
+			#	unfulfilled_effect = -25
+			#	potential = {
+			#		exists = owner
+			#		owner = {
+			#			can_set_policy = {
+			#				policy = economic_stance
+			#				option = economic_stance_planned
+			#			}
+			#		}
+			#	}
+			#	trigger = {
+			#		owner = {
+			#			has_policy_flag = economic_stance_planned
+			#		}
+			#	}
+			#}	# OLD POLICY
 			# No social welfare
 			demand = {	# NEG - NO SOCIAL WELFARE
 				title = "TEC_FAC_COMP_NO_WELFARE"
@@ -568,196 +567,10 @@ bankers = {
 		}
 	}
 	
-	actions = {
-		embrace_faction = {
-			title = "EMBRACE_FACTION"
-			description = "EMBRACE_FACTION_DESC"
-			
-			cost = {
-				influence = @tec_fac_embrace_cost
-			}
-			
-			potential = {
-				exists = owner
-				owner = {
-					OR = {
-						is_subject = no
-						NOT = { any_agreement = { agreement_preset = preset_dominion } }
-					}
-				}
-			}
-			
-			valid = {
-				custom_tooltip = {
-					fail_text = EMBRACE_FACTION_COOLDOWN
-					parameter:empire = {
-						NOT = { has_modifier = embraced_faction_timer }
-					}
-				}
-				support > @tec_fac_embrace_min_support
-				parameter:empire = {
-					NOT = { has_ethic = "ethic_fanatic_capitalism" }
-				}
-			}
-
-			effect = {
-				add_modifier = { modifier = embraced_faction days = @tec_fac_embrace_cd}
-				parameter:empire = {
-					shift_ethic = ethic_capitalism
-					hidden_effect = {
-						add_modifier = { modifier = embraced_faction_timer days = @tec_fac_embrace_cd}
-						every_pop_faction = {
-							limit = { NOT = { is_same_value = root } }
-							add_modifier = { modifier = embraced_another_faction days = @tec_fac_embrace_cd}
-						}
-					}
-				}
-				hidden_effect = {
-					save_event_target_as = TargetFaction
-					parameter:empire = {
-						every_relation = {
-							limit = {
-								is_ai = no
-								tec_is_default_country = yes
-								has_communications = prev
-								has_intel_level = {
-									who = prev
-									category = government
-									level >= 1
-								}
-							}
-							country_event = { id = factions.2000 }
-						}
-					}
-				}
-			}
-			
-			ai_weight = {
-				base = 1
-				modifier = {
-					factor = 0
-					support < 0.50
-					owner = {
-						has_ethic = ethic_capitalism
-					}
-				}
-				modifier = {
-					factor = 0
-					owner = { has_valid_civic = civic_fanatic_purifiers }
-				}
-				modifier = {
-					factor = 0
-					NOT = {
-						owner = {
-							exists = ruler
-							ruler = {
-								leader_of_faction = bankers
-							}
-						}
-					}
-				}
-				modifier = {
-					factor = 0
-					owner = {
-						count_pop_faction = {
-							count < 4
-						}
-					}
-				}
-			}
-		}
-		promote_faction = {
-			title = "PROMOTE_FACTION"
-			description = "PROMOTE_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					NOR = {
-						has_modifier = suppressed_capitalism
-						has_modifier = promoted_capitalism
-					}
-				}
-			}
-
-			effect = {
-				parameter:empire = {
-					add_modifier = { modifier = promoted_capitalism days = -1 }
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
-		cancel_promote_faction = {
-			title = "CANCEL_PROMOTE_FACTION"
-			description = "CANCEL_PROMOTE_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					has_modifier = promoted_capitalism
-				}
-			}
-
-			effect = {
-				parameter:empire = {
-					remove_modifier = promoted_capitalism
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
-		suppress_faction = {
-			title = "SUPPRESS_FACTION"
-			description = "SUPPRESS_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					NOR = {
-						has_modifier = suppressed_capitalism
-						has_modifier = promoted_capitalism 
-					}
-				}
-			}
-
-			effect = {
-				add_modifier = { modifier = suppressed_faction days = -1 }
-				parameter:empire = {
-					add_modifier = { modifier = suppressed_capitalism days = -1 }
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
-		cancel_suppress_faction = {
-			title = "CANCEL_SUPPRESS_FACTION"
-			description = "CANCEL_SUPPRESS_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					has_modifier = suppressed_capitalism
-				}
-			}
-
-			effect = {
-				remove_modifier = suppressed_faction
-				parameter:empire = {
-					remove_modifier = suppressed_capitalism
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
+	inline_script = { 
+			script = factions/inline_evolved_actions
+			ETHIC = capitalism
+		
 	}
 }
 

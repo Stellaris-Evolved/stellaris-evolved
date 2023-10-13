@@ -1,0 +1,293 @@
+# events\!!_necroids_events_2.txt
+
+############################
+#
+# Necroids Events
+# Written by Gemma Thomson
+#
+############################
+
+namespace = necroids
+
+#How much more or less likely a given sacrifice result should be, if the number of Mortal Initiates is within each effect's stated bounds.
+@sacrificeUpWeighting = 5
+@sacrificeDownWeighting = 0.1
+
+#Sacrifice: Togetherness (fired by edict)
+country_event = {
+	id = necroids.200
+	title = necroids.200.name
+	desc = necroids.200.desc
+	picture = GFX_evt_alien_propaganda
+	show_sound = event_death_cult
+	location = capital_scope
+	is_triggered_only = yes
+
+	trigger = {
+		is_spiritualist = yes
+		OR = {
+			has_valid_civic = civic_death_cult
+			has_valid_civic = civic_death_cult_corporate
+		}
+	}
+
+	immediate = {
+		death_cult_sacrifice_effect = yes
+	}
+
+	option = {
+		name = PRAISE
+		add_modifier = {
+			modifier = sacrifice_togetherness_mod
+			days = 1800
+			multiplier = sacrifice_result_mult
+			time_multiplier = edict_length_modifiers
+		}
+	}
+	
+	# Evolved
+	# Changed the option based on the playstyle
+	# NOTE: This is a experiment, not yet done
+		#option = {	# Regular
+		#	name = PRAISE
+		#	trigger = {
+		#		tec_is_organic_assembly_focus_empire = no
+		#		tec_is_robotic_assembly_focus_empire = no
+		#	}
+		#	add_modifier = {
+		#		modifier = sacrifice_togetherness_mod
+		#		days = 1800
+		#		multiplier = sacrifice_result_mult
+		#		time_multiplier = edict_length_modifiers
+		#	}
+		#}
+		#option = {	# Organic
+		#	name = PRAISE
+		#	trigger = {
+		#		tec_is_organic_assembly_focus_empire = yes
+		#	}
+		#	add_modifier = {
+		#		modifier = sacrifice_togetherness_mod
+		#		days = 1800
+		#		multiplier = sacrifice_result_mult
+		#		time_multiplier = edict_length_modifiers
+		#	}
+		#}
+		#option = {	# Robotic
+		#	name = PRAISE
+		#	trigger = {
+		#		tec_is_robotic_assembly_focus_empire = yes
+		#	}
+		#	add_modifier = {
+		#		modifier = sacrifice_togetherness_mod_robotic
+		#		days = 1800
+		#		multiplier = sacrifice_result_mult
+		#		time_multiplier = edict_length_modifiers
+		#	}
+		#}
+	# /
+
+	after = {
+		hidden_effect = {
+			every_subject = {
+				limit = { has_country_flag = recent_overlord_sacrifice }
+				remove_country_flag = recent_overlord_sacrifice
+				add_modifier = {
+					modifier = sacrifice_togetherness_mod_overlord
+					days = 1800
+				}
+				create_message = {
+					type = MESSAGE_OVERLORD_SACRIFICE
+					localization = MESSAGE_OVERLORD_SACRIFICE_DESC
+					days = 30
+					target = prev.capital_scope
+				}
+			}
+			clear_variable = sacrifice_result_mult
+			clear_variable = edict_length_modifiers
+		}
+	}
+}
+
+
+
+
+# Cordyceptic Drones
+# necroids.300
+
+starbase_event = {
+	id = necroids.305
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		owner = {
+			has_valid_civic = civic_hive_cordyceptic_drones
+		}
+		has_starbase_building = cordyceptic_reanimation_facility
+		NOT = {
+			has_starbase_flag = tec_cordyceptic_timer_anticheese
+		}
+	}
+	immediate = {
+		starbase_event = {
+			id = necroids.305
+			days = @tec_cordyceptic_timer
+		}
+		# Made this flag with 5 days fewer than the max limit to avoid people building the
+		# > cordyceptic building multiple times to get multiple fleets
+		set_timed_starbase_flag = {
+			flag = tec_cordyceptic_timer_anticheese
+			days = @tec_cordyceptic_timer_anticheese
+		}
+		solar_system = {
+			save_event_target_as = cordyceptic_reanimation_system
+		}
+		if = {
+			limit = {
+				solar_system = {
+					OR = {
+						has_star_flag = tiyanki_graveyard_system
+						has_star_flag = tiyanki_spawn_system
+					}
+				}
+			}
+			owner = {
+				create_fleet = {
+					effect = {
+						set_owner = root.owner
+						while = {
+							count = 5
+							create_ship = {
+								name = NAME_Reanimated_Tiyanki_Cow
+								design = NAME_Reanimated_Tiyanki_Cow
+								prefix = yes
+							}
+						}
+						while = {
+							count = 3
+							create_ship = {
+								name = NAME_Reanimated_Tiyanki_Bull
+								design = NAME_Reanimated_Tiyanki_Bull
+								prefix = yes
+							}
+						}
+						while = {
+							count = 8
+							create_ship = {
+								name = NAME_Reanimated_Tiyanki_Calf
+								design = NAME_Reanimated_Tiyanki_Calf
+								prefix = yes
+							}
+						}
+						set_location = root.solar_system
+					}
+				}
+			}
+			owner = {
+				create_message = {
+					type = MESSAGE_REANIMATION_COMPLETE
+					localization = MESSAGE_REANIMATION_COMPLETE_TIYANKI_DESC
+					days = 30
+					target = root
+					variable = {
+						type = name
+						localization = SYSTEM
+						scope = event_target:cordyceptic_reanimation_system
+					}
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				solar_system = {
+					has_star_flag = amoeba_home_system
+				}
+			}
+			owner = {
+				create_fleet = {
+					effect = {
+						set_owner = root.owner
+						while = {
+							count = 12
+							create_ship = {
+								name = NAME_Reanimated_Great_Space_Organism
+								design = NAME_Reanimated_Great_Space_Organism
+								prefix = yes
+							}
+						}
+						while = {
+							count = 6
+							create_ship = {
+								name = NAME_Reanimated_Small_Space_Organism
+								design = NAME_Reanimated_Small_Space_Organism
+								prefix = yes
+							}
+						}
+						set_location = root.solar_system
+					}
+				}
+			}
+			owner = {
+				create_message = {
+					type = MESSAGE_REANIMATION_COMPLETE
+					localization = MESSAGE_REANIMATION_AMOEBA_TIYANKI_DESC
+					days = 30
+					target = root
+					variable = {
+						type = name
+						localization = SYSTEM
+						scope = event_target:cordyceptic_reanimation_system
+					}
+				}
+			}
+		}
+		# Evolved
+		# Inhabited non capital planets produce 1 amoeba each 5 years
+		# Capital produce 3 extra amoebas each 5 years
+		# No message
+			else = {
+				if = {		# Capital
+					limit = {
+						solar_system = {
+							is_capital_system = yes
+						}
+					}
+					owner = {
+						create_fleet = {
+							effect = {
+								set_owner = prev
+								while = {
+									count = 3
+									create_ship = {
+										name = NAME_Reanimated_Small_Space_Organism
+										design = NAME_Reanimated_Small_Space_Organism
+										prefix = yes
+									}
+								}
+								set_location = root.solar_system
+							}
+						}
+					}
+				}
+				else = {	# Non capital inhabited planet
+					owner = {
+						create_fleet = {
+							effect = {
+								set_owner = prev
+								while = {
+									count = 1
+									create_ship = {
+										name = NAME_Reanimated_Small_Space_Organism
+										design = NAME_Reanimated_Small_Space_Organism
+										prefix = yes
+									}
+								}
+								set_location = root.owner.capital_star
+							}
+						}
+					}
+				}
+			}
+		# /
+	}
+}

@@ -54,44 +54,24 @@
 
 tech_weight_likelihood = {
 	base = 1.25
-	modifier = {
-		add = 1.25
-		OR = {
-			has_valid_civic = civic_tec_science_directorate
-			has_valid_civic = civic_tec_corporate_innovative
-			has_valid_civic = civic_tec_hive_anaxiomatic
-		}
-	}
+	#modifier = {
+	#	add = 1.25
+	#	OR = {
+	#		has_valid_civic = civic_tec_regular_science_directorate
+	#		has_valid_civic = civic_tec_corporate_innovative
+	#		has_valid_civic = civic_tec_hive_anaxiomatic
+	#	}
+	#}
 }
 
+tec_conclave_election_priest_percentage_value = {
+	add = value:tec_priest_jobs_value
+	divide = trigger:num_pops
+	mult = 200
+}
 
 conclave_election_value = {
-	complex_trigger_modifier = {
-		trigger = pop_percentage
-		parameters = {
-			limit = {
-				OR = {
-					has_job = priest
-					has_job = high_priest
-					has_job = death_priest
-					has_job = mortal_initiate
-					has_job = preacher
-					#Evolved jobs
-					has_job = tec_ai_high_ordinator
-					has_job = tec_ai_ordinator
-					has_job = tec_grand_occultist
-					has_job = tec_minor_occultist
-					has_job = tec_mecha_priest
-					has_job = tec_techno_priest
-					has_job = druid
-					has_Job = templar
-					has_job = transcend
-				}
-			}
-		}
-		mode = add
-		mult = 200 #normalising percentage, then x2
-	}
+	add = value:tec_conclave_election_priest_percentage_value
 
 	mult = value:conclave_election_robots_value
 	mult = value:conclave_election_ascension_value
@@ -111,7 +91,7 @@ conclave_election_value = {
 	modifier = {
 		factor = 5
 		exists = ruler
-		ruler = { has_trait = leader_trait_ruler_chosen }
+		ruler = { has_trait = leader_trait_chosen }
 	}
 	modifier = {
 		factor = 1.25
@@ -145,3 +125,442 @@ conclave_election_value = {
 		is_subject = yes
 	}
 }
+
+toxic_attendant_growth = {
+	base = 1
+	add = value:industrial_districts_value
+}
+
+job_weights_manual_corrections = {
+	#What comes below fixes an annoying logical problem in the system:
+	#check_economic_production_modifier_for_job checks the economic modifiers the current pop would get if it worked that job
+	#But it checks based on the pop's current characteristics. Which means it evaluates triggered job output modifiers such as
+	#planet_jobs_worker_produces_mult as if it were in its current pop category, which means "strong" pops would register as being
+	#good at research so long as they are currently workers.
+
+	# worker
+	modifier = {
+		subtract = species.modifier:planet_jobs_worker_produces_mult
+		tec_ecocat_planet_jobs_worker = { CACHED = yes }
+		NOR = {
+			tec_is_job_of_worker_category = { JOB = $JOB$ }
+			tec_is_job_of_simple_drone_category = { JOB = $JOB$ }
+		}
+	}
+	# modifier = {
+	# 	add = species.modifier:planet_jobs_worker_produces_mult
+	# 	OR = {
+	# 		tec_is_job_of_worker_category = { JOB = $JOB$ }
+	# 		tec_is_job_of_simple_drone_category = { JOB = $JOB$ }
+	# 	}
+	# 	NOT = { tec_ecocat_planet_jobs_worker = { CACHED = yes } }
+	# }
+	# Worker only
+	modifier = {
+		subtract = species.modifier:planet_jobs_worker_only_produces_mult
+		tec_ecocat_planet_jobs_worker_only = { CACHED = yes }
+		NOR = { 
+			tec_is_job_of_worker_category = { JOB = $JOB$ } 
+		}
+	}
+	# modifier = {
+	# 	add = species.modifier:planet_jobs_worker_only_produces_mult
+	# 	OR = {
+	# 		tec_is_job_of_worker_category = { JOB = $JOB$ }
+	# 	}
+	# 	NOT = { tec_ecocat_planet_jobs_worker_only = { CACHED = yes } }
+	# }
+	# slave
+	modifier = {
+		subtract = species.modifier:planet_jobs_slave_produces_mult
+		tec_ecocat_planet_jobs_slave = { CACHED = yes }
+		NOR = {
+			tec_is_job_of_worker_category = { JOB = $JOB$ }
+			tec_is_job_of_specialist_category = { JOB = $JOB$ }
+		}
+	}
+	# no need for add check for em
+
+	# Specialist
+	modifier = {
+		subtract = species.modifier:planet_jobs_specialist_produces_mult
+		tec_ecocat_planet_jobs_specialist = { CACHED = yes }
+		NOR = {
+			tec_is_job_of_specialist_category = { JOB = $JOB$ }
+			tec_is_job_of_complex_drone_category = { JOB = $JOB$ }
+		}
+	}
+	modifier = {
+		add = species.modifier:planet_jobs_specialist_produces_mult
+		NOT = { tec_ecocat_planet_jobs_specialist = { CACHED = yes } }
+		OR = {
+			tec_is_job_of_specialist_category = { JOB = $JOB$ }
+			tec_is_job_of_complex_drone_category = { JOB = $JOB$ }
+		}
+	}
+	
+	# Simple Drone
+	modifier = {
+		subtract = species.modifier:planet_jobs_simple_drone_produces_mult
+		tec_ecocat_planet_jobs_simple_drone = { CACHED = yes }
+		NOR = {
+			tec_is_job_of_simple_drone_category = { JOB = $JOB$ }
+		}
+	}
+	# modifier = {
+	# 	add = species.modifier:planet_jobs_simple_drone_produces_mult
+	# 	OR = {
+	# 		tec_is_job_of_simple_drone_category = { JOB = $JOB$ }
+	# 	}
+	# 	NOR = { tec_ecocat_planet_jobs_simple_drone = { CACHED = yes } }
+	# }
+	
+	# Complex
+	modifier = {
+		subtract = species.modifier:planet_jobs_complex_drone_produces_mult
+		tec_ecocat_planet_jobs_complex_drone = { CACHED = yes }
+		NOR = {
+			tec_is_job_of_complex_drone_category = { JOB = $JOB$ }
+		}
+	}
+	
+	# modifier = {
+	# 	add = species.modifier:planet_jobs_complex_drone_produces_mult
+	# 	OR = {
+	# 		tec_is_job_of_complex_drone_category = { JOB = $JOB$ }
+	# 	}
+	# 	NOT = { tec_ecocat_planet_jobs_complex_drone = { CACHED = yes } }
+	# }
+}
+
+# Gaiaseeders
+gaiaseeder_upkeep = {
+	base = 0
+
+	modifier = {
+		add = 1
+		OR = {
+			is_ideal_planet_class = {
+				who = owner
+				status = yes
+			}
+			owner_main_species = {
+				has_trait = @trait_tec_replicant_main
+			}
+			owner_main_species = {
+				has_trait = @trait_pc_tec_gene_preference
+			}
+			owner = {
+				is_machine_empire = yes
+			}
+		}
+	}
+
+	# Evolved - Machine empires pay more without techs
+		modifier = {
+			add = 0.5
+			owner = {
+				is_machine_empire = yes
+				NOT = {
+					has_technology = tech_terrestrial_sculpting
+				}
+			}
+		}
+		modifier = {
+			add = 1
+			planet = { tec_is_nuked_world = yes }
+			owner = {
+				is_machine_empire = yes
+				NOT = {
+					has_technology = tech_climate_restoration
+				}
+			}
+		}
+	# /
+
+	modifier = {
+		add = 1.25
+		owner = {
+			is_machine_empire = no
+		}
+		OR = {
+			AND = {
+				owner_species = {
+					ideal_planet_is_wet = yes
+				}
+				planet = {
+					is_wet = yes
+					is_ideal_planet_class = {
+						who = owner
+						status = no
+					}
+				}
+			}
+			AND = {
+				owner_species = {
+					ideal_planet_is_dry = yes
+				}
+				planet = {
+					is_dry = yes
+					is_ideal_planet_class = {
+						who = owner
+						status = no
+					}
+				}
+			}
+			AND = {
+				owner_species = {
+					ideal_planet_is_cold = yes
+				}
+				planet = {
+					is_cold = yes
+					is_ideal_planet_class = {
+						who = owner
+						status = no
+					}
+				}
+			}
+		}
+	}
+
+	modifier = {
+		add = 1.50
+		owner = {
+			is_machine_empire = no
+		}
+		OR = {
+			AND = {
+				owner_species = {
+					ideal_planet_is_wet = yes
+				}
+				planet = {
+					OR = {
+						is_dry = yes
+						is_cold = yes
+					}
+				}
+			}
+			AND = {
+				owner_species = {
+					ideal_planet_is_dry = yes
+				}
+				planet = {
+					OR = {
+						is_wet = yes
+						is_cold = yes
+					}
+				}
+			}
+			AND = {
+				owner_species = {
+					ideal_planet_is_cold = yes
+				}
+				planet = {
+					OR = {
+						is_wet = yes
+						is_dry = yes
+					}
+				}
+			}
+			AND = {
+				owner_species = {
+					ideal_planet_is_special = yes
+				}
+				planet = {
+					OR = {
+						is_wet = yes
+						is_dry = yes
+						is_cold = yes
+					}
+				}
+			}
+		}
+	}
+
+	modifier = {
+		add = 1.75
+		planet = {
+			is_planet_class = pc_nuked
+		}
+	}
+
+	modifier = {
+		mult = 0.25
+		planet = {
+			is_capital = yes
+		}
+	}
+
+	modifier = {
+		mult = value:gaiaseeder_cost_mult
+		owner = {
+			tec_has_councilor = { COUNCILOR = "councilor_idyllic_bloom" }
+		}
+	}
+}
+
+overlord_gaiaseeder_upkeep = {
+	base = 0
+
+	modifier = {
+		add = 1
+		is_ideal_planet_class = {
+			who = owner.overlord
+			status = yes
+		}
+		OR = {
+			is_ideal_planet_class = {
+				who = owner.overlord
+				status = yes
+			}
+			owner.overlord.owner_main_species = {
+				has_trait = @trait_tec_replicant_main
+			}
+			owner.overlord.owner_main_species = {
+				has_trait = @trait_pc_tec_gene_preference
+			}
+			owner.overlord = {
+				is_machine_empire = yes
+			}
+		}
+	}
+
+	# Evolved - Machine empires pay more without techs
+		modifier = {
+			add = 0.5
+			owner.overlord = {
+				is_machine_empire = yes
+				NOT = {
+					has_technology = tech_terrestrial_sculpting
+				}
+			}
+		}
+		modifier = {
+			add = 1
+			planet = { tec_is_nuked_world = yes }
+			owner.overlord = {
+				is_machine_empire = yes
+				NOT = {
+					has_technology = tech_climate_restoration
+				}
+			}
+		}
+	# /
+
+	modifier = {
+		add = 1.25
+		owner.overlord = {
+			is_machine_empire = no
+		}
+		OR = {
+			AND = {
+				owner.overlord.species = {
+					ideal_planet_is_wet = yes
+				}
+				planet = {
+					is_wet = yes
+					is_ideal_planet_class = {
+						who = owner.overlord
+						status = no
+					}
+				}
+			}
+			AND = {
+				owner.overlord.species = {
+					ideal_planet_is_dry = yes
+				}
+				planet = {
+					is_dry = yes
+					is_ideal_planet_class = {
+						who = owner.overlord
+						status = no
+					}
+				}
+			}
+			AND = {
+				owner.overlord.species = {
+					ideal_planet_is_cold = yes
+				}
+				planet = {
+					is_cold = yes
+					is_ideal_planet_class = {
+						who = owner.overlord
+						status = no
+					}
+				}
+			}
+		}
+	}
+
+	modifier = {
+		add = 1.50
+		owner.overlord = {
+			is_machine_empire = no
+		}
+		OR = {
+			AND = {
+				owner.overlord.species = {
+					ideal_planet_is_wet = yes
+				}
+				planet = {
+					OR = {
+						is_dry = yes
+						is_cold = yes
+					}
+				}
+			}
+			AND = {
+				owner.overlord.species = {
+					ideal_planet_is_dry = yes
+				}
+				planet = {
+					OR = {
+						is_wet = yes
+						is_cold = yes
+					}
+				}
+			}
+			AND = {
+				owner.overlord.species = {
+					ideal_planet_is_cold = yes
+				}
+				planet = {
+					OR = {
+						is_wet = yes
+						is_dry = yes
+					}
+				}
+			}
+			AND = {
+				owner.overlord.species = {
+					ideal_planet_is_special = yes
+				}
+				planet = {
+					OR = {
+						is_wet = yes
+						is_dry = yes
+						is_cold = yes
+					}
+				}
+			}
+		}
+	}
+
+	modifier = {
+		add = 1.75
+		planet = { is_planet_class = pc_nuked }
+	}
+}
+
+budding_multiplier = {
+	base = 1
+}
+
+
+# Added this here as its not done in vanilla and its useful for multi-councilors
+scripted_modifier_councilor_level_mult_combo = {
+	base = 1
+	mult = value:councilor_level_combo|COUNCILOR_1|$TYPE_1$|COUNCILOR_2|$TYPE_2$|
+	mult = value:scripted_modifier_mult|MODIFIER|$MODIFIER$|
+}
+# mult = value:scripted_modifier_councilor_level_mult_combo|MODIFIER|modifier|TYPE_1|value|TYPE_2|value2|

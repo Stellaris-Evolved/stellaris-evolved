@@ -8,143 +8,11 @@
 #-----------------------------------------------------
 # Note: O V E R W R I T E	02_special_decisions.txt
 # Advanced Habitat
-decision_upgrade_habitat = {
-	owned_planets_only = yes
-	icon = decision_satellite_in_orbit
+#decision_upgrade_habitat
+# ON OVERWRITE FILE
 
-	enactment_time = 540 #720
-	resources = {
-		category = decisions
-		cost = {
-			trigger = {
-				owner = {
-					NOT = {
-						has_active_tradition = tr_expansion_finish_vd
-					}
-				}
-			}
-			influence = 50
-			alloys = 500
-		}
-		cost = {
-			trigger = {
-				owner = {
-					has_active_tradition = tr_expansion_finish_vd
-				}
-			}
-			influence = 40
-			alloys = 400
-		}
-	}
-
-	potential = {
-		is_planet_class = pc_habitat
-		NOR = {
-			has_planet_flag = advanced_habitat
-			has_planet_flag = payback_habitat
-		}
-		exists = owner
-		owner = {
-			has_technology = tech_habitat_2
-		}
-	}
-
-	allow = {
-		free_district_slots = 0
-	}
-
-	effect = {
-		hidden_effect = {
-			set_planet_entity = {
-				entity = "habitat_phase_02_entity"
-				graphical_culture = owner
-			}
-			set_planet_flag = advanced_habitat
-		}
-		set_planet_size = 6
-
-		if = {
-			limit = {
-				owner = {
-					has_ascension_perk = ap_voidborn
-					NOT = { has_technology = tech_habitat_3 }
-					NOT = { has_tech_option = tech_habitat_3 }
-				}
-			}
-			owner = {
-				add_research_option = tech_habitat_3
-			}
-		}
-	}
-
-	ai_weight = {
-		weight = 1000
-	}
-}
-
-decision_upgrade_habitat_2 = {
-	owned_planets_only = yes
-	icon = decision_satellite_in_orbit
-
-	enactment_time = 1080 #1440
-	resources = {
-		category = decisions
-		cost = {
-			trigger = {
-				owner = {
-					NOT = {
-						has_active_tradition = tr_expansion_finish_vd
-					}
-				}
-			}
-			influence = 50
-			alloys = 1000
-		}
-		cost = {
-			trigger = {
-				owner = {
-					has_active_tradition = tr_expansion_finish_vd
-				}
-			}
-			influence = 40
-			alloys = 800
-		}
-	}
-
-	potential = {
-		is_planet_class = pc_habitat
-		has_planet_flag = advanced_habitat
-		NOR = {
-			has_planet_flag = advanced_habitat_2
-			has_planet_flag = payback_habitat
-		}
-		exists = owner
-		owner = {
-			has_technology = tech_habitat_3
-		}
-	}
-
-	allow = {
-		free_district_slots = 0
-		has_major_upgraded_capital = yes
-	}
-
-	effect = {
-		hidden_effect = {
-			set_planet_entity = {
-				entity = "habitat_phase_03_entity"
-				graphical_culture = owner
-			}
-
-			set_planet_flag = advanced_habitat_2
-		}
-		set_planet_size = 8
-	}
-
-	ai_weight = {
-		weight = 1000
-	}
-}
+#decision_upgrade_habitat_2
+# ON OVERWRITE FILE
 
 # Ecu habitat
 decision_tec_hab_arcology_civil = {
@@ -211,6 +79,13 @@ decision_tec_hab_arcology_civil = {
 				days = -1
 			}
 			validate_and_repair_planet_buildings_and_districts = yes
+
+			if = {
+				limit = {
+					owner = { is_ai = yes }
+				}
+				tec_planet_force_update_desgnation = yes
+			}
 		}
 	}
 
@@ -295,14 +170,24 @@ decision_tec_hab_arcology_industrial = {
 				modifier = pm_tec_arcology_habitat
 				days = -1
 			}
+			validate_and_repair_planet_buildings_and_districts = yes
+
 			# Converts district adequately
 			tec_set_focus_flags_effect = yes
-			tec_set_ecu_hab_conversion_effect = {
+			tec_district_conversion_effect = {
 				DISTRICT = district_tec_hab_arcology_industry
-				VARIABLE = num_industrial_districts
 			}
-			tec_set_ecu_hab_industrial_districts_effect = yes
-			validate_and_repair_planet_buildings_and_districts = yes
+			tec_industrial_split_effect = {
+				FACTORY = district_tec_hab_arcology_industry
+				FOUNDRY = district_tec_hab_arcology_foundry
+			}
+
+			if = {
+				limit = {
+					owner = { is_ai = yes }
+				}
+				tec_planet_force_update_desgnation = yes
+			}
 		}
 	}
 
@@ -404,6 +289,580 @@ decision_tec_void_colonize = {
 	}
 }
 
+# Habitat subspecs
+ # Generic Decision
+	decision_tec_habitat_reform = {
+		owned_planets_only = yes
+		icon = decision_satellite_in_orbit
+
+		enactment_time = 0
+		resources = {
+			category = decisions
+			cost = {
+				energy = 100
+			}
+		}
+
+		potential = {
+			is_planet_class = pc_habitat
+			tec_is_arcology_habitat = no
+		}
+
+		allow = {
+			hidden_trigger = {
+				NOT = {
+					has_planet_flag = tec_habitat_picking_spec
+				}
+				if = {
+					limit = {
+						exists = owner
+						owner = {
+							is_ai = yes
+						}
+					}
+					NOT = {
+						has_planet_flag = tec_habitat_anti_ai_spam
+					}
+				}
+			}
+		}
+
+		effect = {
+			custom_tooltip = decision_tec_habitat_reform_tooltip
+			hidden_effect = {
+				planet_event = {
+					id = tec_habitats.100
+				}
+				set_timed_planet_flag = {
+					flag = tec_habitat_anti_ai_spam
+					years = 5
+				}
+			}
+		}
+
+		ai_weight = {
+			weight = 10
+		}
+	}
+ # /
+ # OLD Utility
+	decision_tec_habitat_unlock_trade = {
+		owned_planets_only = yes
+		icon = decision_satellite_in_orbit
+
+		enactment_time = 360
+		resources = {
+			category = decisions
+			cost = {
+				alloys = 200
+			}
+		}
+
+		potential = {
+			always = no
+			is_planet_class = pc_habitat
+			NOR = {
+				has_planet_flag = commercial_habitat
+				has_planet_flag = research_habitat
+			}
+			owner = {
+				tec_uses_trade_value = yes
+			}
+			# No need of a resource deposit
+		}
+
+		allow = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+
+		effect = {
+			custom_tooltip = decision_tec_habitat_unlock_trade_effects
+			hidden_effect = {
+				set_planet_flag = commercial_habitat
+				# Exports extraction districts and swaps them
+					tec_convert_district = {
+						BASE_DISTRICT = district_tec_hab_utility
+						DISTRICT = district_hab_commercial
+						RATE = 1
+					}
+				# /
+			}
+		}
+
+		ai_weight = {
+			weight = 10
+		}
+	}
+	decision_tec_habitat_unlock_research = {
+		owned_planets_only = yes
+		icon = decision_satellite_in_orbit
+
+		enactment_time = 360
+		resources = {
+			category = decisions
+			cost = {
+				alloys = 200
+			}
+		}
+
+		potential = {
+			always = no
+			is_planet_class = pc_habitat
+			NOR = {
+				has_planet_flag = research_habitat
+				has_planet_flag = commercial_habitat
+			}
+			check_modifier_value = {
+				modifier = district_hab_science_max
+				value > 0
+			}
+		}
+
+		allow = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+
+		effect = {
+			custom_tooltip = decision_tec_habitat_unlock_research_effects
+			hidden_effect = {
+				set_planet_flag = research_habitat
+				# Exports extraction districts and swaps them
+					tec_convert_district = {
+						BASE_DISTRICT = district_tec_hab_utility
+						DISTRICT = district_hab_science
+						RATE = 1
+					}
+				# /
+			}
+		}
+
+		ai_weight = {
+			weight = 10
+		}
+	}
+ # /
+ # OLD Menial
+	decision_tec_habitat_unlock_generator = {
+		owned_planets_only = yes
+		icon = decision_satellite_in_orbit
+
+		enactment_time = 360
+		resources = {
+			category = decisions
+			cost = {
+				alloys = 100
+				energy = 200
+			}
+		}
+
+		potential = {
+			always = no
+			is_planet_class = pc_habitat
+			NOT = {
+				has_planet_flag = energy_habitat
+			}
+			# No need of a resource deposit
+		}
+
+		allow = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+
+		effect = {
+			if = {
+				limit = {
+					check_variable = {
+						which = tec_hab_menial_districts
+						value < 2
+					}
+				}
+				custom_tooltip = decision_tec_habitat_unlock_generator_effects
+			}
+			else = {
+				custom_tooltip = decision_tec_habitat_unlock_generator_effects_replace_extraction
+			}
+			hidden_effect = {
+				set_planet_flag = energy_habitat
+				change_variable = {
+					which = tec_hab_menial_districts
+					value = 1
+				}
+				# Exports extraction districts and swaps them
+					if = {
+						limit = {
+							check_variable = {
+								which = tec_hab_menial_districts
+								value = 3
+							}
+						}
+						tec_convert_district = {
+							BASE_DISTRICT = district_tec_hab_extraction
+							DISTRICT = district_hab_energy
+							RATE = 1
+						}
+					}
+					else = {
+						tec_convert_district = {
+							BASE_DISTRICT = district_tec_hab_extraction
+							DISTRICT = district_hab_energy
+							RATE = 0.35
+						}
+					}
+				# /
+			}
+		}
+
+		ai_weight = {
+			weight = 10
+		}
+	}
+	decision_tec_habitat_unlock_mining = {
+		owned_planets_only = yes
+		icon = decision_satellite_in_orbit
+
+		enactment_time = 360
+		resources = {
+			category = decisions
+			cost = {
+				alloys = 100
+				minerals = 100
+			}
+		}
+
+		potential = {
+			always = no
+			is_planet_class = pc_habitat
+			NOT = {
+				has_planet_flag = mining_habitat
+			}
+			check_modifier_value = {
+				modifier = district_hab_mining_max
+				value > 0
+			}
+		}
+
+		allow = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+
+		effect = {
+			if = {
+				limit = {
+					check_variable = {
+						which = tec_hab_menial_districts
+						value < 2
+					}
+				}
+				custom_tooltip = decision_tec_habitat_unlock_mining_effects
+			}
+			else = {
+				custom_tooltip = decision_tec_habitat_unlock_mining_effects_replace_extraction
+			}
+			hidden_effect = {
+				set_planet_flag = mining_habitat
+				change_variable = {
+					which = tec_hab_menial_districts
+					value = 1
+				}
+				# Exports extraction districts and swaps them
+					if = {
+						limit = {
+							check_variable = {
+								which = tec_hab_menial_districts
+								value = 3
+							}
+						}
+						tec_convert_district = {
+							BASE_DISTRICT = district_tec_hab_extraction
+							DISTRICT = district_hab_mining
+							RATE = 1
+						}
+					}
+					else = {
+						tec_convert_district = {
+							BASE_DISTRICT = district_tec_hab_extraction
+							DISTRICT = district_hab_mining
+							RATE = 0.35
+						}
+					}
+				# /
+			}
+		}
+
+		ai_weight = {
+			weight = 10
+		}
+	}
+	decision_tec_habitat_unlock_farming = {
+		owned_planets_only = yes
+		icon = decision_satellite_in_orbit
+
+		enactment_time = 360
+		resources = {
+			category = decisions
+			cost = {
+				alloys = 100
+				food = 150
+			}
+		}
+
+		potential = {
+			always = no
+			is_planet_class = pc_habitat
+			NOT = {
+				has_planet_flag = tec_food_habitat
+			}
+			# No need of a resource deposit
+		}
+
+		allow = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+
+		effect = {
+			if = {
+				limit = {
+					check_variable = {
+						which = tec_hab_menial_districts
+						value < 2
+					}
+				}
+				custom_tooltip = decision_tec_habitat_unlock_farming_effects
+			}
+			else = {
+				custom_tooltip = decision_tec_habitat_unlock_farming_effects_replace_extraction
+			}
+			hidden_effect = {
+				set_planet_flag = tec_food_habitat
+				change_variable = {
+					which = tec_hab_menial_districts
+					value = 1
+				}
+				# Exports extraction districts and swaps them
+					if = {
+						limit = {
+							check_variable = {
+								which = tec_hab_menial_districts
+								value = 3
+							}
+						}
+						tec_convert_district = {
+							BASE_DISTRICT = district_tec_hab_extraction
+							DISTRICT = district_hab_mining
+							RATE = 1
+						}
+					}
+					else = {
+						tec_convert_district = {
+							BASE_DISTRICT = district_tec_hab_extraction
+							DISTRICT = district_tec_hab_food
+							RATE = 0.35
+						}
+					}
+				# /
+			}
+		}
+
+		ai_weight = {
+			weight = 10
+		}
+	}
+	decision_tec_habitat_unlock_leisure = {
+		owned_planets_only = yes
+		icon = decision_satellite_in_orbit
+
+		enactment_time = 360
+		resources = {
+			category = decisions
+			cost = {
+				alloys = 200
+			}
+		}
+
+		potential = {
+			always = no
+			is_planet_class = pc_habitat
+			NOT = {
+				has_planet_flag = tec_leisure_habitat
+			}
+			# No need of a resource deposit
+		}
+
+		allow = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+
+		effect = {
+			if = {
+				limit = {
+					check_variable = {
+						which = tec_hab_menial_districts
+						value < 2
+					}
+				}
+				custom_tooltip = decision_tec_habitat_unlock_leisure_effects
+			}
+			else = {
+				custom_tooltip = decision_tec_habitat_unlock_leisure_effects_replace_extraction
+			}
+			hidden_effect = {
+				set_planet_flag = tec_leisure_habitat
+				change_variable = {
+					which = tec_hab_menial_districts
+					value = 1
+				}
+				# Exports extraction districts and swaps them
+					if = {
+						limit = {
+							check_variable = {
+								which = tec_hab_menial_districts
+								value = 3
+							}
+						}
+						tec_convert_district = {
+							BASE_DISTRICT = district_tec_hab_extraction
+							DISTRICT = district_hab_cultural
+							RATE = 1
+						}
+					}
+					else = {
+						tec_convert_district = {
+							BASE_DISTRICT = district_tec_hab_extraction
+							DISTRICT = district_hab_cultural
+							RATE = 0.35
+						}
+					}
+				# /
+			}
+		}
+
+		ai_weight = {
+			weight = 10
+		}
+	}
+ # /
+# /
+
+# Orbital Autoassembler
+	decision_tec_orbital_autobuilder_focus_mixed = {
+		owned_planets_only = yes
+		icon = decision_satellite_in_orbit
+
+		enactment_time = 0
+		resources = {
+			category = decisions
+		}
+
+		potential = {
+			is_planet_class = pc_habitat
+			has_building = building_tec_hab_orbital_autobuilder
+			OR = {
+				has_planet_flag = tec_orbital_autobuilder_focus_minor
+				has_planet_flag = tec_orbital_autobuilder_focus_major
+			}
+		}
+
+		allow = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+
+		effect = {
+			custom_tooltip = decision_tec_orbital_autobuilder_focus_mixed_effects
+			hidden_effect = {
+				remove_planet_flag = tec_orbital_autobuilder_focus_minor
+				remove_planet_flag = tec_orbital_autobuilder_focus_major
+			}
+		}
+
+		ai_weight = {
+			weight = 10
+		}
+	}
+	decision_tec_orbital_autobuilder_focus_major = {
+		owned_planets_only = yes
+		icon = decision_satellite_in_orbit
+
+		enactment_time = 0
+		resources = {
+			category = decisions
+		}
+
+		potential = {
+			tec_is_habitat = yes
+			has_building = building_tec_hab_orbital_autobuilder
+			NOT = {
+				has_planet_flag = tec_orbital_autobuilder_focus_major
+			}
+		}
+
+		allow = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+
+		effect = {
+			custom_tooltip = decision_tec_orbital_autobuilder_focus_major_effects
+			hidden_effect = {
+				remove_planet_flag = tec_orbital_autobuilder_focus_minor
+				set_planet_flag = tec_orbital_autobuilder_focus_major
+			}
+		}
+
+		ai_weight = {
+			weight = 10
+		}
+	}
+	decision_tec_orbital_autobuilder_focus_minor = {
+		owned_planets_only = yes
+		icon = decision_satellite_in_orbit
+
+		enactment_time = 0
+		resources = {
+			category = decisions
+		}
+
+		potential = {
+			tec_is_habitat = yes
+			has_building = building_tec_hab_orbital_autobuilder
+			NOT = {
+				has_planet_flag = tec_orbital_autobuilder_focus_minor
+			}
+		}
+
+		allow = {
+			hidden_trigger = {
+				always = yes
+			}
+		}
+
+		effect = {
+			custom_tooltip = decision_tec_orbital_autobuilder_focus_minor_effects
+			hidden_effect = {
+				set_planet_flag = tec_orbital_autobuilder_focus_minor
+				remove_planet_flag = tec_orbital_autobuilder_focus_major
+			}
+		}
+
+		ai_weight = {
+			weight = 10
+		}
+	}
+# /
 
 #-----------------------------------------------------
 # Elysian Ring
@@ -411,6 +870,7 @@ decision_tec_void_colonize = {
 # menial
 decision_tec_menial_ely = {
 	icon = decision_tec_basic_ring
+	owned_planets_only = yes
 
 	enactment_time = 360
 
@@ -445,6 +905,13 @@ decision_tec_menial_ely = {
 		#	remove_planet_flag = tec_research_elysium
 		#	remove_planet_flag = tec_resort_elysium
 			validate_and_repair_planet_buildings_and_districts = yes
+
+			if = {
+				limit = {
+					owner = { is_ai = yes }
+				}
+				tec_planet_force_update_desgnation = yes
+			}
 		}
 	}
 	ai_weight = {
@@ -463,6 +930,7 @@ decision_tec_menial_ely = {
 # civil
 decision_tec_civ_ely = {
 	icon = decision_tec_administration_ring
+	owned_planets_only = yes
 
 	enactment_time = 360
 
@@ -497,6 +965,13 @@ decision_tec_civ_ely = {
 
 			set_planet_flag = tec_civ_elysium
 			validate_and_repair_planet_buildings_and_districts = yes
+
+			if = {
+				limit = {
+					owner = { is_ai = yes }
+				}
+				tec_planet_force_update_desgnation = yes
+			}
 		}
 		
 	}
@@ -516,6 +991,7 @@ decision_tec_civ_ely = {
 # Militarized
 decision_tec_mil_ely = {
 	icon = decision_tec_fabrication_ring
+	owned_planets_only = yes
 
 	enactment_time = 360
 
@@ -549,6 +1025,13 @@ decision_tec_mil_ely = {
 
 			set_planet_flag = tec_mil_elysium
 			validate_and_repair_planet_buildings_and_districts = yes
+
+			if = {
+				limit = {
+					owner = { is_ai = yes }
+				}
+				tec_planet_force_update_desgnation = yes
+			}
 		}
 		
 	}
@@ -572,6 +1055,7 @@ decision_tec_mil_ely = {
 # Default Ringworld (housing, energy, minerals, food)
 decision_tec_basic_ring = {
 	icon = decision_tec_basic_ring
+	owned_planets_only = yes
 
 	enactment_time = 900
 
@@ -583,11 +1067,6 @@ decision_tec_basic_ring = {
 	}
 	
 	potential = {
-		exists = space_owner
-		exists = owner
-		owner = {
-			has_galactic_wonders = yes
-		}
 		tec_uses_ringworld_districts = yes
 		tec_is_specced_ringworld = yes
 		tec_is_precursor_ringworld = no
@@ -596,6 +1075,13 @@ decision_tec_basic_ring = {
 	
 	allow = {
 		NOT = { has_planet_flag = tec_block_other_specializations }
+		custom_tooltip = {
+			fail_text = decision_tec_ring_spec_require_galactic_wonders_utopia
+			exists = owner
+			owner = {
+				has_galactic_wonders = yes
+			}
+		}
 	}
 
 
@@ -609,6 +1095,13 @@ decision_tec_basic_ring = {
 				remove_planet_flag = tec_rw_spec_naval		# - subspec
 			remove_planet_flag = tec_rw_spec_admin
 			validate_and_repair_planet_buildings_and_districts = yes
+
+			if = {
+				limit = {
+					owner = { is_ai = yes }
+				}
+				tec_planet_force_update_desgnation = yes
+			}
 		}
 	}
 
@@ -628,6 +1121,7 @@ decision_tec_basic_ring = {
 # Science Ringworld (housing, science, refinery, leisure)
 decision_tec_science_ring = {
 	icon = decision_tec_science_ring
+	owned_planets_only = yes
 
 	enactment_time = 900
 
@@ -639,11 +1133,6 @@ decision_tec_science_ring = {
 	}
 	
 	potential = {
-		exists = space_owner
-		exists = owner
-		owner = {
-			has_galactic_wonders = yes
-		}
 		tec_uses_ringworld_districts = yes
 		tec_is_science_ringworld = no
 		tec_is_precursor_ringworld = no
@@ -651,6 +1140,13 @@ decision_tec_science_ring = {
 	
 	allow = {
 		NOT = { has_planet_flag = tec_block_other_specializations }
+		custom_tooltip = {
+			fail_text = decision_tec_ring_spec_require_galactic_wonders_utopia
+			exists = owner
+			owner = {
+				has_galactic_wonders = yes
+			}
+		}
 	}
 
 
@@ -666,6 +1162,13 @@ decision_tec_science_ring = {
 				remove_planet_flag = tec_rw_spec_naval		# - subspec
 			remove_planet_flag = tec_rw_spec_admin
 			validate_and_repair_planet_buildings_and_districts = yes
+
+			if = {
+				limit = {
+					owner = { is_ai = yes }
+				}
+				tec_planet_force_update_desgnation = yes
+			}
 		}
 		
 	}
@@ -686,6 +1189,7 @@ decision_tec_science_ring = {
 # Fabrication Ringworld (housing, alloys, cg, leisure)
 decision_tec_fabrication_ring = {
 	icon = decision_tec_fabrication_ring
+	owned_planets_only = yes
 
 	enactment_time = 900
 
@@ -697,11 +1201,6 @@ decision_tec_fabrication_ring = {
 	}
 	
 	potential = {
-		exists = space_owner
-		exists = owner
-		owner = {
-			has_galactic_wonders = yes
-		}
 		tec_uses_ringworld_districts = yes
 		tec_is_industry_ringworld = no
 		tec_is_precursor_ringworld = no
@@ -709,6 +1208,13 @@ decision_tec_fabrication_ring = {
 	
 	allow = {
 		NOT = { has_planet_flag = tec_block_other_specializations }
+		custom_tooltip = {
+			fail_text = decision_tec_ring_spec_require_galactic_wonders_utopia
+			exists = owner
+			owner = {
+				has_galactic_wonders = yes
+			}
+		}
 	}
 
 	effect = {
@@ -720,7 +1226,20 @@ decision_tec_fabrication_ring = {
 			#anticheese
 			remove_planet_flag = tec_rw_spec_admin
 			remove_planet_flag = tec_rw_spec_science
+
 			validate_and_repair_planet_buildings_and_districts = yes
+			tec_set_focus_flags_effect = yes
+			tec_industrial_split_effect = {
+				FOUNDRY = district_tec_rw_forge
+				FACTORY = district_tec_rw_industry
+			}
+
+			if = {
+				limit = {
+					owner = { is_ai = yes }
+				}
+				tec_planet_force_update_desgnation = yes
+			}
 		}
 		
 	}
@@ -741,6 +1260,7 @@ decision_tec_fabrication_ring = {
 # swaps naval and cg # REMOVED
 decision_tec_cgnaval_ring = {
 	icon = decision_tec_cgnaval_ring
+	owned_planets_only = yes
 
 	enactment_time = 360
 
@@ -753,10 +1273,6 @@ decision_tec_cgnaval_ring = {
 	
 	potential = {
 		always = no
-		exists = space_owner
-		owner = {
-			has_galactic_wonders = yes
-		}
 		tec_uses_ringworld_districts = yes
 		tec_is_industry_ringworld = no
 		tec_is_precursor_ringworld = no
@@ -769,6 +1285,13 @@ decision_tec_cgnaval_ring = {
 
 	allow = {
 		NOT = { has_planet_flag = tec_block_other_specializations }
+		custom_tooltip = {
+			fail_text = decision_tec_ring_spec_require_galactic_wonders_utopia
+			exists = owner
+			owner = {
+				has_galactic_wonders = yes
+			}
+		}
 	}
 
 	effect = {
@@ -792,6 +1315,13 @@ decision_tec_cgnaval_ring = {
 				break = yes
 			}
 			validate_and_repair_planet_buildings_and_districts = yes
+
+			if = {
+				limit = {
+					owner = { is_ai = yes}
+				}
+				tec_planet_force_update_desgnation = yes
+			}
 		}
 		
 	}
@@ -811,6 +1341,7 @@ decision_tec_cgnaval_ring = {
 # Admin Ringworld (housing, admincap, cg, leisure) - scrapped
 decision_tec_administration_ring = {
 	icon = decision_tec_administration_ring
+	owned_planets_only = yes
 
 	enactment_time = 900
 
@@ -823,10 +1354,6 @@ decision_tec_administration_ring = {
 	
 	potential = {
 		always = no
-		exists = space_owner
-		owner = {
-			has_galactic_wonders = yes
-		}
 		tec_uses_ringworld_districts = yes
 		tec_is_admin_ringworld = no
 		tec_is_precursor_ringworld = no
@@ -834,6 +1361,13 @@ decision_tec_administration_ring = {
 
 	allow = {
 		NOT = { has_planet_flag = tec_block_other_specializations }
+		custom_tooltip = {
+			fail_text = decision_tec_ring_spec_require_galactic_wonders_utopia
+			exists = owner
+			owner = {
+				has_galactic_wonders = yes
+			}
+		}
 	}
 
 	effect = {
@@ -847,6 +1381,13 @@ decision_tec_administration_ring = {
 			remove_planet_flag = tec_rw_spec_science
 
 			validate_and_repair_planet_buildings_and_districts = yes
+
+			if = {
+				limit = {
+					owner = { is_ai = yes }
+				}
+				tec_planet_force_update_desgnation = yes
+			}
 		}
 		
 	}
@@ -865,6 +1406,7 @@ decision_tec_administration_ring = {
 # Precursor Ringworld (future patches)
 decision_tec_precursor_ring = {
 	icon = decision_tec_administration_ring
+	owned_planets_only = yes
 
 	enactment_time = 1800
 
@@ -878,16 +1420,19 @@ decision_tec_precursor_ring = {
 	
 	potential = {
 		always = no
-		exists = space_owner
-		owner = {
-			has_galactic_wonders = yes
-		}
 		tec_uses_ringworld_districts = yes
 		tec_is_unspecced_ringworld = yes
 	}
 	
 	allow = {
 		NOT = { has_planet_flag = tec_block_other_specializations }
+		custom_tooltip = {
+			fail_text = decision_tec_ring_spec_require_galactic_wonders_utopia
+			exists = owner
+			owner = {
+				has_galactic_wonders = yes
+			}
+		}
 	}
 
 	effect = {
@@ -902,6 +1447,13 @@ decision_tec_precursor_ring = {
 			remove_planet_flag = tec_rw_spec_science
 
 			validate_and_repair_planet_buildings_and_districts = yes
+
+			if = {
+				limit = {
+					owner = { is_ai = yes }
+				}
+				tec_planet_force_update_desgnation = yes
+			}
 		}
 		
 	}
@@ -914,136 +1466,5 @@ decision_tec_precursor_ring = {
 	}
 	ai_weight = {
 		weight = 0
-	}
-}
-
-# Note: O V E R W R I T E	02_special_decisions.txt
-# Repair Shattered Ring
-
-decision_shattered_ring_project = {
-	owned_planets_only = yes
-	icon = decision_arcology_project
-
-	enactment_time = 2700
-	resources = {
-		category = decisions
-		cost = {
-			alloys = 7500
-		}
-	}
-
-	potential = {
-		is_planet_class = pc_shattered_ring_habitable
-		exists = owner
-	}
-
-	allow = {
-		num_uncleared_blockers < 1
-		owner = { has_technology = tech_mega_engineering }
-	}
-
-	effect = {
-		# Make ringworld
-		custom_tooltip = decision_shattered_ring_project_effects
-		hidden_effect = {
-			clear_deposits = yes
-			change_pc = pc_ringworld_habitable
-
-			set_planet_entity = {
-				entity = "ringworld_seam_entity_01_entity"
-				graphical_culture = owner
-			}
-			solar_system = {
-				every_system_planet = {
-					limit = { is_planet_class = pc_ringworld_tech }
-					set_planet_entity = {
-						entity = ringworld_tech_entity_01_entity
-						graphical_culture = root.owner
-					}
-				}
-				every_system_planet = {
-					limit = { is_planet_class = pc_ringworld_seam }
-					set_planet_entity = {
-						entity = ringworld_seam_entity_01_entity
-						graphical_culture = root.owner
-					}
-				}
-			}
-
-			# Remove Scrap Processing Buildings
-			if = {
-				limit = { has_building = building_mineral_purification_plant }
-				remove_building = building_mineral_purification_plant
-			}
-
-			if = {
-				limit = { has_building = building_mineral_purification_hub }
-				remove_building = building_mineral_purification_hub
-			}
-
-			if = {
-				limit = { has_building = building_mineral_purification_complex }
-				remove_building = building_mineral_purification_complex
-			}
-
-			# This removes the extra districts when fixing the ring world.
-			if = {
-				limit = {
-					owner = { is_regular_empire = yes }
-				}
-				shattered_ring_world_conversion_effect = {
-					DISTRICT = district_rw_city
-					VARIABLE = num_housing_districts
-				}
-			}
-
-			if = {
-				limit = {
-					owner = { is_hive_empire = yes }
-				}
-				shattered_ring_world_conversion_effect = {
-					DISTRICT = district_rw_hive
-					VARIABLE = num_housing_districts
-				}
-			}
-
-			if = {
-				limit = {
-					owner = { is_machine_empire = yes }
-				}
-				shattered_ring_world_conversion_effect = {
-					DISTRICT = district_rw_nexus
-					VARIABLE = num_housing_districts
-				}
-			}
-
-			# All empire types get farming and industrial districts
-			shattered_ring_world_conversion_effect = {
-				DISTRICT = district_tec_rw_replicator
-				VARIABLE = num_generator_districts
-			}
-
-			shattered_ring_world_conversion_effect = {
-				DISTRICT = district_rw_generator
-				VARIABLE = num_generator_districts
-			}
-
-			shattered_ring_world_conversion_effect = {
-				DISTRICT = district_rw_farming
-				VARIABLE = num_farming_districts
-			}
-			shattered_ring_world_conversion_effect = {
-				DISTRICT = district_rw_industrial
-				VARIABLE = num_industrial_districts
-			}
-			# Finally, bring it in line with ringworld sizes
-			set_planet_size = 10
-			# And set the country flag so you can take Galactic Wonders
-			owner = { set_country_flag = has_built_or_repaired_megastructure }
-		}
-	}
-
-	ai_weight = {
-		weight = 100
 	}
 }

@@ -13,6 +13,7 @@ col_default = {
 		has_upgraded_capital = no
 		is_special_colony_type = no
 		num_sapient_pops < 5
+		is_capital = no
 	}
 
 	planet_modifier = {
@@ -43,6 +44,7 @@ col_default_machine = {
 		has_upgraded_capital = no
 		is_special_colony_type = no
 		num_sapient_pops < 5 # Non-sapient machines are included
+		is_capital = no
 	}
 
 	planet_modifier = {
@@ -72,12 +74,12 @@ col_city = {
 			tec_is_pd_nonconventional_world = yes
 		}
 		is_special_colony_type = no
+		is_capital = no
 	}
 
 	planet_modifier = {
-		planet_structures_upkeep_mult = -0.10
-		planet_district_city_build_speed_mult = 0.25
 		trade_value_mult = 0.20
+		planet_structures_upkeep_mult = -0.10
 	}
 
 	triggered_planet_modifier = {
@@ -104,24 +106,7 @@ col_city = {
 			has_designation = col_city
 		}
 		add = value:housing_districts_value
-		complex_trigger_modifier = {
-			trigger = num_assigned_jobs
-			parameters = {
-				job = merchant # merchant jobs act as a pretty decent proxy for "this is a trade planet"
-			}
-			mode = add
-			mult = 2
-		}
-		#Evolved
-			complex_trigger_modifier = {
-				trigger = num_assigned_jobs
-				parameters = {
-					job = tec_corpo_bank_director
-				}
-				mode = add
-				mult = 2
-			}
-		#/
+		add = value:tec_trader_jobs_value
 	}
 }
 
@@ -138,11 +123,13 @@ col_mining = {
 			tec_is_pd_nonconventional_world = yes
 		}
 		is_special_colony_type = no
+		is_capital = no
+		tec_ai_allow_designation_type = { type = mining }
 	}
 
 	planet_modifier = {
-		planet_building_tec_stripmine_1_build_speed_mult = 0.25
 		planet_miners_produces_mult = 0.25
+		planet_building_tec_stripmine_1_build_speed_mult = 0.25
 	}
 
 	inline_script = {
@@ -161,7 +148,7 @@ col_mining = {
 
 	weight_modifier = {
 		modifier = {
-			add = @stickiness
+			add = @stickiness_low
 			has_designation = col_mining
 		}
 		add = value:mining_combined_value|FACTOR|2|
@@ -173,10 +160,9 @@ col_mining = {
 			}
 			mode = add
 		}
-
 		modifier = {
-			add = -10
-			has_modifier = mineral_poor
+			add = 10
+			tec_has_mineral_processing_buildings = yes
 		}
 		modifier = {
 			add = 5
@@ -193,17 +179,6 @@ col_mining = {
 			add = -10
 			has_modifier = mineral_poor
 		}
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "production"
-					has_sector_focus = "balanced"
-				}
-			}
-		}
 	}
 }
 
@@ -218,15 +193,18 @@ col_farming = {
 			uses_district_set = city_world
 			tec_uses_ringworld_districts = yes
 			uses_district_set = habitat
+			uses_district_set = pdplanethab
 			uses_district_set = machine_world
 			tec_is_pd_nonconventional_world = yes
 		}
 		is_special_colony_type = no
+		is_capital = no
+		tec_ai_allow_designation_type = { type = farming }
 	}
 
 	planet_modifier = {
-		planet_building_hydroponics_farm_build_speed_mult = 0.25
 		planet_farmers_produces_mult = 0.25
+		planet_building_hydroponics_farm_build_speed_mult = 0.25
 	}
 
 	inline_script = {
@@ -244,7 +222,7 @@ col_farming = {
 
 	weight_modifier = {
 		modifier = {
-			add = @stickiness
+			add = @stickiness_low
 			has_designation = col_farming
 		}
 		add = value:farming_combined_value|FACTOR|2|
@@ -254,6 +232,22 @@ col_farming = {
 				type = district_farming
 			}
 			mode = add
+		}
+		#complex_trigger_modifier = {	# Caelum
+		#	trigger = num_buildings
+		#	parameters = {
+		#		type = building_hydroponics_farm
+		#	}
+		#	mode = add
+		#	mult = 2
+		#}
+		modifier = {
+			add = 10
+			tec_has_food_processing_buildings = yes
+		}
+		modifier = {
+			add = 5
+			has_building = building_baol_organic_plant
 		}
 		modifier = {
 			add = 5
@@ -265,17 +259,6 @@ col_farming = {
 				has_modifier = bleak_planet
 				has_modifier = unbalanced_ecosystem
 				has_modifier = irradiated_planet
-			}
-		}
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "production"
-					has_sector_focus = "balanced"
-				}
 			}
 		}
 	}
@@ -292,13 +275,21 @@ col_generator = {
 			tec_uses_ringworld_districts = yes
 			uses_district_set = habitat
 			tec_is_pd_nonconventional_world = yes
+			AND = {
+				owner = {
+					is_gestalt = no
+				}
+				uses_district_set = shattered_ring_world
+			}
 		}
 		is_special_colony_type = no
+		is_capital = no
+		tec_ai_allow_designation_type = { type = generator }
 	}
 
 	planet_modifier = {
-		planet_building_tec_energrid_1_build_speed_mult = 0.25
 		planet_technician_produces_mult = 0.25
+		planet_building_tec_energrid_1_build_speed_mult = 0.25
 	}
 
 	inline_script = {
@@ -317,7 +308,7 @@ col_generator = {
 
 	weight_modifier = {
 		modifier = {
-			add = @stickiness
+			add = @stickiness_low
 			has_designation = col_generator
 		}
 		add = value:generator_combined_value|FACTOR|2|
@@ -330,11 +321,8 @@ col_generator = {
 			mode = add
 		}
 		modifier = {
-			add = 5
-			OR = {
-				has_modifier = hazardous_weather
-				has_modifier = strong_magnetic_field
-			}
+			add = 10
+			tec_has_energy_processing_buildings = yes
 		}
 		modifier = {
 			add = 2
@@ -346,19 +334,15 @@ col_generator = {
 			owner = { has_technology = tech_mine_betharian }
 		}
 		modifier = {
-			add = -10
-			has_modifier = energy_poor
+			add = 5
+			OR = {
+				has_modifier = hazardous_weather
+				has_modifier = strong_magnetic_field
+			}
 		}
 		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "production"
-					has_sector_focus = "balanced"
-				}
-			}
+			add = -10
+			has_modifier = energy_poor
 		}
 	}
 }
@@ -376,11 +360,12 @@ col_hive = {
 		exists = owner
 		owner = { is_hive_empire = yes }
 		is_special_colony_type = no
+		is_capital = no
 	}
 
 	planet_modifier = {
-		planet_structures_upkeep_mult = -0.10
 		planet_jobs_complex_drone_produces_mult = 0.05
+		planet_structures_upkeep_mult = -0.10
 	}
 
 	weight_modifier = {
@@ -388,24 +373,7 @@ col_hive = {
 			add = @stickiness
 			has_designation = col_hive
 		}
-		add = value:housing_districts_value
-		complex_trigger_modifier = {
-			trigger = num_districts
-			parameters = {
-				type = district_hive
-			}
-			mode = add
-			mult = 2
-		}
-
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOT = { has_sector_focus = "balanced" }
-			}
-		}
+		add = value:housing_districts_value|FACTOR|2|
 	}
 }
 
@@ -424,11 +392,12 @@ col_nexus = {
 		exists = owner
 		owner = { is_machine_empire = yes }
 		is_special_colony_type = no
+		is_capital = no
 	}
 
 	planet_modifier = {
-		planet_structures_upkeep_mult = -0.10
 		planet_jobs_complex_drone_produces_mult = 0.05
+		planet_structures_upkeep_mult = -0.10
 	}
 
 	weight_modifier = {
@@ -436,15 +405,7 @@ col_nexus = {
 			add = @stickiness
 			has_designation = col_nexus
 		}
-		add = value:housing_districts_value
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOT = { has_sector_focus = "balanced" }
-			}
-		}
+		add = value:housing_districts_value|FACTOR|2|
 		#modifier = {
 			#add = 5
 			#modifier = {
@@ -472,6 +433,8 @@ col_industrial = {
 			tec_is_pd_nonconventional_world = yes
 		}
 		is_special_colony_type = no
+		is_capital = no
+		tec_ai_allow_designation_type = { type = industrial }
 	}
 
 	planet_modifier = {
@@ -508,7 +471,7 @@ col_industrial = {
 
 	weight_modifier = {
 		modifier = {
-			add = @stickiness
+			add = @stickiness_low
 			has_designation = col_industrial
 		}
 		add = value:industrial_districts_value|FACTOR|3|
@@ -521,45 +484,21 @@ col_industrial = {
 			}
 		}
 		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "manufacturing"
-					has_sector_focus = "balanced"
-				}
+			set = -100
+			exists = owner
+			owner = { is_ai = yes }
+			check_variable_arithmetic = {
+				which = value:industrial_districts_value
+				value <= 0
 			}
 		}
 	}
+
 }
 
 # Forge Planet
 col_foundry = {
 	icon = GFX_colony_type_foundry
-
-	# used by AI to estimate what will happen when we change the designation
-	ai_resource_conversion = {
-		consumer_goods = 0
-		alloys = 2
-		
-		trigger = {
-			owner = {
-				is_gestalt = no
-			}
-		}
-	}
-
-	ai_resource_current_conversion = {
-		alloys = 0.5
-		consumer_goods = -2
-
-		trigger = {
-			owner = {
-				is_gestalt = no
-			}
-		}
-	}
 
 	potential = {
 		exists = owner
@@ -571,9 +510,13 @@ col_foundry = {
 			tec_is_pd_nonconventional_nonfactory_world = yes
 		}
 		is_special_colony_type = no
+		is_capital = no
+		tec_ai_allow_designation_type = { type = foundry }
 	}
-
+	
+	inline_script = colony_types/inline_evolved_foundry_conversion
 	custom_tooltip = col_foundry_custom
+
 	planet_modifier = {
 		planet_metallurgists_upkeep_mult = -0.20
 	}
@@ -632,14 +575,12 @@ col_foundry = {
 			}
 		}
 		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "manufacturing"
-					has_sector_focus = "balanced"
-				}
+			set = -100
+			exists = owner
+			owner = { is_ai = yes }
+			check_variable_arithmetic = {
+				which = value:industrial_districts_value|ALLOY_ONLY|yes|
+				value <= 0
 			}
 		}
 	}
@@ -648,30 +589,6 @@ col_foundry = {
 # Factory Planet
 col_factory = {
 	icon = GFX_colony_type_factory
-
-	# used by AI to estimate what will happen when we change the designation
-	ai_resource_conversion = {
-		consumer_goods = 2
-		alloys = 0
-		
-		trigger = {
-			owner = {
-				is_gestalt = no
-			}
-		}
-	}
-
-	# Used by AI to estimate the current effects of this designation
-	ai_resource_current_conversion = {
-		consumer_goods = 0.5
-		alloys = -0.5
-
-		trigger = {
-			owner = {
-				is_gestalt = no
-			}
-		}
-	}
 
 	potential = {
 		exists = owner
@@ -684,8 +601,11 @@ col_factory = {
 			tec_is_pd_nonconventional_world = yes
 		}
 		is_special_colony_type = no
+		is_capital = no
+		tec_ai_allow_designation_type = { type = factory }
 	}
 
+	inline_script = colony_types/inline_evolved_factory_conversion
 	custom_tooltip = col_factory_custom
 	planet_modifier = {
 		planet_artisans_upkeep_mult = -0.20
@@ -740,14 +660,12 @@ col_factory = {
 			}
 		}
 		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "manufacturing"
-					has_sector_focus = "balanced"
-				}
+			set = -100
+			exists = owner
+			owner = { is_ai = yes }
+			check_variable_arithmetic = {
+				which = value:industrial_districts_value|CG_ONLY|yes|
+				value <= 0
 			}
 		}
 	}
@@ -762,13 +680,14 @@ col_bureau = {
 		exists = owner
 		owner = {
 			is_regular_empire = yes
-			is_spiritualist = no
-			has_make_spiritualist_perk = no
+			tec_country_uses_priests_and_temples = no
 		}
 		NOT = {
 			uses_district_set = habitat
 		}
 		is_special_colony_type = no
+		is_capital = no
+		tec_ai_allow_designation_type = { type = unity }
 	}
 
 	planet_modifier = {
@@ -786,24 +705,6 @@ col_bureau = {
 			has_designation = col_bureau
 		}
 		add = value:unity_combined_value|FACTOR|2|
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "balanced"
-					has_sector_focus = "unity"
-				}
-			}
-		}
-		modifier = {
-			add = 10
-			exists = sector
-			sector = {
-				has_sector_focus = "unity"
-			}
-		}
 	}
 }
 
@@ -814,15 +715,14 @@ col_bureau_spiritualist = {
 		exists = owner
 		owner = {
 			is_regular_empire = yes
-			OR = {
-				is_spiritualist = yes
-				has_make_spiritualist_perk = yes
-			}
+			tec_country_uses_priests_and_temples = yes
 		}
 		NOT = {
 			uses_district_set = habitat
 		}
 		is_special_colony_type = no
+		is_capital = no
+		tec_ai_allow_designation_type = { type = unity }
 	}
 
 	planet_modifier = {
@@ -840,24 +740,6 @@ col_bureau_spiritualist = {
 			has_designation = col_bureau_spiritualist
 		}
 		add = value:unity_combined_value|FACTOR|2|
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "balanced"
-					has_sector_focus = "unity"
-				}
-			}
-		}
-		modifier = {
-			add = 10
-			exists = sector
-			sector = {
-				has_sector_focus = "unity"
-			}
-		}
 	}
 }
 
@@ -871,6 +753,8 @@ col_bureau_hive = {
 			uses_district_set = habitat
 		}
 		is_special_colony_type = no
+		is_capital = no
+		tec_ai_allow_designation_type = { type = unity }
 	}
 
 	planet_modifier = {
@@ -886,24 +770,6 @@ col_bureau_hive = {
 			has_designation = col_bureau_hive
 		}
 		add = value:unity_combined_value|FACTOR|2|
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "balanced"
-					has_sector_focus = "unity"
-				}
-			}
-		}
-		modifier = {
-			add = 10
-			exists = sector
-			sector = {
-				has_sector_focus = "unity"
-			}
-		}
 	}
 }
 
@@ -920,6 +786,8 @@ col_bureau_machine = {
 			uses_district_set = habitat
 		}
 		is_special_colony_type = no
+		is_capital = no
+		tec_ai_allow_designation_type = { type = unity }
 	}
 
 	planet_modifier = {
@@ -935,24 +803,6 @@ col_bureau_machine = {
 			has_designation = col_bureau_machine
 		}
 		add = value:unity_combined_value|FACTOR|2|
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "balanced"
-					has_sector_focus = "unity"
-				}
-			}
-		}
-		modifier = {
-			add = 10
-			exists = sector
-			sector = {
-				has_sector_focus = "unity"
-			}
-		}
 	}
 }
 
@@ -969,6 +819,9 @@ col_refinery = {
 			tec_is_pd_nonconventional_nonrefinery_world = yes
 		}
 		is_special_colony_type = no
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = refinery }
 	}
 
 	planet_modifier = {
@@ -988,18 +841,6 @@ col_refinery = {
 			has_designation = col_refinery
 		}
 		add = value:refinery_combined_value|FACTOR|2|
-
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "manufacturing"
-					has_sector_focus = "balanced"
-				}
-			}
-		}
 	}
 }
 
@@ -1016,11 +857,14 @@ col_research = {
 			tec_is_pd_nonconventional_nonresearch_world = yes
 		}
 		is_special_colony_type = no
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = research }
 	}
 
 	planet_modifier = {
-		planet_building_research_lab_1_build_speed_mult = 0.25
 		planet_researchers_upkeep_mult = -0.2
+		planet_building_research_lab_1_build_speed_mult = 0.25
 	}
 
 	inline_script = {
@@ -1052,17 +896,6 @@ col_research = {
 				has_deposit = d_former_relic_world
 			}
 		}
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "research"
-					has_sector_focus = "balanced"
-				}
-			}
-		}
 	}
 }
 
@@ -1079,6 +912,9 @@ col_fortress = {
 			tec_is_pd_nonconventional_nonfortress_world = yes
 		}
 		is_special_colony_type = no
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = fortress }
 	}
 
 	planet_modifier = {
@@ -1106,17 +942,12 @@ col_fortress = {
 			has_designation = col_fortress
 		}
 		add = value:stronghold_buildings_value|FACTOR|2|
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-			}
-		}
 	}
 }
 
-# Capital Planet
+###################################################
+###		CAPITAL WORLD DESIGNATIONS				###
+###################################################
 col_capital = {
 	icon = GFX_colony_type_capital
 
@@ -1137,8 +968,8 @@ col_capital = {
 		planet_stability_add = 5
 		planet_amenities_add = 10
 		pop_government_ethic_attraction = 1
-		planet_jobs_produces_mult = 0.1
 		planet_resettlement_unemployed_destination_mult = 0.1
+		planet_jobs_produces_mult = 0.1
 	}
 
 	inline_script = colony_types/effects/inline_evolved_ringworld
@@ -1151,6 +982,185 @@ col_capital = {
 		base = 1000
 	}
 }
+
+# to do
+
+col_capital_foundry = {
+	icon = GFX_colony_type_capital_foundry
+
+	potential = {
+		is_capital = yes
+		owner = {
+			AND = {
+				tec_is_default_country = yes
+				is_gestalt = no
+				
+				OR = {
+					is_ai = no
+					AND = {
+						years_passed > 25
+						num_owned_planets >= 5
+					}
+				}
+			}
+		}
+
+		tec_ai_allow_designation_type = { type = foundry }
+	}
+
+	planet_modifier = {
+		planet_stability_add = 5
+		planet_amenities_add = 10
+		pop_government_ethic_attraction = 1
+		planet_resettlement_unemployed_destination_mult = 0.1
+		planet_metallurgists_produces_mult = 0.15
+	}
+
+	inline_script = colony_types/effects/inline_evolved_ringworld
+
+	# Evolved
+		inline_script = colony_types/effects/inline_evolved_tec_land_of_plenty_capital
+	# /
+
+	
+	inline_script = colony_types/inline_evolved_foundry_conversion
+	custom_tooltip = col_foundry_custom
+
+	weight_modifier = {
+		base = 0
+	}
+}
+
+col_capital_factory = {
+	icon = GFX_colony_type_capital_factory
+
+	potential = {
+		is_capital = yes
+		owner = {
+			AND = {
+				tec_is_default_country = yes
+				is_gestalt = no
+				
+				OR = {
+					is_ai = no
+					AND = {
+						years_passed > 25
+						num_owned_planets >= 5
+					}
+				}
+			}
+		}
+
+		tec_ai_allow_designation_type = { type = factory }
+	}
+
+	planet_modifier = {
+		planet_stability_add = 5
+		planet_amenities_add = 10
+		pop_government_ethic_attraction = 1
+		planet_resettlement_unemployed_destination_mult = 0.1
+		planet_artisans_produces_mult = 0.15
+	}
+
+	inline_script = colony_types/effects/inline_evolved_ringworld
+
+	# Evolved
+		inline_script = colony_types/effects/inline_evolved_tec_land_of_plenty_capital
+	# /
+
+
+
+	inline_script = colony_types/inline_evolved_factory_conversion
+	custom_tooltip = col_factory_custom
+
+	weight_modifier = {
+		base = 0
+	}
+}
+
+col_capital_trade = {
+	icon = GFX_colony_type_capital_trade
+
+	potential = {
+		is_capital = yes
+		owner = {
+			AND = {
+				tec_is_default_country = yes
+				is_gestalt = no
+				
+				OR = {
+					is_ai = no
+					AND = {
+						years_passed > 25
+						num_owned_planets >= 5
+					}
+				}
+			}
+		}
+		tec_ai_allow_designation_type = { type = trade }
+	}
+
+	planet_modifier = {
+		planet_stability_add = 5
+		planet_amenities_add = 10
+		pop_government_ethic_attraction = 1
+		planet_resettlement_unemployed_destination_mult = 0.1
+		trade_value_mult = 0.15
+	}
+
+	inline_script = colony_types/effects/inline_evolved_ringworld
+
+	# Evolved
+		inline_script = colony_types/effects/inline_evolved_tec_land_of_plenty_capital
+	# /
+
+	weight_modifier = {
+		base = 0
+	}
+}
+
+col_capital_extraction = {
+	icon = GFX_colony_type_capital_extraction
+
+	potential = {
+		is_capital = yes
+		owner = {
+			AND = {
+				tec_is_default_country = yes
+				is_gestalt = no
+				
+				OR = {
+					is_ai = no
+					AND = {
+						years_passed > 25
+						num_owned_planets >= 5
+					}
+				}
+			}
+		}
+		tec_ai_allow_designation_type = { type = rural }
+	}
+
+	planet_modifier = {
+		planet_stability_add = 5
+		planet_amenities_add = 10
+		pop_government_ethic_attraction = 1
+		planet_resettlement_unemployed_destination_mult = 0.1
+		planet_jobs_worker_produces_mult = 0.15
+	}
+
+	inline_script = colony_types/effects/inline_evolved_ringworld
+
+	# Evolved
+		inline_script = colony_types/effects/inline_evolved_tec_land_of_plenty_capital
+	# /
+
+	weight_modifier = {
+		base = 1000
+	}
+}
+# to do
+
 
 # Capital Planet - Hive Mind
 col_capital_hive = {
@@ -1176,7 +1186,7 @@ col_capital_hive = {
 	inline_script = colony_types/effects/inline_evolved_ringworld
 
 	weight_modifier = {
-		base = 1000
+		base = 0
 	}
 }
 
@@ -1215,6 +1225,7 @@ col_habitat = {	# tweaked
 	potential = {
 		tec_uses_habitat_districts = yes
 		num_sapient_pops < 5
+		is_capital = no
 	}
 
 	planet_modifier = {
@@ -1233,14 +1244,17 @@ col_habitat_energy = {	# tweaked
 	potential = {
 		tec_uses_habitat_districts = yes
 		exists = owner
-		OR = {
-			owner = { is_gestalt = yes }
-			has_planet_flag = energy_habitat
+		check_modifier_value = {
+			modifier = district_hab_energy_max
+			value > 0
 		}
+		is_capital = no
+		tec_ai_allow_designation_type = { type = generator }
 	}
+
 	planet_modifier = {
-		planet_building_tec_energrid_1_build_speed_mult = 0.25
 		planet_technician_produces_mult = 0.1
+		planet_building_tec_energrid_1_build_speed_mult = 0.25
 	}
 
 	triggered_planet_modifier = {
@@ -1255,6 +1269,7 @@ col_habitat_energy = {	# tweaked
 	triggered_planet_modifier = {
 		potential = {
 			tec_is_arcology_habitat = yes
+			owner = { is_gestalt = yes }
 		}
 		modifier = {
 			planet_district_tec_hab_arcology_maintenance_build_speed_mult = 0.25
@@ -1274,20 +1289,16 @@ col_habitat_energy = {	# tweaked
 		}
 		modifier = {
 			add = 5
-			has_planet_flag = energy_habitat
-		}
-		add = value:generator_combined_value|FACTOR|2|
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "balanced"
-					has_sector_focus = "production"
-				}
+			check_modifier_value = {
+				modifier = district_hab_energy_max
+				value > 0
 			}
 		}
+		modifier = {
+			add = 10
+			tec_has_energy_processing_buildings = yes
+		}
+		add = value:generator_combined_value|FACTOR|2|
 	}
 }
 
@@ -1303,7 +1314,10 @@ col_habitat_leisure = {	# tweaked
 				has_valid_civic = civic_machine_servitor
 			}
 		}
+		is_capital = no
+		tec_ai_allow_designation_type = { type = any }
 	}
+
 	planet_modifier = {
 		pop_happiness = 0.10
 	}
@@ -1347,13 +1361,6 @@ col_habitat_leisure = {	# tweaked
 			mode = add
 			mult = 5
 		}
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-			}
-		}
 	}
 }
 
@@ -1369,6 +1376,8 @@ col_habitat_trade = {	# tweaked
 				tec_is_trade_gestalt = yes
 			}
 		}
+		is_capital = no
+		tec_ai_allow_designation_type = { type = trade }
 	}
 	planet_modifier = {
 		trade_value_mult = 0.20
@@ -1397,30 +1406,7 @@ col_habitat_trade = {	# tweaked
 			add = @stickiness
 			has_designation = col_habitat_trade
 		}
-		complex_trigger_modifier = {
-			trigger = num_assigned_jobs
-			parameters = {
-				job = merchant # merchant jobs act as a pretty decent proxy for "this is a trade planet"
-			}
-			mode = add
-			mult = 2
-		}
-		complex_trigger_modifier = {
-			trigger = num_districts
-			parameters = {
-				type = district_hab_commercial
-			}
-			mode = add
-			mult = 3
-		}
-		complex_trigger_modifier = {
-			trigger = num_districts
-			parameters = {
-				type = district_tec_hab_arcology_trade
-			}
-			mode = add
-			mult = 5
-		}
+		add = value:tec_trader_jobs_value
 	}
 }
 
@@ -1429,8 +1415,19 @@ col_habitat_research = {	# tweaked
 
 	potential = {
 		tec_uses_habitat_districts = yes
+		exists = owner
+		OR = {
+			check_modifier_value = {
+				modifier = district_hab_science_max
+				value > 0
+			}
+			has_planet_flag = tec_civil_habitat
+		}
 		NOT = { has_planet_flag = tec_industrial_habitat }
+		is_capital = no
+		tec_ai_allow_designation_type = { type = research }
 	}
+
 	planet_modifier = {
 		planet_researchers_produces_mult = 0.1
 	}
@@ -1458,22 +1455,15 @@ col_habitat_research = {	# tweaked
 			add = @stickiness
 			has_designation = col_habitat_research
 		}
+
 		modifier = {
 			add = 5
-			has_planet_flag = research_habitat
-		}
-		add = value:research_combined_value|FACTOR|2|
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "balanced"
-					has_sector_focus = "research"
-				}
+			check_modifier_value = {
+				modifier = district_hab_science_max
+				value > 0
 			}
 		}
+		add = value:research_combined_value|FACTOR|2|
 	}
 }
 
@@ -1483,12 +1473,18 @@ col_habitat_mining = {		# tweaked
 	potential = {
 		tec_uses_habitat_districts = yes
 		tec_is_arcology_habitat = no
-		has_planet_flag = mining_habitat
+		check_modifier_value = {
+			modifier = district_hab_mining_max
+			value > 0
+		}
+		is_capital = no
+		tec_ai_allow_designation_type = { type = mining }
 	}
+
 	planet_modifier = {
-		planet_building_tec_stripmine_1_build_speed_mult = 0.25
 		planet_miners_produces_mult = 0.1
 		planet_district_hab_mining_build_speed_mult = 0.25
+		planet_building_tec_stripmine_1_build_speed_mult = 0.25
 	}
 
 	inline_script = colony_types/effects/inline_evolved_resolution_greatergood
@@ -1504,20 +1500,16 @@ col_habitat_mining = {		# tweaked
 		}
 		modifier = {
 			add = 5
-			has_planet_flag = mining_habitat
-		}
-		add = value:mining_combined_value|FACTOR|2|
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "balanced"
-					has_sector_focus = "production"
-				}
+			check_modifier_value = {
+				modifier = district_hab_mining_max
+				value > 0
 			}
 		}
+		modifier = {
+			add = 10
+			tec_has_mineral_processing_buildings = yes
+		}
+		add = value:mining_combined_value|FACTOR|2|
 	}
 }
 
@@ -1529,9 +1521,12 @@ col_habitat_farming = { # Mine better - disabled
 		always = no
 		uses_district_set = habitat
 		tec_is_arcology_habitat = no
+		is_capital = no
+		tec_ai_allow_designation_type = { type = farming }
 	}
-	custom_tooltip = col_habitat_farming_custom
+	#custom_tooltip = col_habitat_farming_custom
 	planet_modifier = {
+		planet_farmers_produces_mult = 0.25
 		planet_building_hydroponics_farm_build_speed_mult = 0.25
 	}
 
@@ -1552,18 +1547,15 @@ col_habitat_farming = { # Mine better - disabled
 			add = 5
 			has_planet_flag = tec_food_habitat
 		}
-		add = value:farming_combined_value|FACTOR|2|
 		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "balanced"
-					has_sector_focus = "production"
-				}
-			}
+			add = 10
+			tec_has_food_processing_buildings = yes
 		}
+		modifier = {
+			add = 5
+			has_building = building_baol_organic_plant
+		}
+		add = value:farming_combined_value|FACTOR|2|
 	}
 }
 
@@ -1578,10 +1570,13 @@ col_habitat_gestalt_farming = {	# Mine better - disabled
 			is_gestalt = yes
 		}
 		tec_is_arcology_habitat = no
+		is_capital = no
+		tec_ai_allow_designation_type = { type = farming }
 	}
 	custom_tooltip = col_habitat_farming_gestalt_custom
 	planet_modifier = {
 		planet_building_hydroponics_farm_build_speed_mult = 0.25
+		planet_farmers_produces_mult = 0.25
 	}
 
 	inline_script = colony_types/effects/inline_evolved_resolution_greatergood
@@ -1601,18 +1596,15 @@ col_habitat_gestalt_farming = {	# Mine better - disabled
 			add = 5
 			has_planet_flag = tec_food_habitat
 		}
-		add = value:farming_combined_value|FACTOR|2|
 		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "balanced"
-					has_sector_focus = "production"
-				}
-			}
+			add = 10
+			tec_has_food_processing_buildings = yes
 		}
+		modifier = {
+			add = 5
+			has_building = building_baol_organic_plant
+		}
+		add = value:farming_combined_value|FACTOR|2|
 	}
 }
 
@@ -1621,7 +1613,10 @@ col_habitat_fortress = {	# tweaked
 
 	potential = {
 		tec_uses_habitat_districts = yes
+		is_capital = no
+		tec_ai_allow_designation_type = { type = fortress }
 	}
+
 	planet_modifier = {
 		planet_orbital_bombardment_damage = -0.10
 		army_defense_damage_mult = 0.20
@@ -1671,8 +1666,14 @@ col_habitat_industrial = {	# tweaked
 	icon = GFX_colony_type_hab_industrial
 
 	potential = {
+		exists = owner
+		owner = { country_uses_consumer_goods = yes }
 		tec_uses_habitat_districts = yes
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = industrial }
 	}
+
 	planet_modifier = {
 		planet_metallurgists_upkeep_mult = -0.1
 		planet_artisans_upkeep_mult = -0.1
@@ -1690,6 +1691,7 @@ col_habitat_industrial = {	# tweaked
 	triggered_planet_modifier = {
 		potential = {
 			tec_is_arcology_habitat = yes
+			has_planet_flag = tec_industrial_habitat
 		}
 		modifier = {
 			planet_district_tec_hab_arcology_foundry_build_speed_mult = 0.15
@@ -1713,14 +1715,12 @@ col_habitat_industrial = {	# tweaked
 			}
 		}
 		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "manufacturing"
-					has_sector_focus = "balanced"
-				}
+			set = -100
+			exists = owner
+			owner = { is_ai = yes }
+			check_variable_arithmetic = {
+				which = value:industrial_districts_value
+				value <= 0
 			}
 		}
 	}
@@ -1729,33 +1729,14 @@ col_habitat_industrial = {	# tweaked
 col_habitat_foundry = {		# tweaked
 	icon = GFX_colony_type_habitat_foundry
 
-	# used by AI to estimate what will happen when we change the designation
-	ai_resource_conversion = {
-		consumer_goods = 0
-		alloys = 2
-		
-		trigger = {
-			owner = {
-				is_gestalt = no
-			}
-		}
-	}
-
-	ai_resource_current_conversion = {
-		alloys = 0.5
-		consumer_goods = -2
-
-		trigger = {
-			owner = {
-				is_gestalt = no
-			}
-		}
-	}
 
 	potential = {
 		tec_uses_habitat_districts = yes
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = foundry }
 	}
-	custom_tooltip = col_habitat_foundry_custom
+
 	planet_modifier = {
 		planet_metallurgists_upkeep_mult = -0.2
 	}
@@ -1772,6 +1753,7 @@ col_habitat_foundry = {		# tweaked
 	triggered_planet_modifier = {
 		potential = {
 			tec_is_arcology_habitat = yes
+			has_planet_flag = tec_industrial_habitat
 		}
 		modifier = {
 			planet_district_tec_hab_arcology_foundry_build_speed_mult = 0.25
@@ -1779,6 +1761,9 @@ col_habitat_foundry = {		# tweaked
 	}
 
 	inline_script = colony_types/effects/inline_evolved_resolution_industry_foundry
+
+	inline_script = colony_types/inline_evolved_foundry_conversion
+	custom_tooltip = col_habitat_foundry_custom
 
 	weight_modifier = {
 		modifier = {
@@ -1810,14 +1795,12 @@ col_habitat_foundry = {		# tweaked
 			}
 		}
 		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "manufacturing"
-					has_sector_focus = "balanced"
-				}
+			set = -100
+			exists = owner
+			owner = { is_ai = yes }
+			check_variable_arithmetic = {
+				which = value:industrial_districts_value|ALLOY_ONLY|yes|
+				value <= 0
 			}
 		}
 	}
@@ -1826,36 +1809,14 @@ col_habitat_foundry = {		# tweaked
 col_habitat_factory = {		# tweaked
 	icon = GFX_colony_type_habitat_factory
 
-	# used by AI to estimate what will happen when we change the designation
-	ai_resource_conversion = {
-		consumer_goods = 2
-		alloys = 0
-
-		trigger = {
-			owner = {
-				is_gestalt = no
-			}
-		}
-	}
-
-	# Used by AI to estimate the current effects of this designation
-	ai_resource_current_conversion = {
-		consumer_goods = 0.5
-		alloys = -0.5
-
-		trigger = {
-			owner = {
-				is_gestalt = no
-			}
-		}
-	}
-
 	potential = {
 		tec_uses_habitat_districts = yes
 		exists = owner
 		owner = { country_uses_consumer_goods = yes }
+		is_capital = no
+		tec_ai_allow_designation_type = { type = factory }
 	}
-	custom_tooltip = col_habitat_factory_custom
+
 	planet_modifier = {
 		planet_artisans_upkeep_mult = -0.2
 	}
@@ -1872,6 +1833,7 @@ col_habitat_factory = {		# tweaked
 	triggered_planet_modifier = {
 		potential = {
 			tec_is_arcology_habitat = yes
+			has_planet_flag = tec_industrial_habitat
 		}
 		modifier = {
 			planet_district_tec_hab_arcology_industry_build_speed_mult = 0.25
@@ -1880,6 +1842,8 @@ col_habitat_factory = {		# tweaked
 
 	inline_script = colony_types/effects/inline_evolved_resolution_industry_factory
 
+	inline_script = colony_types/inline_evolved_factory_conversion
+	custom_tooltip = col_habitat_factory_custom
 	weight_modifier = {
 		modifier = {
 			add = @stickiness
@@ -1910,14 +1874,12 @@ col_habitat_factory = {		# tweaked
 			}
 		}
 		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "manufacturing"
-					has_sector_focus = "balanced"
-				}
+			set = -100
+			exists = owner
+			owner = { is_ai = yes }
+			check_variable_arithmetic = {
+				which = value:industrial_districts_value|CG_ONLY|yes|
+				value <= 0
 			}
 		}
 	}
@@ -1928,13 +1890,16 @@ col_habitat_bureau = {
 	icon = GFX_colony_type_hab_bureaucratic
 
 	potential = {
+		exists = owner
 		owner = {
 			is_regular_empire = yes
-			is_spiritualist = no
-			has_make_spiritualist_perk = no
+			tec_country_uses_priests_and_temples = no
 		}
 		uses_district_set = habitat
 		is_special_colony_type = no
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = unity }
 	}
 
 	planet_modifier = {
@@ -1950,24 +1915,6 @@ col_habitat_bureau = {
 			has_designation = col_habitat_bureau
 		}
 		add = value:unity_combined_value|FACTOR|2|
-		modifier = {
-			add = 10
-			exists = sector
-			sector = {
-				has_sector_focus = "unity"
-			}
-		}
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "balanced"
-					has_sector_focus = "unity"
-				}
-			}
-		}
 	}
 }
 
@@ -1982,6 +1929,8 @@ col_habitat_bureau_spiritualist = {
 		}
 		uses_district_set = habitat
 		is_special_colony_type = no
+		is_capital = no
+		tec_ai_allow_designation_type = { type = unity }
 	}
 
 	planet_modifier = {
@@ -2003,24 +1952,6 @@ col_habitat_bureau_spiritualist = {
 			has_designation = col_habitat_bureau_spiritualist
 		}
 		add = value:unity_combined_value|FACTOR|2|
-		modifier = {
-			add = 10
-			exists = sector
-			sector = {
-				has_sector_focus = "unity"
-			}
-		}
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "balanced"
-					has_sector_focus = "unity"
-				}
-			}
-		}
 	}
 }
 
@@ -2032,6 +1963,8 @@ col_habitat_bureau_hive = {
 		owner = { is_hive_empire = yes }
 		uses_district_set = habitat
 		is_special_colony_type = no
+		is_capital = no
+		tec_ai_allow_designation_type = { type = unity }
 	}
 
 	planet_modifier = {
@@ -2045,24 +1978,6 @@ col_habitat_bureau_hive = {
 			has_designation = col_habitat_bureau_hive
 		}
 		add = value:unity_combined_value|FACTOR|2|
-		modifier = {
-			add = 10
-			exists = sector
-			sector = {
-				has_sector_focus = "unity"
-			}
-		}
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "balanced"
-					has_sector_focus = "unity"
-				}
-			}
-		}
 	}
 }
 
@@ -2074,6 +1989,8 @@ col_habitat_bureau_machine = {
 		owner = { is_machine_empire = yes }
 		uses_district_set = habitat
 		is_special_colony_type = no
+		#is_capital = no	# Strange this is not present
+		tec_ai_allow_designation_type = { type = unity }
 	}
 
 	planet_modifier = {
@@ -2087,24 +2004,6 @@ col_habitat_bureau_machine = {
 			has_designation = col_habitat_bureau_machine
 		}
 		add = value:unity_combined_value|FACTOR|2|
-		modifier = {
-			add = 10
-			exists = sector
-			sector = {
-				has_sector_focus = "unity"
-			}
-		}
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "balanced"
-					has_sector_focus = "unity"
-				}
-			}
-		}
 	}
 }
 
@@ -2114,7 +2013,10 @@ col_habitat_refinery = {	# tweaked
 
 	potential = {
 		tec_uses_habitat_districts = yes
+		is_capital = no
+		tec_ai_allow_designation_type = { type = refinery }
 	}
+
 	planet_modifier = {
 		planet_refiners_produces_mult = 0.15
 		planet_translucers_produces_mult = 0.15
@@ -2130,15 +2032,6 @@ col_habitat_refinery = {	# tweaked
 			has_designation = col_habitat_refinery
 		}
 		add = value:refinery_combined_value|FACTOR|2|
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				not = { has_sector_focus = "manufacturing" }
-				not = { has_sector_focus = "balanced" }
-			}
-		}
 	}
 }
 
@@ -2157,6 +2050,9 @@ col_rural_gestalt = {
 		exists = owner
 		owner = { is_gestalt = yes }
 		is_special_colony_type = no
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = rural }
 	}
 
 	planet_modifier = {
@@ -2191,15 +2087,25 @@ col_rural_gestalt = {
 			has_designation = col_rural_gestalt
 		}
 		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "production"
-					has_sector_focus = "balanced"
-				}
+			add = 5
+			OR = {
+				tec_has_energy_processing_buildings = yes
+				tec_has_mineral_processing_buildings = yes
+				tec_has_food_processing_buildings = yes
 			}
+		}
+		modifier = {
+			add = 5
+			has_building = building_baol_organic_plant
+		}
+		modifier = {
+			add = 2
+			tec_has_betharian_deposit = yes
+		}
+		modifier = {
+			add = 3
+			tec_has_betharian_deposit = yes
+			owner = { has_technology = tech_mine_betharian }
 		}
 	}
 }
@@ -2218,6 +2124,8 @@ col_rural = {
 			tec_is_pd_nonconventional_world = yes
 		}
 		is_special_colony_type = no
+		is_capital = no
+		tec_ai_allow_designation_type = { type = rural }
 	}
 
 	planet_modifier = {
@@ -2256,15 +2164,25 @@ col_rural = {
 			has_designation = col_rural
 		}
 		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "production"
-					has_sector_focus = "balanced"
-				}
+			add = 5
+			OR = {
+				tec_has_energy_processing_buildings = yes
+				tec_has_mineral_processing_buildings = yes
+				tec_has_food_processing_buildings = yes
 			}
+		}
+		modifier = {
+			add = 5
+			has_building = building_baol_organic_plant
+		}
+		modifier = {
+			add = 2
+			tec_has_betharian_deposit = yes
+		}
+		modifier = {
+			add = 3
+			tec_has_betharian_deposit = yes
+			owner = { has_technology = tech_mine_betharian }
 		}
 	}
 }
@@ -2276,6 +2194,7 @@ col_ring_mix = {
 
 	potential = {
 		tec_uses_ringworld_districts = yes
+		is_capital = no
 	}
 
 	planet_modifier = {
@@ -2304,6 +2223,9 @@ col_ring_research = {
 
 	potential = {
 		tec_uses_ringworld_districts = yes
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = research }
 	}
 
 	planet_modifier = {
@@ -2321,17 +2243,6 @@ col_ring_research = {
 			has_designation = col_ring_research
 		}
 		add = value:research_combined_value|FACTOR|3|
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "balanced"
-					has_sector_focus = "research"
-				}
-			}
-		}
 	}
 }
 
@@ -2341,6 +2252,9 @@ col_ring_farming = {
 	potential = {
 		tec_uses_ringworld_districts = yes
 		tec_is_unspecced_ringworld = yes
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = farming }
 	}
 
 	planet_modifier = {
@@ -2364,15 +2278,12 @@ col_ring_farming = {
 		}
 		add = value:farming_combined_value|FACTOR|2|
 		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "balanced"
-					has_sector_focus = "production"
-				}
-			}
+			add = 10
+			tec_has_food_processing_buildings = yes
+		}
+		modifier = {
+			add = 5
+			has_building = building_baol_organic_plant
 		}
 	}
 }
@@ -2389,6 +2300,8 @@ col_ring_trade = {
 				tec_is_trade_gestalt = yes
 			}
 		}
+		is_capital = no
+		tec_ai_allow_designation_type = { type = trade }
 	}
 
 	planet_modifier = {
@@ -2428,6 +2341,9 @@ col_ring_generator = {
 	potential = {
 		tec_uses_ringworld_districts = yes
 		tec_is_unspecced_ringworld = yes
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = generator }
 	}
 
 	planet_modifier = {
@@ -2454,15 +2370,6 @@ col_ring_generator = {
 			add = value:generator_districts_value|FACTOR|75|
 			is_capital = no
 		}
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				not = { has_sector_focus = "production" }
-				not = { has_sector_focus = "balanced" }
-			}
-		}
 	}
 }
 
@@ -2472,6 +2379,7 @@ col_ecu_mix = {				# tweaked
 
 	potential = {
 		tec_is_city_world = yes
+		is_capital = no
 	}
 
 	planet_modifier = {
@@ -2488,7 +2396,7 @@ col_ecu_mix = {				# tweaked
 			add = 20
 			num_districts = {
 				type = any
-				value > 10
+				value < 5
 			}
 		}
 	}
@@ -2511,13 +2419,16 @@ col_ecu_industrial = {
 			}
 			tec_is_pd_ecu_with_industrial = yes
 		}
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = industrial }
 	}
 
 	planet_modifier = {
-		planet_district_arcology_civilian_industry_build_speed_mult = 0.25
-		planet_district_arcology_arms_industry_build_speed_mult = 0.25
 		planet_artisans_upkeep_mult = -0.10
 		planet_metallurgists_upkeep_mult = -0.10
+		planet_district_arcology_civilian_industry_build_speed_mult = 0.25
+		planet_district_arcology_arms_industry_build_speed_mult = 0.25
 	}
 
 	inline_script = colony_types/effects/inline_evolved_resolution_industry_industrial
@@ -2537,14 +2448,12 @@ col_ecu_industrial = {
 			tec_has_alloy_buildings = yes
 		}
 		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "manufacturing"
-					has_sector_focus = "balanced"
-				}
+			set = -100
+			exists = owner
+			owner = { is_ai = yes }
+			check_variable_arithmetic = {
+				which = value:industrial_districts_value
+				value <= 0
 			}
 		}
 	}
@@ -2552,25 +2461,6 @@ col_ecu_industrial = {
 
 col_ecu_foundry = {			# tweaked
 	icon = GFX_colony_type_foundry
-
-	# used by AI to estimate what will happen when we change the designation
-	ai_resource_conversion = {
-		consumer_goods = 0
-		alloys = 2
-		
-		trigger = {
-			always = yes
-		}
-	}
-
-	ai_resource_current_conversion = {
-		alloys = 0.5
-		consumer_goods = -2
-
-		trigger = {
-			always = yes
-		}
-	}
 
 	potential = {
 		OR = {
@@ -2583,12 +2473,16 @@ col_ecu_foundry = {			# tweaked
 			}
 			tec_is_pd_ecu_with_foundry = yes
 		}
+		is_capital = no
+
+
+		tec_ai_allow_designation_type = { type = foundry }
 	}
 
 	planet_modifier = {
+		planet_metallurgists_upkeep_mult = -0.2
 		planet_building_foundry_1_build_speed_mult = 0.25
 		planet_district_arcology_arms_industry_build_speed_mult = 0.25
-		planet_metallurgists_upkeep_mult = -0.2
 	}
 
 	inline_script = colony_types/effects/inline_evolved_resolution_industry_foundry
@@ -2626,14 +2520,12 @@ col_ecu_foundry = {			# tweaked
 			}
 		}
 		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "manufacturing"
-					has_sector_focus = "balanced"
-				}
+			set = -100
+			exists = owner
+			owner = { is_ai = yes }
+			check_variable_arithmetic = {
+				which = value:industrial_districts_value|ALLOY_ONLY|yes|
+				value <= 0
 			}
 		}
 	}
@@ -2641,30 +2533,6 @@ col_ecu_foundry = {			# tweaked
 
 col_ecu_factory = {			# tweaked
 	icon = GFX_colony_type_factory
-
-	# used by AI to estimate what will happen when we change the designation
-	ai_resource_conversion = {
-		consumer_goods = 2
-		alloys = 0
-
-		trigger = {
-			owner = {
-				is_gestalt = no
-			}
-		}
-	}
-
-	# Used by AI to estimate the current effects of this designation
-	ai_resource_current_conversion = {
-		consumer_goods = 0.5
-		alloys = -0.5
-
-		trigger = {
-			owner = {
-				is_gestalt = no
-			}
-		}
-	}
 
 	potential = {
 		OR = {
@@ -2679,12 +2547,15 @@ col_ecu_factory = {			# tweaked
 		}
 		exists = owner
 		owner = { country_uses_consumer_goods = yes }
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = factory }
 	}
 
 	planet_modifier = {
+		planet_artisans_upkeep_mult = -0.2
 		planet_building_factory_1_build_speed_mult = 0.25
 		planet_district_arcology_civilian_industry_build_speed_mult = 0.25
-		planet_artisans_upkeep_mult = -0.2
 	}
 
 	inline_script = colony_types/effects/inline_evolved_resolution_industry_factory
@@ -2704,14 +2575,12 @@ col_ecu_factory = {			# tweaked
 			tec_has_alloy_buildings = yes
 		}
 		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "manufacturing"
-					has_sector_focus = "balanced"
-				}
+			set = -100
+			exists = owner
+			owner = { is_ai = yes }
+			check_variable_arithmetic = {
+				which = value:industrial_districts_value|CG_ONLY|yes|
+				value <= 0
 			}
 		}
 	}
@@ -2731,12 +2600,15 @@ col_ecu_research = {
 			}
 			tec_is_pd_ecu_with_research = yes
 		}
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = research }
 	}
 
 	planet_modifier = {
+		planet_researchers_upkeep_mult = -0.2
 		planet_building_research_lab_1_build_speed_mult = 0.25
 		planet_district_tec_arcology_research_build_speed_mult = 0.25
-		planet_researchers_upkeep_mult = -0.2
 	}
 
 	weight_modifier = {
@@ -2745,17 +2617,6 @@ col_ecu_research = {
 			has_designation = col_ecu_research
 		}
 		add = value:research_combined_value|FACTOR|3|
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "balanced"
-					has_sector_focus = "research"
-				}
-			}
-		}
 	}
 }
 
@@ -2765,12 +2626,25 @@ col_mac = {
 
 	potential = {
 		uses_district_set = machine_world
+		is_capital = no
 	}
 
 	planet_modifier = {
-		planet_district_mining_uncapped_build_speed_mult = 0.25
-		planet_district_generator_uncapped_build_speed_mult = 0.25
 		planet_jobs_simple_drone_produces_mult = 0.05
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_rural_generator_district_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_rural_mining_district_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
 	}
 
 	weight_modifier = {
@@ -2790,13 +2664,16 @@ col_mac_foundry = {
 
 	potential = {
 		uses_district_set = machine_world
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = foundry }
 	}
 
-	custom_tooltip = col_foundry_custom
 	planet_modifier = {
-		planet_district_industrial_build_speed_mult = 0.25
 		planet_metallurgists_upkeep_mult = -0.2
+		planet_district_industrial_build_speed_mult = 0.25
 	}
+	custom_tooltip = col_foundry_custom
 
 	inline_script = colony_types/effects/inline_evolved_resolution_industry_foundry
 
@@ -2833,14 +2710,12 @@ col_mac_foundry = {
 			}
 		}
 		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "manufacturing"
-					has_sector_focus = "balanced"
-				}
+			set = -100
+			exists = owner
+			owner = { is_ai = yes }
+			check_variable_arithmetic = {
+				which = value:industrial_districts_value|ALLOY_ONLY|yes|
+				value <= 0
 			}
 		}
 	}
@@ -2855,12 +2730,16 @@ col_mac_factory = {
 			uses_district_set = @pdmachinefactory	# PD
 		}
 		owner = { country_uses_consumer_goods = yes }
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = factory }
+
 	}
 
 	custom_tooltip = col_factory_custom
 	planet_modifier = {
-		planet_district_industrial_build_speed_mult = 0.25
 		planet_artisans_upkeep_mult = -0.2
+		planet_district_industrial_build_speed_mult = 0.25
 	}
 
 	inline_script = colony_types/effects/inline_evolved_resolution_industry_factory
@@ -2895,14 +2774,12 @@ col_mac_factory = {
 			}
 		}
 		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "manufacturing"
-					has_sector_focus = "balanced"
-				}
+			set = -100
+			exists = owner
+			owner = { is_ai = yes }
+			check_variable_arithmetic = {
+				which = value:industrial_districts_value|CG_ONLY|yes|
+				value <= 0
 			}
 		}
 	}
@@ -2914,30 +2791,38 @@ col_hiv = {
 
 	potential = {
 		uses_district_set = hive_world
+		is_capital = no
 	}
 
 	planet_modifier = {
-		planet_district_mining_uncapped_build_speed_mult = 0.25
-		planet_district_farming_uncapped_build_speed_mult = 0.25
-		planet_district_generator_uncapped_build_speed_mult = 0.25
 		planet_jobs_simple_drone_produces_mult = 0.05
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_rural_generator_district_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_rural_mining_district_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
+	}
+
+	inline_script = {
+		script = modifiers/inline_evolved_rural_farming_district_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
 	}
 
 	weight_modifier = {
 		modifier = {
 			add = @stickiness_low
 			has_designation = col_hiv
-		}
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "production"
-					has_sector_focus = "balanced"
-				}
-			}
 		}
 	}
 }
@@ -2947,11 +2832,14 @@ col_hiv_foundry = {
 
 	potential = {
 		uses_district_set = hive_world
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = foundry }
 	}
 
 	planet_modifier = {
-		planet_district_industrial_build_speed_mult = 0.25
 		planet_metallurgists_upkeep_mult = -0.20
+		planet_district_industrial_build_speed_mult = 0.25
 	}
 
 	inline_script = colony_types/effects/inline_evolved_resolution_industry_foundry
@@ -2986,14 +2874,12 @@ col_hiv_foundry = {
 
 		}
 		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "manufacturing"
-					has_sector_focus = "balanced"
-				}
+			set = -100
+			exists = owner
+			owner = { is_ai = yes }
+			check_variable_arithmetic = {
+				which = value:industrial_districts_value|ALLOY_ONLY|yes|
+				value <= 0
 			}
 		}
 	}
@@ -3009,6 +2895,9 @@ col_trophy_machine = {
 			uses_district_set = habitat
 		}
 		is_special_colony_type = no
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = unity }
 	}
 
 	planet_modifier = {
@@ -3024,26 +2913,21 @@ col_trophy_machine = {
 			has_designation = col_trophy_machine
 		}
 		add = value:unity_combined_value|FACTOR|3|RS_ONLY|yes|
-		modifier = {
-			add = 10
-			exists = sector
-			sector = {
-				has_sector_focus = "unity"
-			}
-		}
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "balanced"
-					has_sector_focus = "unity"
-				}
-			}
-		}
 	}
 }
+
+
+# Fallen Empire Capital
+#col_fe_capital
+
+# Fallen Empire Colony
+#col_fe_colony
+
+# Resort World
+#col_resort
+
+# Penal Colony
+#col_penal
 
 # Crucible Planet
 col_crucible = {
@@ -3051,6 +2935,7 @@ col_crucible = {
 
 	potential = {
 		has_modifier = crucible_colony
+		is_capital = no
 	}
 	planet_modifier = {
 		pop_growth_speed = 0.10

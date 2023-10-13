@@ -2,25 +2,24 @@
 
 #root = planet
 
-@small_planet_threshold = 18
-@free_districts_verylow_threshold = 3
-@free_districts_low_threshold = 5
-@free_districts_medium_threshold = 10
-@free_districts_high_threshold = 15
-@built_districts_low_threshold = 3
-@built_districts_medium_threshold = 4
-@built_districts_high_threshold = 8
 
+@stickiness = 10
+@stickiness_low = 5
 
 #trade bonus for ecu
 col_ecu_trade = {
 	icon = GFX_colony_type_habitat_trade
 
 	potential = {
+		exists = owner
+		owner = {
+			tec_uses_trade_value = yes
+		}
 		OR = {
 			uses_district_set = city_world
 			tec_is_pd_ecu_with_trade = yes
 		}
+		tec_ai_allow_designation_type = { type = trade }
 	}
 
 	planet_modifier = {
@@ -34,6 +33,7 @@ col_ecu_trade = {
 			has_designation = col_ecu_trade
 		}
 		add = value:housing_districts_value|FACTOR|2|
+		add = value:tec_trader_jobs_value
 		complex_trigger_modifier = {
 			trigger = num_districts
 			parameters = {
@@ -41,14 +41,6 @@ col_ecu_trade = {
 			}
 			mode = add
 			mult = 10
-		}
-		complex_trigger_modifier = {
-			trigger = num_assigned_jobs
-			parameters = {
-				job = merchant # merchant jobs act as a pretty decent proxy for "this is a trade planet"
-			}
-			mode = add
-			mult = 2
 		}
 	}
 }
@@ -60,12 +52,16 @@ col_tec_habitat_food = {
 	potential = {
 		tec_uses_habitat_districts = yes
 		tec_is_arcology_habitat = no
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = farming }
 	}
 	planet_modifier = {	
+		planet_farmers_produces_mult = 0.25
 		planet_building_hydroponics_farm_build_speed_mult = 0.25
-		planet_farmers_produces_mult = 0.1
 		planet_district_tec_hab_food_build_speed_mult = 0.25
 	}
+
 	inline_script = colony_types/effects/inline_evolved_resolution_greatergood
 	# Evolved
 		inline_script = colony_types/effects/inline_evolved_tec_land_of_plenty_farming
@@ -81,18 +77,15 @@ col_tec_habitat_food = {
 			add = 5
 			has_planet_flag = tec_food_habitat
 		}
-		add = value:farming_combined_value|FACTOR|2|
 		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				NOR = {
-					has_sector_focus = "balanced"
-					has_sector_focus = "production"
-				}
-			}
+			add = 10
+			tec_has_food_processing_buildings = yes
 		}
+		modifier = {
+			add = 5
+			has_building = building_baol_organic_plant
+		}
+		add = value:farming_combined_value|FACTOR|2|
 	}
 }
 
@@ -103,6 +96,8 @@ col_tec_ring_mining = {
 	potential = {
 		tec_uses_ringworld_districts = yes
 		tec_is_unspecced_ringworld = yes
+
+		tec_ai_allow_designation_type = { type = mining }
 	}
 
 	planet_modifier = {
@@ -122,18 +117,13 @@ col_tec_ring_mining = {
 	weight_modifier = {
 		modifier = {
 			add = @stickiness
-			has_designation = col_ring_farming
+			has_designation = col_tec_ring_mining
+		}
+		modifier = {
+			add = 10
+			tec_has_mineral_processing_buildings = yes
 		}
 		add = value:mining_districts_value|FACTOR|3|
-		modifier = {
-			factor = 0
-			exists = sector
-			sector = {
-				has_any_sector_focus = yes
-				not = { has_sector_focus = "production" }
-				not = { has_sector_focus = "balanced" }
-			}
-		}
 	}
 }
 
@@ -151,3 +141,32 @@ col_tec_ring_mining = {
 
 # Rimworld Colonies
 #col_tec_rimworld
+
+col_tec_fallback = {
+	icon = GFX_colony_type_urban
+
+	potential = {
+		exists = owner
+		owner = { is_ai = yes }
+		tec_ai_not_forced_other_designations = { any = yes }
+		NOT = {
+			has_planet_flag = tec_invalidate_fallback_designation
+		}
+	}
+
+	weight_modifier = {
+		base = -10
+	}
+}
+
+col_tec_force = {
+	icon = GFX_colony_type_urban
+
+	potential = {
+		has_planet_flag = tec_force_designation_refresh
+	}
+
+	weight_modifier = {
+		base = -10
+	}
+}

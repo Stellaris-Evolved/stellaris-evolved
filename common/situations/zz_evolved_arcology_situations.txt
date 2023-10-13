@@ -1,0 +1,350 @@
+# common\situations\zz_evolved_arcology_situations.txt
+
+
+# Vars
+# ------------------------------------------------------------
+@tec_arc_situation_cost_low = 25
+@tec_arc_situation_cost_high = 50
+@tec_arc_situation_cost_hybrid = 25
+@tec_arc_path_cost_low = 50
+@tec_arc_path_cost_high = 100
+@tec_arc_path_cost_hybrid = 25
+@tec_arc_path_cost_hybrid_high = 50
+
+# --------------------------- Machine Worlds --------------------------------
+# Steps
+	# Machine colonize
+	# Machine erodes environment
+	# Machine gets an additional district
+	# Allos a specific bonus district swap
+	# Planet changes
+# 
+
+ # --------------- T1
+	situation_tec_machine_world_base = {
+		desc = {
+			text = situation_tec_machine_world_base_desc
+			trigger = {
+				hidden_trigger = {
+					always = yes
+				}
+			}
+		}
+		# Pictures
+			picture = {
+				trigger = {
+					target = {
+						tec_is_gaia_world = no
+						is_dry = yes
+						NOT = {
+							has_modifier = pm_tec_machine_world_half
+						}
+					}
+				}
+				picture = GFX_evt_desert
+			}
+			picture = {
+				trigger = {
+					target = {
+						tec_is_gaia_world = no
+						is_wet = yes
+						NOT = {
+							has_modifier = pm_tec_machine_world_half
+						}
+					}
+				}
+				picture = GFX_evt_continental
+			}
+			picture = {
+				trigger = {
+					target = {
+						tec_is_gaia_world = no
+						is_cold = yes
+						NOT = {
+							has_modifier = pm_tec_machine_world_half
+						}
+					}
+				}
+				picture = GFX_evt_tundra
+			}
+			picture = {
+				trigger = {
+					target = {
+						tec_is_gaia_world = yes
+						NOT = {
+							has_modifier = pm_tec_machine_world_half
+						}
+					}
+				}
+				picture = GFX_evt_gaia
+			}
+			picture = {	# Half completion
+				trigger = {
+					target = {
+						has_modifier = pm_tec_machine_world_half
+					}
+				}
+				picture = GFX_evt_tomb_world
+			}
+			picture = {	# Near completion
+				trigger = {
+					target = {
+						has_modifier = pm_tec_machine_world_full
+					}
+				}
+				picture = GFX_evt_contingency_planet
+			}
+		# /
+		category = positive
+		complete_icon_frame = GFX_situation_outcome_frame_green
+		complete_icon = GFX_situation_outcome_unknown
+		fail_icon_frame = GFX_situation_outcome_frame_red
+		fail_icon = GFX_situation_outcome_negative
+
+		start_value = 0
+		progress_direction = monodirectional
+
+		on_start = {
+			set_situation_locked = yes
+		}
+
+		on_fail = {
+			# This should never happen, but if it does...
+			owner = {
+				start_situation = {
+					type = situation_tec_machine_world_base
+					target = root.target
+					effect = {
+						save_event_target_as = new_situation
+					}
+				}
+			}
+			event_target:new_situation = {
+				set_situation_locked = no
+			}
+		}
+
+		on_monthly = {
+			random_events = {
+				# Nothing
+				200 = 0
+				# Negative random outcomes
+				#2 = tec_machine_world.10011
+				# Positive random outcomes
+				#2 = tec_machine_world.10021
+			}
+		}
+		
+		on_progress_complete = {
+			hidden_effect = {
+				owner = {
+					#country_event = {
+					#	id = tec_machine_world.105
+					#}
+				}
+				destroy_situation = this
+			}
+			custom_tooltip = situation_tec_machine_world_base_end_tooltip
+			destroy_situation = this
+		}
+
+		stages = {
+			# Note: Normal terraforming takes 20 years, 7200 days
+			# Bumped to 10000 of situation long due to the effects being active preemptively
+			# There will be extra bonus for terraforming speed and upkeep reduction for terraforming cost reduction
+
+			# Mechanizing the planet
+			situation_tec_machine_world_base_stage_1 = { #0 - 2000
+				icon = GFX_situation_stage_1
+				icon_background = GFX_situation_stage_frame_red
+				end = 2000
+			}
+			# Unlocks the Assembly line
+			situation_tec_machine_world_base_stage_2 = { #0500 - 4000
+				icon = GFX_situation_stage_2
+				icon_background = GFX_situation_stage_frame_tec_orange
+				end = 4000
+				on_first_enter = {
+					hidden_effect = {
+						#situation_event = {
+						#	id = tec_machine_world.10020
+						#}
+					}
+					
+				}
+			}
+			# Planet becomes even less habitable
+			situation_tec_machine_world_base_stage_3 = { #4000 - 6000
+				icon = GFX_situation_stage_3
+				icon_background = GFX_situation_stage_frame_tec_yellow
+				end = 6000
+				on_first_enter = {
+					hidden_effect = {
+						#situation_event = {
+						#	id = tec_machine_world.10030
+						#}
+					}
+				}
+			}
+			# Planet becomes even less habitable
+			situation_tec_machine_world_base_stage_4 = { #6000 - 8000
+				icon = GFX_situation_stage_4
+				icon_background = GFX_situation_stage_frame_green
+				end = 8000
+				on_first_enter = {
+					hidden_effect = {
+						#situation_event = {
+						#	id = tec_machine_world.10040
+						#}
+					}
+				}
+			}
+			# Planet becomes even less habitable
+			situation_tec_machine_world_base_stage_5 = { #8000 - 10000
+				icon = GFX_situation_stage_5
+				icon_background = GFX_situation_stage_frame_blue
+				end = 10000
+				on_first_enter = {
+					#hidden_effect = {
+					#	situation_event = {
+					#		id = tec_machine_world.10050
+					#	}
+					#}
+				}
+			}
+		}
+
+		# Approaches
+			approach = { # x0.5 speed - way less cost
+				name = situation_tec_machine_world_base_approach_slow
+				icon = GFX_situation_approach_tec_city
+				icon_background = GFX_situation_approach_bg_green
+				#potential = {
+				#	has_situation_flag = 
+				#}
+				on_select = {
+					custom_tooltip = situation_tec_machine_world_base_approach_slow_tooltip
+				}
+				resources = {
+					category = situations
+					upkeep = {
+						society_research = @tec_situation_cost_low
+						#mult = owner.trigger:num_pops
+					}
+				}
+			}
+			approach = { # x1 speed - normal cost
+				name = situation_tec_machine_world_base_approach_normal
+				icon = GFX_situation_approach_tec_city
+				icon_background = GFX_situation_approach_bg_yellow
+				#potential = {
+				#	has_situation_flag = 
+				#}
+				on_select = {
+					custom_tooltip = situation_tec_machine_world_base_approach_normal_tooltip
+				}
+				resources = {
+					category = situations
+					upkeep = {
+						#trigger = {
+						#	owner = {
+						#		has_monthly_income = {
+						#			resource = society_research
+						#			value >= @tec_situation_cost_low
+						#		}
+						#	}
+						#}
+						society_research = @tec_situation_cost_low
+					}
+				}
+			}
+			approach = { # x2 speed - x2 cost
+				name = situation_tec_machine_world_base_approach_fast
+				icon = GFX_situation_approach_tec_city
+				icon_background = GFX_situation_approach_bg_tec_orange
+				#potential = {
+				#	has_situation_flag = 
+				#}
+				on_select = {
+					custom_tooltip = situation_tec_machine_world_base_approach_fast_tooltip
+				}
+				resources = {
+					category = situations
+					upkeep = {
+						#trigger = {
+						#	owner = {
+						#		has_monthly_income = {
+						#			resource = society_research
+						#			value >= @tec_situation_cost_low
+						#		}
+						#	}
+						#}
+						society_research = @tec_situation_cost_low
+					}
+				}
+			}
+		# /
+
+		monthly_progress = {
+			base = 0
+			# Debug
+				modifier = {
+					add = 10
+					desc = EXCELLENT
+					OR = {
+						has_situation_flag = situation_tec_debug
+						owner = {
+							has_country_flag = situation_tec_debug
+						}
+					}
+				}
+				modifier = {
+					add = 5
+					desc = EXCELLENT
+					OR = {
+						has_situation_flag = situation_tec_debug_2
+						owner = {
+							has_country_flag = situation_tec_debug_2
+						}
+					}
+				}
+				modifier = {
+					add = -10
+					desc = EXCELLENT
+					OR = {
+						has_situation_flag = situation_tec_debug_negative
+						owner = {
+							has_country_flag = situation_tec_debug_negative
+						}
+					}
+				}
+				modifier = {
+					add = -5
+					desc = EXCELLENT
+					OR = {
+						has_situation_flag = situation_tec_debug_negative_2
+						owner = {
+							has_country_flag = situation_tec_debug_negative_2
+						}
+					}
+				}
+			# /
+			# Approaches
+			modifier = {
+				add = -2
+				desc = situation_string_tec_gene_path_t1_bad
+				current_situation_approach = situation_approach_tec_gene_path_t1_bio
+			}
+			modifier = {
+				add = 2
+				desc = situation_string_tec_gene_path_t1_base
+				current_situation_approach = situation_approach_tec_gene_path_t1_neutral
+			}
+		}
+
+		abort_trigger = {
+			NOT = { exists = owner }
+		}
+	}
+ # /
+

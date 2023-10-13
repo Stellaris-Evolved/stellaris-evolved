@@ -11,145 +11,12 @@
 # Decisions - Urban megacorp
 # - - - - - - - - - - - - - - - - - - - - - 
 # Arcology Project
-decision_arcology_project = {
-	owned_planets_only = yes
-	icon = decision_arcology_project
-
-	enactment_time = 2700 #3600 2700
-	resources = {
-		category = decisions_ecu
-		cost = {
-			influence = 200
-			minerals = 20000
-		}
-	}
-
-	potential = {
-		exists = owner
-		tec_arcology_project_potential = yes
-		owner = { tec_is_urbancorp = no }
-	}
-
-	allow = {
-		tec_arcology_project_allow = yes
-	}
-
-	effect = {
-		# Make city-planet
-		custom_tooltip = decision_arcology_project_effects
-		hidden_effect = {
-			tec_ecu_logic_start = { change_pc = pc_city }
-			
-			set_industrial_focus_flags = yes
-			relic_world_conversion_effect = {
-				DISTRICT = district_arcology_housing
-				VARIABLE = num_housing_districts
-			}
-			relic_world_conversion_effect = {
-				DISTRICT = district_arcology_arms_industry
-				VARIABLE = num_industrial_districts
-			}
-
-			set_ecu_industrial_districts_effect = yes
-			
-			owner = {
-				country_event = { id = distar.201 } # port for living planet distar.197, triggers in event
-			}
-			planet_event = { id = mega.200 }
-			
-			tec_ecu_logic_finish = yes
-		}
-	}
-
-	ai_weight = {
-		weight = 100
-		modifier = {
-			add = 5
-			OR = {
-				tec_is_nuked_world = yes
-			}
-		}
-		modifier = {
-			add = 3 
-			exists = owner
-			owner = {
-				OR = {
-					is_industrialist = yes
-					has_ethic = ethic_gestalt_disregard
-				}
-			}
-			is_capital = yes # industrialist ais make capital ecus
-		}
-		modifier = {
-			add = 2
-			exists = owner
-			owner = {
-				OR = {
-					is_industrialist = yes
-					has_ethic = ethic_gestalt_disregard
-				}
-			}
-		}
-		modifier = {
-			factor = 0
-			tec_ai_can_ecu = no
-		}
-	}
-}
+# decision_arcology_project
+# ON OVERWRITE FILE
 
 # Arcology Project (Relic Worlds)
-decision_arcology_project_relic = {
-	owned_planets_only = yes
-	icon = decision_arcology_project
-
-	enactment_time = 2700 #3600 2700
-	resources = {
-		category = decisions_ecu
-		cost = {
-			influence = 200
-			minerals = 20000
-		}
-	}
-
-	potential = {
-		exists = owner
-		tec_arcology_project_relic_potential = yes
-		owner = { tec_is_urbancorp = no }
-	}
-
-	allow = {
-		tec_arcology_project_relic_allow = yes
-	}
-
-	effect = {
-		# Make city-planet
-		custom_tooltip = decision_arcology_project_effects
-		hidden_effect = {
-			tec_ecu_logic_start = { change_pc = pc_city relic = yes }
-			
-			set_industrial_focus_flags = yes
-			relic_world_conversion_effect = {
-				DISTRICT = district_arcology_housing
-				VARIABLE = num_housing_districts
-			}
-			relic_world_conversion_effect = {
-				DISTRICT = district_arcology_arms_industry
-				VARIABLE = num_industrial_districts
-			}
-
-			set_ecu_industrial_districts_effect = yes
-			
-			planet_event = { 
-				id = mega.201 
-			}
-			
-			tec_ecu_logic_finish = { relic = yes }
-		}
-	}
-	ai_weight = {
-		weight = 100
-	}
-}
+# decision_arcology_project_relic
+# ON OVERWRITE FILE
 
 # Arcology Project for Urban Idyll megacorps
 decision_arcology_project_tec_corporate_urbancorp = {
@@ -181,7 +48,7 @@ decision_arcology_project_tec_corporate_urbancorp = {
 		hidden_effect = {
 			tec_ecu_logic_start = { change_pc = pc_city }
 			
-			set_industrial_focus_flags = yes
+			tec_set_focus_flags_effect = yes
 			relic_world_conversion_effect = {
 				DISTRICT = district_arcology_housing
 				VARIABLE = num_housing_districts
@@ -270,7 +137,7 @@ decision_arcology_project_relic_tec_corporate_urbancorp = {
 		hidden_effect = {
 			tec_ecu_logic_start = { change_pc = pc_city relic = yes }
 			
-			set_industrial_focus_flags = yes
+			tec_set_focus_flags_effect = yes
 			relic_world_conversion_effect = {
 				DISTRICT = district_arcology_housing
 				VARIABLE = num_housing_districts
@@ -309,6 +176,7 @@ decision_arcology_project_relic_tec_corporate_urbancorp = {
 # Militar ecumenopolis
 decision_tec_military_ecu = {
 	icon = decision_tec_military_ecu
+	owned_planets_only = yes
 
 	enactment_time = 900
 
@@ -320,20 +188,25 @@ decision_tec_military_ecu = {
 	}
 	
 	potential = {
+		exists = owner
 		OR = {
 			is_planet_class = pc_city
 			# Pd compat
-			is_planet_class = @pc_milarc
-		}
-		exists = owner
-		owner = {
-			has_ascension_perk = ap_arcology_project
+			is_pd_miliarc = yes
+			is_pd_milarc = yes # in case of typo
 		}
 		tec_is_unspecced_city_planet = yes
 	}
 
 	allow = {
 		NOT = { has_planet_flag = tec_block_other_specializations }
+		custom_tooltip = {
+			fail_text = decision_tec_arcology_require_arcology_project
+			exists = owner
+			owner = {
+				has_ascension_perk = ap_arcology_project
+			}
+		}
 	}
 
 	effect = {
@@ -367,7 +240,7 @@ decision_tec_military_ecu = {
 	}
 	
 	ai_weight = {
-		weight = 0
+		weight = 100
 		add = value:industrial_districts_value|FACTOR|2|ALLOY_ONLY|yes|
 		add = value:stronghold_buildings_value|FACTOR|3|
 		modifier = {
@@ -383,6 +256,7 @@ decision_tec_military_ecu = {
 # Science ecumenopolis
 decision_tec_science_ecu = {
 	icon = decision_tec_science_ecu
+	owned_planets_only = yes
 
 	enactment_time = 900
 
@@ -394,19 +268,23 @@ decision_tec_science_ecu = {
 	}
 	
 	potential = {
+		exists = owner
 		OR = {
 			is_planet_class = pc_city
-			is_planet_class = @pc_ecocity
-		}
-		exists = owner
-		owner = {
-			has_ascension_perk = ap_arcology_project
+			is_pd_ecocity = yes
 		}
 		tec_is_unspecced_city_planet = yes
 	}
 
 	allow = {
 		NOT = { has_planet_flag = tec_block_other_specializations }
+		custom_tooltip = {
+			fail_text = decision_tec_arcology_require_arcology_project
+			exists = owner
+			owner = {
+				has_ascension_perk = ap_arcology_project
+			}
+		}
 	}
 
 	effect = {
@@ -440,7 +318,7 @@ decision_tec_science_ecu = {
 	}
 
 	ai_weight = {
-		weight = 0
+		weight = 100
 		add = value:research_combined_value|FACTOR|3|
 		add = value:refinery_combined_value|FACTOR|3|
 		modifier = {
@@ -456,6 +334,7 @@ decision_tec_science_ecu = {
 # Administration Ecumenopolis
 decision_tec_administration_ecu = {
 	icon = decision_tec_administration_ecu
+	owned_planets_only = yes
 
 	enactment_time = 900
 
@@ -467,19 +346,23 @@ decision_tec_administration_ecu = {
 	}
 	
 	potential = {
+		exists = owner
 		OR = {
 			is_planet_class = pc_city
-			is_planet_class = @pc_ecocity
-		}
-		exists = owner
-		owner = {
-			has_ascension_perk = ap_arcology_project
+			is_pd_ecocity = yes
 		}
 		tec_is_unspecced_city_planet = yes
 	}
 
 	allow = {
 		NOT = { has_planet_flag = tec_block_other_specializations }
+		custom_tooltip = {
+			fail_text = decision_tec_arcology_require_arcology_project
+			exists = owner
+			owner = {
+				has_ascension_perk = ap_arcology_project
+			}
+		}
 	}
 
 	effect = {
@@ -513,7 +396,7 @@ decision_tec_administration_ecu = {
 	}
 
 	ai_weight = {
-		weight = 0
+		weight = 100
 		add = value:unity_combined_value|FACTOR|3|
 		add = value:industrial_districts_value|FACTOR|2|CG_ONLY|yes|
 		modifier = {
@@ -529,6 +412,7 @@ decision_tec_administration_ecu = {
 # Precursor ecumenopolis
 decision_tec_precursor_ecu = {
 	icon = decision_tec_precursor_ecu
+	owned_planets_only = yes
 
 	enactment_time = 1800
 
@@ -541,14 +425,10 @@ decision_tec_precursor_ecu = {
 	}
 	
 	potential = {
-
 		always = no			#for future patches
+		exists = owner
 		OR = {
 			is_planet_class = pc_city
-		}
-		exists = owner
-		owner = {
-			has_ascension_perk = ap_arcology_project
 		}
 		has_planet_flag = tec_ecumenopolis_refinery_nospec
 		NOR = {
@@ -560,6 +440,13 @@ decision_tec_precursor_ecu = {
 
 	allow = {
 		NOT = { has_planet_flag = tec_block_other_specializations }
+		custom_tooltip = {
+			fail_text = decision_tec_arcology_require_arcology_project
+			exists = owner
+			owner = {
+				has_ascension_perk = ap_arcology_project
+			}
+		}
 	}
 
 	effect = {
@@ -599,6 +486,7 @@ decision_tec_precursor_ecu = {
 # Science ecumenopolis
 decision_tec_science_ecu_refinery = {
 	icon = decision_tec_science_ecu_refinery
+	owned_planets_only = yes
 
 	enactment_time = 300
 
@@ -610,12 +498,9 @@ decision_tec_science_ecu_refinery = {
 	}
 	
 	potential = {
+		exists = owner
 		OR = {
 			is_planet_class = pc_city
-		}
-		exists = owner
-		owner = {
-			has_ascension_perk = ap_arcology_project
 		}
 		has_planet_flag = tec_ecumenopolis_spec_science
 		NOT = {
@@ -625,6 +510,13 @@ decision_tec_science_ecu_refinery = {
 
 	allow = {
 		NOT = { has_planet_flag = tec_block_other_specializations }
+		custom_tooltip = {
+			fail_text = decision_tec_arcology_require_arcology_project
+			exists = owner
+			owner = {
+				has_ascension_perk = ap_arcology_project
+			}
+		}
 	}
 
 
@@ -655,6 +547,7 @@ decision_tec_science_ecu_refinery = {
 
 decision_tec_science_ecu_motes = {
 	icon = decision_tec_science_ecu_motes
+	owned_planets_only = yes
 
 	enactment_time = 300
 
@@ -666,12 +559,9 @@ decision_tec_science_ecu_motes = {
 	}
 	
 	potential = {
+		exists = owner
 		OR = {
 			is_planet_class = pc_city
-		}
-		exists = owner
-		owner = {
-			has_ascension_perk = ap_arcology_project
 		}
 		has_planet_flag = tec_ecumenopolis_spec_science
 		NOT = {
@@ -681,6 +571,13 @@ decision_tec_science_ecu_motes = {
 
 	allow = {
 		NOT = { has_planet_flag = tec_block_other_specializations }
+		custom_tooltip = {
+			fail_text = decision_tec_arcology_require_arcology_project
+			exists = owner
+			owner = {
+				has_ascension_perk = ap_arcology_project
+			}
+		}
 	}
 
 
@@ -711,6 +608,7 @@ decision_tec_science_ecu_motes = {
 
 decision_tec_science_ecu_gas = {
 	icon = decision_tec_science_ecu_gas
+	owned_planets_only = yes
 
 	enactment_time = 300
 
@@ -722,12 +620,9 @@ decision_tec_science_ecu_gas = {
 	}
 	
 	potential = {
+		exists = owner
 		OR = {
 			is_planet_class = pc_city
-		}
-		exists = owner
-		owner = {
-			has_ascension_perk = ap_arcology_project
 		}
 		has_planet_flag = tec_ecumenopolis_spec_science
 		NOT = {
@@ -737,6 +632,13 @@ decision_tec_science_ecu_gas = {
 
 	allow = {
 		NOT = { has_planet_flag = tec_block_other_specializations }
+		custom_tooltip = {
+			fail_text = decision_tec_arcology_require_arcology_project
+			exists = owner
+			owner = {
+				has_ascension_perk = ap_arcology_project
+			}
+		}
 	}
 
 	effect = {
@@ -766,6 +668,7 @@ decision_tec_science_ecu_gas = {
 
 decision_tec_science_ecu_crystals = {
 	icon = decision_tec_science_ecu_crystals
+	owned_planets_only = yes
 
 	enactment_time = 300
 
@@ -777,12 +680,9 @@ decision_tec_science_ecu_crystals = {
 	}
 	
 	potential = {
+		exists = owner
 		OR = {
 			is_planet_class = pc_city
-		}
-		exists = owner
-		owner = {
-			has_ascension_perk = ap_arcology_project
 		}
 		has_planet_flag = tec_ecumenopolis_spec_science
 		NOT = {
@@ -792,6 +692,13 @@ decision_tec_science_ecu_crystals = {
 
 	allow = {
 		NOT = { has_planet_flag = tec_block_other_specializations }
+		custom_tooltip = {
+			fail_text = decision_tec_arcology_require_arcology_project
+			exists = owner
+			owner = {
+				has_ascension_perk = ap_arcology_project
+			}
+		}
 	}
 
 	effect = {
@@ -822,6 +729,7 @@ decision_tec_science_ecu_crystals = {
 # Military flip
 decision_tec_military_naval = {
 	icon = decision_tec_military_naval
+	owned_planets_only = yes
 
 	enactment_time = 300
 
@@ -833,12 +741,9 @@ decision_tec_military_naval = {
 	}
 	
 	potential = {
+		exists = owner
 		OR = {
 			is_planet_class = pc_city
-		}
-		exists = owner
-		owner = {
-			has_ascension_perk = ap_arcology_project
 		}
 		has_planet_flag = tec_ecumenopolis_spec_militarized
 		has_planet_flag = tec_ecumenopolis_militarized_army
@@ -849,6 +754,13 @@ decision_tec_military_naval = {
 
 	allow = {
 		NOT = { has_planet_flag = tec_block_other_specializations }
+		custom_tooltip = {
+			fail_text = decision_tec_arcology_require_arcology_project
+			exists = owner
+			owner = {
+				has_ascension_perk = ap_arcology_project
+			}
+		}
 	}
 
 	effect = {
@@ -877,6 +789,7 @@ decision_tec_military_naval = {
 
 decision_tec_military_garrison = {
 	icon = decision_tec_military_army
+	owned_planets_only = yes
 
 	enactment_time = 300
 
@@ -888,12 +801,9 @@ decision_tec_military_garrison = {
 	}
 	
 	potential = {
+		exists = owner
 		OR = {
 			is_planet_class = pc_city
-		}
-		exists = owner
-		owner = {
-			has_ascension_perk = ap_arcology_project
 		}
 		has_planet_flag = tec_ecumenopolis_spec_militarized
 		has_planet_flag = tec_ecumenopolis_militarized_navy
@@ -904,6 +814,13 @@ decision_tec_military_garrison = {
 
 	allow = {
 		NOT = { has_planet_flag = tec_block_other_specializations }
+		custom_tooltip = {
+			fail_text = decision_tec_arcology_require_arcology_project
+			exists = owner
+			owner = {
+				has_ascension_perk = ap_arcology_project
+			}
+		}
 	}
 
 	effect = {

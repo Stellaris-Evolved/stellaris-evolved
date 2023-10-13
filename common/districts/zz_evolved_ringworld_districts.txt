@@ -38,13 +38,23 @@ district_tec_rw_trade = { # megacorp
 
 	resources = {
 		category = planet_districts
-		cost = {
-			minerals = @rw_cost
-			rare_crystals = @rw_cost_sr
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_rw_cost
+			upkeep = @tec_district_rw_upkeep
 		}
-		upkeep = {
-			energy = @rw_maintenance
-			rare_crystals = @rw_maintenance_sr
+		inline_script = {
+			script = districts/resources/inline_evolved_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				always = yes
+			"
+			rare = rare_crystals
+			rare_cost = @tec_district_rw_sr_cost
+			rare_upkeep = @tec_district_rw_sr_upkeep
 		}
 	}
 
@@ -60,46 +70,35 @@ district_tec_rw_trade = { # megacorp
 	}
 
 	# Modifiers
-		# Standard
-			planet_modifier = {
-				planet_housing_add = 10
-			}
-		# /
+		planet_modifier = {
+			planet_housing_add = 10
+		}
+	# /
+	# Effect Type
+		inline_script = {
+			script = districts/type/inline_evolved_trade
+			scale = 2
+			trader_scale = 2
+			trigger = ""
+			trader_trigger = ""
+		}
 	# /
 	# Jobs
 		# Regular
 			inline_script = {
 				script = jobs/inline_evolved_clerk
-				count = 8
+				count = 6
 				mult = 1
 				display = with_desc
 				trigger = ""
 			}
 
 			inline_script = {
-				script = districts/effects/inline_evolved_mercantile_trickle_up_economics
-				count = 2
-				trigger = ""
-			}
-
-			inline_script = {
-				script = jobs/inline_evolved_job
-				job = merchant
+				script = jobs/inline_evolved_trader
 				count = 2
 				mult = 1
 				display = with_desc
-				trigger = "
-					exists = owner
-					owner = {
-						is_regular_empire = yes
-					}
-				"
-			}
-
-			inline_script = {
-				script = districts/effects/inline_evolved_mercantile_commercial_enterprise
 				trigger = ""
-				count = 2
 			}
 		# /
 		# Gestalt
@@ -123,12 +122,6 @@ district_tec_rw_trade = { # megacorp
 						tec_is_trade_gestalt = yes
 					}
 				"
-			}
-
-			inline_script = {
-				script = districts/effects/inline_evolved_tec_mercantile_commercial_enterprise_gestalt
-				trigger = ""
-				count = 2
 			}
 		# /
 	# /
@@ -161,24 +154,12 @@ district_tec_rw_replicator = {
 
 	show_on_uncolonized = {
 		exists = from
-		#from = {
-		#	OR = {
-		#		country_uses_food = yes
-		#		is_lithoid_empire = yes
-		#	}
-		#}
 		tec_uses_ringworld_districts = yes
 		tec_is_unspecced_ringworld = yes
 	}
 
 	potential = {
 		exists = owner
-		#owner = {
-		#	OR = {
-		#		country_uses_food = yes
-		#		is_lithoid_empire = yes
-		#	}
-		#}
 		tec_uses_ringworld_districts = yes
 		tec_is_unspecced_ringworld = yes
 	}
@@ -188,15 +169,27 @@ district_tec_rw_replicator = {
 	inline_script = districts/convert_to/inline_evolved_mining_districts
 
 	resources = {
-		category = planet_districts
-		cost = {
-			minerals = @rw_cost
-			rare_crystals = @rw_cost_sr
+		category = planet_districts_rw_replicator
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_rw_cost
+			upkeep = @tec_district_rw_upkeep
 		}
-		upkeep = {
-			energy = @rw_maintenance
-			rare_crystals = @rw_maintenance_sr
+		inline_script = {
+			script = districts/resources/inline_evolved_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				always = yes
+			"
+			rare = rare_crystals
+			rare_cost = @tec_district_rw_sr_cost
+			rare_upkeep = @tec_district_rw_sr_upkeep
 		}
+		# Improved Mining Empire Upkeep
+		inline_script = districts/resources/inline_evolved_improved_mining_empire_upkeep
 	}
 
 	triggered_desc = {
@@ -221,16 +214,29 @@ district_tec_rw_replicator = {
 		# Origins
 		# /
 		# Civics
+			# Improved Mining Empire Modifier
+			inline_script = districts/effects/inline_evolved_improved_mining_empire_bonus
+		# /
+		# Planet
+			triggered_planet_modifier = {
+				potential = {
+					NOT = {
+						has_deposit = d_tec_rw_major_structural_damage
+					}
+				}
+				planets_minerals_produces_mult = 0.05
+			}
 		# /
 	# /
 	# Jobs
 		inline_script = {
 			script = jobs/inline_evolved_miner
 			regular_count = 15
-			regular_aquatic_count = 10
+			regular_secondary_count = 10
 			hive_count = 20
-			hive_aquatic_count = 15
+			hive_secondary_count = 15
 			machine_count = 15
+			machine_secondary_count = 10
 			mult = 1
 			display = with_desc
 			trigger = ""
@@ -238,10 +244,11 @@ district_tec_rw_replicator = {
 		inline_script = {
 			script = jobs/inline_evolved_miner
 			regular_count = -2
-			regular_aquatic_count = -1
+			regular_secondary_count = -1
 			hive_count = -2
-			hive_aquatic_count = -1
+			hive_secondary_count = -1
 			machine_count = -2
+			machine_secondary_count = -1
 			mult = 1
 			display = no_desc
 			trigger = "
@@ -251,10 +258,11 @@ district_tec_rw_replicator = {
 		inline_script = {
 			script = jobs/inline_evolved_miner
 			regular_count = -3
-			regular_aquatic_count = -1
+			regular_secondary_count = -1
 			hive_count = -8 # include hive extra jobs
-			hive_aquatic_count = -6 # include hive extra jobs
+			hive_secondary_count = -6 # include hive extra jobs
 			machine_count = -3
+			machine_secondary_count = -1
 			mult = 1
 			display = no_desc
 			trigger = "
@@ -262,17 +270,19 @@ district_tec_rw_replicator = {
 			"
 		}
 		inline_script = {
-			script = jobs/inline_evolved_miner_swaps
+			script = jobs/inline_evolved_miner_secondary
 			regular_count = 5
 			hive_count = 5
+			machine_count = 5
 			mult = 1
 			display = with_desc
 			trigger = ""
 		}
 		inline_script = {
-			script = jobs/inline_evolved_miner_swaps
+			script = jobs/inline_evolved_miner_secondary
 			regular_count = -1
 			hive_count = -1
+			machine_count = -1
 			mult = 1
 			display = no_desc
 			trigger = "
@@ -280,9 +290,10 @@ district_tec_rw_replicator = {
 			"
 		}
 		inline_script = {
-			script = jobs/inline_evolved_miner_swaps
+			script = jobs/inline_evolved_miner_secondary
 			regular_count = -2
 			hive_count = -2
+			machine_count = -2
 			mult = 1
 			display = no_desc
 			trigger = "
@@ -290,22 +301,13 @@ district_tec_rw_replicator = {
 			"
 		}
 	# /
-	# Planet
-		triggered_planet_modifier = {
-			potential = {
-				NOT = {
-					has_deposit = d_tec_rw_major_structural_damage
-				}
-			}
-			planets_minerals_produces_mult = 0.05
-		}
-	# /
 
 	# Starnet
-	inline_script = {
-		script = districts/compat/inline_evolved_starnet_mining_district
-		count = 4
-	}
+		inline_script = {
+			script = districts/compat/inline_evolved_starnet_mining_district
+			count = 4
+		}
+	# /
 }
 
 #district_rw_farming
@@ -344,13 +346,23 @@ district_tec_rw_administrative = {
 	
 	resources = {
 		category = planet_districts
-		cost = {
-			minerals = @rw_cost
-			rare_crystals = @rw_cost_sr
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_rw_cost
+			upkeep = @tec_district_rw_upkeep
 		}
-		upkeep = {
-			energy = @rw_maintenance
-			rare_crystals = @rw_maintenance_sr
+		inline_script = {
+			script = districts/resources/inline_evolved_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				always = yes
+			"
+			rare = rare_crystals
+			rare_cost = @tec_district_rw_sr_cost
+			rare_upkeep = @tec_district_rw_sr_upkeep
 		}
 	}
 
@@ -391,7 +403,10 @@ district_tec_rw_administrative = {
 			mult = 1
 			display = no_desc
 			trigger = "
-				owner = { tec_is_death_cult = yes }
+				exists = owner
+				owner = {
+					tec_is_death_cult = yes
+				}
 			"
 		}
 		inline_script = {
@@ -452,13 +467,23 @@ district_tec_rw_administrative_gestalt = {
 
 	resources = {
 		category = planet_districts
-		cost = {
-			minerals = @rw_cost
-			rare_crystals = @rw_cost_sr
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_rw_cost
+			upkeep = @tec_district_rw_upkeep
 		}
-		upkeep = {
-			energy = @rw_maintenance
-			rare_crystals = @rw_maintenance_sr
+		inline_script = {
+			script = districts/resources/inline_evolved_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				always = yes
+			"
+			rare = rare_crystals
+			rare_cost = @tec_district_rw_sr_cost
+			rare_upkeep = @tec_district_rw_sr_upkeep
 		}
 	}
 
@@ -513,6 +538,10 @@ district_tec_rw_research = {
 	base_buildtime = @rw_district_buildtime
 	is_capped_by_modifier = no
 
+	prerequisites = {
+		tech_basic_science_lab_1
+	}
+
 	show_on_uncolonized = {
 		tec_uses_ringworld_districts = yes
 		tec_is_science_ringworld = yes
@@ -525,6 +554,10 @@ district_tec_rw_research = {
 		tec_is_precursor_ringworld = no
 	}
 
+	allow = {
+		tec_allow_research_buildings_and_districts = yes
+	}
+
 	conversion_ratio = 1
 	inline_script = districts/convert_to/inline_evolved_rw_generator_district_swaps
 	inline_script = districts/convert_to/inline_evolved_research_districts
@@ -532,13 +565,23 @@ district_tec_rw_research = {
 
 	resources = {
 		category = planet_districts
-		cost = {
-			minerals = @rw_cost
-			exotic_gases = @rw_cost_sr
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_rw_cost
+			upkeep = @tec_district_rw_upkeep
 		}
-		upkeep = {
-			energy = @rw_maintenance
-			exotic_gases = @rw_maintenance_sr
+		inline_script = {
+			script = districts/resources/inline_evolved_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				always = yes
+			"
+			rare = exotic_gases
+			rare_cost = @tec_district_rw_sr_cost
+			rare_upkeep = @tec_district_rw_sr_upkeep
 		}
 	}
 
@@ -607,11 +650,14 @@ district_tec_rw_refinery = {
 
 	resources = {
 		category = planet_districts
-		cost = {
-			minerals = @rw_refcost
-		}
-		upkeep = {
-			energy = @rw_refmaintenance
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_rw_cost_high
+			upkeep = @tec_district_rw_upkeep_high
 		}
 	}
 
@@ -693,13 +739,23 @@ district_tec_rw_forge = {
 
 	resources = {
 		category = planet_districts
-		cost = {
-			minerals = @rw_cost
-			volatile_motes = @rw_cost_sr
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_rw_cost
+			upkeep = @tec_district_rw_upkeep
 		}
-		upkeep = {
-			energy = @rw_maintenance
-			volatile_motes = @rw_maintenance_sr
+		inline_script = {
+			script = districts/resources/inline_evolved_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				always = yes
+			"
+			rare = volatile_motes
+			rare_cost = @tec_district_rw_sr_cost
+			rare_upkeep = @tec_district_rw_sr_upkeep
 		}
 
 		inline_script = districts/resources/inline_evolved_industrial_maintenance_upkeep
@@ -769,13 +825,23 @@ district_tec_rw_industry = {
 
 	resources = {
 		category = planet_districts
-		cost = {
-			minerals = @rw_cost
-			rare_crystals = @rw_cost_sr
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_rw_cost
+			upkeep = @tec_district_rw_upkeep
 		}
-		upkeep = {
-			energy = @rw_maintenance
-			rare_crystals = @rw_maintenance_sr
+		inline_script = {
+			script = districts/resources/inline_evolved_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				always = yes
+			"
+			rare = rare_crystals
+			rare_cost = @tec_district_rw_sr_cost
+			rare_upkeep = @tec_district_rw_sr_upkeep
 		}
 
 		inline_script = districts/resources/inline_evolved_industrial_maintenance_upkeep
@@ -844,13 +910,23 @@ district_tec_rw_naval = {
 
 	resources = {
 		category = planet_districts
-		cost = {
-			minerals = @rw_cost
-			rare_crystals = @rw_cost_sr
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_rw_cost
+			upkeep = @tec_district_rw_upkeep
 		}
-		upkeep = {
-			energy = @rw_maintenance
-			rare_crystals = @rw_maintenance_sr
+		inline_script = {
+			script = districts/resources/inline_evolved_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				always = yes
+			"
+			rare = rare_crystals
+			rare_cost = @tec_district_rw_sr_cost
+			rare_upkeep = @tec_district_rw_sr_upkeep
 		}
 	}
 
@@ -871,6 +947,16 @@ district_tec_rw_naval = {
 			}
 		# /
 	# /
+	# Planet
+		triggered_planet_modifier = {	# Navalcap rework
+			potential = {
+				NOT = {
+					has_deposit = d_tec_rw_major_structural_damage
+				}
+			}
+			pop_job_naval_mult = 0.1
+		}
+	# /
 	# Jobs
 		inline_script = {
 			script = jobs/inline_evolved_shipyard_technician
@@ -881,21 +967,11 @@ district_tec_rw_naval = {
 		}
 		
 		inline_script = {
-			script = jobs/inline_evolved_cadet
+			script = jobs/inline_evolved_tec_naval_operator
 			trigger = ""
 			count = 5
 			mult = 1
 			display = with_desc
-		}
-	# /
-	# Planet
-		triggered_planet_modifier = {
-			potential = {
-				NOT = {
-					has_deposit = d_tec_rw_major_structural_damage
-				}
-			}
-			planet_orbital_bombardment_damage = -0.05
 		}
 	# /
 }
@@ -918,6 +994,7 @@ district_tec_rw_leisure = {
 					has_valid_civic = civic_machine_servitor
 				}
 			}
+			tec_is_dystopian_empire = no
 		}
 		tec_is_specced_ringworld = yes
 		tec_is_precursor_ringworld = no
@@ -934,10 +1011,21 @@ district_tec_rw_leisure = {
 					has_valid_civic = civic_machine_servitor
 				}
 			}
+			tec_is_dystopian_empire = no
 		}
 		
 		tec_is_specced_ringworld = yes
 		tec_is_precursor_ringworld = no
+	}
+
+	allow = {
+		tec_ai_allow_leisure_district = yes
+	}
+
+	destroy_trigger = {
+		tec_ai_destroy_leisure_district = {
+			amenities = 100
+		}
 	}
 
 	conversion_ratio = 0.75
@@ -947,13 +1035,23 @@ district_tec_rw_leisure = {
 
 	resources = {
 		category = planet_districts
-		cost = {
-			minerals = @rw_cost
-			exotic_gases = @rw_cost_sr
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_rw_cost
+			upkeep = @tec_district_rw_upkeep
 		}
-		upkeep = {
-			energy = @rw_maintenance
-			exotic_gases = @rw_maintenance_sr
+		inline_script = {
+			script = districts/resources/inline_evolved_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				always = yes
+			"
+			rare = exotic_gases
+			rare_cost = @tec_district_rw_sr_cost
+			rare_upkeep = @tec_district_rw_sr_upkeep
 		}
 	}
 
@@ -1008,7 +1106,7 @@ district_tec_rw_leisure = {
 				trigger = "
 					exists = owner
 					owner = {
-						is_machine_empire = yes 
+						is_machine_empire = yes
 						has_valid_civic = civic_machine_servitor
 					}
 				"
@@ -1071,6 +1169,16 @@ district_tec_rw_maintenance = {
 		tec_is_precursor_ringworld = no
 	}
 
+	allow = {
+		tec_ai_allow_leisure_district = yes
+	}
+
+	destroy_trigger = {
+		tec_ai_destroy_leisure_district = {
+			amenities = 50
+		}
+	}
+
 	conversion_ratio = 0.75
 	inline_script = districts/convert_to/inline_evolved_rw_leisure_district_swaps
 	inline_script = districts/convert_to/inline_evolved_leisure_districts
@@ -1078,13 +1186,23 @@ district_tec_rw_maintenance = {
 	
 	resources = {
 		category = planet_districts
-		cost = {
-			minerals = @rw_cost
-			exotic_gases = @rw_cost_sr
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_rw_cost
+			upkeep = @tec_district_rw_upkeep
 		}
-		upkeep = {
-			energy = @rw_maintenance
-			exotic_gases = @rw_maintenance_sr
+		inline_script = {
+			script = districts/resources/inline_evolved_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				always = yes
+			"
+			rare = exotic_gases
+			rare_cost = @tec_district_rw_sr_cost
+			rare_upkeep = @tec_district_rw_sr_upkeep
 		}
 	}
 
@@ -1125,9 +1243,11 @@ district_tec_rw_maintenance = {
 		inline_script = {
 			script = jobs/inline_evolved_technician
 			regular_count = 4
+			regular_secondary_count = 4
 			hive_count = 4
+			hive_secondary_count = 4
 			machine_count = 4
-			machine_aquatic_count = 4
+			machine_secondary_count = 4
 			mult = 1
 			display = with_desc
 			trigger = ""

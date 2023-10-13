@@ -3,14 +3,88 @@
 #If rules here evaluate to true, there might still be other rules that make the action unavailable.
 #If a rule here evaluates to false the action will become unavailable
 
+
+
 # This = Planet
 is_new_colony = {
-	colony_age < 15
+	colony_age < 60
 	num_pops < 10
 	#OR = {
 	#	has_building = building_colony_shelter
 	#	has_building = building_tec_hive_sapling
 	#	has_building = building_tec_cyberhive_sapling
+	#}
+}
+
+# This = pop
+pop_generates_crime = {
+	is_sapient = yes
+	NOT = { tec_is_non_sapient_robot = { cached = yes } }
+	NOT = { tec_is_non_sapient_bioservant = { cached = yes } }
+	is_being_assimilated = no
+}
+
+#Root = planet
+#This = species
+species_can_live_on_planet = {
+	exists = root #somehow this appeared in the error log. No idea how!
+	NAND = {
+		root = { is_planet_class = pc_machine }
+		NOR = {
+			has_trait = trait_machine_unit
+			has_trait = trait_mechanical
+			AND = {
+				tec_is_cybernetic_species = yes
+				exists = root.owner
+				OR = {	# Evolved
+					root.owner = {
+						has_country_flag = synthetic_empire
+					}
+					root.owner = {
+						is_machine_empire = yes
+						OR = {
+							has_civic = civic_machine_assimilator # Assimilator empire
+							has_ascension_perk = ap_mechromancy
+						}
+					}
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			root = { is_planet_class = pc_hive }
+		}
+		OR = {
+			has_trait = trait_hive_mind
+			AND = { #Necrophage Hive Mind can have Necrophytes
+				exists = root.owner
+				root.owner = {
+					is_hive_empire = yes
+					has_origin = origin_necrophage
+					prev = { species_can_be_necrophaged = yes }
+				}
+			}
+		}
+	}
+}
+
+#This = leader
+should_pay_for_leader_upkeep = {
+	# Moved to the leader economy block : leaders\inline_evolved_leader_base_upkeep.txt
+	always = yes
+	#NOT = {
+	#	AND = {
+	#		exists = owner
+	#		owner = {
+	#			is_gestalt = yes
+	#		}
+	#		is_councilor = yes
+	#	}
+	#}
+	#NOR = {
+	#	has_leader_flag = marauder_merc_leader
+	#	has_leader_flag = hired_admiral_merc_leader
 	#}
 }
 
@@ -27,7 +101,7 @@ can_generate_leader_from_pop = {
 			OR = {
 				has_technology = tech_synthetic_leaders
 				# Evolved
-				has_valid_civic = civic_tec_mecha_perfectionists
+				has_valid_civic = civic_tec_origin_mecha_perfectionists
 			}
 		}
 		root = { is_machine_empire = yes }
@@ -80,7 +154,7 @@ can_generate_leader_from_species = {
 					OR = {
 						has_technology = "tech_synthetic_leaders" 
 						has_country_flag = synthetic_empire
-						has_valid_civic = civic_tec_mecha_perfectionists
+						has_valid_civic = civic_tec_origin_mecha_perfectionists
 					}
 				}
 			}
@@ -115,9 +189,9 @@ can_generate_leader_from_species = {
 	}
 }
 
-# Root = Pop
+# Root = Species
 # From = Country
-# This = Pop
+# This = Species
 species_has_happiness = {
 	NOR = {
 		has_trait = trait_machine_unit
@@ -135,7 +209,6 @@ species_has_happiness = {
 		}
 		AND = {
 			has_trait = @trait_tec_bioservant
-			exists = from
 			OR = {
 				NOT = { exists = from }
 				from = { is_hive_empire = yes }
@@ -203,6 +276,8 @@ can_release_vassal_from_species = {
 			}
 			# dumb pops can't be vassals
 			can_think = no
+			has_trait = trait_clone_soldier_infertile
+			has_trait = trait_clone_soldier_infertile_full_potential
 		}
 	}
 }
@@ -260,8 +335,7 @@ can_species_be_assembled = {
 				}
 				# Note: this must be placed above hive rule
 			}
-			else_if = {	
-				# Cyborg
+			else_if = {	# Cyborg
 				limit = {
 					root.owner = {
 						tec_allows_machine_assembly_for_cyborg = yes
@@ -294,11 +368,8 @@ can_species_be_assembled = {
 			# PD
 				else_if = {
 					limit = {
-						has_global_flag = planetarydiversity
-						OR = {
-							has_trait = @trait_organic_fourschildren
-							has_trait = @trait_organic_fourschildren_2
-						}
+						has_planetary_diversity = yes
+						is_organic_fourschildren = yes
 					}
 					root = {
 						# Event 'clones.3' should cover this, but extra safety check.
@@ -320,10 +391,14 @@ can_species_be_assembled = {
 						has_modifier = tiyanki_trophy
 						owner = { has_modifier = syamelles_curse }
 						AND = {
-							has_building = building_posthumous_employment_center
-							owner = { has_civic = civic_permanent_employment }
+							tec_has_zombie_assembly_buildings = yes
+							owner = { tec_is_zombie_empire = yes }
 						}
 						has_planet_flag = can_organic_assemble_flag #for mod compatibility
+						#check_modifier_value = {	# Should work as fallback
+						#	modifier = planet_pop_assembly_organic_add
+						#	value > 0
+						#}
 					}
 				}
 			}
@@ -392,7 +467,7 @@ can_species_procreate = {	# Aka can_species_grow_on_planet
 				}
 			}
 			NOT = {
-				has_trait = trait_tec_replicant_standard
+				has_trait = trait_tec_replicant_main
 			}
 		}
 	# /
@@ -476,7 +551,10 @@ can_build_branch_offices = {
 			}
 			custom_tooltip = {
 				fail_text = BRANCH_OFFICE_TEC_NOT_SYMBIOTIC_MACHINE
-				tec_is_symbiotic_machine = yes
+				OR = {
+					tec_is_symbiotic_machine = yes
+					tec_is_trade_machine = yes
+				}
 			}
 		}
 	}
@@ -585,9 +663,7 @@ can_build_branch_office_on_planet = {
 			root = { is_criminal_syndicate = yes }
 			root = { tec_is_symbiotic_hivemind = yes }
 			root = {
-				NOT = {
-					has_valid_civic = civic_tec_machine_traders
-				}
+				tec_is_trade_machine = no
 				tec_is_symbiotic_machine = yes
 			}
 			root = { tec_is_parasite_hivemind = yes }
@@ -699,7 +775,7 @@ can_build_branch_office_on_planet = {
 				has_corporate_government = yes
 			}
 			root = {
-				has_valid_civic = civic_tec_machine_traders
+				tec_is_trade_machine = yes
 				tec_is_symbiotic_machine = yes
 			}
 			root = { is_criminal_syndicate = yes }
@@ -717,7 +793,7 @@ can_build_branch_office_on_planet = {
 		exists = owner
 		OR = {
 			root = {
-				is_criminal_syndicate = no 
+				is_criminal_syndicate = no
 			}
 			owner = {
 				NOR = {
@@ -798,7 +874,10 @@ is_criminal_syndicate_rule = {
 # From = country, country that would receive the leader
 can_trade_leader = {
 	# The leader must have a trait from a specialist subject type.
-	this = { has_specialist_subject_leader_trait = yes }
+	this = {
+		has_specialist_subject_leader_trait = yes
+		is_heir = no
+	}
 	# The subject and overlord must both be regular empires, machine intelligences or hive-minds.
 	OR = {
 		AND = {
@@ -836,9 +915,78 @@ can_trade_leader = {
 			}
 		}
 	}
-	NOR = { 
+	NOR = {
 		has_trait = leader_trait_fotd_scientist
 		has_trait = leader_trait_fotd_admiral
+	}
+}
+
+# -------- R6A
+# Root = current planet
+# This = pop
+# Purge, Sapience, Migration Controls policy (ignored by Gestalts and Synths), and target habitability are checked in code.
+can_pop_auto_migrate = {
+	hidden_trigger = { #this is always true where this tooltip is called
+		OR = {
+			is_unemployed = yes
+			# Evolved
+				has_job = tec_state_worker
+			# /
+		}
+		if = {
+			limit = {
+				owner = { is_ai = yes }
+			}
+			root = { # blocks ai from relocating pops from planets with unemployment when upgrading capital
+				NOR = {
+					num_pops = @pops_t2
+					num_pops = @pops_t3
+					num_pops = @pops_t4
+					num_pops = @pops_t5
+				}
+			}
+		}
+		root = { # blocks migration cheese
+			num_pops > 1
+		}
+	}
+	custom_tooltip = {
+		fail_text = AUTO_MIGRATE_ASSIMILATED
+		is_being_assimilated = no
+	}
+	if = {
+		limit = {
+			OR = {
+				is_shackled_robot = yes
+				is_enslaved = yes
+			}
+		}
+		custom_tooltip = {
+			fail_text = AUTO_MIGRATE_SLAVE_PROCESSING
+			OR = {
+				planet = {
+					OR = {
+						has_building = building_slave_processing
+						AND = {
+							exists = orbital_defence
+							orbital_defence = {
+								exists = starbase
+								starbase = {
+									has_starbase_building = ring_slave_processing_facility
+								}
+							}
+						}
+					}
+				}
+				solar_system = {
+					count_starbase_buildings = {
+						type = transit_hub
+						count >= 1
+						include_being_constructed = no
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -910,5 +1058,266 @@ can_modify_organic_portraits = {
 		has_country_flag = can_resequence
 		
 		has_technology = tech_tec_appearance_recombination
+	}
+}
+
+# Paragons
+
+# this = leader
+can_leader_get_council_trait = {
+	OR = {
+		AND = {
+			exists = owner
+			owner = { has_country_flag = tec_force_allow_all_traits }
+		}
+		NOR = {
+			AND = {
+				exists = owner
+				owner = { has_country_flag = tec_force_normal_traits }
+			}
+			AND = {
+				exists = owner
+				owner = { is_gestalt = yes }
+				is_councilor = no
+			}
+			check_variable_arithmetic = {
+				which = modifier:tec_leader_only_normal_traits
+				value > 0
+			}
+		}
+		# Caelum
+		has_leader_flag = restored_node
+	}
+}
+
+# this = leader
+can_leader_get_normal_trait = {
+	OR = {
+		AND = {
+			exists = owner
+			owner = { has_country_flag = tec_force_allow_all_traits }
+		}
+		NOR = {
+			AND = {
+				exists = owner
+				owner = { has_country_flag = tec_force_councilor_traits }
+			}
+			check_variable_arithmetic = {
+				which = modifier:tec_leader_only_councilor_traits
+				value > 0
+			}
+			AND = {
+				OR = {
+					is_councilor = yes
+					# Caelum
+					has_leader_flag = restored_node
+				}
+				exists = owner
+				owner = {
+					OR = {
+						# short_circuit
+						check_variable_arithmetic = {
+							which = modifier:tec_councilor_only_councilor_traits
+							value > 0
+						}
+						# gestalts
+						is_gestalt = yes
+					}
+				}
+			}
+			AND = {
+				is_ruler = yes
+				exists = owner
+				owner = {
+					OR = {
+						# short_circuit
+						check_variable_arithmetic = {
+							which = modifier:tec_ruler_only_councilor_traits
+							value > 0
+						}
+						has_authority = auth_dictatorial
+						has_authority = auth_imperial
+						# has_authority = auth_tec_theocracy
+						# has_authority = auth_tec_patrocorporate
+					}
+				}
+			}
+		}
+	}
+}
+
+can_leader_get_subclass_trait = {
+	NAND = {
+		exists = owner
+		owner = { is_gestalt = yes }
+		OR = {
+			is_councilor = yes
+			# Caelum
+			has_leader_flag = restored_node
+		}
+	}
+	NAND = {
+		exists = owner
+		owner = { tec_is_aiauth_empire = yes }
+		tec_is_aiauth_councilor_node = yes
+	}
+	has_any_subclass = no
+}
+
+can_leader_get_destiny_trait = {
+	NAND = {
+		exists = owner
+		owner = { is_gestalt = yes }
+	}
+}
+
+should_count_towards_leader_cap = {
+	tec_should_count_towards_leader_cap = yes
+}
+
+# this = leader
+can_dismiss_leader = {
+	custom_tooltip = {	# Caelum
+		fail_text = "requires_actor_not_feudal_society"
+		exists = owner
+		owner = {
+			tec_is_feudal_empire = no
+		}
+	}
+	if = {
+		limit = {
+			leader_class = admiral
+			is_idle = no
+			# Rulers and heirs can't be dismissed any way and can be non-idle
+			is_ruler = no
+			is_heir = no
+		}
+		custom_tooltip = {
+			fail_text = "requires_fleet_control"
+			exists = fleet
+			fleet = {
+				controller = {
+					is_same_value = prev.owner
+					is_same_value = prevprev.owner
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			OR = {
+				is_heir = yes
+				is_ruler = yes
+			}
+		}
+		custom_tooltip = {
+			always = no
+			fail_text = "can_not_dismiss_rulers"
+		}
+	}
+	if = {
+		limit = {
+			tec_is_aiauth_planetary_node = yes
+		}
+		custom_tooltip = {
+			always = no
+			fail_text = "tec_can_not_dismiss_aiauth_planetary_nodes"
+		}
+	}
+}
+
+
+# This = leader
+will_leader_retire = {
+	exists = owner
+	not = { has_leader_flag = use_unspecific_death_reason }
+	owner = {
+		is_gestalt = no
+	}
+	has_leader_flag = retirement_is_default # Randomized retirement instead of death in paragon.590
+	tec_is_aiauth_node = no
+}
+
+# this = planet
+should_ai_build_stronghold_on_vulnerable_planet = {
+	always = no
+	#planet_stability > 50
+	#OR = {
+	#	AND = {
+	#		num_pops <= 5
+	#		num_buildings = { type = building_stronghold value < 1 }
+	#	}
+	#	AND = {
+	#		num_pops <= 10
+	#		num_buildings = { type = building_stronghold value < 2  }
+	#	}
+	#	AND = {
+	#		num_pops <= 15
+	#		num_buildings = { type = building_stronghold value < 3  }
+	#	}
+	#	AND = {
+	#		num_pops <= 25
+	#		num_buildings = { type = building_stronghold value < 4  }
+	#	}
+	#}
+	#
+	#exists = sector
+	#sector = {
+	#	NOT = { has_sector_type = core_sector }
+	#}
+	#
+	#IF = {
+	#	LIMIT = {
+	#		exists = owner
+	#		owner = { is_gestalt = yes }
+	#	}
+	#	NOT = { has_available_jobs = warrior_drone }
+	#	any_owned_pop = {
+	#		is_unemployed = yes
+	#		can_work_specific_job = warrior_drone
+	#	}
+	#}
+	#ELSE = {
+	#	NOT = { has_available_jobs = soldier }
+	#	any_owned_pop = {
+	#		is_unemployed = yes
+	#		can_work_specific_job = soldier
+	#	}
+	#}
+}
+
+
+# This = planet
+# Checked if planet is a terraforming candidate
+is_terraforming_candidate = {
+	OR = {
+		has_modifier = terraforming_candidate
+		has_modifier = frozen_terraforming_candidate
+		has_modifier = toxic_terraforming_candidate
+		has_modifier = pm_tec_desiccated_planet
+	}
+}
+
+# Root = country
+# This = planet
+# Checked if the planet is special terraforming candidate and the country has the required matching ascension perk to do it
+has_ascension_for_terraforming_candidate = {
+	exists = root
+	OR = {
+		AND = {
+			#No ascension perk required for terraforming_candidate modifier
+			OR = {
+				has_modifier = terraforming_candidate
+				has_modifier = pm_tec_desiccated_planet
+			}
+		}
+		AND = {
+			root = { has_ascension_perk = ap_detox }
+			has_modifier = toxic_terraforming_candidate
+		}
+		AND = {
+			root = { has_ascension_perk = ap_hydrocentric }
+			has_modifier = frozen_terraforming_candidate
+		}
 	}
 }

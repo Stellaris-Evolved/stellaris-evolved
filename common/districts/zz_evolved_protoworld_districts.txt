@@ -1,9 +1,4 @@
-@proto_citytime = 860
-@proto_basetime = 720
-@proto_citycost = 500
-@proto_basecost = 500
-@proto_cityupkeep = 3
-@proto_upkeep = 2
+
 
 # --------------- Habitation
 district_tec_proto_city = {
@@ -41,11 +36,14 @@ district_tec_proto_city = {
 	
 	resources = {
 		category = planet_districts_cities
-		cost = {
-			minerals = @proto_citycost
-		}
-		upkeep = {
-			energy = @proto_upkeep
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_proto_cost
+			upkeep = @tec_district_proto_upkeep
 		}
 	}
 	
@@ -64,11 +62,6 @@ district_tec_proto_city = {
 		inline_script = districts/effects/inline_evolved_tec_artifice_2
 		# /
 	# /
-
-	inline_script = {
-		script = districts/compat/inline_evolved_starnet_housing_district
-		count = 0.5
-	}
 
 	inline_script = {
 		script = districts/inline_evolved_aibait_housing
@@ -112,11 +105,15 @@ district_tec_proto_industrial = {
 	inline_script = districts/convert_to/inline_evolved_industrial_districts
 	
 	resources = {
-		category = planet_districts_cities
-		cost = {
-			minerals = @proto_citycost
-		}
-		upkeep = {
+		category = planet_districts_industrial
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = no
+			"
+			cost = @tec_district_proto_cost
+			upkeep = 0
 		}
 	}
 }
@@ -170,15 +167,16 @@ district_tec_proto_generator = {
 	inline_script = districts/convert_to/inline_evolved_trade_districts
 
 	resources = {
-		category = planet_districts
-		cost = {
-			minerals = @proto_basecost
-		}
-		upkeep = {
-			energy = @proto_upkeep
-		}
+		category = planet_districts_generator
 
-		# inline_script = districts/resources/inline_evolved_tec_syndical
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_proto_cost
+			upkeep = @tec_district_proto_upkeep
+		}
 
 		inline_script = {
 			script = districts/resources/inline_evolved_tec_automation_energy
@@ -189,7 +187,9 @@ district_tec_proto_generator = {
 		inline_script = {
 			script = districts/resources/inline_evolved_tec_generate_basic_resources
 			resource = energy
-		}	
+		}
+		# Improved Technician Empire Upkeep
+		inline_script = districts/resources/inline_evolved_improved_technician_empire_upkeep
 	}
 
 	# overlord_resources = {
@@ -217,13 +217,20 @@ district_tec_proto_generator = {
 		text = tec_protoworld_energy_district
 	}
 
+	# Modifier
+		# Improved Technician Empire Modifier
+		inline_script = districts/effects/inline_evolved_improved_technician_empire_bonus
+	# /
+
 	# Jobs
 		inline_script = {
 			script = jobs/inline_evolved_technician
 			regular_count = 1
+			regular_secondary_count = 1
 			hive_count = 1
+			hive_secondary_count = 1
 			machine_count = 1
-			machine_aquatic_count = 0
+			machine_secondary_count = 1
 			mult = 1
 			display = with_desc
 			trigger = ""
@@ -284,16 +291,16 @@ district_tec_proto_mining = {
 	inline_script = districts/convert_to/inline_evolved_mining_districts
 
 	resources = {
-		category = planet_districts
-		cost = {
-			minerals = @proto_basecost
-		}
-		upkeep = {
-			energy = @proto_upkeep
-		}
+		category = planet_districts_mining
 
-		# inline_script = districts/resources/inline_evolved_tec_syndical
-		# inline_script = districts/resources/inline_evolved_mining_guilds
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_proto_cost
+			upkeep = @tec_district_proto_upkeep
+		}
 
 		inline_script = {
 			script = districts/resources/inline_evolved_tec_automation_minerals
@@ -305,6 +312,8 @@ district_tec_proto_mining = {
 			script = districts/resources/inline_evolved_tec_generate_basic_resources
 			resource = minerals
 		}
+		# Improved Mining Empire Upkeep
+		inline_script = districts/resources/inline_evolved_improved_mining_empire_upkeep
 	}
 	# overlord_resources = {
 	# 	category = planet_requisitioned_minerals
@@ -331,14 +340,20 @@ district_tec_proto_mining = {
 		text = tec_protoworld_mineral_district
 	}
 
+	# Modifiers
+		# Improved Mining Empire Modifier
+		inline_script = districts/effects/inline_evolved_improved_mining_empire_bonus
+	# /
+
 	# Jobs
 		inline_script = {
 			script = jobs/inline_evolved_miner
 			regular_count = 1
-			regular_aquatic_count = 0
+			regular_secondary_count = 1
 			hive_count = 1
-			hive_aquatic_count = 0
+			hive_secondary_count = 1
 			machine_count = 1
+			machine_secondary_count = 1
 			mult = 1
 			display = with_desc
 			trigger = ""
@@ -346,10 +361,11 @@ district_tec_proto_mining = {
 	# /
 
 	# Starnet
-	inline_script = {
-		script = districts/compat/inline_evolved_starnet_mining_district
-		count = 1
-	}
+		inline_script = {
+			script = districts/compat/inline_evolved_starnet_mining_district
+			count = 1
+		}
+	# /
 }
 
 district_tec_proto_farming = {
@@ -399,15 +415,16 @@ district_tec_proto_farming = {
 	inline_script = districts/convert_to/inline_evolved_farming_districts
 	
 	resources = {
-		category = planet_districts
-		cost = {
-			minerals = @proto_basecost
-		}
-		upkeep = {
-			energy = @proto_upkeep
-		}
+		category = planet_districts_farming
 
-		# inline_script = districts/resources/inline_evolved_tec_syndical
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_proto_cost
+			upkeep = @tec_district_proto_upkeep
+		}
 
 		inline_script = {
 			script = districts/resources/inline_evolved_tec_automation_food
@@ -419,6 +436,8 @@ district_tec_proto_farming = {
 			script = districts/resources/inline_evolved_tec_generate_basic_resources
 			resource = food
 		}
+		# Improved Farming Empire Upkeep
+		inline_script = districts/resources/inline_evolved_improved_farming_empire_upkeep
 	}
 	# overlord_resources = {
 	# 	category = planet_requisitioned_food
@@ -445,15 +464,21 @@ district_tec_proto_farming = {
 		text = tec_protoworld_food_district
 	}
 
+	# Modifier
+		# Improved Farming Empire Modifier
+		inline_script = districts/effects/inline_evolved_improved_farming_empire_bonus
+	# /
+
 	# /
 	# Jobs
 		inline_script = {
 			script = jobs/inline_evolved_farmer
 			regular_count = 1
-			regular_aquatic_count = 0
+			regular_secondary_count = 1
 			hive_count = 1
-			hive_aquatic_count = 0
+			hive_secondary_count = 1
 			machine_count = 1
+			machine_secondary_count = 1
 			mult = 1
 			display = with_desc
 			trigger = ""

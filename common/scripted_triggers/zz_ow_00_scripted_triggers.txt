@@ -20,8 +20,8 @@ has_encountered_other_species = {
 		}
 		# Stellaris Evolved
 		has_country_flag = tec_has_encountered_other_species
-		has_valid_civic = civic_tec_se_symbiotic_race
-		has_valid_civic = civic_slave_race
+		has_valid_civic = civic_tec_origin_symbiotic_race
+		has_valid_civic = civic_tec_origin_slave_race
 	}
 }
 
@@ -39,6 +39,7 @@ species_can_be_necrophaged = {
 	}
 	OR = {
 		species_has_happiness_with_owner = prev.owner
+		has_trait = trait_tec_cyborg_mindless
 		prev.owner = { has_valid_civic = civic_tec_hive_mindflayers }
 	}
 }
@@ -50,16 +51,25 @@ is_cyborg_empire = {
 			has_trait = trait_cybernetic 
 		}
 		owner_species = {
-			has_trait = @trait_tec_advanced_cyborg
+			has_trait = @trait_tec_superior_cybernetics_main
 		}
 		owner_species = {
-			has_trait = @trait_tec_cyberpsionic
+			has_trait = @trait_tec_cyberpsionic_main
 		}
 		#	owner_species = {
-		#		has_trait = @trait_tec_rudimentary_cyborg
+		#		has_trait = @trait_tec_basic_cybernetics_main
 		#	}
 	}
-	
+}
+
+# Scopes: country, leader, pop, army, (colony) ship
+is_mechanical_species = {
+	species = {
+		OR = {
+			has_trait = trait_machine_unit # Machine Intelligence
+			has_trait = trait_mechanical # Robots & Synthetically-ascended Pops
+		}
+	}
 }
 
 
@@ -142,6 +152,8 @@ is_reanimator = {
 		has_valid_civic = civic_reanimated_armies
 		has_valid_civic = civic_permanent_employment
 		has_valid_civic = civic_hive_cordyceptic_drones
+
+		has_ascension_perk = ap_mechromancy
 		
 		#Stellaris Evolved
 		has_civic = civic_tec_corporate_reanimators
@@ -170,6 +182,7 @@ can_do_advanced_gene_modding = {
 		OR = {
 			has_tradition = tr_genetics_resequencing
 			has_country_flag = can_resequence
+			has_technology = tech_tec_advanced_genemodding
 		}
 	}
 }
@@ -178,7 +191,7 @@ can_remove_beneficial_genetic_traits = {
 	hidden_trigger = { exists = from }
 	from = {
 		OR = {
-			has_technology = @tech_genetic_resequencing
+			# has_technology = @tech_genetic_resequencing
 			has_tradition = tr_genetics_resequencing
 			has_country_flag = can_remove_positive_traits_organic
 			has_country_flag = can_resequence
@@ -271,7 +284,7 @@ can_think = {
 	NOR = {
 		has_trait = trait_nerve_stapled
 		has_trait = trait_zombie
-		tec_has_stapled_trait = yes
+		tec_has_stapled_trait = { cached = yes }
 	}
 }
 
@@ -319,7 +332,7 @@ is_phototrophic = {
 		has_trait = trait_harvested_radiotrophic
 		has_trait = trait_lithoid_radiotrophic
 		# PD
-		has_trait = @trait_radiotrophic_mutants
+		is_pd_radiotrophic_mutant = yes
 	}
 }
 
@@ -334,10 +347,14 @@ has_phototrophic_energy_upkeep = {
 				has_trait = trait_harvested_radiotrophic
 				has_trait = trait_lithoid_radiotrophic
 				# PD
-				has_trait = @trait_radiotrophic_mutants
+				is_pd_radiotrophic_mutant = yes
 			}
-			planet = { tec_is_nuked_world = no }
-			planet = { is_pd_radiotrophic_world = no }
+			planet = {
+				NOR = {
+					tec_is_nuked_world = yes
+					is_pd_radiotrophic_world = yes
+				}
+			}
 		}
 	}
 }
@@ -416,5 +433,110 @@ has_any_generator_district_or_building = {
 	check_variable_arithmetic = {
 		which = value:generator_combined_value
 		value > 0
+	}
+}
+
+has_research_building = {
+	check_variable_arithmetic = {
+		which = value:research_combined_value
+		value > 0
+	}
+}
+
+should_ai_focus_on_trade = {	# Paragon
+	is_ai = yes
+	OR = {
+		has_ai_personality = peaceful_traders
+		has_ai_personality = ruthless_capitalists
+	}
+	owner_main_species = {
+		OR = {
+			has_trait = "trait_thrifty"
+			has_trait = "trait_cyborg_trading_algorithms"
+			has_trait = "trait_robot_trading_algorithms"
+		}
+	}
+}
+
+is_gestalt_node = {	# Paragon
+	OR = {
+		is_councilor_type = councilor_gestalt_governor
+		is_councilor_type = councilor_gestalt_scientist
+		is_councilor_type = councilor_gestalt_admiral
+		is_councilor_type = councilor_gestalt_general
+	}
+}
+
+is_default_or_fallen = {
+	OR = {
+		is_country_type = default
+
+		is_country_type = default_exocolonist
+		is_country_type = default_exocolonist_ai
+
+		is_country_type = fallen_empire
+		is_country_type = awakened_fallen_empire #for checks in buildings
+
+		AND = {
+			has_global_flag = zofe_activated
+			is_zofe_compatible = yes
+		}
+	}
+}
+
+can_build_megastructures = {
+	OR = {
+		has_technology = tech_gateway_construction
+		has_technology = tech_ring_world
+		has_technology = tech_orbital_ring_tier_1
+		has_technology = tech_hyper_relays
+
+		can_build_unity_megastructures = yes
+
+		# Evolved
+		has_technology = tech_elysium_ring
+	}
+}
+
+empire_has_good_habitability_on_tomb_worlds = {
+	OR = {
+		is_lithoid = yes
+		has_trait = trait_survivor
+		has_trait = trait_pc_nuked_preference
+		has_trait = trait_plantoid_radiotrophic
+		has_trait = trait_advanced_radiotrophic
+		has_trait = trait_harvested_radiotrophic
+		has_trait = trait_lithoid_radiotrophic
+		has_trait = trait_cybernetic
+		has_trait = trait_mechanical
+		has_trait = trait_machine_unit
+		has_trait = trait_tec_replicant_main
+		has_trait = trait_tec_cyberpsionic_main
+		has_trait = trait_tec_superior_cybernetics_main
+		has_trait = trait_tec_gene_perfection
+		has_trait = trait_pc_tec_gene_preference
+		is_pd_radiotrophic_mutant = yes
+	}
+}
+
+# Caelum
+is_worker_coop_empire = {
+	#has_valid_civic = civic_worker_coop
+	tec_is_worker_coop_empire = yes
+}
+
+values_others = {
+	OR = {
+		is_xenophile = yes
+		has_ethic = ethic_gestalt_empathy
+		AND = {
+			NOT = {
+				has_ethic = ethic_gestalt_apathy
+			}
+			has_valid_civic = civic_machine_servitor
+		}
+		has_valid_civic = civic_hive_empath
+		has_valid_civic = civic_machine_exploration_protocol
+		tec_is_fruitful_empire = yes
 	}
 }

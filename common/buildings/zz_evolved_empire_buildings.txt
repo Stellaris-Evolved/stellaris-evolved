@@ -12,7 +12,7 @@ building_tec_entepre_forge = {		# Alloys
 		NOT = { has_modifier = resort_colony }
 		NOT = { has_modifier = slave_colony }
 		exists = owner
-		owner = { 
+		owner = {
 			is_competitive = yes
 		}
 	}
@@ -73,11 +73,6 @@ building_tec_entepre_factory = {	# CG
 			owner = { is_regular_empire = yes }
 		"
 	}
-
-	ai_resource_production = {
-		trigger = { always = yes }
-		consumer_goods = 1
-	}
 }
 
 building_tec_entepre_research = {	# Research
@@ -132,13 +127,9 @@ building_tec_entepre_research = {	# Research
 		tier = 1
 	}
 
-	inline_script = buildings/effects/inline_evolved_corporate_researchbureau
-
-	ai_resource_production = {
-		trigger = { always = yes }
-		physics_research = 1
-		society_research = 1
-		engineering_research = 1
+	inline_script = {
+		script = buildings/effects/inline_evolved_corporate_researchbureau
+		tier = 1
 	}
 }
 
@@ -151,11 +142,12 @@ building_tec_entepre_theatres = {	# Amenities
 		NOT = {	has_modifier = slave_colony	}
 		owner = {
 			is_competitive = yes
+			tec_is_dystopian_empire = no
 		}
 	}
 
 	allow = {
-		tec_ai_allow_amentity_building = yes
+		tec_ai_allow_amenity_building = yes
 	}
 
 	destroy_trigger = {
@@ -165,7 +157,7 @@ building_tec_entepre_theatres = {	# Amenities
 				is_competitive = no
 			}
 			has_modifier = slave_colony
-			tec_ai_destroy_amentity_building = {
+			tec_ai_destroy_amenity_building = {
 				amenities = 25
 			}
 		}
@@ -204,6 +196,7 @@ building_tec_outreach_platform = {	# Outreach
 	base_cap_amount = 1
 	position_priority = 30		# Unique
 	category = amenity
+	ai_estimate_without_unemployment = yes
 
 	potential = {
 		exists = owner
@@ -235,11 +228,16 @@ building_tec_outreach_platform = {	# Outreach
 				planet_building_build_speed_mult = 0.25
 				planet_decision_enact_speed_mult = 0.05
 			}
-			triggered_planet_modifier = {	# 1
+			triggered_planet_modifier = {	# 2 or AI
 				potential = {
-					tec_has_constructors_in_orbit = {
-						NUM = 2
+					exists = owner
+					OR = {
+						tec_has_constructors_in_orbit = {
+							NUM = 2
+						}
+						owner = { is_ai = yes }
 					}
+
 				}
 				planet_building_build_speed_mult = 0.5
 				planet_decision_enact_speed_mult = 0.15
@@ -403,6 +401,7 @@ building_tec_biopsionic_convergence = {
 	base_cap_amount = 1
 	position_priority = 10		# Important
 	category = government
+	ai_estimate_without_unemployment = yes
 
 	potential = {
 		exists = owner
@@ -412,19 +411,19 @@ building_tec_biopsionic_convergence = {
 	}
 
 	allow = {
-		exists = planet
-		planet = {
-			any_owned_species = {
-				tec_is_any_psionic_species = yes
-				count_species_pop = {
-					count >= 2
-				}
+		any_owned_species = {
+			tec_is_any_psionic_species = yes
+			count_species_pop = {
+				count >= 2
 			}
 		}
 	}
 
 	triggered_desc = {
-		text = BUILDING_TEC_BIOPSIO_ALLOW_CONVERGENCE
+		trigger = {
+			always = yes
+		}
+		text = building_tec_biopsionic_allow_convergence
 	}
 	
 	resources = {
@@ -435,7 +434,22 @@ building_tec_biopsionic_convergence = {
 		}
 
 		cost = {
+			trigger = {
+				exists = owner
+				owner = {
+					is_ai = no
+				}
+			}
 			sr_zro = 50
+		}
+		cost = {
+			trigger = {
+				exists = owner
+				owner = {
+					is_ai = yes
+				}
+			}
+			energy = 500
 		}
 		produces = {
 			trigger = {
@@ -450,11 +464,36 @@ building_tec_biopsionic_convergence = {
 			sr_zro = 1
 			multiplier = tec_conv_planet
 		}
+		produces = {
+			trigger = {
+				exists = planet
+				planet = {
+					check_variable = {
+						which = tec_conv_planet
+						value > 0
+					}
+				}
+				exists = owner
+				owner = {
+					exists = ruler
+					ruler = {
+						has_trait = leader_trait_tec_aiauth_biopsionic_main
+					}
+				}
+			}
+			sr_tec_ai_power = 2
+			multiplier = tec_conv_planet
+		}
 		
 	}
 
+	inline_script = {
+		script = buildings/inline_evolved_aibait_essential
+		trigger = ""
+	}
+
 	ai_resource_production = {
-		sr_zro = 50
+		sr_zro = 2
 		trigger = {
 			always = yes
 		}
@@ -469,6 +508,7 @@ building_tec_cyberpsionic_extractor = {
 	can_be_disabled = no
 	can_be_ruined = no
 	category = research
+	ai_estimate_without_unemployment = yes
 
 	potential = {
 		exists = owner
@@ -487,11 +527,25 @@ building_tec_cyberpsionic_extractor = {
 			alloys = 250
 			sr_zro = 50
 		}
-		produces = {	
+		produces = {
 			sr_zro = 1
 		}
 		produces = {
 			energy = 5
+			multiplier = value:tec_cyberpsionic_entropy_scaling
+		}
+
+		produces = {
+			trigger = {
+				exists = owner
+				owner = {
+					exists = ruler
+					ruler = {
+						has_trait = leader_trait_tec_aiauth_cyberpsionic_main
+					}
+				}
+			}
+			sr_tec_ai_power = 2
 			multiplier = value:tec_cyberpsionic_entropy_scaling
 		}
 	}
@@ -606,6 +660,13 @@ building_tec_cyberpsionic_extractor = {
 			}
 		}
 	}
+
+	inline_script = {
+		script = buildings/inline_evolved_aibait
+		trigger = "
+			not = { has_building = building_tec_cyberpsionic_extractor }
+		"
+	}
 }
 
 building_tec_cyberpsionic_transmuter = {
@@ -615,6 +676,7 @@ building_tec_cyberpsionic_transmuter = {
 	can_be_disabled = no
 	can_be_ruined = no
 	category = research
+	ai_estimate_without_unemployment = yes
 
 	potential = {
 		exists = owner
@@ -732,7 +794,7 @@ building_tec_cyberpsionic_transmuter = {
 				}
 				giga_sr_amb_megaconstruction = 1
 				multiplier = value:tec_cyberpsionic_entropy_scaling
-			}	
+			}
 		# /	
 	}
 
@@ -765,12 +827,18 @@ building_tec_cyberpsionic_gate = {
 	can_be_disabled = no
 	can_be_ruined = no
 	category = research
+	ai_estimate_without_unemployment = yes
 
 	potential = {
 		exists = owner
 		owner = {
 			has_country_flag = tec_cyberpsionic_buildings
 		}
+	}
+
+	allow = {
+		has_upgraded_capital = yes
+		tec_ai_allow_cyberpsionic_gate_building = yes
 	}
 
 	resources = {
@@ -852,6 +920,26 @@ building_tec_cyberpsionic_gate = {
 			multiplier = value:tec_cyberpsionic_entropy_scaling
 		}
 	# /
+
+	inline_script = {
+		script = buildings/inline_evolved_aibait
+		trigger = "
+			OR = {
+				tec_is_arcology = yes
+				AND = {
+					exists = owner
+					owner = { tec_uses_trade_value = yes }
+					OR = {
+						has_trade_designation = yes
+						check_variable_arithmetic = {
+							which = value:trade_combined_value
+							value >= 4
+						}
+					}
+				}
+			}
+		"
+	}
 }
 
 # Old/do not remove yet

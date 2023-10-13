@@ -1,0 +1,436 @@
+
+
+tec_handle_relic_flag = {
+	optimize_memory
+	set_planet_flag = tec_ecumenopolis_was_relic_planet
+
+	remove_planet_flag = tec_ecumenopolis_spec_militarized
+	remove_planet_flag = tec_ecumenopolis_spec_science
+	remove_planet_flag = tec_ecumenopolis_spec_admin
+}
+
+tec_ecu_clean_modifiers = {
+	optimize_memory
+	remove_modifier = pm_tec_industrialized_planet
+	
+	#PD
+	remove_modifier = @pd_engineered_environment
+	remove_modifier = @pd_engineered_environment_gaia
+}
+
+tec_ecoworld_clean_modifiers = {
+	optimize_memory
+	remove_modifier = pm_tec_industrialized_planet
+}
+
+
+tec_ecu_logic_start = {
+	optimize_memory
+	tec_ecu_deposits_handler_before = yes
+	clear_deposits = yes
+
+	change_pc = $change_pc$
+
+	tec_ecu_clean_modifiers = yes
+	tec_ecu_planet_entity = yes
+
+	[[relic]
+		tec_handle_relic_flag = yes
+	]
+}
+
+tec_ecu_logic_finish = {
+	optimize_memory
+	[[relic]
+		add_deposit = d_former_relic_world
+		while = {
+			count = 4
+			solar_system = {
+				random_system_ambient_object = {
+					limit = { has_ambient_object_flag = relic_world_debris }
+					destroy_ambient_object = this
+				}
+			}
+		}
+	]
+	tec_ecu_ecological_resolution = yes
+	tec_ecu_deposits_handler_after = yes
+}
+
+
+tec_ecu_ecological_resolution = {
+	optimize_memory
+	# Faction flags
+	owner = {
+		set_timed_country_flag = {
+			flag = tec_recently_created_ecumenopolis
+			years = 10
+		}
+		change_variable = {
+			which = tec_created_ecus
+			value = 1
+		}
+	}
+	# Galcom Resolution
+	if = {
+		limit = {
+			OR = {
+				is_active_resolution = "resolution_ecology_environmental_control_board"
+				is_active_resolution = "resolution_ecology_paradise_initiative"
+			}
+		}
+		owner = {
+			set_timed_country_flag = { flag = resolution_breached_terraformed days = 3600 }
+		}
+	}
+}
+
+tec_ecu_deposits_handler_before = {
+	optimize_memory
+	# PSIONIC DEPOSITS
+		if = {
+			limit = {
+				has_deposit = d_tec_psionic_ascension_zone_1
+			}
+			while = {
+				limit = {
+					has_deposit = d_tec_psionic_ascension_zone_1
+				}
+				remove_deposit = d_tec_psionic_ascension_zone_1
+				change_variable = {
+					which = tec_temporal_psionic_d
+					value = 1
+				}
+			}
+		}
+	# /
+	# Eco deposits
+		if = {	# Soil
+			limit = {
+				has_deposit = d_tec_eco_terraformer_soil
+			}
+			while = {
+				limit = {
+					has_deposit = d_tec_eco_terraformer_soil
+				}
+				remove_deposit = d_tec_eco_terraformer_soil
+				change_variable = {
+					which = tec_temporal_d_tec_eco_terraformer_soil
+					value = 1
+				}
+			}
+		}
+		if = {	# Magnetic
+			limit = {
+				has_deposit = d_tec_eco_terraformer_magnetic
+			}
+			while = {
+				limit = {
+					has_deposit = d_tec_eco_terraformer_magnetic
+				}
+				remove_deposit = d_tec_eco_terraformer_magnetic
+				change_variable = {
+					which = tec_temporal_d_tec_eco_terraformer_magnetic
+					value = 1
+				}
+			}
+		}
+		if = {	# Atmosphere
+			limit = {
+				has_deposit = d_tec_eco_terraformer_atmosphere
+			}
+			while = {
+				limit = {
+					has_deposit = d_tec_eco_terraformer_atmosphere
+				}
+				remove_deposit = d_tec_eco_terraformer_atmosphere
+				change_variable = {
+					which = tec_temporal_d_tec_eco_terraformer_atmosphere
+					value = 1
+				}
+			}
+		}
+	# /
+}
+
+tec_ecu_deposits_handler_after = {
+	optimize_memory
+	# PSIONIC DEPOSITS
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_temporal_psionic_d
+					value > 0
+				}
+			}
+			while = {
+				limit = {
+					check_variable = {
+						which = tec_temporal_psionic_d
+						value > 0
+					}
+				}
+				add_deposit = d_tec_psionic_ascension_zone_1
+				change_variable = {
+					which = tec_temporal_psionic_d
+					value = -1
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						which = tec_temporal_psionic_d
+						value = 0
+					}
+				}
+				clear_variable = tec_temporal_psionic_d
+			}
+		}
+	# /
+	# Eco deposits
+		if = {	# Soil
+			limit = {
+				check_variable = {
+					which = tec_temporal_d_tec_eco_terraformer_soil
+					value > 0
+				}
+			}
+			while = {
+				limit = {
+					check_variable = {
+						which = tec_temporal_d_tec_eco_terraformer_soil
+						value > 0
+					}
+				}
+				add_deposit = d_tec_eco_terraformer_soil
+				change_variable = {
+					which = tec_temporal_d_tec_eco_terraformer_soil
+					value = -1
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						which = tec_temporal_d_tec_eco_terraformer_soil
+						value = 0
+					}
+				}
+				clear_variable = tec_temporal_d_tec_eco_terraformer_soil
+			}
+		}
+		if = {	# Magnetic
+			limit = {
+				check_variable = {
+					which = tec_temporal_d_tec_eco_terraformer_magnetic
+					value > 0
+				}
+			}
+			while = {
+				limit = {
+					check_variable = {
+						which = tec_temporal_d_tec_eco_terraformer_magnetic
+						value > 0
+					}
+				}
+				add_deposit = d_tec_eco_terraformer_magnetic
+				change_variable = {
+					which = tec_temporal_d_tec_eco_terraformer_magnetic
+					value = -1
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						which = tec_temporal_d_tec_eco_terraformer_magnetic
+						value = 0
+					}
+				}
+				clear_variable = tec_temporal_d_tec_eco_terraformer_magnetic
+			}
+		}
+		if = {	# Atmosphere
+			limit = {
+				check_variable = {
+					which = tec_temporal_d_tec_eco_terraformer_atmosphere
+					value > 0
+				}
+			}
+			while = {
+				limit = {
+					check_variable = {
+						which = tec_temporal_d_tec_eco_terraformer_atmosphere
+						value > 0
+					}
+				}
+				add_deposit = d_tec_eco_terraformer_atmosphere
+				change_variable = {
+					which = tec_temporal_d_tec_eco_terraformer_atmosphere
+					value = -1
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						which = tec_temporal_d_tec_eco_terraformer_atmosphere
+						value = 0
+					}
+				}
+				clear_variable = tec_temporal_d_tec_eco_terraformer_atmosphere
+			}
+		}
+	# /
+}
+
+# Habitat ecu handler
+tec_set_focus_flags_effect = {
+	optimize_memory
+	if = {
+		limit = {
+			has_factory_designation = yes
+		}
+		set_planet_flag = factory_planet
+	}
+	else_if = {
+		limit = {
+			has_foundry_designation = yes
+		}
+		set_planet_flag = foundry_planet
+	}
+}
+
+tec_district_conversion_effect = {
+	optimize_memory
+	export_trigger_value_to_variable = {
+		trigger = num_districts
+		parameters = {
+			type = $DISTRICT$
+		}
+		variable = tec_district_conversion
+	}
+	divide_variable = { which = tec_district_conversion value = $RATIO|2$ }
+	floor_variable = tec_district_conversion
+	while = {
+		count = tec_district_conversion
+		remove_district = $DISTRICT$
+	}
+	clear_variable = tec_district_conversion
+}
+
+tec_industrial_split_effect = {
+	optimize_memory
+	if = {
+		limit = {
+			has_planet_flag = factory_planet
+		}
+		remove_planet_flag = factory_planet
+		swap_districts_effect = {
+			DISTRICT1 = $FOUNDRY$
+			DISTRICT2 = $FACTORY$
+		}
+	}
+	else_if = {
+		limit = {
+			has_planet_flag = foundry_planet
+		}
+		remove_planet_flag = foundry_planet
+	}
+	else = {
+		split_districts_effect = {
+			DISTRICT1 = $FOUNDRY$
+			DISTRICT2 = $FACTORY$
+		}
+	}
+}
+
+tec_ecoworld_terraforming_effect = {
+	optimize_memory
+	owner = {
+		change_variable = {
+			which = tec_terraformed_worlds
+			value = 1
+		}
+	}
+
+	if = {
+		limit = {
+			exists = owner
+			owner = {
+				has_technology = tech_terrestrial_sculpting
+				has_ascension_perk = ap_world_shaper
+				OR = {
+					has_valid_civic = civic_tec_regular_eco_keepers
+					has_valid_civic = civic_agrarian_idyll
+					has_valid_civic = civic_tec_origin_gaia_children
+				}
+			}
+			planet = {
+				NOR = {
+					tec_is_gaia_world = yes
+					tec_is_pd_perfect_planets = yes
+					tec_is_pd_exotic_planets = yes
+				}
+			}
+		}
+		change_pc = pc_gaia
+	}
+}
+
+tec_ecoworld_demote_industrial_jobs = {
+	optimize_memory
+	if = {
+		limit = { 
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+			}
+		}
+		
+		every_owned_pop = {
+			limit = {
+				planet = {
+					is_same_value = root
+				}
+				OR = {
+					has_job = foundry
+					has_job = catalytic_technician
+					has_job = artisan
+					has_job = artificer
+
+					has_job = alloy_drone
+					has_job = fabricator
+					has_job = catalytic_technician
+					has_job = artisan_drone
+				}
+			}
+			add_modifier = {
+				modifier = tec_demote_me_senpai
+				days = 45
+			}
+		}
+	}
+}
+
+# Habitats
+	tec_convert_district = {
+		optimize_memory
+		export_trigger_value_to_variable = {
+			trigger = num_districts
+			parameters = {
+				type = $BASE_DISTRICT$
+			}
+			variable = swap_districts_variable
+		}
+		multiply_variable = {
+			which = swap_districts_variable
+			value = $RATE$
+		}
+		while = {
+			count = swap_districts_variable
+			remove_district = $BASE_DISTRICT$
+			add_district_if_possible_effect = {
+				district = $DISTRICT$
+			}
+		}
+		clear_variable = swap_districts_variable
+	}
+# /

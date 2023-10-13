@@ -137,7 +137,7 @@ action_make_rival = {	# Evolved - Apathic / everevolving
 		# Evolved
 			custom_tooltip = {
 				fail_text = "tec_requires_actor_not_universalism"
-				NOT = { has_valid_civic = civic_tec_universalism }
+				NOT = { has_valid_civic = civic_tec_regular_universalism }
 			}
 			custom_tooltip = {
 				fail_text = "tec_requires_actor_not_apathic_gestalt"
@@ -147,16 +147,22 @@ action_make_rival = {	# Evolved - Apathic / everevolving
 		custom_tooltip = {
 			fail_text = "requires_terrible_opinion_or_supremacist"
 			OR = {
-				opinion_level = { who = from level <= terrible }
-				is_harming_relations_with = from
+				from = { is_rival = prev }
 				from = { is_at_war_with = prev }
+				is_harming_relations_with = from
 				OR = {
 					has_policy_flag = "diplo_stance_supremacist"
 					from = { has_policy_flag = "diplo_stance_supremacist" }
 					is_fallen_empire = yes
 					from = { is_fallen_empire = yes }
+					has_policy_flag = "diplo_stance_animosity"
+					from = { has_policy_flag = "diplo_stance_animosity" }
 				}
-				from = { is_rival = prev }
+				tec_has_opinion_level = {
+					WHO = from
+					LTE = yes
+					TERRIBLE = yes
+				}
 			}
 		}
 		
@@ -336,7 +342,11 @@ action_form_defensive_pact = { 	# Evolved - tec_is_pompous_empire // apathic // 
 		custom_tooltip = {
 			fail_text = "requires_excellent_or_better_opinion"
 			OR = {
-				opinion_level = { who = from level >= excellent }
+				tec_has_opinion_level = {
+					WHO = from
+					GTE = yes
+					EXCELLENT = yes
+				}
 				is_improving_relations_with = from
 			}
 		}
@@ -436,7 +446,11 @@ action_form_non_aggression_pact = {	# Evolved - tec_is_pompous_empire
 			fail_text = "requires_neutral_or_better_opinion"
 
 			OR = {
-				opinion_level = { who = from level >= neutral }
+				tec_has_opinion_level = {
+					WHO = from
+					GTE = yes
+					NEUTRAL = yes
+				}
 				is_improving_relations_with = from
 			}
 		}
@@ -519,31 +533,32 @@ action_form_commercial_pact = {	# Evolved - tec_is_pompous_empire // trade_gesta
 				}
 			}
 		}
-		custom_tooltip = {
-			fail_text = "requires_actor_not_criminal_heritage"
-			is_criminal_syndicate = no
-		}
-		if = {
-			limit = { from = { is_criminal_syndicate = yes } }
-			if = {
-				limit = {
-					has_intel = {
-						who = from
-						intel = civics
-					}
-				}
-				custom_tooltip = {
-					fail_text = requires_recipient_not_criminal_heritage
-					always = no
-				}
-			}
-			else = {
-				custom_tooltip = {
-					fail_text = diplo_action_no_low_intel
-					always = no
-				}
-			}
-		}
+		# Criminal syndicates can now make commercial pacts
+		#custom_tooltip = {
+		#	fail_text = "requires_actor_not_criminal_heritage"
+		#	is_criminal_syndicate = no
+		#}
+		#if = {
+		#	limit = { from = { is_criminal_syndicate = yes } }
+		#	if = {
+		#		limit = {
+		#			has_intel = {
+		#				who = from
+		#				intel = civics
+		#			}
+		#		}
+		#		custom_tooltip = {
+		#			fail_text = requires_recipient_not_criminal_heritage
+		#			always = no
+		#		}
+		#	}
+		#	else = {
+		#		custom_tooltip = {
+		#			fail_text = diplo_action_no_low_intel
+		#			always = no
+		#		}
+		#	}
+		#}
 		custom_tooltip = {
 			fail_text = "federation_actor_no_separate_treaties"
 			NOT = {
@@ -596,11 +611,15 @@ action_form_commercial_pact = {	# Evolved - tec_is_pompous_empire // trade_gesta
 			fail_text = "tec_requires_good_opinion"
 
 			OR = {
-				OR = {
-					is_megacorp = yes 
+				OR = {	# bypass
+					is_megacorp = yes
 					tec_is_trade_gestalt = yes
 				}
-				opinion_level = { who = from level >= good }
+				tec_has_opinion_level = {
+					WHO = from
+					GTE = yes
+					GOOD = yes
+				}
 			}
 		}
 		
@@ -804,8 +823,12 @@ action_form_research_agreement = { 	# Evolved - tec_is_pompous_empire
 			fail_text = "tec_requires_good_opinion"
 
 			OR = {
-				opinion_level = { who = from level >= good }
-				has_valid_civic = civic_tec_archivist
+				tec_has_opinion_level = {
+					WHO = from
+					GTE = yes
+					GOOD = yes
+				}
+				has_valid_civic = civic_tec_regular_archivist
 			}
 		}
 		custom_tooltip = {
@@ -1000,7 +1023,11 @@ action_guarantee_independence = { 	# Evolved - tec_is_pompous_empire
 			fail_text = "requires_neutral_or_better_opinion"
 
 			OR = {
-				opinion_level = { who = from level >= neutral }
+				tec_has_opinion_level = {
+					WHO = from
+					GTE = yes
+					NEUTRAL = yes
+				}
 				is_improving_relations_with = from
 			}
 		}
@@ -1147,7 +1174,7 @@ action_form_migration_pact = {	# Evolved - tec_is_pompous_empire // Opinion
 			fail_text = "requires_actor_not_fanatic_purifiers"
 			OR = {
 				is_same_species = from
-				NOT = { has_valid_civic = civic_fanatic_purifiers	}
+				NOT = { has_valid_civic = civic_fanatic_purifiers }
 			}
 		}
 		custom_tooltip = {
@@ -1189,6 +1216,39 @@ action_form_migration_pact = {	# Evolved - tec_is_pompous_empire // Opinion
 		custom_tooltip = {
 			fail_text = "requires_actor_not_inward_perfection"
 			NOT = { has_valid_civic = civic_inwards_perfection }
+		}
+		if = {
+			limit = { 
+				from = { 
+					tec_is_selective_kinship_empire = yes
+					NOT = { is_same_species_class = ROOT }
+				}
+			}
+			if = {
+				limit = {
+					has_intel = {
+						who = from
+						intel = civics
+					}
+				}
+				custom_tooltip = {
+					fail_text = requires_recipient_not_selective_kinship
+					always = no
+				}
+			}
+			else = {
+				custom_tooltip = {
+					fail_text = diplo_action_no_low_intel
+					always = no
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "requires_actor_not_selective_kinship"
+			NAND = {
+				tec_is_selective_kinship_empire = yes
+				NOT = { from = { is_same_species_class = root } }
+			}
 		}
 		if = {
 			limit = { from = { has_valid_civic = civic_barbaric_despoilers } }
@@ -1281,7 +1341,11 @@ action_form_migration_pact = {	# Evolved - tec_is_pompous_empire // Opinion
 			fail_text = "tec_requires_good_opinion"
 
 			OR = {
-				opinion_level = { who = from level >= good }
+				tec_has_opinion_level = {
+					WHO = from
+					GTE = yes
+					GOOD = yes
+				}
 			}
 		}
 			#custom_tooltip = {
@@ -1369,7 +1433,11 @@ action_offer_federation_association_status = { 	# Evolved - tec_is_pompous_empir
 
 			OR = {
 				from = { is_same_value = prevprev } # Bypass opinion check if we are proposing on behalf of recipient
-				opinion_level = { who = from level >= good }
+				tec_has_opinion_level = {
+					WHO = from
+					GTE = yes
+					GOOD = yes
+				}
 				is_improving_relations_with = from
 			}
 		}
@@ -1603,7 +1671,11 @@ action_invite_to_federation = {	# Evolved - tec_is_pompous_empire // Apathic
 
 			OR = {
 				from = { is_same_value = prevprev } # Bypass opinion check if we are proposing on behalf of recipient
-				opinion_level = { who = from level >= excellent }
+				tec_has_opinion_level = {
+					WHO = from
+					GTE = yes
+					EXCELLENT = yes
+				}
 				is_improving_relations_with = from
 			}
 		}
@@ -1801,7 +1873,11 @@ action_ask_to_join_federation = {	# Evolved - Pompopus, apathic
 			fail_text = "requires_excellent_or_better_opinion"
 
 			OR = {
-				opinion_level = { who = from level >= excellent }
+				tec_has_opinion_level = {
+					WHO = from
+					GTE = yes
+					EXCELLENT = yes
+				}
 				is_improving_relations_with = from
 			}
 		}
@@ -2228,7 +2304,52 @@ action_release_subject = {
 #action_negotiate_existing_agreement = {
 
 # Send an insult. Harms relations.
-#action_insult = {
+action_insult = {
+	icon = "GFX_diplomacy_status_war"
+	requires_recipient_independence = no
+	requires_actor_independence = no
+	auto_accepted = yes
+	should_show_auto_accept_message_recipient = yes
+	action_type = aggressive
+
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_poor_or_worse_opinion"
+
+			OR = {
+				tec_has_opinion_level = {
+					WHO = from
+					LTE = yes
+					POOR = yes
+				}
+				is_fallen_empire = yes
+				from = { is_fallen_empire = yes }
+				is_harming_relations_with = from
+				from = { is_at_war_with = prev }
+			}
+		}
+	}
+
+	on_accept = {
+		if = {
+			limit = {
+				has_technology = tech_satisfying_insults
+				NOT = {
+					has_modifier = satisfying_insult_recently
+				}
+			}
+			add_modifier = {
+				modifier = satisfying_insult_recently
+				days = 1800
+			}
+			add_resource = { influence = 50}
+			country_event = {
+				id = fircon.20
+				days = 1800
+			}
+		}
+	}
+}
 
 # Annex a subject of a type that permits annexation. Costs influence and takes time based on the size of the subject.
 #action_integrate_subject = {
@@ -2376,7 +2497,11 @@ action_embassy = {
 		modifier = {
 			add = 1
 			has_attitude_behavior = { target = from behavior = trade }
-			opinion = { who = from value > 50 }
+			tec_has_opinion = {
+				WHO = from
+				GT = yes
+				VALUE = 50
+			}
 		}
 
 		modifier = {

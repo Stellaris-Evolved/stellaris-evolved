@@ -1,5 +1,5 @@
 # --------------- Regular
-commandante = { 			# Stratocracy
+tec_commander = { 			# Stratocracy
 	category = ruler
 	condition_string = RULER_JOB_TRIGGER
 	building_icon = building_stronghold
@@ -18,16 +18,22 @@ commandante = { 			# Stratocracy
 	resources = {
 		category = planet_soldiers
 		produces = {
-			unity = 2
+			unity = 4
 		}
 
 		upkeep = {
 			consumer_goods = 2
 		}
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 
-	country_modifier = {
-		country_naval_cap_add = 5
+	triggered_country_modifier = {	# Navalcap rework
+		pop_job_naval_mult = 0.025
+	}
+
+	triggered_country_modifier = {
+		country_naval_cap_add = 2
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_naval_mult|
 	}
 
 	planet_modifier = {
@@ -36,7 +42,8 @@ commandante = { 			# Stratocracy
 	
 	triggered_planet_modifier = {
 		potential = {
-			always = yes
+			exists = owner
+			owner = { tec_is_dystopian_empire = no }
 		}
 		planet_amenities_add = 3
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
@@ -48,17 +55,17 @@ commandante = { 			# Stratocracy
 
 	inline_script = jobs/effects/type/inline_evolved_soldier_effect
 	
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 
 	
 	weight = {
 		# Ruler job Weight
 		weight = @ruler_job_weight
-		mult = value:job_weights_modifier|JOB|commandante|RESOURCE|unity|
+		mult = value:job_weights_modifier|JOB|tec_commander|RESOURCE|unity|
 		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
 		modifier = {
 			factor = 5
-			has_job = commandante
+			has_job = tec_commander
 		}
 
 		# Living standard weight
@@ -82,7 +89,7 @@ commandante = { 			# Stratocracy
 	}
 }
 
-supervisor_bureaucrat = { 	# Embedded Bureaucracy
+tec_supervisor_bureaucrat = { 	# Embedded Bureaucracy
 	category = ruler
 	condition_string = RULER_JOB_TRIGGER
 	building_icon = building_capital
@@ -106,15 +113,17 @@ supervisor_bureaucrat = { 	# Embedded Bureaucracy
 		upkeep = {
 			consumer_goods = 2
 		}
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 	planet_modifier = {
-		planet_jobs_unity_produces_mult = 0.05
+		planet_jobs_unity_produces_mult = 0.025
 		planet_stability_add = 2
 	}
 
 	triggered_planet_modifier = {
 		potential = {
-			always = yes
+			exists = owner
+			owner = { tec_is_dystopian_empire = no }
 		}
 		planet_amenities_add = 6
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
@@ -125,16 +134,16 @@ supervisor_bureaucrat = { 	# Embedded Bureaucracy
 	# Maybe since basically bureaucrat
 	# inline_script = jobs/effects/type/inline_evolved_bureaucrat_effect
 
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 	
 	weight = {
 		# Ruler job Weight
 		weight = @ruler_job_weight
-		mult = value:job_weights_modifier|JOB|supervisor_bureaucrat|RESOURCE|unity|
+		mult = value:job_weights_modifier|JOB|tec_supervisor_bureaucrat|RESOURCE|unity|
 		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
 		modifier = {
 			factor = 5
-			has_job = supervisor_bureaucrat
+			has_job = tec_supervisor_bureaucrat
 		}
 
 		# Living standard weight
@@ -215,6 +224,7 @@ tec_grand_archivist = { 	# Archivists
 			unity = 2
 			consumer_goods = 2
 		}
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 	
 	triggered_planet_modifier = {
@@ -222,6 +232,7 @@ tec_grand_archivist = { 	# Archivists
 			exists = owner
 			owner = {
 				has_policy_flag = vault_knowledge
+				tec_is_dystopian_empire = no
 			}
 		}
 		planet_amenities_add = 5
@@ -233,13 +244,14 @@ tec_grand_archivist = { 	# Archivists
 			exists = owner
 			owner = {
 				has_policy_flag = unvault_knowledge
+				tec_is_dystopian_empire = no
 			}
 		}
 		planet_amenities_add = 2.5
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
 
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 
 	inline_script = jobs/effects/type/inline_evolved_researcher_effect
 	
@@ -298,11 +310,12 @@ tec_technocrat = { 			# New Technocracy
 	resources = {
 		category = planet_administrators
 		produces = {
-			unity = 6
+			unity = 7
 		}
 		upkeep = {
 			consumer_goods = 2
 		}
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 
 	country_modifier = {
@@ -315,13 +328,14 @@ tec_technocrat = { 			# New Technocracy
 
 	triggered_planet_modifier = {
 		potential = {
-			always = yes
+			exists = owner
+			owner = { tec_is_dystopian_empire = no }
 		}
 		planet_amenities_add = 3
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
 	
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 
 	inline_script = jobs/effects/type/inline_evolved_administrator_effect
 
@@ -387,18 +401,28 @@ tec_master_tinker = { 		# Tinkerers
 	resources = {
 		category = planet_metallurgists
 		produces = {
-			engineering_research = 5
+			engineering_research = 3
+			unity = 2
 			alloys = 3
 		}
 		upkeep = {
-			minerals = 2
+			minerals = 4
 			consumer_goods = 2
 		}
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 
 	triggered_planet_modifier = {
 		potential = {
 			always = yes
+		}
+		planet_jobs_alloys_produces_mult = 0.025
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { tec_is_dystopian_empire = no }
 		}
 		planet_amenities_add = 2
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
@@ -406,7 +430,7 @@ tec_master_tinker = { 		# Tinkerers
 	
 	inline_script = jobs/effects/type/inline_evolved_foundry_effect
 
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 	
 	weight = {
 		# Ruler job Weight
@@ -469,7 +493,7 @@ tec_master_tinker = { 		# Tinkerers
 tec_grand_occultist = {		# Lodge
 	category = ruler
 	condition_string = RULER_JOB_TRIGGER
-	building_icon = building_tec_advanced_lodge
+	building_icon = building_tec_occultist_lodge_2
 	clothes_texture_index = 1
 	icon = tec_grand_archivist
 
@@ -484,7 +508,7 @@ tec_grand_occultist = {		# Lodge
 	possible_precalc = can_fill_ruler_job
 	
 	resources = {
-		category = planet_researchers
+		category = planet_tec_occultists
 		produces = {
 			physics_research = 5
 			engineering_research = 5
@@ -500,6 +524,7 @@ tec_grand_occultist = {		# Lodge
 			energy = 0
 			mult = 1
 		}
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 
 	overlord_resources = {
@@ -513,13 +538,16 @@ tec_grand_occultist = {		# Lodge
 	
 	triggered_planet_modifier = {
 		potential = {
-			always = yes
+			exists = owner
+			owner = { tec_is_dystopian_empire = no }
 		}
 		planet_amenities_add = 3
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
 
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
+	
+	inline_script = jobs/effects/type/inline_evolved_priest_effect
 	
 	inline_script = jobs/effects/type/inline_evolved_researcher_effect
 	
@@ -559,7 +587,7 @@ tec_grand_occultist = {		# Lodge
 	}
 }
 
-mogul = {					# Economics
+tec_mogul = {					# Economics
 	category = ruler
 	condition_string = RULER_JOB_TRIGGER
 	building_icon = building_galactic_stock_exchange
@@ -579,15 +607,16 @@ mogul = {					# Economics
 	resources = {
 		category = planet_merchants
 		produces = {
-			unity = 2
+			unity = 4
 		}
 		upkeep = {
 			consumer_goods = 2
 		}
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 
 	planet_modifier = {
-		trade_value_mult = 0.05
+		trade_value_mult = 0.025
 	}
 
 	triggered_planet_modifier = {
@@ -600,13 +629,14 @@ mogul = {					# Economics
 
 	triggered_planet_modifier = {
 		potential = {
-			always = yes
+			exists = owner
+			owner = { tec_is_dystopian_empire = no }
 		}
 		planet_amenities_add = 3
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
 
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 	
 	weight = {
 		# Ruler job Weight
@@ -616,7 +646,7 @@ mogul = {					# Economics
 
 		modifier = {
 			factor = 5
-			has_job = mogul
+			has_job = tec_mogul
 		}
 
 		# Living standard weight
@@ -665,6 +695,7 @@ tec_landowner = {			# Full medievalism
 		upkeep = {
 			consumer_goods = 2
 		}
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 	
 	pop_modifier = {
@@ -679,7 +710,7 @@ tec_landowner = {			# Full medievalism
 	# basically enforcer due to crime reduction
 	# inline_script = jobs/effects/type/inline_evolved_enforcer_effect
 
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 		
 	weight = {
 		# Ruler job Weight
@@ -743,6 +774,7 @@ tec_high_inquisitor = {		# Authoritarian
 		upkeep = {
 			consumer_goods = 2
 		}
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 
 	planet_modifier = {
@@ -752,7 +784,7 @@ tec_high_inquisitor = {		# Authoritarian
 
 	inline_script = jobs/effects/type/inline_evolved_enforcer_effect
 	
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 	
 	weight = {
 		# Ruler job Weight
@@ -768,7 +800,6 @@ tec_high_inquisitor = {		# Authoritarian
 }
 
 tec_procurator = {			# Not done
-	icon = administrator
 	category = ruler
 	condition_string = RULER_JOB_TRIGGER
 	building_icon = building_capital
@@ -785,7 +816,8 @@ tec_procurator = {			# Not done
 	possible_precalc = can_fill_ruler_job
 
 	resources = {
-		category = planet_administrators		
+		category = planet_administrators
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 
 	triggered_country_modifier = {
@@ -798,7 +830,8 @@ tec_procurator = {			# Not done
 
 	triggered_planet_modifier = {
 		potential = {
-			always = yes
+			exists = owner
+			owner = { tec_is_dystopian_empire = no }
 		}
 		planet_amenities_add = 3
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
@@ -811,7 +844,7 @@ tec_procurator = {			# Not done
 	# inline_script = jobs/effects/type/inline_evolved_bureaucrat_effect
 
 
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 	
 	weight = {
 		# Ruler job Weight
@@ -827,7 +860,6 @@ tec_procurator = {			# Not done
 }
 
 tec_diplomat = {			# Not done
-	icon = administrator
 	category = ruler
 	condition_string = RULER_JOB_TRIGGER
 	building_icon = building_embassy
@@ -844,7 +876,8 @@ tec_diplomat = {			# Not done
 	possible_precalc = can_fill_ruler_job
 
 	resources = {
-		category = planet_administrators		
+		category = planet_administrators
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 
 	triggered_country_modifier = {
@@ -858,7 +891,8 @@ tec_diplomat = {			# Not done
 	
 	triggered_planet_modifier = {
 		potential = {
-			always = yes
+			exists = owner
+			owner = { tec_is_dystopian_empire = no }
 		}
 		planet_amenities_add = 3
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
@@ -870,7 +904,7 @@ tec_diplomat = {			# Not done
 	# maybe since kinda bureaucrat
 	# inline_script = jobs/effects/type/inline_evolved_bureaucrat_effect
 
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 	
 	weight = {
 		# Ruler job Weight
@@ -915,6 +949,7 @@ tec_overseer = {			# Authoritarian police
 		}
 
 		inline_script = jobs/resources/inline_evolved_anticrime_campaign_upkeep
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 
 	pop_modifier = {
@@ -936,7 +971,7 @@ tec_overseer = {			# Authoritarian police
 
 	inline_script = jobs/effects/type/inline_evolved_enforcer_effect
 
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 		
 	weight = {
 		# Ruler job Weight
@@ -952,6 +987,125 @@ tec_overseer = {			# Authoritarian police
 		modifier = {
 			factor = 5
 			has_job = fe_overseer
+		}
+
+		# Living standard weight
+		modifier = {
+			factor = 0.1
+			has_citizenship_rights = no
+			NOR = {
+				tec_has_trait_slave = yes
+			}
+		}
+
+		# crisis purge
+		modifier = {
+			factor = 0.01
+			exists = planet
+			exists = planet.controller
+			planet.controller = {
+				tec_control_crisis_country = yes
+			}
+		}
+	}
+}
+
+tec_chemical_baron = {
+	category = ruler
+	condition_string = RULER_JOB_TRIGGER
+	building_icon = building_capital
+	clothes_texture_index = 1
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_ruler_job
+
+	resources = {
+		category = planet_administrators
+		produces = {
+			unity = 3
+		}
+		upkeep = {
+			consumer_goods = 2
+		}
+
+		# Extra production
+			produces = {
+				trigger = {
+					planet = {
+						NOR = {
+							has_planet_flag = tec_chemical_baron_motes
+							has_planet_flag = tec_chemical_baron_gases
+							has_planet_flag = tec_chemical_baron_crystals
+						}
+					}
+				}
+				volatile_motes = 1
+				exotic_gases = 1
+				rare_crystals = 1
+			}
+		# /
+		# Specific production
+			produces = {
+				trigger = {
+					planet = {
+						has_planet_flag = tec_chemical_baron_motes
+					}
+				}
+				volatile_motes = 3
+			}
+			produces = {
+				trigger = {
+					planet = {
+						has_planet_flag = tec_chemical_baron_gases
+					}
+				}
+				exotic_gases = 3
+			}
+			produces = {
+				trigger = {
+					planet = {
+						has_planet_flag = tec_chemical_baron_crystals
+					}
+				}
+				rare_crystals = 3
+			}
+		# /
+		inline_script = jobs/resources/inline_evolved_rulers
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { tec_is_dystopian_empire = no }
+		}
+		planet_amenities_add = 3
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
+		}
+		planet_crime_add = 5
+	}
+	
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
+
+	weight = {
+		# Ruler job Weight
+		weight = @ruler_job_weight
+		mult = value:job_weights_modifier|JOB|politician|RESOURCE|unity|
+		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+		modifier = {
+			factor = 5
+			has_job = politician
 		}
 
 		# Living standard weight
@@ -1010,6 +1164,7 @@ tec_corpo_consultant = {	#
 			energy = 0
 			mult = 1
 		}
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 
 	overlord_resources = {
@@ -1020,6 +1175,15 @@ tec_corpo_consultant = {	#
 			mult = 1
 		}
 	}
+
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
+		}
+		planet_jobs_physics_research_produces_mult = 0.025
+		planet_jobs_society_research_produces_mult = 0.025
+		planet_jobs_engineering_research_produces_mult = 0.025
+	}
 	
 	triggered_planet_modifier = {
 		potential = {
@@ -1029,7 +1193,7 @@ tec_corpo_consultant = {	#
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
 	}
 
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 	inline_script = jobs/effects/type/inline_evolved_researcher_effect
 	
 	weight = {
@@ -1089,10 +1253,11 @@ tec_corpo_bank_director = {	#
 		upkeep = {
 			consumer_goods = 2
 		}
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 	
 	planet_modifier = {
-		trade_value_mult = 0.05
+		trade_value_mult = 0.025
 	}
 
 	triggered_planet_modifier = {
@@ -1102,7 +1267,7 @@ tec_corpo_bank_director = {	#
 		trade_value_add = 12
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
 	}
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 	
 	weight = {
 		# Ruler job Weight
@@ -1137,7 +1302,7 @@ tec_corpo_bank_director = {	#
 }
 
 tec_corpo_prospector = {	# 
-	icon = geoengineer
+	icon = tec_geoengineer
 	category = ruler
 	condition_string = RULER_JOB_TRIGGER
 	building_icon = building_capital
@@ -1169,6 +1334,7 @@ tec_corpo_prospector = {	#
 			energy = 0
 			mult = 1
 		}
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 
 	overlord_resources = {
@@ -1187,8 +1353,15 @@ tec_corpo_prospector = {	#
 		trade_value_add = 6
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
 	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
+		}
+		
+	}
 
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 	inline_script = jobs/effects/type/inline_evolved_researcher_effect
 		
 	weight = {
@@ -1228,7 +1401,7 @@ tec_corpo_prospector = {	#
 }
 
 tec_corpo_ecoprospector = {	# 
-	icon = xenobiologist
+	icon = tec_xenobiologist
 	category = ruler
 	condition_string = RULER_JOB_TRIGGER
 	building_icon = building_capital
@@ -1260,6 +1433,7 @@ tec_corpo_ecoprospector = {	#
 			energy = 0
 			mult = 1
 		}
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 
 	overlord_resources = {
@@ -1279,7 +1453,7 @@ tec_corpo_ecoprospector = {	#
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
 	}
 	
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 	inline_script = jobs/effects/type/inline_evolved_researcher_effect
 
 	weight = {
@@ -1340,6 +1514,7 @@ tec_corpo_parabellum = {	# NOT READY
 		produces = {
 			unity = 2
 		}
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 	
 	triggered_planet_modifier = {
@@ -1352,7 +1527,8 @@ tec_corpo_parabellum = {	# NOT READY
 	
 	triggered_planet_modifier = {
 		potential = {
-			always = yes
+			exists = owner
+			owner = { tec_is_dystopian_empire = no }
 		}
 		planet_amenities_add = 5
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
@@ -1360,7 +1536,7 @@ tec_corpo_parabellum = {	# NOT READY
 
 	inline_script = jobs/effects/type/inline_evolved_soldier_effect
 	
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 
 	weight = {
 		# Ruler job Weight
@@ -1413,18 +1589,14 @@ tec_corpo_tinker = {		#
 	resources = {
 		category = planet_metallurgists
 		produces = {
-			trigger = {
-				owner = {
-					has_valid_civic = civic_tec_corporate_inventcorp
-				}
-			}
-			unity = 2
-			alloys = 4
+			engineering_research = 3
+			alloys = 3
 		}
 		upkeep = {
-			minerals = 2
+			minerals = 4
 			consumer_goods = 2
 		}
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 	
 	triggered_planet_modifier = {
@@ -1435,16 +1607,22 @@ tec_corpo_tinker = {		#
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
 	}
 	
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
+		}
+		planet_jobs_alloys_produces_mult = 0.025
+	}
+	
 	inline_script = jobs/effects/type/inline_evolved_foundry_effect
 
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 	
 	weight = {
 		# Ruler job Weight
 		weight = @ruler_job_weight
 		mult = value:job_weights_modifier|JOB|tec_corpo_tinker|RESOURCE|alloys|
 		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
-		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
 		modifier = {
 			factor = 5
 			has_job = tec_corpo_tinker
@@ -1475,8 +1653,7 @@ tec_corpo_tinker = {		#
 	}
 }
 
-tec_corpo_procurator = {	# 
-	icon = administrator
+tec_corpo_procurator = {	#
 	category = ruler
 	condition_string = RULER_JOB_TRIGGER
 	building_icon = building_capital
@@ -1493,7 +1670,8 @@ tec_corpo_procurator = {	#
 	possible_precalc = can_fill_ruler_job
 
 	resources = {
-		category = planet_administrators		
+		category = planet_administrators
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 
 	triggered_country_modifier = {
@@ -1506,7 +1684,8 @@ tec_corpo_procurator = {	#
 	
 	triggered_planet_modifier = {
 		potential = {
-			always = yes
+			exists = owner
+			owner = { tec_is_dystopian_empire = no }
 		}
 		planet_amenities_add = 3
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
@@ -1515,7 +1694,7 @@ tec_corpo_procurator = {	#
 
 	inline_script = jobs/effects/type/inline_evolved_administrator_effect
 
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 	
 	weight = {
 		# Ruler job Weight
@@ -1529,8 +1708,7 @@ tec_corpo_procurator = {	#
 	}
 }
 
-tec_corpo_chancellor = {	# 
-	icon = administrator
+tec_corpo_chancellor = {	#
 	category = ruler
 	condition_string = RULER_JOB_TRIGGER
 	building_icon = building_capital
@@ -1547,7 +1725,8 @@ tec_corpo_chancellor = {	#
 	possible_precalc = can_fill_ruler_job
 
 	resources = {
-		category = planet_administrators		
+		category = planet_administrators
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 
 	triggered_country_modifier = {
@@ -1560,7 +1739,8 @@ tec_corpo_chancellor = {	#
 
 	triggered_planet_modifier = {
 		potential = {
-			always = yes
+			exists = owner
+			owner = { tec_is_dystopian_empire = no }
 		}
 		planet_amenities_add = 3
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
@@ -1568,7 +1748,7 @@ tec_corpo_chancellor = {	#
 	
 	inline_script = jobs/effects/type/inline_evolved_administrator_effect
 
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 	
 	weight = {
 		# Ruler job Weight
@@ -1582,8 +1762,8 @@ tec_corpo_chancellor = {	#
 	}
 }
 
-tec_corpo_overseer = {		# 
-	icon = administrator
+tec_corpo_overseer = {		#
+	icon = tec_overseer
 	category = ruler
 	condition_string = RULER_JOB_TRIGGER
 	building_icon = building_capital
@@ -1600,7 +1780,8 @@ tec_corpo_overseer = {		#
 	possible_precalc = can_fill_ruler_job
 
 	resources = {
-		category = planet_administrators		
+		category = planet_administrators
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 
 	triggered_country_modifier = {
@@ -1613,7 +1794,8 @@ tec_corpo_overseer = {		#
 	
 	triggered_planet_modifier = {
 		potential = {
-			always = yes
+			exists = owner
+			owner = { tec_is_dystopian_empire = no }
 		}
 		planet_amenities_add = 5
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
@@ -1621,7 +1803,7 @@ tec_corpo_overseer = {		#
 
 	inline_script = jobs/effects/type/inline_evolved_administrator_effect
 
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 	
 	weight = {
 		# Ruler job Weight
@@ -1656,6 +1838,7 @@ tec_ai_computator = {		#
 		category = planet_politicians
 		produces = {
 			unity = 4
+			sr_tec_ai_power = 2 # +2 from inline
 		}
 		produces = {
 			trigger = {
@@ -1669,11 +1852,13 @@ tec_ai_computator = {		#
 		upkeep = {
 			consumer_goods = 2
 		}
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 
 	triggered_planet_modifier = {
 		potential = {
-			always = yes
+			exists = owner
+			owner = { tec_is_dystopian_empire = no }
 		}
 		planet_amenities_add = 3
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
@@ -1690,11 +1875,7 @@ tec_ai_computator = {		#
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
 	}
 
-	country_modifier = {
-		country_ethic_sr_tec_ai_power_dummy_produces_add = 5
-	}
-
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 		
 	weight = {
 		# Ruler job Weight
@@ -1751,7 +1932,8 @@ tec_ai_high_ordinator = {	#
 	resources = {
 		category = planet_priests
 		produces = {
-			unity = 4
+			unity = 5
+			sr_tec_ai_power = 2  # +2 from inline below
 		}
 		produces = {
 			trigger = {
@@ -1765,11 +1947,13 @@ tec_ai_high_ordinator = {	#
 		upkeep = {
 			consumer_goods = 2
 		}
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 
 	triggered_planet_modifier = {
 		potential = {
-			always = yes
+			exists = owner
+			owner = { tec_is_dystopian_empire = no }
 		}
 		planet_amenities_add = 5
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
@@ -1782,19 +1966,15 @@ tec_ai_high_ordinator = {	#
 				is_megacorp = yes
 			}
 		}
-		trade_value_add = 4
+		trade_value_add = 6
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
-	}
-
-	country_modifier = {
-		country_ethic_sr_tec_ai_power_dummy_produces_add = 5
 	}
 
 	inline_script = jobs/effects/type/inline_evolved_administrator_effect
 
 	inline_script = jobs/effects/type/inline_evolved_priest_effect
 
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 
 
 	weight = {
@@ -1880,6 +2060,7 @@ tec_consular = {
 		upkeep = {
 			consumer_goods = 2
 		}
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 	
 	planet_modifier = {
@@ -1888,7 +2069,8 @@ tec_consular = {
 
 	triggered_planet_modifier = {
 		potential = {
-			always = yes
+			exists = owner
+			owner = { tec_is_dystopian_empire = no }
 		}
 		planet_amenities_add = 3
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
@@ -1902,7 +2084,7 @@ tec_consular = {
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
 	}
 
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 	
 	weight = {
 		# Ruler job Weight
@@ -1959,6 +2141,7 @@ tec_crime_consular = {
 		upkeep = {
 			consumer_goods = 2
 		}
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 	
 	planet_modifier = {
@@ -1974,7 +2157,7 @@ tec_crime_consular = {
 	}
 
 	
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 		
 	weight = {
 		# Ruler job Weight
@@ -2026,7 +2209,11 @@ tec_imperial_admin = {		#
 	possible_precalc = can_fill_ruler_job
 
 	resources = {
-		category = planet_administrators		
+		category = planet_politicians
+		produces = {
+			unity = 2
+		}
+		inline_script = jobs/resources/inline_evolved_rulers
 	}
 
 	triggered_country_modifier = {
@@ -2039,18 +2226,14 @@ tec_imperial_admin = {		#
 	
 	triggered_planet_modifier = {
 		potential = {
-			always = yes
+			exists = owner
+			owner = { tec_is_dystopian_empire = no }
 		}
 		planet_amenities_add = 3
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
 
-	inline_script = jobs/effects/type/inline_evolved_administrator_effect
-
-	# maybe since kinda bureaucrat
-	# inline_script = jobs/effects/type/inline_evolved_bureaucrat_effect
-
-	inline_script = jobs/effects/inline_evolved_tec_social_prosperity
+	inline_script = jobs/effects/inline_evolved_civic_tec_regular_social_prosperity
 	
 
 	# Authorities
@@ -2101,108 +2284,86 @@ tec_imperial_admin = {		#
 				exists = owner
 				owner = {
 					tec_is_aiauth_empire = yes
+					is_megacorp = no
 				}
 			}
-			planet_jobs_robotic_produces_mult = 0.05
+			planet_jobs_sr_tec_ai_power_produces_mult = 0.1
 		}
 	# /
 
 	# Ethics
-		triggered_planet_modifier = {	# NOFAN
-			potential = {
-				exists = owner
-				owner = {
-					NOR = {
-						has_ethic = ethic_fanatic_egalitarian
-						has_ethic = ethic_fanatic_authoritarian
-						has_ethic = ethic_fanatic_xenophile
-						has_ethic = ethic_fanatic_xenophobe
-						has_ethic = ethic_fanatic_militarist
-						has_ethic = ethic_fanatic_pacifist
-						has_ethic = ethic_fanatic_materialist
-						has_ethic = ethic_fanatic_spiritualist
-
-						has_ethic = ethic_fanatic_capitalism
-						has_ethic = ethic_fanatic_socialism
-						has_ethic = ethic_fanatic_pluralist
-						has_ethic = ethic_fanatic_elitist
-						has_ethic = ethic_fanatic_green
-						has_ethic = ethic_fanatic_industrial
-					}
-				}
-			}
-			modifier = {
-				planet_stability_add = 5
-			}
-		}
-
 		triggered_planet_modifier = {	# Lib
 			potential = {
 				exists = owner
 				owner = {
-					has_ethic = ethic_fanatic_egalitarian
+					is_egalitarian = yes
 				}
 			}
-			modifier = {
-				pop_happiness = 0.05
-			}
+			pop_political_power = 0.1
+			mult = value:scripted_ethics_weight_mult|ETHIC|egalitarian|
 		}
 		triggered_planet_modifier = {	# Auth
 			potential = {
 				exists = owner
 				owner = {
-					has_ethic = ethic_fanatic_authoritarian
+					is_authoritarian = yes
 				}
 			}
-			trade_value_mult = 0.05
+			pop_cat_ruler_political_power = 0.25
+			mult = value:scripted_ethics_weight_mult|ETHIC|authoritarian|
 		}
 
 		triggered_planet_modifier = {	# Phile
 			potential = {
 				exists = owner
 				owner = {
-					has_ethic = ethic_fanatic_xenophile
+					is_xenophile = yes
 				}
 			}
-			planet_pops_upkeep_mult = -0.15
+			planet_immigration_pull_add = 1
+			mult = value:scripted_ethics_weight_mult|ETHIC|xenophile|
 		}
 		triggered_planet_modifier = {	# Phobe
 			potential = {
 				exists = owner
 				owner = {
-					has_ethic = ethic_fanatic_xenophobe
+					is_xenophobe = yes
 				}
 			}
-			army_defense_damage_mult = 0.1
+			planet_jobs_tec_main_species_produces_mult = 0.02
+			mult = value:scripted_ethics_weight_mult|ETHIC|xenophobe|
 		}
 
-		triggered_planet_modifier = {	# mil
-			potential = {
+		triggered_country_modifier = {	# mil
+			potential = {	# Navalcap rework
 				exists = owner
 				owner = {
-					has_ethic = ethic_fanatic_militarist
+					is_militarist = yes
 				}
 			}
-			armies_cost_mult = -0.15
+			country_naval_cap_add = 2
+			mult = value:scripted_modifier_ethics_weight_mult|ETHIC|militarist|MODIFIER|pop_job_naval_mult|
 		}
 		triggered_planet_modifier = {	# pacif
 			potential = {
 				exists = owner
 				owner = {
-					has_ethic = ethic_fanatic_pacifist
+					is_pacifist = yes
 				}
 			}
-			planet_jobs_unity_produces_mult = 0.05
+			tec_pop_lifestyle_trade_value_add = 0.05
+			mult = value:scripted_ethics_weight_mult|ETHIC|pacifist|
 		}
 
-		triggered_planet_modifier = {	# mat
+		triggered_country_modifier = {	# mat
 			potential = {
 				exists = owner
 				owner = {
-					has_ethic = ethic_fanatic_materialist
+					is_materialist = yes
 				}
 			}
-			planet_pops_robotics_upkeep_mult = -0.1
+			country_admin_cap_add = 1
+			mult = value:scripted_ethics_weight_mult|ETHIC|materialist|
 		}
 		triggered_planet_modifier = {	# spi
 			potential = {
@@ -2211,66 +2372,70 @@ tec_imperial_admin = {		#
 					has_ethic = ethic_fanatic_spiritualist
 				}
 			}
-			planet_pops_organics_upkeep_mult = -0.1
+			planetary_ascension_cost_mult = 0.05
+			mult = value:scripted_ethics_weight_mult|ETHIC|spiritualist|
 		}
 
 		triggered_planet_modifier = {	# cap
 			potential = {
 				exists = owner
 				owner = {
-					has_ethic = ethic_fanatic_capitalism
+					is_capitalism = yes
 				}
 			}
-			trade_value_mult = 0.05
+			pop_job_trade_mult = 0.05
+			mult = value:scripted_ethics_weight_mult|ETHIC|capitalism|
 		}
 		triggered_planet_modifier = {	# soc
 			potential = {
 				exists = owner
 				owner = {
-					has_ethic = ethic_fanatic_socialism
+					is_cooperative = yes
 				}
 			}
-			planet_housing_mult = 0.1
+			pop_cat_worker_political_power = 0.2
+			mult = value:scripted_ethics_weight_mult|ETHIC|socialism|
 		}
 
 		triggered_planet_modifier = {	# egal
 			potential = {
 				exists = owner
 				owner = {
-					has_ethic = ethic_fanatic_pluralist
+					is_pluralist = yes
 				}
 			}
 			planet_jobs_productive_produces_mult = 0.05
 			planet_jobs_productive_upkeep_mult = 0.05
+			mult = value:scripted_ethics_weight_mult|ETHIC|pluralist|
 		}
 		triggered_planet_modifier = {	# eli
 			potential = {
 				exists = owner
 				owner = {
-					has_ethic = ethic_fanatic_elitist
+					is_elitist = yes
 				}
 			}
-			planet_jobs_ruler_produces_mult = 0.05
-			planet_jobs_specialist_produces_mult = 0.05
+			planet_jobs_ruler_produces_mult = 0.025
+			planet_jobs_specialist_produces_mult = 0.025
+			mult = value:scripted_ethics_weight_mult|ETHIC|elitist|
 		}
 
-		triggered_planet_modifier = {	# green
+		triggered_planet_modifier = {
 			potential = {
 				exists = owner
-				owner = {
-					has_ethic = ethic_fanatic_green
-				}
+				owner = { is_ecologist = yes }
 			}
-			planet_districts_upkeep_mult = -0.05
+			planet_jobs_upkeep_mult = -0.025
+			mult = value:scripted_ethics_weight_mult|ETHIC|green|
 		}
-		triggered_planet_modifier = {	# ind
+
+		triggered_planet_modifier = {
 			potential = {
 				exists = owner
-				owner = {
-					has_ethic = ethic_fanatic_industrial
-				}
+				owner = { is_industrialist = yes }
 			}
-			planet_buildings_upkeep_mult = -0.05
+			empire_size_districts_mult = 0.05
+			mult = value:scripted_ethics_weight_mult|ETHIC|industrial|
 		}
 	# /
 	
@@ -2278,7 +2443,6 @@ tec_imperial_admin = {		#
 		# Ruler job Weight
 		weight = @ruler_job_weight
 		mult = value:job_weights_modifier|JOB|tec_imperial_admin|RESOURCE|unity|
-		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
 		modifier = {
 			factor = 5
 			has_job = tec_imperial_admin
@@ -2307,4 +2471,8 @@ tec_imperial_admin = {		#
 			}
 		}
 	}
+}
+
+tec_corporate_parabellum_corp = {
+	inline_script = jobs/inline_evolved_disabled
 }

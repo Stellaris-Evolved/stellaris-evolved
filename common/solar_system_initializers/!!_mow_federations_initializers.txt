@@ -30,11 +30,17 @@ lost_colony_1 = {
 	usage_odds = {
 		base = 0
 		modifier = {
-			any_country = {
+			any_playable_country = {
 				has_origin = origin_lost_colony
+				OR = {
+					is_human_species = no
+					AND = {
+						is_human_species = yes
+						any_system = { has_star_flag = sol_system }
+					}
+				}
 				NOR = {
 					has_country_flag = parent_system_spawned
-					is_human_species = yes
 					# don't spawn if AI-generated and adv start disabled
 					# see game_start.1
 					AND = {
@@ -105,41 +111,14 @@ lost_colony_1 = {
 					has_origin = origin_lost_colony
 					NOR = {
 						has_country_flag = parent_system_spawned
-						is_human_species = yes
 					}
 				}
 				set_country_flag = parent_system_spawned
 				save_event_target_as = lost_colony_child
 			}
 
-			create_country = {
-				species = event_target:lost_colony_child
-				name_list = event_target:lost_colony_child
-				type = default
-				origin = "origin_default"
-				government_restrictions = {
-					authority = {
-						NOR = {
-							value = auth_machine_intelligence
-							value = auth_hive_mind
-							# Evolved new auths
-							value = auth_tec_hive_biological
-							value = auth_tec_hive_cybernetic
-						}
-					}
-				}
-				effect = {
-					save_event_target_as = lost_colony_parent
-					add_resource = {
-						minerals = 2400
-						energy = 2400
-						food = 2400
-						alloys = 800
-						consumer_goods = 1200
-						influence = 600
-					}
-				}
-			}
+			lost_colony_generate_parent_effect = yes
+
 			create_colony = {
 				owner = event_target:lost_colony_parent
 			}
@@ -212,9 +191,22 @@ lost_colony_1 = {
 				building = crew_quarters
 				owner = event_target:lost_colony_parent
 				effect = {
-					set_starbase_module = {
-						slot = 1
-						module = trading_hub
+					if = {
+						limit = {
+							event_target:lost_colony_parent = {
+								is_gestalt = yes
+							}
+						}
+						set_starbase_module = {
+							slot = 1
+							module = solar_panel_network
+						}
+					}
+					else = {
+						set_starbase_module = {
+							slot = 1
+							module = trading_hub
+						}
 					}
 				}
 			}

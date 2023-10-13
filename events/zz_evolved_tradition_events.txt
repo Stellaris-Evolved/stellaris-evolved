@@ -254,6 +254,7 @@ planet_event = {
 		else = {
 			add_district = district_city
 		}
+		validate_and_repair_planet_buildings_and_districts = yes
 	}
 }
 
@@ -331,7 +332,7 @@ country_event = {
 		every_owned_leader = {
 			limit = {
 				OR = {
-					leader_class = ruler
+					is_ruler = yes
 					leader_class = governor
 				}
 				has_level < 5
@@ -778,6 +779,7 @@ country_event = {
 	is_triggered_only = yes
 
 	trigger = {
+		exists = from
 		OR = {
 			root = {	# root is unnecesary but i put it just in case...
 				has_tradition = tr_tec_might_final_2
@@ -947,7 +949,7 @@ country_event = {
 	}
 }
 
-#tr_tec_invention_4:0 "Nuclear Geniality"
+#tr_tec_invention_4:0 "Nuclear Geniality" (removed)
 country_event = {
 	id = tec_tradition.720
 	is_triggered_only = yes
@@ -955,6 +957,7 @@ country_event = {
 
 	trigger = {
 		has_tradition = tr_tec_invention_4
+		always = no
 	}
 
 	immediate = {
@@ -963,10 +966,26 @@ country_event = {
 				limit = { leader_class = scientist }
 				random_list = {
 					20 = {
-						add_trait = leader_trait_spark_of_genius
+						add_trait_no_notify = leader_trait_spark_of_genius
 					}
 					20 = {
-						add_trait = leader_trait_maniacal
+						if = {
+							limit = {
+								has_trait = leader_trait_maniacal
+							}
+							remove_trait = leader_trait_maniacal
+							add_trait_no_notify = leader_trait_maniacal_2
+						}
+						else_if = {
+							limit = {
+								has_trait = leader_trait_maniacal_2
+							}
+							remove_trait = leader_trait_maniacal_2
+							add_trait_no_notify = leader_trait_maniacal_3
+						}
+						else = {
+							add_trait_no_notify = leader_trait_maniacal
+						}
 					}
 					60 = {
 						break = yes
@@ -1975,7 +1994,7 @@ country_event = {	# Common announcement
 			OR = {
 				has_ethic = ethic_materialist
 				has_ethic = ethic_fanatic_materialist
-				has_civic = civic_tec_occultist
+				has_civic = civic_tec_regular_occultist
 			}
 		}
 	}
@@ -2645,6 +2664,18 @@ country_event = {	# Country no longer exists
 				has_country_flag = tec_bt_mid_spread_candidate_101
 			}
 			has_country_flag = tec_bt_high_spread_candidate_101
+		}
+	}
+	
+	option = {
+		name = "tec_bt.8101.c"
+		custom_tooltip = "tec_bt.7101.tooltip"
+		trigger = {
+			NOR = {
+				has_country_flag = tec_bt_high_spread_candidate_101
+				has_country_flag = tec_bt_mid_spread_candidate_101
+				has_country_flag = tec_bt_close_spread_candidate_101
+			}
 		}
 	}
 
@@ -4403,6 +4434,7 @@ country_event = {	# Bt 105 each 5 years, controlled by bt.500
 				event_target:global_event_country = {
 					has_country_flag = tec_close_spread_off_bt_105
 				}
+				exists = event_target:tec_bt_105_og
 				NOR = {
 					has_technology = tech_tec_bt_105_test
 					is_researching_technology = tech_tec_bt_105_test

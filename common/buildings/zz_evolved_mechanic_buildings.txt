@@ -1,0 +1,153 @@
+# common\buildings\zz_evolved_mechanic_buildings.txt
+
+# Habitat Orbital Buildings
+	building_tec_hab_orbital_autobuilder = {
+		base_buildtime = @b2_time
+		base_cap_amount = 1
+		position_priority = 30		# Unique
+		category = government
+		ai_estimate_without_unemployment = yes
+
+		potential = {
+			tec_is_habitat = yes
+			exists = owner
+			owner = {
+				is_void_dweller_empire = yes
+			}
+		}
+
+		allow = {
+			fail_text = {
+				text = building_tec_hab_orbital_autobuilder_require_available_orbitals
+				hidden_trigger = {
+					# Mimics minor orbital things
+					root = {
+						solar_system = {
+							any_system_planet = {
+								# Surveyed one is worthless
+								# fail_text = "requires_no_anomaly"
+								NOT = {
+									has_anomaly = yes
+								}
+								# fail_text = "requires_no_existing_megastructure"
+								NOR = {
+									has_planet_flag = megastructure
+									has_planet_flag = has_megastructure
+								}
+								# fail_text = "requires_no_orbital_debris"
+								NOT = {
+									has_planet_flag = has_orbital_debris
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		destroy_trigger = {
+			tec_is_habitat = no	
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
+			}
+			upkeep = {	# Minor = 50
+				trigger = {
+					has_planet_flag = tec_building_minor_orbital
+				}
+				# 4 months = 12.5 per month
+				alloys = 15
+				mult = owner.value:habitat_build_cost_mult
+			}
+			upkeep = {	# Major = 200
+				trigger = {
+					has_planet_flag = tec_building_major_orbital
+				}
+				# 16 months = 12.5
+				alloys = 15
+				mult = owner.value:habitat_build_cost_mult
+			}
+		}
+
+		# Descs
+			triggered_desc = {
+				trigger = {
+					NOR = {
+						has_planet_flag = tec_orbital_autobuilder_focus_major
+						has_planet_flag = tec_orbital_autobuilder_focus_minor
+					}
+				}
+				text = building_tec_hab_orbital_autobuilder_default_effect
+			}
+			triggered_desc = {
+				trigger = {
+					has_planet_flag = tec_orbital_autobuilder_focus_minor
+				}
+				text = building_tec_hab_orbital_autobuilder_minor_effect
+			}
+			triggered_desc = {
+				trigger = {
+					has_planet_flag = tec_orbital_autobuilder_focus_major
+				}
+				text = building_tec_hab_orbital_autobuilder_major_effect
+			}
+
+			triggered_desc = {	# Building major orbital
+				trigger = {
+					has_planet_flag = tec_building_minor_orbital
+				}
+				text = building_tec_hab_orbital_autobuilder_building_minor_orbital
+			}
+			triggered_desc = {	# Building major orbital
+				trigger = {
+					has_planet_flag = tec_building_major_orbital
+				}
+				text = building_tec_hab_orbital_autobuilder_building_major_orbital
+			}
+			triggered_desc = {	# Building no orbital
+				trigger = {
+					has_planet_flag = tec_building_no_orbital
+				}
+				text = building_tec_hab_orbital_autobuilder_building_no_orbital
+			}
+			triggered_desc = {	# displays orbitals info
+				trigger = {
+					always = yes
+				}
+				text = building_tec_hab_orbital_autobuilder_current_orbitals
+			}
+		# /
+
+		# Effects
+			on_built = {
+				# Scans instantly and later each year
+				hidden_effect = {
+					remove_planet_flag = tec_building_no_orbital
+					planet_event = {
+						id = tec_habitats.200
+					}
+				}
+				#on_orbital_complete_effect = {
+				#	BODY = minor
+				#	TYPE = generic
+				#}
+				#on_orbital_complete_effect = {
+				#	BODY = major
+				#	TYPE = generic
+				#}
+				#on_orbital_complete_effect = {
+				#	BODY = major
+				#	TYPE = knights
+				#}
+			}
+		# /
+
+		# AI
+
+		# /
+	}
+# /

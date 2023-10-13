@@ -1,10 +1,10 @@
-# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
-# Supremacist Faction
-# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
+# common\pop_faction_types\zz_vanilla_supremacist.txt
 
+# ------------------------------------------------- Xenophobe hateful Faction
 supremacist = {
 	election_header = "GFX_faction_header_yellow"
 	guiding_ethic = ethic_xenophobe
+	visual_ethic = "supremacist_visual_ethic"
 	
 	unique = yes
 	support_multiplier = 1
@@ -12,39 +12,19 @@ supremacist = {
 	resources = {
 		category = pop_factions
 		produces = {
-			unity = @tec_fac_infl_produce
+			unity = @faction_base_unity
 		}
-		produces = {	# Political virtue
-			trigger = {
-				owner = {
-					has_valid_civic = civic_tec_political_virtue
-				}
-				pop_faction = {
-					faction_approval >= 0.5
-				}
-			}
-			unity = 0.20
+		inline_script = {
+			script = pop_faction_types/inline_evolved_tec_political_virtue
+			ethic = xenophobe
+			resource_1 = unity
+			count_1 = @tec_fac_political_virtue_advanced
+			resource_2 = "#"
+			count_2 = 0
+			resource_3 = "#"
+			count_3 = 0
 		}
-		produces = {	# Political virtue
-			trigger = {
-				owner = {
-					has_valid_civic = civic_tec_political_virtue
-					is_xenophobe = yes
-				}
-				pop_faction = {
-					faction_approval >= 0.5
-				}
-			}
-			unity = 0.05
-		}
-		produces = {	# Idealistic foundation
-			trigger = {
-				owner = {
-					has_valid_civic = civic_idealistic_foundation
-				}
-			}
-			influence = 0.005
-		}
+		inline_script = pop_faction_types/inline_evolved_tec_idealistic_foundation
 	}
 
 	#Note: number of potential or actual members is checked by POP_FACTION_MIN_POTENTIAL_MEMBERS define
@@ -70,7 +50,7 @@ supremacist = {
 	can_join_faction = {
 		NOT = { tec_is_shackled_robot = { cached = yes } }
 		NOT = { tec_is_shackled_bioservant = { cached = yes } }
-		NOT = { tec_has_stapled_trait = { cached = yes } }
+		NOT = { tec_has_stapled_trait ={ cached = yes } }
 		is_same_species = owner_species
 	}
 	
@@ -82,7 +62,7 @@ supremacist = {
 			exists = from
 			from = {
 				exists = leader
-				leader = { leader_class = ruler }
+				leader = { is_ruler = yes }
 			}
 		}
 		
@@ -133,7 +113,19 @@ supremacist = {
 		script = pop_faction_types/demand_faction_pleased
 		FLAG = galcom_resolution_passed_pro_supremacist
 	}
-	
+
+	# Faction Demands for Ruler and Council positions.
+	inline_script = {
+		script = "factions/inline_evolved_global_faction_demands"
+		ETHIC = ethic_xenophobe
+		ETHIC_FANATIC = ethic_fanatic_xenophobe
+		ETHIC_OPPOSED = ethic_xenophile
+		EXTRA_POTENTIAL = "
+			exists = owner
+			owner = { tec_is_aiauth_empire = no }
+		"
+	}
+
 	# Evolved: List of demands
 		# Supremacists just don't want xenos
 		# Positives (only pos)
@@ -292,7 +284,13 @@ supremacist = {
 				trigger = {
 					owner = {
 						exists = ruler
-						ruler = { is_same_species = owner_species }
+						OR = {
+							ruler = { is_same_species = owner_species }
+							AND = {
+								owner = { tec_is_selective_kinship_empire = yes }
+								ruler = { is_same_species_class = owner_species }
+							}
+						}
 					}
 				}
 			}
@@ -486,6 +484,293 @@ supremacist = {
 					}
 				}
 			}
+
+			
+			demand = {
+				title = "SUPREMACIST_COUNCIL_SAME_SPECIES1"
+				unfulfilled_title = "SUPREMACIST_COUNCIL_NOT_SAME_SPECIES1"
+				desc = "SUPREMACIST_COUNCIL_NOT_SAME_SPECIES_DESC1"
+
+				fulfilled_effect = 0.001
+				unfulfilled_effect = -10
+
+				potential = {
+					exists = owner
+					owner = {
+						any_owned_leader = {
+							is_councilor = yes
+							is_same_species = owner_species
+							is_ruler = no
+						}
+						NOR = {
+							has_valid_civic = civic_fanatic_purifiers
+							OR = {
+								count_owned_leader = {
+									count <= value:count_councilors_xenos_2
+									limit = {
+										is_councilor = yes
+										is_ruler = no
+										is_same_species = owner_species
+									}
+								}
+								AND = {
+									tec_is_selective_kinship_empire = yes
+									count_owned_leader = {
+										count <= value:count_councilors_xenos_2
+										limit = {
+											is_councilor = yes
+											is_ruler = no
+											is_same_species_class = owner_species
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+				trigger = {
+					owner = {
+						OR = {
+							count_owned_leader = {
+								count = value:count_councilors
+								limit = {
+									is_councilor = yes
+									is_ruler = no
+									is_same_species = owner_species
+								}
+							}
+							AND = {
+								tec_is_selective_kinship_empire = yes
+								count_owned_leader = {
+									count = value:count_councilors
+									limit = {
+										is_councilor = yes
+										is_ruler = no
+										is_same_species_class = owner_species
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			demand = {
+				title = "SUPREMACIST_COUNCIL_SAME_SPECIES2"
+				unfulfilled_title = "SUPREMACIST_COUNCIL_NOT_SAME_SPECIES2"
+				desc = "SUPREMACIST_COUNCIL_NOT_SAME_SPECIES_DESC2"
+
+				fulfilled_effect = 0.001
+				unfulfilled_effect = -20
+
+				potential = {
+					exists = owner
+					owner = {
+						NOT = { has_valid_civic = civic_fanatic_purifiers }
+						OR = {
+							AND = {
+								any_owned_leader = {
+									is_councilor = yes
+									is_same_species = owner_species
+									is_ruler = no
+								}
+								count_owned_leader = {
+									count = 2
+									limit = {
+										is_councilor = yes
+										is_ruler = no
+										NOT = { is_same_species = owner_species }
+									}
+								}
+							}
+							AND = {
+								tec_is_selective_kinship_empire = yes
+								any_owned_leader = {
+									is_councilor = yes
+									is_same_species_class = owner_species
+									is_ruler = no
+								}
+								count_owned_leader = {
+									count = 2
+									limit = {
+										is_councilor = yes
+										is_ruler = no
+										NOT = { is_same_species_class = owner_species }
+									}
+								}
+							}
+						}
+					}
+				}
+
+				trigger = {
+					always = no
+				}
+			}
+			demand = {
+				title = "SUPREMACIST_COUNCIL_SAME_SPECIES3"
+				unfulfilled_title = "SUPREMACIST_COUNCIL_NOT_SAME_SPECIES3"
+				desc = "SUPREMACIST_COUNCIL_NOT_SAME_SPECIES_DESC3"
+
+				fulfilled_effect = 0.001
+				unfulfilled_effect = -30
+
+				potential = {
+					exists = owner
+					owner = {
+						NOT = { has_valid_civic = civic_fanatic_purifiers }
+						OR = {
+							AND = {
+								any_owned_leader = {
+									is_councilor = yes
+									is_same_species = owner_species
+									is_ruler = no
+								}
+								count_owned_leader = {
+									count = 3
+									limit = {
+										is_councilor = yes
+										is_ruler = no
+										NOT = { is_same_species = owner_species }
+									}
+								}
+							}
+							AND = {
+								tec_is_selective_kinship_empire = yes
+								any_owned_leader = {
+									is_councilor = yes
+									is_same_species_class = owner_species
+									is_ruler = no
+								}
+								count_owned_leader = {
+									count = 3
+									limit = {
+										is_councilor = yes
+										is_ruler = no
+										NOT = { is_same_species_class = owner_species }
+									}
+								}
+							}
+						}
+					}
+				}
+
+				trigger = {
+					always = no
+				}
+			}
+			demand = {
+				title = "SUPREMACIST_COUNCIL_SAME_SPECIES4"
+				unfulfilled_title = "SUPREMACIST_COUNCIL_NOT_SAME_SPECIES4"
+				desc = "SUPREMACIST_COUNCIL_NOT_SAME_SPECIES_DESC4"
+
+				fulfilled_effect = 0.001
+				unfulfilled_effect = -40
+
+				potential = {
+					exists = owner
+					owner = {
+						NOT = { has_valid_civic = civic_fanatic_purifiers }
+						OR = {
+							AND = {
+								any_owned_leader = {
+									is_councilor = yes
+									is_same_species = owner_species
+									is_ruler = no
+								}
+								count_owned_leader = {
+									count = 4
+									limit = {
+										is_councilor = yes
+										is_ruler = no
+										NOT = { is_same_species = owner_species }
+									}
+								}
+							}
+							AND = {
+								tec_is_selective_kinship_empire = yes
+								any_owned_leader = {
+									is_councilor = yes
+									is_same_species_class = owner_species
+									is_ruler = no
+								}
+								count_owned_leader = {
+									count = 4
+									limit = {
+										is_councilor = yes
+										is_ruler = no
+										NOT = { is_same_species_class = owner_species }
+									}
+								}
+							}
+						}
+					}
+				}
+
+				trigger = {
+					always = no
+				}
+			}
+			demand = {
+				title = "SUPREMACIST_COUNCIL_NOT_FULL_XENOS"
+				unfulfilled_title = "SUPREMACIST_COUNCIL_FULL_XENOS"
+				desc = "SUPREMACIST_COUNCIL_FULL_XENOS_DESC"
+
+				fulfilled_effect = 0.001
+				unfulfilled_effect = -60
+
+				potential = {
+					exists = owner
+					owner = {
+						tec_is_aiauth_empire = no
+						NOT = { has_valid_civic = civic_fanatic_purifiers }
+						NOR = {
+							any_owned_leader = {
+								is_councilor = yes
+								is_same_species = owner_species
+								is_ruler = no
+							}
+							AND = {
+								tec_is_selective_kinship_empire = yes
+								any_owned_leader = {
+									is_councilor = yes
+									is_same_species_class = owner_species
+									is_ruler = no
+								}
+							}
+						}
+						OR = {
+							count_owned_leader = {
+								count >= 5
+								limit = {
+									is_councilor = yes
+									is_ruler = no
+									NOT = { is_same_species = owner_species }
+								}
+							}
+							any_owned_leader = {
+								is_councilor = yes
+								is_ruler = no
+							}
+							AND = {
+								tec_is_selective_kinship_empire = yes
+								count_owned_leader = {
+									count >= 5
+									limit = {
+										is_councilor = yes
+										is_ruler = no
+										NOT = { is_same_species_class = owner_species }
+									}
+								}
+							}
+						}
+					}
+				}
+
+				trigger = {
+					always = no
+				}
+			}
 		# /
 		demand = {	# NEG - FACTION NEGATIVE ECONOMY
 			title = "TEC_FACTION_NO_NEGATIVE_ECONOMY"
@@ -537,212 +822,9 @@ supremacist = {
 		}
 	}
 	
-	actions = {
-		embrace_faction = {
-			title = "EMBRACE_FACTION"
-			description = "EMBRACE_FACTION_DESC"
-			
-			cost = {
-				influence = @tec_fac_embrace_cost
-			}
-			
-			potential = {
-				exists = owner
-				owner = {
-					OR = {
-						is_subject = no
-						NOT = { any_agreement = { agreement_preset = preset_dominion } }
-					}
-				}
-			}
-			
-			valid = {
-				custom_tooltip = {
-					fail_text = EMBRACE_FACTION_COOLDOWN
-					parameter:empire = {
-						NOT = { has_modifier = embraced_faction_timer }
-					}
-				}
-				support > @tec_fac_embrace_min_support
-				parameter:empire = {
-					NOT = { has_ethic = "ethic_fanatic_xenophobe" }
-				}
-			}
-
-			effect = {
-				add_modifier = { modifier = embraced_faction days = @tec_fac_embrace_cd}
-				parameter:empire = {
-					shift_ethic = ethic_xenophobe
-					hidden_effect = {
-						every_pop_faction = { # embraces xenophobe ethos
-							limit = { is_pop_faction_type = isolationist }
-							add_modifier = { modifier = embraced_faction days = @tec_fac_embrace_cd	}
-						}
-						add_modifier = { modifier = embraced_faction_timer days = @tec_fac_embrace_cd}
-						every_pop_faction = {
-							limit = {
-								NOR = {
-									is_same_value = root
-									is_pop_faction_type = isolationist # same ethos
-								}
-							}
-							add_modifier = { modifier = embraced_another_faction days = @tec_fac_embrace_cd}
-						}
-					}
-				}
-				hidden_effect = {
-					save_event_target_as = TargetFaction
-					parameter:empire = {
-						every_relation = {
-							limit = {
-								is_ai = no
-								tec_is_default_country = yes
-								has_communications = prev
-								has_intel_level = {
-									who = prev
-									category = government
-									level >= 1
-								}
-							}
-							country_event = { id = factions.2000 }
-						}
-					}
-				}
-			}
-			
-			ai_weight = {
-				base = 1
-				modifier = {
-					factor = 0
-					support < 0.50
-					owner = {
-						has_ethic = ethic_xenophobe
-					}
-				}
-				modifier = {
-					factor = 0
-					owner = { has_valid_civic = civic_fanatic_purifiers }
-				}
-				modifier = {
-					factor = 0
-					NOT = {
-						owner = {
-							exists = ruler
-							ruler = {
-								leader_of_faction = supremacist
-							}
-						}
-					}
-				}
-				modifier = {
-					factor = 0
-					owner = {
-						count_pop_faction = {
-							count < 4
-						}
-					}
-				}
-			}
-		}
-		promote_faction = {
-			title = "PROMOTE_FACTION"
-			description = "PROMOTE_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					NOR = {
-						has_modifier = suppressed_xenophobe
-						has_modifier = promoted_xenophobe
-					}
-				}
-			}
-
-			effect = {
-				parameter:empire = {
-					add_modifier = { modifier = promoted_xenophobe days = -1 }
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
-		cancel_promote_faction = {
-			title = "CANCEL_PROMOTE_FACTION"
-			description = "CANCEL_PROMOTE_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = { has_modifier = promoted_xenophobe }
-			}
-
-			effect = {
-				parameter:empire = {
-					remove_modifier = promoted_xenophobe
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
-		suppress_faction = {
-			title = "SUPPRESS_FACTION"
-			description = "SUPPRESS_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					NOR = {
-						has_modifier = suppressed_xenophobe
-						has_modifier = promoted_xenophobe
-					}
-				}
-			}
-
-			effect = {
-				add_modifier = { modifier = suppressed_faction days = -1 }
-				parameter:empire = {
-					hidden_effect = {
-						every_pop_faction = {
-							limit = { is_pop_faction_type = isolationist }
-							add_modifier = { modifier = suppressed_faction days = -1 }
-						}
-					}
-					add_modifier = { modifier = suppressed_xenophobe days = -1 }
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
-		cancel_suppress_faction = {
-			title = "CANCEL_SUPPRESS_FACTION"
-			description = "CANCEL_SUPPRESS_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = { has_modifier = suppressed_xenophobe }
-			}
-
-			effect = {
-				remove_modifier = suppressed_faction
-				parameter:empire = {
-					remove_modifier = suppressed_xenophobe
-					hidden_effect = {
-						every_pop_faction = {
-							limit = { is_pop_faction_type = isolationist }
-							remove_modifier = suppressed_faction
-						}
-					}
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
+	inline_script = { 
+			script = factions/inline_evolved_actions
+			ETHIC = xenophobe
+		
 	}
 }

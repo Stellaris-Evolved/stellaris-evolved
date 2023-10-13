@@ -1,0 +1,174 @@
+# ai auth
+
+# scope: leader
+tec_aiauth_node_upkeep_scale = {
+	base = 1.5
+	
+	modifier = {
+		is_ruler = yes
+		add = 0.2
+	}
+	pow = trigger:has_skill
+}
+
+# scope: country
+tec_aiauth_ai_power_balance = {
+	complex_trigger_modifier = {
+		trigger = resource_income_compare
+		parameters = {
+			resource  = sr_tec_ai_power
+		}
+		mode = add
+	}
+}
+
+# node weight from modifiers, this does not include the base of 1 weight
+# scope: leader
+tec_aiauth_node_weight = {
+	add = modifier:tec_aiauth_weight_add
+
+	modifier = {
+		is_ruler = yes
+		exists = owner
+		add = owner.modifier:tec_aiauth_ruler_weight_add
+	}
+
+	modifier = {
+		tec_is_aiauth_councilor_node = yes
+		exists = owner
+		add = owner.modifier:tec_aiauth_councilor_weight_add
+	}
+
+	modifier = {
+		tec_is_aiauth_planetary_node = yes
+		exists = owner
+		add = owner.modifier:tec_aiauth_planetary_node_weight_add
+	}
+
+	modifier = {
+		OR = {
+			tec_leader_is_at_max_skill = yes
+			tec_get_experiece_aiauth_node = no
+		}
+		factor = 0
+	}
+}
+
+tec_aiauth_node_weight_tooltip = {
+	modifier = {
+		add = 1
+		tec_get_experiece_aiauth_node = yes
+	}
+	add = value:tec_aiauth_node_weight
+}
+
+# scope: leader
+tec_aiauth_experience_per_month = {
+	add = value:tec_aiauth_node_weight_tooltip
+	modifier = {
+		exists = owner
+		divide = owner.value:tec_aiauth_total_weight
+	}
+	modifier = {
+		exists = owner
+		mult = owner.value:tec_aiauth_ai_power_balance
+	}
+	min = 0
+}
+
+# scope: leader
+tec_aiauth_total_weight = {
+	add = owner.modifier:tec_aiauth_total_weight_add
+	complex_trigger_modifier = {
+		trigger = count_owned_leader
+		trigger_scope = owner
+		parameters = {
+			limit = {
+				tec_is_aiauth_node = yes
+				tec_leader_is_at_max_skill = no
+				tec_get_experiece_aiauth_node = yes
+			}
+		}
+		mode = add
+		
+	}
+}
+
+# scope: leader
+tec_aiauth_experience_per_month_with_exp_gain = {
+	add = modifier:tec_aiauth_experience_per_month # yes the modifier not the value, since we can also give global experience and such to nodes.
+	subtract = value:tec_aiauth_passive_experience_from_defines
+	modifier = { # negative add_experience does not use experience modifiers reeeee
+		check_variable_arithmetic = {
+			which = value:tec_aiauth_experience_per_month
+			value < value:tec_aiauth_passive_experience_from_defines
+		}
+		mult = value:tec_leader_exp_gain
+	}
+}
+
+tec_aiauth_passive_experience_from_defines = {
+	modifier = {
+		is_councilor = yes
+		add = @tec_base_coucilor_experience_gain_defines
+	}
+	modifier = {
+		is_ruler = yes
+		add = @tec_base_ruler_experience_gain_defines
+	}
+	modifier = {
+		leader_class = governor
+		exists = planet
+		is_idle = no
+		add = @tec_base_governor_experience_gain_defines
+	}
+}
+
+
+tec_aiauth_expected_ai_power = {
+	add = 10 # base want
+	complex_trigger_modifier = {
+		trigger = count_owned_leader
+		parameters = {
+			limit = {
+				tec_is_aiauth_node = yes
+				tec_leader_is_at_max_skill = no
+			}
+		}
+		mode = add
+		mult = 10
+	}
+	modifier = {
+		ruler = {
+			has_skill < 8
+		}
+		add = 10
+	}
+}
+
+tec_aiauth_fragment_cost = {
+	complex_trigger_modifier = {
+		trigger = count_owned_leader
+		parameters = {
+			limit = {
+				tec_is_aiauth_node = yes
+			}
+		}
+		mode = add
+	}
+	subtract = 3 # first 3
+	mult = 500
+	min = 500
+}
+
+tec_aiauth_fragment_subtract_cost = {
+	add = value:tec_aiauth_fragment_cost
+	mult = -1
+}
+
+tec_aiauth_ruler_refragment_level = {
+	add = ruler.trigger:has_skill
+	divide = 2
+	floor = yes
+	min = 1
+}

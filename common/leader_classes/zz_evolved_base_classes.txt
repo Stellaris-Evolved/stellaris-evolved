@@ -1,23 +1,25 @@
+# common\leader_classes\zz_evolved_base_classes.txt
+
 @leader_unity_upkeep = 2
 @tec_leader_cg_upkeep = 0.5
 
 admiral = {
+	name = admiral
+	name_plural = admiral_plural
+	description = admiral_description
 	can_lead_navy = yes
 	max_trait_points = 1
 	can_have_traits = yes
 	resources = {
 		category = leader_admirals
 		cost = {
-			unity = 1
-			multiplier = owner.value:leader_cost
+			unity = 70
+			mult = value:leader_cost
 		}
 		# Upkeeps
-			upkeep = {	# Standard
-				trigger = {
-					has_leader_upkeep = yes
-				}
-				unity = @leader_unity_upkeep
-			}
+			#inline_script = "paragon/leader_base_upkeep"
+			# Moved to my own inline for better control
+			inline_script = leaders/inline_evolved_leader_base_upkeep
 		# /
 		# Production
 			# Static
@@ -65,25 +67,43 @@ admiral = {
 	}
 
 	default_category = admiral
+	ai_weight = {
+		modifier = {
+			factor = 2
+			or = {
+				is_militarist = yes
+				is_authoritarian = yes
+			}
+		}
+	}
+	leader_background_job_weight = {
+		noble = 100
+		knight_commander = 100
+		death_priest = 100
+		duelist = 100
+		knight = 100
+		ranger = 100
+		squire = 100
+	}
 }
 
 general = {
+	name = general
+	name_plural = general_plural
+	description = general_description
 	can_lead_army = yes
 	max_trait_points = 1
 	can_have_traits = yes
 	resources = {
 		category = leader_generals
 		cost = {
-			unity = 1
-			multiplier = owner.value:leader_cost
+			unity = 70
+			mult = value:leader_cost
 		}
 		# Upkeeps
-			upkeep = {	# Standard
-				trigger = {
-					has_leader_upkeep = yes
-				}
-				unity = @leader_unity_upkeep
-			}
+			#inline_script = "paragon/leader_base_upkeep"
+			# Moved to my own inline for better control
+			inline_script = leaders/inline_evolved_leader_base_upkeep
 		# /
 		# Production
 			produces = {
@@ -124,92 +144,93 @@ general = {
 		# /
 	}
 	default_category = general
+	leader_background_job_weight = {
+		noble = 100
+		knight_commander = 100
+		death_priest = 100
+		duelist = 100
+		knight = 100
+		ranger = 100
+		squire = 100
+	}
 }
 
 scientist = {
+	name = scientist
+	name_plural = scientist_plural
+	description = scientist_description
 	can_research = yes
 	max_trait_points = 1
 	can_have_traits = yes
 	resources = {
 		category = leader_scientists
 		cost = {
-			unity = 1
-			multiplier = owner.value:leader_cost
+			unity = 70
+			mult = value:leader_cost
 		}
 		# Upkeeps
-			upkeep = {	# Standard
-				trigger = {
-					has_leader_upkeep = yes
-				}
-				unity = @leader_unity_upkeep
-			}
+			#inline_script = "paragon/leader_base_upkeep"
+			# Moved to my own inline for better control
+			inline_script = leaders/inline_evolved_leader_base_upkeep
 		# /
 		# Production
 			# Vanilla production
-			produces = {
-				trigger = {
-					has_trait = leader_trait_scientist_composer_chosen
-				}
-				volatile_motes = 2
-				exotic_gases = 2
-				rare_crystals = 2
-			}
-			produces = {
-				trigger = {
-					has_trait = leader_trait_scientist_instrument_chosen
-				}
-				sr_zro = 2
-			}
 			# Static production
-			produces = {
-				trigger = {
-					is_idle = no
-					exists = owner
-					owner = {
-						tec_produces_energy_from_scientists = yes
+			# Unused
+				produces = {
+					trigger = {
+						#is_idle = no
+						# Note for future me: gestalt nodes are idle... xD
+						tec_is_head_researcher = yes
+						exists = owner
+						owner = {
+							tec_produces_energy_from_scientists = yes
+						}
 					}
+					energy = 2
+					multiplier = value:tec_leader_scripted_production|BASE|1|
 				}
-				energy = 2
-				multiplier = value:tec_leader_scripted_production|BASE|1|
-			}
-			produces = {
-				trigger = {
-					is_idle = no
-					tec_is_head_researcher = yes
-					exists = owner
-					owner = {
-						tec_produces_unity_from_scientists = yes
+				produces = {
+					trigger = {
+						#is_idle = no
+						# Note for future me: gestalt nodes are idle... xD
+						tec_is_head_researcher = yes
+						exists = owner
+						owner = {
+							tec_produces_unity_from_scientists = yes
+						}
 					}
+					unity = 2
+					multiplier = value:tec_leader_scientist_production|MULT|1|
+					# 2 * 1 * level 2 leader = 4
 				}
-				unity = 2
-				multiplier = value:tec_leader_scientist_production|MULT|1|
-				# 2 * 1 * level 2 leader = 4
-			}
-			produces = {
-				trigger = {
-					is_idle = no
-					tec_is_head_researcher = yes
-					exists = owner
-					owner = {
-						tec_produces_research_from_scientists = yes
+				produces = {
+					trigger = {
+						#is_idle = no
+						# Note for future me: gestalt nodes are idle... xD
+						tec_is_head_researcher = yes
+						exists = owner
+						owner = {
+							tec_produces_research_from_scientists = yes
+						}
 					}
+					physics_research = 2
+					society_research = 2
+					engineering_research = 2
+					multiplier = value:tec_leader_scientist_production|MULT|1|
 				}
-				physics_research = 2
-				society_research = 2
-				engineering_research = 2
-				multiplier = value:tec_leader_scientist_production|MULT|1|
-			}
+			# /
 			# Scaled production
 			produces = {	# Scaled unity
 				trigger = {
-					is_idle = no
 					tec_is_head_researcher = yes
 					exists = owner
 					owner = {
 						tec_produces_scaled_unity_from_scientists = yes
 					}
 				}
-				unity = 1
+				# Note: unity boosted to 3 due to the unification of research leaders
+				unity = 3
 				multiplier = value:tec_leader_scientist_production|MULT|1|
 				# 1 * 10 techs*value * 1.2 (level 2) = 6 r
 				# 1 * 100 techs*value * 1.5 (level 5) = 75 r
@@ -217,8 +238,7 @@ scientist = {
 			}
 			produces = {	# Scaled research
 				trigger = {
-					is_idle = no
-					is_researching_area = physics
+					tec_is_head_researcher = yes
 					exists = owner
 					owner = {
 						tec_produces_scaled_research_from_scientists = yes
@@ -232,8 +252,7 @@ scientist = {
 			}
 			produces = {
 				trigger = {
-					is_idle = no
-					is_researching_area = society
+					tec_is_head_researcher = yes
 					exists = owner
 					owner = {
 						tec_produces_scaled_research_from_scientists = yes
@@ -247,8 +266,7 @@ scientist = {
 			}
 			produces = {
 				trigger = {
-					is_idle = no
-					is_researching_area = engineering
+					tec_is_head_researcher = yes
 					exists = owner
 					owner = {
 						tec_produces_scaled_research_from_scientists = yes
@@ -263,25 +281,51 @@ scientist = {
 		# /
 	}
 	default_category = scientist
+
+	ai_weight = {
+		base = 50
+	}
+	minimum_ai_target = 3
+	leader_background_job_weight = {
+		head_researcher = 100
+		noble = 100
+		colonist = 100
+		researcher = 100
+		xeno_zoo_keeper = 100
+		telepath = 100
+		chemist = 100
+		translucer = 100
+		gas_refiner = 100
+		roboticist = 100
+		healthcare = 100
+		bluelotus_technician = 100
+		foundry = 100
+		catalytic_technician = 100
+		artificer = 100
+		technician = 100
+		gas_extractor = 100
+		mote_harvester = 100
+		puddle_technician = 100
+	}
 }
 
 governor = {
+	name = governor
+	name_plural = governor_plural
+	description = governor_description
 	can_govern_planet = yes
 	max_trait_points = 1
 	can_have_traits = yes
 	resources = {
 		category = leader_governors
 		cost = {
-			unity = 1
-			multiplier = owner.value:leader_cost
+			unity = 70
+			mult = value:leader_cost
 		}
 		# Upkeeps
-			upkeep = {	# Standard
-				trigger = {
-					has_leader_upkeep = yes
-				}
-				unity = @leader_unity_upkeep
-			}
+			#inline_script = "paragon/leader_base_upkeep"
+			# Moved to my own inline for better control
+			inline_script = leaders/inline_evolved_leader_base_upkeep
 		# /
 		# Production
 			produces = {
@@ -321,22 +365,48 @@ governor = {
 			}
 		# /
 	}
-	
+
+	ai_weight = {
+		modifier = {
+			factor = 2
+			or = {
+				is_pacifist = yes
+				is_egalitarian = yes
+			}
+		}
+	}
+
 	default_category = governor
-}
-
-ruler = {
-	can_rule_empire = yes
-	max_trait_points = 2
-	can_have_traits = yes
-	default_category = ruler
-
-	resources = {
-		category = leader_rulers
+	leader_background_job_weight = {
+		high_priest = 100
+		politician = 100
+		noble = 100
+		merchant = 100
+		executive = 100
+		colonist = 100
+		priest = 100
+		culture_worker = 100
+		bureaucrat = 100
+		unifier = 100
+		manager = 100
+		entertainer = 100
+		death_chronicler = 100
+		artisan = 100
+		reassigner = 100
+		clerk = 100
+		miner = 100
+		crystal_miner = 100
+		farmer = 100
+		preacher = 100
+		scrap_miner = 100
+		angler = 100
 	}
 }
 
 envoy = {
+	name = envoy
+	name_plural = envoy_plural
+	description = envoy_description
 	can_be_envoy = yes
 	default_category = envoy
 	assignment_cooldown = 360

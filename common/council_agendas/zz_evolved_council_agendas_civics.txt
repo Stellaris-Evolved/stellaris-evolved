@@ -1,0 +1,105 @@
+# common\council_agendas\zz_evolved_council_agendas_civics.txt
+@tec_base_civic_agenda_cost = 7000
+
+# Genetic Ascendancy
+	agenda_tec_genetic_ascendancy = {
+		agenda_cost = @tec_base_civic_agenda_cost
+		potential = {
+			tec_is_genetic_ascendancy_empire = yes
+		}
+		allow = {
+			always = yes
+		}
+		modifier = {
+			species_leader_exp_gain = 0.1
+		}
+		finish_modifier = modifier_tec_agenda_tec_genetic_ascendancy_finish
+		effect = {
+			custom_tooltip = council_agenda_agenda_tec_genetic_ascendancy_effect_desc
+			if = {	# T5 - 5 leaders
+				limit = {
+					capital_scope = {
+						has_building = building_tec_epigenetic_chambers
+						has_planetary_ascension_tier > 15
+					}
+				}
+				custom_tooltip = council_agenda_agenda_tec_genetic_ascendancy_tier_5
+				tec_genetic_ascendancy_effect = {
+					LEADER_COUNT = 5
+					EXP_MULT = 0.6
+				}
+			}
+			else_if = { # T4 - 4 leaders
+				limit = {
+					capital_scope = {
+						has_building = building_tec_epigenetic_chambers
+						has_planetary_ascension_tier > 10
+					}
+				}
+				custom_tooltip = council_agenda_agenda_tec_genetic_ascendancy_tier_4
+				tec_genetic_ascendancy_effect = {
+					LEADER_COUNT = 4
+					EXP_MULT = 0.7
+				}
+
+			}
+			else_if = { # T3 - 3 leaders
+				limit = {
+					capital_scope = {
+						has_building = building_tec_epigenetic_chambers
+						has_planetary_ascension_tier > 5
+					}
+				}
+				custom_tooltip = council_agenda_agenda_tec_genetic_ascendancy_tier_3
+				tec_genetic_ascendancy_effect = {
+					LEADER_COUNT = 3
+					EXP_MULT = 0.8
+				}
+
+			}
+			else_if = { # T2 - 2 leaders
+				limit = {
+					capital_scope = {
+						has_building = building_tec_epigenetic_chambers
+					}
+				}
+				custom_tooltip = council_agenda_agenda_tec_genetic_ascendancy_tier_2
+				tec_genetic_ascendancy_effect = {
+					LEADER_COUNT = 2
+					EXP_MULT = 0.90
+				}
+			}
+			else = { # T1
+				custom_tooltip = council_agenda_agenda_tec_genetic_ascendancy_tier_1
+				tec_genetic_ascendancy_effect = {
+					LEADER_COUNT = 1
+					EXP_MULT = 1
+				}
+			}
+			every_owned_leader = {
+				if = {
+					# Remove Exp per Trait being removed.
+					limit = {
+						is_councilor = yes
+						num_leader_traits = {
+							value > 0
+							negative = yes	# Tiers don't matter in this check.
+						}
+					}
+					hidden_effect = {
+						add_experience = value:agenda_gestalt_purge_traits_exp_change_total  # -300 per trait, not counting tiers.
+
+						# Restore pending traits and tiers, so they'll come back eventually. But a 10% chance to reduce their numbers.
+						change_variable = { which = leader_pending_negative_traits_unmodified value = value:leader_num_negative_leader_trait_tiers }
+						random = {
+							chance = 10
+							subtract_variable = { which = leader_pending_negative_traits_unmodified value = 1 }
+						}
+					}
+
+					remove_trait = all_negative
+				}
+			}
+		}
+	}
+# /

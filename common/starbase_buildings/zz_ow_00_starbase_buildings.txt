@@ -1,3 +1,5 @@
+# common\starbase_buildings\zz_ow_00_starbase_buildings.txt
+
 # o v e r w r i t e 
 
 offworld_trading_company = {
@@ -14,7 +16,7 @@ offworld_trading_company = {
 				tec_is_trade_gestalt = yes
 			}
 		}
-		is_orbital_ring = no
+		is_normal_starbase = yes
 	}
 	
 	possible = {
@@ -128,7 +130,7 @@ hydroponics_bay = {
 	potential = {
 		exists = owner
 		owner = { has_technology = "tech_food_processing_1" }
-		is_orbital_ring = no
+		is_normal_starbase = yes
 		
 		tec_ai_allow_food_starbase_building = yes
 	}
@@ -176,6 +178,59 @@ hydroponics_bay = {
 
 	ai_weight = {
 		weight = 100
+	}
+}
+
+mining_bay = {	# Caelum	# DISABLED
+	icon = "GFX_spaceport_mining_bay"
+	construction_days = 180
+
+	potential = {
+		exists = owner
+		owner = { has_technology = tech_space_mining_1 }
+		always = no
+	}
+
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_starport_or_ring"
+			OR = {
+				has_starbase_size >= starbase_starport
+				is_orbital_ring = yes
+			}
+		}
+		custom_tooltip = {
+			fail_text = "requires_shattered_world"
+			solar_system = {
+				any_system_planet = {
+					OR = {
+						is_planet_class = pc_shattered
+						is_planet_class = pc_shattered_2
+					}
+				}
+			}
+		}
+	}
+
+	resources = {
+		category = starbase_buildings
+		cost = {
+			alloys = 50
+		}
+
+		produces = {
+			minerals = 10
+		}
+
+		upkeep = {
+			energy = 1
+		}
+	}
+
+	show_in_tech = "tech_space_mining_1"
+
+	ai_weight = {
+		weight = 100 #use same weight here - ai weighting is done in starbase_types.txt
 	}
 }
 
@@ -238,6 +293,61 @@ crew_quarters = {
 	}
 }
 
+# navalcap rework
+naval_logistics_office = {
+	icon = "GFX_starbase_naval_logistics"
+	construction_days = 360
+
+	potential = {
+		exists = owner
+		owner = { has_technology = tech_interstellar_fleet_traditions }
+	}
+
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_anchorage"
+			OR = {
+				has_starbase_module = anchorage
+				starbase_buildable_is_in_queue_before = {
+					first = anchorage
+					second = naval_logistics_office
+				}
+				has_starbase_module = orbital_ring_anchorage
+				starbase_buildable_is_in_queue_before = {
+					first = orbital_ring_anchorage
+					second = naval_logistics_office
+				}
+			}
+		}
+	}
+
+	resources = {
+		category = starbase_buildings
+		cost = {
+			alloys = 100
+		}
+
+		upkeep = {
+			energy = 2
+		}
+	}
+
+	custom_tooltip = sm_naval_logistics_office_desc_modifier
+	show_in_tech = "tech_interstellar_fleet_traditions"
+
+	ai_weight = {
+		weight = 100 #use same weight here - ai weighting is done in starbase_types.txt
+		modifier = {
+			factor = 0
+			count_starbase_modules = {
+				type = anchorage
+				count < 1
+			}
+		}
+	}
+}
+
+
 
 curator_think_tank = {
 	icon = "GFX_starbase_curator_think_tank"
@@ -249,7 +359,7 @@ curator_think_tank = {
 			is_homicidal = no
 			has_country_flag = curator_intro
 		}
-		is_orbital_ring = no
+		is_normal_starbase = yes
 	}
 
 	possible = {
@@ -378,5 +488,88 @@ resource_silo = {
 				tec_is_hoarder_empire = yes
 			}
 		}
+	}
+}
+
+# Cordyceptic
+cordyceptic_reanimation_facility = {
+	icon = "GFX_cordyceptic_reanimation_facility"
+	construction_days = 180
+
+	potential = {
+		exists = owner
+		owner = { has_valid_civic = civic_hive_cordyceptic_drones }
+	}
+
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_tiyanki_spawning_system"
+			OR = {
+				solar_system = {	# Is capital
+					is_capital_system = yes
+				}
+				solar_system = {	# Is inhabited
+					any_system_planet = {
+						is_colony = yes
+						controller = {
+							is_same_value = root.owner
+						}
+					}
+				}
+				star.solar_system = {	# Is teeming with life
+					OR = {
+						has_star_flag = tiyanki_graveyard_system
+						has_star_flag = tiyanki_spawn_system
+						has_star_flag = amoeba_home_system
+					}
+				}
+			}
+		}
+	}
+
+	resources = {
+		category = starbase_buildings
+		cost = {
+			alloys = 50
+			food = 100
+		}
+
+		upkeep = {
+			trigger = {
+				NOT = {
+					star.solar_system = {	# Is teeming with life
+						OR = {
+							has_star_flag = tiyanki_graveyard_system
+							has_star_flag = tiyanki_spawn_system
+							has_star_flag = amoeba_home_system
+						}
+					}
+				}
+			}
+			food = 2
+		}
+		upkeep = {
+			trigger = {
+				star.solar_system = {	# Is teeming with life
+					OR = {
+						has_star_flag = tiyanki_graveyard_system
+						has_star_flag = tiyanki_spawn_system
+						has_star_flag = amoeba_home_system
+					}
+				}
+			}
+			food = 10
+		}
+	}
+
+	custom_tooltip = sm_cordyceptic_reanimation_facility_desc_modifier
+	on_finished = {
+		starbase_event = { id = necroids.305 days = @tec_cordyceptic_timer }
+	}
+
+	ai_build_at_chokepoint = yes
+	ai_build_outside_chokepoint = yes
+	ai_weight = {
+		weight = 100 #use same weight here - ai weighting is done in starbase_types.txt
 	}
 }

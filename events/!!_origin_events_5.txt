@@ -1,0 +1,665 @@
+# events\!!_origin_events_5.txt
+
+# Please paradox devs make scripted triggers for origins or don't gate country triggered events by has_origin
+# At least if not called monthly, etc, i beg q_q
+
+namespace = origin
+
+#########################
+# FRUITFUL PARTNERSHIP
+## By Giada Zavarise
+#########################
+
+# Initial event to study the Tiyanki
+country_event = {
+	id = origin.7000
+	title = origin.7000.name
+	desc = origin.7000.desc
+	picture = GFX_evt_tiyanki_family
+	show_sound = evn_ove_tiyanki_family
+	is_triggered_only = yes
+
+	trigger = {
+		tec_is_fruitful_empire = yes
+	}
+
+	option = {
+		name = "origin.7000.a"
+		enable_special_project = {
+			name = "TIYANKIS_PROJECT"
+			owner = root
+		}
+	}
+
+	option = {
+		name = "origin.7000.b"
+	}
+}
+
+# Follow-up | Fired by TIYANKIS_PROJECT on_success
+country_event = {
+	id = origin.7005
+	title = origin.7005.name
+	desc = origin.7005.desc
+	picture = GFX_evt_tiyanki_family
+	show_sound = evn_ove_tiyanki_family
+	is_triggered_only = yes
+
+	trigger = {
+		tec_is_fruitful_empire = yes
+	}
+
+	option = {
+		name = "EXCELLENT"
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier3researchreward
+			min = @tier3researchmin
+			max = @tier3researchmax
+		}
+		if = {
+			limit = {
+				has_tech_option = tech_space_whale_weapon_1
+			}
+			add_tech_progress = {
+				tech = tech_space_whale_weapon_1
+				progress = 0.6
+			}
+		}
+		else = {
+			add_research_option = tech_space_whale_weapon_1
+			add_tech_progress = {
+				tech = tech_space_whale_weapon_1
+				progress = 0.2
+			}
+		}
+	}
+}
+
+# Tutorial
+country_event = {
+	id = origin.7100
+	title = origin.7100.name
+	desc = origin.7100.desc
+	picture = GFX_evt_fruitful_partnership
+	show_sound = evn_ove_tiyanki_family
+	is_triggered_only = yes
+
+	trigger = {
+		tec_is_fruitful_empire = yes
+		NOT = { has_country_flag = fruitful_partnership_tutorial }
+	}
+
+	immediate = {
+		set_country_flag = fruitful_partnership_tutorial
+	}
+
+	option = {
+		name = EXCELLENT
+	}
+}
+
+# Seed Bombing stance creates blockers | Fired by on_planet_bombarded
+# This = Planet
+# From = Bombarder
+#planet_event = {
+#	id = origin.7200
+
+
+# Seed Bombing stance creates blockers - tutorial event for the first time | Fired by on_planet_bombarded
+# This = Planet
+# From = Bombarder
+#planet_event = {
+#	id = origin.7201
+
+
+## Space Critters Behaviour
+
+# Luring critters to space station | fired by on_monthly_pulse_country
+# this = country
+country_event = {
+	id = origin.7300
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		tec_is_fruitful_empire = yes
+		any_owned_starbase = {
+			OR = {
+				has_starbase_building = feeder
+				has_starbase_building = ring_feeder
+			}
+		}
+	}
+
+	immediate = {
+		random_owned_starbase = {
+			limit = {
+				OR = {
+					has_starbase_building = feeder
+					has_starbase_building = ring_feeder
+				}
+			}
+			save_event_target_as = feeder_starbase
+			solar_system = {
+				save_event_target_as = feeder_starbase_system
+			}
+		}
+
+		# first, check if there are valid critters nearby
+		if = {
+			limit = {
+				# Looking for pacified critters that aren't guarding a system or carrying seeds
+				event_target:feeder_starbase_system = {
+					any_neighbor_system = {
+						any_fleet_in_system = {
+							owner = {
+								is_pacified_space_critter_country_type = yes
+							}
+							NOR = {
+								has_fleet_flag = fruitful_lured_critter
+								has_fleet_flag = fruitful_seeded_critter
+								has_fleet_flag = is_garrison_fleet
+							}
+						}
+					}
+				}
+			}
+			# Prioritize the nearby critters if there's a valid target
+			event_target:feeder_starbase_system = {
+				random_neighbor_system = {
+					limit = {
+						any_fleet_in_system = {
+							owner = {
+								is_pacified_space_critter_country_type = yes
+							}
+							NOR = {
+								has_fleet_flag = fruitful_lured_critter
+								has_fleet_flag = fruitful_seeded_critter
+								has_fleet_flag = is_garrison_fleet
+							}
+						}
+					}
+					random_fleet_in_system = {
+						limit = {
+							owner = {
+								is_pacified_space_critter_country_type = yes
+							}
+							NOR = {
+								has_fleet_flag = fruitful_lured_critter
+								has_fleet_flag = fruitful_seeded_critter
+								has_fleet_flag = is_garrison_fleet
+							}
+						}
+						save_event_target_as = lured_critter
+					}
+				}
+			}
+		}
+		# if there are no critters nearby, choose a random one in the galaxy
+		else = {
+			random_country = {
+				limit = {
+					is_pacified_space_critter_country_type = yes
+				}
+				random_owned_fleet = {
+					limit = {
+						NOR = {
+							has_fleet_flag = fruitful_lured_critter
+							has_fleet_flag = fruitful_seeded_critter
+						}
+					}
+					save_event_target_as = lured_critter
+				}
+			}
+		}
+
+		# push the lured critter towards the starbase
+		if = {
+			limit = {
+				exists = event_target:lured_critter
+			}
+			event_target:lured_critter = {
+				set_fleet_flag = fruitful_lured_critter
+				auto_move_to_planet = {
+					target = event_target:feeder_starbase.star
+					clear_auto_move_on_arrival = yes
+				}
+			}
+		}
+	}
+}
+
+# Lured critters eat the seed | fired by on_fleet_auto_move_arrival
+# This = owner of fleet
+# From = fleet
+# FromFrom = planet (if any)
+#country_event = {
+#	id = origin.7301
+
+
+# Space critters see a feeding station and approach it. om nom. | fired by on_entering_system_fleet
+# Scope = Fleet
+# From = System
+#fleet_event = {
+#	id = origin.7302
+
+# Bubbles and friends can carry the seed | Fired by on_fleet_enter_orbit
+#From = Planet/Starbase/Megastructure scope
+#This = Fleet scope
+fleet_event = {
+	id = origin.7303
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		any_owned_ship = {
+			is_organic_controllable_ship = yes
+		}
+		from = {
+			is_scope_type = starbase
+			OR = {
+				has_starbase_building = feeder
+				has_starbase_building = ring_feeder
+			}
+			owner = {
+				tec_is_fruitful_empire = yes
+			}
+		}
+		NOR = {
+			has_fleet_flag = fruitful_lured_critter
+			has_fleet_flag = fruitful_seeded_critter
+			has_fleet_flag = is_garrison_fleet
+		}
+	}
+
+	immediate = {
+		set_fleet_flag = fruitful_seeded_critter
+		save_event_target_as = seeded_fleet
+		fruitful_add_seed_to_critter = yes # changes the name to display the seed icon
+
+		from.owner = {
+			set_country_flag = put_seed_on@event_target:seeded_fleet # used to notify players once the seed lands on a planet
+			if = {
+				limit = {
+					has_country_flag = fruitful_partnership_tutorial_bubbles
+				}
+				create_message = {
+					type = MESSAGE_FRUITFUL_SEED_CRITTER
+					localization = MESSAGE_FRUITFUL_SEED_CRITTER
+					days = 30
+					target = fromfrom
+					variable = {
+						type = name
+						localization = SYSTEM
+						scope = fromfrom
+					}
+				}
+			}
+			# Tutorial event for the first time it happens
+			else = {
+				country_event = { id = origin.7304 }
+			}
+		}
+	}
+}
+
+country_event = {
+	id = origin.7304
+	title = origin.7304.name
+	desc = origin.7304.desc
+	picture = GFX_evt_fruitful_partnership
+	show_sound = evn_ove_tiyanki_family
+	is_triggered_only = yes
+
+	trigger = {
+		tec_is_fruitful_empire = yes
+	}
+
+	option = {
+		name = EXCELLENT
+	}
+}
+
+
+# Seeded critters have a chance of leaving seed on planet (HIDDEN) | fired by on_entering_system_fleet
+# Scope = Fleet
+# From = System
+#fleet_event = {
+#	id = origin.7310
+
+# Seeded critters leave seed on planet
+# Scope = Fleet
+# Fromfrom = System
+fleet_event = {
+	id = origin.7311
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		fromfrom = {
+			any_system_planet = {
+				is_valid_planet_for_seed = yes
+			}
+		}
+	}
+
+	immediate = {
+		save_event_target_as = seeded_fleet
+
+		# grab the owner of the seeds being dropped
+		random_playable_country = {
+			limit = {
+				tec_is_fruitful_empire = yes
+				has_country_flag = put_seed_on@event_target:seeded_fleet
+			}
+			save_event_target_as = seeds_owner
+		}
+
+		# find planet
+		fromfrom = {
+			random_system_planet = {
+				limit = {
+					is_valid_planet_for_seed = yes
+				}
+				save_event_target_as = seeded_planet
+			}
+		}
+
+		# go to the planet
+		clear_orders = yes
+		clear_fleet_actions = THIS
+		queue_actions = {
+			find_closest_planet = {
+				trigger = {
+					id = garden.critters.1@root
+					is_planet = event_target:seeded_planet
+				}
+				found_planet = {
+					move_to = this
+					orbit_planet = this
+					wait = {
+						duration = 10
+						random = 25
+					}
+					effect = {
+						id = garden.critters.2@root
+						set_planet_flag = seeds_planted_by@event_target:seeds_owner
+						set_surveyed = {
+							surveyed = yes
+							surveyor = event_target:seeds_owner
+						}
+						# If the planet has an owner:
+						# YOU
+						# - Get a positive opinion modifier
+						# THEM
+						# - Get a planet modifier (nice forests) or levels up an existing one
+						# - Get a decision to remove the modifier
+						if = {
+							limit = {
+								exists = owner
+							}
+							switch = {
+								trigger = has_modifier
+								seeded_planet_1_modifier = {
+									add_modifier = {
+										modifier = seeded_planet_2_modifier
+									}
+									remove_modifier = seeded_planet_1_modifier
+								}
+								seeded_planet_2_modifier = {
+									add_modifier = {
+										modifier = seeded_planet_3_modifier
+									}
+									remove_modifier = seeded_planet_2_modifier
+								}
+								default = {
+									add_modifier = {
+										modifier = seeded_planet_1_modifier
+									}
+								}
+							}
+							if = {
+								limit = {
+									owner = {
+										NOT = { is_same_value = event_target:seeds_owner }
+									}
+								}
+								planet_event = { id = origin.7327 days = 1 }
+								owner = {
+									add_opinion_modifier = {
+										modifier = opinion_nice_forests
+										who = event_target:seeds_owner
+									}
+								}
+							}
+							# notify the seeds owner
+							event_target:seeds_owner = {
+								remove_country_flag = put_seed_on@event_target:seeded_fleet
+								set_country_flag = seed_on_planet@event_target:seeded_planet
+								set_visited = fromfrom
+								create_message = {
+									type = MESSAGE_FRUITFUL_SEED_PLANTED
+									localization = MESSAGE_FRUITFUL_SEED_PLANTED_OWNER
+									days = 30
+									target = event_target:seeded_planet
+									variable = {
+										type = name
+										localization = PLANET
+										scope = event_target:seeded_planet
+									}
+									variable = {
+										type = name
+										localization = SYSTEM
+										scope = fromfrom
+									}
+								}
+							}
+						}
+						# If the planet has no owner:
+						# YOU
+						# - Get a planet modifier (dormant seed pod)
+						# - Get a special project to open it, colonizing the planet
+						else = {
+							add_modifier = {
+								modifier = seeded_planet_0_modifier
+							}
+							enable_special_project = {
+								name = OPEN_SEED_PODS_PROJECT
+								owner = event_target:seeds_owner
+								location = this
+							}
+							# notify the seeds owner
+							event_target:seeds_owner = {
+								remove_country_flag = put_seed_on@event_target:seeded_fleet
+								set_country_flag = seed_on_planet@event_target:seeded_planet
+								set_visited = fromfrom
+								create_message = {
+									type = MESSAGE_FRUITFUL_SEED_PLANTED
+									localization = MESSAGE_FRUITFUL_SEED_PLANTED_NO_OWNER
+									days = 30
+									target = event_target:seeded_planet
+									variable = {
+										type = name
+										localization = PLANET
+										scope = event_target:seeded_planet
+									}
+									variable = {
+										type = name
+										localization = SYSTEM
+										scope = fromfrom
+									}
+								}
+							}
+						}
+						prev = {
+							fruitful_remove_seed_to_critter = yes
+							remove_fleet_flag = fruitful_seeded_critter
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# Special project completed: opening the seed pods | fired by OPEN_SEED_PODS_PROJECT
+#planet_event = {
+#	id = origin.7320
+
+#country_event = {
+#	id = origin.7321
+
+# Seeds lost (planet was destroyed or colonized)
+#country_event = {
+#	id = origin.7325
+
+# Someone else colonizes the planet - seeds open | Fired by on_colonization_started
+#planet_event = {
+#	id = origin.7326
+
+# # Seeds rain on already-colonized planet
+#planet_event = {
+#	id = origin.7327
+
+# Someone else colonizes the planet - seeds open | Fired by on_colonization_started
+#planet_event = {
+#	id = origin.7328
+
+# # Colonization started | Building outpost
+#planet_event = {
+#	id = origin.7400
+
+# Galcom - Pest control or protection act passed
+country_event = {
+	id = origin.7500
+	title = origin.7500.name
+	desc = origin.7500.desc
+	picture = GFX_evt_galactic_senate
+	show_sound = event_galactic_community
+	is_triggered_only = yes
+
+	trigger = {
+		tec_is_fruitful_empire = yes
+		OR = {
+			last_resolution_changed = resolution_amoeba_conservation_act
+			last_resolution_changed = resolution_tiyanki_conservation_act
+			last_resolution_changed = resolution_repeal_tiyanki_pest_control
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		every_playable_country = {
+			limit = {
+				has_communications = root
+				position_on_last_resolution = support
+			}
+			root = {
+				add_opinion_modifier = {
+					modifier = opinion_voted_to_help_tiyanki
+					who = prev
+				}
+			}
+		}
+	}
+}
+
+# Galcom - Pest control or protection act passed
+country_event = {
+	id = origin.7510
+	title = origin.7510.name
+	desc = origin.7510.desc
+	picture = GFX_evt_galactic_senate
+	show_sound = event_assembly_fight
+	is_triggered_only = yes
+
+	trigger = {
+		tec_is_fruitful_empire = yes
+		OR = {
+			last_resolution_changed = resolution_tiyanki_pest_control
+			last_resolution_changed = resolution_repeal_tiyanki_conservation_act
+			last_resolution_changed = resolution_repeal_amoeba_conservation_act
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		every_playable_country = {
+			limit = {
+				has_communications = root
+				position_on_last_resolution = support
+			}
+			root = {
+				add_opinion_modifier = {
+					modifier = opinion_voted_to_kill_tiyanki
+					who = prev
+				}
+			}
+		}
+	}
+}
+
+# Possibility of spawning armies | Fired by on_war_beginning
+# Root = Country
+# From = War
+country_event = {
+	id = origin.7600
+	title = origin.7600.name
+	desc = origin.7600.desc
+	picture = GFX_evt_aggressive_flora
+	show_sound = event_assembly_fight
+	is_triggered_only = yes
+
+	trigger = {
+		tec_is_fruitful_empire = yes
+	}
+
+	option = {
+		name = EXCELLENT
+		save_event_target_as = fruitful_project_owner
+		begin_event_chain = {
+			event_chain = fruitful_partnership_war_chain
+			target = this
+		}
+		# Special projects on your planets
+		every_owned_planet = {
+			limit = {
+				has_seeded_modifier = yes
+				has_planet_flag = seeds_planted_by@root
+			}
+			enable_special_project = {
+				name = WEEDS_ARMY_PROJECT
+				owner = root
+				location = this
+			}
+		}
+		# Special projects on your enemy's planets
+		from = {
+			every_war_participant = {
+				limit= {
+					NOT = { is_same_value = root }
+				}
+				every_owned_planet = {
+					limit = {
+						has_seeded_modifier = yes
+						has_planet_flag = seeds_planted_by@root
+					}
+					enable_special_project = {
+						name = WEEDS_ARMY_PROJECT
+						owner = root
+						location = this
+					}
+				}
+			}
+		}
+	}
+}
+
+# Spawn invasive army | Fired by WEEDS_ARMY_PROJECT on_complete
+#country_event = {
+#	id = origin.7700
+
+# Spawn invasive army - tell the planet owner | Fired by WEEDS_ARMY_PROJECT on_complete
+#country_event = {
+#	id = origin.7710

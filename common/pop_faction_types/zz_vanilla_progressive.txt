@@ -1,10 +1,10 @@
-# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
-# Progressive Faction
-# - - - - - - - - - - - - - - - - - - - - - # - - - - - - - - - - - - - - - - - - - - - 
+# common\pop_faction_types\zz_vanilla_progressive.txt
 
+# ------------------------------------------------- Egalitarian Faction
 progressive = {
 	election_header = "GFX_faction_header_yellow"
 	guiding_ethic = ethic_egalitarian
+	visual_ethic = "progressive_visual_ethic"
 	
 	unique = yes
 	support_multiplier = 1
@@ -12,40 +12,20 @@ progressive = {
 	resources = {
 		category = pop_factions
 		produces = {
-			unity = @tec_fac_infl_produce
+			unity = @faction_base_unity
 		}
-		produces = {	# Political virtue
-			trigger = {
-				owner = {
-					has_valid_civic = civic_tec_political_virtue
-				}
-				pop_faction = {
-					faction_approval >= 0.5
-				}
-			}
-			influence = 0.003
+
+		inline_script = {
+			script = pop_faction_types/inline_evolved_tec_political_virtue
+			ethic = egalitarian
+			resource_1 = influence
+			count_1 = @tec_fac_political_virtue_influence
+			resource_2 = "#"
+			count_2 = 0
+			resource_3 = "#"
+			count_3 = 0
 		}
-		produces = {	# Political virtue
-			trigger = {
-				exists = owner
-				owner = {
-					has_valid_civic = civic_tec_political_virtue
-					is_egalitarian = yes
-				}
-				pop_faction = {
-					faction_approval >= 0.5
-				}
-			}	
-			influence = 0.0005
-		}
-		produces = {	# Idealistic foundation
-			trigger = {
-				owner = {
-					has_valid_civic = civic_idealistic_foundation
-				}
-			}
-			influence = 0.005
-		}
+		inline_script = pop_faction_types/inline_evolved_tec_idealistic_foundation
 	}
 
 	#Note: number of potential or actual members is checked by POP_FACTION_MIN_POTENTIAL_MEMBERS define
@@ -70,7 +50,7 @@ progressive = {
 	can_join_faction = {
 		NOT = { tec_is_shackled_robot = { cached = yes } }
 		NOT = { tec_is_shackled_bioservant = { cached = yes } }
-		NOT = { tec_has_stapled_trait = { cached = yes } }
+		NOT = { tec_has_stapled_trait ={ cached = yes } }
 	}
 	
 	attraction = {
@@ -81,7 +61,7 @@ progressive = {
 			exists = from
 			from = {
 				exists = leader
-				leader = { leader_class = ruler }
+				leader = { is_ruler = yes }
 			}
 		}
 		
@@ -105,7 +85,7 @@ progressive = {
 		
 		modifier = {
 			factor = 0
-			leader_class = ruler
+			is_ruler = yes
 			owner = { has_authority = auth_imperial }
 		}
 		
@@ -126,16 +106,18 @@ progressive = {
 		script = pop_faction_types/demand_faction_pleased
 		FLAG = galcom_resolution_passed_pro_progressive
 	}
-	
-	# Evolved: List of demands
-		# Egalitarians want a less controlled empire
-		# Positives (only pos)
-			# 
-		# Neutral (pos and negs)
-			# 
-		# Negatives (only negs)
-			# 
-	# /
+
+	# Faction Demands for Ruler and Council positions.
+	inline_script = {
+		script = "factions/inline_evolved_global_faction_demands"
+		ETHIC = ethic_egalitarian
+		ETHIC_FANATIC = ethic_fanatic_egalitarian
+		ETHIC_OPPOSED = ethic_authoritarian
+		EXTRA_POTENTIAL = "
+			exists = owner
+			owner = { tec_is_aiauth_empire = no }
+		"
+	}
 
 	# ----------------------- D E M A N D S -----------------------
 		# Pos scaling
@@ -143,27 +125,27 @@ progressive = {
 		# /
 		# Pos
 			# Federal state
-			demand = {	# POS - FED STATE
-				title = "TEC_EGA_FEDERALSTATE"
-				unfulfilled_title = "TEC_EGA_NO_FEDERALSTATE"
-				desc = "TEC_EGA_FEDERALSTATE_DESC"
-				fulfilled_effect = 5
-				unfulfilled_effect = 0
-				potential = {
-					exists = owner
-					owner = {
-						can_set_policy = {
-							policy = bureaucracy
-							option = federal_state
-						}
-					}
-				}
-				trigger = {
-					owner = {
-						has_policy_flag = federal_state
-					}
-				}
-			}
+			#demand = {	# POS - FED STATE
+			#	title = "TEC_FAC_EGA_FEDERALSTATE"
+			#	unfulfilled_title = "TEC_FAC_EGA_NO_FEDERALSTATE"
+			#	desc = "TEC_FAC_EGA_FEDERALSTATE_DESC"
+			#	fulfilled_effect = 5
+			#	unfulfilled_effect = 0
+			#	potential = {
+			#		exists = owner
+			#		owner = {
+			#			can_set_policy = {
+			#				policy = bureaucracy
+			#				option = federal_state
+			#			}
+			#		}
+			#	}
+			#	trigger = {
+			#		owner = {
+			#			has_policy_flag = federal_state
+			#		}
+			#	}
+			#}	# OLD POLICY
 			# Beacon of liberty
 			demand = {	# POS - EGALITARIAN CIVICS
 				title = "TEC_FAC_EGA_EGALITARIAN_CIVICS"
@@ -230,6 +212,14 @@ progressive = {
 										country = prev
 									}
 									has_living_standard = {
+										type = living_standard_worker_ownership
+										country = prev
+									}
+									has_living_standard = {
+										type = living_standard_tec_shared_ownership
+										country = prev
+									}
+									has_living_standard = {
 										type = living_standard_utopian
 										country = prev
 									}
@@ -251,8 +241,12 @@ progressive = {
 									}
 									# Excludes presapient and enslaved crafted species
 									is_sapient = no
-									species_rights_robot_full_rights_check_pop_faction = no
-									tec_species_rights_bioservant_full_rights_check_pop_faction = no
+									prev = {
+										species_rights_robot_full_rights_check_pop_faction = no
+									}
+									prev = {
+										tec_species_rights_bioservant_full_rights_check_pop_faction = no
+									}
 								}
 							}
 						}
@@ -291,8 +285,12 @@ progressive = {
 								NOR = {
 									# Excludes presapient and enslaved crafted species
 									is_sapient = no
-									species_rights_robot_full_rights_check_pop_faction = no
-									tec_species_rights_bioservant_full_rights_check_pop_faction = no
+									prev = {
+										species_rights_robot_full_rights_check_pop_faction = no
+									}
+									prev = {
+										tec_species_rights_bioservant_full_rights_check_pop_faction = no
+									}
 								}
 							}
 							has_policy_flag = resettlement_allowed
@@ -318,29 +316,29 @@ progressive = {
 			}
 		# /
 		# Bad
-			demand = {	# NEG - STATE MEDIA
-				title = "TEC_FAC_EGA_STATE_MEDIA_BAD"
-				unfulfilled_title = "TEC_FAC_EGA_NO_STATE_MEDIA_BAD"
-				desc = "TEC_FAC_EGA_STATE_MEDIA_BAD_DESC"
-				fulfilled_effect = 0
-				unfulfilled_effect = -5
-				potential = {
-					exists = owner
-					owner = {
-						can_set_policy = {
-							policy = interstellar_media
-							option = free_media
-						}
-					}
-				}
-				trigger = {
-					owner = {
-						NOT = {
-							has_policy_flag = state_media
-						}
-					}
-				}
-			}
+			#demand = {	# NEG - STATE MEDIA
+			#	title = "TEC_FAC_EGA_STATE_MEDIA_BAD"
+			#	unfulfilled_title = "TEC_FAC_EGA_NO_STATE_MEDIA_BAD"
+			#	desc = "TEC_FAC_EGA_STATE_MEDIA_BAD_DESC"
+			#	fulfilled_effect = 0
+			#	unfulfilled_effect = -5
+			#	potential = {
+			#		exists = owner
+			#		owner = {
+			#			can_set_policy = {
+			#				policy = interstellar_media
+			#				option = free_media
+			#			}
+			#		}
+			#	}
+			#	trigger = {
+			#		owner = {
+			#			NOT = {
+			#				has_policy_flag = state_media
+			#			}
+			#		}
+			#	}
+			#}	# OLD POLICY
 			demand = {	# BAD - NOSTRATA
 				title = "TEC_FAC_EGA_NOSTRATA"
 				unfulfilled_title = "TEC_FAC_EGA_NO_NOSTRATA"
@@ -354,9 +352,19 @@ progressive = {
 					owner = {
 						NOT = {	# There are no species with strat
 							any_owned_species = {
-								has_living_standard = {
-									type = living_standard_stratified 
-									country = prev
+								OR = {
+									has_living_standard = {
+										type = living_standard_stratified
+										country = prev
+									}
+									has_living_standard = { 
+										type = living_standard_dystopian_society
+										country = prev 
+									}
+									has_living_standard = {
+										type = living_standard_tec_chemical_dystopian_society
+										country = prev
+									}
 								}
 							}
 						}
@@ -455,195 +463,9 @@ progressive = {
 		}
 	}
 	
-	actions = {
-		embrace_faction = {
-			title = "EMBRACE_FACTION"
-			description = "EMBRACE_FACTION_DESC"
-			
-			cost = {
-				influence = @tec_fac_embrace_cost
-			}
-			
-			potential = {
-				exists = owner
-				owner = {
-					OR = {
-						is_subject = no
-						NOT = { any_agreement = { agreement_preset = preset_dominion } }
-					}
-				}
-			}
-			
-			valid = {
-				custom_tooltip = {
-					fail_text = EMBRACE_FACTION_COOLDOWN
-					parameter:empire = {
-						NOT = { has_modifier = embraced_faction_timer }
-					}
-				}
-				support > @tec_fac_embrace_min_support
-				parameter:empire = {
-					NOT = { has_ethic = "ethic_fanatic_egalitarian" }
-				}
-			}
-
-			effect = {
-				add_modifier = { modifier = embraced_faction days = @tec_fac_embrace_cd}
-				parameter:empire = {
-					shift_ethic = ethic_egalitarian
-					hidden_effect = {
-						add_modifier = { modifier = embraced_faction_timer days = @tec_fac_embrace_cd}
-						every_pop_faction = {
-							limit = { NOT = { is_same_value = root } }
-							add_modifier = { modifier = embraced_another_faction days = @tec_fac_embrace_cd}
-						}
-					}
-				}
-				hidden_effect = {
-					save_event_target_as = TargetFaction
-					parameter:empire = {
-						every_relation = {
-							limit = {
-								is_ai = no
-								tec_is_default_country = yes
-								has_communications = prev
-								has_intel_level = {
-									who = prev
-									category = government
-									level >= 1
-								}
-							}
-							country_event = { id = factions.2000 }
-						}
-					}
-				}
-			}
-			
-			ai_weight = {
-				base = 1
-				modifier = {
-					factor = 0
-					support < 0.50
-					owner = {
-						has_ethic = ethic_egalitarian
-					}
-				}
-				modifier = {
-					factor = 0
-					owner = { has_valid_civic = civic_fanatic_purifiers }
-				}
-				modifier = {
-					factor = 0
-					NOT = {
-						owner = {
-							exists = ruler
-							ruler = {
-								leader_of_faction = progressive
-							}
-						}
-					}
-				}
-				modifier = {
-					factor = 0
-					owner = {
-						count_pop_faction = {
-							count < 4
-						}
-					}
-				}
-			}
-		}
-		promote_faction = {
-			title = "PROMOTE_FACTION"
-			description = "PROMOTE_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					NOR = {
-						has_modifier = suppressed_egalitarian
-						has_modifier = promoted_egalitarian 
-					}
-				}
-			}
-
-			effect = {
-				parameter:empire = {
-					add_modifier = { modifier = promoted_egalitarian days = -1 }
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
-		cancel_promote_faction = {
-			title = "CANCEL_PROMOTE_FACTION"
-			description = "CANCEL_PROMOTE_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					has_modifier = promoted_egalitarian
-				}
-			}
-
-			effect = {
-				parameter:empire = {
-					remove_modifier = promoted_egalitarian
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
-		suppress_faction = {
-			title = "SUPPRESS_FACTION"
-			description = "SUPPRESS_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					NOR = {
-						has_modifier = suppressed_egalitarian
-						has_modifier = promoted_egalitarian 
-					}
-				}
-			}
-
-			effect = {
-				add_modifier = { modifier = suppressed_faction days = -1 }
-				parameter:empire = {
-					add_modifier = { modifier = suppressed_egalitarian days = -1 }
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
-		cancel_suppress_faction = {
-			title = "CANCEL_SUPPRESS_FACTION"
-			description = "CANCEL_SUPPRESS_FACTION_DESC"
-			
-			potential = {
-				exists = owner
-				parameter:empire = {
-					has_modifier = suppressed_egalitarian
-				}
-			}
-
-			effect = {
-				remove_modifier = suppressed_faction
-				parameter:empire = {
-					remove_modifier = suppressed_egalitarian
-				}
-			}
-			
-			ai_weight = {
-				base = 0
-			}
-		}
+	inline_script = { 
+			script = factions/inline_evolved_actions
+			ETHIC = egalitarian
+		
 	}
 }
