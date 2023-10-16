@@ -1269,15 +1269,44 @@ set_first_contact_starting_stage = {
 		}
 		custom_tooltip = start_dragon_communications_study
 	}
+	else_if = {
+		limit = {
+			contact_country = {
+				is_country_type = jaunting_traveler_dummy
+			}
+		}
+		custom_tooltip = start_jaunting_traveler_communications_study
+	}
 	else = {
 		custom_tooltip = start_first_contact
 	}
+	# Start proper First Contact
 	hidden_effect = {
 		owner = {
 			set_timed_country_flag = {
 				flag = recent_first_contact_process_started
 				years = 20
 			}
+		}
+		# If it's a pre-ftl country, abort
+		if = {
+			limit = {
+				root.owner = { is_country_type = primitive }
+			}
+			contact_country = {
+				establish_communications_no_message = root.owner
+			}
+		}
+		# is this the first contact between the slavers and Payback/Broken Shackles?
+		if = {
+			limit = {
+				contact_country = {
+					is_country_type = default
+					has_origin = origin_slavers
+				}
+				root.owner = { has_slave_origin = yes }
+			}
+			setup_first_contact_path = { TYPE = slavers }
 		}
 		if = {
 			limit = {
@@ -1309,6 +1338,8 @@ set_first_contact_starting_stage = {
 					crystal_faction = { setup_first_contact_path = { TYPE = crystals } }
 					drone = { setup_first_contact_path = { TYPE = drones } }
 					drone_faction = { setup_first_contact_path = { TYPE = drones } }
+					cloud = { setup_first_contact_path = { TYPE = void_clouds } }
+					# NPC factions
 					dormant_marauders = { setup_first_contact_path = { TYPE = marauders } }
 					pirate = { setup_first_contact_path = { TYPE = pirates } }
 					neutral_faction = { setup_first_contact_path = { TYPE = pirates } }
@@ -1337,10 +1368,11 @@ set_first_contact_starting_stage = {
 						}
 					}
 					caravaneer_home = { setup_first_contact_path = { TYPE = caravaneers } }
-					cloud = { setup_first_contact_path = { TYPE = void_clouds } }
 					nomad = { setup_first_contact_path = { TYPE = nomad } }
+					# Misc.
 					dragon_dummy = { setup_first_contact_path = { TYPE = origin_dragon } }
-					default = {
+					jaunting_traveler_dummy = { setup_first_contact_path = { TYPE = jaunting_traveler } }
+					default = { # note that this does not refer to 'default'-type countries, but is instead a function of 'switch = {}'
 						root = { fire_on_action = { on_action = on_first_contact_stage_1_no_path } }
 					#	root = {
 					#		log_error = "No valid first contact path for encounter with [This.ContactCountry.GetName] (country type: [This.ContactCountry.GetCountryType])"
