@@ -8,7 +8,7 @@
 	# Main ascensions
 		# Biological
 			# Bio A								tec_gene_path.xxx
-			# Bio B								tec_bio_path.xxx
+			# Bio B								tec_biogenic_path.xxx
 		# Cybernetics
 			# Cyborgs							tec_cybernetic_path.xxx
 			# Synths							tec_synth_path.xxx
@@ -147,7 +147,7 @@ namespace = tec_ascension
 # /
 
 # --------------------------------- MAIN ASCENSIONS ---------------------------------
-# Biological A
+# Biological A Genetic
 # ------------------------------------------------------------ tec_gene_path.xxx
 namespace = tec_gene_path
 
@@ -1618,20 +1618,214 @@ namespace = tec_gene_path
  # /
 # /
 
-# Biological B TO DO
-# ------------------------------------------------------------ tec_bio_path.xxx
-namespace = tec_bio_path
+# Biological B Biogenic
+# ------------------------------------------------------------ tec_biogenic_path.xxx
+namespace = tec_biogenic_path
 
- # --------------- BIO T1
+ # --------------- BIOGENIC T1
+  #  --------------- BIOGENIC T1 Pick
+	# No pick as it depends on the gene t1 situation
+  # /
 
+  #  --------------- BIOGENIC T1 Situation
+	# Note: changes the situation from the original one to the alternative one
+
+  # /
+
+  #  --------------- BIOGENIC T1 Finish
+	country_event = { # GENE T1 Situation Completed
+		id = tec_biogenic_path.105
+		title = "tec_biogenic_path.105.name"
+		desc = {	# Regular
+			trigger = {
+				is_gestalt = no
+			}
+			text = "tec_biogenic_path.105.desc.regular"
+		}
+		desc = {	# Hivemind
+			trigger = {
+				is_gestalt = yes
+			}
+			text = "tec_biogenic_path.105.desc.hivemind"
+		}
+		picture = GFX_evt_genetic_modification
+		show_sound = event_engineered_evolution
+		trackable = yes
+
+		is_triggered_only = yes
+
+		immediate = {
+		}
+
+		option = {
+			name = "tec_biogenic_path.105.a"
+			custom_tooltip = "tec_biogenic_path.105.a.tooltip"
+			hidden_effect = {
+				# PATH FLAG
+				set_country_flag = tec_biogenic_unlock
+				set_country_flag = tec_biogenic_path_unlocked_tradition_1
+				# Announcement
+				if = {
+					limit = {
+						NOT = {
+							has_country_flag = tec_comm_1st_step
+						}
+					}
+					set_country_flag = tec_comm_1st_step
+					if = {
+						limit = {	# Prevents FE and alike from triggering the announce
+							NOT = {
+								has_country_flag = tec_advanced_ascension
+							}
+						}
+						every_country = {
+							limit = {
+								is_ai = no
+								NOR = {
+									is_same_value = root
+									# TO DO policy for muting other empire things 
+									has_country_flag = tec_mute_empire_announces
+								}
+								has_communications = root
+								root = {
+									is_primitive = no
+								}
+							}
+							country_event = {
+								id = tec_biogenic_path.10501
+								days = 5 
+							}
+						}
+					}
+				}
+				# Fear of the Dark Separatists - Scared
+					if = {
+						limit = {
+							any_planet_within_border = {
+								has_planet_flag = fotd_seperatist_planet@root
+								owner = {
+									has_country_flag = fotd_seperatist_country@root
+								}
+							}
+						}
+						country_event = { id = origin.6115 days = 10 random = 5 }
+					}
+				# /
+				fire_on_action = { on_action = tec_ascension_situation_finished }
+			}
+		}
+	}
+
+	country_event = { # GENE T1 Notification to other empires
+		id = tec_biogenic_path.10501
+		title = "tec_biogenic_path.10501.name"
+		desc = {	# Regular
+			trigger = {
+				is_gestalt = no
+			}
+			text = tec_biogenic_path.10501.desc.regular
+		}
+		desc = {	# Hivemind
+			trigger = {
+				is_gestalt = yes
+			}
+			text = tec_biogenic_path.10501.desc.hivemind
+		}
+		picture = GFX_evt_genetic_modification
+		#show_sound = event_engineered_evolution
+
+		is_triggered_only = yes
+
+		option = {	# Interesting yet concerning
+			name = "tec_biogenic_path.10501.a"
+		}
+
+		option = {	# That tech is dangerous...
+			name = "tec_biogenic_path.10501.b"
+			trigger = {
+				NOR = {
+					is_homicidal = yes
+					has_ascension_perk = ap_become_the_crisis
+				}
+			}
+		}
+		option = {	# Fools! They will wither with those changes!
+			name = "tec_biogenic_path.10501.c"
+			trigger = {
+				OR = {
+					# Has main gene path
+					has_country_flag = tec_gene_path_unlocked_tradition_1
+					# Has mixed gene path
+					has_country_flag = tec_biopsionic_path_finished
+					has_country_flag = tec_replicant_path_finished
+				}
+			}
+		}
+		option = {	# More species unlocking their potential...
+			name = "tec_biogenic_path.10501.d"
+			trigger = {
+				has_country_flag = tec_biogenic_path_unlocked_tradition_1
+			}
+		}
+		option = {	# They will never outgrow our versatility.
+			name = "tec_biogenic_path.10501.e"
+			trigger = {
+				is_machine_empire = yes
+				NOR = {
+					has_ethic = ethic_gestalt_empathy
+					has_civic = civic_machine_assimilator
+					has_civic = civic_machine_servitor
+				}
+			}
+		}
+		option = {	# No matter what they do, they will be extinguished
+			name = "tec_biogenic_path.10501.f"
+			trigger = {
+				OR = {
+					is_homicidal = yes
+					has_ascension_perk = ap_become_the_crisis
+				}
+			}
+		}
+		option = {	# We will incorporate their genetic material soon.
+			name = "tec_biogenic_path.10501.g"
+			trigger = {
+				OR = {
+					has_civic = civic_machine_assimilator
+					has_civic = civic_machine_servitor
+				}
+			}
+		}
+	}
+  # /
  # /
 
- # --------------- BIO T2 Gating
+ # --------------- BIOGENIC T2 Gating
+  #  --------------- BIOGENIC T2 Gating Pick
 
+  # /
+
+  #  --------------- BIOGENIC T2 Gating Situation
+
+  # /
+
+  #  --------------- BIOGENIC T2 Gating Finish
+
+  # /
  # /
 
- # --------------- BIO T2
+ # --------------- BIOGENIC T2
+  #  --------------- BIOGENIC T2 Pick
 
+  # /
+
+  #  --------------- BIOGENIC T2 Situation
+
+  # /
+
+  #  --------------- BIOGENIC T2 Finish
+
+  # /
  # /
 
 
