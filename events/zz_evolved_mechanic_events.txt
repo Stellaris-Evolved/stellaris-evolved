@@ -12,7 +12,7 @@ namespace = tec_habitats
 		title = tec_habitats.100.name
 		desc = tec_habitats.100.desc
 		picture = GFX_evt_habitat
-		show_sound = notification
+		#show_sound = notification
 		is_triggered_only = yes
 		location = this
 		
@@ -1315,175 +1315,592 @@ namespace = tec_habitats
 
 # ------------------------------------------------- Machine Worlds
 namespace = tec_machine_world
-	# Autoassembler event
-	planet_event = {	# Selects the type of orbital on assembly
-		id = tec_machine_world.200
-		hide_window = yes
-		is_triggered_only = yes
 
-		trigger = {
-			# Test
-			has_building = building_tec_hab_orbital_autobuilder
+ # Initial
+	# On decision enabled
+	planet_event = {
+		id = tec_machine_world.100
+		title = tec_machine_world.100.name
+		desc = tec_machine_world.100.desc
+		picture = GFX_evt_contingency_planet
+		show_sound = pc_machine
+		is_triggered_only = yes
+		location = this
+		
+		immediate = {
+			hidden_effect = {
+				set_planet_flag = tec_planet_becoming_machine
+			}
 		}
 
-		immediate = {
-			# Test
-			if = {	#Checks if there is a candidate for an orbital
-				limit = {
-					solar_system = {
-						count_system_planet = {
-							count > 0
-							limit = {
-								# fail_text = "requires_no_anomaly"
-								NOT = { has_anomaly = yes }
-								# fail_text = "requires_no_existing_megastructure"
-								NOR = {
-									has_planet_flag = megastructure
-									has_planet_flag = has_megastructure
-								}
-								# fail_text = "requires_no_orbital_debris"
-								NOT = {
-									has_planet_flag = has_orbital_debris
-								}
-								tec_has_constructors_in_orbit = {
-									NUM = 0
-								}
-							}
+		# Machine options
+			option = {	# Ok machine
+				name = tec_machine_world.100_machine
+				custom_tooltip = tec_machine_world.100_machine
+				icon = {	# TO DO machine icon
+					icon = GFX_resource_energy_large
+					icon_background = GFX_situation_approach_bg_tec_blue
+					text = BLANK_STRING
+				}
+				trigger = {
+					owner = {
+						is_machine_empire = yes
+						NOR = {
+							has_valid_civic = civic_machine_servitor
+							has_valid_civic = civic_machine_assimilator
 						}
 					}
 				}
-				log = "autoassembler found orbital"
-				random_list = {
-					50 = {
-						modifier = {	# No available minor orbital slots
-							factor = 0
-							solar_system = {
-								count_system_planet = {
-									count = 0
-									limit = {
-										# fail_text = "requires_no_anomaly"
-										NOT = { has_anomaly = yes }
-										# fail_text = "requires_no_existing_megastructure"
-										NOR = {
-											has_planet_flag = megastructure
-											has_planet_flag = has_megastructure
-										}
-										# fail_text = "requires_no_orbital_debris"
-										NOT = {
-											has_planet_flag = has_orbital_debris
-										}
-										OR = {
-											is_asteroid = yes
-											is_moon = yes
-										}
-										#tec_has_constructors_in_orbit = {
-										#	NUM = 0
-										#}
-									}
-								}
-							}
-						}
-						modifier = {	# Focus on minor orbitals
-							factor = 10
-							has_planet_flag = tec_orbital_autobuilder_focus_minor
-						}
-						log = "autoassembler constructs minor (random)"
-						planet_event = {
-							id = tec_habitats.20010
-							days = 120
-							# Note: Reduced from 180 to mimic megastructure cost reductions
-						}
-						planet = {
-							set_timed_planet_flag = {
-								flag = tec_building_minor_orbital
-								months = 4
-								#months = 6
-							}
-							set_saved_date = {
-								key = tec_building_minor_orbital_timer
-								days_from_present = 120
-								expires = 120
-								#days_from_present = 180
-								#expires = 180
-							}
-						}
-					}
-					50 = {
-						modifier = {	# No available major orbital slots
-							factor = 0
-							solar_system = {
-								count_system_planet = {
-									count = 0
-									limit = {
-										# fail_text = "requires_no_anomaly"
-										NOT = { has_anomaly = yes }
-										# fail_text = "requires_no_existing_megastructure"
-										NOR = {
-											has_planet_flag = megastructure
-											has_planet_flag = has_megastructure
-										}
-										# fail_text = "requires_no_orbital_debris"
-										NOT = {
-											has_planet_flag = has_orbital_debris
-										}
-										NOR = {
-											is_asteroid = yes
-											is_moon = yes
-										}
-										#tec_has_constructors_in_orbit = {
-										#	NUM = 0
-										#}
-									}
-								}
-							}
-						}
-						modifier = {	# Focus on major orbitals
-							factor = 10
-							has_planet_flag = tec_orbital_autobuilder_focus_major
-						}
-						log = "autoassembler constructs major (random)"
-						planet_event = {
-							id = tec_habitats.20020
-							days = 480
-							# Note: reduced from 720 to mimic megastructure cost reductions
-						}
-						planet = {
-							set_timed_planet_flag = {
-								flag = tec_building_major_orbital
-								months = 16
-								#months = 24
-							}
-							set_saved_date = {
-								key = tec_building_major_orbital_timer
-								days_from_present = 480
-								expires = 480
-								#days_from_present = 720
-								#expires = 720
-							}
+				hidden_effect = {
+					owner = {
+						remove_country_flag = tec_mute_machine_world
+						start_situation = {
+							type = situation_tec_machine_world_base
+							target = root
 						}
 					}
 				}
 			}
-			else = {
-				log = "autoassembler found no orbitals"
-				# TO DO toast of the assembler being deactivated
-				set_timed_planet_flag = {
-					flag = tec_building_no_orbital
-					months = 4
-					#months = 6
+			option = {	# Ok servitor
+				name = tec_machine_world.100_servitor
+				custom_tooltip = tec_machine_world.100_servitor
+				icon = {	# TO DO machine icon
+					icon = GFX_resource_energy_large
+					icon_background = GFX_situation_approach_bg_tec_blue
+					text = BLANK_STRING
 				}
-				set_saved_date = {
-					key = tec_building_no_orbital_timer
-					days_from_present = 360
-					expires = 360
-					#days_from_present = 180
-					#expires = 180
+				trigger = {
+					owner = {
+						is_machine_empire = yes
+						has_valid_civic = civic_machine_servitor
+					}
 				}
-				planet_event = {	# Repeats itself a year after for checking
-					id = tec_habitats.200
-					days = 360
+				hidden_effect = {
+					owner = {
+						remove_country_flag = tec_mute_machine_world
+						start_situation = {
+							type = situation_tec_machine_world_base
+							target = root
+						}
+					}
+				}
+			}
+			option = {	# Ok assimilator
+				name = tec_machine_world.100_servitor
+				custom_tooltip = tec_machine_world.100_servitor
+				icon = {	# TO DO machine icon
+					icon = GFX_resource_energy_large
+					icon_background = GFX_situation_approach_bg_tec_blue
+					text = BLANK_STRING
+				}
+				trigger = {
+					owner = {
+						is_machine_empire = yes
+						has_valid_civic = civic_machine_assimilator
+					}
+				}
+				hidden_effect = {
+					owner = {
+						remove_country_flag = tec_mute_machine_world
+						start_situation = {
+							type = situation_tec_machine_world_base
+							target = root
+						}
+					}
+				}
+			}
+
+			option = {	# Ok machine but silent
+				name = tec_machine_world.100_machine_silent
+				custom_tooltip = tec_machine_world.100_machine_silent
+				icon = {	# TO DO machine icon
+					icon = GFX_resource_energy_large
+					icon_background = GFX_situation_approach_bg_yellow
+					text = BLANK_STRING
+				}
+				trigger = {
+					owner = {
+						is_machine_empire = yes
+						NOR = {
+							has_valid_civic = civic_machine_servitor
+							has_valid_civic = civic_machine_assimilator
+						}
+					}
+				}
+				hidden_effect = {
+					owner = {
+						set_country_flag = tec_mute_machine_world
+						start_situation = {
+							type = situation_tec_machine_world_base
+							target = root
+						}
+					}
+				}
+			}
+			option = {	# Ok servitor but silent
+				name = tec_machine_world.100_servitor_silent
+				custom_tooltip = tec_machine_world.100_servitor_silent
+				icon = {	# TO DO machine icon
+					icon = GFX_resource_energy_large
+					icon_background = GFX_situation_approach_bg_yellow
+					text = BLANK_STRING
+				}
+				trigger = {
+					owner = {
+						is_machine_empire = yes
+						has_valid_civic = civic_machine_servitor
+					}
+				}
+				hidden_effect = {
+					owner = {
+						set_country_flag = tec_mute_machine_world
+						start_situation = {
+							type = situation_tec_machine_world_base
+							target = root
+						}
+					}
+				}
+			}
+			option = {	# Ok assimilator but silent
+				name = tec_machine_world.100_servitor_silent
+				custom_tooltip = tec_machine_world.100_servitor_silent
+				icon = {	# TO DO machine icon
+					icon = GFX_resource_energy_large
+					icon_background = GFX_situation_approach_bg_yellow
+					text = BLANK_STRING
+				}
+				trigger = {
+					owner = {
+						is_machine_empire = yes
+						has_valid_civic = civic_machine_assimilator
+					}
+				}
+				hidden_effect = {
+					owner = {
+						set_country_flag = tec_mute_machine_world
+						start_situation = {
+							type = situation_tec_machine_world_base
+							target = root
+						}
+					}
+				}
+			}
+		# /
+		# Regular options
+			option = {	# Ok synths
+				name = tec_machine_world.100_synth
+				custom_tooltip = tec_machine_world.100_synth
+				icon = {	# TO DO machine icon
+					icon = GFX_resource_energy_large
+					icon_background = GFX_situation_approach_bg_tec_blue
+					text = BLANK_STRING
+				}
+				trigger = {
+					owner = {
+						tec_has_synthetic_ascension_path = yes
+						is_gestalt = no
+					}
+				}
+				hidden_effect = {
+					owner = {
+						remove_country_flag = tec_mute_machine_world
+						start_situation = {
+							type = situation_tec_machine_world_base
+							target = root
+						}
+					}
+				}
+			}
+			option = {	# Ok cyborgs
+				name = tec_machine_world.100_cyborg
+				custom_tooltip = tec_machine_world.100_cyborg
+				icon = {	# TO DO machine icon
+					icon = GFX_situation_approach_tec_cyb
+					icon_background = GFX_situation_approach_bg_tec_blue
+					text = BLANK_STRING
+				}
+				trigger = {
+					owner = {
+						tec_has_cybernetic_ascension_path = yes
+						is_gestalt = no
+					}
+				}
+				hidden_effect = {
+					owner = {
+						remove_country_flag = tec_mute_machine_world
+						start_situation = {
+							type = situation_tec_machine_world_base
+							target = root
+						}
+					}
+				}
+			}
+			option = {	# Ok cyborg hiveminds
+				name = tec_machine_world.100_cyberhive
+				custom_tooltip = tec_machine_world.100_cyberhive
+				icon = {	# TO DO machine icon
+					icon = GFX_text_auth_tec_hive_cybernetic
+					icon_background = GFX_text_auth_tec_hive_cybernetic
+					text = BLANK_STRING
+				}
+				trigger = {
+					owner = {
+						OR = {
+							AND = {
+								is_hive_empire = yes
+								tec_has_cybernetic_ascension_path = yes
+							}
+							tec_is_cyberhive = yes
+						}
+					}
+				}
+				hidden_effect = {
+					owner = {
+						remove_country_flag = tec_mute_machine_world
+						start_situation = {
+							type = situation_tec_machine_world_base
+							target = root
+						}
+					}
+				}
+			}
+
+			option = {	# Ok synths but silent
+				name = tec_machine_world.100_synth_silent
+				custom_tooltip = tec_machine_world.100_synth_silent
+				icon = {	# TO DO machine icon
+					icon = GFX_situation_approach_tec_ai
+					icon_background = GFX_situation_approach_bg_yellow
+					text = BLANK_STRING
+				}
+				trigger = {
+					owner = {
+						tec_has_synthetic_ascension_path = yes
+						is_gestalt = no
+					}
+				}
+				hidden_effect = {
+					owner = {
+						set_country_flag = tec_mute_machine_world
+						start_situation = {
+							type = situation_tec_machine_world_base
+							target = root
+						}
+					}
+				}
+			}
+			option = {	# Ok cyborgs but silent
+				name = tec_machine_world.100_cyborg_silent
+				custom_tooltip = tec_machine_world.100_cyborg_silent
+				icon = {	# TO DO machine icon
+					icon = GFX_situation_approach_tec_cyb
+					icon_background = GFX_situation_approach_bg_yellow
+					text = BLANK_STRING
+				}
+				trigger = {
+					owner = {
+						tec_has_cybernetic_ascension_path = yes
+						is_gestalt = no
+					}
+				}
+				hidden_effect = {
+					owner = {
+						set_country_flag = tec_mute_machine_world
+						start_situation = {
+							type = situation_tec_machine_world_base
+							target = root
+						}
+					}
+				}
+			}
+			option = {	# Ok cyborg hiveminds but silent
+				name = tec_machine_world.100_cyberhive_silent
+				custom_tooltip = tec_machine_world.100_cyberhive_silent
+				icon = {	# TO DO machine icon
+					icon = GFX_text_auth_tec_hive_cybernetic
+					icon_background = GFX_text_auth_tec_hive_cybernetic
+					text = BLANK_STRING
+				}
+				trigger = {
+					owner = {
+						OR = {
+							AND = {
+								is_hive_empire = yes
+								tec_has_cybernetic_ascension_path = yes
+							}
+							tec_is_cyberhive = yes
+						}
+					}
+				}
+				hidden_effect = {
+					owner = {
+						set_country_flag = tec_mute_machine_world
+						start_situation = {
+							type = situation_tec_machine_world_base
+							target = root
+						}
+					}
+				}
+			}
+		# /
+	}
+ # /
+ # Stages
+	situation_event = { # Stage 2 - 20%
+		id = tec_machine_world.10020
+		title = "tec_machine_world.10020.name"
+		desc = "tec_machine_world.10020.desc"
+
+		picture = GFX_evt_overtuned
+		is_triggered_only = yes
+		situation = this
+		location = target
+
+		immediate = {
+			hidden_effect = {
+				set_situation_locked = yes
+			}
+		}
+
+		after = {
+			hidden_effect = {
+				set_situation_locked = no
+			}
+		}
+
+		option = {
+			name = tec_machine_world.10020.a
+			custom_tooltip = tec_machine_world.10020.a.tooltip
+			icon = {
+				icon = GFX_situation_approach_tec_machine_world
+				icon_background = GFX_situation_approach_bg_tec_blue
+				text = tec_blank
+			}
+		}
+	}
+	situation_event = { # Stage 2 - 20% only notification
+		id = tec_machine_world.10021
+		hide_window = yes
+		is_triggered_only = yes
+		location = target
+
+		immediate = {
+			owner = {
+				create_message = {
+					type = TOAST_TEC_MACHINE_WORLD_STAGE_2
+					localization = TOAST_TEC_MACHINE_WORLD_STAGE_2_DESC
+					days = @toast_message_days
+					target = root.target
 				}
 			}
 		}
 	}
+	situation_event = { # Stage 3 - 40%
+		id = tec_machine_world.10030
+		title = "tec_machine_world.10030.name"
+		desc = "tec_machine_world.10030.desc"
+
+		picture = GFX_evt_overtuned
+		is_triggered_only = yes
+		situation = this
+		location = target
+
+		immediate = {
+			hidden_effect = {
+				set_situation_locked = yes
+			}
+		}
+
+		after = {
+			hidden_effect = {
+				set_situation_locked = no
+			}
+		}
+
+		option = {
+			name = tec_machine_world.10020.a
+			custom_tooltip = tec_machine_world.10020.a.tooltip
+			icon = {
+				icon = GFX_situation_approach_tec_machine_world
+				icon_background = GFX_situation_approach_bg_tec_blue
+				text = tec_blank
+			}
+		}
+	}
+	situation_event = { # Stage 3 - 40% only notification
+		id = tec_machine_world.10031
+		hide_window = yes
+		is_triggered_only = yes
+		location = target
+
+		immediate = {
+			owner = {
+				create_message = {
+					type = TOAST_TEC_MACHINE_WORLD_STAGE_3
+					localization = TOAST_TEC_MACHINE_WORLD_STAGE_3_DESC
+					days = @toast_message_days
+					target = root.target
+				}
+			}
+		}
+	}
+	situation_event = { # Stage 4 - 60%
+		id = tec_machine_world.10040
+		title = "tec_machine_world.10040.name"
+		desc = "tec_machine_world.10040.desc"
+
+		picture = GFX_evt_overtuned
+		is_triggered_only = yes
+		situation = this
+		location = target
+
+		immediate = {
+			hidden_effect = {
+				set_situation_locked = yes
+			}
+		}
+
+		after = {
+			hidden_effect = {
+				set_situation_locked = no
+			}
+		}
+
+		option = {
+			name = tec_machine_world.10040.a
+			custom_tooltip = tec_machine_world.10040.a.tooltip
+			icon = {
+				icon = GFX_situation_approach_tec_machine_world
+				icon_background = GFX_situation_approach_bg_tec_blue
+				text = tec_blank
+			}
+		}
+	}
+	situation_event = { # Stage 5 - 60% only notification
+		id = tec_machine_world.10041
+		hide_window = yes
+		is_triggered_only = yes
+		location = target
+
+		immediate = {
+			owner = {
+				create_message = {
+					type = TOAST_TEC_MACHINE_WORLD_STAGE_4
+					localization = TOAST_TEC_MACHINE_WORLD_STAGE_4_DESC
+					days = @toast_message_days
+					target = root.target
+				}
+			}
+		}
+	}
+	situation_event = { # Stage 5 - 80%
+		id = tec_machine_world.10050
+		title = "tec_machine_world.10050.name"
+		desc = "tec_machine_world.10050.desc"
+
+		picture = GFX_evt_overtuned
+		is_triggered_only = yes
+		situation = this
+		location = target
+
+		immediate = {
+			hidden_effect = {
+				set_situation_locked = yes
+			}
+		}
+
+		after = {
+			hidden_effect = {
+				set_situation_locked = no
+			}
+		}
+
+		option = {
+			name = tec_machine_world.10050.a
+			custom_tooltip = tec_machine_world.10050.a.tooltip
+			icon = {
+				icon = GFX_situation_approach_tec_machine_world
+				icon_background = GFX_situation_approach_bg_tec_blue
+				text = tec_blank
+			}
+		}
+	}
+	situation_event = { # Stage 5 - 80% only notification
+		id = tec_machine_world.10051
+		hide_window = yes
+		is_triggered_only = yes
+		location = target
+
+		immediate = {
+			owner = {
+				create_message = {
+					type = TOAST_TEC_MACHINE_WORLD_STAGE_5
+					localization = TOAST_TEC_MACHINE_WORLD_STAGE_5_DESC
+					days = @toast_message_days
+					target = root.target
+				}
+			}
+		}
+	}
+ # /
+ # Random
+
+ # /
+ # Finish
+	planet_event = {
+		id = tec_machine_world.105
+		title = tec_machine_world.105.name
+		desc = tec_machine_world.105.desc
+		picture = GFX_evt_contingency_planet
+		show_sound = pc_machine
+		is_triggered_only = yes
+		location = this
+		
+		immediate = {
+			hidden_effect = {
+				remove_planet_flag = tec_planet_becoming_machine
+			}
+		}
+
+		# Machine options
+			option = {	# Ok machine
+				name = tec_machine_world.105
+				custom_tooltip = tec_machine_world.105
+				icon = {
+					icon = GFX_situation_approach_tec_machine_world
+					icon_background = GFX_situation_approach_bg_tec_blue
+					text = BLANK_STRING
+				}
+				trigger = {
+					always = yes
+				}
+				hidden_effect = {
+					owner = {
+						remove_country_flag = tec_mute_machine_world
+						start_situation = {
+							type = situation_tec_machine_world_base
+							target = root
+						}
+					}
+				}
+			}
+		# /
+	}
+
+	planet_event = {	# Just notification
+		id = tec_machine_world.106
+		hide_window = yes
+		is_triggered_only = yes
+		location = this
+		
+		immediate = {
+			log = ""
+		}
+	}
+ # /
+# /
+# ------------------------------------------------- Machine Worlds
+namespace = tec_hive_world
+	
+	
 # /

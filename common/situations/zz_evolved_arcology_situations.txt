@@ -31,69 +31,70 @@
 			}
 		}
 		# Pictures
-			#picture = {
-			#	trigger = {
-			#		target = {
-			#			tec_is_gaia_world = no
-			#			is_dry = yes
-			#			NOT = {
-			#				has_modifier = pm_tec_machine_world_half
-			#			}
-			#		}
-			#	}
-			#	picture = GFX_evt_desert
-			#}
-			#picture = {
-			#	trigger = {
-			#		target = {
-			#			tec_is_gaia_world = no
-			#			is_wet = yes
-			#			NOT = {
-			#				has_modifier = pm_tec_machine_world_half
-			#			}
-			#		}
-			#	}
-			#	picture = GFX_evt_continental
-			#}
-			#picture = {
-			#	trigger = {
-			#		target = {
-			#			tec_is_gaia_world = no
-			#			is_cold = yes
-			#			NOT = {
-			#				has_modifier = pm_tec_machine_world_half
-			#			}
-			#		}
-			#	}
-			#	picture = GFX_evt_tundra
-			#}
-			#picture = {
-			#	trigger = {
-			#		target = {
-			#			tec_is_gaia_world = yes
-			#			NOT = {
-			#				has_modifier = pm_tec_machine_world_half
-			#			}
-			#		}
-			#	}
-			#	picture = GFX_evt_gaia
-			#}
-			#picture = {	# Half completion
-			#	trigger = {
-			#		target = {
-			#			has_modifier = pm_tec_machine_world_half
-			#		}
-			#	}
-			#	picture = GFX_evt_tomb_world
-			#}
-			#picture = {	# Near completion
-			#	trigger = {
-			#		target = {
-			#			has_modifier = pm_tec_machine_world_full
-			#		}
-			#	}
-			#	picture = GFX_evt_contingency_planet
-			#}
+			picture = {	# Non completed dry
+				trigger = {
+					target = {
+						tec_is_gaia_world = no
+						is_dry = yes
+						NOT = {
+							has_modifier = pm_tec_machine_world_stage_4
+						}
+					}
+				}
+				picture = GFX_evt_arid
+			}
+			picture = {	# Non completed wet
+				trigger = {
+					target = {
+						tec_is_gaia_world = no
+						is_wet = yes
+						NOT = {
+							has_modifier = pm_tec_machine_world_stage_4
+						}
+					}
+				}
+				picture = GFX_evt_continental
+			}
+			picture = {	# Non completed cold
+				trigger = {
+					target = {
+						tec_is_gaia_world = no
+						is_cold = yes
+						NOT = {
+							has_modifier = pm_tec_machine_world_stage_4
+						}
+					}
+				}
+				picture = GFX_evt_tundra
+			}
+			picture = {	# Non completed gaia
+				trigger = {
+					target = {
+						tec_is_gaia_world = yes
+						NOT = {
+							has_modifier = pm_tec_machine_world_stage_4
+						}
+					}
+				}
+				picture = GFX_evt_gaia
+			}
+			picture = {	# Half completion
+				trigger = {
+					target = {
+						has_modifier = pm_tec_machine_world_stage_4
+					}
+				}
+				# TO DO specific skin
+				picture = GFX_evt_tomb_world
+			}
+			picture = {	# Near completion
+				trigger = {
+					target = {
+						has_modifier = pm_tec_machine_world_full
+					}
+				}
+				picture = GFX_evt_contingency_planet
+			}
 		# /
 		category = positive
 		complete_icon_frame = GFX_situation_outcome_frame_green
@@ -129,22 +130,104 @@
 				# Nothing
 				200 = 0
 				# Negative random outcomes
-				#2 = tec_machine_world.10011
+					#2 = tec_machine_world.10011
+				# /
 				# Positive random outcomes
-				#2 = tec_machine_world.10021
+					#2 = tec_machine_world.10021
+				# /
 			}
 		}
 		
-		on_progress_complete = {
+		on_progress_complete = {	# Changes the planet class
 			hidden_effect = {
-				owner = {
-					#country_event = {
-					#	id = tec_machine_world.105
-					#}
+				if = {
+					limit = {
+						owner = {
+							NOT = {
+								has_country_flag = tec_mute_machine_world
+							}
+						}
+					}
+					target = {
+						planet_event = {
+							id = tec_machine_world.105
+						}
+					}
+				}
+				else = {	# Just a notification
+					target = {
+						planet_event = {
+							id = tec_machine_world.106
+						}
+					}
 				}
 				destroy_situation = this
 			}
-			custom_tooltip = situation_tec_machine_world_base_end_tooltip
+			if = {
+				limit = {
+					owner = {
+						is_machine_empire = yes
+						NOR = {
+							has_valid_civic = civic_machine_assimilator
+							has_valid_civic = civic_machine_servitor
+						}
+					}
+				}
+				custom_tooltip = situation_tec_machine_world_base_end_tooltip_machine
+			}
+			else_if = {
+				limit = {
+					owner = {
+						is_machine_empire = yes
+						has_valid_civic = civic_machine_assimilator
+					}
+				}
+				custom_tooltip = situation_tec_machine_world_base_end_tooltip_assimilator
+			}
+			else_if = {
+				limit = {
+					owner = {
+						is_machine_empire = yes
+						has_valid_civic = civic_machine_servitor
+					}
+				}
+				custom_tooltip = situation_tec_machine_world_base_end_tooltip_servitor
+			}
+			else_if = {
+				limit = {
+					owner = {
+						tec_has_cybernetic_ascension_path = yes
+						is_gestalt = no
+					}
+				}
+				custom_tooltip = situation_tec_machine_world_base_end_tooltip_cyborg
+			}
+			else_if = {
+				limit = {
+					owner = {
+						tec_has_synthetic_ascension_path = yes
+						is_gestalt = no
+					}
+				}
+				custom_tooltip = situation_tec_machine_world_base_end_tooltip_synth
+			}
+			else_if = {
+				limit = {
+					owner = {
+						OR = {
+							AND = {
+								is_hive_empire = yes
+								tec_has_cybernetic_ascension_path = yes
+							}
+							tec_is_cyberhive = yes
+						}
+					}
+				}
+				custom_tooltip = situation_tec_machine_world_base_end_tooltip_cyberhive
+			}
+			else = {
+				custom_tooltip = situation_tec_machine_world_base_end_tooltip_standard
+			}
 			destroy_situation = this
 		}
 
@@ -160,17 +243,47 @@
 				end = 2000
 			}
 			# Unlocks the Assembly line
-			situation_tec_machine_world_base_stage_2 = { #0500 - 4000
+			situation_tec_machine_world_base_stage_2 = { #2000 - 4000
 				icon = GFX_situation_stage_2
 				icon_background = GFX_situation_stage_frame_tec_orange
 				end = 4000
 				on_first_enter = {
 					hidden_effect = {
-						#situation_event = {
-						#	id = tec_machine_world.10020
-						#}
+						if = {		# Normal event
+							limit = {
+								owner = {
+									NOT = {
+										has_country_flag = tec_mute_machine_world
+									}
+								}
+							}
+							situation_event = {
+								id = tec_machine_world.10020
+							}
+						}
+						else = {	# Just a toast
+							situation_event = {
+								id = tec_machine_world.10021
+							}
+							#owner = {
+								#create_message = {
+								#	type = MESSAGE_TEC_TOAST_MACHINE_WORLD_PHASE_2
+								#	localization =  MESSAGE_TEC_TOAST_MACHINE_WORLD_PHASE_2_DESC
+								#	days = @toast_message_days
+								#	target = target
+								#	variable = {
+								#		type = name
+								#		localization = LEADER
+								#		scope = event_target:situation_t
+								#	}
+								#	variable = {
+								#			key = "border"
+								#			value = "GFX_border_veteran" #TODO Add real rarity frame gfx
+								#	}
+								#}
+							#}
+						}
 					}
-					
 				}
 			}
 			# Planet becomes even less habitable
@@ -180,9 +293,23 @@
 				end = 6000
 				on_first_enter = {
 					hidden_effect = {
-						#situation_event = {
-						#	id = tec_machine_world.10030
-						#}
+						if = {		# Normal event
+							limit = {
+								owner = {
+									NOT = {
+										has_country_flag = tec_mute_machine_world
+									}
+								}
+							}
+							situation_event = {
+								id = tec_machine_world.10030
+							}
+						}
+						else = {	# Just a toast
+							situation_event = {
+								id = tec_machine_world.10031
+							}
+						}
 					}
 				}
 			}
@@ -196,6 +323,26 @@
 						#situation_event = {
 						#	id = tec_machine_world.10040
 						#}
+						if = {		# Normal event
+							limit = {
+								owner = {
+									NOT = {
+										has_country_flag = tec_mute_machine_world
+									}
+								}
+							}
+							situation_event = {
+								id = tec_machine_world.10040
+							}
+						}
+						else = {	# Just a toast
+							situation_event = {
+								id = tec_machine_world.10041
+							}
+						}
+						add_modifier = {
+							modifier = pm_tec_machine_world_stage_4
+						}
 					}
 				}
 			}
@@ -205,11 +352,28 @@
 				icon_background = GFX_situation_stage_frame_blue
 				end = 10000
 				on_first_enter = {
-					#hidden_effect = {
-					#	situation_event = {
-					#		id = tec_machine_world.10050
-					#	}
-					#}
+					hidden_effect = {
+						#situation_event = {
+						#	id = tec_machine_world.10030
+						#}
+						if = {		# Normal event
+							limit = {
+								owner = {
+									NOT = {
+										has_country_flag = tec_mute_machine_world
+									}
+								}
+							}
+							situation_event = {
+								id = tec_machine_world.10050
+							}
+						}
+						else = {	# Just a toast & notification
+							situation_event = {
+								id = tec_machine_world.10051
+							}
+						}
+					}
 				}
 			}
 		}
@@ -217,8 +381,8 @@
 		# Approaches
 			approach = { # x0.5 speed - way less cost
 				name = situation_tec_machine_world_base_approach_slow
-				icon = GFX_situation_approach_tec_city
-				icon_background = GFX_situation_approach_bg_green
+				icon = GFX_situation_approach_tec_machine_world
+				icon_background = GFX_situation_approach_bg_tec_orange
 				#potential = {
 				#	has_situation_flag = 
 				#}
@@ -236,7 +400,7 @@
 			approach = { # x1 speed - normal cost
 				name = situation_tec_machine_world_base_approach_normal
 				icon = GFX_situation_approach_tec_city
-				icon_background = GFX_situation_approach_bg_yellow
+				icon_background = GFX_situation_approach_bg_green
 				#potential = {
 				#	has_situation_flag = 
 				#}
@@ -260,8 +424,8 @@
 			}
 			approach = { # x2 speed - x2 cost
 				name = situation_tec_machine_world_base_approach_fast
-				icon = GFX_situation_approach_tec_city
-				icon_background = GFX_situation_approach_bg_tec_orange
+				icon = GFX_situation_approach_tec_machine_world
+				icon_background = GFX_situation_approach_bg_tec_blue
 				#potential = {
 				#	has_situation_flag = 
 				#}
