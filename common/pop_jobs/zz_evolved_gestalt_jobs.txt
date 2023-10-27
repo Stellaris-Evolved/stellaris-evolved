@@ -1,3 +1,5 @@
+# common\pop_jobs\zz_evolved_gestalt_jobs.txt
+
 # --------------- Brood Drones
 	tec_broodqueen_drone = {
 		category = tec_brood_drone
@@ -3762,6 +3764,7 @@
 # /
 
 # ------------ Special worlds ---------------
+	# Assembly helpers
 	tec_hive_germinator_drone = {					# Hive worlds
 		category = complex_drone
 		condition_string = DRONE_JOB_TRIGGER
@@ -3850,6 +3853,209 @@
 			modifier = {
 				factor = 0
 				has_trait = trait_mechanical
+			}
+		}
+	}
+	# Converters
+	tec_biomass_agri_drone = {							# Minerals + energy > food
+		category = simple_drone
+		condition_string = DRONE_JOB_TRIGGER
+		building_icon = building_tec_biohive_food_processing_complex
+
+		possible_pre_triggers = {
+			has_owner = yes
+			#is_enslaved = no
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+
+		possible_precalc = can_fill_drone_job
+
+		resources = {
+			category = planet_farmers
+			produces = {
+				food = 8
+			}
+			upkeep = {
+				minerals = 2
+				energy = 2
+			}
+
+			inline_script = {
+				script = jobs/resources/inline_evolved_produce_farmer_requisition_resources
+				food = @requisitorium_food_reduction
+				mult = 1
+			}
+		}
+
+		overlord_resources = {
+			category = planet_requisitioned_food
+			inline_script = {
+				script = jobs/resources/inline_evolved_produce_farmer_requisition_overlord_resources
+				food = @requisitorium_food_overlord
+				mult = 1
+			}
+		}
+
+		inline_script = jobs/effects/type/inline_evolved_agri_drone_effect
+
+		weight = {
+			weight = @simple_drone_job_weight
+			mult = value:job_weights_modifier|JOB|agri_drone|RESOURCE|food|
+			modifier = {
+				factor = 1.2
+				has_job = agri_drone
+			}
+					
+			modifier = {
+				factor = 0.9
+				owner = {
+					is_robot_empire = yes
+				}
+			}
+			modifier = {
+				factor = 1.1
+				exists = owner
+				years_passed < 1
+				owner = { has_valid_civic = civic_machine_assimilator }
+				tec_is_cyborg_species = yes
+			}
+
+			modifier = {
+				factor = 0.5
+				has_trait = trait_lithoid
+
+				owner = {
+					is_lithoid_empire = yes
+					has_monthly_income = {
+						resource = food
+						value >= 0
+					}
+				}
+			}
+
+			# Crafted pops modifier
+			modifier = {
+				factor = 2
+				tec_is_crafted_sentient_pop = yes
+			}
+			modifier = {
+				factor = 200
+				tec_is_crafted_nonsapient_pop = yes
+			}
+
+			#Prioritize serving species
+			modifier = {
+				factor = 3
+				OR = {
+					tec_has_stapled_trait ={ cached = yes }
+				}
+			}
+			
+			modifier = {
+				factor = 0.9
+				NOT = { has_job = agri_drone }
+				owner = {
+					has_monthly_income = {
+						resource = food
+						value > 50
+					}
+				}
+			}
+		}
+	}
+	tec_biomass_mining_drone = {						# food + energy > minerals
+		category = simple_drone
+		condition_string = DRONE_JOB_TRIGGER
+		building_icon = building_tec_biohive_mineral_purification_hub
+
+		possible_pre_triggers = {
+			has_owner = yes
+			#is_enslaved = no
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+
+		possible_precalc = can_fill_drone_job
+
+		resources = {
+			category = planet_miners
+			produces = {
+				minerals = 6
+			}
+			upkeep = {
+				food = 2
+				energy = 2
+			}
+
+			inline_script = {
+				script = jobs/resources/inline_evolved_material_miner_requisition_resources
+				minerals = @requisitorium_minerals_reduction
+				mult = 1
+			}
+		}
+
+		overlord_resources = {
+			category = planet_requisitioned_minerals
+			inline_script = {
+				script = jobs/resources/inline_evolved_material_miner_requisition_overlord_resources
+				minerals = @requisitorium_minerals_overlord
+				mult = 1
+			}
+		}
+
+		inline_script = jobs/effects/type/inline_evolved_mining_drone_effect
+
+		weight = {
+			weight = @simple_drone_job_weight
+			mult = value:job_weights_modifier|JOB|tec_biomass_mining_drone|RESOURCE|minerals|
+			modifier = {
+				factor = 1.2
+				has_job = tec_biomass_mining_drone
+			}
+
+			modifier = {
+				factor = 1.1
+				exists = owner
+				years_passed < 1
+				owner = { has_valid_civic = civic_machine_assimilator }
+				tec_is_cyborg_species = yes
+			}
+
+			# Crafted pops modifier
+			modifier = {
+				factor = 2
+				tec_is_crafted_sentient_pop = yes
+			}
+			modifier = {
+				factor = 200
+				tec_is_crafted_nonsapient_pop = yes
+			}
+
+			#Prioritize serving species
+			modifier = {
+				factor = 3
+				OR = {
+					tec_has_stapled_trait ={ cached = yes }
+				}
+			}
+
+			# low income modifier
+			modifier = {
+				factor = 1.1
+	
+				exists = planet
+				planet = {
+					has_available_jobs = tec_biomass_mining_drone
+				}
+				owner = {
+					has_monthly_income = {
+						resource = minerals
+						value < 30
+					}
+				}
 			}
 		}
 	}
