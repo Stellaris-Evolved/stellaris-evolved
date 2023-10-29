@@ -480,6 +480,10 @@ tec_ai_destroy_factory_building = {
 		OR = {
 			owner = {
 				should_ai_focus_on_trade = yes
+				OR = {
+					has_policy_flag = trade_conversion_consumer_goods
+					has_policy_flag = trade_conversion_trade_league
+				}
 				has_monthly_income = { resource = consumer_goods value > 30 }
 			}
 			has_any_industry_district = no
@@ -608,7 +612,7 @@ tec_ai_destroy_milacademy_building = {
 			owner = { is_ai = yes }
 		}
 		check_variable_arithmetic = {
-			which = value:stronghold_buildings_value
+			which = value:military_combined_value|CACHED|yes|
 			value <= 0
 		}
 	}
@@ -628,14 +632,31 @@ tec_ai_destroy_fortress_building = {
 			used_naval_capacity_percent < 0.6
 			is_at_war = no
 		}
-		check_variable_arithmetic = {
-			which = value:stronghold_buildings_value
-			value > 2
-		}
 		free_building_slots = 0
+		solar_system = {
+			is_bottleneck_system = no
+		}
 	}
 	else = {
 		always = no
+	}
+}
+
+tec_ai_allow_fortress_building = {
+	if = {
+		limit = {
+			exists = owner
+			owner = { is_ai = yes }
+		}
+		OR = {
+			owner = { used_naval_capacity_percent < 0.8 }  # if need naval cap prefer naval academies
+			owner = { tec_has_stronghold_buildings_swap = yes }
+			owner = { tec_has_soldier_swap = yes }
+			has_fortress_designation = yes
+		}
+	}
+	else = {
+		always = yes
 	}
 }
 
@@ -673,7 +694,7 @@ tec_ai_destroy_research_boosting_building = {
 		}
 		has_research_designation = no
 		check_variable_arithmetic = {
-			which = value:research_combined_value
+			which = value:research_combined_value|CACHED|yes|
 			value <= 0
 		}
 	}
@@ -694,6 +715,28 @@ tec_ai_destroy_energy_boosting_building = {
 	}
 	else = {
 		always = no
+	}
+}
+
+tec_ai_allow_energy_boosting_building = {
+	if = {
+		limit = {
+			exists = owner
+			owner = {
+				is_ai = yes
+			}
+		}
+		OR = {
+			owner = { tec_is_labour_hero_empire = yes }
+			has_generator_designation = yes
+			check_variable_arithmetic = {
+				which = value:generator_combined_value|CACHED|yes|
+				value >= 6
+			}
+		}
+	}
+	else = {
+		always = yes
 	}
 }
 
@@ -801,6 +844,29 @@ tec_ai_destroy_minerals_boosting_building = {
 	}
 }
 
+tec_ai_allow_minerals_boosting_building = {
+	if = {
+		limit = {
+			exists = owner
+			owner = {
+				is_ai = yes
+			}
+		}
+		OR = {
+			owner = { tec_is_labour_hero_empire = yes }
+			has_mining_designation = yes
+			check_variable_arithmetic = {
+				which = value:mining_combined_value|CACHED|yes|
+				value >= 6
+			}
+		}
+	}
+	else = {
+		always = yes
+	}
+}
+
+
 
 tec_ai_allow_minerals_building = {
 	if = {
@@ -893,6 +959,31 @@ tec_ai_destroy_food_boosting_building = {
 		always = no
 	}
 }
+
+
+tec_ai_allow_food_boosting_building = {
+	if = {
+		limit = {
+			exists = owner
+			owner = {
+				is_ai = yes
+			}
+		}
+		owner = { country_uses_food = yes }
+		OR = {
+			owner = { tec_is_labour_hero_empire = yes }
+			has_farming_designation = yes
+			check_variable_arithmetic = {
+				which = value:farming_combined_value|CACHED|yes|
+				value >= 6
+			}
+		}
+	}
+	else = {
+		always = yes
+	}
+}
+
 
 tec_ai_allow_food_building = {
 	if = {
@@ -1247,22 +1338,6 @@ tec_ai_destroy_leisure_district = {
 	}
 }
 
-# jobs
-
-# scope: planet
-tec_ai_allow_reducing_clerks = {
-	if = {
-		limit = { 
-			exists = owner
-			owner = { is_ai = yes } 
-		}
-		owner = { should_ai_focus_on_trade = no }
-	}
-	else = {
-		always = yes
-	}
-}
-
 # designations
 
 tec_ai_not_forced_other_designations = {
@@ -1313,19 +1388,19 @@ tec_ai_allow_designation_type_by_planet_type = {
 		}
 		[[mining]
 			check_variable_arithmetic = {
-				which = value:mining_combined_value
+				which = value:mining_combined_value|CACHED|yes|
 				value > 0
 			}
 		]
 		[[farming]
 			check_variable_arithmetic = {
-				which = value:farming_combined_value
+				which = value:farming_combined_value|CACHED|yes|
 				value > 0
 			}
 		]
 		[[generator]
 			check_variable_arithmetic = {
-				which = value:generator_combined_value
+				which = value:generator_combined_value|CACHED|yes|
 				value > 0
 			}
 		]
@@ -1351,11 +1426,7 @@ tec_ai_allow_designation_type_by_planet_type = {
 		}
 
 		check_variable_arithmetic = {
-			which = value:industrial_districts_value|CG_ONLY|yes|
-			value > 0
-		}
-		check_variable_arithmetic = {
-			which = value:industrial_districts_value|ALLOY_ONLY|yes|
+			which = value:industrial_districts_value|CACHED|yes|
 			value > 0
 		}
 	]
@@ -1451,7 +1522,7 @@ tec_ai_allow_designation_type_by_planet_type = {
 		}
 
 		check_variable_arithmetic = {
-			which = value:research_combined_value
+			which = value:research_combined_value|CACHED|yes|
 			value > 1
 		}
 	]
@@ -1483,20 +1554,20 @@ tec_ai_allow_designation_type_by_planet_type = {
 		}
 
 		check_variable_arithmetic = {
-			which = value:unity_combined_value
+			which = value:unity_combined_value|CACHED|yes|
 			value > 1
 		}
 	]
 	[[refinery]
 		check_variable_arithmetic = {
-			which = value:refinery_combined_value
+			which = value:refinery_combined_value|CACHED|yes|
 			value > 1
 		}
 	]
 	[[fortress]
 		OR = {
 			check_variable_arithmetic = {
-				which = value:military_combined_value
+				which = value:military_combined_value|CACHED|yes|
 				value > 1
 			}
 			solar_system = { is_bottleneck_system = yes }
@@ -1504,7 +1575,7 @@ tec_ai_allow_designation_type_by_planet_type = {
 	]
 	[[trade]
 		check_variable_arithmetic = {
-			which = value:trade_combined_value
+			which = value:trade_combined_value|CACHED|yes|
 			value > 2
 		}
 	]
@@ -1576,5 +1647,62 @@ tec_ai_destroy_clinic_building = {
 	}
 	else = {
 		always = no
+	}
+}
+
+tec_ai_allow_city_disitrct_for_jobs = {
+	if = {
+		limit = {
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+			}
+		}
+		OR = {
+			AND = {
+				exists = owner
+				owner = {
+					has_valid_civic = civic_tec_regular_distributism
+				}
+			}
+			tec_has_clerk_jobs_available = no
+		}
+	} else = {
+		tec_has_maintenance_drone_jobs_available = no
+	}
+}
+
+tec_ai_allow_naval_academy_building = {
+	if = {
+		limit = {
+			exists = owner
+			owner = { is_ai = yes }
+		}
+		OR = {
+			is_capital = no
+			owner = { num_owned_planets = 1 }
+		}
+	}
+	else = {
+		always = yes
+	}
+}
+
+tec_ai_allow_strategic_war_edicts = {
+	if = {
+		limit = {
+			is_ai = yes
+		}
+		OR = {
+			is_at_war = yes
+			AND = {
+				has_crisis = yes
+				crisis_happened_and_defeated = no
+			}
+			has_global_flag = gray_goo_crisis_active
+		}
+	}
+	else = {
+		always = yes
 	}
 }

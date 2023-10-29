@@ -2537,7 +2537,7 @@ tec_has_betharian_deposit = {
 
 tec_has_any_sr_building_or_district = {
 	check_variable_arithmetic = {
-		which = value:refinery_combined_value
+		which = value:refinery_combined_value|CACHED|yes|
 		value > 0 
 	}
 }
@@ -2709,6 +2709,19 @@ tec_has_possible_job = {
 	}
 }
 
+tec_can_reduce_job_further = {
+	OR = {
+		num_assigned_jobs = { job = $job$ value > 0 }
+		has_available_jobs = $job$
+	}
+}
+
+tec_can_increase_job_further = {
+	OR = {
+		has_forbidden_jobs = $job$
+	}
+}
+
 # Machine processing
 
 tec_has_local_machine_processing = {
@@ -2719,7 +2732,7 @@ tec_has_local_machine_processing = {
 
 # scope: planet
 tec_has_non_emigrant_pops_unemployed = {
-	num_unemployed > 0
+	num_unemployed > 1
 	OR = {
 		free_building_slots > 0
 		free_district_slots > 0
@@ -3100,7 +3113,10 @@ tec_leader_first_staring_actions_done = {
 tec_has_councilor = { # NOTE: adjust tec_cache_country_councilor_triggers with each councilor you want cached
 	exists = owner
 	owner = {
-		has_country_flag = tec_cache_tec_has_councilor_$COUNCILOR$
+		check_variable_arithmetic = {
+			which = value:councilor_level|TYPE|$COUNCILOR$|
+			value > 0
+		}
 	}
 }
 
@@ -3944,4 +3960,33 @@ tec_can_make_research_federation = {
 		fail_text = requires_actor_not_barbaric_despoilers
 		NOT = { has_valid_civic = civic_barbaric_despoilers }
 	}
+}
+
+# yes i know i simplified, but my god, who decided this was a good idea ?!?!
+# this event was check for every pop against every other pop
+# Added also the check for kinship civic in pop categories...
+# we can technically move these back there if those checks remain cause it will only happen
+# in one empire or so, but better net, less calculations the better
+
+tec_planet_selective_kinship_likes = {
+	[[cached]
+		has_planet_flag = tec_cache_tec_planet_selective_kinship_likes
+	]
+	[[!cached]
+		any_owned_pop = {
+			NOT = { is_same_species = owner }
+			is_same_species_class = owner
+		}
+	]
+}
+
+tec_planet_selective_kinship_hates = {
+	[[cached]
+		has_planet_flag = tec_cache_tec_planet_selective_kinship_likes
+	]
+	[[!cached]
+		any_owned_pop = {
+			NOT = { is_same_species_class = owner }
+		}
+	]
 }

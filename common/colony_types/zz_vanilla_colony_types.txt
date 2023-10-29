@@ -151,7 +151,7 @@ col_mining = {
 			add = @stickiness_low
 			has_designation = col_mining
 		}
-		add = value:mining_combined_value|FACTOR|2|
+		add = value:mining_combined_value|FACTOR|2|CACHED|yes|
 
 		complex_trigger_modifier = {
 			trigger = num_free_districts
@@ -225,7 +225,7 @@ col_farming = {
 			add = @stickiness_low
 			has_designation = col_farming
 		}
-		add = value:farming_combined_value|FACTOR|2|
+		add = value:farming_combined_value|FACTOR|2|CACHED|yes|
 		complex_trigger_modifier = {
 			trigger = num_free_districts
 			parameters = {
@@ -311,7 +311,7 @@ col_generator = {
 			add = @stickiness_low
 			has_designation = col_generator
 		}
-		add = value:generator_combined_value|FACTOR|2|
+		add = value:generator_combined_value|FACTOR|2|CACHED|yes|
 
 		complex_trigger_modifier = {
 			trigger = num_free_districts
@@ -704,7 +704,7 @@ col_bureau = {
 			add = @stickiness
 			has_designation = col_bureau
 		}
-		add = value:unity_combined_value|FACTOR|2|
+		add = value:unity_combined_value|FACTOR|2|CACHED|yes|
 	}
 }
 
@@ -739,7 +739,7 @@ col_bureau_spiritualist = {
 			add = @stickiness
 			has_designation = col_bureau_spiritualist
 		}
-		add = value:unity_combined_value|FACTOR|2|
+		add = value:unity_combined_value|FACTOR|2|CACHED|yes|
 	}
 }
 
@@ -769,7 +769,7 @@ col_bureau_hive = {
 			add = @stickiness
 			has_designation = col_bureau_hive
 		}
-		add = value:unity_combined_value|FACTOR|2|
+		add = value:unity_combined_value|FACTOR|2|CACHED|yes|
 	}
 }
 
@@ -802,7 +802,7 @@ col_bureau_machine = {
 			add = @stickiness
 			has_designation = col_bureau_machine
 		}
-		add = value:unity_combined_value|FACTOR|2|
+		add = value:unity_combined_value|FACTOR|2|CACHED|yes|
 	}
 }
 
@@ -840,7 +840,7 @@ col_refinery = {
 			add = @stickiness
 			has_designation = col_refinery
 		}
-		add = value:refinery_combined_value|FACTOR|2|
+		add = value:refinery_combined_value|FACTOR|2|CACHED|yes|
 	}
 }
 
@@ -879,7 +879,7 @@ col_research = {
 			add = @stickiness
 			has_designation = col_research
 		}
-		add = value:research_combined_value|FACTOR|2|
+		add = value:research_combined_value|FACTOR|2|CACHED|yes|
 
 		modifier = {
 			add = 5
@@ -941,7 +941,7 @@ col_fortress = {
 			add = @stickiness
 			has_designation = col_fortress
 		}
-		add = value:stronghold_buildings_value|FACTOR|2|
+		add = value:military_combined_value|FACTOR|2|CACHED|yes|
 	}
 }
 
@@ -1004,7 +1004,18 @@ col_capital_foundry = {
 				}
 			}
 		}
-
+		if = {
+			limit = {
+				owner = {
+					is_ai = yes
+				}
+			}
+			owner = { # to not cause swings
+				any_owned_planet = {
+					has_factory_designation = yes
+				}
+			}
+		}
 		tec_ai_allow_designation_type = { type = foundry }
 	}
 
@@ -1040,14 +1051,7 @@ col_capital_factory = {
 			AND = {
 				tec_is_default_country = yes
 				is_gestalt = no
-				
-				OR = {
-					is_ai = no
-					AND = {
-						years_passed > 25
-						num_owned_planets >= 5
-					}
-				}
+				is_ai = no # block ai from being dumb and destroying their alloys
 			}
 		}
 
@@ -1087,7 +1091,6 @@ col_capital_trade = {
 			AND = {
 				tec_is_default_country = yes
 				is_gestalt = no
-				
 				OR = {
 					is_ai = no
 					AND = {
@@ -1128,7 +1131,7 @@ col_capital_extraction = {
 			AND = {
 				tec_is_default_country = yes
 				is_gestalt = no
-				
+
 				OR = {
 					is_ai = no
 					AND = {
@@ -1139,6 +1142,18 @@ col_capital_extraction = {
 			}
 		}
 		tec_ai_allow_designation_type = { type = rural }
+
+		if = {
+			limit = {
+				owner = {
+					is_ai = yes
+				}
+			}
+			check_variable_arithmetic = {
+				which = value:tec_ai_count_productive_worker_pops
+				value > value:tec_ai_count_non_worker_pops
+			}
+		}
 	}
 
 	planet_modifier = {
@@ -1223,8 +1238,13 @@ col_habitat = {	# tweaked
 	icon = GFX_colony_type_habitat
 
 	potential = {
+		exists = owner
 		tec_uses_habitat_districts = yes
-		num_sapient_pops < 5
+		OR = {
+			num_sapient_pops < 5
+			owner = { ia_ai = yes }
+		}
+
 		is_capital = no
 	}
 
@@ -1298,7 +1318,7 @@ col_habitat_energy = {	# tweaked
 			add = 10
 			tec_has_energy_processing_buildings = yes
 		}
-		add = value:generator_combined_value|FACTOR|2|
+		add = value:generator_combined_value|FACTOR|2|CACHED|yes|
 	}
 }
 
@@ -1463,7 +1483,7 @@ col_habitat_research = {	# tweaked
 				value > 0
 			}
 		}
-		add = value:research_combined_value|FACTOR|2|
+		add = value:research_combined_value|FACTOR|2|CACHED|yes|
 	}
 }
 
@@ -1509,7 +1529,7 @@ col_habitat_mining = {		# tweaked
 			add = 10
 			tec_has_mineral_processing_buildings = yes
 		}
-		add = value:mining_combined_value|FACTOR|2|
+		add = value:mining_combined_value|FACTOR|2|CACHED|yes|
 	}
 }
 
@@ -1555,7 +1575,7 @@ col_habitat_farming = { # Mine better - disabled
 			add = 5
 			has_building = building_baol_organic_plant
 		}
-		add = value:farming_combined_value|FACTOR|2|
+		add = value:farming_combined_value|FACTOR|2|CACHED|yes|
 	}
 }
 
@@ -1604,7 +1624,7 @@ col_habitat_gestalt_farming = {	# Mine better - disabled
 			add = 5
 			has_building = building_baol_organic_plant
 		}
-		add = value:farming_combined_value|FACTOR|2|
+		add = value:farming_combined_value|FACTOR|2|CACHED|yes|
 	}
 }
 
@@ -1658,7 +1678,7 @@ col_habitat_fortress = {	# tweaked
 				has_building = building_order_castle
 			}
 		}
-		add = value:stronghold_buildings_value|FACTOR|3|
+		add = value:military_combined_value|FACTOR|3|CACHED|yes|
 	}
 }
 
@@ -1914,7 +1934,7 @@ col_habitat_bureau = {
 			add = @stickiness
 			has_designation = col_habitat_bureau
 		}
-		add = value:unity_combined_value|FACTOR|2|
+		add = value:unity_combined_value|FACTOR|2|CACHED|yes|
 	}
 }
 
@@ -1951,7 +1971,7 @@ col_habitat_bureau_spiritualist = {
 			add = @stickiness
 			has_designation = col_habitat_bureau_spiritualist
 		}
-		add = value:unity_combined_value|FACTOR|2|
+		add = value:unity_combined_value|FACTOR|2|CACHED|yes|
 	}
 }
 
@@ -1977,7 +1997,7 @@ col_habitat_bureau_hive = {
 			add = @stickiness
 			has_designation = col_habitat_bureau_hive
 		}
-		add = value:unity_combined_value|FACTOR|2|
+		add = value:unity_combined_value|FACTOR|2|CACHED|yes|
 	}
 }
 
@@ -2003,7 +2023,7 @@ col_habitat_bureau_machine = {
 			add = @stickiness
 			has_designation = col_habitat_bureau_machine
 		}
-		add = value:unity_combined_value|FACTOR|2|
+		add = value:unity_combined_value|FACTOR|2|CACHED|yes|
 	}
 }
 
@@ -2031,7 +2051,7 @@ col_habitat_refinery = {	# tweaked
 			add = @stickiness
 			has_designation = col_habitat_refinery
 		}
-		add = value:refinery_combined_value|FACTOR|2|
+		add = value:refinery_combined_value|FACTOR|2|CACHED|yes|
 	}
 }
 
@@ -2242,7 +2262,7 @@ col_ring_research = {
 			add = @stickiness
 			has_designation = col_ring_research
 		}
-		add = value:research_combined_value|FACTOR|3|
+		add = value:research_combined_value|FACTOR|3|CACHED|yes|
 	}
 }
 
@@ -2276,7 +2296,7 @@ col_ring_farming = {
 			add = @stickiness
 			has_designation = col_ring_farming
 		}
-		add = value:farming_combined_value|FACTOR|2|
+		add = value:farming_combined_value|FACTOR|2|CACHED|yes|
 		modifier = {
 			add = 10
 			tec_has_food_processing_buildings = yes
@@ -2365,11 +2385,7 @@ col_ring_generator = {
 			add = @stickiness
 			has_designation = col_ring_generator
 		}
-		add = value:generator_combined_value|FACTOR|2|
-		modifier = {
-			add = value:generator_districts_value|FACTOR|75|
-			is_capital = no
-		}
+		add = value:generator_combined_value|FACTOR|2|CACHED|yes|
 	}
 }
 
@@ -2616,7 +2632,7 @@ col_ecu_research = {
 			add = @stickiness
 			has_designation = col_ecu_research
 		}
-		add = value:research_combined_value|FACTOR|3|
+		add = value:research_combined_value|FACTOR|3|CACHED|yes|
 	}
 }
 

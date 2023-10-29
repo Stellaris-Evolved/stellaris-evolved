@@ -935,22 +935,6 @@ can_pop_auto_migrate = {
 				has_job = tec_state_worker
 			# /
 		}
-		if = {
-			limit = {
-				owner = { is_ai = yes }
-			}
-			root = { # blocks ai from relocating pops from planets with unemployment when upgrading capital
-				NOR = {
-					num_pops = @pops_t2
-					num_pops = @pops_t3
-					num_pops = @pops_t4
-					num_pops = @pops_t5
-				}
-			}
-		}
-		root = { # blocks migration cheese
-			num_pops > 1
-		}
 	}
 	custom_tooltip = {
 		fail_text = AUTO_MIGRATE_ASSIMILATED
@@ -987,6 +971,59 @@ can_pop_auto_migrate = {
 						include_being_constructed = no
 					}
 				}
+			}
+		}
+	}
+}
+
+# This = planet
+# Checked before can_pop_auto_migrate to save performance
+can_planet_auto_migrate = {
+	hidden_trigger = {
+		if = {
+			limit = {
+				owner = { is_ai = yes }
+			}
+			 # blocks ai from relocating pops from planets with unemployment when upgrading capital
+			NOR = {
+				num_pops = @pops_t2
+				AND = {
+					num_pops = @pops_t3
+					owner = { has_technology = tech_colonial_centralization }
+				}
+				AND = {
+					num_pops = @pops_t4
+					owner = { has_technology = tech_galactic_administration }
+				}
+				AND = {
+					num_pops = @pops_t5
+					owner = { has_technology = tech_tec_imperial_coordination }
+				}
+			}
+		}
+		num_sapient_pops > 1 # blocks migration cheese
+	}
+	custom_tooltip = {
+		fail_text = AUTO_MIGRATE_CULTURE_SHOCK
+		NOT = { has_modifier = planet_culture_shock }
+	}
+	custom_tooltip = {
+		fail_text = AUTO_MIGRATE_COLONY_TOO_NEW
+		OR = {
+			colony_age > 60
+			is_capital = yes # Don't break Doomsday!
+		}
+	}
+	custom_tooltip = {
+		fail_text = AUTO_MIGRATE_ONLY_HAS_ONE_POP
+		num_sapient_pops > 1
+	}
+	hidden_trigger = {
+		exists = owner
+		owner = {
+			OR = {
+				is_country_type = default
+				is_country_type = awakened_fallen_empire
 			}
 		}
 	}
