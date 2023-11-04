@@ -1,1 +1,218 @@
 # common\situations\zz_evolved_mechanic_situations.txt
+
+situation_tec_psionic_planet_ascension = {
+    desc = {
+        text = situation_tec_psionic_planet_ascension_desc
+        trigger = {
+            hidden_trigger = {
+                always = yes
+            }
+        }
+    }
+    picture = GFX_evt_psionics
+    category = positive
+    complete_icon_frame = GFX_situation_outcome_frame_green
+    complete_icon = GFX_situation_outcome_unknown
+    fail_icon_frame = GFX_situation_outcome_frame_red
+    fail_icon = GFX_situation_outcome_negative
+    start_value = 0
+
+    progress_direction = monodirectional
+
+    on_start = {
+        set_situation_locked = no
+        set_situation_approach = situation_approach_tec_psionic_planet_ascension_normal
+    }
+
+    on_fail = {
+        # This should never happen, but if it does...
+        owner = {
+            start_situation = {
+                type = situation_tec_psionic_planet_ascension
+                target = prev.target
+                effect = {
+                    copy_flags_and_variables_from = prevprev
+                }
+            }
+        }
+        destroy_situation = this
+    }
+
+    on_monthly = {
+        # nothing for now
+        random_events = {
+            # Nothing
+            200 = 0
+            # Negative random outcomes
+            #2 = tec_gene_path.20011
+            #2 = tec_gene_path.20012
+            #1 = tec_gene_path.20013
+            # Positive random outcomes
+            #2 = tec_gene_path.20021
+            #2 = tec_gene_path.20022
+            #1 = tec_gene_path.20023
+        }
+    }
+
+    on_progress_complete = {
+        hidden_effect = {
+            target = {
+                planet_event = {
+                    id = tec_psionic_path.30001
+                }
+            }
+            owner = {
+                start_situation = {
+                    type = situation_tec_psionic_planet_ascension
+                    target = prev.target
+                    effect = {
+                        copy_flags_and_variables_from = prevprev
+                    }
+                }
+            }
+        }
+        custom_tooltip = situation_tec_psionic_planet_ascension_end_tooltip
+        destroy_situation = this
+    }
+
+    stages = {
+        # Under 0
+        situation_tec_psionic_planet_ascension_stage_1 = {
+            icon = GFX_situation_stage_1
+            icon_background = GFX_situation_stage_frame_blue
+            end = 120
+            on_first_enter = {
+                #hidden_effect = {
+                #	situation_event = {
+                #		id = tec_gene_path.10115
+                #	}
+                #}
+            }
+        }
+    }
+
+    # Approaches
+    approach = { # Basic
+        name = situation_approach_tec_psionic_planet_ascension_normal
+        icon = GFX_situation_approach_pop
+        icon_background = GFX_situation_approach_bg_tec_purple
+        on_select = {
+            custom_tooltip = situation_approach_tec_psionic_planet_ascension_normal_desc
+        }
+        default = yes
+        resources = {
+            category = situations
+            upkeep = {
+                trigger = {
+                    NOT = { has_situation_flag = situation_tec_psionic_first_ascension_planet }
+                }
+                sr_zro = 5
+            }
+        }
+    }
+    approach = { # Accelerated
+        name = situation_approach_tec_psionic_planet_ascension_forced
+        icon = GFX_situation_approach_tec_mind
+        icon_background = GFX_situation_approach_bg_tec_purple
+        potential = {
+            hidden_trigger = {
+                owner = { is_ai = no }
+            }
+        }
+        on_select = {
+            custom_tooltip = situation_approach_tec_psionic_planet_ascension_forced_desc
+        }
+        resources = {
+            category = situations
+            upkeep = {
+                trigger = {
+                    NOT = { has_situation_flag = situation_tec_psionic_first_ascension_planet }
+                }
+                sr_zro = 5
+            }
+            upkeep = {
+                sr_zro = 5
+            }
+        }
+    }
+    # /
+
+    monthly_progress = {
+        base = 0
+        # Debug
+        modifier = {
+            add = 10
+            desc = EXCELLENT
+            OR = {
+                has_situation_flag = situation_tec_debug
+                owner = {
+                    has_country_flag = situation_tec_debug
+                }
+            }
+        }
+        modifier = {
+            add = 5
+            desc = EXCELLENT
+            OR = {
+                has_situation_flag = situation_tec_debug_2
+                owner = {
+                    has_country_flag = situation_tec_debug_2
+                }
+            }
+        }
+        modifier = {
+            add = -10
+            desc = EXCELLENT
+            OR = {
+                has_situation_flag = situation_tec_debug_negative
+                owner = {
+                    has_country_flag = situation_tec_debug_negative
+                }
+            }
+        }
+        modifier = {
+            add = -5
+            desc = EXCELLENT
+            OR = {
+                has_situation_flag = situation_tec_debug_negative_2
+                owner = {
+                    has_country_flag = situation_tec_debug_negative_2
+                }
+            }
+        }
+        # /
+        # Approaches
+        modifier = {
+            add = 1
+            desc = situation_approach_tec_psionic_planet_ascension_normal
+            current_situation_approach = situation_approach_tec_psionic_planet_ascension_normal
+        }
+        modifier = {
+            add = 2
+            desc = situation_approach_tec_psionic_planet_ascension_forced
+            current_situation_approach = situation_approach_tec_psionic_planet_ascension_forced
+        }
+        modifier = {
+            mult = 0.2
+            desc = situation_tec_psionic_planet_ascension_slow_progression
+            has_situation_flag = situation_tec_psionic_first_ascension_planet
+            exists = owner
+            NOT = {
+                owner = {
+                    has_country_flag = tec_psionics_t2_completed
+                }
+            }
+        }
+    }
+
+    abort_trigger = {
+        OR = {
+            NOT = { exists = owner }
+            #NOT = { exists = target.owner }
+            #target.owner = {
+            #    NOT = { is_same_value = prevprev.owner }
+            #}
+        }
+
+    }
+}

@@ -7283,6 +7283,15 @@ namespace = tec_psionic_path
 							}
 							add_deposit = d_tec_psionic_ascension_zone_1
 							save_event_target_as = tec_recently_ascended_planet
+							owner = {
+								start_situation = {
+									type = situation_tec_psionic_planet_ascension
+									target = prev
+									effect = {
+										set_situation_flag = situation_tec_psionic_first_ascension_planet
+									}
+								}
+							}
 						}
 					}
 				}
@@ -7313,6 +7322,15 @@ namespace = tec_psionic_path
 							}
 							add_deposit = d_tec_psionic_ascension_zone_1
 							save_event_target_as = tec_recently_ascended_planet
+							owner = {
+								start_situation = {
+									type = situation_tec_psionic_planet_ascension
+									target = prev
+									effect = {
+										set_situation_flag = situation_tec_psionic_first_ascension_planet
+									}
+								}
+							}
 						}
 					}
 				}
@@ -7530,10 +7548,16 @@ namespace = tec_psionic_path
 		is_triggered_only = yes
 
 		trigger = {
-			has_modifier = pm_tec_psionic_ascension
+			always = yes
 		}
 		
 		immediate = {
+			if = {
+				limit = {
+					NOT = { has_deposit = d_tec_psionic_ascension_zone_1 }
+				}
+				add_deposit = d_tec_psionic_ascension_zone_1
+			}
 			if = {
 				limit = {
 					exists = owner
@@ -7585,87 +7609,16 @@ namespace = tec_psionic_path
 		}
 
 		immediate = {
-			if = { # 10+ pops, selects 1
-				limit = {
-					num_pops < 21
-				}
-				while = {
-					count = 1
-					random_owned_pop = {
-						limit = {
-							is_sapient = yes
-						}
-						kill_pop = yes
+			while = {
+				count = value:tec_psionic_planet_ascension_pop_ascend
+				random_owned_pop = {
+					limit = {
+						is_sapient = yes
 					}
-					add_deposit = d_tec_psionic_wasteland
-					add_planet_devastation = 10
+					kill_pop = yes
 				}
-			}
-			else_if = { # 20+ pops, selects up to 2
-				limit = {
-					num_pops < 31
-					num_pops > 20
-				}
-				while = {
-					count = 2
-					random_owned_pop = {
-						limit = {
-							is_sapient = yes
-						}
-						kill_pop = yes
-					}
-					add_deposit = d_tec_psionic_wasteland
-				}
-			}
-			else_if = { # 30+ pops, selects up to 3
-				limit = {
-					num_pops < 41
-					num_pops > 30
-				}
-				while = {
-					count = 3
-					random_owned_pop = {
-						limit = {
-							is_sapient = yes
-						}
-						kill_pop = yes
-					}
-					add_deposit = d_tec_psionic_wasteland
-					add_planet_devastation = 10
-				}
-			}
-			else_if = { # 40+ pops, selects up to 4
-				limit = {
-					num_pops < 51
-					num_pops > 40
-				}
-				while = {
-					count = 4
-					random_owned_pop = {
-						limit = {
-							is_sapient = yes
-						}
-						kill_pop = yes
-					}
-					add_deposit = d_tec_psionic_wasteland
-					add_planet_devastation = 10
-				}
-			}
-			else_if = { # 50+ pops, selects up to 5
-				limit = {
-					num_pops > 50
-				}
-				while = {
-					count = 5
-					random_owned_pop = {
-						limit = {
-							is_sapient = yes
-						}
-						kill_pop = yes
-					}
-					add_deposit = d_tec_psionic_wasteland
-					add_planet_devastation = 10
-				}
+				add_deposit = d_tec_psionic_wasteland
+				add_planet_devastation = 10
 			}
 		}
 
@@ -7692,127 +7645,26 @@ namespace = tec_psionic_path
 		}
 
 		immediate = {
-			if = { # 10+ pops, selects 1
-				limit = {
-					num_pops < 21
-				}
-				while = {
-					count = 1
-					random_owned_species = {
-						limit = {
-							tec_is_any_psionic_species = yes
-						}
-						save_event_target_as = tec_selected_psionic_species
-					}
-					random_owned_pop = {
-						limit = {
-							species = {
-								is_same_value = event_target:tec_selected_psionic_species
-							}
-							is_sapient = yes
-						}
-						kill_pop = yes
-					}
-					add_deposit = d_tec_psionic_ascension_zone_1
-				}
+			create_variable_if_not_exists = {
+				VARIABLE = tec_psionic_planet_ascended_pops
+				VALUE_IF_CREATED = 0
 			}
-			else_if = { # 20+ pops, selects up to 2
-				limit = {
-					num_pops < 31
-					num_pops > 20
-				}
-				while = {
-					count = 2
-					random_owned_species = {
-						limit = {
+			while = {
+				count = value:tec_psionic_planet_ascension_pop_ascend
+				random_owned_pop = {
+					limit = {
+						species = {
 							tec_is_any_psionic_species = yes
 						}
-						save_event_target_as = tec_selected_psionic_species
+						is_sapient = yes
 					}
-					random_owned_pop = {
-						limit = {
-							species = {
-								is_same_value = event_target:tec_selected_psionic_species
-							}
-							is_sapient = yes
+					kill_pop = yes
+					prev = {
+						change_variable = {
+							which = tec_psionic_planet_ascended_pops
+							value = 1
 						}
-						kill_pop = yes
 					}
-					add_deposit = d_tec_psionic_ascension_zone_1
-				}
-			}
-			else_if = { # 30+ pops, selects up to 3
-				limit = {
-					num_pops < 41
-					num_pops > 30
-				}
-				while = {
-					count = 3
-					random_owned_species = {
-						limit = {
-							tec_is_any_psionic_species = yes
-						}
-						save_event_target_as = tec_selected_psionic_species
-					}
-					random_owned_pop = {
-						limit = {
-							species = {
-								is_same_value = event_target:tec_selected_psionic_species
-							}
-							is_sapient = yes
-						}
-						kill_pop = yes
-					}
-					add_deposit = d_tec_psionic_ascension_zone_1
-				}
-			}
-			else_if = { # 40+ pops, selects up to 4
-				limit = {
-					num_pops < 51
-					num_pops > 40
-				}
-				while = {
-					count = 4
-					random_owned_species = {
-						limit = {
-							tec_is_any_psionic_species = yes
-						}
-						save_event_target_as = tec_selected_psionic_species
-					}
-					random_owned_pop = {
-						limit = {
-							species = {
-								is_same_value = event_target:tec_selected_psionic_species
-							}
-							is_sapient = yes
-						}
-						kill_pop = yes
-					}
-					add_deposit = d_tec_psionic_ascension_zone_1
-				}
-			}
-			else_if = { # 50+ pops, selects up to 5
-				limit = {
-					num_pops > 50
-				}
-				while = {
-					count = 5
-					random_owned_species = {
-						limit = {
-							tec_is_any_psionic_species = yes
-						}
-						save_event_target_as = tec_selected_psionic_species
-					}
-					random_owned_pop = {
-						limit = {
-							species = {
-								is_same_value = event_target:tec_selected_psionic_species
-							}
-							is_sapient = yes
-						}
-						kill_pop = yes
-					}
-					add_deposit = d_tec_psionic_ascension_zone_1
 				}
 			}
 		}
@@ -7839,127 +7691,26 @@ namespace = tec_psionic_path
 		}
 
 		immediate = {
-			if = { # 10+ pops, selects 1
-				limit = {
-					num_pops < 21
-				}
-				while = {
-					count = 1
-					random_owned_species = {
-						limit = {
-							tec_is_any_psionic_species = yes
-						}
-						save_event_target_as = tec_selected_psionic_species
-					}
-					random_owned_pop = {
-						limit = {
-							species = {
-								is_same_value = event_target:tec_selected_psionic_species
-							}
-							is_sapient = yes
-						}
-						kill_pop = yes
-					}
-					add_deposit = d_tec_psionic_ascension_zone_1
-				}
+			create_variable_if_not_exists = {
+				VARIABLE = tec_psionic_planet_ascended_pops
+				VALUE_IF_CREATED = 0
 			}
-			else_if = { # 20+ pops, selects up to 2
-				limit = {
-					num_pops < 31
-					num_pops > 20
-				}
-				while = {
-					count = 2
-					random_owned_species = {
-						limit = {
+			while = {
+				count = value:tec_psionic_planet_ascension_pop_ascend
+				random_owned_pop = {
+					limit = {
+						species = {
 							tec_is_any_psionic_species = yes
 						}
-						save_event_target_as = tec_selected_psionic_species
+						is_sapient = yes
 					}
-					random_owned_pop = {
-						limit = {
-							species = {
-								is_same_value = event_target:tec_selected_psionic_species
-							}
-							is_sapient = yes
+					kill_pop = yes
+					prev = {
+						change_variable = {
+							which = tec_psionic_planet_ascended_pops
+							value = 1
 						}
-						kill_pop = yes
 					}
-					add_deposit = d_tec_psionic_ascension_zone_1
-				}
-			}
-			else_if = { # 30+ pops, selects up to 3
-				limit = {
-					num_pops < 41
-					num_pops > 30
-				}
-				while = {
-					count = 3
-					random_owned_species = {
-						limit = {
-							tec_is_any_psionic_species = yes
-						}
-						save_event_target_as = tec_selected_psionic_species
-					}
-					random_owned_pop = {
-						limit = {
-							species = {
-								is_same_value = event_target:tec_selected_psionic_species
-							}
-							is_sapient = yes
-						}
-						kill_pop = yes
-					}
-					add_deposit = d_tec_psionic_ascension_zone_1
-				}
-			}
-			else_if = { # 40+ pops, selects up to 4
-				limit = {
-					num_pops < 51
-					num_pops > 40
-				}
-				while = {
-					count = 4
-					random_owned_species = {
-						limit = {
-							tec_is_any_psionic_species = yes
-						}
-						save_event_target_as = tec_selected_psionic_species
-					}
-					random_owned_pop = {
-						limit = {
-							species = {
-								is_same_value = event_target:tec_selected_psionic_species
-							}
-							is_sapient = yes
-						}
-						kill_pop = yes
-					}
-					add_deposit = d_tec_psionic_ascension_zone_1
-				}
-			}
-			else_if = { # 50+ pops, selects up to 5
-				limit = {
-					num_pops > 50
-				}
-				while = {
-					count = 5
-					random_owned_species = {
-						limit = {
-							tec_is_any_psionic_species = yes
-						}
-						save_event_target_as = tec_selected_psionic_species
-					}
-					random_owned_pop = {
-						limit = {
-							species = {
-								is_same_value = event_target:tec_selected_psionic_species
-							}
-							is_sapient = yes
-						}
-						kill_pop = yes
-					}
-					add_deposit = d_tec_psionic_ascension_zone_1
 				}
 			}
 		}
