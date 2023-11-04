@@ -98,6 +98,14 @@ situation_tec_psionic_planet_ascension = {
         icon_background = GFX_situation_approach_bg_tec_purple
         on_select = {
             custom_tooltip = situation_approach_tec_psionic_planet_ascension_normal_desc
+            hidden_effect = {
+                target = {
+                    remove_planet_flag = tec_psionic_planet_ascension_normal
+                    remove_planet_flag = tec_psionic_planet_ascension_slaves
+                    remove_planet_flag = tec_psionic_planet_ascension_xenos
+                    set_planet_flag = tec_psionic_planet_ascension_normal
+                }
+            }
         }
         default = yes
         resources = {
@@ -109,7 +117,12 @@ situation_tec_psionic_planet_ascension = {
                 sr_zro = 5
             }
         }
+
+        ai_weight = {
+            base = 1
+        }
     }
+
     approach = { # Accelerated
         name = situation_approach_tec_psionic_planet_ascension_forced
         icon = GFX_situation_approach_tec_mind
@@ -121,6 +134,12 @@ situation_tec_psionic_planet_ascension = {
         }
         on_select = {
             custom_tooltip = situation_approach_tec_psionic_planet_ascension_forced_desc
+            target = {
+                remove_planet_flag = tec_psionic_planet_ascension_normal
+                remove_planet_flag = tec_psionic_planet_ascension_slaves
+                remove_planet_flag = tec_psionic_planet_ascension_xenos
+                set_planet_flag = tec_psionic_planet_ascension_normal
+            }
         }
         resources = {
             category = situations
@@ -131,10 +150,85 @@ situation_tec_psionic_planet_ascension = {
                 sr_zro = 5
             }
             upkeep = {
+                sr_zro = 10
+            }
+        }
+
+        ai_weight = {
+            base = 0
+        }
+    }
+
+    approach = { # Slaves
+        name = situation_approach_tec_psionic_planet_ascension_slaves
+        icon = GFX_situation_approach_fist
+        icon_background = GFX_situation_approach_bg_tec_purple
+        on_select = {
+            custom_tooltip = situation_approach_tec_psionic_planet_ascension_slaves_desc
+            target = {
+                remove_planet_flag = tec_psionic_planet_ascension_normal
+                remove_planet_flag = tec_psionic_planet_ascension_slaves
+                remove_planet_flag = tec_psionic_planet_ascension_xenos
+                set_planet_flag = tec_psionic_planet_ascension_slaves
+            }
+        }
+        potential = {
+            exists = owner
+            owner = {
+                allows_slavery = yes
+            }
+        }
+
+        resources = {
+            category = situations
+            upkeep = {
+                trigger = {
+                    NOT = { has_situation_flag = situation_tec_psionic_first_ascension_planet }
+                }
                 sr_zro = 5
             }
         }
+
+        ai_weight = {
+            add = 10
+        }
     }
+
+    approach = { # Xenos
+        name = situation_approach_tec_psionic_planet_ascension_xenos
+        icon = GFX_situation_approach_kneel
+        icon_background = GFX_situation_approach_bg_tec_purple
+        on_select = {
+            custom_tooltip = situation_approach_tec_psionic_planet_ascension_xenos_desc
+            target = {
+                remove_planet_flag = tec_psionic_planet_ascension_normal
+                remove_planet_flag = tec_psionic_planet_ascension_slaves
+                remove_planet_flag = tec_psionic_planet_ascension_xenos
+                set_planet_flag = tec_psionic_planet_ascension_xenos
+            }
+        }
+        potential = {
+            exists = owner
+            owner = {
+                is_xenophobe = yes
+            }
+        }
+
+        resources = {
+            category = situations
+            upkeep = {
+                trigger = {
+                    NOT = { has_situation_flag = situation_tec_psionic_first_ascension_planet }
+                }
+                sr_zro = 5
+            }
+        }
+
+        ai_weight = {
+            add = 100
+        }
+    }
+
     # /
 
     monthly_progress = {
@@ -193,6 +287,16 @@ situation_tec_psionic_planet_ascension = {
             current_situation_approach = situation_approach_tec_psionic_planet_ascension_forced
         }
         modifier = {
+            add = 1
+            desc = situation_approach_tec_psionic_planet_ascension_slaves
+            current_situation_approach = situation_approach_tec_psionic_planet_ascension_slaves
+        }
+        modifier = {
+            add = 1
+            desc = situation_approach_tec_psionic_planet_ascension_xenos
+            current_situation_approach = situation_approach_tec_psionic_planet_ascension_xenos
+        }
+        modifier = {
             mult = 0.2
             desc = situation_tec_psionic_planet_ascension_slow_progression
             has_situation_flag = situation_tec_psionic_first_ascension_planet
@@ -200,6 +304,20 @@ situation_tec_psionic_planet_ascension = {
             NOT = {
                 owner = {
                     has_country_flag = tec_psionics_t2_completed
+                }
+            }
+        }
+        modifier = {
+            mult = 0
+            desc = sr_zro_deficit
+            exists = owner
+            owner = {
+                OR = {
+                    has_deficit = sr_zro
+                    has_modifier = sr_zro_deficit
+                    has_actual_deficit = {
+                        RESOURCE = sr_zro
+                    }
                 }
             }
         }
