@@ -72,14 +72,23 @@ species_can_live_on_planet = {
 #This = leader
 should_pay_for_leader_upkeep = {
 	# Moved to the leader economy block : leaders\inline_evolved_leader_base_upkeep.txt
-	always = yes
-	#NOT = {
+	NOR = {
+		has_leader_flag = marauder_merc_leader
+		has_leader_flag = hired_admiral_merc_leader
+
+		has_trait = leader_trait_spacebender
+		has_leader_flag = should_not_have_upkeep
+	}
+	# Vanilla ref
+	#NOR = {
 	#	AND = {
 	#		exists = owner
 	#		owner = {
 	#			is_gestalt = yes
 	#		}
 	#		is_councilor = yes
+	#		has_trait = leader_trait_spacebender
+	#		has_leader_flag = should_not_have_upkeep
 	#	}
 	#}
 	#NOR = {
@@ -287,6 +296,9 @@ can_release_vassal_from_species = {
 # Root = Planet
 can_species_be_assembled = {
 	is_sapient = yes
+	NOT = {
+		has_trait = trait_exd
+	}
 	tec_can_assemble_species_due_to_purity_assembly_policy = yes
 	has_population_control = {
 		type = no
@@ -516,7 +528,8 @@ can_fill_worker_job = {
 #this/root = pop
 #checked if job's possible_precalc = can_fill_specialist_job
 can_fill_specialist_job = {
-	can_fill_specialist_job = yes
+	can_fill_specialist_job_trigger = yes
+	# Defined in 01_scripted_triggers_jobs.txt
 }
 
 #this/root = pop
@@ -919,7 +932,7 @@ can_trade_leader = {
 	}
 	NOR = {
 		has_trait = leader_trait_fotd_scientist
-		has_trait = leader_trait_fotd_admiral
+		has_trait = leader_trait_fotd_commander
 	}
 }
 
@@ -1224,16 +1237,9 @@ should_count_towards_leader_cap = {
 
 # this = leader
 can_dismiss_leader = {
-	custom_tooltip = {	# Caelum
-		fail_text = "requires_actor_not_feudal_society"
-		exists = owner
-		owner = {
-			tec_is_feudal_empire = no
-		}
-	}
 	if = {
 		limit = {
-			leader_class = admiral
+			leader_class = commander
 			is_idle = no
 			# Rulers and heirs can't be dismissed any way and can be non-idle
 			is_ruler = no
@@ -1264,11 +1270,25 @@ can_dismiss_leader = {
 	}
 	if = {
 		limit = {
-			tec_is_aiauth_planetary_node = yes
+			leader_class = scientist
+		}
+		custom_tooltip = {
+			fail_text = "can_not_dismiss_rift_explorer"
+			NAND = {
+				exists = fleet
+				fleet = {
+					has_fleet_order = explore_astral_rift_fleet_order
+				}
+			}
+		}
+	}
+	if = {	# Evolved
+		limit = {
+			tec_is_aiauth_planetary_governing_node = yes
 		}
 		custom_tooltip = {
 			always = no
-			fail_text = "tec_can_not_dismiss_aiauth_planetary_nodes"
+			fail_text = "tec_can_not_dismiss_aiauth_planetary_governing_nodes"
 		}
 	}
 }

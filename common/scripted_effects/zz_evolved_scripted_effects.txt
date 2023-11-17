@@ -1,3 +1,5 @@
+# common\scripted_effects\zz_evolved_scripted_effects.txt
+
 tec_cache = {
 	optimize_memory
 	[[scope_redirect]
@@ -1214,7 +1216,7 @@ tec_country_create_aiauth_ruler  = {
 	set_country_flag = tec_force_councilor_traits
 	tec_country_aiauth_prepare_ai_species = yes
 	create_leader = {
-		class = $CLASS|governor$
+		class = $CLASS|official$
 		species = event_target:tec_ai_species
 		name = tec_aiauth_ruler
 		skill = 1
@@ -1295,28 +1297,19 @@ tec_country_create_aiauth_ruler_replace = {
 tec_country_refragment_aiauth_ruler  = {
 	if = {
 		limit = {
-			has_country_flag = tec_fragmenting_admiral
+			has_country_flag = tec_fragmenting_official
 		}
 		tec_country_create_aiauth_ruler = {
-			CLASS = admiral
+			CLASS = official
 			ETHIC = $ETHIC|ethic_gestalt_consciousness$
 		}
 	}
 	else_if = {
 		limit = {
-			has_country_flag = tec_fragmenting_general
+			has_country_flag = tec_fragmenting_commander
 		}
 		tec_country_create_aiauth_ruler = {
-			CLASS = general
-			ETHIC = $ETHIC|ethic_gestalt_consciousness$
-		}
-	}
-	else_if = {
-		limit = {
-			has_country_flag = tec_fragmenting_governor
-		}
-		tec_country_create_aiauth_ruler = {
-			CLASS = governor
+			CLASS = commander
 			ETHIC = $ETHIC|ethic_gestalt_consciousness$
 		}
 	}
@@ -1385,11 +1378,13 @@ tec_country_create_aiauth_councilor = {
 		set_owner = prev
 		set_leader_flag = tec_no_species_traits
 		add_trait_no_notify = leader_trait_tec_aiauth_node
-		[[COUNCIL_POS] set_council_position = $COUNCIL_POS$ ]
 		tec_leader_add_councilor_trait = yes
 		tec_leader_handle_starting_modifiers = {
 			from = prev
 		}
+		[[COUNCIL_POS]
+			set_council_position = $COUNCIL_POS$
+		]
 		set_gestalt_node_protrait_effect = yes
 		set_leader_flag = leader_death_events_blocked
 	}
@@ -1399,34 +1394,23 @@ tec_country_create_aiauth_councilor = {
 tec_country_refragment_aiauth_councilor = {
 	if = {
 		limit = {
-			has_country_flag = tec_fragmenting_admiral
+			has_country_flag = tec_fragmenting_official
 		}
 		tec_country_create_aiauth_councilor = {
-			CLASS = admiral
-			NAME = councilor_tec_aiauth_fragment_admiral
-			DESC = councilor_tec_aiauth_fragment_admiral_desc
+			CLASS = official
+			NAME = councilor_tec_aiauth_fragment_official
+			DESC = councilor_tec_aiauth_fragment_official_desc
 			ETHIC = $ETHIC|ethic_gestalt_consciousness$
 		}
 	}
 	else_if = {
 		limit = {
-			has_country_flag = tec_fragmenting_general
+			has_country_flag = tec_fragmenting_commander
 		}
 		tec_country_create_aiauth_councilor = {
-			CLASS = general
-			NAME = councilor_tec_aiauth_fragment_general
-			DESC = councilor_tec_aiauth_fragment_general_desc
-			ETHIC = $ETHIC|ethic_gestalt_consciousness$
-		}
-	}
-	else_if = {
-		limit = {
-			has_country_flag = tec_fragmenting_governor
-		}
-		tec_country_create_aiauth_councilor = {
-			CLASS = governor
-			NAME = councilor_tec_aiauth_fragment_governor
-			DESC = councilor_tec_aiauth_fragment_governor_desc
+			CLASS = commander
+			NAME = councilor_tec_aiauth_fragment_commander
+			DESC = councilor_tec_aiauth_fragment_commander_desc
 			ETHIC = $ETHIC|ethic_gestalt_consciousness$
 		}
 	}
@@ -1443,37 +1427,87 @@ tec_country_refragment_aiauth_councilor = {
 	}
 }
 
-tec_country_create_aiauth_planetary_node = {
+tec_country_create_aiauth_planetary_governing_node = {
 	set_country_flag = tec_force_normal_traits
 	tec_country_aiauth_prepare_ai_species = yes
-	create_leader = {
-		class = governor
-		species = event_target:tec_ai_species
-		name = tec_aiauth_planetary_governor
-		skill = 1
-		gender = indeterminable
-		event_leader = yes
-		skip_background_generation = yes
-		can_manually_change_location = no
-		hide_leader = no
-		can_assign_to_council = no
-		custom_description = tec_aiauth_planetary_governor_desc
-		randomize_traits = yes
-		background_ethic = $ETHIC|ethic_gestalt_consciousness$
-		effect = {
-			save_event_target_as = tec_aiauth_planetary_node
+	ruler = {
+		save_event_target_as = tec_aiauth_ruler
+	}
+	if = {
+		limit = { ruler = { leader_class = official } }
+		create_leader = {
+			#class = event_target:tec_aiauth_ruler
+			# ^ somehow this doesn't work
+			class = official
+			species = event_target:tec_ai_species.leader_class
+			name = tec_aiauth_planetary_governing_node
+			skill = 1
+			gender = indeterminable
+			event_leader = yes
+			skip_background_generation = yes
+			can_manually_change_location = no
+			hide_leader = no
+			can_assign_to_council = no
+			custom_description = tec_aiauth_planetary_governing_node_desc
+			randomize_traits = yes
+			background_ethic = $ETHIC|ethic_gestalt_consciousness$
+			effect = {
+				save_event_target_as = tec_aiauth_planetary_governing_node
+			}
 		}
 	}
-	event_target:tec_aiauth_planetary_node = {
+	else_if = {
+		limit = { ruler = { leader_class = commander } }
+		create_leader = {
+			class = commander
+			species = event_target:tec_ai_species.leader_class
+			name = tec_aiauth_planetary_governing_node
+			skill = 1
+			gender = indeterminable
+			event_leader = yes
+			skip_background_generation = yes
+			can_manually_change_location = no
+			hide_leader = no
+			can_assign_to_council = no
+			custom_description = tec_aiauth_planetary_governing_node_desc
+			randomize_traits = yes
+			background_ethic = $ETHIC|ethic_gestalt_consciousness$
+			effect = {
+				save_event_target_as = tec_aiauth_planetary_governing_node
+			}
+		}
+	}
+	else_if = {
+		limit = { ruler = { leader_class = scientist } }
+		create_leader = {
+			class = scientist
+			species = event_target:tec_ai_species.leader_class
+			name = tec_aiauth_planetary_governing_node
+			skill = 1
+			gender = indeterminable
+			event_leader = yes
+			skip_background_generation = yes
+			can_manually_change_location = no
+			hide_leader = no
+			can_assign_to_council = no
+			custom_description = tec_aiauth_planetary_governing_node_desc
+			randomize_traits = yes
+			background_ethic = $ETHIC|ethic_gestalt_consciousness$
+			effect = {
+				save_event_target_as = tec_aiauth_planetary_governing_node
+			}
+		}
+	}
+	event_target:tec_aiauth_planetary_governing_node = {
 		set_leader_flag = tec_no_species_traits
-		add_trait_no_notify = leader_trait_tec_aiauth_planetary_node
+		add_trait_no_notify = leader_trait_tec_aiauth_planetary_governing_node
 		set_owner = prev
 		tec_leader_handle_starting_modifiers = {
 			from = prev
 		}
 		set_name = {
-			key = "tec_aiauth_planetary_governor"
-			variable_string = "\\[tec_aiauth_planetary_governor_planet\\]"
+			key = "tec_aiauth_planetary_governing_node"
+			variable_string = "\\[tec_aiauth_planetary_governing_node_planet\\]"
 		}
 		set_gestalt_node_protrait_effect = yes
 		set_leader_flag = leader_death_events_blocked

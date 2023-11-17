@@ -2,18 +2,137 @@
 
 @leader_unity_upkeep = 2
 @tec_leader_cg_upkeep = 0.5
+@base_leader_cap = 3
 
-admiral = {
-	name = admiral
-	name_plural = admiral_plural
-	description = admiral_description
-	can_lead_navy = yes
+official = {
+	name = official
+	name_plural = official_plural
+	description = official_description
+	can_govern_planet = yes
 	max_trait_points = 1
 	can_have_traits = yes
+	can_be_assigned_to_federation = yes
+	can_be_assigned_to_galactic_community = yes
+	leader_capacity = @base_leader_cap
 	resources = {
-		category = leader_admirals
+		category = leader_officials
 		cost = {
-			unity = 70
+			unity = 1
+			mult = value:leader_cost
+		}
+		# Upkeeps
+			#inline_script = "paragon/leader_base_upkeep"
+			# Moved to my own inline for better control
+			inline_script = leaders/inline_evolved_leader_base_upkeep
+		# /
+		# Production
+			produces = {
+				trigger = {
+					exists = owner
+					owner = {
+						has_tradition = tr_politics_adopt
+					}
+					OR = {
+						is_assigned_to_galcom = yes
+						is_strengthing_imperial_authority = yes
+						is_undermining_imperial_authority = yes
+					}
+				}
+				influence = 0.1
+				mult = trigger:has_skill
+			}
+
+			produces = {
+				trigger = {
+					is_idle = no
+					exists = owner
+					owner = {
+						tec_produces_energy_from_officials = yes
+					}
+				}
+				energy = 2
+				multiplier = value:tec_leader_official_production|MULT|1|
+			}
+			produces = {
+				trigger = {
+					is_idle = no
+					exists = owner
+					owner = {
+						tec_produces_unity_from_officials = yes
+					}
+				}
+				unity = 2
+				multiplier = value:tec_leader_official_production|MULT|1|
+			}
+			produces = {
+				trigger = {
+					is_idle = no
+					exists = owner
+					owner = {
+						tec_produces_research_from_officials = yes
+					}
+				}
+				physics_research = 2
+				society_research = 2
+				engineering_research = 2
+				multiplier = value:tec_leader_official_production|MULT|1|
+			}
+		# /
+	}
+
+	ai_weight = {
+		modifier = {
+			factor = 2
+			or = {
+				is_pacifist = yes
+				is_egalitarian = yes
+			}
+		}
+	}
+
+	replaces_old_class = "governor"
+
+	leader_background_job_weight = {
+		high_priest = 100
+		politician = 100
+		noble = 100
+		merchant = 100
+		executive = 100
+		colonist = 100
+		priest = 100
+		culture_worker = 100
+		bureaucrat = 100
+		unifier = 100
+		manager = 100
+		entertainer = 100
+		death_chronicler = 100
+		artisan = 100
+		reassigner = 100
+		clerk = 100
+		miner = 100
+		crystal_miner = 100
+		farmer = 100
+		preacher = 100
+		scrap_miner = 100
+		angler = 100
+	}
+	icon = 4
+}
+
+commander = {
+	name = commander
+	name_plural = commander_plural
+	description = commander_description
+	can_lead_navy = yes
+	can_lead_army = yes
+	can_govern_planet = yes
+	max_trait_points = 1
+	can_have_traits = yes
+	leader_capacity = @base_leader_cap
+	resources = {
+		category = leader_commanders
+		cost = {
+			unity = 1
 			mult = value:leader_cost
 		}
 		# Upkeeps
@@ -28,7 +147,7 @@ admiral = {
 					is_idle = no
 					exists = owner
 					owner = {
-						tec_produces_energy_from_admirals = yes
+						tec_produces_energy_from_commanders = yes
 					}
 				}
 				energy = 2
@@ -40,11 +159,11 @@ admiral = {
 					is_idle = no
 					exists = owner
 					owner = {
-						tec_produces_scaled_unity_from_admirals = yes
+						tec_produces_scaled_unity_from_commanders = yes
 					}
 				}
 				unity = 1
-				multiplier = value:tec_leader_admiral_production|MULT|1|
+				multiplier = value:tec_leader_commander_production|MULT|1|
 				# 1 * 15 size fleet * 1 * 1.2 (level 2) = 18 res
 				# 1 * 100 fleet size * 1 * 1.5 (level 5) = 150 res
 			}
@@ -53,20 +172,19 @@ admiral = {
 					is_idle = no
 					exists = owner
 					owner = {
-						tec_produces_scaled_research_from_admirals = yes
+						tec_produces_scaled_research_from_commanders = yes
 					}
 				}
 				physics_research = 1
 				society_research = 1
 				engineering_research = 1
-				multiplier = value:tec_leader_admiral_production|MULT|1|
+				multiplier = value:tec_leader_commander_production|MULT|1|
 				# 1 * 15 size fleet * 1 * 1.2 (level 2) = 18 res
 				# 1 * 100 fleet size * 1 * 1.5 (level 5) = 150 res
 			}
 		# /
 	}
 
-	default_category = admiral
 	ai_weight = {
 		modifier = {
 			factor = 2
@@ -76,74 +194,10 @@ admiral = {
 			}
 		}
 	}
-	leader_background_job_weight = {
-		noble = 100
-		knight_commander = 100
-		death_priest = 100
-		duelist = 100
-		knight = 100
-		ranger = 100
-		squire = 100
-	}
-}
 
-general = {
-	name = general
-	name_plural = general_plural
-	description = general_description
-	can_lead_army = yes
-	max_trait_points = 1
-	can_have_traits = yes
-	resources = {
-		category = leader_generals
-		cost = {
-			unity = 70
-			mult = value:leader_cost
-		}
-		# Upkeeps
-			#inline_script = "paragon/leader_base_upkeep"
-			# Moved to my own inline for better control
-			inline_script = leaders/inline_evolved_leader_base_upkeep
-		# /
-		# Production
-			produces = {
-				trigger = {
-					is_idle = no
-					exists = owner
-					owner = {
-						tec_produces_energy_from_generals = yes
-					}
-				}
-				energy = 2
-				multiplier = value:tec_leader_scripted_production|BASE|1|
-			}
-			produces = {
-				trigger = {
-					is_idle = no
-					exists = owner
-					owner = {
-						tec_produces_unity_from_generals = yes
-					}
-				}
-				unity = 2
-				multiplier = value:tec_leader_scripted_production|BASE|1|
-			}
-			produces = {
-				trigger = {
-					is_idle = no
-					exists = owner
-					owner = {
-						tec_produces_research_from_generals = yes
-					}
-				}
-				physics_research = 2
-				society_research = 2
-				engineering_research = 2
-				multiplier = value:tec_leader_scripted_production|BASE|1|
-			}
-		# /
-	}
-	default_category = general
+	replaces_old_class = "admiral"
+	replaces_old_class = "general"
+
 	leader_background_job_weight = {
 		noble = 100
 		knight_commander = 100
@@ -153,19 +207,30 @@ general = {
 		ranger = 100
 		squire = 100
 	}
+	icon = 1
 }
 
 scientist = {
 	name = scientist
 	name_plural = scientist_plural
 	description = scientist_description
-	can_research = yes
+	can_research_tech = yes
+	can_research_special_projects = yes
+	can_crew_science_ship = yes
+	can_research_anomalies = yes
+	can_survey = yes
+	can_boost_cloaking_detection = yes
+	can_research_archaeology_site = yes
+	can_explore_rifts = yes
+	can_conduct_active_reconnaissance = yes
+	can_govern_planet = yes
 	max_trait_points = 1
 	can_have_traits = yes
+	leader_capacity = @base_leader_cap
 	resources = {
 		category = leader_scientists
 		cost = {
-			unity = 70
+			unity = 1
 			mult = value:leader_cost
 		}
 		# Upkeeps
@@ -280,7 +345,6 @@ scientist = {
 			}
 		# /
 	}
-	default_category = scientist
 
 	ai_weight = {
 		base = 50
@@ -307,100 +371,7 @@ scientist = {
 		mote_harvester = 100
 		puddle_technician = 100
 	}
-}
-
-governor = {
-	name = governor
-	name_plural = governor_plural
-	description = governor_description
-	can_govern_planet = yes
-	max_trait_points = 1
-	can_have_traits = yes
-	resources = {
-		category = leader_governors
-		cost = {
-			unity = 70
-			mult = value:leader_cost
-		}
-		# Upkeeps
-			#inline_script = "paragon/leader_base_upkeep"
-			# Moved to my own inline for better control
-			inline_script = leaders/inline_evolved_leader_base_upkeep
-		# /
-		# Production
-			produces = {
-				trigger = {
-					is_idle = no
-					exists = owner
-					owner = {
-						tec_produces_energy_from_governors = yes
-					}
-				}
-				energy = 2
-				multiplier = value:tec_leader_governor_production|MULT|1|
-			}
-			produces = {
-				trigger = {
-					is_idle = no
-					exists = owner
-					owner = {
-						tec_produces_unity_from_governors = yes
-					}
-				}
-				unity = 2
-				multiplier = value:tec_leader_governor_production|MULT|1|
-			}
-			produces = {
-				trigger = {
-					is_idle = no
-					exists = owner
-					owner = {
-						tec_produces_research_from_governors = yes
-					}
-				}
-				physics_research = 2
-				society_research = 2
-				engineering_research = 2
-				multiplier = value:tec_leader_governor_production|MULT|1|
-			}
-		# /
-	}
-
-	ai_weight = {
-		modifier = {
-			factor = 2
-			or = {
-				is_pacifist = yes
-				is_egalitarian = yes
-			}
-		}
-	}
-
-	default_category = governor
-	leader_background_job_weight = {
-		high_priest = 100
-		politician = 100
-		noble = 100
-		merchant = 100
-		executive = 100
-		colonist = 100
-		priest = 100
-		culture_worker = 100
-		bureaucrat = 100
-		unifier = 100
-		manager = 100
-		entertainer = 100
-		death_chronicler = 100
-		artisan = 100
-		reassigner = 100
-		clerk = 100
-		miner = 100
-		crystal_miner = 100
-		farmer = 100
-		preacher = 100
-		scrap_miner = 100
-		angler = 100
-	}
+	icon = 3
 }
 
 envoy = {
@@ -411,29 +382,9 @@ envoy = {
 	default_category = envoy
 	assignment_cooldown = 360
 	can_have_traits = no
-	resources = {
-		category = leader_envoys
-		produces = {
-			trigger = {
-				is_idle = no
-				exists = owner
-				owner = {
-					has_tradition = tr_politics_adopt
-				}
-				OR = {
-					has_envoy_task = {
-						task = galactic_community
-					}
-					has_envoy_task = {
-						task = strengthen_imperial_authority
-					}
-					has_envoy_task = {
-						task = undermine_imperial_authority
-					}
-				}
-			}
-			influence = 0.1
-		}
-	}
+	recruitable = no
+	can_rule_empire = no
+	can_be_assigned_to_federation = no
+	can_be_assigned_to_galactic_community = no
+	icon = 5
 }
-

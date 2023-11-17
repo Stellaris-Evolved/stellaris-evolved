@@ -192,7 +192,7 @@ inline_script = {
 * [buildings/effects/type/inline_evolved_foundry](common/inline_scripts/buildings/effects/type/inline_evolved_foundry.txt)
 * [buildings/effects/type/inline_evolved_healthcare](common/inline_scripts/buildings/effects/type/inline_evolved_healthcare.txt)
 * [buildings/effects/type/inline_evolved_hydroponics_farm](common/inline_scripts/buildings/effects/type/inline_evolved_hydroponics_farm.txt)
-* [buildings/effects/type/inline_evolved_military_academy](common/inline_scripts/buildings/effects/type/inline_evolved_military_academy.txt)
+* [buildings/effects/type/inline_evolved_military_booster](common/inline_scripts/buildings/effects/type/inline_evolved_military_booster.txt)
 * [buildings/effects/type/inline_evolved_mineral_purification_plant](common/inline_scripts/buildings/effects/type/inline_evolved_mineral_purification_plant.txt)
 * [buildings/effects/type/inline_evolved_ministry_production](common/inline_scripts/buildings/effects/type/inline_evolved_ministry_production.txt)
 * [buildings/effects/type/inline_evolved_monument](common/inline_scripts/buildings/effects/type/inline_evolved_monument.txt)
