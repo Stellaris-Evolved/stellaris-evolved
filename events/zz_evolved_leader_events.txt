@@ -776,9 +776,6 @@ country_event = { # Remnants - Adds a Archaeostudies Expertise trait / FROM = Le
 	is_triggered_only = yes
 
 	trigger = {
-		# DLC
-		has_ancrel = yes
-		has_origin = origin_remnants
 		tec_country_leader_gets_starting_actions = yes
 		from = { 
 			tec_leader_gets_starting_actions = { flag = tec_remnant_traits } 
@@ -786,24 +783,86 @@ country_event = { # Remnants - Adds a Archaeostudies Expertise trait / FROM = Le
 		}
 		exists = owner
 		# VALID EMPIRE
-		has_valid_civic = civic_crusader_spirit_corporate
-		FROM = {
-			leader_class = scientist
-			OR = {
-				is_councilor_type = councilor_research
-				is_councilor_type = councilor_gestalt_cognitive
-				is_councilor_type = councilor_tec_aiauth_development
-			}
-		}
+		has_ancrel = yes
+		has_origin = origin_remnants
+		days_passed < 3
 	}
 
 	immediate = {
 		set_country_flag = tec_force_allow_all_traits
-		FROM = {
+		#FROM = {
+		#	add_trait_no_notify = leader_trait_expertise_archaeostudies
+		#	set_leader_flag = tec_remnant_traits
+		#}
+		every_owned_leader = {
+			limit = {
+				OR = {
+					is_councilor_type = councilor_research
+					is_councilor_type = councilor_gestalt_cognitive
+					is_councilor_type = councilor_tec_aiauth_development
+					AND = { # AIAUTH Fallback
+						is_ruler = no
+						has_trait = leader_trait_tec_aiauth_node
+						leader_class = scientist
+					}
+				}
+			}
 			add_trait_no_notify = leader_trait_expertise_archaeostudies
 			set_leader_flag = tec_remnant_traits
 		}
 		remove_country_flag = tec_force_allow_all_traits
 	}
-}
 
+	#after = {	# Safe measure
+	#	if = {
+	#		limit = {
+	#			any_owned_leader = {
+	#				OR = {
+	#					is_councilor_type = councilor_research
+	#					is_councilor_type = councilor_gestalt_cognitive
+	#					is_councilor_type = councilor_tec_aiauth_development
+	#				}
+	#				NOT = {
+	#					has_trait = leader_trait_expertise_archaeostudies
+	#				}
+	#			}
+	#		}
+	#		random_owned_leader = {
+	#			limit = {
+	#				OR = {
+	#					is_councilor_type = councilor_research
+	#					is_councilor_type = councilor_gestalt_cognitive
+	#					is_councilor_type = councilor_tec_aiauth_development
+	#				}
+	#				NOT = {
+	#					has_trait = leader_trait_expertise_archaeostudies
+	#				}
+	#			}
+	#			leader_event = {
+	#				id = tec_leaders_replace.10501
+	#				days = 1
+	#			}
+	#		}
+	#	}
+	#}
+}
+leader_event = {
+	id = tec_leaders_replace.10501
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		always = yes
+	}
+	immediate = {
+		owner = {
+			set_country_flag = tec_force_allow_all_traits
+		}
+		add_trait_no_notify = leader_trait_expertise_archaeostudies
+		set_leader_flag = tec_remnant_traits
+		owner = {
+			remove_country_flag = tec_force_allow_all_traits
+		}
+	}
+}
