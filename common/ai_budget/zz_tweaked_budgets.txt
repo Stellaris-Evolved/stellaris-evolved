@@ -207,7 +207,7 @@ tec_expenditure_zro_blockers = {	# extremehigh and priority because psionics
 		}
 
 		weight = {
-			weight = 0.5
+			weight = 0.8
 		}
 	}
 
@@ -223,7 +223,7 @@ tec_expenditure_zro_blockers = {	# extremehigh and priority because psionics
 		}
 
 		weight = {
-			weight = 0.8
+			weight = 1
 		}
 	}
 
@@ -238,7 +238,22 @@ tec_expenditure_zro_blockers = {	# extremehigh and priority because psionics
 		}
 
 		weight = {
-			weight = 0.6
+			weight = 1.5
+		}
+	}
+
+	tec_food_expenditure_planets_high = {
+		resource = food
+		type = expenditure
+		category = planets
+
+		potential = {
+			resource_stockpile_compare = { resource = food value >= 5000 }
+			tec_uses_food_buildings = yes
+		}
+
+		weight = {
+			weight = 2.2
 		}
 	}
 # /
@@ -274,7 +289,7 @@ tec_expenditure_zro_blockers = {	# extremehigh and priority because psionics
 		}
 
 		weight = {
-			weight = 0.4
+			weight = 0.25
 		}
 	}
 
@@ -289,7 +304,7 @@ tec_expenditure_zro_blockers = {	# extremehigh and priority because psionics
 		}
 
 		weight = {
-			weight = 0.5
+			weight = 0.15
 		}
 	}
 
@@ -320,7 +335,7 @@ tec_expenditure_zro_blockers = {	# extremehigh and priority because psionics
 		}
 	
 		weight = {
-			weight = 0.1
+			weight = 0.15
 		}
 	}
 	
@@ -335,7 +350,22 @@ tec_expenditure_zro_blockers = {	# extremehigh and priority because psionics
 		}
 	
 		weight = {
-			weight = 0.05
+			weight = 0.1
+		}
+	}
+
+	tec_food_expenditure_stations_high = {
+		resource = food
+		type = expenditure
+		category = stations
+	
+		potential = {
+			tec_uses_food_buildings = yes
+			resource_stockpile_compare = { resource = food value >= 5000 }
+		}
+	
+		weight = {
+			weight = 0.03
 		}
 	}
 # /
@@ -346,6 +376,7 @@ tec_food_expenditure_decisions = {
 	category = decisions
 
 	potential = {
+		tec_uses_food_buildings = no
 		resource_stockpile_compare = { resource = food value >= 500 }
 	}
 
@@ -363,12 +394,93 @@ tec_food_expenditure_decision_doit = {
 		resource_stockpile_compare = { resource = food value >= 500 }
 		AND = {
 			is_ai = yes
+			tec_uses_food_buildings = no
 			has_country_flag = tec_ai_use_food_for_worlds
 		}
 	}
 
 	weight = {
 		weight = 0.8
+	}
+}
+
+#food user fix since ratios were way too high for them
+
+food_expenditure_buffer_food_user = { # Buffer, will not be spent
+	resource = food
+	type = expenditure
+	category = buffer
+
+	potential = {
+		tec_uses_food_buildings = yes
+	}
+
+	weight = {
+		weight = 0.05
+	}
+}
+
+tec_food_expenditure_decisions_food_user = {
+	resource = food
+	type = expenditure
+	category = decisions
+
+	potential = {
+		tec_uses_food_buildings = yes
+		resource_stockpile_compare = { resource = food value >= 500 }
+	}
+
+	weight = {
+		weight = 0.1
+	}
+}
+
+tec_food_expenditure_decision_doit_food_user = {
+	resource = food
+	type = expenditure
+	category = decisions
+
+	potential = {
+		resource_stockpile_compare = { resource = food value >= 500 }
+		AND = {
+			is_ai = yes
+			tec_uses_food_buildings = yes
+			has_country_flag = tec_ai_use_food_for_worlds
+		}
+	}
+
+	weight = {
+		weight = 0.1
+	}
+}
+
+#Colonies for food empire, more at low food, lower at higher food
+#It sometimes happened that the AI was locked during war, making it stockpile budget for colonies it couldn't spend. This fixes that.
+#slightly reduced over vanilla
+food_expenditure_colonies_expand_food_user = {
+	resource = food
+	type = expenditure
+	category = colonies
+
+	potential = {
+		is_machine_empire = no
+		is_lithoid_empire = no
+		tec_uses_food_buildings = yes
+		NOT = { has_origin = origin_tree_of_life }
+		ai_colonize_plans > 0
+		has_resource = { type = food amount > 400 }
+		has_monthly_income = {
+			resource = food
+			value > 0
+		}
+	}
+
+	weight = {
+		weight = 1.0
+	}
+
+	desired_max = {
+		base = 550
 	}
 }
 
