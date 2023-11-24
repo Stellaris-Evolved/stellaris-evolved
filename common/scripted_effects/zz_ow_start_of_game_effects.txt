@@ -657,17 +657,65 @@ void_dweller_home_planet_setup = {	# Caelum
 		}
 		add_research_option = tech_habitat_2
 
-		if = {
+		if = {	# Energy
 			limit = {
-				OR = {
-					is_lithoid_empire = no
+				always = yes
+			}
+			give_technology = {
+				tech = tech_tec_energy_plant
+				message = no
+			}
+		}
+		if = {	# Minerals
+			limit = {
+				any_owned_species = {
 					OR = {
-						is_machine_empire = no
-						is_catalytic_empire = yes
-						has_valid_civic = civic_machine_assimilator
-						has_valid_civic = civic_machine_servitor
+						is_lithoid = yes
+						has_trait = trait_tec_machine_clockwork
 					}
 				}
+				is_catalytic_empire = no
+			}
+			give_technology = {
+				tech = tech_powered_exoskeletons
+				message = no
+			}
+			give_technology = {
+				tech = tech_space_mining_1
+				message = no
+			}
+			give_technology = {
+				tech = tech_tec_mining_array
+				message = no
+			}
+			#Note: removed this as those serve a diff purpose in evolved
+			#root.solar_system.starbase = {
+			#	remove_starbase_building = {
+			#		slot = 1
+			#	}
+			#	set_starbase_building = {
+			#		slot = 1
+			#		building = mining_bay
+			#	}
+			#}
+		}
+		if = {	# Food
+			limit = {
+				OR = {
+					NOT = {
+						any_owned_species = {
+							OR = {
+								is_lithoid = yes
+								has_trait = trait_tec_machine_clockwork
+							}
+						}
+					}
+					is_catalytic_empire = yes
+				}
+			}
+			give_technology = {
+				tech = tech_powered_exoskeletons
+				message = no
 			}
 			give_technology = {
 				tech = tech_eco_simulation
@@ -685,26 +733,6 @@ void_dweller_home_planet_setup = {	# Caelum
 			#	set_starbase_building = {
 			#		slot = 1
 			#		building = hydroponics_bay
-			#	}
-			#}
-		}
-		else = {
-			give_technology = {
-				tech = tech_powered_exoskeletons
-				message = no
-			}
-			give_technology = {
-				tech = tech_space_mining_1
-				message = no
-			}
-			#Note: removed this as those serve a diff purpose in evolved
-			#root.solar_system.starbase = {
-			#	remove_starbase_building = {
-			#		slot = 1
-			#	}
-			#	set_starbase_building = {
-			#		slot = 1
-			#		building = mining_bay
 			#	}
 			#}
 		}
@@ -915,62 +943,182 @@ void_dweller_home_planet_setup = {	# Caelum
 	add_deposit = d_tec_minor_arcane_replicator
 
 	# Districts
-	while = {
-		count = 3
-		# Upped from 2
-		add_district = {
-			district_type = district_hab_housing
-			ignore_cap = yes
+		while = {
+			count = 2
+			add_district = {
+				district_type = district_hab_housing
+				ignore_cap = yes
+			}
 		}
-	}
-	while = {
-		count = 3
-		add_district = {
-			district_type = district_hab_industrial
-			ignore_cap = yes
+		while = {
+			count = 3
+			add_district = {
+				district_type = district_hab_industrial
+				ignore_cap = yes
+			}
 		}
-	}
-	#Adds mining districts
+		# Always allowed to be a mining habitat
 		set_planet_flag = mining_habitat
 		change_variable = {
 			which = tec_hab_menial_districts
 			value = 1
 		}
-		while = {
-			count = 2
-			add_district = {
-				district_type = district_hab_mining
-				ignore_cap = yes
+		
+		# Base
+		if = {	# Fallback
+			limit = {
+				owner = {
+					is_lithoid_empire = no
+					is_machine_empire = no
+				}
 			}
-		}
-	# /
-	if = {
-		limit = {
-			owner = {
-				is_catalytic_empire = no
+			if = {
+				limit = {
+					NOT = {
+						has_planet_flag = tec_food_habitat
+					}
+				}
+				set_planet_flag = tec_food_habitat
+				change_variable = {
+					which = tec_hab_menial_districts
+					value = 1
+				}
 			}
-		}
-		add_district = district_hab_mining
-	}
-	else = {
-		set_planet_flag = tec_food_habitat
-		change_variable = {
-			which = tec_hab_menial_districts
-			value = 1
-		}
-		remove_district = district_hab_mining
-		remove_district = district_hab_mining
-		while = {
-			count = 3
 			add_district = {
 				district_type = district_tec_hab_food
 				ignore_cap = yes
 			}
 		}
-	}
+		if = {	# Fallback Lithoid
+			limit = {
+				owner = {
+					is_lithoid_empire = yes
+					is_machine_empire = no
+				}
+			}
+			if = {
+				limit = {
+					NOT = {
+						has_planet_flag = mining_habitat
+					}
+				}
+				set_planet_flag = mining_habitat
+				change_variable = {
+					which = tec_hab_menial_districts
+					value = 1
+				}
+			}
+			add_district = {
+				district_type = district_hab_mining
+				ignore_cap = yes
+			}
+		}
+		if = {	# Fallback machine
+			limit = {
+				owner = {
+					is_machine_empire = yes
+				}
+			}
+			if = {
+				limit = {
+					NOT = {
+						has_planet_flag = energy_habitat
+					}
+				}
+				set_planet_flag = energy_habitat
+				change_variable = {
+					which = tec_hab_menial_districts
+					value = 1
+				}
+			}
+			add_district = {
+				district_type = district_hab_energy
+				ignore_cap = yes
+			}
+		}
+		if = {	# Energy
+			limit = {
+				owner = {
+					OR = {
+						tec_is_quantum_alloys_empire = yes
+						tec_is_cyberarch_empire = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					NOT = {
+						has_planet_flag = energy_habitat
+					}
+				}
+				set_planet_flag = energy_habitat
+				change_variable = {
+					which = tec_hab_menial_districts
+					value = 1
+				}
+			}
+			while = {
+				count = 3
+				add_district = {
+					district_type = district_hab_energy
+					ignore_cap = yes
+				}
+			}
+		}
+		if = {	# Minerals
+			limit = {
+				owner = {
+					NOR = {
+						# Energy based
+						tec_is_quantum_alloys_empire = yes
+						tec_is_cyberarch_empire = yes
+						# Food based
+						is_catalytic_empire = yes
+						tec_is_bioarch_empire = yes
+					}
+				}
+			}
+			while = {
+				count = 3
+				add_district = {
+					district_type = district_hab_mining
+					ignore_cap = yes
+				}
+			}
+		}
+		if = {	# Food
+			limit = {
+				owner = {
+					OR = {
+						is_catalytic_empire = yes
+						tec_is_bioarch_empire = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					NOT = {
+						has_planet_flag = tec_food_habitat
+					}
+				}
+				set_planet_flag = tec_food_habitat
+				change_variable = {
+					which = tec_hab_menial_districts
+					value = 1
+				}
+			}
+			while = {
+				count = 3
+				add_district = {
+					district_type = district_tec_hab_food
+					ignore_cap = yes
+				}
+			}
+		}
+	# /
 	#buildings
 	tec_start_add_major_habitat_capital = yes
-		#if = {
+	#if = {
 		#	limit = {
 		#		owner = {
 		#			is_eager_explorer_empire = no
@@ -989,63 +1137,82 @@ void_dweller_home_planet_setup = {	# Caelum
 		#		district_type = district_hab_mining
 		#		ignore_cap = yes
 		#	}
-		#}
-	if = {
-		limit = {
-			owner = {
-				OR = {
-					is_lithoid_empire = no
-					is_catalytic_empire = yes
-				}
-			}
-		}
-		if = {
-			limit = {	# Non organic machines
+	#}
+	# Extra buildings
+		if = {	# BASE Energy
+			limit = {
 				owner = {
-					country_uses_food = no
+					any_owned_species = {
+						OR = {
+							is_robotic = yes
+							is_phototrophic = yes
+						}
+					}
 				}
 			}
 			add_building = building_tec_energrid_1
-			add_building = building_tec_energrid_1
-			add_building = building_tec_energrid_1
 		}
-		else = {
-			add_building = building_hydroponics_farm
-			add_building = building_hydroponics_farm
-			add_building = building_hydroponics_farm
-		}
-	}
-	else_if = {
-		limit = {
-			owner = {
-				tec_is_quantum_alloys_empire = yes
-				is_lithoid_empire = no
+		if = {	# BASE Minerals
+			limit = {
+				owner = {
+					any_owned_species = {
+						OR = {
+							is_lithoid = yes
+							has_trait = trait_tec_machine_clockwork
+							has_trait = trait_tec_lithophytic
+						}
+					}
+				}
 			}
+			add_building = building_tec_stripmine_1
 		}
-		add_building = building_hydroponics_farm
-		add_building = building_hydroponics_farm
-		add_building = building_tec_energrid_1
-	}
-	else_if = {
-		limit = {
-			owner = {
-				tec_is_quantum_alloys_empire = yes
-				is_lithoid_empire = yes
+		if = {	# BASE FOOD
+			limit = {
+				owner = {
+					OR = {
+						NOR = {
+							is_lithoid_empire = yes
+							is_machine_empire = yes
+						}
+						AND = {
+							is_machine_empire = yes
+							NOT = {
+								any_owned_species = {
+									OR = {
+										is_robotic = yes
+										is_lithoid = yes
+										has_trait = trait_tec_machine_clockwork
+										has_trait = trait_tec_lithophytic
+									}
+								}
+							}
+						}
+					}
+				}
 			}
+			add_building = building_hydroponics_farm
 		}
-		add_building = building_tec_energrid_1
-		add_building = building_tec_energrid_1
-		add_district = {
-			district_type = district_hab_mining
-			ignore_cap = yes
+		# Extra
+		if = { # Energy
+			limit = {
+				owner = {
+					tec_is_quantum_alloys_empire = yes
+					tec_is_cyberarch_empire = yes
+				}
+			}
+			add_building = building_tec_energrid_1
 		}
-	}
-	else = {
-		add_district = {
-			district_type = district_hab_mining
-			ignore_cap = yes
+		if = { # Food
+			limit = {
+				owner = {
+					# Food
+					is_catalytic_empire = yes
+					tec_is_bioarch_empire = yes
+				}
+			}
+			add_building = building_hydroponics_farm
 		}
-	}
+	# /
 	if = {
 		limit = {
 			num_unemployed > 0
