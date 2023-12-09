@@ -3092,11 +3092,14 @@ tec_should_pay_for_leader_upkeep = {
 
 # scope: leader
 tec_leader_gets_starting_actions = {
-	NOR = {
-		has_leader_flag = renowned_leader
-		has_leader_flag = legendary_leader
-		has_leader_flag = tec_no_starting_actions
-		[[flag] has_leader_flag = $flag$ ]
+	OR = {
+		NOR = {
+			has_leader_flag = renowned_leader
+			has_leader_flag = legendary_leader
+			has_leader_flag = tec_no_starting_actions
+			[[flag] has_leader_flag = $flag$ ]
+		}
+		has_leader_flag = tec_force_starting_actions
 	}
 }
 
@@ -3111,6 +3114,9 @@ tec_country_leader_gets_starting_actions = {
 
 tec_leader_first_staring_actions_done = {
 	has_leader_flag = tec_first_leader_handle_starting_modifiers_done
+	NOT = {
+		has_leader_flag = tec_force_starting_actions
+	}
 }
 
 
@@ -3135,26 +3141,26 @@ tec_has_opinion = {
 			is_same_value = prev.$WHO$
 		}
 		is_variable_set = tec_cache_tec_opinion
-		[[ GT ] 
+		[[ GT ]
 		check_variable_arithmetic = {
 			which = tec_cache_tec_opinion
 			value > $VALUE$
 		}
 		]
-		[[ GTE ] 
+		[[ GTE ]
 		check_variable_arithmetic = {
 			which = tec_cache_tec_opinion
 			value >= $VALUE$
 		}
 	
 		]
-		[[ EQ ] 
+		[[ EQ ]
 		check_variable_arithmetic = {
 			which = tec_cache_tec_opinion
 			value = $VALUE$
 		}
 	
-	]
+		]
 		[[ LTE ] 
 		check_variable_arithmetic = {
 			which = tec_cache_tec_opinion
@@ -3448,6 +3454,135 @@ tec_should_count_towards_leader_cap = {
 		#		has_trait = leader_trait_ruler_hive_mind
 		#	}
 		#}
+	}
+}
+
+tec_can_leader_get_council_trait = {
+	OR = {
+		AND = {
+			exists = owner
+			owner = { has_country_flag = tec_force_allow_all_traits }
+		}
+		AND = {
+			exists = owner
+			owner = { has_country_flag = tec_force_councilor_traits }
+		}
+		NOR = {
+			AND = {
+				exists = owner
+				owner = { has_country_flag = tec_force_normal_traits }
+			}
+			AND = {
+				exists = owner
+				owner = { is_gestalt = yes }
+				is_councilor = no
+			}
+			check_variable_arithmetic = {
+				which = modifier:tec_leader_only_normal_traits
+				value > 0
+			}
+		}
+		# Caelum
+		has_leader_flag = restored_node
+	}
+	if = {
+		limit = {
+			exists = owner
+		}
+		owner = {
+			is_crisis_faction = no
+		}
+	}
+}
+
+tec_can_leader_get_normal_trait = {
+	OR = {
+		AND = {
+			exists = owner
+			owner = { has_country_flag = tec_force_allow_all_traits }
+		}
+		AND = {
+			exists = owner
+			owner = { has_country_flag = tec_force_normal_traits }
+		}
+		NOR = {
+			AND = {	# FORCED
+				exists = owner
+				owner = { has_country_flag = tec_force_councilor_traits }
+			}
+			check_variable_arithmetic = {
+				which = modifier:tec_leader_only_councilor_traits
+				value > 0
+			}
+			AND = {	# COUNCILOR
+				OR = {
+					is_councilor = yes
+					# Caelum
+					has_leader_flag = restored_node
+				}
+				exists = owner
+				owner = {
+					OR = {
+						# short_circuit
+						check_variable_arithmetic = {
+							which = modifier:tec_councilor_only_councilor_traits
+							value > 0
+						}
+						# gestalts
+						is_gestalt = yes
+					}
+				}
+			}
+			AND = {	# RULER
+				OR = {
+					AND = {
+						is_ruler = yes
+						exists = owner
+						owner = {
+							is_autocracy = yes
+						}
+					}
+					is_heir = yes
+				}
+				exists = owner
+				owner = {
+					# short_circuit
+					check_variable_arithmetic = {
+						which = modifier:tec_ruler_only_councilor_traits
+						value > 0
+					}
+				}
+			}
+		}
+	}
+}
+
+tec_can_leader_get_subclass_trait = {
+	NAND = {
+		exists = owner
+		owner = { is_gestalt = yes }
+		OR = {
+			is_councilor = yes
+			# Caelum
+			has_leader_flag = restored_node
+		}
+	}
+	NAND = {
+		exists = owner
+		owner = { tec_is_aiauth_empire = yes }
+		tec_is_aiauth_councilor_node = yes
+	}
+	has_any_subclass = no
+}
+
+tec_can_leader_get_destiny_trait = {
+	NAND = {
+		exists = owner
+		owner = { is_gestalt = yes }
+	}
+	exists = owner
+	owner = {
+		is_crisis_faction = no
 	}
 }
 
