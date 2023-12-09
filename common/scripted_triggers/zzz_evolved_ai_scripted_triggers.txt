@@ -726,6 +726,7 @@ tec_ai_allow_energy_boosting_building = {
 			exists = owner
 			owner = {
 				is_ai = yes
+				#in an ideal world we would have a trigger to check whether or not an empire's stuff costs alloys
 				is_machine_empire = no
 			}
 		}
@@ -738,13 +739,7 @@ tec_ai_allow_energy_boosting_building = {
 			}
 		}
 	}
-	else = {
-		always = yes
-	}
-}
-
-tec_ai_allow_energy_boosting_building_alloy_cost = {
-	if = {
+	else_if = {
 		limit = {
 			exists = owner
 			owner = {
@@ -753,7 +748,9 @@ tec_ai_allow_energy_boosting_building_alloy_cost = {
 			}
 		}
 		AND = {
-			resource_stockpile_compare = { resource = alloys value > 1200 }
+			owner = {
+				resource_stockpile_compare = { resource = alloys value > 1200 }
+			}
 			OR = {
 				has_generator_designation = yes
 				check_variable_arithmetic = {
@@ -890,21 +887,17 @@ tec_ai_allow_minerals_boosting_building = {
 			}
 		}
 	}
-	else = {
-		always = yes
-	}
-}
-
-tec_ai_allow_minerals_boosting_building_alloy_cost = {
-	if = {
+	else_if = {
 		limit = {
 			exists = owner
 			owner = {
 				is_ai = yes
 				is_machine_empire = yes
-				resource_stockpile_compare = { resource = alloys value > 1200 }
 			}
 		}
+		owner = {
+				resource_stockpile_compare = { resource = alloys value > 1200 }
+			}
 		OR = {
 			owner = { tec_is_labour_hero_empire = yes }
 			has_mining_designation = yes
@@ -918,8 +911,6 @@ tec_ai_allow_minerals_boosting_building_alloy_cost = {
 		always = yes
 	}
 }
-
-
 
 tec_ai_allow_minerals_building = {
 	if = {
@@ -1020,6 +1011,7 @@ tec_ai_allow_food_boosting_building = {
 			exists = owner
 			owner = {
 				is_ai = yes
+				tec_is_biohive = no
 			}
 		}
 		owner = { country_uses_food = yes }
@@ -1032,22 +1024,19 @@ tec_ai_allow_food_boosting_building = {
 			}
 		}
 	}
-	else = {
-		always = yes
-	}
-}
-
-tec_ai_allow_food_boosting_building_alloy_cost = {
-	if = {
+	else_if = {
 		limit = {
 			exists = owner
 			owner = {
 				is_ai = yes
+				tec_is_biohive = yes
 				#Prevents from being stuck trying to build stuff we don't have the planet budget for (fuck ai)
-				resource_stockpile_compare = { resource = alloys value > 1200 }
 			}
 		}
-		owner = { country_uses_food = yes }
+		owner = { 
+			resource_stockpile_compare = { resource = alloys value > 1200 }
+			country_uses_food = yes
+		}
 		OR = {
 			owner = { tec_is_labour_hero_empire = yes }
 			has_farming_designation = yes
