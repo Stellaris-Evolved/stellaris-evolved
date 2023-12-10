@@ -97,3 +97,70 @@ alloys_expenditure_planets = {
 		base = 450
 	}
 }
+
+
+#Stop spending on ships if we can't afford it
+#There is a problem with AI that will cause it to sell a ton of stuff just in order to buy a few alloys
+#Evolved exacerbates this issue due to naval cap jobs requiring alloys
+alloys_expenditure_ships = {
+	resource = alloys
+	type = expenditure
+	category = ships
+
+	potential = {
+		always = yes
+	}
+
+	weight = {
+		weight = 0.6
+
+		# spend more alloys building ships while at war
+		modifier = {
+			factor = 2
+			OR = {
+				recently_lost_war = yes
+				is_at_war = yes
+			}
+		}
+
+		# If we want to colonize and are at peace then prio that
+		modifier = {
+			factor = 0.25
+			AND = {
+				ai_colonize_plans > 0
+				is_at_war = no
+			}
+		}
+
+		# spend less alloys on ships if over capacity
+		modifier = {
+			factor = 0.5
+			used_naval_capacity_percent >= 1.0
+		}
+
+		modifier = {
+			factor = 5
+			used_naval_capacity_percent < 1.0
+			OR = {
+				any_neighbor_country = {
+					has_ascension_perk = ap_become_the_crisis
+				}
+				any_country = {
+					is_crisis_faction = yes
+				}
+			}
+		}
+
+		#Don't allocate if poor
+		modifier = {
+			factor = 0
+			OR = {
+				has_resource = { type = alloys amount < 500 }
+				has_monthly_income = {
+					resource = alloys
+					value < 14
+				}
+			}
+		}
+	}
+}
