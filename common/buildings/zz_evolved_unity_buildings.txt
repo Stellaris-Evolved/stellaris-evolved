@@ -1578,6 +1578,7 @@
 		base_buildtime = @b1_time
 		position_priority = 120		# Unity
 		exempt_from_ai_planet_specialization = no
+		icon = building_hive_node		#BIOHIVE ART PLACEHOLDER!!!!
 
 		category = unity
 
@@ -1634,6 +1635,7 @@
 		can_build = no
 		exempt_from_ai_planet_specialization = no
 		position_priority = 120		# Unity
+		icon = building_hive_cluster		#BIOHIVE ART PLACEHOLDER!!!!
 
 		category = unity
 
@@ -1708,6 +1710,7 @@
 		base_buildtime = @b3_time
 		can_build = no
 		position_priority = 120		# Unity
+		icon = building_hive_confluence		#BIOHIVE ART PLACEHOLDER!!!!
 
 		category = unity
 
@@ -2198,12 +2201,16 @@
  # /
 # /
 
-# BOOSTERS
+# UNIQUE
 # -----------------------------------------
  # --------------- Regular
 	building_autocurating_vault = {
+		icon = building_autocurating_vault_unique
 		base_buildtime = @b2_time
 		base_cap_amount = 1
+		empire_limit = {
+			base = 1
+		}
 		position_priority = 30		# Unique
 		ai_estimate_without_unemployment = yes
 
@@ -2214,7 +2221,7 @@
 		}
 
 		show_tech_unlock_if = {
-			is_machine_empire = no	# see 'building_alpha_hub'
+			is_gestalt = no
 			is_megacorp = no		# see 'building_corporate_vault'
 			tec_country_uses_priests_and_temples = no
 		}
@@ -2223,7 +2230,7 @@
 			exists = owner
 			NOT = { has_modifier = slave_colony }
 			owner = {
-				is_machine_empire = no
+				is_gestalt = no
 				is_megacorp = no
 				tec_country_uses_priests_and_temples = no
 			}
@@ -2238,9 +2245,14 @@
 		}
 
 		convert_to = {
+			building_autocurating_vault
 			building_citadel_of_faith
-			building_alpha_hub
 			building_corporate_vault
+			building_tec_hive_unity_vault
+			building_tec_cyberhive_unity_vault
+			building_tec_biohive_unity_vault
+			#building_tec_lithohive_unity_vault
+			building_alpha_hub
 		}
 
 		resources = {
@@ -2255,34 +2267,35 @@
 				tier = 2
 				rare = rare_crystals
 			}
-
-
-			inline_script = {
-				script = buildings/resources/inline_evolved_ring_production_cost
-				rare = rare_crystals
-				type = unity
-			}
-
-			produces = {
-				unity = 10
-			}
 		}
 
-		planet_modifier = {
-			planet_administrators_produces_mult = 0.15
-		}
-		triggered_planet_modifier = {
-			potential = {
-				has_ringworld_output_boost = yes
-			}
-			planet_administrators_unity_produces_add = 1
-			planet_managers_unity_produces_add = 1
-			planet_priests_unity_produces_add = 1
-			planet_telepaths_unity_produces_add = 1
+		country_modifier = {
+			country_official_cap_add = 1
+			country_unity_produces_mult = 0.05
 		}
 		# ADD per Ascension
-			inline_script = buildings/effects/inline_evolved_technocracy_ascension
+			triggered_country_modifier = {
+				potential = {
+					always = yes
+				}
+				country_official_cap_add = 1
+				mult = planet.value:tec_script_add_per_ascension|BASE|0|ASCENSION_BASE|0|ASCENSION_MULT|@tec_per_planet_ascension_mult_very_low|MULT|1|ROUND|yes|
+			}
+			triggered_desc = {
+				trigger = {
+					always = yes
+				}
+				text = tec_building_ascension_scaling_leader_official
+			}
 		# /
+
+		inline_script = {
+			script = jobs/inline_evolved_politician
+			count = 1
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
 
 		inline_script = {
 			script = buildings/inline_evolved_aibait
@@ -2297,8 +2310,12 @@
  # /
  # --------------- Spiritualist
 	building_citadel_of_faith = {
+		icon = building_citadel_of_faith_unique
 		base_buildtime = @b2_time
 		base_cap_amount = 1
+		empire_limit = {
+			base = 1
+		}
 		position_priority = 30		# Unique
 		ai_estimate_without_unemployment = yes
 
@@ -2326,8 +2343,13 @@
 
 		convert_to = {
 			building_autocurating_vault
-			building_alpha_hub
+			building_citadel_of_faith
 			building_corporate_vault
+			building_tec_hive_unity_vault
+			building_tec_cyberhive_unity_vault
+			building_tec_biohive_unity_vault
+			#building_tec_lithohive_unity_vault
+			building_alpha_hub
 		}
 
 		resources = {
@@ -2342,21 +2364,30 @@
 				tier = 2
 				rare = rare_crystals
 			}
-
-			inline_script = {
-				script = buildings/resources/inline_evolved_ring_production_cost
-				rare = rare_crystals
-				type = unity
-			}
-
-			produces = {
-				unity = 10
-			}
 		}
+
+		country_modifier = {
+			country_official_cap_add = 1
+			country_unity_produces_mult = 0.05
+		}
+		# ADD per Ascension
+			triggered_country_modifier = {
+				potential = {
+					always = yes
+				}
+				country_official_cap_add = 1
+				mult = planet.value:tec_script_add_per_ascension|BASE|0|ASCENSION_BASE|0|ASCENSION_MULT|@tec_per_planet_ascension_mult_very_low|MULT|1|ROUND|yes|
+			}
+			triggered_desc = {
+				trigger = {
+					always = yes
+				}
+				text = tec_building_ascension_scaling_leader_official
+			}
+		# /
 
 		planet_modifier = {
 			pop_ethic_spiritualist_attraction_mult = 0.20
-			planet_administrators_produces_mult = 0.15
 		}
 
 		inline_script = {
@@ -2365,20 +2396,6 @@
 			mult = 1
 			display = with_desc
 			trigger = ""
-		}
-
-		inline_script = buildings/effects/inline_evolved_exalted_priesthood_unity_building
-		inline_script = buildings/effects/inline_evolved_technocracy_ascension
-		inline_script = buildings/effects/inline_evolved_tec_spiritual_seekers
-
-		triggered_planet_modifier = {
-			potential = {
-				has_ringworld_output_boost = yes
-			}
-			planet_administrators_unity_produces_add = 1
-			planet_managers_unity_produces_add = 1
-			planet_priests_unity_produces_add = 1
-			planet_telepaths_unity_produces_add = 1
 		}
 
 		inline_script = {
@@ -2394,10 +2411,13 @@
  # /
  # --------------- Megacorp
 	building_corporate_vault = {
-		base_buildtime = @b3_time
+		icon = building_autocurating_vault_unique
+		base_buildtime = @b2_time
 		base_cap_amount = 1
+		empire_limit = {
+			base = 1
+		}
 		position_priority = 30		# Unique
-		icon = building_autocurating_vault
 		ai_estimate_without_unemployment = yes
 
 		category = unity
@@ -2429,8 +2449,13 @@
 		}
 
 		convert_to = {
-			building_citadel_of_faith
 			building_autocurating_vault
+			building_citadel_of_faith
+			building_corporate_vault
+			building_tec_hive_unity_vault
+			building_tec_cyberhive_unity_vault
+			building_tec_biohive_unity_vault
+			#building_tec_lithohive_unity_vault
 			building_alpha_hub
 		}
 
@@ -2446,34 +2471,440 @@
 				tier = 2
 				rare = rare_crystals
 			}
-
-			inline_script = {
-				script = buildings/resources/inline_evolved_ring_production_cost
-				rare = rare_crystals
-				type = unity
-			}
-
-			produces = {
-				unity = 10
-			}
 		}
 
-		planet_modifier = {
-			planet_administrators_produces_mult = 0.15
-		}
-
-		triggered_planet_modifier = {
-			potential = {
-				has_ringworld_output_boost = yes
-			}
-			planet_administrators_unity_produces_add = 1
-			planet_managers_unity_produces_add = 1
-			planet_priests_unity_produces_add = 1
-			planet_telepaths_unity_produces_add = 1
+		country_modifier = {
+			country_official_cap_add = 1
+			country_unity_produces_mult = 0.05
 		}
 		# ADD per Ascension
-			inline_script = buildings/effects/inline_evolved_technocracy_ascension
+			triggered_country_modifier = {
+				potential = {
+					always = yes
+				}
+				country_official_cap_add = 1
+				mult = planet.value:tec_script_add_per_ascension|BASE|0|ASCENSION_BASE|0|ASCENSION_MULT|@tec_per_planet_ascension_mult_very_low|MULT|1|ROUND|yes|
+			}
+			triggered_desc = {
+				trigger = {
+					always = yes
+				}
+				text = tec_building_ascension_scaling_leader_official
+			}
 		# /
+
+		inline_script = {
+			script = jobs/inline_evolved_politician
+			count = 1
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/inline_evolved_aibait
+			trigger = "
+				check_variable_arithmetic = {
+					which = value:unity_combined_value|CACHED|yes|
+					value >= 3
+				}
+			"
+		}
+	}
+ # /
+ # --------------- Hive
+	building_tec_hive_unity_vault = {
+		icon = building_autocurating_vault_unique
+		base_buildtime = @b2_time
+		base_cap_amount = 1
+		empire_limit = {
+			base = 1
+		}
+		position_priority = 30		# Unique
+		ai_estimate_without_unemployment = yes
+
+		category = unity
+
+		prerequisites = {
+			"tech_autocurating_vault"
+		}
+
+		show_tech_unlock_if = {
+			tec_has_regular_hive_set = yes
+		}
+
+		potential = {
+			exists = owner
+			NOT = { has_modifier = slave_colony }
+			owner = {
+				tec_has_regular_hive_set = yes
+			}
+		}
+
+		allow = {
+			has_major_upgraded_capital = yes
+			tec_ai_allow_rare_dependant_building = {
+				tier = 2
+				rare = rare_crystals
+			}
+		}
+
+		convert_to = {
+			building_autocurating_vault
+			building_citadel_of_faith
+			building_corporate_vault
+			building_tec_hive_unity_vault
+			building_tec_cyberhive_unity_vault
+			building_tec_biohive_unity_vault
+			#building_tec_lithohive_unity_vault
+			building_alpha_hub
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_rare_resource_cost
+				tier = 2
+				rare = rare_crystals
+			}
+		}
+
+		country_modifier = {
+			country_official_cap_add = 1
+			country_unity_produces_mult = 0.05
+		}
+		# ADD per Ascension
+			triggered_country_modifier = {
+				potential = {
+					always = yes
+				}
+				country_official_cap_add = 1
+				mult = planet.value:tec_script_add_per_ascension|BASE|0|ASCENSION_BASE|0|ASCENSION_MULT|@tec_per_planet_ascension_mult_very_low|MULT|1|ROUND|yes|
+			}
+			triggered_desc = {
+				trigger = {
+					always = yes
+				}
+				text = tec_building_ascension_scaling_leader_official
+			}
+		# /
+
+		inline_script = {
+			script = jobs/inline_evolved_synapse
+			count = 2
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/inline_evolved_aibait
+			trigger = "
+				check_variable_arithmetic = {
+					which = value:unity_combined_value|CACHED|yes|
+					value >= 3
+				}
+			"
+		}
+	}
+ # /
+ # --------------- CyberHive
+	building_tec_cyberhive_unity_vault = {
+		icon = building_autocurating_vault_unique
+		base_buildtime = @b2_time
+		base_cap_amount = 1
+		empire_limit = {
+			base = 1
+		}
+		position_priority = 30		# Unique
+		ai_estimate_without_unemployment = yes
+
+		category = unity
+
+		prerequisites = {
+			"tech_autocurating_vault"
+		}
+
+		show_tech_unlock_if = {
+			tec_has_cyberhive_set = yes
+		}
+
+		potential = {
+			exists = owner
+			NOT = { has_modifier = slave_colony }
+			owner = {
+				tec_has_cyberhive_set = yes
+			}
+		}
+
+		allow = {
+			has_major_upgraded_capital = yes
+			tec_ai_allow_rare_dependant_building = {
+				tier = 2
+				rare = rare_crystals
+			}
+		}
+
+		convert_to = {
+			building_autocurating_vault
+			building_citadel_of_faith
+			building_corporate_vault
+			building_tec_hive_unity_vault
+			building_tec_cyberhive_unity_vault
+			building_tec_biohive_unity_vault
+			#building_tec_lithohive_unity_vault
+			building_alpha_hub
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_rare_resource_cost
+				tier = 2
+				rare = rare_crystals
+			}
+		}
+
+		country_modifier = {
+			country_official_cap_add = 1
+			country_unity_produces_mult = 0.05
+		}
+		# ADD per Ascension
+			triggered_country_modifier = {
+				potential = {
+					always = yes
+				}
+				country_official_cap_add = 1
+				mult = planet.value:tec_script_add_per_ascension|BASE|0|ASCENSION_BASE|0|ASCENSION_MULT|@tec_per_planet_ascension_mult_very_low|MULT|1|ROUND|yes|
+			}
+			triggered_desc = {
+				trigger = {
+					always = yes
+				}
+				text = tec_building_ascension_scaling_leader_official
+			}
+		# /
+
+		inline_script = {
+			script = jobs/inline_evolved_synapse
+			count = 2
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/inline_evolved_aibait
+			trigger = "
+				check_variable_arithmetic = {
+					which = value:unity_combined_value|CACHED|yes|
+					value >= 3
+				}
+			"
+		}
+	}
+ # /
+ # --------------- BioHive
+	building_tec_biohive_unity_vault = {
+		icon = building_autocurating_vault_unique
+		#BIOHIVE ART PLACEHOLDER!!!!
+		base_buildtime = @b2_time
+		base_cap_amount = 1
+		empire_limit = {
+			base = 1
+		}
+		position_priority = 30		# Unique
+		ai_estimate_without_unemployment = yes
+
+		category = unity
+
+		prerequisites = {
+			"tech_autocurating_vault"
+		}
+
+		show_tech_unlock_if = {
+			tec_has_biohive_set = yes
+		}
+
+		potential = {
+			exists = owner
+			NOT = { has_modifier = slave_colony }
+			owner = {
+				tec_has_biohive_set = yes
+			}
+		}
+
+		allow = {
+			has_major_upgraded_capital = yes
+			tec_ai_allow_rare_dependant_building = {
+				tier = 2
+				rare = rare_crystals
+			}
+		}
+
+		convert_to = {
+			building_autocurating_vault
+			building_citadel_of_faith
+			building_corporate_vault
+			building_tec_hive_unity_vault
+			building_tec_cyberhive_unity_vault
+			building_tec_biohive_unity_vault
+			#building_tec_lithohive_unity_vault
+			building_alpha_hub
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_rare_resource_cost
+				tier = 2
+				rare = rare_crystals
+			}
+		}
+
+		country_modifier = {
+			country_official_cap_add = 1
+			country_unity_produces_mult = 0.05
+		}
+		# ADD per Ascension
+			triggered_country_modifier = {
+				potential = {
+					always = yes
+				}
+				country_official_cap_add = 1
+				mult = planet.value:tec_script_add_per_ascension|BASE|0|ASCENSION_BASE|0|ASCENSION_MULT|@tec_per_planet_ascension_mult_very_low|MULT|1|ROUND|yes|
+			}
+			triggered_desc = {
+				trigger = {
+					always = yes
+				}
+				text = tec_building_ascension_scaling_leader_official
+			}
+		# /
+
+		inline_script = {
+			script = jobs/inline_evolved_synapse
+			count = 2
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/inline_evolved_aibait
+			trigger = "
+				check_variable_arithmetic = {
+					which = value:unity_combined_value|CACHED|yes|
+					value >= 3
+				}
+			"
+		}
+	}
+ # /
+ # --------------- Lithohive
+	#building_tec_lithohive_unity_vault
+ # /
+ # --------------- Machine
+	building_alpha_hub = {
+		icon = building_autocurating_vault_unique
+		base_buildtime = @b3_time
+		base_cap_amount = 1
+		empire_limit = {
+			base = 1
+		}
+		position_priority = 30		# Unique
+		ai_estimate_without_unemployment = yes
+
+		category = unity
+
+		prerequisites = {
+			"tech_autocurating_vault"
+		}
+
+		show_tech_unlock_if = {
+			is_machine_empire = yes
+		}
+
+		potential = {
+			exists = owner
+			owner = { is_machine_empire = yes }
+		}
+
+		allow = {
+			has_major_upgraded_capital = yes
+			tec_ai_allow_rare_dependant_building = {
+				tier = 2
+				rare = rare_crystals
+			}
+		}
+
+		convert_to = {
+			building_autocurating_vault
+			building_citadel_of_faith
+			building_corporate_vault
+			building_tec_hive_unity_vault
+			building_tec_cyberhive_unity_vault
+			building_tec_biohive_unity_vault
+			#building_tec_lithohive_unity_vault
+			building_alpha_hub
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_rare_resource_cost
+				tier = 2
+				rare = rare_crystals
+			}
+		}
+
+		country_modifier = {
+			country_official_cap_add = 1
+			country_unity_produces_mult = 0.05
+		}
+		# ADD per Ascension
+			triggered_country_modifier = {
+				potential = {
+					always = yes
+				}
+				country_official_cap_add = 1
+				mult = planet.value:tec_script_add_per_ascension|BASE|0|ASCENSION_BASE|0|ASCENSION_MULT|@tec_per_planet_ascension_mult_very_low|MULT|1|ROUND|yes|
+			}
+			triggered_desc = {
+				trigger = {
+					always = yes
+				}
+				text = tec_building_ascension_scaling_leader_official
+			}
+		# /
+
+		inline_script = {
+			script = jobs/inline_evolved_coordinator
+			count = 2
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
 
 		inline_script = {
 			script = buildings/inline_evolved_aibait
@@ -2489,6 +2920,7 @@
  # --------------- Archaeotech
 	building_league_offices = {
 		base_buildtime = @b2_time
+		base_cap_amount = 1
 		empire_limit = {
 			base = 1
 		}
@@ -2599,28 +3031,37 @@
 		}
 	}
  # /
- # --------------- Hive
-	#building_tec_hive_amplifier
- # /
- # --------------- CyberHive
-	#building_tec_cyberhive_amplifier
- # /
- # --------------- BioHive
-	#building_tec_biohive_amplifier
- # /
- # --------------- Machine
-	building_alpha_hub = {
-		base_buildtime = @b3_time
-		base_cap_amount = 1
-		position_priority = 30		# Unique
+# /
+
+# BOOSTERS
+ # --------------- Regular
+	building_tec_regular_unity_booster_1 = {
 		icon = building_autocurating_vault
+		base_buildtime = @b2_time
+		base_cap_amount = 1
+		position_priority = 35		# Unique Secondary
 		ai_estimate_without_unemployment = yes
 
 		category = unity
 
+		prerequisites = {
+			"tech_autocurating_vault"
+		}
+
+		show_tech_unlock_if = {
+			is_gestalt = no
+			is_megacorp = no		# see 'building_corporate_vault'
+			tec_country_uses_priests_and_temples = no
+		}
+
 		potential = {
 			exists = owner
-			owner = { is_machine_empire = yes }
+			NOT = { has_modifier = slave_colony }
+			owner = {
+				is_machine_empire = no
+				is_megacorp = no
+				tec_country_uses_priests_and_temples = no
+			}
 		}
 
 		allow = {
@@ -2631,15 +3072,15 @@
 			}
 		}
 
-		destroy_trigger = {
-			exists = owner
-			owner = { is_machine_empire = no }
-		}
-
 		convert_to = {
-			building_autocurating_vault
-			building_citadel_of_faith
-			building_corporate_vault
+			building_tec_regular_unity_booster_1
+			building_tec_spiritualist_unity_booster_1
+			building_tec_corporate_unity_booster_1
+			building_tec_hive_unity_booster_1
+			building_tec_cyberhive_unity_booster_1
+			building_tec_biohive_unity_booster_1
+			#building_tec_lithohive_unity_booster_1
+			building_tec_machine_unity_booster_1
 		}
 
 		resources = {
@@ -2660,22 +3101,534 @@
 				rare = rare_crystals
 				type = unity
 			}
-
-			produces = {
-				unity = 10
-			}
 		}
 
 		planet_modifier = {
-			planet_administrators_produces_mult = 0.15
+			planet_administrators_produces_mult = 0.10
 		}
-
 		triggered_planet_modifier = {
 			potential = {
 				has_ringworld_output_boost = yes
 			}
-			custom_tooltip = "sm_ring_maintenance_hub_effect"
+			planet_administrators_unity_produces_add = 1
+			planet_managers_unity_produces_add = 1
+			planet_priests_unity_produces_add = 1
+			planet_telepaths_unity_produces_add = 1
 		}
+
+		# ADD per Ascension
+			inline_script = buildings/effects/inline_evolved_technocracy_ascension
+		# /
+
+		inline_script = {
+			script = buildings/inline_evolved_aibait
+			trigger = "
+				check_variable_arithmetic = {
+					which = value:unity_combined_value|CACHED|yes|
+					value >= 3
+				}
+			"
+		}
+	}
+ # /
+ # --------------- Spiritualist
+	building_tec_spiritualist_unity_booster_1 = {
+		icon = building_citadel_of_faith
+		base_buildtime = @b2_time
+		base_cap_amount = 1
+		position_priority = 35		# Unique Secondary
+		ai_estimate_without_unemployment = yes
+
+		category = unity
+
+		prerequisites = {
+			"tech_transcendent_faith"
+		}
+
+		potential = {
+			exists = owner
+			owner = {
+				tec_country_uses_priests_and_temples = yes
+			}
+			NOT = { has_modifier = slave_colony }
+		}
+
+		allow = {
+			has_major_upgraded_capital = yes
+			tec_ai_allow_rare_dependant_building = {
+				tier = 2
+				rare = rare_crystals
+			}
+		}
+
+		convert_to = {
+			building_tec_regular_unity_booster_1
+			building_tec_spiritualist_unity_booster_1
+			building_tec_corporate_unity_booster_1
+			building_tec_hive_unity_booster_1
+			building_tec_cyberhive_unity_booster_1
+			building_tec_biohive_unity_booster_1
+			#building_tec_lithohive_unity_booster_1
+			building_tec_machine_unity_booster_1
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_rare_resource_cost
+				tier = 2
+				rare = rare_crystals
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_ring_production_cost
+				rare = rare_crystals
+				type = unity
+			}
+		}
+
+		planet_modifier = {
+			pop_ethic_spiritualist_attraction_mult = 0.20
+			planet_administrators_produces_mult = 0.10
+		}
+		triggered_planet_modifier = {
+			potential = {
+				has_ringworld_output_boost = yes
+			}
+			planet_administrators_unity_produces_add = 1
+			planet_managers_unity_produces_add = 1
+			planet_priests_unity_produces_add = 1
+			planet_telepaths_unity_produces_add = 1
+		}
+
+		inline_script = {
+			script = jobs/inline_evolved_high_priest
+			count = 1
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+
+		inline_script = buildings/effects/inline_evolved_exalted_priesthood_unity_building
+		inline_script = buildings/effects/inline_evolved_technocracy_ascension
+		inline_script = buildings/effects/inline_evolved_tec_spiritual_seekers
+
+
+		inline_script = {
+			script = buildings/inline_evolved_aibait
+			trigger = "
+				check_variable_arithmetic = {
+					which = value:unity_combined_value|CACHED|yes|
+					value >= 3
+				}
+			"
+		}
+	}
+ # /
+ # --------------- Megacorp
+	building_tec_corporate_unity_booster_1 = {
+		icon = building_autocurating_vault
+		base_buildtime = @b3_time
+		base_cap_amount = 1
+		position_priority = 35		# Unique Secondary
+		ai_estimate_without_unemployment = yes
+
+		category = unity
+
+		prerequisites = {
+			"tech_autocurating_vault"
+		}
+
+		show_tech_unlock_if = {
+			is_megacorp = yes
+			tec_country_uses_priests_and_temples = no
+		}
+
+		potential = {
+			exists = owner
+			NOT = { has_modifier = slave_colony }
+			owner = {
+				is_megacorp = yes
+				tec_country_uses_priests_and_temples = no
+			}
+		}
+
+		allow = {
+			has_major_upgraded_capital = yes
+			tec_ai_allow_rare_dependant_building = {
+				tier = 2
+				rare = rare_crystals
+			}
+		}
+
+		convert_to = {
+			building_tec_regular_unity_booster_1
+			building_tec_spiritualist_unity_booster_1
+			building_tec_corporate_unity_booster_1
+			building_tec_hive_unity_booster_1
+			building_tec_cyberhive_unity_booster_1
+			building_tec_biohive_unity_booster_1
+			#building_tec_lithohive_unity_booster_1
+			building_tec_machine_unity_booster_1
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_rare_resource_cost
+				tier = 2
+				rare = rare_crystals
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_ring_production_cost
+				rare = rare_crystals
+				type = unity
+			}
+		}
+
+		planet_modifier = {
+			planet_administrators_produces_mult = 0.10
+		}
+		triggered_planet_modifier = {
+			potential = {
+				has_ringworld_output_boost = yes
+			}
+			planet_administrators_unity_produces_add = 1
+			planet_managers_unity_produces_add = 1
+			planet_priests_unity_produces_add = 1
+			planet_telepaths_unity_produces_add = 1
+		}
+
+		# ADD per Ascension
+			inline_script = buildings/effects/inline_evolved_technocracy_ascension
+		# /
+
+		inline_script = {
+			script = buildings/inline_evolved_aibait
+			trigger = "
+				check_variable_arithmetic = {
+					which = value:unity_combined_value|CACHED|yes|
+					value >= 3
+				}
+			"
+		}
+	}
+ # /
+ # --------------- Hive
+	building_tec_hive_unity_booster_1 = {
+		icon = building_autocurating_vault
+		base_buildtime = @b3_time
+		base_cap_amount = 1
+		position_priority = 35		# Unique Secondary
+		ai_estimate_without_unemployment = yes
+
+		category = unity
+
+		prerequisites = {
+			"tech_autocurating_vault"
+		}
+
+		show_tech_unlock_if = {
+			tec_has_regular_hive_set = yes
+		}
+
+		potential = {
+			exists = owner
+			NOT = { has_modifier = slave_colony }
+			owner = {
+				tec_has_regular_hive_set = yes
+			}
+		}
+
+		allow = {
+			has_major_upgraded_capital = yes
+			tec_ai_allow_rare_dependant_building = {
+				tier = 2
+				rare = rare_crystals
+			}
+		}
+
+		convert_to = {
+			building_tec_regular_unity_booster_1
+			building_tec_spiritualist_unity_booster_1
+			building_tec_corporate_unity_booster_1
+			building_tec_hive_unity_booster_1
+			building_tec_cyberhive_unity_booster_1
+			building_tec_biohive_unity_booster_1
+			#building_tec_lithohive_unity_booster_1
+			building_tec_machine_unity_booster_1
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_rare_resource_cost
+				tier = 2
+				rare = rare_crystals
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_ring_production_cost
+				rare = rare_crystals
+				type = unity
+			}
+		}
+
+		planet_modifier = {
+			planet_administrators_produces_mult = 0.10
+		}
+		triggered_planet_modifier = {
+			potential = {
+				has_ringworld_output_boost = yes
+			}
+			planet_administrators_unity_produces_add = 1
+			planet_managers_unity_produces_add = 1
+			planet_priests_unity_produces_add = 1
+			planet_telepaths_unity_produces_add = 1
+		}
+
+		inline_script = {
+			script = jobs/inline_evolved_synapse
+			count = @b1_jobs
+			mult = 1
+			trigger = ""
+			display = with_desc
+		}
+
+		inline_script = {
+			script = buildings/inline_evolved_aibait
+			trigger = "
+				check_variable_arithmetic = {
+					which = value:unity_combined_value|CACHED|yes|
+					value >= 3
+				}
+			"
+		}
+	}
+ # /
+ # --------------- CyberHive
+	building_tec_cyberhive_unity_booster_1 = {
+		icon = building_autocurating_vault
+		base_buildtime = @b3_time
+		base_cap_amount = 1
+		position_priority = 35		# Unique Secondary
+		ai_estimate_without_unemployment = yes
+
+		category = unity
+
+		prerequisites = {
+			"tech_autocurating_vault"
+		}
+
+		show_tech_unlock_if = {
+			tec_has_cyberhive_set = yes
+		}
+
+		potential = {
+			exists = owner
+			NOT = { has_modifier = slave_colony }
+			owner = {
+				tec_has_cyberhive_set = yes
+			}
+		}
+
+		allow = {
+			has_major_upgraded_capital = yes
+			tec_ai_allow_rare_dependant_building = {
+				tier = 2
+				rare = rare_crystals
+			}
+		}
+
+		convert_to = {
+			building_tec_regular_unity_booster_1
+			building_tec_spiritualist_unity_booster_1
+			building_tec_corporate_unity_booster_1
+			building_tec_hive_unity_booster_1
+			building_tec_cyberhive_unity_booster_1
+			building_tec_biohive_unity_booster_1
+			#building_tec_lithohive_unity_booster_1
+			building_tec_machine_unity_booster_1
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_rare_resource_cost
+				tier = 2
+				rare = rare_crystals
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_ring_production_cost
+				rare = rare_crystals
+				type = unity
+			}
+		}
+
+		planet_modifier = {
+			planet_administrators_produces_mult = 0.10
+		}
+		triggered_planet_modifier = {
+			potential = {
+				has_ringworld_output_boost = yes
+			}
+			planet_administrators_unity_produces_add = 1
+			planet_managers_unity_produces_add = 1
+			planet_priests_unity_produces_add = 1
+			planet_telepaths_unity_produces_add = 1
+		}
+
+		inline_script = {
+			script = jobs/inline_evolved_synapse
+			count = @b1_jobs
+			mult = 1
+			trigger = ""
+			display = with_desc
+		}
+
+		inline_script = {
+			script = buildings/inline_evolved_aibait
+			trigger = "
+				check_variable_arithmetic = {
+					which = value:unity_combined_value|CACHED|yes|
+					value >= 3
+				}
+			"
+		}
+	}
+ # /
+ # --------------- BioHive
+	building_tec_biohive_unity_booster_1 = {
+		icon = building_autocurating_vault
+		#BIOHIVE ART PLACEHOLDER!!!!
+		base_buildtime = @b3_time
+		base_cap_amount = 1
+		position_priority = 35		# Unique Secondary
+		ai_estimate_without_unemployment = yes
+
+		category = unity
+
+		prerequisites = {
+			"tech_autocurating_vault"
+		}
+
+		show_tech_unlock_if = {
+			tec_has_biohive_set = yes
+		}
+
+		potential = {
+			exists = owner
+			NOT = { has_modifier = slave_colony }
+			owner = {
+				tec_has_biohive_set = yes
+			}
+		}
+
+		allow = {
+			has_major_upgraded_capital = yes
+			tec_ai_allow_rare_dependant_building = {
+				tier = 2
+				rare = rare_crystals
+			}
+		}
+
+		convert_to = {
+			building_tec_regular_unity_booster_1
+			building_tec_spiritualist_unity_booster_1
+			building_tec_corporate_unity_booster_1
+			building_tec_hive_unity_booster_1
+			building_tec_cyberhive_unity_booster_1
+			building_tec_biohive_unity_booster_1
+			#building_tec_lithohive_unity_booster_1
+			building_tec_machine_unity_booster_1
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_rare_resource_cost
+				tier = 2
+				rare = rare_crystals
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_ring_production_cost
+				rare = rare_crystals
+				type = unity
+			}
+		}
+
+		planet_modifier = {
+			planet_administrators_produces_mult = 0.10
+		}
+		triggered_planet_modifier = {
+			potential = {
+				has_ringworld_output_boost = yes
+			}
+			planet_administrators_unity_produces_add = 1
+			planet_managers_unity_produces_add = 1
+			planet_priests_unity_produces_add = 1
+			planet_telepaths_unity_produces_add = 1
+		}
+
+		inline_script = {
+			script = jobs/inline_evolved_synapse
+			count = @b1_jobs
+			mult = 1
+			trigger = ""
+			display = with_desc
+		}
+
+		inline_script = {
+			script = buildings/inline_evolved_aibait
+			trigger = "
+				check_variable_arithmetic = {
+					which = value:unity_combined_value|CACHED|yes|
+					value >= 3
+				}
+			"
+		}
+	}
+ # /
+ # --------------- Lithohive
+	#building_tec_lithohive_unity_booster_1
+ # /
+ # --------------- Machine
+	building_tec_machine_unity_booster_1 = {
+		base_buildtime = @b3_time
+		base_cap_amount = 1
+		position_priority = 35		# Unique Secondary
+		icon = building_autocurating_vault
+		ai_estimate_without_unemployment = yes
+
+		category = unity
 
 		prerequisites = {
 			"tech_autocurating_vault"
@@ -2683,6 +3636,60 @@
 
 		show_tech_unlock_if = {
 			is_machine_empire = yes
+		}
+
+		potential = {
+			exists = owner
+			owner = { is_machine_empire = yes }
+		}
+
+		allow = {
+			has_major_upgraded_capital = yes
+			tec_ai_allow_rare_dependant_building = {
+				tier = 2
+				rare = rare_crystals
+			}
+		}
+
+		convert_to = {
+			building_tec_regular_unity_booster_1
+			building_tec_spiritualist_unity_booster_1
+			building_tec_corporate_unity_booster_1
+			building_tec_hive_unity_booster_1
+			building_tec_cyberhive_unity_booster_1
+			building_tec_biohive_unity_booster_1
+			#building_tec_lithohive_unity_booster_1
+			building_tec_machine_unity_booster_1
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_rare_resource_cost
+				tier = 2
+				rare = rare_crystals
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_ring_production_cost
+				rare = rare_crystals
+				type = unity
+			}
+		}
+
+		planet_modifier = {
+			planet_administrators_produces_mult = 0.10
+		}
+		triggered_planet_modifier = {
+			potential = {
+				has_ringworld_output_boost = yes
+			}
+			custom_tooltip = "sm_ring_maintenance_hub_effect"
 		}
 
 		inline_script = {
@@ -2698,7 +3705,7 @@
  # /
 # /
 
-# MEMORIAL BOOSTERS
+# MEMORIALS/MONUMENTS
 # -----------------------------------------
  # --------------- Regular
 	building_autochthon_monument = {
@@ -2744,12 +3751,11 @@
 				multiplier = owner.trigger:num_ascension_perks
 			}
 		}
+		triggered_desc = {
+			text = building_autochthon_monument_effect
+		}
 
 		inline_script = buildings/convert_to/inline_evolved_monument_1
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.05
-		}
 
 		inline_script = {
 			script = jobs/inline_evolved_job
@@ -2765,11 +3771,6 @@
 			tier = 1
 			type = regular
 		}
-
-		triggered_desc = {
-			text = building_autochthon_monument_effect
-		}
-
 	}
 	building_heritage_site = {
 		base_buildtime = @b2_time
@@ -2812,7 +3813,7 @@
 			category = planet_buildings
 			produces = {
 				trigger = { exists = owner }
-				unity = 2
+				unity = 3
 				multiplier = owner.trigger:num_ascension_perks
 			}
 			inline_script = {
@@ -2820,9 +3821,8 @@
 				tier = 2
 			}
 		}
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.10
+		triggered_desc = {
+			text = building_heritage_site_effect
 		}
 
 		inline_script = {
@@ -2838,10 +3838,6 @@
 			script = buildings/effects/type/inline_evolved_monument
 			tier = 2
 			type = regular
-		}
-
-		triggered_desc = {
-			text = building_heritage_site_effect
 		}
 
 		inline_script = {
@@ -2886,7 +3882,7 @@
 			category = planet_buildings
 			produces = {
 				trigger = { exists = owner }
-				unity = 3
+				unity = 5
 				multiplier = owner.trigger:num_ascension_perks
 			}
 			inline_script = {
@@ -2894,11 +3890,6 @@
 				tier = 3
 			}
 		}
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.15
-		}
-
 		triggered_desc = {
 			text = building_hypercomms_forum_effect
 		}
@@ -2969,9 +3960,8 @@
 				tier = 1
 			}
 		}
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.05
+		triggered_desc = {
+			text = building_autochthon_monument_effect
 		}
 
 		inline_script = {
@@ -2987,10 +3977,6 @@
 			script = buildings/effects/type/inline_evolved_monument
 			tier = 1
 			type = regular
-		}
-
-		triggered_desc = {
-			text = building_autochthon_monument_effect
 		}
 	}
 	building_corporate_site = {
@@ -3033,7 +4019,7 @@
 			category = planet_buildings
 			produces = {
 				trigger = { exists = owner }
-				unity = 2
+				unity = 3
 				multiplier = owner.trigger:num_ascension_perks
 			}
 			inline_script = {
@@ -3041,11 +4027,6 @@
 				tier = 2
 			}
 		}
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.10
-		}
-
 		triggered_desc = {
 			text = building_heritage_site_effect
 		}
@@ -3106,7 +4087,7 @@
 			category = planet_buildings
 			produces = {
 				trigger = { exists = owner }
-				unity = 3
+				unity = 5
 				multiplier = owner.trigger:num_ascension_perks
 			}
 			inline_script = {
@@ -3114,11 +4095,9 @@
 				tier = 3
 			}
 		}
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.15
+		triggered_desc = {
+			text = building_hypercomms_forum_effect
 		}
-
 
 		inline_script = {
 			script = jobs/inline_evolved_job
@@ -3133,10 +4112,6 @@
 			script = buildings/effects/type/inline_evolved_monument
 			tier = 3
 			type = regular
-		}
-
-		triggered_desc = {
-			text = building_hypercomms_forum_effect
 		}
 
 		inline_script = {
@@ -3194,11 +4169,6 @@
 				tier = 1
 			}
 		}
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.05
-		}
-
 		triggered_desc = {
 			text = building_autochthon_monument_effect
 		}
@@ -3262,7 +4232,7 @@
 			category = planet_buildings
 			produces = {
 				trigger = { exists = owner }
-				unity = 2
+				unity = 3
 				multiplier = owner.trigger:num_ascension_perks
 			}
 			inline_script = {
@@ -3270,11 +4240,6 @@
 				tier = 2
 			}
 		}
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.10
-		}
-
 		triggered_desc = {
 			text = building_heritage_site_effect
 		}
@@ -3339,7 +4304,7 @@
 			category = planet_buildings
 			produces = {
 				trigger = { exists = owner }
-				unity = 3
+				unity = 5
 				multiplier = owner.trigger:num_ascension_perks
 			}
 			inline_script = {
@@ -3347,11 +4312,6 @@
 				tier = 3
 			}
 		}
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.15
-		}
-
 		triggered_desc = {
 			text = building_hypercomms_forum_effect
 		}
@@ -3423,11 +4383,6 @@
 				tier = 1
 			}
 		}
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.05
-		}
-
 		triggered_desc = {
 			text = building_autochthon_monument_effect
 		}
@@ -3489,7 +4444,7 @@
 			category = planet_buildings
 			produces = {
 				trigger = { exists = owner }
-				unity = 2
+				unity = 3
 				multiplier = owner.trigger:num_ascension_perks
 			}
 			inline_script = {
@@ -3497,11 +4452,6 @@
 				tier = 2
 			}
 		}
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.10
-		}
-
 		triggered_desc = {
 			text = building_heritage_site_effect
 		}
@@ -3564,7 +4514,7 @@
 			category = planet_buildings
 			produces = {
 				trigger = { exists = owner }
-				unity = 3
+				unity = 5
 				multiplier = owner.trigger:num_ascension_perks
 			}
 			inline_script = {
@@ -3572,11 +4522,6 @@
 				tier = 3
 			}
 		}
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.15
-		}
-
 		triggered_desc = {
 			text = building_hypercomms_forum_effect
 		}
@@ -3607,6 +4552,7 @@
 		base_buildtime = @b1_time
 		position_priority = 30		# Unique
 		base_cap_amount = 1
+		icon = building_holo_theatres		#BIOHIVE ART PLACEHOLDER!!!!
 
 		category = unity
 
@@ -3648,11 +4594,6 @@
 				tier = 1
 			}
 		}
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.05
-		}
-
 		triggered_desc = {
 			text = building_autochthon_monument_effect
 		}
@@ -3676,6 +4617,7 @@
 		base_buildtime = @b2_time
 		position_priority = 30		# Unique
 		can_build = no
+		icon = building_hyper_entertainment_forum		#BIOHIVE ART PLACEHOLDER!!!!
 
 		category = unity
 
@@ -3713,7 +4655,7 @@
 			category = planet_buildings
 			produces = {
 				trigger = { exists = owner }
-				unity = 2
+				unity = 3
 				multiplier = owner.trigger:num_ascension_perks
 			}
 			inline_script = {
@@ -3721,11 +4663,6 @@
 				tier = 2
 			}
 		}
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.10
-		}
-
 		triggered_desc = {
 			text = building_heritage_site_effect
 		}
@@ -3754,6 +4691,7 @@
 		base_buildtime = @b3_time
 		position_priority = 30		# Unique
 		can_build = no
+		icon = building_citadel_of_faith		#BIOHIVE ART PLACEHOLDER!!!!
 
 		category = unity
 
@@ -3787,7 +4725,7 @@
 			category = planet_buildings
 			produces = {
 				trigger = { exists = owner }
-				unity = 3
+				unity = 5
 				multiplier = owner.trigger:num_ascension_perks
 			}
 			inline_script = {
@@ -3795,11 +4733,6 @@
 				tier = 3
 			}
 		}
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.15
-		}
-
 		triggered_desc = {
 			text = building_hypercomms_forum_effect
 		}
@@ -3870,14 +4803,10 @@
 				tier = 1
 			}
 		}
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.05
-		}
-
 		triggered_desc = {
 			text = building_autochthon_monument_effect
 		}
+
 		inline_script = {
 			script = jobs/inline_evolved_job
 			job = evaluator
@@ -3933,7 +4862,7 @@
 			category = planet_buildings
 			produces = {
 				trigger = { exists = owner }
-				unity = 2
+				unity = 3
 				multiplier = owner.trigger:num_ascension_perks
 			}
 			inline_script = {
@@ -3941,11 +4870,6 @@
 				tier = 2
 			}
 		}
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.10
-		}
-
 		triggered_desc = {
 			text = building_heritage_site_effect
 		}
@@ -4006,7 +4930,7 @@
 			category = planet_buildings
 			produces = {
 				trigger = { exists = owner }
-				unity = 3
+				unity = 5
 				multiplier = owner.trigger:num_ascension_perks
 			}
 			inline_script = {
@@ -4014,11 +4938,6 @@
 				tier = 3
 			}
 		}
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.15
-		}
-
 		triggered_desc = {
 			text = building_hypercomms_forum_effect
 		}
@@ -4086,11 +5005,6 @@
 				tier = 1
 			}
 		}
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.05
-		}
-
 		triggered_desc = {
 			text = building_autochthon_monument_effect
 		}
@@ -4175,7 +5089,7 @@
 			category = planet_buildings
 			produces = {
 				trigger = { exists = owner }
-				unity = 2
+				unity = 3
 				multiplier = owner.trigger:num_ascension_perks
 			}
 			inline_script = {
@@ -4183,11 +5097,6 @@
 				tier = 2
 			}
 		}
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.10
-		}
-
 		triggered_desc = {
 			text = building_heritage_site_effect
 		}
@@ -4272,7 +5181,7 @@
 			category = planet_buildings
 			produces = {
 				trigger = { exists = owner }
-				unity = 2
+				unity = 5
 				multiplier = owner.trigger:num_ascension_perks
 			}
 			inline_script = {
@@ -4280,11 +5189,6 @@
 				tier = 3
 			}
 		}
-
-		planet_modifier = {
-			planet_jobs_unity_produces_mult = 0.15
-		}
-
 		triggered_desc = {
 			text = building_hypercomms_forum_effect
 		}

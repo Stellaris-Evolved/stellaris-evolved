@@ -1,156 +1,38 @@
 # common\traits\00_governor_traits.txt
-# O V E R W R I T E - Replace because dupl
 
 @designation_bonus = 50
-
-##############
-# SUBCLASSES #
-##############
-
-subclass_governor_pioneer = {
-	custom_subtitle = governor_subclass
-	subclass_trait = yes
-	inline_script = {
-		script = trait/icon_subclass
-		SUBCLASS = pioneer
-		COUNCIL = no
-	}
-	leader_class = { governor }
-	custom_tooltip_with_modifiers = pioneer_subclass
-	triggered_modifier = {
-		potential = {
-			exists = owner
-			owner = { trait_is_gestalt_check = no }
-		}
-		pop_growth_speed = 0.05
-	}
-	triggered_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_hive_empire = no
-				trait_is_gestalt_check = yes
-			}
-		}
-		planet_pop_assembly_mult = 0.05
-	}
-	triggered_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_hive_empire = yes
-				trait_is_gestalt_check = yes
-			}
-		}
-		planet_pop_assembly_organic_add = 0.2
-	}
-
-	self_modifier = {
-		species_leader_exp_gain = 0.5
-	}
-
-	subclass_background_icon = "GFX_leader_subclass_pioneer_background"
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		mult = value:tec_ai_leader_is_planet_governor
-		modifier = {
-			mult = 0
-			is_councilor = yes
-		}
-	}
-}
-
-subclass_governor_economist = {
-	custom_subtitle = governor_subclass
-	subclass_trait = yes
-	inline_script = {
-		script = trait/icon_subclass
-		SUBCLASS = economist
-		COUNCIL = no
-	}
-	custom_tooltip_with_modifiers = economist_subclass
-	modifier = {
-		planet_jobs_produces_mult = 0.05
-		pop_amenities_usage_mult = -0.1
-	}
-
-	leader_class = { governor }
-
-	subclass_background_icon = "GFX_leader_subclass_economist_background"
-
-	ai_weight = {
-		base = @tec_good_trait_weight
-		mult = value:tec_ai_leader_is_planet_governor
-		modifier = {
-			mult = 0
-			is_councilor = yes
-		}
-	}
-}
-
-subclass_governor_visionary = {
-	custom_subtitle = councilor_subclass_governor
-	subclass_trait = yes
-	councilor_trait = yes
-	inline_script = {
-		script = trait/icon_subclass
-		SUBCLASS = visionary
-		COUNCIL = yes
-	}
-	custom_tooltip_with_modifiers = councilor_subclass_tt
-	triggered_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_gestalt = no }
-		}
-		planet_pops_upkeep_mult = -0.05
-		trade_value_mult = 0.05
-	}
-
-	leader_potential_add = {
-		NAND = {
-			exists = owner
-			owner = { is_gestalt = yes }
-		}
-	}
-	leader_class = { governor }
-	subclass_background_icon = "GFX_leader_subclass_visionary_background"
-
-	ai_weight = {
-		base = @tec_base_trait_weight
-		mult = value:tec_ai_leader_is_councilor
-	}
-}
 
 ####################################
 # SHARED TRAITS BLOCKED IN PARAGON #
 ####################################
 
 trait_ruler_frontier_spirit = {
-	councilor_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_frontier_spirit"
 		RARITY = common
 		COUNCIL = yes
 		TIER = none
 	}
-	modifier = {
+	councilor_modifier = {
 		ship_colonizer_cost_mult = -0.25
 		planet_colony_development_speed_mult = 0.15
 	}
 	leader_potential_add = {
 		has_paragon_dlc = no
 	}
-	leader_class = { governor }
-	selectable_weight = @class_trait_weight
+	leader_class = { official }
+	selectable_weight = {
+		weight = @subclass_trait_weight
+		inline_script = paragon/council_weight_mult
+	}
 }
 
 leader_trait_intellectual = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_intellectual"
 		RARITY = common
 		COUNCIL = no
@@ -164,8 +46,9 @@ leader_trait_intellectual = {
 	leader_potential_add = {
 		has_paragon_dlc = no
 	}
-	leader_class = { governor }
-	selectable_weight = @class_trait_weight
+	leader_class = { official }
+	initial = no
+	randomized = no
 }
 
 ####################################
@@ -179,181 +62,213 @@ leader_trait_intellectual = {
 leader_trait_bureaucrat = { # Unifier
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_bureaucrat"
 		RARITY = common
 		COUNCIL = no
 		TIER = 1
 	}
-	modifier = {
-		planet_administrators_unity_produces_mult = 0.1
-	}
-	on_gained_effect = {
-		add_age = value:tenth_of_leader_lifespan
-		set_random_governor_background_effect = yes
-	}
 	leader_potential_add = {
-		is_pool_leader = yes # Starting trait only.
-		is_ruler = no
+		trait_is_crisis_faction_check = no
 	}
-	leader_class = { governor }
-	selectable_weight = @class_trait_weight
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
+		}
+		planet_administrators_unity_produces_mult = 0.05
+		mult = trigger:has_skill
+	}
+	leader_class = { official commander scientist }
+	triggered_desc = {
+		exclusive_trigger = {
+			always = yes
+		}
+		text = leader_trait_bureaucrat_tt
+	}
+	selectable_weight = {
+		weight = @shared_trait_weight
+		inline_script = paragon/governor_weight_mult
+		inline_script = {
+			script = "paragon/existing_trait_weight_mult"
+			TRAIT = leader_trait_bureaucrat
+		}
+	}
 }
 
 leader_trait_bureaucrat_2 = { # Unifier
 	replace_traits = { "leader_trait_bureaucrat" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_bureaucrat"
 		RARITY = common
 		COUNCIL = no
 		TIER = 2
 	}
-	modifier = {
-		planet_administrators_unity_produces_mult = 0.2
-	}
-	leader_class = { governor }
-
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		modifier = {
-			add = planet.value:unity_combined_value|CACHED|yes|
-			exists = planet
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
 		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
+		planet_administrators_unity_produces_mult = 0.05
+		mult = trigger:has_skill
 	}
+	triggered_sector_modifier = {
+		potential = {
+			always = yes
+		}
+		planet_administrators_unity_produces_mult = 0.025
+		mult = trigger:has_skill
+	}
+	triggered_desc = {
+		exclusive_trigger = {
+			always = yes
+		}
+		text = leader_trait_bureaucrat_2_tt
+	}
+	leader_class = { official commander scientist }
+
+	#ai_weight = {
+	#	base = @tec_reduced_trait_weight
+	#	modifier = {
+	#		add = planet.value:unity_combined_value|CACHED|yes|
+	#		exists = planet
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_army_veteran = {
-	councilor_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = leader
 		ICON = "GFX_leader_trait_army_veteran"
 		RARITY = common
 		COUNCIL = yes
 		TIER = 1
 	}
-	modifier = {
+	councilor_modifier = {
 		planet_army_build_speed_mult = 0.15
-		armies_cost_mult = -0.05
-		#armies_upkeep_mult = -0.1
+		armies_cost_mult = -0.15
 		army_defense_damage_mult = 0.15
 	}
 	leader_potential_add = {
 		is_pool_leader = yes # Starting trait only.
-		is_ruler = no
 	}
 	on_gained_effect = {
-		add_age = value:tenth_of_leader_lifespan
-		set_random_general_background_effect = yes
+		add_age = value:percent_of_leader_lifespan|PERCENT|10|
+		set_random_commander_background_effect = yes
 	}
-	leader_class = { governor }
+	leader_class = { official scientist }
 	opposites = { "leader_trait_retired_fleet_officer" }
+	selectable_weight = {
+		weight = @shared_trait_weight
+		inline_script = {
+			script = "paragon/existing_trait_weight_mult"
+			TRAIT = leader_trait_army_veteran
+		}
+	}
 }
 
 leader_trait_army_veteran_2 = {
-	councilor_trait = yes
 	replace_traits = { "leader_trait_army_veteran" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = leader
 		ICON = "GFX_leader_trait_army_veteran"
 		RARITY = common
 		COUNCIL = yes
 		TIER = 2
 	}
-	modifier = {
+	councilor_modifier = {
 		planet_army_build_speed_mult = 0.25
-		armies_cost_mult = -0.1
-		#armies_upkeep_mult = -0.2
+		armies_cost_mult = -0.10
 		army_defense_damage_mult = 0.25
 	}
-	leader_class = { governor }
+	leader_class = { official scientist }
 	opposites = { "leader_trait_retired_fleet_officer" }
 
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		add = value:tec_ai_leader_wants_defensive_traits
-		mult = value:tec_ai_leader_is_councilor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_reduced_trait_weight
+	#	add = value:tec_ai_leader_wants_defensive_traits
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_retired_fleet_officer = {
-	councilor_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = leader
 		ICON = "GFX_leader_trait_retired_fleet_officer"
 		RARITY = common
 		COUNCIL = yes
 		TIER = 1
 	}
-	modifier = {
+	councilor_modifier = {
 		starbase_shipyard_build_speed_mult = 0.10
 		ship_starting_experience_add = 100
 	}
 	leader_potential_add = {
 		is_pool_leader = yes # Starting trait only.
-		is_ruler = no
 	}
 	on_gained_effect = {
-		add_age = value:tenth_of_leader_lifespan
-		set_random_admiral_background_effect = yes
+		add_age = value:percent_of_leader_lifespan|PERCENT|10|
+		set_random_commander_background_effect = yes
 	}
-	leader_class = { governor }
+	leader_class = { official scientist }
 	opposites = { "leader_trait_army_veteran" }
+	selectable_weight = {
+		weight = @shared_trait_weight
+		inline_script = {
+			script = "paragon/existing_trait_weight_mult"
+			TRAIT = leader_trait_retired_fleet_officer
+		}
+	}
 }
 
 leader_trait_retired_fleet_officer_2 = {
-	councilor_trait = yes
 	replace_traits = { "leader_trait_retired_fleet_officer" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = leader
 		ICON = "GFX_leader_trait_retired_fleet_officer"
 		RARITY = common
 		COUNCIL = yes
 		TIER = 2
 	}
-	modifier = {
+	councilor_modifier = {
 		starbase_shipyard_build_speed_mult = 0.20
 		ship_starting_experience_add = 200
 	}
-	leader_class = { governor }
+	leader_class = { official scientist }
 	opposites = { "leader_trait_army_veteran" }
 
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		add = value:tec_ai_leader_wants_aggressive_traits
-		mult = value:tec_ai_leader_is_councilor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_reduced_trait_weight
+	#	add = value:tec_ai_leader_wants_aggressive_traits
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_agrarian_upbringing = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = leader
 		ICON = "GFX_leader_trait_agrarian_upbringing"
 		RARITY = common
 		COUNCIL = no
 		TIER = 1
 	}
-	modifier = {
-		planet_jobs_food_produces_mult = 0.1
-	}
 	leader_potential_add = {
+		trait_is_crisis_faction_check = no
 		has_global_flag = game_started
 		owner = { country_uses_food = yes }
 		is_pool_leader = yes # Starting trait only.
-		is_ruler = no
 	}
 	on_gained_effect = {
 		if = {
@@ -364,33 +279,49 @@ leader_trait_agrarian_upbringing = {
 			change_background_job = farmer
 		}
 	}
-	leader_class = { governor }
+	planet_modifier = {
+		planet_jobs_food_produces_mult = 0.10
+	}
+	sector_modifier = {
+		planet_jobs_food_produces_mult = 0.05
+	}
+	leader_class = { commander official scientist }
+	selectable_weight = {
+		weight = @shared_trait_weight
+		inline_script = {
+			script = "paragon/existing_trait_weight_mult"
+			TRAIT = leader_trait_agrarian_upbringing
+		}
+	}
 }
 
 leader_trait_agrarian_upbringing_2 = {
 	replace_traits = { "leader_trait_agrarian_upbringing" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = leader
 		ICON = "GFX_leader_trait_agrarian_upbringing"
 		RARITY = common
 		COUNCIL = no
 		TIER = 2
 	}
-	modifier = {
-		planet_jobs_food_produces_mult = 0.2
+	planet_modifier = {
+		planet_jobs_food_produces_mult = 0.20
 	}
-	leader_class = { governor }
+	sector_modifier = {
+		planet_jobs_food_produces_mult = 0.10
+	}
+	leader_class = { commander official scientist }
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:farming_combined_value|CACHED|yes|
-			exists = planet
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:farming_combined_value|CACHED|yes|
+	#		exists = planet
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 #########################
@@ -399,574 +330,718 @@ leader_trait_agrarian_upbringing_2 = {
 
 ###################
 trait_ruler_fertility_preacher = {
-	councilor_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_fertility_preacher"
 		RARITY = common
 		COUNCIL = yes
 		TIER = 1
 	}
-	triggered_modifier = {
+	triggered_councilor_modifier = {
 		potential = {
 			exists = owner
-			owner = { is_machine_empire = no }
+			#owner = {	# Vanilla
+			#	is_machine_empire = no
+			#}
+			owner = {	# Evolved
+				NOR = {
+					has_origin = origin_clone_army
+					has_origin = origin_tec_clones
+					has_origin = origin_tec_hive_biomorph
+					has_valid_civic = civic_tec_hive_eusocial
+					owner_main_species = {
+						has_trait = trait_tec_lithoid_sedimentary
+					}
+				}
+			}
 		}
-		pop_growth_speed = 0.03
+		pop_growth_speed = 0.025
 	}
-	triggered_modifier = {
+	triggered_councilor_modifier = {
 		potential = {
 			exists = owner
-			owner = { is_machine_empire = yes }
+			#owner = {	# Vanilla
+			#	is_machine_empire = no
+			#}
+			owner = {	# Evolved
+				OR = {
+					has_origin = origin_clone_army
+					has_origin = origin_tec_clones
+					has_origin = origin_tec_hive_biomorph
+					has_valid_civic = civic_tec_hive_eusocial
+					owner_main_species = {
+						has_trait = trait_tec_lithoid_sedimentary
+					}
+				}
+			}
 		}
-		planet_pop_assembly_mult = 0.03
+		planet_pop_assembly_organic_mult = 0.025
 	}
-	triggered_modifier = {
+	triggered_councilor_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_synthetic_empire = yes
+			}
+		}
+		planet_pop_assembly_mult = 0.025
+		planet_pop_assembly_organic_mult = 0.025
+	}
+	triggered_councilor_modifier = {
 		potential = {
 			exists = owner
 			owner = { country_uses_food = yes }
 		}
 		planet_jobs_food_produces_mult = 0.1
 	}
-	leader_class = { governor }
-	selectable_weight = @class_trait_weight
-
-	ai_weight = {
-		base = @tec_base_trait_weight
-		modifier = {
-			add = 5
-			exists = owner
-			owner = { country_uses_food = yes }
-		}
-		mult = value:tec_ai_leader_is_councilor
-		mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|trait_ruler_fertility_preacher|TIERS|2|
+	leader_class = { official }
+	selectable_weight = {
+		weight = @class_trait_weight
+		inline_script = paragon/council_weight_mult
 	}
+
+	#ai_weight = {
+	#	base = @tec_base_trait_weight
+	#	modifier = {
+	#		add = 5
+	#		exists = owner
+	#		owner = { country_uses_food = yes }
+	#	}
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|trait_ruler_fertility_preacher|TIERS|2|
+	#}
 }
 
 trait_ruler_fertility_preacher_2 = {
 	replace_traits = { "trait_ruler_fertility_preacher" }
-	councilor_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_fertility_preacher"
 		RARITY = common
 		COUNCIL = yes
 		TIER = 2
 	}
-	triggered_modifier = {
+	triggered_councilor_modifier = {
 		potential = {
 			exists = owner
-			owner = { is_machine_empire = no }
+			#owner = {	# Vanilla
+			#	is_machine_empire = no
+			#}
+			owner = {	# Evolved
+				NOR = {
+					has_origin = origin_clone_army
+					has_origin = origin_tec_clones
+					has_origin = origin_tec_hive_biomorph
+					has_valid_civic = civic_tec_hive_eusocial
+					owner_main_species = {
+						has_trait = trait_tec_lithoid_sedimentary
+					}
+				}
+			}
 		}
 		pop_growth_speed = 0.05
 	}
-	triggered_modifier = {
+	triggered_councilor_modifier = {
 		potential = {
 			exists = owner
-			owner = { is_machine_empire = yes }
+			#owner = {	# Vanilla
+			#	is_machine_empire = no
+			#}
+			owner = {	# Evolved
+				OR = {
+					has_origin = origin_clone_army
+					has_origin = origin_tec_clones
+					has_origin = origin_tec_hive_biomorph
+					has_valid_civic = civic_tec_hive_eusocial
+					owner_main_species = {
+						has_trait = trait_tec_lithoid_sedimentary
+					}
+				}
+			}
+		}
+		planet_pop_assembly_organic_mult = 0.05
+	}
+	triggered_councilor_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_synthetic_empire = yes
+			}
 		}
 		planet_pop_assembly_mult = 0.05
+		planet_pop_assembly_organic_mult = 0.05
 	}
-	triggered_modifier = {
+	triggered_councilor_modifier = {
 		potential = {
 			exists = owner
 			owner = { country_uses_food = yes }
 		}
 		planet_jobs_food_produces_mult = 0.15
 	}
-	leader_class = { governor }
+	leader_class = { official }
 
-	ai_weight = {
-		base = @tec_base_trait_weight
-		modifier = {
-			add = 5
-			exists = owner
-			owner = { country_uses_food = yes }
-		}
-		mult = value:tec_ai_leader_is_councilor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_base_trait_weight
+	#	modifier = {
+	#		add = 5
+	#		exists = owner
+	#		owner = { country_uses_food = yes }
+	#	}
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_righteous = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = leader
 		ICON = "GFX_leader_trait_righteous"
 		RARITY = common
 		COUNCIL = no
 		TIER = 1
 	}
-	triggered_modifier = {
+	leader_potential_add = {
+		trait_is_crisis_faction_check = no
+	}
+	triggered_planet_modifier = {
 		potential = { trait_is_gestalt_check = no }
 		planet_crime_add = -25
 	}
-	triggered_modifier = {
+	triggered_planet_modifier = {
 		potential = { trait_is_gestalt_check = yes }
 		planet_crime_no_happiness_add = -25
 	}
-	leader_potential_add = {
-		is_ruler = no
+	triggered_sector_modifier = {
+		potential = { trait_is_gestalt_check = no }
+		planet_crime_add = -10
 	}
-	leader_class = { governor }
+	triggered_sector_modifier = {
+		potential = { trait_is_gestalt_check = yes }
+		planet_crime_no_happiness_add = -10
+	}
+	leader_class = { commander official }
 	opposites = {
 		leader_trait_corrupt
 		leader_trait_corrupt_2
 	}
-	selectable_weight = @class_trait_weight
-
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		add = value:tec_ai_leader_wants_anticrime_traits
-		mult = value:tec_ai_leader_is_planet_governor
+	selectable_weight = {
+		weight = @shared_trait_weight
+		inline_script = paragon/governor_weight_mult
 	}
+
+	#ai_weight = {
+	#	base = @tec_reduced_trait_weight
+	#	add = value:tec_ai_leader_wants_anticrime_traits
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#}
 }
 
 leader_trait_righteous_2 = {
 	replace_traits = { "leader_trait_righteous" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = leader
 		ICON = "GFX_leader_trait_righteous"
 		RARITY = common
 		COUNCIL = no
 		TIER = 2
 	}
-	triggered_modifier = {
+	triggered_planet_modifier = {
 		potential = { trait_is_gestalt_check = no }
 		planet_crime_add = -50
 	}
-	triggered_modifier = {
+	triggered_planet_modifier = {
 		potential = { trait_is_gestalt_check = yes }
 		planet_crime_no_happiness_add = -50
 	}
-	leader_class = { governor }
+	triggered_sector_modifier = {
+		potential = { trait_is_gestalt_check = no }
+		planet_crime_add = -25
+	}
+	triggered_sector_modifier = {
+		potential = { trait_is_gestalt_check = yes }
+		planet_crime_no_happiness_add = -25
+	}
+	leader_class = { commander official }
 	opposites = {
 		leader_trait_corrupt
 		leader_trait_corrupt_2
 	}
 
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		add = value:tec_ai_leader_wants_anticrime_traits
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_reduced_trait_weight
+	#	add = value:tec_ai_leader_wants_anticrime_traits
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_iron_fist = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = commander
 		ICON = "GFX_leader_trait_iron_fist"
 		RARITY = common
 		COUNCIL = no
 		TIER = 1
 	}
-	modifier = {
+	planet_modifier = {
 		planet_jobs_slave_produces_mult = 0.1
 	}
-	leader_potential_add = {
-		from = { allows_slavery = yes }
-		is_gestalt = no
-		is_ruler = no
+	sector_modifier = {
+		planet_jobs_slave_produces_mult = 0.05
 	}
-	leader_class = { governor }
+	leader_potential_add = {
+		trait_is_crisis_faction_check = no
+		trait_is_gestalt_check = no
+		owner = { allows_slavery = yes }
+	}
+	leader_class = { commander }
 	selectable_weight = {
-		weight = @class_trait_weight
-		inline_script = {
-			script = paragon/subclass_weight_mult
-			SUBCLASS = governor_economist
-		}
+		weight = @shared_trait_weight
+		inline_script = paragon/governor_weight_mult
 	}
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		add = value:tec_ai_leader_wants_slaver_traits
-		mult = value:tec_ai_leader_is_planet_governor
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	add = value:tec_ai_leader_wants_slaver_traits
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#}
 }
 
 leader_trait_iron_fist_2 = {
 	replace_traits = { "leader_trait_iron_fist" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = commander
 		ICON = "GFX_leader_trait_iron_fist"
 		RARITY = common
 		COUNCIL = no
 		TIER = 2
 	}
-	modifier = {
+	planet_modifier = {
 		planet_jobs_slave_produces_mult = 0.2
 	}
-	leader_class = { governor }
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		add = value:tec_ai_leader_wants_slaver_traits
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
+	sector_modifier = {
+		planet_jobs_slave_produces_mult = 0.1
 	}
+	leader_class = { commander }
+
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	add = value:tec_ai_leader_wants_slaver_traits
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_environmental_engineer = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = leader
 		ICON = "GFX_leader_trait_environmental_engineer"
 		RARITY = common
 		COUNCIL = no
 		TIER = 1
 	}
-	modifier = {
+	leader_potential_add = {
+		trait_is_crisis_faction_check = no
+		owner = {
+			has_blocker_removal_tech = yes
+		}
+	}
+	planet_modifier = {
 		deposit_blockers_cost_mult = -0.25
 		planet_clear_blocker_speed_mult = 0.25
 	}
-	leader_potential_add = {
-		is_ruler = no
+	sector_modifier = {
+		deposit_blockers_cost_mult = -0.10
+		planet_clear_blocker_speed_mult = 0.10
 	}
-	leader_class = { governor }
+	leader_class = { commander official scientist }
 	selectable_weight = {
-		weight = @class_trait_weight
-		inline_script = {
-			script = paragon/subclass_weight_mult
-			SUBCLASS = governor_pioneer
+		weight = @shared_trait_weight
+		inline_script = paragon/governor_weight_mult
+		modifier = {
+			owner = {
+				has_valid_civic = civic_environmentalist
+			}
+			factor = @anti_synergy_weight_mult
 		}
 	}
 
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		add = value:tec_ai_leader_wants_blocker_traits
-		mult = value:tec_ai_leader_is_planet_governor
-	}
+	#ai_weight = {
+	#	base = @tec_reduced_trait_weight
+	#	add = value:tec_ai_leader_wants_blocker_traits
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#}
 }
 
 leader_trait_environmental_engineer_2 = {
 	replace_traits = { "leader_trait_environmental_engineer" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = leader
 		ICON = "GFX_leader_trait_environmental_engineer"
 		RARITY = common
 		COUNCIL = no
 		TIER = 2
 	}
-	modifier = {
+	planet_modifier = {
 		deposit_blockers_cost_mult = -0.35
 		planet_clear_blocker_speed_mult = 0.35
 	}
-	leader_class = { governor }
-
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		add = value:tec_ai_leader_wants_blocker_traits
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
+	sector_modifier = {
+		deposit_blockers_cost_mult = -0.15
+		planet_clear_blocker_speed_mult = 0.15
 	}
+	leader_class = { commander official scientist }
+
+	#ai_weight = {
+	#	base = @tec_reduced_trait_weight
+	#	add = value:tec_ai_leader_wants_blocker_traits
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_enlister = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = commander
 		ICON = "GFX_leader_trait_enlister"
 		RARITY = common
 		COUNCIL = no
 		TIER = 1
 	}
-	modifier = {
+	leader_potential_add = {
+		trait_is_crisis_faction_check = no
+	}
+	planet_modifier = {
 		planet_army_build_speed_mult = 0.1
 		armies_cost_mult = -0.1
 	}
-	leader_potential_add = {
-		is_ruler = no
-	}
-	leader_class = { governor }
-	selectable_weight = {
-		weight = @class_trait_weight
-		inline_script = {
-			script = paragon/ethic_weight_mult
-			IS = militarist
-			NOT = pacifist
+	triggered_planet_modifier = {
+		potential = {
+			trait_is_gestalt_check = no
 		}
+		job_soldier_add = 1
+	}
+	triggered_planet_modifier = {
+		potential = {
+			trait_is_gestalt_check = yes
+		}
+		job_warrior_drone_add = 1
+	}
+	sector_modifier = {
+		planet_army_build_speed_mult = 0.05
+		armies_cost_mult = -0.05
+	}
+	leader_class = { commander }
+	selectable_weight = {
+		weight = @shared_trait_weight
+		inline_script = paragon/governor_weight_mult
 	}
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		add = value:tec_ai_leader_wants_aggressive_traits
-		mult = value:tec_ai_leader_is_planet_governor
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	add = value:tec_ai_leader_wants_aggressive_traits
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#}
 }
 
 leader_trait_enlister_2 = {
 	replace_traits = { "leader_trait_enlister" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_enlister"
 		RARITY = common
 		COUNCIL = no
 		TIER = 2
 	}
-	modifier = {
+	planet_modifier = {
 		planet_army_build_speed_mult = 0.2
 		armies_cost_mult = -0.2
 	}
-	leader_class = { governor }
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		add = value:tec_ai_leader_wants_aggressive_traits
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
+	triggered_planet_modifier = {
+		potential = {
+			trait_is_gestalt_check = no
+		}
+		job_soldier_add = 2
 	}
+	triggered_planet_modifier = {
+		potential = {
+			trait_is_gestalt_check = yes
+		}
+		job_warrior_drone_add = 2
+	}
+	sector_modifier = {
+		planet_army_build_speed_mult = 0.1
+		armies_cost_mult = -0.1
+	}
+	triggered_sector_modifier = {
+		potential = {
+			trait_is_gestalt_check = no
+		}
+		job_soldier_add = 1
+	}
+	triggered_sector_modifier = {
+		potential = {
+			trait_is_gestalt_check = yes
+		}
+		job_warrior_drone_add = 1
+	}
+	leader_class = { commander }
+
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	add = value:tec_ai_leader_wants_aggressive_traits
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_shipwright = {
-	councilor_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_shipwright"
 		RARITY = common
 		COUNCIL = yes
 		TIER = 1
 	}
-	#modifier = {	# Vanilla
+	#councilor_modifier = {	# Vanilla
 	#	starbase_shipyard_build_speed_mult = 0.05
-	#	starbase_shipyard_build_cost_mult = -0.025
-	#	ship_hull_mult = 0.025
+	#	starbase_shipyard_build_cost_mult = -0.05
 	#}
-	modifier = {	# Evolved
-		starbase_shipyard_build_speed_mult = 0.05
-		ships_upkeep_mult = -0.025
-		ship_hull_mult = 0.025
+	councilor_modifier = {	# Evolved
+		starbase_shipyard_build_speed_mult = 0.10
 	}
-	leader_potential_add = {
-		is_ruler = no
-	}
-	leader_class = { governor }
+	leader_class = { official }
 	opposites = {
 		leader_trait_irenic
 		leader_trait_irenic_2
 	}
 	selectable_weight = {
 		weight = @class_trait_weight
-		inline_script = {
-			script = paragon/ethic_weight_mult
-			IS = militarist
-			NOT = pacifist
-		}
+		inline_script = paragon/council_weight_mult
 	}
 
-	ai_weight = {
-		base = @tec_good_trait_weight
-		add = value:tec_ai_leader_wants_aggressive_traits
-		mult = value:tec_ai_leader_is_councilor
-		mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|leader_trait_shipwright|TIERS|2|
-	}
+	#ai_weight = {
+	#	base = @tec_good_trait_weight
+	#	add = value:tec_ai_leader_wants_aggressive_traits
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|leader_trait_shipwright|TIERS|2|
+	#}
 }
 
 leader_trait_shipwright_2 = {
-	councilor_trait = yes
 	replace_traits = { "leader_trait_shipwright" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_shipwright"
 		RARITY = common
 		COUNCIL = yes
 		TIER = 2
 	}
-	#modifier = {	# Vanilla
+	#councilor_modifier = {
 	#	starbase_shipyard_build_speed_mult = 0.10
-	#	starbase_shipyard_build_cost_mult = -0.05
-	#	ship_hull_mult = 0.05
+	#	starbase_shipyard_build_cost_mult = -0.10
 	#}
-	modifier = {	# Evolved
-		starbase_shipyard_build_speed_mult = 0.10
-		ships_upkeep_mult = -0.05
-		ship_hull_mult = 0.05
+	councilor_modifier = {	# Evolved
+		starbase_shipyard_build_speed_mult = 0.20
 	}
-	leader_class = { governor }
+	leader_class = { official }
 	opposites = {
 		leader_trait_irenic
 		leader_trait_irenic_2
 	}
 
-	ai_weight = {
-		base = @tec_good_trait_weight
-		add = value:tec_ai_leader_wants_aggressive_traits
-		mult = value:tec_ai_leader_is_councilor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_good_trait_weight
+	#	add = value:tec_ai_leader_wants_aggressive_traits
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_architectural_interest = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = leader
 		ICON = "GFX_leader_trait_architectural_interest"
 		RARITY = common
 		COUNCIL = no
 		TIER = 1
 	}
-	modifier = {
+	leader_potential_add = {
+		trait_is_crisis_faction_check = no
+	}
+	planet_modifier = {
 		planet_structures_upkeep_mult = -0.1
 		planet_building_build_speed_mult = 0.1
 	}
-	leader_potential_add = {
-		is_ruler = no
+	sector_modifier = {
+		planet_structures_upkeep_mult = -0.05
+		planet_building_build_speed_mult = 0.05
 	}
-	leader_class = { governor }
+	leader_class = { official scientist }
 	opposites = {
 		leader_trait_procrastinator
 		leader_trait_procrastinator_2
 	}
 	selectable_weight = {
-		weight = @class_trait_weight
-		inline_script = {
-			script = paragon/subclass_weight_mult
-			SUBCLASS = governor_pioneer
-		}
+		weight = @shared_trait_weight
+		inline_script = paragon/governor_weight_mult
 	}
 
-	ai_weight = {
-		base = @tec_base_trait_weight
-		modifier = {
-			add = 5
-			exists = planet
-			planet = {
-				tec_is_arcology = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-	}
+	#ai_weight = {
+	#	base = @tec_base_trait_weight
+	#	modifier = {
+	#		add = 5
+	#		exists = planet
+	#		planet = {
+	#			tec_is_arcology = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#}
 }
 
 leader_trait_architectural_interest_2 = {
 	replace_traits = { "leader_trait_architectural_interest" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = leader
 		ICON = "GFX_leader_trait_architectural_interest"
 		RARITY = common
 		COUNCIL = no
 		TIER = 2
 	}
-	modifier = {
+	planet_modifier = {
 		planet_structures_upkeep_mult = -0.2
 		planet_building_build_speed_mult = 0.2
 	}
-	leader_class = { governor }
+	sector_modifier = {
+		planet_structures_upkeep_mult = -0.1
+		planet_building_build_speed_mult = 0.1
+	}
+	leader_class = { official scientist }
 	opposites = {
 		leader_trait_procrastinator
 		leader_trait_procrastinator_2
 	}
 
-	ai_weight = {
-		base = @tec_good_trait_weight
-		modifier = {
-			add = 5
-			exists = planet
-			planet = {
-				tec_is_arcology = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_good_trait_weight
+	#	modifier = {
+	#		add = 5
+	#		exists = planet
+	#		planet = {
+	#			tec_is_arcology = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_trade_focus = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_trader"
 		RARITY = common
 		COUNCIL = no
 		TIER = 1
 	}
 	leader_potential_add = {
+		trait_is_crisis_faction_check = no
 		has_paragon_dlc = yes
-		owner = {
-			tec_uses_trade_value = yes
-		}
-		is_ruler = no
+		owner = { is_gestalt = no }
 	}
-	modifier = {
+	planet_modifier = {
 		trade_value_mult = 0.15
 	}
-	leader_class = { governor }
+	sector_modifier = {
+		trade_value_mult = 0.075
+	}
+	leader_class = { official }
 	selectable_weight = {
-		weight = @subclass_trait_weight
+		weight = @class_trait_weight
+		inline_script = paragon/governor_weight_mult
 		modifier = {
 			add = @designation_bonus
-			exists = planet 
+			exists = planet
 			planet = {
 				has_trade_designation = yes
 			}
 		}
 	}
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:trade_combined_value|FACTOR|2|CACHED|yes|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				has_trade_designation = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:trade_combined_value|FACTOR|2|CACHED|yes|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_base_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			has_trade_designation = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#}
 }
 
 leader_trait_trade_focus_2 = {
 	replace_traits = { "leader_trait_trade_focus" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_trader"
 		RARITY = common
 		COUNCIL = no
 		TIER = 2
 	}
-	modifier = {
+	planet_modifier = {
 		trade_value_mult = 0.25
 	}
-	leader_class = { governor }
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:trade_combined_value|FACTOR|2|CACHED|yes|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				has_trade_designation = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
+	sector_modifier = {
+		trade_value_mult = 0.125
 	}
+	leader_class = { official }
+
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:trade_combined_value|FACTOR|2|CACHED|yes|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_base_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			has_trade_designation = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###############
@@ -975,595 +1050,570 @@ leader_trait_trade_focus_2 = {
 
 leader_trait_frontier_spirit = {
 	veteran_class_locked_trait = yes
-	councilor_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_frontier_spirit"
 		RARITY = veteran
 		COUNCIL = yes
 		TIER = 1
 	}
-	modifier = {
+	councilor_modifier = {
 		ship_colonizer_cost_mult = -0.05
 		planet_colony_development_speed_mult = 0.15
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		has_trait = subclass_governor_visionary
+		has_trait = subclass_official_economy_councilor
 	}
-	leader_class = { governor }
-	selectable_weight = @class_trait_weight
+	leader_class = { official }
+	selectable_weight = {
+		weight = @subclass_trait_weight
+		inline_script = paragon/council_weight_mult
+	}
 
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		subtract = value:tec_ai_leader_years_passed|YEARS|30|OFFSET|10|
-		mult = value:tec_ai_leader_is_councilor
-		mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|leader_trait_frontier_spirit|TIERS|3|
-	}
+	#ai_weight = {
+	#	base = @tec_reduced_trait_weight
+	#	subtract = value:tec_ai_leader_years_passed|YEARS|30|OFFSET|10|
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|leader_trait_frontier_spirit|TIERS|3|
+	#}
 }
 
 leader_trait_frontier_spirit_2 = {
 	veteran_class_locked_trait = yes
-	councilor_trait = yes
 	replace_traits = { "leader_trait_frontier_spirit" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_frontier_spirit"
 		RARITY = veteran
 		COUNCIL = yes
 		TIER = 2
 	}
-	modifier = {
+	councilor_modifier = {
 		ship_colonizer_cost_mult = -0.10
 		planet_colony_development_speed_mult = 0.33
 	}
-	leader_class = { governor }
+	leader_class = { official }
 
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		subtract = value:tec_ai_leader_years_passed|YEARS|30|OFFSET|10|
-		mult = value:tec_ai_leader_is_councilor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_reduced_trait_weight
+	#	subtract = value:tec_ai_leader_years_passed|YEARS|30|OFFSET|10|
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 leader_trait_frontier_spirit_3 = {
 	veteran_class_locked_trait = yes
-	councilor_trait = yes
 	replace_traits = { "leader_trait_frontier_spirit_2" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_frontier_spirit"
 		RARITY = veteran
 		COUNCIL = yes
 		TIER = 3
 	}
-	modifier = {
+	councilor_modifier = {
 		ship_colonizer_cost_mult = -0.10
 		planet_colony_development_speed_mult = 0.50
 		colony_start_num_pops_add = 1
 	}
-	leader_class = { governor }
+	leader_class = { official }
 
-	ai_weight = {
-		base = @tec_good_trait_weight
-		subtract = value:tec_ai_leader_years_passed|YEARS|30|OFFSET|10|
-		mult = value:tec_ai_leader_is_councilor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_good_trait_weight
+	#	subtract = value:tec_ai_leader_years_passed|YEARS|30|OFFSET|10|
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_cultural_focus = {
-	councilor_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_cultural_focus"
 		RARITY = veteran
 		COUNCIL = yes
 		TIER = 1
 	}
 	leader_potential_add = {
-		has_any_governor_focus = no
 		has_paragon_dlc = yes
-		has_trait = subclass_governor_visionary
+		has_trait = subclass_official_economy_councilor
 	}
-	modifier = {
+	councilor_modifier = {
 		planet_jobs_unity_produces_mult = 0.1
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
-	custom_tooltip_with_modifiers = only_one_governor_focus
-	selectable_weight = @subclass_trait_weight
-
-	ai_weight = {
-		base = @tec_good_trait_weight
-		modifier = {
-			add = 5
-			exists = owner
-			owner = {
-				is_spiritualist = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_councilor
-		mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|leader_trait_cultural_focus|TIERS|3|
+	leader_class = { official }
+	selectable_weight = {
+		weight = @class_trait_weight
+		inline_script = paragon/council_weight_mult
 	}
+
+	#ai_weight = {
+	#	base = @tec_good_trait_weight
+	#	modifier = {
+	#		add = 5
+	#		exists = owner
+	#		owner = {
+	#			is_spiritualist = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|leader_trait_cultural_focus|TIERS|3|
+	#}
 }
 
 leader_trait_cultural_focus_2 = {
-	councilor_trait = yes
 	replace_traits = { "leader_trait_cultural_focus" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_cultural_focus"
 		RARITY = veteran
 		COUNCIL = yes
 		TIER = 2
 	}
-	modifier = {
+	councilor_modifier = {
 		planet_jobs_unity_produces_mult = 0.15
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
-	custom_tooltip_with_modifiers = only_one_governor_focus
+	leader_class = { official }
 
-	ai_weight = {
-		base = @tec_base_trait_weight
-		modifier = {
-			add = 5
-			exists = owner
-			owner = {
-				is_spiritualist = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_councilor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_base_trait_weight
+	#	modifier = {
+	#		add = 5
+	#		exists = owner
+	#		owner = {
+	#			is_spiritualist = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 leader_trait_cultural_focus_3 = {
-	councilor_trait = yes
 	replace_traits = { "leader_trait_cultural_focus_2" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_cultural_focus"
 		RARITY = veteran
 		COUNCIL = yes
 		TIER = 3
 	}
-	modifier = {
+	councilor_modifier = {
 		planet_jobs_unity_produces_mult = 0.25
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
-	custom_tooltip_with_modifiers = only_one_governor_focus
+	leader_class = { official }
 
-	ai_weight = {
-		base = @tec_good_trait_weight
-		modifier = {
-			add = 5
-			exists = owner
-			owner = {
-				is_spiritualist = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_councilor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_good_trait_weight
+	#	modifier = {
+	#		add = 5
+	#		exists = owner
+	#		owner = {
+	#			is_spiritualist = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 trait_ruler_investor = {
-	councilor_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_investor"
 		RARITY = free_or_veteran
 		COUNCIL = yes
 		TIER = 1
 	}
-	triggered_modifier = {
-		potential = {
-			exists = owner
-			owner = { tec_uses_trade_value = yes }
-		}
+	triggered_councilor_modifier = {
+		potential = { trait_is_gestalt_check = no }
 		trade_value_mult = 0.1
 	}
-	triggered_modifier = {
-		potential = {
-			exists = owner
-			owner = { tec_uses_trade_value = no }
-		}
+	triggered_councilor_modifier = {
+		potential = { trait_is_gestalt_check = yes }
 		planet_jobs_produces_mult = 0.025
 	}
 	leader_potential_add = {
 		OR = {
 			has_paragon_dlc = no
-			has_trait = subclass_governor_visionary
+			has_trait = subclass_official_economy_councilor
 		}
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { official }
 	opposites = {
 		leader_trait_insider_trading
 		leader_trait_insider_trading_2
 	}
 	selectable_weight = {
 		inline_script = paragon/subclass_free_trait_weight
+		inline_script = paragon/council_weight_mult
 	}
 
-	ai_weight = {
-		base = @tec_base_trait_weight
-		modifier = {
-			add = 5
-			exists = owner
-			owner = {
-				OR = {
-					is_megacorp = yes
-					tec_is_trade_gestalt = yes
-					should_ai_focus_on_trade = yes
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_councilor
-		mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|trait_ruler_investor|TIERS|3|
-	}
+	#ai_weight = {
+	#	base = @tec_base_trait_weight
+	#	modifier = {
+	#		add = 5
+	#		exists = owner
+	#		owner = {
+	#			OR = {
+	#				is_megacorp = yes
+	#				tec_is_trade_gestalt = yes
+	#				should_ai_focus_on_trade = yes
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|trait_ruler_investor|TIERS|3|
+	#}
 }
 
 trait_ruler_investor_2 = {
-	councilor_trait = yes
 	replace_traits = { "trait_ruler_investor" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_investor"
 		RARITY = free_or_veteran
 		COUNCIL = yes
 		TIER = 2
 	}
-	triggered_modifier = {
-		potential = {
-			exists = owner
-			owner = { tec_uses_trade_value = yes }
-		}
+	triggered_councilor_modifier = {
+		potential = { trait_is_gestalt_check = no }
 		trade_value_mult = 0.15
 	}
-	triggered_modifier = {
-		potential = {
-			exists = owner
-			owner = { tec_uses_trade_value = no }
-		}
+	triggered_councilor_modifier = {
+		potential = { trait_is_gestalt_check = yes }
 		planet_jobs_produces_mult = 0.05
 	}
-	leader_class = { governor }
+	leader_class = { official }
 	opposites = {
 		leader_trait_insider_trading
 		leader_trait_insider_trading_2
 	}
 	veteran_class_locked_trait = yes
 
-	ai_weight = {
-		base = @tec_base_trait_weight
-		modifier = {
-			add = 5
-			exists = owner
-			owner = {
-				OR = {
-					is_megacorp = yes
-					tec_is_trade_gestalt = yes
-					should_ai_focus_on_trade = yes
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_councilor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_base_trait_weight
+	#	modifier = {
+	#		add = 5
+	#		exists = owner
+	#		owner = {
+	#			OR = {
+	#				is_megacorp = yes
+	#				tec_is_trade_gestalt = yes
+	#				should_ai_focus_on_trade = yes
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 trait_ruler_investor_3 = {
-	councilor_trait = yes
 	replace_traits = { "trait_ruler_investor_2" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_investor"
 		RARITY = veteran
 		COUNCIL = yes
 		TIER = 3
 	}
-	triggered_modifier = {
-		potential = {
-			exists = owner
-			owner = { tec_uses_trade_value = yes }
-		}
+	triggered_councilor_modifier = {
+		potential = { trait_is_gestalt_check = no }
 		trade_value_mult = 0.25
 	}
-	triggered_modifier = {
-		potential = {
-			exists = owner
-			owner = { tec_uses_trade_value = no }
-		}
+	triggered_councilor_modifier = {
+		potential = { trait_is_gestalt_check = yes }
 		planet_jobs_produces_mult = 0.1
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { official }
 	opposites = {
 		leader_trait_insider_trading
 		leader_trait_insider_trading_2
 	}
 
-	ai_weight = {
-		base = @tec_good_trait_weight
-		modifier = {
-			add = 5
-			exists = owner
-			owner = {
-				OR = {
-					is_megacorp = yes
-					tec_is_trade_gestalt = yes
-					should_ai_focus_on_trade = yes
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_councilor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_good_trait_weight
+	#	modifier = {
+	#		add = 5
+	#		exists = owner
+	#		owner = {
+	#			OR = {
+	#				is_megacorp = yes
+	#				tec_is_trade_gestalt = yes
+	#				should_ai_focus_on_trade = yes
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 trait_ruler_architectural_sense = {
-	councilor_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_architectural_sense"
 		RARITY = free_or_veteran
 		COUNCIL = yes
 		TIER = 1
 	}
-	modifier = {
-		planet_structures_cost_mult = -0.05
+	councilor_modifier = {
+		planet_buildings_cost_mult = -0.05
+		planet_districts_cost_mult = -0.05
 		planet_building_build_speed_mult = 0.10
 	}
 	leader_potential_add = {
 		OR = {
 			has_paragon_dlc = no
-			has_trait = subclass_governor_visionary			
+			has_trait = subclass_official_economy_councilor
 		}
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { official }
 	selectable_weight = {
 		inline_script = paragon/subclass_free_trait_weight
+		inline_script = paragon/council_weight_mult
 	}
 
-	ai_weight = {
-		base = @tec_base_trait_weight
-		subtract = value:tec_ai_leader_years_passed|YEARS|60|OFFSET|20|
-		mult = value:tec_ai_leader_is_councilor
-		mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|trait_ruler_architectural_sense|TIERS|3|
-	}
+	#ai_weight = {
+	#	base = @tec_base_trait_weight
+	#	subtract = value:tec_ai_leader_years_passed|YEARS|60|OFFSET|20|
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|trait_ruler_architectural_sense|TIERS|3|
+	#}
 }
 
 trait_ruler_architectural_sense_2 = {
-	councilor_trait = yes
 	replace_traits = { "trait_ruler_architectural_sense" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_architectural_sense"
 		RARITY = free_or_veteran
 		COUNCIL = yes
 		TIER = 2
 	}
-	modifier = {
-		planet_structures_cost_mult = -0.10
+	councilor_modifier = {
+		planet_buildings_cost_mult = -0.10
+		planet_districts_cost_mult = -0.10
 		planet_building_build_speed_mult = 0.15
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { official }
 
-	ai_weight = {
-		base = @tec_base_trait_weight
-		subtract = value:tec_ai_leader_years_passed|YEARS|60|OFFSET|10|
-		mult = value:tec_ai_leader_is_councilor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_base_trait_weight
+	#	subtract = value:tec_ai_leader_years_passed|YEARS|60|OFFSET|10|
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 trait_ruler_architectural_sense_3 = {
-	councilor_trait = yes
 	replace_traits = { "trait_ruler_architectural_sense_2" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_architectural_sense"
 		RARITY = veteran
 		COUNCIL = yes
 		TIER = 3
 	}
-	modifier = {
-		planet_structures_cost_mult = -0.1
-		planet_structures_upkeep_mult = -0.05
+	councilor_modifier = {
+		planet_buildings_cost_mult = -0.1
+		planet_districts_cost_mult = -0.1
+		planet_buildings_upkeep_mult = -0.05
+		planet_districts_upkeep_mult = -0.05
 		planet_building_build_speed_mult = 0.25
 	}
 	veteran_class_locked_trait = yes
 	leader_potential_add = {
 		has_paragon_dlc = yes
 	}
-	leader_class = { governor }
+	leader_class = { official }
 
-	ai_weight = {
-		base = @tec_good_trait_weight
-		subtract = value:tec_ai_leader_years_passed|YEARS|60|OFFSET|10|
-		mult = value:tec_ai_leader_is_councilor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_good_trait_weight
+	#	subtract = value:tec_ai_leader_years_passed|YEARS|60|OFFSET|10|
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 trait_ruler_deep_connections = {
-	councilor_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_deep_connections"
 		RARITY = free_or_veteran
 		COUNCIL = yes
 		TIER = 1
 	}
-	modifier = {
+	councilor_modifier = {
 		country_councilor_influence_produces_add = 0.5
 	}
 	veteran_class_locked_trait = yes
 	leader_potential_add = {
 		OR = {
 			has_paragon_dlc = no
-			has_trait = subclass_governor_visionary
+			has_trait = subclass_official_diplomacy_councilor
 		}
 	}
-	leader_class = { governor }
+	leader_class = { official }
 	selectable_weight = {
 		inline_script = paragon/subclass_free_trait_weight
+		inline_script = paragon/council_weight_mult
 	}
 
-	ai_weight = {
-		base = @tec_good_trait_weight
-		modifier = {
-			add = 5
-			exists = owner
-			owner = {
-				is_megacorp = yes
-			}
-		}
-		modifier = {
-			add = 5
-			exists = owner
-			owner = {
-				OR = {
-					tec_is_symbiotic_gestalt = yes # they are basically megas
-					tec_is_trade_gestalt = yes # trade deals need influence
-					has_valid_civic = civic_tec_corporate_cooperacorp # Super expensive branch offices
-					is_criminal_syndicate = yes # To spread their influence
-					has_tradition = tr_politics_adopt # need for politics
-					has_origin = origin_void_dwellers # hab spam need influence
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_councilor
-		mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|trait_ruler_deep_connections|TIERS|3|
-	}
+	#ai_weight = {
+	#	base = @tec_good_trait_weight
+	#	modifier = {
+	#		add = 5
+	#		exists = owner
+	#		owner = {
+	#			is_megacorp = yes
+	#		}
+	#	}
+	#	modifier = {
+	#		add = 5
+	#		exists = owner
+	#		owner = {
+	#			OR = {
+	#				tec_is_symbiotic_gestalt = yes # they are basically megas
+	#				tec_is_trade_gestalt = yes # trade deals need influence
+	#				has_valid_civic = civic_tec_corporate_cooperacorp # Super expensive branch offices
+	#				is_criminal_syndicate = yes # To spread their influence
+	#				has_tradition = tr_politics_adopt # need for politics
+	#				has_origin = origin_void_dwellers # hab spam need influence
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|trait_ruler_deep_connections|TIERS|3|
+	#}
 }
 
 trait_ruler_deep_connections_2 = {
-	councilor_trait = yes
 	replace_traits = { "trait_ruler_deep_connections" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_deep_connections"
 		RARITY = free_or_veteran
 		COUNCIL = yes
 		TIER = 2
 	}
-	modifier = {
+	councilor_modifier = {
 		country_councilor_influence_produces_add = 0.75
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { official }
 
-	ai_weight = {
-		base = @tec_good_trait_weight
-		modifier = {
-			add = 5
-			exists = owner
-			owner = {
-				is_megacorp = yes
-			}
-		}
-		modifier = {
-			add = 5
-			exists = owner
-			owner = {
-				OR = {
-					tec_is_symbiotic_gestalt = yes # they are basically megas
-					tec_is_trade_gestalt = yes # trade deals need influence
-					has_valid_civic = civic_tec_corporate_cooperacorp # Super expensive branch offices
-					is_criminal_syndicate = yes # To spread their influence
-					has_tradition = tr_politics_adopt # need for politics
-					has_origin = origin_void_dwellers # hab spam need influence
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_councilor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_good_trait_weight
+	#	modifier = {
+	#		add = 5
+	#		exists = owner
+	#		owner = {
+	#			is_megacorp = yes
+	#		}
+	#	}
+	#	modifier = {
+	#		add = 5
+	#		exists = owner
+	#		owner = {
+	#			OR = {
+	#				tec_is_symbiotic_gestalt = yes # they are basically megas
+	#				tec_is_trade_gestalt = yes # trade deals need influence
+	#				has_valid_civic = civic_tec_corporate_cooperacorp # Super expensive branch offices
+	#				is_criminal_syndicate = yes # To spread their influence
+	#				has_tradition = tr_politics_adopt # need for politics
+	#				has_origin = origin_void_dwellers # hab spam need influence
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 trait_ruler_deep_connections_3 = {
-	councilor_trait = yes
 	replace_traits = { "trait_ruler_deep_connections_2" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_deep_connections"
 		RARITY = veteran
 		COUNCIL = yes
 		TIER = 3
 	}
-	modifier = {
+	councilor_modifier = {
 		country_councilor_influence_produces_add = 1
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { official }
 
-	ai_weight = {
-		base = @tec_good_trait_weight
-		modifier = {
-			add = 5
-			exists = owner
-			owner = {
-				is_megacorp = yes
-			}
-		}
-		modifier = {
-			add = 5
-			exists = owner
-			owner = {
-				OR = {
-					tec_is_symbiotic_gestalt = yes # they are basically megas
-					tec_is_trade_gestalt = yes # trade deals need influence
-					has_valid_civic = civic_tec_corporate_cooperacorp # Super expensive branch offices
-					is_criminal_syndicate = yes # To spread their influence
-					has_tradition = tr_politics_adopt # need for politics
-					has_origin = origin_void_dwellers # hab spam need influence
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_councilor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_good_trait_weight
+	#	modifier = {
+	#		add = 5
+	#		exists = owner
+	#		owner = {
+	#			is_megacorp = yes
+	#		}
+	#	}
+	#	modifier = {
+	#		add = 5
+	#		exists = owner
+	#		owner = {
+	#			OR = {
+	#				tec_is_symbiotic_gestalt = yes # they are basically megas
+	#				tec_is_trade_gestalt = yes # trade deals need influence
+	#				has_valid_civic = civic_tec_corporate_cooperacorp # Super expensive branch offices
+	#				is_criminal_syndicate = yes # To spread their influence
+	#				has_tradition = tr_politics_adopt # need for politics
+	#				has_origin = origin_void_dwellers # hab spam need influence
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_reformer = {
-	councilor_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_reformer"
 		RARITY = free_or_veteran
 		COUNCIL = yes
@@ -1573,77 +1623,76 @@ leader_trait_reformer = {
 		is_gestalt = no
 		OR = {
 			has_paragon_dlc = no
-			has_trait = subclass_governor_visionary
+			has_trait = subclass_official_economy_councilor
 		}
 	}
-	modifier = {
+	councilor_modifier = {
 		country_unity_produces_mult = 0.05
 		pop_government_ethic_attraction = 0.35
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { official }
 	selectable_weight = {
 		inline_script = paragon/subclass_free_trait_weight
+		inline_script = paragon/council_weight_mult
 	}
 
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		modifier = {
-			add = 5
-			exists = owner
-			owner = {
-				OR = {
-					is_spiritualist = yes
-					is_egalitarian = yes
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_councilor
-		mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|leader_trait_reformer|TIERS|3|
-	}
+	#ai_weight = {
+	#	base = @tec_reduced_trait_weight
+	#	modifier = {
+	#		add = 5
+	#		exists = owner
+	#		owner = {
+	#			OR = {
+	#				is_spiritualist = yes
+	#				is_egalitarian = yes
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|leader_trait_reformer|TIERS|3|
+	#}
 }
 
 leader_trait_reformer_2 = {
-	councilor_trait = yes
 	replace_traits = { "leader_trait_reformer" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_reformer"
 		RARITY = free_or_veteran
 		COUNCIL = yes
 		TIER = 2
 	}
-	modifier = {
+	councilor_modifier = {
 		country_unity_produces_mult = 0.1
 		pop_government_ethic_attraction = 0.5
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { official }
 
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		modifier = {
-			add = 5
-			exists = owner
-			owner = {
-				OR = {
-					is_spiritualist = yes
-					is_egalitarian = yes
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_councilor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_reduced_trait_weight
+	#	modifier = {
+	#		add = 5
+	#		exists = owner
+	#		owner = {
+	#			OR = {
+	#				is_spiritualist = yes
+	#				is_egalitarian = yes
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 leader_trait_reformer_3 = {
-	councilor_trait = yes
 	replace_traits = { "leader_trait_reformer_2" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_reformer"
 		RARITY = veteran
 		COUNCIL = yes
@@ -1652,52 +1701,50 @@ leader_trait_reformer_3 = {
 	leader_potential_add = {
 		has_paragon_dlc = yes
 	}
-	modifier = {
+	councilor_modifier = {
 		country_unity_produces_mult = 0.15
 		pop_government_ethic_attraction = 0.75
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { official }
 
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		modifier = {
-			add = 5
-			exists = owner
-			owner = {
-				OR = {
-					is_spiritualist = yes
-					is_egalitarian = yes
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_councilor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_reduced_trait_weight
+	#	modifier = {
+	#		add = 5
+	#		exists = owner
+	#		owner = {
+	#			OR = {
+	#				is_spiritualist = yes
+	#				is_egalitarian = yes
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_courtroom_training = {
-	councilor_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_courtroom_training"
 		RARITY = veteran
 		COUNCIL = yes
 		TIER = 1
 	}
-	modifier = {
+	councilor_modifier = {
 		country_trust_cap_add = 35
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		has_trait = subclass_governor_visionary
-		is_militarist = no
+		has_trait = subclass_official_diplomacy_councilor
 		is_xenophobe = no
 		owner = { is_homicidal = no }
 	}
-	leader_class = { governor }
+	leader_class = { official }
 	opposites = {
 		leader_trait_intolerant
 		leader_trait_intolerant_2
@@ -1705,77 +1752,71 @@ leader_trait_courtroom_training = {
 	veteran_class_locked_trait = yes
 	selectable_weight = {
 		weight = @subclass_trait_weight
-		inline_script = {
-			script = paragon/ethic_weight_mult
-			IS = pacifist
-			NOT = militarist
-		}
+		inline_script = paragon/council_weight_mult
 	}
 
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		add = value:tec_ai_leader_wants_diplomatic_traits
-		mult = value:tec_ai_leader_is_councilor
-		mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|leader_trait_courtroom_training|TIERS|3|
-	}
+	#ai_weight = {
+	#	base = @tec_reduced_trait_weight
+	#	add = value:tec_ai_leader_wants_diplomatic_traits
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|leader_trait_courtroom_training|TIERS|3|
+	#}
 }
 
 leader_trait_courtroom_training_2 = {
-	councilor_trait = yes
 	replace_traits = { "leader_trait_courtroom_training" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_courtroom_training"
 		RARITY = veteran
 		COUNCIL = yes
 		TIER = 2
 	}
-	modifier = {
+	councilor_modifier = {
 		country_trust_cap_add = 50
 	}
-	leader_class = { governor }
+	leader_class = { official }
 	opposites = {
 		leader_trait_intolerant
 		leader_trait_intolerant_2
 	}
 	veteran_class_locked_trait = yes
 
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		add = value:tec_ai_leader_wants_diplomatic_traits
-		mult = value:tec_ai_leader_is_councilor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_reduced_trait_weight
+	#	add = value:tec_ai_leader_wants_diplomatic_traits
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 leader_trait_courtroom_training_3 = {
-	councilor_trait = yes
 	replace_traits = { "leader_trait_courtroom_training_2" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_courtroom_training"
 		RARITY = veteran
 		COUNCIL = yes
 		TIER = 3
 	}
-	modifier = {
+	councilor_modifier = {
 		country_trust_cap_add = 75
 	}
-	leader_class = { governor }
+	leader_class = { official }
 	opposites = {
 		leader_trait_intolerant
 		leader_trait_intolerant_2
 	}
 	veteran_class_locked_trait = yes
 
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		add = value:tec_ai_leader_wants_diplomatic_traits
-		mult = value:tec_ai_leader_is_councilor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_reduced_trait_weight
+	#	add = value:tec_ai_leader_wants_diplomatic_traits
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 #############
@@ -1785,365 +1826,395 @@ leader_trait_courtroom_training_3 = {
 leader_trait_mining_focus = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = commander
 		ICON = "GFX_leader_trait_mining_focus"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 1
 	}
-	modifier = {
+	planet_modifier = {
 		planet_jobs_minerals_produces_mult = 0.15
+	}
+	sector_modifier = {
+		planet_jobs_minerals_produces_mult = 0.075
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
 		has_any_governor_focus = no
-		has_trait = subclass_governor_pioneer
+		has_governor_subclass = yes
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { commander }
 	custom_tooltip_with_modifiers = only_one_governor_focus
 	selectable_weight = {
 		weight = @subclass_trait_weight
+		inline_script = paragon/governor_weight_mult
 		modifier = {
 			factor = @designation_bonus
-			exists = planet 
+			exists = planet
 			planet = {
 				has_mining_designation = yes
 			}
 		}
 	}
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:mining_combined_value|CACHED|yes|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				has_mining_designation = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:mining_combined_value|CACHED|yes|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_base_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			has_mining_designation = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#}
 }
 
 leader_trait_mining_focus_2 = {
 	replace_traits = { "leader_trait_mining_focus" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = commander
 		ICON = "GFX_leader_trait_mining_focus"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 2
 	}
-	modifier = {
+	planet_modifier = {
 		planet_jobs_minerals_produces_mult = 0.25
 	}
+	sector_modifier = {
+		planet_jobs_minerals_produces_mult = 0.125
+	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { commander }
 	custom_tooltip_with_modifiers = only_one_governor_focus
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:mining_combined_value|CACHED|yes|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				has_mining_designation = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:mining_combined_value|CACHED|yes|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_base_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			has_mining_designation = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 leader_trait_mining_focus_3 = {
 	replace_traits = { "leader_trait_mining_focus_2" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = commander
 		ICON = "GFX_leader_trait_mining_focus"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 3
 	}
-	modifier = {
+	planet_modifier = {
 		planet_jobs_minerals_produces_mult = 0.45
 	}
+	sector_modifier = {
+		planet_jobs_minerals_produces_mult = 0.225
+	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { commander }
 	custom_tooltip_with_modifiers = only_one_governor_focus
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:mining_combined_value|CACHED|yes|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				has_mining_designation = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:mining_combined_value|CACHED|yes|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_base_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			has_mining_designation = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_generator_focus = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = commander
 		ICON = "GFX_leader_trait_financial"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 1
 	}
-	modifier = {
+	planet_modifier = {
 		planet_jobs_energy_produces_mult = 0.15
+	}
+	sector_modifier = {
+		planet_jobs_energy_produces_mult = 0.075
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
 		has_any_governor_focus = no
-		has_trait = subclass_governor_pioneer
+		has_governor_subclass = yes
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { commander }
 	custom_tooltip_with_modifiers = only_one_governor_focus
 	selectable_weight = {
 		weight = @subclass_trait_weight
+		inline_script = paragon/governor_weight_mult
 		modifier = {
 			factor = @designation_bonus
-			exists = planet 
+			exists = planet
 			planet = {
 				has_generator_designation = yes
 			}
 		}
 	}
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:generator_combined_value|CACHED|yes|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				has_generator_designation = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:generator_combined_value|CACHED|yes|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_base_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			has_generator_designation = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#}
 }
 
 leader_trait_generator_focus_2 = {
 	replace_traits = { "leader_trait_generator_focus" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = commander
 		ICON = "GFX_leader_trait_financial"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 2
 	}
-	modifier = {
+	planet_modifier = {
 		planet_jobs_energy_produces_mult = 0.25
 	}
+	sector_modifier = {
+		planet_jobs_energy_produces_mult = 0.125
+	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { commander }
 	custom_tooltip_with_modifiers = only_one_governor_focus
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:generator_combined_value|CACHED|yes|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				has_generator_designation = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:generator_combined_value|CACHED|yes|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_base_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			has_generator_designation = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 leader_trait_generator_focus_3 = {
 	replace_traits = { "leader_trait_generator_focus_2" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = commander
 		ICON = "GFX_leader_trait_financial"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 3
 	}
-	modifier = {
+	planet_modifier = {
 		planet_jobs_energy_produces_mult = 0.45
 	}
+	sector_modifier = {
+		planet_jobs_energy_produces_mult = 0.225
+	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { commander }
 	custom_tooltip_with_modifiers = only_one_governor_focus
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:generator_combined_value|CACHED|yes|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				has_generator_designation = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:generator_combined_value|CACHED|yes|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_base_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			has_generator_designation = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_farming_focus = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = commander
 		ICON = "GFX_leader_trait_food"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 1
 	}
-	modifier = {
+	planet_modifier = {
 		planet_jobs_food_produces_mult = 0.15
+	}
+	sector_modifier = {
+		planet_jobs_food_produces_mult = 0.075
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
 		owner = { country_uses_food = yes }
-		has_trait = subclass_governor_pioneer
 		has_any_governor_focus = no
+		has_governor_subclass = yes
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { commander }
 	custom_tooltip_with_modifiers = only_one_governor_focus
 	selectable_weight = {
 		weight = @subclass_trait_weight
+		inline_script = paragon/governor_weight_mult
 		modifier = {
 			factor = @designation_bonus
-			exists = planet 
+			exists = planet
 			planet = {
 				has_farming_designation = yes
 			}
 		}
 	}
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:farming_combined_value|CACHED|yes|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				has_farming_designation = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:farming_combined_value|CACHED|yes|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_base_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			has_farming_designation = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#}
 }
 
 leader_trait_farming_focus_2 = {
 	replace_traits = { "leader_trait_farming_focus" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = commander
 		ICON = "GFX_leader_trait_food"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 2
 	}
-	modifier = {
+	planet_modifier = {
 		planet_jobs_food_produces_mult = 0.25
 	}
+	sector_modifier = {
+		planet_jobs_food_produces_mult = 0.125
+	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { commander }
 	custom_tooltip_with_modifiers = only_one_governor_focus
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:farming_combined_value|CACHED|yes|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				has_farming_designation = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:farming_combined_value|CACHED|yes|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_base_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			has_farming_designation = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 leader_trait_farming_focus_3 = {
 	replace_traits = { "leader_trait_farming_focus_2" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = commander
 		ICON = "GFX_leader_trait_food"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 3
 	}
-	modifier = {
+	planet_modifier = {
 		planet_jobs_food_produces_mult = 0.45
 	}
+	sector_modifier = {
+		planet_jobs_food_produces_mult = 0.225
+	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { commander }
 	custom_tooltip_with_modifiers = only_one_governor_focus
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:farming_combined_value|CACHED|yes|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				has_farming_designation = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:farming_combined_value|CACHED|yes|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_base_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			has_farming_designation = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_settler = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_settler"
 		RARITY = veteran
 		COUNCIL = no
@@ -2151,471 +2222,320 @@ leader_trait_settler = {
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		has_trait = subclass_governor_pioneer
+		has_trait = subclass_official_governor
 	}
 	veteran_class_locked_trait = yes
-	modifier = {
+	planet_modifier = {
 		planet_housing_add = 4
 		planet_amenities_add = 10
 	}
-	leader_class = { governor }
+	sector_modifier = {
+		planet_housing_add = 2
+		planet_amenities_add = 5
+	}
+	leader_class = { official }
 	selectable_weight = {
 		inline_script = paragon/subclass_free_trait_weight
+		inline_script = paragon/governor_weight_mult
 	}
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = 10
-			exists = planet
-			planet = {
-				tec_is_habitat = yes
-			}
-		}
-		modifier = {
-			add = 10
-			exists = planet
-			planet = {
-				OR = {
-					free_amenities < 0
-					free_housing < 0
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = 10
+	#		exists = planet
+	#		planet = {
+	#			tec_is_habitat = yes
+	#		}
+	#	}
+	#	modifier = {
+	#		add = 10
+	#		exists = planet
+	#		planet = {
+	#			OR = {
+	#				free_amenities < 0
+	#				free_housing < 0
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#}
 }
 
 leader_trait_settler_2 = {
 	replace_traits = { "leader_trait_settler" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_settler"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 2
 	}
-	modifier = {
+	planet_modifier = {
 		planet_housing_add = 6
 		planet_amenities_add = 15
 	}
-	veteran_class_locked_trait = yes
-	leader_class = { governor }
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = 10
-			exists = planet
-			planet = {
-				tec_is_habitat = yes
-			}
-		}
-		modifier = {
-			add = 10
-			exists = planet
-			planet = {
-				OR = {
-					free_amenities < 0
-					free_housing < 0
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
+	sector_modifier = {
+		planet_housing_add = 3
+		planet_amenities_add = 7
 	}
+	veteran_class_locked_trait = yes
+	leader_class = { official }
+
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = 10
+	#		exists = planet
+	#		planet = {
+	#			tec_is_habitat = yes
+	#		}
+	#	}
+	#	modifier = {
+	#		add = 10
+	#		exists = planet
+	#		planet = {
+	#			OR = {
+	#				free_amenities < 0
+	#				free_housing < 0
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 leader_trait_settler_3 = {
 	replace_traits = { "leader_trait_settler_2" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_settler"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 3
 	}
-	modifier = {
+	planet_modifier = {
 		planet_housing_add = 10
 		planet_amenities_add = 25
 	}
-	veteran_class_locked_trait = yes
-	leader_class = { governor }
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = 10
-			exists = planet
-			planet = {
-				tec_is_habitat = yes
-			}
-		}
-		modifier = {
-			add = 10
-			exists = planet
-			planet = {
-				OR = {
-					free_amenities < 0
-					free_housing < 0
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
+	sector_modifier = {
+		planet_housing_add = 5
+		planet_amenities_add = 10
 	}
+	veteran_class_locked_trait = yes
+	leader_class = { official }
+
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = 10
+	#		exists = planet
+	#		planet = {
+	#			tec_is_habitat = yes
+	#		}
+	#	}
+	#	modifier = {
+	#		add = 10
+	#		exists = planet
+	#		planet = {
+	#			OR = {
+	#				free_amenities < 0
+	#				free_housing < 0
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_cartographer = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_cartographer"
 		RARITY = veteran
-		COUNCIL = no
+		COUNCIL = yes
 		TIER = 1
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		has_trait = subclass_governor_pioneer
+		OR = {
+			has_trait = subclass_official_economy_councilor
+			has_trait = subclass_scientist_councilor
+		}
 	}
-	modifier = {
-		terraform_speed_mult = 0.3
+	councilor_modifier = {
+		terraform_speed_mult = 0.10
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
-	selectable_weight = @subclass_trait_weight
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = @tec_base_ap_weight
-			exists = planet
-			planet = {
-				is_terraforming = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
+	leader_class = { official scientist }
+	selectable_weight = {
+		weight = @subclass_trait_weight
+		inline_script = paragon/council_weight_mult
 	}
+
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = @tec_base_ap_weight
+	#		exists = planet
+	#		planet = {
+	#			is_terraforming = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#}
 }
 
 leader_trait_cartographer_2 = {
 	replace_traits = { "leader_trait_cartographer" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_cartographer"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 2
 	}
-	modifier = {
-		terraform_speed_mult = 0.6
+	councilor_modifier = {
+		terraform_speed_mult = 0.25
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { official scientist }
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = @tec_base_ap_weight
-			exists = planet
-			planet = {
-				is_terraforming = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = @tec_base_ap_weight
+	#		exists = planet
+	#		planet = {
+	#			is_terraforming = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 leader_trait_cartographer_3 = {
 	replace_traits = { "leader_trait_cartographer_2" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_cartographer"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 3
 	}
-	modifier = {
-		terraform_speed_mult = 1.2
+	councilor_modifier = {
+		terraform_speed_mult = 0.33
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { official scientist }
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = @tec_base_ap_weight
-			exists = planet
-			planet = {
-				is_terraforming = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = @tec_base_ap_weight
+	#		exists = planet
+	#		planet = {
+	#			is_terraforming = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_expeditionist = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_expeditionist"
 		RARITY = veteran
-		COUNCIL = no
+		COUNCIL = yes
 		TIER = 1
 	}
-	modifier = {
-		planet_clear_blocker_speed_mult = 0.35
+	councilor_modifier = {
+		planet_clear_blocker_speed_mult = 0.10
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		has_trait = subclass_governor_pioneer
+		has_trait = subclass_official_economy_councilor
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
-	selectable_weight = @subclass_trait_weight
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		add = value:tec_ai_leader_wants_blocker_traits
-		mult = value:tec_ai_leader_is_planet_governor
+	leader_class = { official }
+	selectable_weight = {
+		weight = @subclass_trait_weight
+		inline_script = paragon/council_weight_mult
 	}
+
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	add = value:tec_ai_leader_wants_blocker_traits
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#}
 }
 
 leader_trait_expeditionist_2 = {
 	replace_traits = { "leader_trait_expeditionist" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_expeditionist"
 		RARITY = veteran
-		COUNCIL = no
+		COUNCIL = yes
 		TIER = 2
 	}
-	modifier = {
-		planet_clear_blocker_speed_mult = 0.75
+	councilor_modifier = {
+		planet_clear_blocker_speed_mult = 0.25
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { official }
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		add = value:tec_ai_leader_wants_blocker_traits
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	add = value:tec_ai_leader_wants_blocker_traits
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 leader_trait_expeditionist_3 = {
 	replace_traits = { "leader_trait_expeditionist_2" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_expeditionist"
 		RARITY = veteran
-		COUNCIL = no
+		COUNCIL = yes
 		TIER = 3
 	}
-	modifier = {
-		planet_clear_blocker_speed_mult = 1.5
+	councilor_modifier = {
+		planet_clear_blocker_speed_mult = 0.33
 	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { official }
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		add = value:tec_ai_leader_wants_blocker_traits
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
-}
-
-###################
-leader_trait_geologist = {
-	inline_script = {
-		script = trait/icon
-		CLASS = governor
-		ICON = "GFX_leader_trait_geologist"
-		RARITY = veteran
-		COUNCIL = no
-		TIER = 1
-	}
-	leader_potential_add = {
-		has_paragon_dlc = yes
-		has_trait = subclass_governor_pioneer
-	}
-	opposites = { leader_trait_naturalist }
-	veteran_class_locked_trait = yes
-	leader_class = { governor }
-
-	inline_script = {	# Evolved
-		script = leaders/inline_evolved_tec_geologist_modifiers
-		mult = 1
-	}
-
-	custom_tooltip_with_modifiers = "geologist_custom_desc"
-	selectable_weight = @subclass_trait_weight
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:tec_district_generator_max_value|FACTOR|0.15|
-			exists = planet
-		}
-		modifier = {
-			add = planet.value:tec_district_farming_max_value|FACTOR|0.15|
-			exists = planet
-		}
-		modifier = {
-			add = planet.value:tec_district_mining_max_value|FACTOR|0.15|
-			exists = planet
-		}
-		modifier = {
-			add = planet.modifier:building_mote_harvesters_max
-			exists = planet
-		}
-		modifier = {
-			add = planet.modifier:building_gas_extractors_max
-			exists = planet
-		}
-		modifier = {
-			add = planet.modifier:building_crystal_mines_max
-			exists = planet
-		}
-		modifier = {
-			add = planet.modifier:building_betharian_power_plant_max
-			exists = planet
-		}
-
-		mult = 2
-		mult = value:tec_ai_leader_is_planet_governor
-	}
-}
-
-leader_trait_geologist_2 = {
-	replace_traits = { "leader_trait_geologist" }
-	inline_script = {
-		script = trait/icon
-		CLASS = governor
-		ICON = "GFX_leader_trait_geologist"
-		RARITY = veteran
-		COUNCIL = no
-		TIER = 2
-	}
-	opposites = { leader_trait_naturalist }
-	veteran_class_locked_trait = yes
-	leader_class = { governor }
-
-	inline_script = {	# Evolved
-		script = leaders/inline_evolved_tec_geologist_modifiers
-		mult = 1.5
-	}
-	custom_tooltip_with_modifiers = "geologist_custom_desc_2"
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:tec_district_generator_max_value|FACTOR|0.15|
-			exists = planet
-		}
-		modifier = {
-			add = planet.value:tec_district_farming_max_value|FACTOR|0.15|
-			exists = planet
-		}
-		modifier = {
-			add = planet.value:tec_district_mining_max_value|FACTOR|0.15|
-			exists = planet
-		}
-		modifier = {
-			add = planet.modifier:building_mote_harvesters_max
-			exists = planet
-		}
-		modifier = {
-			add = planet.modifier:building_gas_extractors_max
-			exists = planet
-		}
-		modifier = {
-			add = planet.modifier:building_crystal_mines_max
-			exists = planet
-		}
-		modifier = {
-			add = planet.modifier:building_betharian_power_plant_max
-			exists = planet
-		}
-
-		mult = 2
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
-}
-leader_trait_geologist_3 = {
-	replace_traits = { "leader_trait_geologist_2" }
-	inline_script = {
-		script = trait/icon
-		CLASS = governor
-		ICON = "GFX_leader_trait_geologist"
-		RARITY = veteran
-		COUNCIL = no
-		TIER = 3
-	}
-	opposites = { leader_trait_naturalist }
-	veteran_class_locked_trait = yes
-	leader_class = { governor }
-	inline_script = {	# Evolved
-		script = leaders/inline_evolved_tec_geologist_modifiers
-		mult = 2
-	}
-	custom_tooltip_with_modifiers = "geologist_custom_desc_3"
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:tec_district_generator_max_value|FACTOR|0.15|
-			exists = planet
-		}
-		modifier = {
-			add = planet.value:tec_district_farming_max_value|FACTOR|0.15|
-			exists = planet
-		}
-		modifier = {
-			add = planet.value:tec_district_mining_max_value|FACTOR|0.15|
-			exists = planet
-		}
-		modifier = {
-			add = planet.modifier:building_mote_harvesters_max
-			exists = planet
-		}
-		modifier = {
-			add = planet.modifier:building_gas_extractors_max
-			exists = planet
-		}
-		modifier = {
-			add = planet.modifier:building_crystal_mines_max
-			exists = planet
-		}
-		modifier = {
-			add = planet.modifier:building_betharian_power_plant_max
-			exists = planet
-		}
-
-		mult = 2
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	add = value:tec_ai_leader_wants_blocker_traits
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_naturalist = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_naturalist"
 		RARITY = veteran
 		COUNCIL = no
@@ -2624,28 +2544,36 @@ leader_trait_naturalist = {
 	planet_modifier = {
 		deposit_blockers_natural_unity_produces_add = 3
 	}
+	sector_modifier = {
+		deposit_blockers_natural_unity_produces_add = 1.5
+	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		has_trait = subclass_governor_pioneer
+		OR = {
+			has_trait = subclass_official_governor
+			has_trait = subclass_scientist_governor
+		}
 	}
-	opposites = { leader_trait_geologist }
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
-	selectable_weight = @subclass_trait_weight
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		add = value:tec_ai_leader_wants_blocker_traits
-		mult = 2
-		mult = value:tec_ai_leader_is_planet_governor
+	leader_class = { official scientist }
+	selectable_weight = {
+		weight = @subclass_trait_weight
+		inline_script = paragon/governor_weight_mult
 	}
+
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	add = value:tec_ai_leader_wants_blocker_traits
+	#	mult = 2
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#}
 }
 
 leader_trait_naturalist_2 = {
 	replace_traits = { "leader_trait_naturalist" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_naturalist"
 		RARITY = veteran
 		COUNCIL = no
@@ -2654,23 +2582,26 @@ leader_trait_naturalist_2 = {
 	planet_modifier = {
 		deposit_blockers_natural_unity_produces_add = 6
 	}
-	opposites = { leader_trait_geologist }
-	veteran_class_locked_trait = yes
-	leader_class = { governor }
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		add = value:tec_ai_leader_wants_blocker_traits
-		mult = 2
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
+	sector_modifier = {
+		deposit_blockers_natural_unity_produces_add = 3
 	}
+	veteran_class_locked_trait = yes
+	leader_class = { official scientist }
+
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	add = value:tec_ai_leader_wants_blocker_traits
+	#	mult = 2
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 leader_trait_naturalist_3 = {
 	replace_traits = { "leader_trait_naturalist_2" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_naturalist"
 		RARITY = veteran
 		COUNCIL = no
@@ -2679,121 +2610,19 @@ leader_trait_naturalist_3 = {
 	planet_modifier = {
 		deposit_blockers_natural_unity_produces_add = 12
 	}
-	opposites = { leader_trait_geologist }
-	veteran_class_locked_trait = yes
-	leader_class = { governor }
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		add = value:tec_ai_leader_wants_blocker_traits
-		mult = 2
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
-}
-
-###################
-leader_trait_life_support_systems = {
-	inline_script = {
-		script = trait/icon
-		CLASS = governor
-		ICON = "GFX_leader_trait_life_support_systems"
-		RARITY = veteran
-		COUNCIL = no
-		TIER = 1
-	}
-	modifier = {
-		habitability_floor_add = 0.2
+	sector_modifier = {
+		deposit_blockers_natural_unity_produces_add = 6
 	}
 	veteran_class_locked_trait = yes
-	leader_potential_add = {
-		has_paragon_dlc = yes
-		has_trait = subclass_governor_pioneer
-		owner = { is_machine_empire = no }
-	}
-	leader_class = { governor }
-	selectable_weight = @subclass_trait_weight
+	leader_class = { official scientist }
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				habitability = {
-					who = owner_main_species
-					value < 0.2
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-	}
-}
-
-leader_trait_life_support_systems_2 = {
-	replace_traits = { "leader_trait_life_support_systems" }
-	inline_script = {
-		script = trait/icon
-		CLASS = governor
-		ICON = "GFX_leader_trait_life_support_systems"
-		RARITY = veteran
-		COUNCIL = no
-		TIER = 2
-	}
-	modifier = {
-		habitability_floor_add = 0.35
-	}
-	veteran_class_locked_trait = yes
-	leader_class = { governor }
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				habitability = {
-					who = owner_main_species
-					value < 0.35
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
-}
-
-leader_trait_life_support_systems_3 = {
-	replace_traits = { "leader_trait_life_support_systems_2" }
-	inline_script = {
-		script = trait/icon
-		CLASS = governor
-		ICON = "GFX_leader_trait_life_support_systems"
-		RARITY = veteran
-		COUNCIL = no
-		TIER = 3
-	}
-	modifier = {
-		habitability_floor_add = 0.6
-	}
-	veteran_class_locked_trait = yes
-	leader_class = { governor }
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = @tec_good_trait_weight
-			exists = planet
-			planet = {
-				habitability = {
-					who = owner_main_species
-					value < 0.6
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	add = value:tec_ai_leader_wants_blocker_traits
+	#	mult = 2
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
@@ -2803,7 +2632,7 @@ leader_trait_life_support_systems_3 = {
 leader_trait_forge_focus = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_forge_focus"
 		RARITY = veteran
 		COUNCIL = no
@@ -2811,148 +2640,158 @@ leader_trait_forge_focus = {
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		has_trait = subclass_governor_economist
 		has_any_governor_focus = no
+		has_governor_subclass = yes
 	}
-	modifier = {
+	planet_modifier = {
 		planet_jobs_alloys_produces_mult = 0.1
 	}
+	sector_modifier = {
+		planet_jobs_alloys_produces_mult = 0.05
+	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { official }
 	custom_tooltip_with_modifiers = only_one_governor_focus
 	selectable_weight = {
 		weight = @subclass_trait_weight
+		inline_script = paragon/governor_weight_mult
 		modifier = {
 			add = @designation_bonus
-			exists = planet 
+			exists = planet
 			planet = {
 				has_foundry_designation = yes
 			}
 		}
 	}
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:industrial_districts_value|ALLOY_ONLY|yes|FACTOR|2|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				tec_has_alloy_buildings = yes
-			}
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				OR = {
-					has_foundry_designation = yes
-					has_industrial_designation = yes
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:industrial_districts_value|ALLOY_ONLY|yes|FACTOR|2|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			tec_has_alloy_buildings = yes
+	#		}
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			OR = {
+	#				has_foundry_designation = yes
+	#				has_industrial_designation = yes
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#}
 }
 
 leader_trait_forge_focus_2 = {
 	replace_traits = { "leader_trait_forge_focus" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_forge_focus"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 2
 	}
 	veteran_class_locked_trait = yes
-	modifier = {
+	planet_modifier = {
 		planet_jobs_alloys_produces_mult = 0.2
 	}
-	leader_class = { governor }
+	sector_modifier = {
+		planet_jobs_alloys_produces_mult = 0.1
+	}
+	leader_class = { official }
 	custom_tooltip_with_modifiers = only_one_governor_focus
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:industrial_districts_value|ALLOY_ONLY|yes|FACTOR|2|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				tec_has_alloy_buildings = yes
-			}
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				OR = {
-					has_foundry_designation = yes
-					has_industrial_designation = yes
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:industrial_districts_value|ALLOY_ONLY|yes|FACTOR|2|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			tec_has_alloy_buildings = yes
+	#		}
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			OR = {
+	#				has_foundry_designation = yes
+	#				has_industrial_designation = yes
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 leader_trait_forge_focus_3 = {
 	replace_traits = { "leader_trait_forge_focus_2" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_forge_focus"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 3
 	}
 	veteran_class_locked_trait = yes
-	modifier = {
+	planet_modifier = {
 		planet_jobs_alloys_produces_mult = 0.35
 	}
-	leader_class = { governor }
+	sector_modifier = {
+		planet_jobs_alloys_produces_mult = 0.175
+	}
+	leader_class = { official }
 	custom_tooltip_with_modifiers = only_one_governor_focus
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:industrial_districts_value|ALLOY_ONLY|yes|FACTOR|2|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				tec_has_alloy_buildings = yes
-			}
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				OR = {
-					has_foundry_designation = yes
-					has_industrial_designation = yes
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:industrial_districts_value|ALLOY_ONLY|yes|FACTOR|2|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			tec_has_alloy_buildings = yes
+	#		}
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			OR = {
+	#				has_foundry_designation = yes
+	#				has_industrial_designation = yes
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_industrial_focus = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_industrial_focus"
 		RARITY = veteran
 		COUNCIL = no
@@ -2960,150 +2799,161 @@ leader_trait_industrial_focus = {
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		has_trait = subclass_governor_economist
 		has_any_governor_focus = no
-		is_gestalt = no
+		has_governor_subclass = yes
+		owner = {
+			country_uses_consumer_goods = yes
+		}
 	}
-	modifier = {
+	planet_modifier = {
 		planet_jobs_consumer_goods_produces_mult = 0.1
 	}
+	sector_modifier = {
+		planet_jobs_consumer_goods_produces_mult = 0.05
+	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { official }
 	custom_tooltip_with_modifiers = only_one_governor_focus
 	selectable_weight = {
 		weight = @subclass_trait_weight
+		inline_script = paragon/governor_weight_mult
 		modifier = {
 			add = @designation_bonus
-			exists = planet 
+			exists = planet
 			planet = {
-				has_industrial_designation = yes
+				has_factory_designation = yes
 			}
 		}
 	}
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:industrial_districts_value|CG_ONLY|yes|FACTOR|2|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				tec_has_cg_buildings = yes
-			}
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				OR = {
-					has_factory_designation = yes
-					has_industrial_designation = yes
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:industrial_districts_value|CG_ONLY|yes|FACTOR|2|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			tec_has_cg_buildings = yes
+	#		}
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			OR = {
+	#				has_factory_designation = yes
+	#				has_industrial_designation = yes
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#}
 }
 
 leader_trait_industrial_focus_2 = {
 	replace_traits = { "leader_trait_industrial_focus" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_industrial_focus"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 2
 	}
-	modifier = {
+	planet_modifier = {
 		planet_jobs_consumer_goods_produces_mult = 0.2
 	}
+	sector_modifier = {
+		planet_jobs_consumer_goods_produces_mult = 0.1
+	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { official }
 	custom_tooltip_with_modifiers = only_one_governor_focus
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:industrial_districts_value|CG_ONLY|yes|FACTOR|2|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				tec_has_cg_buildings = yes
-			}
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				OR = {
-					has_factory_designation = yes
-					has_industrial_designation = yes
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:industrial_districts_value|CG_ONLY|yes|FACTOR|2|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			tec_has_cg_buildings = yes
+	#		}
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			OR = {
+	#				has_factory_designation = yes
+	#				has_industrial_designation = yes
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 leader_trait_industrial_focus_3 = {
 	replace_traits = { "leader_trait_industrial_focus_2" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_industrial_focus"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 3
 	}
-	modifier = {
+	planet_modifier = {
 		planet_jobs_consumer_goods_produces_mult = 0.35
 	}
+	sector_modifier = {
+		planet_jobs_consumer_goods_produces_mult = 0.175
+	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { official }
 	custom_tooltip_with_modifiers = only_one_governor_focus
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:industrial_districts_value|CG_ONLY|yes|FACTOR|2|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				tec_has_cg_buildings = yes
-			}
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				OR = {
-					has_factory_designation = yes
-					has_industrial_designation = yes
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
-
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:industrial_districts_value|CG_ONLY|yes|FACTOR|2|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			tec_has_cg_buildings = yes
+	#		}
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			OR = {
+	#				has_factory_designation = yes
+	#				has_industrial_designation = yes
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_refinement_focus = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_refinement_focus"
 		RARITY = veteran
 		COUNCIL = no
@@ -3111,240 +2961,195 @@ leader_trait_refinement_focus = {
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		has_trait = subclass_governor_economist
 		has_any_governor_focus = no
+		has_governor_subclass = yes
 	}
-	modifier = {
+	planet_modifier = {
 		planet_refiners_produces_mult = 0.1
 		planet_translucers_produces_mult = 0.1
 		planet_chemists_produces_mult = 0.1
 	}
+	sector_modifier = {
+		planet_refiners_produces_mult = 0.05
+		planet_translucers_produces_mult = 0.05
+		planet_chemists_produces_mult = 0.05
+	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { official }
 	custom_tooltip_with_modifiers = only_one_governor_focus
 	selectable_weight = {
 		weight = @subclass_trait_weight
+		inline_script = paragon/governor_weight_mult
 		modifier = {
 			add = @designation_bonus
-			exists = planet 
+			exists = planet
 			planet = {
 				has_refinery_designation = yes
 			}
 		}
 	}
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		subtract = @tec_reduced_trait_weight
-		modifier = {
-			add = planet.value:refinery_combined_value|FACTOR|2|CACHED|yes|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				has_refinery_designation = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	subtract = @tec_reduced_trait_weight
+	#	modifier = {
+	#		add = planet.value:refinery_combined_value|FACTOR|2|CACHED|yes|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_base_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			has_refinery_designation = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#}
 }
 
 leader_trait_refinement_focus_2 = {
 	replace_traits = { "leader_trait_refinement_focus" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_refinement_focus"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 2
 	}
-	modifier = {
+	planet_modifier = {
 		planet_refiners_produces_mult = 0.2
 		planet_translucers_produces_mult = 0.2
 		planet_chemists_produces_mult = 0.2
 	}
+	sector_modifier = {
+		planet_refiners_produces_mult = 0.1
+		planet_translucers_produces_mult = 0.1
+		planet_chemists_produces_mult = 0.1
+	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { official }
 	custom_tooltip_with_modifiers = only_one_governor_focus
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:refinery_combined_value|FACTOR|2|CACHED|yes|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				has_refinery_designation = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:refinery_combined_value|FACTOR|2|CACHED|yes|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_base_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			has_refinery_designation = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 leader_trait_refinement_focus_3 = {
 	replace_traits = { "leader_trait_refinement_focus_2" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_refinement_focus"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 3
 	}
-	modifier = {
+	planet_modifier = {
 		planet_refiners_produces_mult = 0.35
 		planet_translucers_produces_mult = 0.35
 		planet_chemists_produces_mult = 0.35
 	}
+	sector_modifier = {
+		planet_refiners_produces_mult = 0.175
+		planet_translucers_produces_mult = 0.175
+		planet_chemists_produces_mult = 0.175
+	}
 	veteran_class_locked_trait = yes
-	leader_class = { governor }
+	leader_class = { official }
 	custom_tooltip_with_modifiers = only_one_governor_focus
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:refinery_combined_value|FACTOR|2|CACHED|yes|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				has_refinery_designation = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:refinery_combined_value|FACTOR|2|CACHED|yes|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_base_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			has_refinery_designation = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_urbanist = {
+	destiny_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_urbanist"
-		RARITY = free_or_veteran
+		RARITY = paragon
 		COUNCIL = no
-		TIER = 1
-	}
-	leader_potential_add = {
-		OR = {
-			has_paragon_dlc = no
-			has_trait = subclass_governor_economist
-		}
-	}
-	veteran_class_locked_trait = yes
-	modifier = {
-		empire_size_districts_mult = -0.35
-		planet_structures_upkeep_mult = -0.25
-	}
-	leader_class = { governor }
-	selectable_weight = {
-		inline_script = paragon/subclass_free_trait_weight
-	}
-
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		modifier = {
-			add = planet.value:tec_num_districts
-			exists = planet
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				tec_is_arcology = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-	}
-}
-
-leader_trait_urbanist_2 = {
-	replace_traits = { "leader_trait_urbanist" }
-	inline_script = {
-		script = trait/icon
-		CLASS = governor
-		ICON = "GFX_leader_trait_urbanist"
-		RARITY = free_or_veteran
-		COUNCIL = no
-		TIER = 2
-	}
-	veteran_class_locked_trait = yes
-	modifier = {
-		empire_size_districts_mult = -0.5
-		planet_structures_upkeep_mult = -0.35
-	}
-	leader_class = { governor }
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		modifier = {
-			add = planet.value:tec_num_districts
-			exists = planet
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				tec_is_arcology = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
-}
-
-leader_trait_urbanist_3 = {
-	replace_traits = { "leader_trait_urbanist_2" }
-	inline_script = {
-		script = trait/icon
-		CLASS = governor
-		ICON = "GFX_leader_trait_urbanist"
-		RARITY = veteran
-		COUNCIL = no
-		TIER = 3
+		TIER = none
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
+		has_trait = subclass_official_governor
 	}
 	veteran_class_locked_trait = yes
-	modifier = {
+	planet_modifier = {
 		empire_size_districts_mult = -0.75
-		planet_structures_upkeep_mult = -0.50
+		planet_buildings_upkeep_mult = -0.5
+		planet_districts_upkeep_mult = -0.5
 	}
-	leader_class = { governor }
+	sector_modifier = {
+		empire_size_districts_mult = -0.375
+		planet_buildings_upkeep_mult = -0.25
+		planet_districts_upkeep_mult = -0.25
+	}
+	leader_class = { official }
+	selectable_weight = {
+		weight = @subclass_trait_weight
+		inline_script = paragon/governor_weight_mult
 
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		modifier = {
-			add = planet.value:tec_num_districts
-			exists = planet
+		modifier = {	# Evolved
+			always = yes
+			factor = owner.value:tec_leader_destiny_weight|TRAIT|leader_trait_urbanist|MULT|0.5|
 		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				tec_is_arcology = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
 	}
+
+	#ai_weight = {
+	#	base = @tec_reduced_trait_weight
+	#	modifier = {
+	#		add = planet.value:tec_num_districts
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			tec_is_arcology = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#}
 }
 
 ###################
 leader_trait_assembler = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_assembler"
 		RARITY = veteran
 		COUNCIL = no
@@ -3352,7 +3157,10 @@ leader_trait_assembler = {
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		has_trait = subclass_governor_economist
+		OR = {
+			has_trait = subclass_official_governor
+			has_trait = subclass_scientist_governor
+		}
 		owner = {
 			OR = {
 				is_gestalt = yes
@@ -3361,135 +3169,198 @@ leader_trait_assembler = {
 		}
 	}
 	veteran_class_locked_trait = yes
-	triggered_modifier = {
+	triggered_planet_modifier = {
 		potential = {
 			owner = { is_hive_empire = no }
 		}
-		planet_pop_assembly_mult = 0.15
+		#planet_pop_assembly_mult = 0.15
+		# Evolved
+		planet_pop_assembly_mult = 0.1
 	}
-	triggered_modifier = {
+	triggered_planet_modifier = {
 		potential = {
 			owner = { is_hive_empire = yes }
 		}
-		planet_pop_assembly_organic_mult = 0.15
+		#planet_pop_assembly_organic_mult = 0.15
+		# Evolved
+		planet_pop_assembly_organic_mult = 0.1
 	}
-	leader_class = { governor }
-	selectable_weight = @subclass_trait_weight
+	triggered_sector_modifier = {
+		potential = {
+			owner = { is_hive_empire = no }
+		}
+		#planet_pop_assembly_mult = 0.075
+		# Evolved
+		planet_pop_assembly_mult = 0.05
+	}
+	triggered_sector_modifier = {
+		potential = {
+			owner = { is_hive_empire = yes }
+		}
+		#planet_pop_assembly_organic_mult = 0.075
+		# Evolved
+		planet_pop_assembly_organic_mult = 0.05
+	}
+	leader_class = { official scientist }
+	selectable_weight = {
+		weight = @subclass_trait_weight
+		inline_script = paragon/governor_weight_mult
+	}
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.modifier:planet_pop_assembly_add
-			exists = planet
-			exists = owner
-			owner = { is_hive_empire = no }
-		}
-		modifier = {
-			add = planet.modifier:planet_pop_assembly_organic_add
-			exists = planet
-			exists = owner
-			owner = { is_hive_empire = yes }
-		}
-		mult = 4
-		mult = value:tec_ai_leader_is_planet_governor
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.modifier:planet_pop_assembly_add
+	#		exists = planet
+	#		exists = owner
+	#		owner = { is_hive_empire = no }
+	#	}
+	#	modifier = {
+	#		add = planet.modifier:planet_pop_assembly_organic_add
+	#		exists = planet
+	#		exists = owner
+	#		owner = { is_hive_empire = yes }
+	#	}
+	#	mult = 4
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#}
 }
 
 leader_trait_assembler_2 = {
 	replace_traits = { "leader_trait_assembler" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_assembler"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 2
 	}
 	veteran_class_locked_trait = yes
-	triggered_modifier = {
+	triggered_planet_modifier = {
 		potential = {
 			owner = { is_hive_empire = no }
 		}
-		planet_pop_assembly_mult = 0.25
+		#planet_pop_assembly_mult = 0.25
+		# Evolved
+		planet_pop_assembly_mult = 0.15
 	}
-	triggered_modifier = {
+	triggered_planet_modifier = {
 		potential = {
 			owner = { is_hive_empire = yes }
 		}
-		planet_pop_assembly_organic_mult = 0.25
+		#planet_pop_assembly_organic_mult = 0.25
+		# Evolved
+		planet_pop_assembly_organic_mult = 0.15
 	}
-	leader_class = { governor }
+	triggered_sector_modifier = {
+		potential = {
+			owner = { is_hive_empire = no }
+		}
+		#planet_pop_assembly_mult = 0.125
+		# Evolved
+		planet_pop_assembly_mult = 0.075
+	}
+	triggered_sector_modifier = {
+		potential = {
+			owner = { is_hive_empire = yes }
+		}
+		#planet_pop_assembly_organic_mult = 0.125
+		# Evolved
+		planet_pop_assembly_organic_mult = 0.075
+	}
+	leader_class = { official scientist }
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.modifier:planet_pop_assembly_add
-			exists = planet
-			exists = owner
-			owner = { is_hive_empire = no }
-		}
-		modifier = {
-			add = planet.modifier:planet_pop_assembly_organic_add
-			exists = planet
-			exists = owner
-			owner = { is_hive_empire = yes }
-		}
-		mult = 4
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.modifier:planet_pop_assembly_add
+	#		exists = planet
+	#		exists = owner
+	#		owner = { is_hive_empire = no }
+	#	}
+	#	modifier = {
+	#		add = planet.modifier:planet_pop_assembly_organic_add
+	#		exists = planet
+	#		exists = owner
+	#		owner = { is_hive_empire = yes }
+	#	}
+	#	mult = 4
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 leader_trait_assembler_3 = {
 	replace_traits = { "leader_trait_assembler_2" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_assembler"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 3
 	}
 	veteran_class_locked_trait = yes
-	triggered_modifier = {
+	triggered_planet_modifier = {
 		potential = {
 			owner = { is_hive_empire = no }
 		}
-		planet_pop_assembly_mult = 0.4
+		#planet_pop_assembly_mult = 0.4
+		# Evolved
+		planet_pop_assembly_mult = 0.2
 	}
-	triggered_modifier = {
+	triggered_planet_modifier = {
 		potential = {
 			owner = { is_hive_empire = yes }
 		}
-		planet_pop_assembly_organic_mult = 0.4
+		#planet_pop_assembly_organic_mult = 0.4
+		# Evolved
+		planet_pop_assembly_organic_mult = 0.2
 	}
-	leader_class = { governor }
+	triggered_sector_modifier = {
+		potential = {
+			owner = { is_hive_empire = no }
+		}
+		#planet_pop_assembly_mult = 0.1
+		# Evolved
+		planet_pop_assembly_mult = 0.1
+	}
+	triggered_sector_modifier = {
+		potential = {
+			owner = { is_hive_empire = yes }
+		}
+		#planet_pop_assembly_organic_mult = 0.2
+		# Evolved
+		planet_pop_assembly_organic_mult = 0.1
+	}
+	leader_class = { official scientist }
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.modifier:planet_pop_assembly_add
-			exists = planet
-			exists = owner
-			owner = { is_hive_empire = no }
-		}
-		modifier = {
-			add = planet.modifier:planet_pop_assembly_organic_add
-			exists = planet
-			exists = owner
-			owner = { is_hive_empire = yes }
-		}
-		mult = 4
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.modifier:planet_pop_assembly_add
+	#		exists = planet
+	#		exists = owner
+	#		owner = { is_hive_empire = no }
+	#	}
+	#	modifier = {
+	#		add = planet.modifier:planet_pop_assembly_organic_add
+	#		exists = planet
+	#		exists = owner
+	#		owner = { is_hive_empire = yes }
+	#	}
+	#	mult = 4
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_pop_focused = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_pop_focused"
 		RARITY = veteran
 		COUNCIL = no
@@ -3497,216 +3368,90 @@ leader_trait_pop_focused = {
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		has_trait = subclass_governor_economist
+		has_trait = subclass_official_governor
 	}
 	veteran_class_locked_trait = yes
-	modifier = {
+	planet_modifier = {
 		planet_jobs_worker_produces_mult = 0.05
 	}
-	leader_class = { governor }
-	selectable_weight = @subclass_trait_weight
-
-	ai_weight = {
-		base = @tec_good_trait_weight
-		mult = value:tec_ai_leader_is_planet_governor
+	sector_modifier = {
+		planet_jobs_worker_produces_mult = 0.025
 	}
+	leader_class = { official }
+	selectable_weight = {
+		weight = @subclass_trait_weight
+		inline_script = paragon/governor_weight_mult
+	}
+
+	#ai_weight = {
+	#	base = @tec_good_trait_weight
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#}
 }
 
 leader_trait_pop_focused_2 = {
 	replace_traits = { "leader_trait_pop_focused" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_pop_focused"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 2
 	}
 	veteran_class_locked_trait = yes
-	modifier = {
+	planet_modifier = {
 		planet_jobs_worker_produces_mult = 0.1
 		planet_jobs_specialist_produces_mult = 0.05
 	}
-	leader_class = { governor }
-
-	ai_weight = {
-		base = @tec_good_trait_weight
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
+	sector_modifier = {
+		planet_jobs_worker_produces_mult = 0.05
+		planet_jobs_specialist_produces_mult = 0.025
 	}
+	leader_class = { official }
+
+	#ai_weight = {
+	#	base = @tec_good_trait_weight
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 leader_trait_pop_focused_3 = {
 	replace_traits = { "leader_trait_pop_focused_2" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_pop_focused"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 3
 	}
 	veteran_class_locked_trait = yes
-	modifier = {
+	planet_modifier = {
 		planet_jobs_worker_produces_mult = 0.15
 		planet_jobs_specialist_produces_mult = 0.1
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_gestalt = no
-			}
-		}
 		planet_jobs_ruler_produces_mult = 0.05
 	}
+	sector_modifier = {
+		planet_jobs_worker_produces_mult = 0.075
+		planet_jobs_specialist_produces_mult = 0.05
+		planet_jobs_ruler_produces_mult = 0.025
+	}
+	leader_class = { official }
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_machine_empire = yes
-			}
-		}
-		planet_jobs_tec_prime_drone_produces_mult = 0.05
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_hive_empire = yes
-			}
-		}
-		planet_jobs_tec_brood_drone_produces_mult = 0.05
-	}
-	leader_class = { governor }
-
-	ai_weight = {
-		base = @tec_good_trait_weight
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
-}
-
-###################
-leader_trait_academic = {
-	inline_script = {
-		script = trait/icon
-		CLASS = governor
-		ICON = "GFX_leader_trait_intellectual"
-		RARITY = veteran
-		COUNCIL = no
-		TIER = 1
-	}
-	leader_potential_add = {
-		has_paragon_dlc = yes
-		has_trait = subclass_governor_economist
-	}
-	veteran_class_locked_trait = yes
-	modifier = {
-		planet_researchers_produces_mult = 0.05
-		planet_researchers_upkeep_mult = -0.05
-	}
-	leader_class = { governor }
-	selectable_weight = @subclass_trait_weight
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-
-		modifier = {
-			add = planet.value:research_combined_value|FACTOR|2|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				has_research_designation = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-	}
-}
-
-leader_trait_academic_2 = {
-	replace_traits = { "leader_trait_academic" }
-	inline_script = {
-		script = trait/icon
-		CLASS = governor
-		ICON = "GFX_leader_trait_intellectual"
-		RARITY = veteran
-		COUNCIL = no
-		TIER = 2
-	}
-	veteran_class_locked_trait = yes
-	modifier = {
-		planet_researchers_produces_mult = 0.1
-		planet_researchers_upkeep_mult = -0.1
-	}
-	leader_class = { governor }
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-
-		modifier = {
-			add = planet.value:research_combined_value|FACTOR|2|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				has_research_designation = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
-}
-
-leader_trait_academic_3 = {
-	replace_traits = { "leader_trait_academic_2" }
-	inline_script = {
-		script = trait/icon
-		CLASS = governor
-		ICON = "GFX_leader_trait_intellectual"
-		RARITY = veteran
-		COUNCIL = no
-		TIER = 3
-	}
-	veteran_class_locked_trait = yes
-	modifier = {
-		planet_researchers_produces_mult = 0.15
-		planet_researchers_upkeep_mult = -0.15
-	}
-	leader_class = { governor }
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-
-		modifier = {
-			add = planet.value:research_combined_value|FACTOR|2|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				has_research_designation = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
-	}
+	#ai_weight = {
+	#	base = @tec_good_trait_weight
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
 leader_trait_distribution_lines = {
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_fleet_logistician"
 		RARITY = veteran
 		COUNCIL = no
@@ -3714,146 +3459,200 @@ leader_trait_distribution_lines = {
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		has_trait = subclass_governor_economist
+		has_trait = subclass_official_governor
 	}
 	veteran_class_locked_trait = yes
-	modifier = {
-		planet_artisans_upkeep_mult = -0.075
-		planet_metallurgists_upkeep_mult = -0.075
+	planet_modifier = {
+		planet_metallurgists_upkeep_mult = -0.05
 	}
-	leader_class = { governor }
-	selectable_weight = @subclass_trait_weight
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-
-		modifier = {
-			add = planet.value:industrial_districts_value|FACTOR|2|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				OR = {
-					tec_has_cg_buildings = yes
-					tec_has_alloy_buildings = yes
-				}
+	triggered_planet_modifier = {
+		potential = {
+			owner = {
+				country_uses_consumer_goods = yes
 			}
 		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				OR = {
-					has_industrial_designation = yes
-					has_foundry_designation = yes
-					has_factory_designation = yes
-				}
+		planet_artisans_upkeep_mult = -0.05
+	}
+	sector_modifier = {
+		planet_metallurgists_upkeep_mult = -0.025
+	}
+	triggered_sector_modifier = {
+		potential = {
+			owner = {
+				country_uses_consumer_goods = yes
 			}
 		}
-		mult = value:tec_ai_leader_is_planet_governor
+		planet_artisans_upkeep_mult = -0.025
 	}
+	leader_class = { official }
+	selectable_weight = {
+		weight = @subclass_trait_weight
+		inline_script = paragon/governor_weight_mult
+	}
+
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:industrial_districts_value|FACTOR|2|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			OR = {
+	#				tec_has_cg_buildings = yes
+	#				tec_has_alloy_buildings = yes
+	#			}
+	#		}
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			OR = {
+	#				has_industrial_designation = yes
+	#				has_foundry_designation = yes
+	#				has_factory_designation = yes
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#}
 }
 
 leader_trait_distribution_lines_2 = {
 	replace_traits = { "leader_trait_distribution_lines" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_fleet_logistician"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 2
 	}
 	veteran_class_locked_trait = yes
-	modifier = {
-		planet_artisans_upkeep_mult = -0.125
-		planet_metallurgists_upkeep_mult = -0.125
+	planet_modifier = {
+		planet_metallurgists_upkeep_mult = -0.1
 	}
-	leader_class = { governor }
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-
-		modifier = {
-			add = planet.value:industrial_districts_value|FACTOR|2|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				OR = {
-					tec_has_cg_buildings = yes
-					tec_has_alloy_buildings = yes
-				}
+	triggered_planet_modifier = {
+		potential = {
+			owner = {
+				country_uses_consumer_goods = yes
 			}
 		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				OR = {
-					has_industrial_designation = yes
-					has_foundry_designation = yes
-					has_factory_designation = yes
-				}
+		planet_artisans_upkeep_mult = -0.1
+	}
+	sector_modifier = {
+		planet_metallurgists_upkeep_mult = -0.05
+	}
+	triggered_sector_modifier = {
+		potential = {
+			owner = {
+				country_uses_consumer_goods = yes
 			}
 		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
+		planet_artisans_upkeep_mult = -0.05
 	}
+	leader_class = { official }
+
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:industrial_districts_value|FACTOR|2|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			OR = {
+	#				tec_has_cg_buildings = yes
+	#				tec_has_alloy_buildings = yes
+	#			}
+	#		}
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			OR = {
+	#				has_industrial_designation = yes
+	#				has_foundry_designation = yes
+	#				has_factory_designation = yes
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 leader_trait_distribution_lines_3 = {
 	replace_traits = { "leader_trait_distribution_lines_2" }
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_fleet_logistician"
 		RARITY = veteran
 		COUNCIL = no
 		TIER = 3
 	}
 	veteran_class_locked_trait = yes
-	modifier = {
-		planet_artisans_upkeep_mult = -0.2
+	planet_modifier = {
 		planet_metallurgists_upkeep_mult = -0.2
 	}
-	leader_class = { governor }
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-
-		modifier = {
-			add = planet.value:industrial_districts_value|FACTOR|2|
-			exists = planet
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				OR = {
-					tec_has_cg_buildings = yes
-					tec_has_alloy_buildings = yes
-				}
+	triggered_planet_modifier = {
+		potential = {
+			owner = {
+				country_uses_consumer_goods = yes
 			}
 		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = planet
-			planet = {
-				OR = {
-					has_industrial_designation = yes
-					has_foundry_designation = yes
-					has_factory_designation = yes
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = @tec_upgrade_trait_weight_mult
+		planet_artisans_upkeep_mult = -0.2
 	}
+	sector_modifier = {
+		planet_metallurgists_upkeep_mult = -0.1
+	}
+	triggered_sector_modifier = {
+		potential = {
+			owner = {
+				country_uses_consumer_goods = yes
+			}
+		}
+		planet_artisans_upkeep_mult = -0.1
+	}
+	leader_class = { official }
+
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:industrial_districts_value|FACTOR|2|
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			OR = {
+	#				tec_has_cg_buildings = yes
+	#				tec_has_alloy_buildings = yes
+	#			}
+	#		}
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			OR = {
+	#				has_industrial_designation = yes
+	#				has_foundry_designation = yes
+	#				has_factory_designation = yes
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = @tec_upgrade_trait_weight_mult
+	#}
 }
 
 ###################
@@ -3864,7 +3663,7 @@ leader_trait_efficient = {
 	destiny_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_efficient"
 		RARITY = paragon
 		COUNCIL = no
@@ -3872,57 +3671,68 @@ leader_trait_efficient = {
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		has_trait = subclass_governor_economist
+		has_trait = subclass_official_governor
 	}
-	modifier = {
+	planet_modifier = {
 		planet_jobs_ruler_produces_mult = 0.5
 		pop_cat_ruler_political_power = 0.15
 	}
-	leader_class = { governor }
-	selectable_weight = @subclass_trait_weight
-	destiny_background_icon = "GFX_leader_background_destiny_1"
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = owner
-			owner = {
-				tec_has_ruler_civic = yes
-			}
-		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = owner
-			owner = {
-				tec_is_dystopian_empire = yes
-			}
-		}
-		modifier = {
-			mult = 0.5
-			exists = owner
-			owner = {
-				is_elitist = no
-			}
-		}
-		modifier = {
-			mult = 0
-			exists = owner
-			owner = {
-				tec_is_worker_coop_empire = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = value:tec_ai_leader_wants_councilor_destiny_trait
+	sector_modifier = {
+		planet_jobs_ruler_produces_mult = 0.25
+		pop_cat_ruler_political_power = 0.075
 	}
+	leader_class = { official }
+	selectable_weight = {
+		weight = @subclass_trait_weight
+		inline_script = paragon/governor_weight_mult
+
+		modifier = {	# Evolved
+			always = yes
+			factor = owner.value:tec_leader_destiny_weight|TRAIT|leader_trait_efficient|MULT|0.5|
+		}
+	}
+	background_icon = "GFX_leader_background_destiny_1"
+
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = owner
+	#		owner = {
+	#			tec_has_ruler_civic = yes
+	#		}
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = owner
+	#		owner = {
+	#			tec_is_dystopian_empire = yes
+	#		}
+	#	}
+	#	modifier = {
+	#		mult = 0.5
+	#		exists = owner
+	#		owner = {
+	#			is_elitist = no
+	#		}
+	#	}
+	#	modifier = {
+	#		mult = 0
+	#		exists = owner
+	#		owner = {
+	#			tec_is_worker_coop_empire = yes
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = value:tec_ai_leader_wants_councilor_destiny_trait
+	#}
 }
 
 leader_trait_arbiter = {
 	destiny_trait = yes
-	ethic_destiny_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = commander
 		ICON = "GFX_leader_trait_arbiter"
 		RARITY = paragon
 		COUNCIL = no
@@ -3930,147 +3740,70 @@ leader_trait_arbiter = {
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		has_trait = subclass_governor_economist
-		OR = {
-			has_ethic = ethic_authoritarian
-			has_ethic = ethic_industrial
-		}
-
+		has_trait = subclass_commander_governor
 	}
-	modifier = {
+	planet_modifier = {
 		planet_jobs_worker_produces_mult = 0.5
+		planet_jobs_slave_produces_mult = 0.5
 		planet_pops_upkeep_mult = -0.35
 		pop_happiness = -0.1
 		pop_growth_speed_reduction = 0.05
 	}
-	
-	leader_class = { governor }
+	sector_modifier = {
+		planet_jobs_worker_produces_mult = 0.25
+		planet_jobs_slave_produces_mult = 0.25
+		planet_pops_upkeep_mult = -0.175
+		pop_happiness = -0.05
+		pop_growth_speed_reduction = 0.025
+	}
+	leader_class = { commander }
 	selectable_weight = {
 		weight = @subclass_trait_weight
-		inline_script = {
-			script = paragon/ethic_weight_mult
-			IS = authoritarian
-			NOT = egalitarian
-		}
-		inline_script = {
-			script = paragon/ethic_weight_mult
-			IS = industrial
-			NOT = green
-		}
-	}
-	destiny_background_icon = "GFX_leader_background_destiny_1"
+		inline_script = paragon/governor_weight_mult
 
-	ai_weight = {
-		base = @tec_base_trait_weight
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				OR = {
-					has_rural_designation = yes
-					has_farming_designation = yes
-					has_generator_designation = yes
-					has_mining_designation = yes
-				}
-			}
+		modifier = {	# Evolved
+			always = yes
+			factor = owner.value:tec_leader_destiny_weight|TRAIT|leader_trait_arbiter|MULT|0.5|
 		}
-		modifier = {
-			add = @tec_reduced_trait_weight
-			exists = owner
-			owner = {
-				OR = {
-					has_valid_civic = civic_tec_regular_distributism
-					tec_is_improved_farming_empire = yes
-					tec_is_improved_technician_empire = yes
-					tec_is_improved_mining_empire = yes
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = value:tec_ai_leader_wants_councilor_destiny_trait
 	}
-}
+	background_icon = "GFX_leader_background_destiny_1"
 
-leader_trait_automation_champion = {
-	destiny_trait = yes
-	inline_script = {
-		script = trait/icon
-		CLASS = governor
-		ICON = "GFX_leader_trait_automation_champion"
-		RARITY = paragon
-		COUNCIL = no
-		TIER = none
-	}
-	leader_potential_add = {
-		has_paragon_dlc = yes
-	}
-	modifier = {
-		planet_jobs_robotic_produces_mult = 0.25
-		planet_structures_upkeep_mult = -0.25
-	}
-	leader_class = { governor }
-	selectable_weight = @shared_trait_weight
-
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				tec_has_robotic_assembly_buildings = yes
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = value:tec_ai_leader_wants_councilor_destiny_trait
-	}
-}
-
-leader_trait_expert_survivalist = {
-	destiny_trait = yes
-	inline_script = {
-		script = trait/icon
-		CLASS = governor
-		ICON = "GFX_leader_trait_expert_survivalist"
-		RARITY = paragon
-		COUNCIL = no
-		TIER = none
-	}
-	leader_potential_add = {
-		has_paragon_dlc = yes
-		has_trait = subclass_governor_pioneer
-	}
-	modifier = {
-		pop_environment_tolerance = 0.3
-		planet_pops_upkeep_mult = -0.15
-		pop_growth_speed = 0.15
-	}
-	leader_class = { governor }
-	selectable_weight = @subclass_trait_weight
-	destiny_background_icon = "GFX_leader_background_destiny_1"
-
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				habitability = {
-					who = owner_main_species
-					value <= 0.7
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = value:tec_ai_leader_wants_councilor_destiny_trait
-	}
+	#ai_weight = {
+	#	base = @tec_base_trait_weight
+	#	modifier = {
+	#		add = @tec_base_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			OR = {
+	#				has_rural_designation = yes
+	#				has_farming_designation = yes
+	#				has_generator_designation = yes
+	#				has_mining_designation = yes
+	#			}
+	#		}
+	#	}
+	#	modifier = {
+	#		add = @tec_reduced_trait_weight
+	#		exists = owner
+	#		owner = {
+	#			OR = {
+	#				has_valid_civic = civic_tec_regular_distributism
+	#				tec_is_improved_farming_empire = yes
+	#				tec_is_improved_technician_empire = yes
+	#				tec_is_improved_mining_empire = yes
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = value:tec_ai_leader_wants_councilor_destiny_trait
+	#}
 }
 
 leader_trait_utopian_idealist = {
 	destiny_trait = yes
-	ethic_destiny_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_utopian_idealist"
 		RARITY = paragon
 		COUNCIL = no
@@ -4078,45 +3811,53 @@ leader_trait_utopian_idealist = {
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		has_trait = subclass_governor_pioneer
-		OR = {
-			has_ethic = ethic_egalitarian
-			has_ethic = ethic_socialism
-		}
+		has_trait = subclass_official_governor
 	}
-	modifier = {
+	planet_modifier = {
 		pop_happiness = 0.2
 		pop_growth_from_immigration = 0.25
 		planet_immigration_pull_mult = 0.1
 	}
-	leader_class = { governor }
-	selectable_weight = @subclass_trait_weight
-	destiny_background_icon = "GFX_leader_background_destiny_1"
-
-	ai_weight = {
-		base = @tec_reduced_trait_weight
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				OR = {
-					happiness_planet < 0.8
-					is_capital = yes
-					tec_is_arcology = yes
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = value:tec_ai_leader_wants_councilor_destiny_trait
+	sector_modifier = {
+		pop_happiness = 0.1
+		pop_growth_from_immigration = 0.125
+		planet_immigration_pull_mult = 0.05
 	}
+	leader_class = { official }
+	selectable_weight = {
+		weight = @subclass_trait_weight
+		inline_script = paragon/governor_weight_mult
+
+		modifier = {	# Evolved
+			always = yes
+			factor = owner.value:tec_leader_destiny_weight|TRAIT|leader_trait_utopian_idealist|MULT|0.5|
+		}
+	}
+	background_icon = "GFX_leader_background_destiny_1"
+
+	#ai_weight = {
+	#	base = @tec_reduced_trait_weight
+	#	modifier = {
+	#		add = @tec_base_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			OR = {
+	#				happiness_planet < 0.8
+	#				is_capital = yes
+	#				tec_is_arcology = yes
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = value:tec_ai_leader_wants_councilor_destiny_trait
+	#}
 }
 
 leader_trait_mediator = {
 	destiny_trait = yes
-	ethic_destiny_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = leader
 		ICON = "GFX_leader_trait_mediator"
 		RARITY = paragon
 		COUNCIL = no
@@ -4124,185 +3865,214 @@ leader_trait_mediator = {
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		has_trait = subclass_governor_economist
+		has_governor_subclass = yes
 		has_ethic = ethic_xenophile
 	}
-	modifier = {
-		pop_growth_from_immigration = 0.2
+	triggered_planet_modifier = {
+		potential = {
+			exists = planet
+		}
+		pop_job_amenities_mult = 0.02
+		mult = planet.value:species_on_planet
 	}
-	triggered_modifier = {
+	triggered_planet_modifier = {
+		potential = {
+			exists = planet
+		}
+		pop_citizen_happiness = 0.02
+		mult = planet.value:species_on_planet
+	}
+	triggered_sector_modifier = {
+		potential = {
+			exists = planet
+		}
 		pop_job_amenities_mult = 0.01
+		mult = planet.value:species_on_planet
+	}
+	triggered_sector_modifier = {
+		potential = {
+			exists = planet
+		}
 		pop_citizen_happiness = 0.01
 		mult = planet.value:species_on_planet
 	}
 	custom_tooltip = leader_trait_mediator_effect
-	leader_class = { governor }
-	selectable_weight = @subclass_trait_weight
-	destiny_background_icon = "GFX_leader_background_destiny_1"
+	leader_class = { commander official scientist }
+	selectable_weight = {
+		weight = @subclass_trait_weight
+		inline_script = paragon/governor_weight_mult
 
-	ai_weight = {
-		base = @tec_situational_trait_weight
-		modifier = {
-			add = planet.value:species_on_planet
-			exists = planet
+		modifier = {	# Evolved
+			always = yes
+			factor = owner.value:tec_leader_destiny_weight|TRAIT|leader_trait_mediator|MULT|0.5|
 		}
-		modifier = {
-			add = @tec_base_trait_weight
-			exists = planet
-			planet = {
-				OR = {
-					is_capital = yes
-					tec_is_arcology = yes
-				}
-			}
-		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = value:tec_ai_leader_wants_councilor_destiny_trait
 	}
+	background_icon = "GFX_leader_background_destiny_1"
+
+	#ai_weight = {
+	#	base = @tec_situational_trait_weight
+	#	modifier = {
+	#		add = planet.value:species_on_planet
+	#		exists = planet
+	#	}
+	#	modifier = {
+	#		add = @tec_base_trait_weight
+	#		exists = planet
+	#		planet = {
+	#			OR = {
+	#				is_capital = yes
+	#				tec_is_arcology = yes
+	#			}
+	#		}
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = value:tec_ai_leader_wants_councilor_destiny_trait
+	#}
 }
 
 leader_trait_shroud_preacher = {
 	destiny_trait = yes
-	ethic_destiny_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = leader
 		ICON = "GFX_leader_trait_shroud_preacher"
 		RARITY = paragon
 		COUNCIL = no
 		TIER = none
 	}
-	modifier = {
+	planet_modifier = {
 		planet_psionic_jobs_produces_mult = 0.25
+	}
+	sector_modifier = {
+		planet_psionic_jobs_produces_mult = 0.125
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
 		has_ethic = ethic_spiritualist
+		OR = {
+			has_trait = subclass_scientist_governor
+			has_trait = subclass_official_governor
+			has_trait = subclass_commander_governor
+		}
 	}
 	custom_tooltip_with_modifiers = leader_trait_shroud_preacher_effect
-	leader_class = { governor }
-	selectable_weight = @shared_trait_weight
-	destiny_background_icon = "GFX_leader_background_destiny_1"
+	leader_class = { official scientist commander }
+	selectable_weight = {
+		weight = @subclass_trait_weight
+		inline_script = paragon/governor_weight_mult
 
-	ai_weight = {
-		base = @tec_good_trait_weight
-		modifier = {
-			mult = @tec_block_trait_weight_mult
-			exists = owner
-			owner = {
-				tec_has_any_psionic_ascension_path = no
-			}
+		modifier = {	# Evolved
+			always = yes
+			factor = owner.value:tec_leader_destiny_weight|TRAIT|leader_trait_shroud_preacher|MULT|0.5|
 		}
-		mult = 2
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = value:tec_ai_leader_wants_councilor_destiny_trait
 	}
+	background_icon = "GFX_leader_background_destiny_1"
+
+	#ai_weight = {
+	#	base = @tec_good_trait_weight
+	#	modifier = {
+	#		mult = @tec_block_trait_weight_mult
+	#		exists = owner
+	#		owner = {
+	#			tec_has_any_psionic_ascension_path = no
+	#		}
+	#	}
+	#	mult = 2
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = value:tec_ai_leader_wants_councilor_destiny_trait
+	#}
 }
 
 leader_trait_master_diplomat = {
 	destiny_trait = yes
-	ethic_destiny_trait = yes
-	councilor_trait = yes
 	cost = 1
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_master_diplomat"
 		RARITY = paragon
 		COUNCIL = yes
 		TIER = none
 	}
-	modifier = {
-		diplo_weight_mult = 0.4
-		country_trust_cap_add = 120
+	councilor_modifier = {
+		diplo_weight_mult = 0.2
+		country_trust_cap_add = 50
 		envoys_add = 2
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		has_ethic = ethic_pacifist
-		has_trait = subclass_governor_visionary
+		has_trait = subclass_official_diplomacy_councilor
 		owner = {
 			is_homicidal = no
 		}
-		tec_leader_already_exists_destiny_in_empire = {
-			trait = leader_trait_master_diplomat
-		}
 	}
-	leader_class = { governor }
+	leader_class = { official }
 	opposites = {
 		leader_trait_reclusive
 		leader_trait_reclusive_2
 	}
 	selectable_weight = {
 		weight = @subclass_trait_weight
-		inline_script = {
-			script = paragon/ethic_weight_mult
-			IS = pacifist
-			NOT = militarist
+		inline_script = paragon/council_weight_mult
+
+		modifier = {	# Evolved
+			always = yes
+			factor = owner.value:tec_leader_destiny_weight|TRAIT|leader_trait_master_diplomat|MULT|0.5|
 		}
 	}
-	destiny_background_icon = "GFX_leader_background_destiny_1"
+	background_icon = "GFX_leader_background_destiny_1"
 
-	ai_weight = {
-		base = @tec_base_trait_weight
-		add = value:tec_value|VALUE|tec_ai_leader_wants_diplomatic_traits|MULT|2|
-		mult = value:tec_ai_leader_is_councilor
-		mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|leader_trait_master_diplomat|
-	}
+	#ai_weight = {
+	#	base = @tec_base_trait_weight
+	#	add = value:tec_value|VALUE|tec_ai_leader_wants_diplomatic_traits|MULT|2|
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|leader_trait_master_diplomat|
+	#}
 }
 
 leader_trait_supreme_organizer = {
 	destiny_trait = yes
-	councilor_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_supreme_organizer"
 		RARITY = paragon
 		COUNCIL = yes
 		TIER = none
 	}
-	modifier = {
-		empire_size_penalty_mult = -0.05
-		empire_size_add = -25
+	councilor_modifier = {
+		empire_size_penalty_mult = -0.1
 		pop_government_ethic_attraction = 0.50
 		pop_happiness = -0.05
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		has_trait = subclass_governor_visionary
-		tec_leader_already_exists_destiny_in_empire = {
-			trait = leader_trait_supreme_organizer
-		}
+		has_trait = subclass_official_economy_councilor
 	}
-	leader_class = { governor }
+	leader_class = { official }
 	selectable_weight = {
 		weight = @subclass_trait_weight
-		inline_script = {
-			script = paragon/ethic_weight_mult
-			IS = xenophobe
-			NOT = xenophile
-		}
-		inline_script = {
-			script = paragon/ethic_weight_mult
-			IS = socialism
-			NOT = capitalism
-		}
-	}
-	destiny_background_icon = "GFX_leader_background_destiny_1"
+		inline_script = paragon/council_weight_mult
 
-	ai_weight = {
-		base = @tec_good_trait_weight
-		mult = value:tec_ai_leader_is_councilor
-		mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|leader_trait_supreme_organizer|
+		modifier = {	# Evolved
+			always = yes
+			factor = owner.value:tec_leader_destiny_weight|TRAIT|leader_trait_supreme_organizer|MULT|0.5|
+		}
 	}
+	background_icon = "GFX_leader_background_destiny_1"
+
+	#ai_weight = {
+	#	base = @tec_good_trait_weight
+	#	mult = value:tec_ai_leader_is_councilor
+	#	mult = value:tec_ai_leader_avoid_stack_trait_mult|TRAIT|leader_trait_supreme_organizer|
+	#}
 }
 
 leader_trait_galvanizer = {
 	destiny_trait = yes
 	inline_script = {
 		script = trait/icon
-		CLASS = governor
+		CLASS = official
 		ICON = "GFX_leader_trait_galvanizer"
 		RARITY = paragon
 		COUNCIL = no
@@ -4310,26 +4080,41 @@ leader_trait_galvanizer = {
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		has_trait = subclass_governor_visionary
+		has_trait = subclass_official_governor
 	}
-	modifier = {
-		pop_category_normal_resources_unity_produces_add = 0.5
-		pop_category_normal_resources_society_research_produces_add = 0.5
-		tec_pop_lifestyle_trade_value_add = 0.25
+	planet_modifier = {
+		pop_category_workers_unity_produces_add = 0.5
+		pop_category_specialists_unity_produces_add = 0.5
+		pop_category_rulers_unity_produces_add = 0.5
+		pop_happiness = 0.05
 	}
-	leader_class = { governor }
-	selectable_weight = @subclass_trait_weight
-	destiny_background_icon = "GFX_leader_background_destiny_1"
+	sector_modifier = {
+		pop_category_workers_unity_produces_add = 0.25
+		pop_category_specialists_unity_produces_add = 0.25
+		pop_category_rulers_unity_produces_add = 0.25
+		pop_happiness = 0.05
+	}
+	leader_class = { official }
+	selectable_weight = {
+		weight = @subclass_trait_weight
+		inline_script = paragon/governor_weight_mult
 
-	ai_weight = {
-		base = @tec_base_trait_weight
-		modifier = {
-			add = planet.value:tec_trigger|TRIGGER|num_pops|MULT|0.2|
-			exists = planet
+		modifier = {	# Evolved
+			always = yes
+			factor = owner.value:tec_leader_destiny_weight|TRAIT|leader_trait_galvanizer|MULT|0.5|
 		}
-		mult = value:tec_ai_leader_is_planet_governor
-		mult = value:tec_ai_leader_wants_councilor_destiny_trait
 	}
+	background_icon = "GFX_leader_background_destiny_1"
+
+	#ai_weight = {
+	#	base = @tec_base_trait_weight
+	#	modifier = {
+	#		add = planet.value:tec_trigger|TRIGGER|num_pops|MULT|0.2|
+	#		exists = planet
+	#	}
+	#	mult = value:tec_ai_leader_is_governing_planet
+	#	mult = value:tec_ai_leader_wants_councilor_destiny_trait
+	#}
 }
 
 ###################
@@ -4344,21 +4129,37 @@ leader_trait_corrupt = {
 		COUNCIL = no
 		TIER = 1
 	}
-	triggered_modifier = {
+	leader_potential_add = {
+		trait_is_crisis_faction_check = no
+		NOT = { has_trait_tier1or2 = { TRAIT = leader_trait_lawless } }
+	}
+	triggered_planet_modifier = {
 		potential = { trait_is_gestalt_check = no }
 		planet_crime_add = 10
 	}
-	triggered_modifier = {
+	triggered_planet_modifier = {
 		potential = { trait_is_gestalt_check = yes }
 		planet_crime_no_happiness_add = 10
 	}
-	leader_class = { governor }
+	triggered_sector_modifier = {
+		potential = { trait_is_gestalt_check = no }
+		planet_crime_add = 5
+	}
+	triggered_sector_modifier = {
+		potential = { trait_is_gestalt_check = yes }
+		planet_crime_no_happiness_add = 5
+	}
+	leader_class = { commander official scientist }
 	opposites = {
 		leader_trait_righteous
 		leader_trait_righteous_2
+		leader_trait_martinet
+		leader_trait_martinet_2
+		leader_trait_martinet_3
 	}
 	selectable_weight = {
 		weight = @class_negative_trait_weight
+		inline_script = paragon/governor_weight_mult
 		modifier = {
 			species = {
 				has_trait = trait_decadent
@@ -4377,20 +4178,31 @@ leader_trait_corrupt_2 = {
 		COUNCIL = no
 		TIER = 2
 	}
-	triggered_modifier = {
+	triggered_planet_modifier = {
 		potential = { trait_is_gestalt_check = no }
 		planet_crime_add = 30
 	}
-	triggered_modifier = {
+	triggered_planet_modifier = {
 		potential = { trait_is_gestalt_check = yes }
 		planet_crime_no_happiness_add = 30
 	}
-	leader_class = { governor }
+	triggered_sector_modifier = {
+		potential = { trait_is_gestalt_check = no }
+		planet_crime_add = 15
+	}
+	triggered_sector_modifier = {
+		potential = { trait_is_gestalt_check = yes }
+		planet_crime_no_happiness_add = 15
+	}
+	leader_class = { commander official scientist }
 	opposites = {
 		leader_trait_righteous
 		leader_trait_righteous_2
+		leader_trait_martinet
+		leader_trait_martinet_2
+		leader_trait_martinet_3
 	}
-	selectable_weight = @tier2_negative_trait_weight	
+	selectable_weight = @tier2_negative_trait_weight
 }
 
 ###################
@@ -4402,15 +4214,20 @@ leader_trait_polluter = {
 		COUNCIL = no
 		TIER = 1
 	}
-	modifier = {
+	planet_modifier = {
 		pop_growth_speed = -0.05
 	}
+	sector_modifier = {
+		pop_growth_speed = -0.025
+	}
 	leader_potential_add = {
+		trait_is_crisis_faction_check = no
 		owner = { is_machine_empire = no }
 	}
-	leader_class = { governor }
+	leader_class = { commander official scientist }
 	selectable_weight = {
 		weight = @class_negative_trait_weight
+		inline_script = paragon/governor_weight_mult
 		modifier = {
 			has_ethic = ethic_materialist
 			factor = @ethic_weight_mult
@@ -4427,10 +4244,13 @@ leader_trait_polluter_2 = {
 		COUNCIL = no
 		TIER = 2
 	}
-	modifier = {
+	planet_modifier = {
 		pop_growth_speed = -0.15
 	}
-	leader_class = { governor }
+	sector_modifier = {
+		pop_growth_speed = -0.075
+	}
+	leader_class = { commander official scientist }
 	selectable_weight = @tier2_negative_trait_weight
 }
 
@@ -4443,16 +4263,24 @@ leader_trait_sadistic = {
 		COUNCIL = no
 		TIER = 1
 	}
-	modifier = {
+	planet_modifier = {
 		planet_stability_add = -5
 	}
+	sector_modifier = {
+		planet_stability_add = -2.5
+	}
 	leader_potential_add = {
+		trait_is_crisis_faction_check = no
 		NOT = { has_ethic = ethic_pacifist }
 	}
-	leader_class = { governor }
-	opposites = { "leader_trait_righteous" }
+	leader_class = { commander official scientist }
+	opposites = {
+		leader_trait_righteous
+		leader_trait_righteous_2
+	}
 	selectable_weight = {
 		weight = @class_negative_trait_weight
+		inline_script = paragon/governor_weight_mult
 		modifier = {
 			has_ethic = ethic_militarist
 			factor = @ethic_weight_mult
@@ -4469,11 +4297,17 @@ leader_trait_sadistic_2 = {
 		COUNCIL = no
 		TIER = 2
 	}
-	modifier = {
+	planet_modifier = {
 		planet_stability_add = -10
 	}
-	leader_class = { governor }
-	opposites = { "leader_trait_righteous" }
+	sector_modifier = {
+		planet_stability_add = -5
+	}
+	leader_class = { commander official scientist }
+	opposites = {
+		leader_trait_righteous
+		leader_trait_righteous_2
+	}
 	selectable_weight = @tier2_negative_trait_weight
 }
 
@@ -4486,17 +4320,29 @@ leader_trait_profligate = {
 		COUNCIL = no
 		TIER = 1
 	}
-	triggered_modifier = {
+	leader_potential_add = {
+		trait_is_crisis_faction_check = no
+	}
+	triggered_planet_modifier = {
 		potential = { trait_is_gestalt_check = no }
 		planet_jobs_consumer_goods_upkeep_mult = 0.10
 	}
-	triggered_modifier = {
+	triggered_planet_modifier = {
 		potential = { trait_is_gestalt_check = yes }
 		pop_amenities_usage_no_happiness_mult = 0.10
 	}
-	leader_class = { governor }
+	triggered_sector_modifier = {
+		potential = { trait_is_gestalt_check = no }
+		planet_jobs_consumer_goods_upkeep_mult = 0.05
+	}
+	triggered_sector_modifier = {
+		potential = { trait_is_gestalt_check = yes }
+		pop_amenities_usage_no_happiness_mult = 0.05
+	}
+	leader_class = { commander official scientist }
 	selectable_weight = {
 		weight = @class_negative_trait_weight
+		inline_script = paragon/governor_weight_mult
 		modifier = {
 			species = {
 				has_trait = trait_wasteful
@@ -4515,15 +4361,23 @@ leader_trait_profligate_2 = {
 		COUNCIL = no
 		TIER = 2
 	}
-	triggered_modifier = {
+	triggered_planet_modifier = {
 		potential = { trait_is_gestalt_check = no }
 		planet_jobs_consumer_goods_upkeep_mult = 0.25
 	}
-	triggered_modifier = {
+	triggered_planet_modifier = {
 		potential = { trait_is_gestalt_check = yes }
 		pop_amenities_usage_no_happiness_mult = 0.25
 	}
-	leader_class = { governor }
+	triggered_sector_modifier = {
+		potential = { trait_is_gestalt_check = no }
+		planet_jobs_consumer_goods_upkeep_mult = 0.125
+	}
+	triggered_sector_modifier = {
+		potential = { trait_is_gestalt_check = yes }
+		pop_amenities_usage_no_happiness_mult = 0.125
+	}
+	leader_class = { commander official scientist }
 	selectable_weight = @tier2_negative_trait_weight
 }
 
@@ -4536,16 +4390,23 @@ leader_trait_procrastinator = {
 		COUNCIL = no
 		TIER = 1
 	}
-	modifier = {
+	leader_potential_add = {
+		trait_is_crisis_faction_check = no
+	}
+	planet_modifier = {
 		planet_building_build_speed_mult = -0.10
 	}
-	leader_class = { governor }
+	sector_modifier = {
+		planet_building_build_speed_mult = -0.05
+	}
+	leader_class = { commander official scientist }
 	opposites = {
 		leader_trait_architectural_interest
 		leader_trait_architectural_interest_2
 	}
 	selectable_weight = {
 		weight = @class_negative_trait_weight
+		inline_script = paragon/governor_weight_mult
 		modifier = {
 			species = {
 				has_trait = trait_sedentary
@@ -4564,10 +4425,13 @@ leader_trait_procrastinator_2 = {
 		COUNCIL = no
 		TIER = 2
 	}
-	modifier = {
+	planet_modifier = {
 		planet_building_build_speed_mult = -0.30
 	}
-	leader_class = { governor }
+	sector_modifier = {
+		planet_building_build_speed_mult = -0.15
+	}
+	leader_class = { commander official scientist }
 	opposites = {
 		leader_trait_architectural_interest
 		leader_trait_architectural_interest_2
@@ -4584,27 +4448,35 @@ leader_trait_insider_trading = {
 		COUNCIL = no
 		TIER = 1
 	}
-	triggered_modifier = {
-		potential = {
-			exists = owner
-			owner = { tec_uses_trade_value = yes }
-		}
+	leader_potential_add = {
+		trait_is_crisis_faction_check = no
+	}
+	triggered_planet_modifier = {
+		potential = { trait_is_gestalt_check = no }
 		trade_value_mult = -0.10
 	}
-	triggered_modifier = {
-		potential = {
-			exists = owner
-			owner = { tec_uses_trade_value = no }
-		}
+	triggered_planet_modifier = {
+		potential = { trait_is_gestalt_check = yes }
 		planet_jobs_produces_mult = -0.05
 	}
-	leader_class = { governor }
+	triggered_sector_modifier = {
+		potential = { trait_is_gestalt_check = no }
+		trade_value_mult = -0.05
+	}
+	triggered_sector_modifier = {
+		potential = { trait_is_gestalt_check = yes }
+		planet_jobs_produces_mult = -0.025
+	}
+	leader_class = { commander official scientist }
 	opposites = {
 		trait_ruler_investor
 		trait_ruler_investor_2
 		trait_ruler_investor_3
 	}
-	selectable_weight = @class_negative_trait_weight
+	selectable_weight = {
+		weight = @class_negative_trait_weight
+		inline_script = paragon/governor_weight_mult
+	}
 }
 
 leader_trait_insider_trading_2 = {
@@ -4616,21 +4488,23 @@ leader_trait_insider_trading_2 = {
 		COUNCIL = no
 		TIER = 2
 	}
-	triggered_modifier = {
-		potential = {
-			exists = owner
-			owner = { tec_uses_trade_value = yes }
-		}
+	triggered_planet_modifier = {
+		potential = { trait_is_gestalt_check = no }
 		trade_value_mult = -0.25
 	}
-	triggered_modifier = {
-		potential = {
-			exists = owner
-			owner = { tec_uses_trade_value = no }
-		}
+	triggered_planet_modifier = {
+		potential = { trait_is_gestalt_check = yes }
 		planet_jobs_produces_mult = -0.10
 	}
-	leader_class = { governor }
+	triggered_sector_modifier = {
+		potential = { trait_is_gestalt_check = no }
+		trade_value_mult = -0.125
+	}
+	triggered_sector_modifier = {
+		potential = { trait_is_gestalt_check = yes }
+		planet_jobs_produces_mult = -0.05
+	}
+	leader_class = { commander official scientist }
 	opposites = {
 		trait_ruler_investor
 		trait_ruler_investor_2
@@ -4642,37 +4516,32 @@ leader_trait_insider_trading_2 = {
 ###################
 leader_trait_irenic = {
 	negative = yes
-	councilor_trait = yes
 	inline_script = {
 		script = trait/icon_negative
 		ICON = "GFX_leader_trait_irenic"
 		COUNCIL = yes
 		TIER = 1
 	}
-	modifier = {
+	#councilor_modifier = {	# Vanilla
+	#	starbase_shipyard_build_speed_mult = -0.10
+	#	starbase_shipyard_build_cost_mult = 0.10
+	#}
+	councilor_modifier = {	# Evolved
 		starbase_shipyard_build_speed_mult = -0.10
-		starbase_shipyard_build_cost_mult = 0.10
 	}
-	leader_potential_add = {
-		NOT = { has_ethic = ethic_militarist }
-	}
-	leader_class = { governor }
+	leader_class = { official }
 	opposites = {
 		leader_trait_shipwright
 		leader_trait_shipwright_2
 	}
 	selectable_weight = {
 		weight = @class_negative_trait_weight
-		modifier = {
-			has_ethic = ethic_pacifist
-			factor = @ethic_weight_mult
-		}
+		inline_script = paragon/council_weight_mult
 	}
 }
 
 leader_trait_irenic_2 = {
 	negative = yes
-	councilor_trait = yes
 	replace_traits = { "leader_trait_irenic" }
 	inline_script = {
 		script = trait/icon_negative
@@ -4680,11 +4549,14 @@ leader_trait_irenic_2 = {
 		COUNCIL = yes
 		TIER = 2
 	}
-	modifier = {
+	#councilor_modifier = {	# Vanilla
+	#	starbase_shipyard_build_speed_mult = -0.25
+	#	starbase_shipyard_build_cost_mult = 0.25
+	#}
+	councilor_modifier = {	# Evolved
 		starbase_shipyard_build_speed_mult = -0.25
-		starbase_shipyard_build_cost_mult = 0.25
 	}
-	leader_class = { governor }
+	leader_class = { official }
 	opposites = {
 		leader_trait_shipwright
 		leader_trait_shipwright_2

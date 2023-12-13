@@ -138,6 +138,14 @@ edicts = {
 		upkeep
 	}
 	modifier_category = country
+	add_unscaled_value_to_tooltip = yes
+	scaled_value_key = "ECONOMICS_SCALED_RESOURCES_EMPIRE_SIZE_STRING"
+}
+
+edicts_unscaled = {
+	use_for_ai_budget = yes
+	parent = edicts
+	add_unscaled_value_to_tooltip = no
 }
 
 rare_edicts = {
@@ -435,20 +443,6 @@ ships = {
 	}
 
 	triggered_cost_modifier = {
-		key = ship_science
-		use_parent_icon = yes
-		modifier_types = {
-			mult
-			add
-		}
-
-		trigger = {
-			is_scope_valid = yes
-			is_ship_class = shipclass_science_ship
-		}
-	}
-
-	triggered_cost_modifier = {
 		key = ship_military
 		use_parent_icon = yes
 		modifier_types = {
@@ -479,34 +473,6 @@ ships = {
 				is_ship_class = shipclass_military
 				is_ship_class = shipclass_military_special
 			}
-		}
-	}
-
-	triggered_cost_modifier = {
-		key = ship_science
-		use_parent_icon = yes
-		modifier_types = {
-			add
-			mult
-		}
-
-		trigger = {
-			is_scope_valid = yes
-			is_ship_class = shipclass_science_ship
-		}
-	}
-	
-	triggered_upkeep_modifier = {
-		key = ship_science
-		use_parent_icon = yes
-		modifier_types = {
-			add
-			mult
-		}
-
-		trigger = {
-			is_scope_valid = yes
-			is_ship_class = shipclass_science_ship
 		}
 	}
 }
@@ -1435,6 +1401,14 @@ planet_jobs = {
 				key = planet_jobs_tec_brood_drone
 				trigger = "
 					has_job_category = tec_brood_drone
+				"
+			}
+
+			inline_script = {
+				script = economic_categories/inline_evolved_triggered_modifiers
+				key = planet_jobs_tec_free_agent
+				trigger = "
+					is_pop_category = tec_free_agent
 				"
 			}
 		# /
@@ -3052,7 +3026,7 @@ leaders = {
 	parent = country
 }
 
-leader_admirals = {
+leader_commanders = {
 	parent = leaders
 	modifier_category = leader
 	generate_add_modifiers = {
@@ -3072,31 +3046,16 @@ leader_admirals = {
 
 	inline_script = {
 		script = economic_categories/inline_evolved_pse_leader_psionic
-		class = admirals
+		class = commanders
 	}
 }
 
+leader_admirals = {
+	parent = leader_commanders
+}
+
 leader_generals = {
-	parent = leaders
-	modifier_category = leader
-	generate_add_modifiers = {
-		cost
-		produces
-		upkeep
-	}
-	generate_mult_modifiers = {
-		cost
-		produces
-		upkeep
-	}
-	inline_script = economic_categories/inline_evolved_leaders
-
-	inline_script = economic_categories/inline_evolved_leaders_resources
-
-	inline_script = {
-		script = economic_categories/inline_evolved_pse_leader_psionic
-		class = generals
-	}
+	parent = leader_commanders
 }
 
 leader_scientists = {
@@ -3122,7 +3081,7 @@ leader_scientists = {
 	}
 }
 
-leader_governors = {
+leader_officials = {
 	parent = leaders
 	modifier_category = leader
 	generate_add_modifiers = {
@@ -3141,8 +3100,12 @@ leader_governors = {
 
 	inline_script = {
 		script = economic_categories/inline_evolved_pse_leader_psionic
-		class = governors
+		class = officials
 	}
+}
+
+leader_governors = {
+	parent = leader_officials
 }
 
 leader_envoys = {
@@ -3375,6 +3338,10 @@ pop_factions = {
 
 subjects = {
 	parent = diplomacy
+	generate_add_modifiers = {
+		produces
+	}
+	modifier_category = country
 }
 
 federation = {

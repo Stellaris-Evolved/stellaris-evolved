@@ -1424,7 +1424,7 @@ manufactorium_specialist = {
 		upkeep = { #no modifiers min: 2 food/3 minerals max: 9
 			minerals = 5
 		}
-		produces = { 
+		produces = {
 			trigger = {
 				planet = {
 					has_planet_flag = manufactorium_crafters
@@ -1520,7 +1520,7 @@ manufactorium_specialist = {
 			}
 			minerals = -2
 		}
-		produces = { 
+		produces = {
 			trigger = {
 				planet = {
 					has_planet_flag = manufactorium_despoilers
@@ -1666,7 +1666,7 @@ manufactorium_complex_drone = {
 			}
 			minerals = -2
 		}
-		produces = { 
+		produces = {
 			trigger = {
 				planet = {
 					has_planet_flag = manufactorium_despoilers
@@ -1902,7 +1902,7 @@ puddle_technician = {
 		category = planet_farmers
 		produces = {
 			food = 6
-			alloys = 1 
+			alloys = 1
 		}
 		inline_script = {
 			script = jobs/resources/inline_evolved_produce_farmer_requisition_resources
@@ -1933,8 +1933,8 @@ puddle_technician = {
 			factor = 10
 			is_enslaved = yes
 			can_take_servant_job = no
-			NOT = { 
-				has_slavery_type = { type = slavery_indentured } 
+			NOT = {
+				has_slavery_type = { type = slavery_indentured }
 			}
 		}
 		modifier = {
@@ -1954,7 +1954,7 @@ puddle_technician = {
 			}
 			can_take_servant_job = no
 			owner = {
-				NOT = { has_technology = tech_droid_workers } 
+				NOT = { has_technology = tech_droid_workers }
 			}
 		}
 		modifier = {
@@ -2022,7 +2022,7 @@ puddle_technician_drone = {
 		category = planet_farmers
 		produces = {
 			food = 6
-			alloys = 1 
+			alloys = 1
 		}
 		inline_script = {
 			script = jobs/resources/inline_evolved_produce_farmer_requisition_resources
@@ -2053,8 +2053,8 @@ puddle_technician_drone = {
 			factor = 10
 			is_enslaved = yes
 			can_take_servant_job = no
-			NOT = { 
-				has_slavery_type = { type = slavery_indentured } 
+			NOT = {
+				has_slavery_type = { type = slavery_indentured }
 			}
 		}
 		modifier = {
@@ -2431,7 +2431,7 @@ astrogarbage_collector_gestalt = {	# Caelum
 
 @power_farmer_output = 12
 @power_farmer_alloy_upkeep = 0.5
-@power_farmer_mineral_upkeep = 2 
+@power_farmer_mineral_upkeep = 2
 
 myrmeku_power_farmer = {	# Caelum
 	category = specialist
@@ -2546,6 +2546,8 @@ stratovent_researcher = {	# Caelum
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult||
 	}
 
+	inline_script = jobs/effects/type/inline_evolved_researcher_effect
+
 	weight = {
 		weight = @specialist_job_weight
 		mult = value:job_weights_modifier|JOB|stratovent_researcher|RESOURCE|society_research|
@@ -2639,5 +2641,148 @@ stratovent_refiner_minerals = {	# Caelum
 	weight = {
 		weight = @specialist_job_weight
 		mult = value:job_weights_multiple_resources_modifier|JOB|stratovent_refiner_minerals|RESOURCE1|exotic_gases|WEIGHT1|0.7|RESOURCE2|minerals|WEIGHT2|0.3|
+	}
+}
+
+
+#Glacial Crisis event chain jobs
+mineral_diver = {
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon =  building_mineral_purification_plant
+	clothes_texture_index = 2
+	icon = miner
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		hidden_trigger = { exists = owner }
+		owner = {
+			is_gestalt = no
+		}
+	}
+
+	resources = {
+		category = planet_miners
+		produces = {
+			minerals = 3
+			alloys = 1
+		}
+		upkeep = {
+			energy = 2
+		}
+	}
+
+	inline_script = jobs/effects/type/inline_evolved_miner_effect
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = value:job_weights_modifier|JOB|mineral_diver|RESOURCE|minerals|
+	}
+}
+
+mineral_diver_drone = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon =  building_mineral_purification_plant
+	clothes_texture_index = 2
+	icon = mining_drone
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+	possible = {
+		hidden_trigger = { exists = owner }
+		owner = {
+			is_gestalt = yes
+		}
+	}
+
+	resources = {
+		category = planet_miners
+		produces = {
+			minerals = 3
+			alloys = 1
+		}
+		upkeep = {
+			energy = 2
+		}
+	}
+
+	inline_script = jobs/effects/type/inline_evolved_miner_effect
+
+	weight = {
+		weight = @complex_drone_job_weight
+		mult = value:job_weights_modifier|JOB|mineral_diver_drone|RESOURCE|minerals|
+	}
+}
+
+#Rapid Desertification event chain jobs
+alien_hunter = {
+	category = worker
+	is_capped_by_modifier = yes
+	condition_string = WORKER_JOB_TRIGGER
+	building_icon = building_crude_huts
+	icon = hunter_gatherer
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_worker_job
+
+	resources = {
+		category = planet_farmers
+		produces = {
+			food = 2
+		}
+	}
+
+	planet_modifier = {
+		pop_environment_tolerance = 0.025
+	}
+
+	inline_script = jobs/effects/type/inline_evolved_farmer_effect
+
+	weight = {
+		weight = @worker_job_weight
+		mult = value:job_weights_modifier|JOB|alien_hunter|RESOURCE|food|
+		modifier = {
+			factor = 10
+			is_enslaved = yes
+			can_take_servant_job = no
+			NOT = { has_slavery_type = { type = slavery_indentured } }
+		}
+		# Crafted pops modifier
+		modifier = {
+			factor = 2
+			tec_is_crafted_sentient_pop = yes
+		}
+		modifier = {
+			factor = 200
+			tec_is_crafted_nonsapient_pop = yes
+		}
+
+		#Prioritize serving species
+		modifier = {
+			factor = 3
+			OR = {
+				tec_has_stapled_trait = { cached = yes }
+			}
+		}
 	}
 }

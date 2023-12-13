@@ -19,6 +19,10 @@
 					text = civic_tooltip_egalitarian
 					inline_script = governments/conditions/ethic_egalitarian
 				}
+				NOR = {
+					text = civic_tooltip_not_xenophobe
+					inline_script = governments/conditions/ethic_xenophobe
+				}
 			}
 			civics = {
 				NOR = {
@@ -64,8 +68,8 @@
 
 		random_weight = { base = @civic_default_random_weight }
 
-		ai_weight = { 
-			base = @ai_civic_default_base_weight 
+		ai_weight = {
+			base = @ai_civic_default_base_weight
 			modifier = {
 				factor = @ai_civic_personality_mismatch_factor
 				OR = {
@@ -93,11 +97,22 @@ civic_franchising = {
 		inline_script = governments/conditions/is_corporate
 	}
 	modifier = {
-		empire_size_branch_office_mult = -0.25
+		empire_size_branch_office_mult = -0.1
+		divided_patrongage_max_subjects = 1
+	}
+
+	swap_type = {
+		description = "civic_tooltip_franchising_effects"
+		trigger = {
+			host_has_dlc = "Overlord"
+		}
+		modifier = {
+			planet_max_subject_holding_buildings_add = 1
+			specialist_subject_conversion_time_mult = -0.33
+		}
 	}
 	
 	random_weight = { base = @civic_default_random_weight }
-
 	ai_weight = {
 		base = @ai_civic_default_base_weight
 		modifier = {
@@ -200,7 +215,7 @@ civic_naval_contractors = {
 	swap_type = {
 		# Note: This cause iffy effec "desc"
 		#name = civic_naval_contractors
-		#description = civic_naval_contractors_desc
+		#description = "civic_naval_contractors_desc"
 		trigger = {
 			host_has_dlc = "Overlord"
 		}
@@ -447,7 +462,9 @@ civic_ruthless_competition = {
 
 civic_criminal_heritage = {
 	description = "civic_tooltip_criminal_heritage_effects"
+
 	modification = no
+
 	potential = {
 		inline_script = governments/conditions/is_corporate
 	}
@@ -500,7 +517,7 @@ civic_private_military_companies = {
 	swap_type = {
 		# Note: This cause iffy effec "desc"
 		#name = civic_private_military_companies
-		#description = civic_private_military_companies_desc
+		#description = "civic_private_military_companies_desc"
 		trigger = {
 			host_has_dlc = "Overlord"
 		}
@@ -704,6 +721,8 @@ civic_death_cult_corporate = {
 				#value = civic_death_cult_corporate
 				value = civic_tec_regular_machine_cult
 				value = civic_death_cult
+				value = civic_dimensional_worship
+				value = civic_corporate_dimensional_worship
 			}
 
 			NOR = {
@@ -851,10 +870,21 @@ civic_corporate_hedonism = {
 
 # Fish patch
 civic_corporate_anglers = {
-	modification = no
+	description = "civic_anglers_tooltip"
+
+	alternate_civic_version = civic_anglers
+	modification = {
+		add = {
+			has_country_flag = tec_can_add_civic_anglers
+		}
+		remove = {
+			has_country_flag = tec_can_remove_civic_anglers
+		}
+	}
+
 	playable = { has_aquatics = yes }
 	ai_playable = { has_aquatics = yes }
-	description = "civic_anglers_tooltip"
+
 	potential = {
 		inline_script = governments/conditions/is_corporate
 	}
@@ -865,7 +895,7 @@ civic_corporate_anglers = {
 			}
 		}
 		civics = {
-			NOT = { 
+			NOT = {
 				value = civic_anglers
 			}
 		}
@@ -887,9 +917,6 @@ civic_corporate_anglers = {
 					is_lithoid_empire = yes
 				}
 			}
-		}
-		modifier = {
-			
 		}
 	}
 
@@ -1150,8 +1177,18 @@ civic_corporate_scavengers = {
 civic_corporate_ascensionists = {
 	description = "civic_corporate_ascensionists_tooltip"
 
-	playable = { host_has_dlc = "Utopia" }
-	ai_playable = { host_has_dlc = "Utopia" }
+	playable = {
+		OR = {
+			host_has_dlc = "Utopia"
+			has_astral_planes_dlc = yes
+		}
+	}
+	ai_playable = {
+		OR = {
+			host_has_dlc = "Utopia"
+			has_astral_planes_dlc = yes
+		}
+	}
 	potential = {
 		inline_script = governments/conditions/is_corporate
 	}
@@ -1198,14 +1235,24 @@ civic_corporate_ascensionists = {
 
 # First Contact
 civic_privatized_exploration = {
-	playable = { has_first_contact_dlc = yes }
-
 	description = "civic_privatized_exploration_effects"
-	
+
+	alternate_civic_version = civic_eager_explorers
+	modification = {
+		add = {
+			has_civic = civic_eager_explorers
+		}
+		remove = {
+			always = no
+		}
+	}
+
+	playable = { has_first_contact_dlc = yes }
+	ai_playable = { has_first_contact_dlc = yes }
+
 	potential = {
 		inline_script = governments/conditions/is_corporate
 	}
-	modification = no
 	possible = {
 		origin = {
 			NOR = {
@@ -1213,6 +1260,14 @@ civic_privatized_exploration = {
 				value = origin_payback
 				value = origin_broken_shackles
 				value = origin_fear_of_the_dark
+			}
+		}
+		civics = {
+			NOR = {
+				value = civic_hyperspace_specialty
+				value = civic_corporate_hyperspace_specialty
+				value = civic_sovereign_guardianship
+				value = civic_corporate_sovereign_guardianship
 			}
 		}
 	}
@@ -1232,8 +1287,12 @@ civic_privatized_exploration = {
 # Paragons
 civic_crusader_spirit_corporate = {
 	description = "civic_tooltip_crusader_spirit_corporate_effects"
+
+	alternate_civic_version = civic_crusader_spirit
+
 	playable = { host_has_dlc = "Galactic Paragons" }
 	ai_playable = { host_has_dlc = "Galactic Paragons" }
+
 	potential = {
 		inline_script = governments/conditions/is_corporate
 	}
@@ -1287,20 +1346,9 @@ civic_task_delegation_corporate = {
 	possible = {
 	}
 	modifier = {
-		country_leader_cap_add = 1
-		leaders_tec_non_ai_node_upkeep_mult = -0.2
-		negative_traits_country = -1
-	}
-
-	swap_type = {
-		trigger = {
-			is_scope_valid = yes
-			tec_is_aiauth_empire = yes
-		}
-
-		modifier = {
-			leaders_tec_ai_node_upkeep_mult = -0.1
-		}
+		country_official_cap_add = 1
+		country_commander_cap_add = 1
+		country_scientist_cap_add = 1
 	}
 
 	random_weight = {
@@ -1325,11 +1373,11 @@ civic_private_healthcare_corporate = {
 			}
 		}
 	}
-	possible = {
-	}
+
 	modifier = {
-		leader_age = 10
+		leader_lifespan_add = 10
 	}
+
 	random_weight = {
 		base = 4
 	}
@@ -1337,16 +1385,171 @@ civic_private_healthcare_corporate = {
 
 civic_memory_vault_corporate = {
 	description = "civic_tooltip_memory_vault_corporate_effects"
+
+	alternate_civic_version = civic_memory_vault
+
 	playable = { host_has_dlc = "Galactic Paragons" }
 	ai_playable = { host_has_dlc = "Galactic Paragons" }
+
 	potential = {
 		inline_script = governments/conditions/is_corporate
 	}
 	modifier = {
-		tec_leader_starting_skill_add = 1
 		councilor_skill_add = 1
+		leader_initial_skill = 1
 	}
 	random_weight = {
 		base = 4
+	}
+}
+
+# Astral Planes
+civic_corporate_hyperspace_specialty = {
+	description = "civic_corporate_hyperspace_specialty_effects"
+
+	alternate_civic_version = civic_hyperspace_specialty
+
+	playable = { has_astral_planes_dlc = yes }
+	ai_playable = { has_astral_planes_dlc = yes }
+
+	potential = {
+		inline_script = governments/conditions/is_corporate
+	}
+	possible = {
+		civics = {
+			NOR = {
+				value = civic_privatized_exploration
+				value = civic_eager_explorers
+			}
+		}
+	}
+	modifier = {
+		planet_sensor_range_add = 2
+		ship_speed_mult = 0.1
+		country_physics_tech_research_speed = 0.15
+	}
+}
+
+civic_corporate_dimensional_worship = {
+	description = "civic_corporate_dimensional_worship_effects"
+
+	playable = { has_astral_planes_dlc = yes }
+	ai_playable = { has_astral_planes_dlc = yes }
+
+	potential = {
+		inline_script = governments/conditions/is_corporate
+	}
+	possible = {
+		civics = {
+			NOR = {
+				text = civic_tooltip_not_death_cult
+				value = civic_death_cult
+				value = civic_death_cult_corporate
+			}
+		}
+		ethics = {
+			OR = {
+				text = civic_tooltip_spiritualist
+				inline_script = governments/conditions/ethic_spiritualist
+			}
+		}
+	}
+	modifier = {
+		country_astral_threads_produces_mult = 0.25
+	}
+	custom_tooltip_with_modifiers = "civic_dimensional_worship_effects_additional"
+}
+
+civic_corporate_dark_consortium = {
+	description = "civic_corporate_dark_consortium_effects"
+
+	alternate_civic_version = civic_dark_consortium
+	modification = {
+		add = {
+			has_technology = tech_mine_dark_matter
+		}
+		remove = {
+			custom_tooltip = {
+				fail_text = CIVIC_NOT_MODDABLE
+				NOT = { has_country_flag = civic_dark_consortium_locked }
+			}
+		}
+	}
+
+	playable = { has_astral_planes_dlc = yes }
+	ai_playable = { has_astral_planes_dlc = yes }
+
+	potential = {
+		inline_script = governments/conditions/is_corporate
+	}
+
+	random_weight = {
+		base = @civic_rare_random_weight
+	}
+	ai_weight = {
+		base = @civic_rare_random_weight
+	}
+}
+
+civic_corporate_sovereign_guardianship = {
+	description = "civic_corporate_sovereign_guardianship_effects"
+
+	alternate_civic_version = civic_sovereign_guardianship
+	modification = {
+		add = {
+			has_civic = civic_sovereign_guardianship
+		}
+		remove = {
+			always = no
+		}
+	}
+
+	playable = { has_astral_planes_dlc = yes }
+	ai_playable = { has_astral_planes_dlc = yes }
+
+	potential = {
+		inline_script = governments/conditions/is_corporate
+	}
+
+	possible = {
+		ethics = {
+			OR = {
+				text = civic_tooltip_militarist
+				inline_script = governments/conditions/ethic_militarist
+			}
+		}
+		origin = {
+			NOR = {
+				value = origin_fear_of_the_dark
+				value = origin_payback
+				value = origin_broken_shackles
+			}
+		}
+		civics = {
+			NOR = {
+				value = civic_inwards_perfection
+				value = civic_eager_explorers
+				value = civic_privatized_exploration
+				value = civic_fanatic_purifiers
+			}
+		}
+	}
+
+	modifier = {
+		empire_size_colonies_mult = 1
+		empire_size_branch_office_mult = 1
+		empire_size_systems_mult = 1.5
+		empire_size_pops_mult = -0.25
+		empire_size_districts_mult = -0.50
+		diplo_weight_mult = 0.2
+
+		planet_soldiers_unity_produces_add = @sovereign_guardianship_soldier_unity
+	}
+
+	random_weight = {
+		base = @civic_rare_random_weight
+	}
+	ai_weight = {
+		base = @civic_rare_random_weight
 	}
 }

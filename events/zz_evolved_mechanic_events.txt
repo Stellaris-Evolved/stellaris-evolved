@@ -5,6 +5,87 @@
 # ------------------------------------------------------------
 
 # ------------------------------------------------- Habitats
+namespace = tec_ships
+	# on_ship_built
+	ship_event = {	# Colonizers snatch a pop from the colony
+		id = tec_ships.10
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			exists = owner
+			owner = {	# Disabled for ais because dumb dumb
+				is_ai = no
+				is_eager_explorer_empire = no
+			}
+			is_ship_class = shipclass_colonizer
+		}
+
+		immediate = {
+			save_event_target_as = tec_colonizer
+			# Check if there is a colony in the system
+			if = {
+				limit = {
+					solar_system = {
+						any_system_planet = {
+							is_colony = yes
+							# Lets prevent abandoning colonies xD
+							num_pops > 1
+							owner = {
+								is_same_value = event_target:tec_colonizer.owner
+							}
+							any_owned_species = {
+								is_exact_same_species = event_target:tec_colonizer
+							}
+						}
+					}
+				}
+				solar_system = {
+					random_system_planet = {
+						limit = {
+							is_colony = yes
+							# Lets prevent abandoning colonies xD
+							num_pops > 1
+							owner = {
+								is_same_value = event_target:tec_colonizer.owner
+							}
+							any_owned_species = {
+								is_exact_same_species = event_target:tec_colonizer
+							}
+						}
+						random_owned_pop = {
+							limit = {
+								is_exact_same_species = event_target:tec_colonizer							
+							}
+							kill_pop = yes
+						}
+					}
+				}
+			}
+			# Else checks to snatch a pop from other planet
+			else = {
+				owner = {
+					random_owned_planet = {
+						limit = {
+							is_colony = yes
+							any_owned_species = {
+								is_exact_same_species = event_target:tec_colonizer
+							}
+						}
+						random_owned_pop = {
+							limit = {
+								is_exact_same_species = event_target:tec_colonizer							
+							}
+							kill_pop = yes
+						}
+					}
+				}
+			}
+		}
+	}
+# /
+
+# ------------------------------------------------- Habitats
 namespace = tec_habitats
 	# Specialize events
 	planet_event = {
@@ -19,6 +100,18 @@ namespace = tec_habitats
 		immediate = {
 			hidden_effect = {
 				set_planet_flag = tec_habitat_picking_spec
+				# Lets avoid some shenanigans with the var
+				if = {
+					limit = {
+						NOT = {
+							is_variable_set = tec_hab_menial_districts
+						}
+					}
+					set_variable = {
+						which = tec_hab_menial_districts
+						value = 0
+					}
+				}
 			}
 		}
 
@@ -986,6 +1079,7 @@ namespace = tec_habitats
 								NOR = {
 									has_planet_flag = megastructure
 									has_planet_flag = has_megastructure
+									#has_planet_flag = tec_has_orbital
 								}
 								# fail_text = "requires_no_orbital_debris"
 								NOT = {
@@ -1020,6 +1114,7 @@ namespace = tec_habitats
 										NOR = {
 											has_planet_flag = megastructure
 											has_planet_flag = has_megastructure
+											#has_planet_flag = tec_has_orbital
 										}
 										# fail_text = "requires_no_orbital_debris"
 										NOT = {
@@ -1074,6 +1169,7 @@ namespace = tec_habitats
 										NOR = {
 											has_planet_flag = megastructure
 											has_planet_flag = has_megastructure
+											#has_planet_flag = tec_has_orbital
 										}
 										# fail_text = "requires_no_orbital_debris"
 										NOT = {
@@ -1161,6 +1257,7 @@ namespace = tec_habitats
 						NOR = {
 							has_planet_flag = megastructure
 							has_planet_flag = has_megastructure
+							#has_planet_flag = tec_has_orbital
 						}
 						# fail_text = "requires_no_orbital_debris"
 						NOT = {
@@ -1231,6 +1328,7 @@ namespace = tec_habitats
 							NOR = {
 								has_planet_flag = megastructure
 								has_planet_flag = has_megastructure
+								#has_planet_flag = tec_has_orbital
 							}
 							# fail_text = "requires_no_orbital_debris"
 							NOT = {
@@ -1274,6 +1372,7 @@ namespace = tec_habitats
 							NOR = {
 								has_planet_flag = megastructure
 								has_planet_flag = has_megastructure
+								#has_planet_flag = tec_has_orbital
 							}
 							# fail_text = "requires_no_orbital_debris"
 							NOT = {

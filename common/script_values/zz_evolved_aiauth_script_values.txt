@@ -40,9 +40,9 @@ tec_aiauth_node_weight = {
 	}
 
 	modifier = {
-		tec_is_aiauth_planetary_node = yes
+		tec_is_aiauth_planetary_governing_node = yes
 		exists = owner
-		add = owner.modifier:tec_aiauth_planetary_node_weight_add
+		add = owner.modifier:tec_aiauth_planetary_governing_node_weight_add
 	}
 
 	modifier = {
@@ -63,11 +63,11 @@ tec_aiauth_node_weight_tooltip = {
 }
 
 # scope: leader
-tec_aiauth_experience_per_month = {
+tec_aiauth_experience_per_month_value = {
 	add = value:tec_aiauth_node_weight_tooltip
 	modifier = {
 		exists = owner
-		divide = owner.value:tec_aiauth_total_weight
+		divide = owner.value:tec_aiauth_total_weight_value
 	}
 	modifier = {
 		exists = owner
@@ -77,7 +77,7 @@ tec_aiauth_experience_per_month = {
 }
 
 # scope: leader
-tec_aiauth_total_weight = {
+tec_aiauth_total_weight_value = {
 	add = owner.modifier:tec_aiauth_total_weight_add
 	complex_trigger_modifier = {
 		trigger = count_owned_leader
@@ -90,7 +90,6 @@ tec_aiauth_total_weight = {
 			}
 		}
 		mode = add
-		
 	}
 }
 
@@ -100,10 +99,11 @@ tec_aiauth_experience_per_month_with_exp_gain = {
 	subtract = value:tec_aiauth_passive_experience_from_defines
 	modifier = { # negative add_experience does not use experience modifiers reeeee
 		check_variable_arithmetic = {
-			which = value:tec_aiauth_experience_per_month
+			which = value:tec_aiauth_experience_per_month_value
 			value < value:tec_aiauth_passive_experience_from_defines
 		}
 		mult = value:tec_leader_exp_gain
+		# Positive mult = reduced xp
 	}
 }
 
@@ -117,13 +117,12 @@ tec_aiauth_passive_experience_from_defines = {
 		add = @tec_base_ruler_experience_gain_defines
 	}
 	modifier = {
-		leader_class = governor
-		exists = planet
-		is_idle = no
-		add = @tec_base_governor_experience_gain_defines
+		#exists = planet
+		#is_idle = no
+		has_trait = leader_trait_tec_aiauth_planetary_governing_node
+		add = @tec_base_governing_experience_gain_defines
 	}
 }
-
 
 tec_aiauth_expected_ai_power = {
 	add = 10 # base want
