@@ -1,12 +1,15 @@
 # common\traits\20_leader_subclasses.txt
 
+@ai_selection_high = 5
+@ai_selection_low = 0.1
+
 #############
 # COMMANDER #
 #############
 
 subclass_commander_admiral = {	# EVOLVED NOTE: Admiral
 	custom_subtitle = commander_subclass
-	subclass_trait = yes
+	leader_trait_type = subclass
 	inline_script = {
 		script = trait/icon_subclass
 		SUBCLASS = commander_admiral
@@ -24,13 +27,38 @@ subclass_commander_admiral = {	# EVOLVED NOTE: Admiral
 			is_heir = yes
 		}
 	}
+	ai_weight = {
+		modifier = {
+			is_councilor = yes
+			factor = @ai_selection_low
+		}
+		modifier = {
+			is_councilor = no
+			factor = @ai_selection_high
+		}
+		modifier = {
+			exists = fleet
+			NOT = {
+				fleet = {
+					is_ship_class = shipclass_transport
+				}
+			}
+			factor = @ai_selection_high
+		}
+		modifier = {
+			NOT = {
+				exists = fleet
+			}
+			factor = @ai_selection_low
+		}
+	}
 	leader_class = { commander }
 	background_icon = "GFX_leader_subclass_commander_admiral_background"
 }
 
 subclass_commander_general = {	# EVOLVED NOTE: General
 	custom_subtitle = commander_subclass
-	subclass_trait = yes
+	leader_trait_type = subclass
 	inline_script = {
 		script = trait/icon_subclass
 		SUBCLASS = commander_general
@@ -54,13 +82,55 @@ subclass_commander_general = {	# EVOLVED NOTE: General
 			is_heir = yes
 		}
 	}
+	ai_weight = {
+		modifier = {
+			is_councilor = yes
+			factor = @ai_selection_low
+		}
+		modifier = {
+			is_councilor = no
+			factor = @ai_selection_high
+		}
+		modifier = {
+			OR = {
+				AND = {
+					exists = fleet
+					fleet = {
+						is_ship_class = shipclass_transport
+					}
+				}
+				owner = {
+					any_owned_army = {
+						exists = leader
+						leader = {
+							is_same_value = root
+						}
+					}
+				}
+			}
+			factor = @ai_selection_high
+		}
+		modifier = {
+			NOT = {
+				owner = {
+					any_owned_army = {
+						exists = leader
+						leader = {
+							is_same_value = root
+						}
+					}
+				}
+			}
+			factor = @ai_selection_low
+		}
+	}
 	leader_class = { commander }
 	background_icon = "GFX_leader_subclass_commander_general_background"
 }
 
 subclass_commander_governor = {	# EVOLVED NOTE: Governor
 	custom_subtitle = commander_subclass
-	subclass_trait = yes
+	leader_trait_type = subclass
 	inline_script = {
 		script = trait/icon_subclass
 		SUBCLASS = commander_governor
@@ -113,15 +183,22 @@ subclass_commander_governor = {	# EVOLVED NOTE: Governor
 		"
 		MULT = "mult = trigger:has_skill"
 	}
-
 	ai_weight = {
 		modifier = {
 			is_councilor = yes
-			factor = 0
+			factor = @ai_selection_low
 		}
 		modifier = {
 			is_councilor = no
-			factor = 2
+			factor = @ai_selection_high
+		}
+		modifier = {
+			exists =  planet
+			factor = @ai_selection_high
+		}
+		modifier = {
+			NOT = { exists =  planet }
+			factor = @ai_selection_low
 		}
 	}
 	leader_class = { commander }
@@ -130,7 +207,7 @@ subclass_commander_governor = {	# EVOLVED NOTE: Governor
 
 subclass_commander_councilor = {	# EVOLVED NOTE: .... xd
 	custom_subtitle = councilor_subclass_commander
-	subclass_trait = yes
+	leader_trait_type = subclass
 	inline_script = {
 		script = trait/icon_subclass
 		SUBCLASS = commander_councilor
@@ -151,6 +228,16 @@ subclass_commander_councilor = {	# EVOLVED NOTE: .... xd
 			owner = { is_gestalt = yes }
 		}
 	}
+	ai_weight = {
+		modifier = {
+			is_councilor = yes
+			factor = @ai_selection_high
+		}
+		modifier = {
+			is_councilor = no
+			factor = @ai_selection_low
+		}
+	}
 	leader_class = { commander }
 	background_icon = "GFX_leader_subclass_commander_councilor_background"
 }
@@ -161,7 +248,7 @@ subclass_commander_councilor = {	# EVOLVED NOTE: .... xd
 
 subclass_official_delegate = {	# EVOLVED NOTE: Fed&Galcom
 	custom_subtitle = governor_subclass
-	subclass_trait = yes
+	leader_trait_type = subclass
 	inline_script = {
 		script = trait/icon_subclass
 		SUBCLASS = official_delegate
@@ -177,31 +264,28 @@ subclass_official_delegate = {	# EVOLVED NOTE: Fed&Galcom
 	galcom_modifier = {
 		diplo_weight_mult = 0.05
 	}
-
 	ai_weight = {
 		modifier = {
 			is_councilor = yes
-			factor = 0
+			factor = @ai_selection_low
 		}
-
 		modifier = {
-			NOT = {
-				owner = {
-					any_owned_leader = {
-						has_trait = subclass_official_governor
-					}
-				}
-			}
-			factor = 100
+			is_councilor = no
+			factor = @ai_selection_high
 		}
-
 		modifier = {
-			owner = {
-				any_owned_leader = {
-					has_trait = subclass_official_governor
-				}
+			OR = {
+				is_assigned_to_federation = yes
+				is_assigned_to_galcom = yes
 			}
-			factor = 0.5
+			factor = @ai_selection_high
+		}
+		modifier = {
+			OR = {
+				is_assigned_to_federation = no
+				is_assigned_to_galcom = no
+			}
+			factor = @ai_selection_low
 		}
 	}
 	background_icon = "GFX_leader_subclass_official_delegate_background"
@@ -209,7 +293,7 @@ subclass_official_delegate = {	# EVOLVED NOTE: Fed&Galcom
 
 subclass_official_governor = {	# EVOLVED NOTE: Governor
 	custom_subtitle = governor_subclass
-	subclass_trait = yes
+	leader_trait_type = subclass
 	inline_script = {
 		script = trait/icon_subclass
 		SUBCLASS = official_governor
@@ -242,12 +326,19 @@ subclass_official_governor = {	# EVOLVED NOTE: Governor
 	ai_weight = {
 		modifier = {
 			is_councilor = yes
-			factor = 0
+			factor = @ai_selection_low
 		}
-
 		modifier = {
 			is_councilor = no
-			factor = 2
+			factor = @ai_selection_high
+		}
+		modifier = {
+			exists =  planet
+			factor = @ai_selection_high
+		}
+		modifier = {
+			NOT = { exists =  planet }
+			factor = @ai_selection_low
 		}
 	}
 
@@ -256,7 +347,7 @@ subclass_official_governor = {	# EVOLVED NOTE: Governor
 
 subclass_official_diplomacy_councilor = {	# EVOLVED NOTE: Councilor Diplo
 	custom_subtitle = councilor_subclass_governor
-	subclass_trait = yes
+	leader_trait_type = subclass
 	inline_script = {
 		script = trait/icon_subclass
 		SUBCLASS = official_diplomacy_councilor
@@ -278,13 +369,23 @@ subclass_official_diplomacy_councilor = {	# EVOLVED NOTE: Councilor Diplo
 			owner = { is_gestalt = yes }
 		}
 	}
+	ai_weight = {
+		modifier = {
+			is_councilor = yes
+			factor = @ai_selection_high
+		}
+		modifier = {
+			is_councilor = no
+			factor = @ai_selection_low
+		}
+	}
 	leader_class = { official }
 	background_icon = "GFX_leader_subclass_official_diplomacy_councilor_background"
 }
 
 subclass_official_economy_councilor = {		# EVOLVED NOTE: Councilor Eco
 	custom_subtitle = councilor_subclass_governor
-	subclass_trait = yes
+	leader_trait_type = subclass
 	inline_script = {
 		script = trait/icon_subclass
 		SUBCLASS = official_economy_councilor
@@ -307,6 +408,16 @@ subclass_official_economy_councilor = {		# EVOLVED NOTE: Councilor Eco
 			owner = { is_gestalt = yes }
 		}
 	}
+	ai_weight = {
+		modifier = {
+			is_councilor = yes
+			factor = @ai_selection_high
+		}
+		modifier = {
+			is_councilor = no
+			factor = @ai_selection_low
+		}
+	}
 	leader_class = { official }
 	background_icon = "GFX_leader_subclass_official_economy_councilor_background"
 }
@@ -316,7 +427,7 @@ subclass_official_economy_councilor = {		# EVOLVED NOTE: Councilor Eco
 #############
 subclass_scientist_explorer = {		# EVOLVED NOTE: Exploration
 	custom_subtitle = scientist_subclass
-	subclass_trait = yes
+	leader_trait_type = subclass
 	inline_script = {
 		script = trait/icon_subclass
 		SUBCLASS = scientist_explorer
@@ -332,11 +443,26 @@ subclass_scientist_explorer = {		# EVOLVED NOTE: Exploration
 	ai_weight = {
 		modifier = {
 			is_councilor = yes
-			factor = 0
+			factor = @ai_selection_low
 		}
 		modifier = {
 			is_councilor = no
-			factor = 2
+			factor = @ai_selection_high
+		}
+		modifier = {
+			exists = fleet
+			NOT = {
+				fleet = {
+					is_ship_class = shipclass_transport
+				}
+			}
+			factor = @ai_selection_high
+		}
+		modifier = {
+			NOT = {
+				exists = fleet
+			}
+			factor = @ai_selection_low
 		}
 	}
 
@@ -346,7 +472,7 @@ subclass_scientist_explorer = {		# EVOLVED NOTE: Exploration
 
 subclass_scientist_scholar = {		# EVOLVED NOTE: Events
 	custom_subtitle = scientist_subclass
-	subclass_trait = yes
+	leader_trait_type = subclass
 	inline_script = {
 		script = trait/icon_subclass
 		SUBCLASS = scientist_scholar
@@ -359,15 +485,29 @@ subclass_scientist_scholar = {		# EVOLVED NOTE: Events
 		ship_archaeological_site_excavation_speed_mult = 0.1
 		country_astral_rift_speed_mult = 0.1
 	}
-
 	ai_weight = {
 		modifier = {
 			is_councilor = yes
-			factor = 0
+			factor = @ai_selection_low
 		}
 		modifier = {
 			is_councilor = no
-			factor = 2
+			factor = @ai_selection_high
+		}
+		modifier = {
+			exists = fleet
+			NOT = {
+				fleet = {
+					is_ship_class = shipclass_transport
+				}
+			}
+			factor = @ai_selection_high
+		}
+		modifier = {
+			NOT = {
+				exists = fleet
+			}
+			factor = @ai_selection_low
 		}
 	}
 
@@ -377,7 +517,7 @@ subclass_scientist_scholar = {		# EVOLVED NOTE: Events
 
 subclass_scientist_governor = {		# EVOLVED NOTE: Governor
 	custom_subtitle = scientist_subclass
-	subclass_trait = yes
+	leader_trait_type = subclass
 	inline_script = {
 		script = trait/icon_subclass
 		SUBCLASS = scientist_governor
@@ -405,15 +545,22 @@ subclass_scientist_governor = {		# EVOLVED NOTE: Governor
 		"
 		MULT = "mult = trigger:has_skill"
 	}
-
 	ai_weight = {
 		modifier = {
 			is_councilor = yes
-			factor = 0
+			factor = @ai_selection_low
 		}
 		modifier = {
 			is_councilor = no
-			factor = 2
+			factor = @ai_selection_high
+		}
+		modifier = {
+			exists =  planet
+			factor = @ai_selection_high
+		}
+		modifier = {
+			NOT = { exists =  planet }
+			factor = @ai_selection_low
 		}
 	}
 
@@ -423,7 +570,7 @@ subclass_scientist_governor = {		# EVOLVED NOTE: Governor
 
 subclass_scientist_councilor = {	# EVOLVED NOTE: Councilor
 	custom_subtitle = councilor_subclass_scientist
-	subclass_trait = yes
+	leader_trait_type = subclass
 	inline_script = {
 		script = trait/icon_subclass
 		SUBCLASS = scientist_councilor
@@ -438,11 +585,20 @@ subclass_scientist_councilor = {	# EVOLVED NOTE: Councilor
 		}
 		all_technology_research_speed = 0.05
 	}
-
 	leader_potential_add = {
 		NAND = {
 			exists = owner
 			owner = { is_gestalt = yes }
+		}
+	}
+	ai_weight = {
+		modifier = {
+			is_councilor = yes
+			factor = @ai_selection_high
+		}
+		modifier = {
+			is_councilor = no
+			factor = @ai_selection_low
 		}
 	}
 	leader_class = { scientist }
