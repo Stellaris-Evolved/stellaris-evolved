@@ -1,8 +1,76 @@
 # common\scripted_effects\zz_evolved_ascension_scripted_effects.txt
 
-#Ascension scripted effects
+# Ascension situation effects# TODO CODE REWORK
+tec_ascension_situation_swap_effect = {
+	optimize_memory
+	# Saves the situation
+	save_event_target_as = tec_prev_situation
+	owner = {
+		save_event_target_as = tec_target_country
+		event_target:tec_target_country = {
+			start_situation = {
+				type = $NEW_SITUATION$
+				target = event_target:tec_target_country.capital_scope
+				effect = {
+					save_event_target_as = new_situation
+				}
+			}
+			event_target:new_situation = {
+				# No need, situation must go smooth
+				#set_situation_locked = yes
+				# Sorts approachs
+				[[OLD_SITUATION_APPROACH_1]
+					if = {
+						limit = {
+							event_target:tec_prev_situation = {
+								current_situation_approach = $OLD_SITUATION_APPROACH_1$
+							}
+						}
+						set_situation_approach = $NEW_SITUATION_APPROACH_1$
+					}
+				]
+				[[!OLD_SITUATION_APPROACH_1]]
+				[[OLD_SITUATION_APPROACH_2]
+					if = {
+						limit = {
+							event_target:tec_prev_situation = {
+								current_situation_approach = $OLD_SITUATION_APPROACH_2$
+							}
+						}
+						set_situation_approach = $NEW_SITUATION_APPROACH_2$
+					}
+				]
+				[[!OLD_SITUATION_APPROACH_2]]
+				[[OLD_SITUATION_APPROACH_3]
+					if = {
+						limit = {
+							event_target:tec_prev_situation = {
+								current_situation_approach = $OLD_SITUATION_APPROACH_3$
+							}
+						}
+						set_situation_approach = $NEW_SITUATION_APPROACH_3$
+					}
+				]
+				[[!OLD_SITUATION_APPROACH_3]]
+				# Mimics the progress of the situation
+				add_situation_progress = $NEW_PROGRESS$
+			}
+		}
+		# Deletes former situation
+		event_target:tec_prev_situation = {
+			abort_situation = this
+		}
+	}
+	[[!EXTRA_EFFECT]]
+	[[EXTRA_EFFECT]
+		$EXTRA_EFFECT$
+	]
+}
+
+# Ascension scripted effects
 # ----------------
 
+# Utils
 tec_add_shroud_cd_effect = {
 	add_modifier = {
 		modifier = "shroud_cooldown"
