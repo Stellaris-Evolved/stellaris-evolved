@@ -32,183 +32,190 @@
 # -----------------------------------------
 # MAIN ASCENSION PATHS
 # -----------------------------------------
-# ------------------------------------------------- Psionics
-	ap_mind_over_matter = { 			# Psionic Tier I
-		potential = {
-			has_utopia = yes
-		
-			tec_has_main_ascension_path = no
+# ------------------------------------------------- Mystical Paths
+	ap_mind_over_matter = { 			# Mystical Tier I
+		# GENERIC - Allows branching
+			potential = {
+				has_utopia = yes
+			
+				tec_has_main_ascension_path = no
 
-			is_machine_empire = no
-			is_hive_empire = no
-			is_mechanical_empire = no
-			is_synthetic_empire = no
-		}
-		possible = {
-			custom_tooltip = {
-				fail_text = "requires_ascension_perks_2"
-				num_ascension_perks > 1
+				is_machine_empire = no
+				is_hive_empire = no
+				is_mechanical_empire = no
+				is_synthetic_empire = no
 			}
-			custom_tooltip = {
-				fail_text = "tec_ap_require_tech_colonial_centralization"
-				has_technology = tech_colonial_centralization
-			}
-			custom_tooltip = {
-				fail_text = "synthetic_empire_psionic_ascension"
-				NOT = { has_trait = trait_mechanical }
-			}
-			custom_tooltip = {
-				fail_text = "tec_blocked_path"
-				NOR = {
-					# Locked if the empire has picked another T1 or T2
-					# Completed main perk
-						#tec_has_psionic_ascension_path = yes
-						tec_has_genetic_ascension_path = yes
-						tec_has_cybernetic_ascension_path = yes
-						tec_has_synthetic_ascension_path = yes
-					# /
-					# Completed evolved perk
-						# Psionics
-							#has_ascension_perk = ap_tec_psionic_ascendance
-							#has_ascension_perk = ap_tec_
-						# Genetics
-							has_ascension_perk = ap_tec_genetic_perfection
-							#has_ascension_perk = ap_tec_
-						# Cybernetics
-							has_ascension_perk = ap_tec_cybernetic_revolution
-							#has_ascension_perk = ap_tec_
-						# Synthetics
-							has_ascension_perk = ap_tec_synthetic_singularity
-							#has_ascension_perk = ap_tec_
-					# /
-					# Completed mixed path
-						has_ascension_perk = ap_tec_replicant
-						#has_ascension_perk = ap_tec_biopsionic
-						#has_ascension_perk = ap_tec_cyberpsionic
-					# /
+			possible = {
+				custom_tooltip = {
+					fail_text = "requires_ascension_perks_2"
+					num_ascension_perks > 1
+				}
+				custom_tooltip = {
+					fail_text = "tec_ap_require_tech_colonial_centralization"
+					has_technology = tech_colonial_centralization
+				}
+				custom_tooltip = {
+					fail_text = "synthetic_empire_psionic_ascension"
+					NOT = { has_trait = trait_mechanical }
+				}
+				custom_tooltip = {
+					fail_text = "tec_blocked_path"
+					NOR = {
+						# Locked if the empire has picked another T1 or T2
+						# Completed main perk
+							#tec_has_psionic_ascension_path = yes
+							tec_has_genetic_ascension_path = yes
+							tec_has_cybernetic_ascension_path = yes
+							tec_has_synthetic_ascension_path = yes
+						# /
+						# Completed evolved perk
+							# Psionics
+								#has_ascension_perk = ap_tec_psionic_ascendance
+								#has_ascension_perk = ap_tec_
+							# Genetics
+								has_ascension_perk = ap_tec_genetic_perfection
+								#has_ascension_perk = ap_tec_
+							# Cybernetics
+								has_ascension_perk = ap_tec_cybernetic_revolution
+								#has_ascension_perk = ap_tec_
+							# Synthetics
+								has_ascension_perk = ap_tec_synthetic_singularity
+								#has_ascension_perk = ap_tec_
+						# /
+						# Completed mixed path
+							has_ascension_perk = ap_tec_replicant
+							#has_ascension_perk = ap_tec_biopsionic
+							#has_ascension_perk = ap_tec_cyberpsionic
+						# /
+					}
+				}
+				custom_tooltip = {
+					fail_text = tec_crisis_cant_pick_ap
+					is_crisis_faction = no
 				}
 			}
-			custom_tooltip = {
-				fail_text = tec_crisis_cant_pick_ap
-				is_crisis_faction = no
+			on_enabled = {
+				# Effects on tec_ascension.504
+				custom_tooltip = "ap_mind_over_matter_generic_tooltip"
+				if = { # Pre-steps - Psionic Theory
+					limit = {
+						NOR = {
+							has_tech_option = tech_psionic_theory
+							has_technology = tech_psionic_theory
+						}
+					}
+					custom_tooltip = tec_ap_unlock_tech_psionic_theory
+				}
+				if = { # Free - Telepathy
+					limit = {
+						NOR = {
+							has_tech_option = tech_telepathy
+							has_technology = tech_telepathy
+						}
+					}
+					custom_tooltip = tec_ap_unlock_tech_telepathy
+				}
 			}
-		}
-
-		on_enabled = {
-			custom_tooltip = "ap_mind_over_matter_tooltip"
-			hidden_effect = {
-				# Global controller
-					event_target:global_event_country = {
-						change_variable = {
-							which = tec_number_of_psiascended_empires
-							value = 1
+			ai_weight = {
+				weight = @tec_force_path_ap_weight
+				# Ethic
+					modifier = {
+						factor = 0.75
+						NOR = {
+							has_ethic = ethic_spiritualist
+							has_ethic = ethic_fanatic_spiritualist
+						}
+					}
+					modifier = {
+						factor = 1.25
+						OR = {
+							has_ethic = ethic_spiritualist
+							has_ethic = ethic_fanatic_spiritualist
 						}
 					}
 				# /
-				# Effects
-					#country_event = { id = utopia.2600 }
-					if = {
-						limit = {
-							has_country_flag = tec_advanced_ascension
+				# Overlord
+					modifier = {
+						factor = 2
+						is_subject = yes
+						overlord = {
+							tec_has_psionic_ascension_path = yes
 						}
-						tec_give_psionic_t1_ap_effect = yes
 					}
-					else = {
-						country_event = {
-							id = tec_psionic_path.100
+				# /
+				# Ascension Controller
+					# Note: This affect mixed paths
+					# Global checker
+					modifier = {
+						factor = 0.75
+						event_target:global_event_country = {
+							check_variable = {
+								which = tec_number_of_mystical_empires
+								value >= 2
+							}
+						}
+					}
+					modifier = {
+						factor = 0.75
+						event_target:global_event_country = {
+							check_variable = {
+								which = tec_number_of_mystical_empires
+								value >= 3
+							}
+						}
+					}
+					modifier = {
+						factor = 0.75
+						event_target:global_event_country = {
+							check_variable = {
+								which = tec_number_of_mystical_empires
+								value >= 4
+							}
 						}
 					}
 				# /	
-			}
-			if = { # Pre-steps - Psionic Theory
-				limit = {
-					NOT = {
-						has_technology = tech_psionic_theory
-					}
-				}
-				custom_tooltip = tec_ap_unlock_tech_psionic_theory
-				hidden_effect = {
-					add_research_option = tech_psionic_theory
+				modifier = {
+					factor = 10
+					has_ascension_perk = ap_become_the_crisis
 				}
 			}
-			if = { # Free - Telepathy
-				limit = {
-					NOT = {
-						has_technology = tech_telepathy
-					}
-				}
-				custom_tooltip = tec_ap_unlock_tech_telepathy
-				hidden_effect = {
-					add_research_option = tech_telepathy
-				}
+		# /
+		tradition_swap = {	# Psionic
+			name = ap_mind_over_matter_psionic
+			inherit_effects = no
+			inherit_icon = no
+			inherit_name = no
+			trigger = {	# TODO ASCENSION
+				has_country_flag = ap_mind_over_matter_psionic
 			}
-			custom_tooltip = tec_ap_unlock_psionic_tradition
-			custom_tooltip = ap_mind_over_matter_steps
-		}
-
-		ai_weight = {
-			weight = @tec_force_path_ap_weight
-			# Ethic
-				modifier = {
-					factor = 0.75
-					NOR = {
-						has_ethic = ethic_spiritualist
-						has_ethic = ethic_fanatic_spiritualist
-					}
-				}
-				modifier = {
-					factor = 1.25
-					OR = {
-						has_ethic = ethic_spiritualist
-						has_ethic = ethic_fanatic_spiritualist
-					}
-				}
-			# /
-			# Overlord
-				modifier = {
-					factor = 2
-					is_subject = yes
-					overlord = {
-						tec_has_psionic_ascension_path = yes
-					}
-				}
-			# /
-			# Ascension Controller
-				# Note: This affect mixed paths
-				# Global checker
-				modifier = {
-					factor = 0.75
-					event_target:global_event_country = {
-						check_variable = {
-							which = tec_number_of_psiascended_empires
-							value >= 2
-						}
-					}
-				}
-				modifier = {
-					factor = 0.75
-					event_target:global_event_country = {
-						check_variable = {
-							which = tec_number_of_psiascended_empires
-							value >= 3
-						}
-					}
-				}
-				modifier = {
-					factor = 0.75
-					event_target:global_event_country = {
-						check_variable = {
-							which = tec_number_of_psiascended_empires
-							value >= 4
-						}
-					}
-				}
-			# /	
-			modifier = {
-				factor = 10
-				has_ascension_perk = ap_become_the_crisis
+			on_enabled = {
+				# TODO ASCENSION
+			}
+			weight = {
+				factor = @tec_force_path_ap_weight
 			}
 		}
+		tradition_swap = {	# Psychic
+			name = ap_mind_over_matter_psychic
+			inherit_effects = no
+			inherit_icon = no
+			inherit_name = no
+			trigger = {	# TODO ASCENSION
+				has_country_flag = ap_mind_over_matter_psychic
+			}
+			on_enabled = {
+				# TODO ASCENSION
+			}
+			weight = {
+				factor = @tec_force_path_ap_weight
+			}
+		}
+		#tradition_swap = {	# Ethereal Psionic
+		#	name = ap_mind_over_matter_psionic_ethereal
+		#}
+		#tradition_swap = {	# Ethereal Psychic
+		#	name = ap_mind_over_matter_psychic_ethereal
+		#}
 	}
 
 	ap_tec_psionic_ascendance = {		# Psionic Tier II
@@ -388,40 +395,16 @@
 		}
 
 		on_enabled = {
+			# Effects on tec_ascension.501
 			custom_tooltip = "ap_engineered_evolution_tooltip"
-			hidden_effect = {
-				# Global controller
-					event_target:global_event_country = {
-						change_variable = {
-							which = tec_number_of_bioascended_empires
-							value = 1
-						}
-					}
-				# /
-				# Effects
-					if = {
-						limit = {
-							has_country_flag = tec_advanced_ascension
-						}
-						tec_give_gene_t1_ap_effect = yes
-					}
-					else = {
-						country_event = {
-							id = tec_gene_path.100
-						}
-					}
-				# /	
-			}
 			if = {	# Pre-steps - Gene Tailoring
 				limit = {
-					NOT = {
+					NOR = {
+						has_tech_option = tech_gene_tailoring
 						has_technology = tech_gene_tailoring
 					}
 				}
 				custom_tooltip = tec_ap_unlock_tech_gene_tailoring
-				hidden_effect = {
-					add_research_option = tech_gene_tailoring
-				}
 			}
 			if = {	# Free - Gene Seed
 				limit = {
@@ -430,9 +413,6 @@
 					}
 				}
 				custom_tooltip = tec_ap_unlock_tech_gene_seed_purification
-				hidden_effect = {
-					add_research_option = tech_gene_seed_purification
-				}
 			}
 			if = {	# Notify Clone Army
 				limit = {
@@ -719,6 +699,7 @@
 		}
 
 		on_enabled = {
+			# Effects on tec_ascension.502
 			if = {	# Notify Biohives
 				limit = {
 					tec_is_biohive = yes
@@ -753,40 +734,14 @@
 				custom_tooltip = "ap_tec_the_flesh_is_weak_cyborg_tooltip"
 				custom_tooltip = "ap_tec_block_ai_uprising_cyborg_tooltip"
 			}
-			
-			hidden_effect = {
-				# Global controller
-					event_target:global_event_country = {
-						change_variable = {
-							which = tec_number_of_cyberascended_empires
-							value = 1
-						}
-					}
-				# /
-				# Effects
-					if = {
-						limit = {
-							has_country_flag = tec_advanced_ascension
-						}
-						tec_give_cybernetic_t1_ap_effect = yes
-					}
-					else = {
-						country_event = {
-							id = tec_cybernetic_path.100
-						}
-					}
-				# /
-			}
 			if = { # Pre-steps - Neuro Quantum Links
 				limit = {
-					NOT = {
+					NOR = {
+						has_tech_option = tech_neuro_quantum_links
 						has_technology = tech_neuro_quantum_links
 					}
 				}
 				custom_tooltip = tec_ap_unlock_tech_neuro_quantum_links
-				hidden_effect = {
-					add_research_option = tech_neuro_quantum_links
-				}
 			}
 			custom_tooltip = tec_ap_unlock_cybernetic_basic_tradition
 			custom_tooltip = ap_the_flesh_is_weak_steps
@@ -849,7 +804,7 @@
 					factor = 0.75
 					event_target:global_event_country = {
 						check_variable = {
-							which = tec_number_of_cyberascended_empires
+							which = tec_number_of_technoascended_empires
 							value >= 2
 						}
 					}
@@ -858,7 +813,7 @@
 					factor = 0.75
 					event_target:global_event_country = {
 						check_variable = {
-							which = tec_number_of_cyberascended_empires
+							which = tec_number_of_technoascended_empires
 							value >= 3
 						}
 					}
@@ -867,7 +822,7 @@
 					factor = 0.75
 					event_target:global_event_country = {
 						check_variable = {
-							which = tec_number_of_cyberascended_empires
+							which = tec_number_of_technoascended_empires
 							value >= 4
 						}
 					}
@@ -1064,6 +1019,7 @@
 		}
 
 		on_enabled = {
+			# Effects on tec_ascension.503
 			if = {
 				limit = {
 					has_country_flag = synthetic_empire
@@ -1075,14 +1031,6 @@
 				custom_tooltip = "ap_synthetic_evolution_tooltip_regular"
 			}
 			hidden_effect = {
-				# Global controller
-					event_target:global_event_country = {
-						change_variable = {
-							which = tec_number_of_cyberascended_empires
-							value = 1
-						}
-					}
-				# /
 				# Effects
 					if = {
 						limit = {
@@ -1105,9 +1053,6 @@
 					}
 				}
 				custom_tooltip = tec_ap_unlock_tech_synthetic_workers
-				hidden_effect = {
-					add_research_option = tech_synthetic_workers
-				}
 			}
 			if = {	# Pre-steps - Synth leaders
 				limit = {
@@ -1117,9 +1062,6 @@
 					}
 				}
 				custom_tooltip = tec_ap_unlock_tech_synthetic_leaders
-				hidden_effect = {
-					add_research_option = tech_synthetic_leaders
-				}
 			}
 			if = {	# Pre-steps - Synths
 				limit = {
@@ -1334,7 +1276,7 @@
 				# Global Controller
 					event_target:global_event_country = {
 						change_variable = {
-							which = tec_number_of_cyberascended_empires
+							which = tec_number_of_technoascended_empires
 							value = 1
 						}
 					}
