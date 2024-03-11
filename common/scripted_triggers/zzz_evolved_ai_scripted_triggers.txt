@@ -137,6 +137,7 @@ tec_ai_should_allocate_ecoworld_budget = {
 		has_ascension_perk = ap_mastery_of_nature
 	}
 	any_owned_planet = {
+		NOT = { has_planet_flag = tec_undergoing_ecoworld_project }
 		tec_ecoworld_project_potential = yes
 		tec_ecoworld_project_allow = yes
 		tec_ai_can_ecu = yes
@@ -255,7 +256,7 @@ tec_ai_allow_assembly_building = {
 			else_if = {
 				limit = {
 					OR = {
-						tec_allows_machine_assembly_for_cyborg = yes 
+						tec_allows_machine_assembly_for_cyborg = yes
 						tec_has_synthetic_ascension_path = yes
 						tec_is_machine_cult = yes
 					}
@@ -501,14 +502,18 @@ tec_ai_allow_exotic_dependant_building = { # to not block ai build plans
 			exists = owner
 			owner = { is_ai = yes }
 		}
-		owner = {
-			resource_stockpile_compare = {
-				resource = $exotic$
-				value >= @b_exotic_cost
-			}
-			has_monthly_income = {
-				resource = $exotic$
-				value >= @b_exotic_upkeep
+		OR = {
+			has_building_construction = yes
+			owner = {
+				resource_stockpile_compare = {
+					resource = $exotic$
+					value >= @b_exotic_cost
+					mult = 2
+				}
+				has_monthly_income = {
+					resource = $exotic$
+					value >= @b_exotic_upkeep
+				}
 			}
 		}
 	}
@@ -517,20 +522,27 @@ tec_ai_allow_exotic_dependant_building = { # to not block ai build plans
 	}
 }
 
-tec_ai_allow_rare_dependant_building = { # to not block ai build plans
+tec_ai_allow_rare_dependant_building = { # Still blocked the AI so increased stockpile requirements (budgets issue)
 	if = {
 		limit = {
 			exists = owner
 			owner = { is_ai = yes }
 		}
-		owner = {
-			resource_stockpile_compare = {
-				resource = $rare$
-				value >= @b$tier$_rare_cost
-			}
-			has_monthly_income = {
-				resource = $rare$
-				value >= @b$tier$_rare_upkeep
+		OR = {
+			#works well
+			#This allows the building to not get instantly unupgraded by the AI if the allows are not met AFTER the construction started (there is also a problem with it not refunding resources if the construction gets cancelled under these circumstances)
+			#Since the AI can't queue stuff, this is a good solution
+			has_building_construction = yes
+			owner = {
+				resource_stockpile_compare = {
+					resource = $rare$
+					value >= @b$tier$_rare_cost
+					mult = 2
+				}
+				has_monthly_income = {
+					resource = $rare$
+					value >= @b$tier$_rare_upkeep
+				}
 			}
 		}
 	}
@@ -545,10 +557,15 @@ tec_ai_allow_artifacts_dependant_building = { # to not block ai build plans
 			exists = owner
 			owner = { is_ai = yes }
 		}
-		owner = {
-			resource_stockpile_compare = {
-				resource = minor_artifacts
-				value >= @b2_rare_cost
+		#See above
+		OR = {
+			has_building_construction = yes
+			owner = {
+				resource_stockpile_compare = {
+					resource = minor_artifacts
+					value >= @b2_rare_cost
+					mult = 2
+				}
 			}
 		}
 	}
@@ -724,6 +741,8 @@ tec_ai_allow_energy_boosting_building = {
 			exists = owner
 			owner = {
 				is_ai = yes
+				#in an ideal world we would have a trigger to check whether or not an empire's stuff costs alloys
+				is_machine_empire = no
 			}
 		}
 		OR = {
@@ -732,6 +751,27 @@ tec_ai_allow_energy_boosting_building = {
 			check_variable_arithmetic = {
 				which = value:generator_combined_value|CACHED|yes|
 				value >= 6
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			exists = owner
+			owner = {
+				is_ai = yes
+				is_machine_empire = yes
+			}
+		}
+		AND = {
+			owner = {
+				resource_stockpile_compare = { resource = alloys value > 400 }
+			}
+			OR = {
+				has_generator_designation = yes
+				check_variable_arithmetic = {
+					which = value:generator_combined_value|CACHED|yes|
+					value >= 6
+				}
 			}
 		}
 	}
@@ -785,14 +825,15 @@ tec_ai_allow_energy_building = {
 						has_planet_flag = energy_habitat
 						has_planet_flag = tec_energy_planet_2
 					}
+					#Put this here since it's good to always check whether or not we can get more through districts, since buildings take priority over district building
+					owner = {
+						has_monthly_income = {
+							resource = energy
+							value < -40
+						}
+					}
 					has_planet_flag = tec_energy_planet_3
 					has_planet_flag = tec_energy_planet_4
-				}
-			}
-			owner = {
-				has_monthly_income = {
-					resource = energy
-					value < -20
 				}
 			}
 		}
@@ -850,8 +891,29 @@ tec_ai_allow_minerals_boosting_building = {
 			exists = owner
 			owner = {
 				is_ai = yes
+				is_machine_empire = no
 			}
 		}
+		OR = {
+			owner = { tec_is_labour_hero_empire = yes }
+			has_mining_designation = yes
+			check_variable_arithmetic = {
+				which = value:mining_combined_value|CACHED|yes|
+				value >= 6
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			exists = owner
+			owner = {
+				is_ai = yes
+				is_machine_empire = yes
+			}
+		}
+		owner = {
+				resource_stockpile_compare = { resource = alloys value > 400 }
+			}
 		OR = {
 			owner = { tec_is_labour_hero_empire = yes }
 			has_mining_designation = yes
@@ -865,8 +927,6 @@ tec_ai_allow_minerals_boosting_building = {
 		always = yes
 	}
 }
-
-
 
 tec_ai_allow_minerals_building = {
 	if = {
@@ -967,9 +1027,36 @@ tec_ai_allow_food_boosting_building = {
 			exists = owner
 			owner = {
 				is_ai = yes
+				tec_is_biohive = no
+				is_machine_empire = no
 			}
 		}
 		owner = { country_uses_food = yes }
+		OR = {
+			owner = { tec_is_labour_hero_empire = yes }
+			has_farming_designation = yes
+			check_variable_arithmetic = {
+				which = value:farming_combined_value|CACHED|yes|
+				value >= 6
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			exists = owner
+			owner = {
+				is_ai = yes
+				OR = {
+					tec_is_biohive = yes
+					is_machine_empire = yes
+				}
+				#Prevents from being stuck trying to build stuff we don't have the planet budget for (fuck ai)
+			}
+		}
+		owner = { 
+			resource_stockpile_compare = { resource = alloys value > 400 }
+			country_uses_food = yes
+		}
 		OR = {
 			owner = { tec_is_labour_hero_empire = yes }
 			has_farming_designation = yes
@@ -1204,39 +1291,41 @@ tec_ai_allow_research_starbase_building = {
 
 tec_ai_needs_housing_district_housing = {
 	free_housing < 1
-	free_building_slots > 0
+	free_building_slots >= 0
 }
 
 tec_ai_needs_housing_district_building_slots = {
 	free_building_slots < 1
-	free_district_slots > 1
+	free_district_slots >= 1
 }
 
 
 tec_ai_allow_housing_district = {
-	# $housing$ $has_building_slots$
-	if = {
-		limit = { 
-			exists = owner
-			owner = { is_ai = yes } 
-		}
-		OR = {
-			AND = {
-				free_housing < $housing$
+    if = {
+        limit = { 
+            exists = owner
+            owner = { is_ai = yes } 
+        }
+        OR = {
+            AND = {
+                free_housing < $housing$
+            }
+            if = {
+                limit = {
+                    $has_building_slots$
+                }
+                free_building_slots < 1
+                num_buildings = { type = any value < @tec_building_slot_max }
+            }
+			else = {
+				always = no
 			}
-			if = {
-				limit = {
-					$has_building_slots$
-				}
-				free_building_slots < 1
-				num_buildings = { type = any value < @tec_building_slot_max }
-			}
-			$use_for_jobs$
-		}
-	}
-	else = {
-		always = yes
-	}
+            AND = { $use_for_jobs$ }
+        }
+    }
+    else = {
+        always = yes
+    }
 }
 
 tec_ai_allow_rural_district = {

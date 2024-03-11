@@ -1,3 +1,4 @@
+# common\decisions\zz_vanilla_overwrite_decisions.txt
 # - - - - - - - - - - - - - - - - - - - - - 
 # Centralized Overwrites
 # - - - - - - - - - - - - - - - - - - - - - 
@@ -47,7 +48,17 @@ decision_market_nomination = {
 			has_global_flag = ongoing_market_relocation_nomination
 		}
 		#from = { has_communications = event_target:50percentcomms } # should include self
-		from = { has_country_flag = market_nomination_eligible }
+		exists = from
+		from = {
+			has_country_flag = market_nomination_eligible
+			NOT = {
+				has_valid_civic = civic_inwards_perfection
+			}
+			OR = {
+				is_ai = no
+				NOT = { has_ethic = ethic_fanatic_xenophobe }
+			}
+		}
 	}
 
 	allow = {
@@ -487,7 +498,6 @@ decision_museum_exhibits = {
 # O V E R W R I T E	02_special_decisions.txt
 # - - - - - - - - - - - - - - - - - - - - - 
 
-
 # decision_geologist_prospect = {
 # 	owned_planets_only = yes
 
@@ -556,11 +566,137 @@ decision_museum_exhibits = {
 # }
 
 
+# Resort Colony
+decision_resort_colony = {
+	owned_planets_only = yes
+
+	prerequisites = {
+		"tech_resort_colonies"
+	}
+
+	resources = {
+		category = decisions
+		cost = {
+			unity = 1000
+		}
+	}
+
+	potential = {
+		exists = owner
+		owner = {
+			is_regular_empire = yes
+		}
+		is_capital = no
+		NOR = { 
+			has_modifier = penal_colony 
+			has_modifier = slave_colony
+			has_modifier = resort_colony
+			tec_is_city_world = yes
+			AND = {
+				is_planet_class = pc_nuked
+				NOR = {
+					owner = {
+						OR = {	
+							is_memorialist_empire = yes	
+							has_trait = trait_survivor
+							has_trait = trait_pc_nuked_preference
+							has_trait = trait_plantoid_radiotrophic
+							has_trait = trait_advanced_radiotrophic
+							has_trait = trait_harvested_radiotrophic
+							has_trait = trait_lithoid_radiotrophic
+						}
+					}
+				}
+			}
+			AND = {
+				tec_is_relic_world = yes
+				NOT = {
+					owner = {
+						is_memorialist_empire = yes
+					}
+				}
+			}
+		}
+		is_artificial = no
+	}
+
+	allow = {
+		custom_tooltip = {
+			fail_text = decision_resort_colony_no_districts
+			num_districts = {
+				type = any
+				value < 1
+			}
+			num_buildings = {
+				type = any
+				value < 2
+			}
+		}
+		custom_tooltip = {
+			fail_text = decision_resort_colony_only_one
+			NOT = {
+				owner = {
+					any_owned_planet = {
+						has_modifier = resort_colony
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = decision_cant_be_building_anything
+			has_building_construction = no
+		}
+	}
+
+	effect = {
+		add_modifier = {
+			modifier = resort_colony
+			days = -1
+		}
+		hidden_effect = {
+			# TO DO alt capitals
+			if = {
+				limit = {
+					OR = {
+						has_building = building_colony_shelter
+						has_building = building_capital
+					}
+				}
+				remove_building = building_colony_shelter
+				remove_building = building_capital
+				add_building = building_resort_capital
+			}
+			if = {
+				limit = {
+					OR = {
+						has_building = building_major_capital
+						has_building = building_system_capital
+						# Evolved
+						has_building = building_galactic_capital
+					}
+				}
+				remove_building = building_major_capital
+				remove_building = building_system_capital
+				# Evolved
+				remove_building = building_galactic_capital
+				# /
+				add_building = building_resort_major_capital
+			}
+		}
+		hidden_effect = {
+			validate_planet_buildings_and_districts = yes
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}
+
+
 # - - - - - - - - - - - - - - - - - - - - - 
 # O V E R W R I T E	08_paragon_decisions.txt
 # - - - - - - - - - - - - - - - - - - - - - 
-
-
 
 # Divine Algorithm
 decision_divine_algorithm = {
