@@ -107,7 +107,7 @@ habitat_central_complex = {
 					else = {
 						NOR = {
 							has_planet_flag = megastructure
-							has_planet_flag = has_megastructure
+							#has_planet_flag = has_megastructure
 							solar_system = {
 								OR = {
 									has_star_flag = ring_world_built
@@ -133,6 +133,10 @@ habitat_central_complex = {
 					is_asteroid = yes
 					is_moon = yes
 				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_not_astral_scar"
+				is_astral_scar = no
 			}
 			custom_tooltip = {
 				fail_text = "requires_not_solarpunk"
@@ -215,6 +219,27 @@ habitat_central_complex = {
 		factor = 5
 
 		modifier = {
+			# AI shouldn't build habitats if they have any uncolonised habitats.
+			factor = 0
+			owner = {
+				any_planet_within_border = {
+					tec_is_habitat = yes
+					is_colony = no
+				}
+			}
+		}
+
+		modifier = {
+			# AI shouldn't build habitats if they don't have starports in the system
+			# unless they have either the Void Dwellers origin or Voidborn AP.
+			factor = 0
+			owner = {
+				is_void_dweller_empire = no
+			}
+			starbase = { NOT = { has_starbase_size >= starbase_starport } }
+		}
+
+		modifier = {
 			factor = 5
 			exists = sector
 			sector = { has_sector_type = core_sector }
@@ -258,384 +283,19 @@ habitat_central_complex = {
 		fromfrom.planet = {
 			save_event_target_as = target_planet
 		}
-		#hidden_effect = {	# Ai tweaks  # Caelum - need review
-			#from = {
-			#	change_variable = {
-			#		which = tec_ai_habitats_in_queue
-			#		value = -1
-			#	}
-			#}
-			#if = {
-			#	limit = {
-			#		from = {
-			#			is_ai = yes
-			#			NOT = {
-			#				has_origin = origin_void_dwellers
-			#			}
-			#		}
-			#	}
-			#	from = {
-			#		set_timed_country_flag = {
-			#			flag = tec_ai_stop_spamming_habitats_please
-			#			years = 5
-			#		}
-			#	}
-			#}
-		#}
-		spawn_planet = {
-			class = "pc_habitat"
-			location = event_target:target_planet
-			orbit_location = yes
-			orbit_angle_offset = 135
-			orbit_distance_offset = 9.899
-			size = 6
-			has_ring = no
-
-			init_effect = {
-				set_name = {
-					key = HABITAT_PLANET_NAME
-					variable_string = "[FROM.from.solar_system.GetName]"
+		if = {
+			limit = {
+				fromfrom.planet = {
+					is_star = yes
 				}
-				set_planet_entity = {
-					entity = "habitat_phase_03_entity"
-					graphical_culture = from
-				}
-				set_surveyed = {
-					surveyed = yes
-					surveyor = FROM
-				}
-				set_all_comms_surveyed = yes
-				clear_blockers = yes
-
-				set_planet_flag = megastructure
-				set_planet_flag = habitat
-				set_planet_flag = habitat_level_1
-				save_event_target_as = target_habitat
-				add_deposit = d_system_resources
-				event_target:target_planet = {
-					set_planet_flag = habitat@PREV
-				}
-
-				# Old effects  # Caelum - need review
-				if = {
-					limit = {
-						always = no
-					}
-					if = {	# Trade
-						limit = {
-							OR = {
-								AND = {
-									has_global_flag = giga_game_started
-									fromfrom.planet = { has_trade_deposit = yes }
-								}
-								has_deposit = d_trade_value_1
-								has_deposit = d_trade_value_2
-								has_deposit = d_trade_value_3
-								has_deposit = d_trade_value_4
-								has_deposit = d_trade_value_5
-								has_deposit = d_trade_value_6
-								has_deposit = d_trade_value_7
-								has_deposit = d_trade_value_8
-								has_deposit = d_trade_value_9
-								has_deposit = d_trade_value_10
-							}
-						}
-						set_planet_flag = commercial_habitat
-					}
-					if = {	# Research
-						limit = {
-							fromfrom.planet = {
-								OR = {
-									has_deposit_for = shipclass_research_station
-									has_deposit = d_zro_deposit_1
-									has_deposit = d_zro_deposit_2
-									has_deposit = d_zro_deposit_3
-									has_deposit = d_zro_deposit_4
-									has_deposit = d_zro_deposit_5
-									has_deposit = d_dark_matter_deposit_1
-									has_deposit = d_dark_matter_deposit_2
-									has_deposit = d_dark_matter_deposit_3
-									has_deposit = d_dark_matter_deposit_10
-									has_deposit = d_living_metal_deposit
-									has_deposit = d_nanites_deposit
-									has_deposit = d_artifacts_1
-									has_deposit = d_artifacts_2
-									has_deposit = d_artifacts_3
-								}
-							}
-						}
-						set_planet_flag = research_habitat
-					}
-					if = {	# Mining
-						limit = {
-							fromfrom.planet = { 
-								OR = {
-									# Gigas
-										has_resource = { type = minerals amount > 0 }
-									# /
-									has_deposit = d_minerals_1
-									has_deposit = d_minerals_2
-									has_deposit = d_minerals_3
-									has_deposit = d_minerals_4
-									has_deposit = d_minerals_5
-									has_deposit = d_minerals_6
-									has_deposit = d_minerals_7
-									has_deposit = d_minerals_8
-									has_deposit = d_minerals_9
-									has_deposit = d_minerals_10
-									has_deposit = d_alloys_1
-									has_deposit = d_alloys_2
-									has_deposit = d_alloys_3
-									has_deposit = d_alloys_4
-									has_deposit = d_alloys_5
-									has_deposit = d_alloys_10
-									has_deposit = d_alloys_25
-								}
-							}
-						}
-						set_planet_flag = mining_habitat
-						change_variable = {
-							which = tec_hab_menial_districts
-							value = 1
-						}
-					}
-					else_if = {	# Energy
-						limit = {
-							fromfrom.planet = {
-								OR = {
-									# Gigas
-										has_resource = { type = energy amount > 0 }
-									# /
-									has_deposit = d_energy_1
-									has_deposit = d_energy_2
-									has_deposit = d_energy_3
-									has_deposit = d_energy_4
-									has_deposit = d_energy_5
-									has_deposit = d_energy_6
-									has_deposit = d_energy_7
-									has_deposit = d_energy_8
-									has_deposit = d_energy_9
-									has_deposit = d_energy_10
-								}
-							}
-						}
-						set_planet_flag = energy_habitat
-						change_variable = {
-							which = tec_hab_menial_districts
-							value = 1
-						}
-					}
-					else_if = {	# Food
-						limit = {
-							fromfrom.planet = {
-								NOR = {
-									has_deposit_for = shipclass_research_station 
-									has_deposit_for = shipclass_mining_station 
-								}
-							}
-						}
-						set_planet_flag = tec_food_habitat
-						change_variable = {
-							which = tec_hab_menial_districts
-							value = 1
-						}
-					}
-
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_exotic_gases_1 } }
-						add_deposit = d_hab_gas_1
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_exotic_gases_2 } }
-						add_deposit = d_hab_gas_2
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_exotic_gases_3 } }
-						add_deposit = d_hab_gas_3
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_exotic_gases_4 } }
-						add_deposit = d_hab_gas_4
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_exotic_gases_5 } }
-						add_deposit = d_hab_gas_5
-					}
-
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_rare_crystals_1 } }
-						add_deposit = d_hab_crystal_1
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_rare_crystals_2 } }
-						add_deposit = d_hab_crystal_2
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_rare_crystals_3 } }
-						add_deposit = d_hab_crystal_3
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_rare_crystals_4 } }
-						add_deposit = d_hab_crystal_4
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_rare_crystals_5 } }
-						add_deposit = d_hab_crystal_5
-					}
-
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_volatile_motes_1 } }
-						add_deposit = d_hab_mote_1
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_volatile_motes_2 } }
-						add_deposit = d_hab_mote_2
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_volatile_motes_3 } }
-						add_deposit = d_hab_mote_3
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_volatile_motes_4 } }
-						add_deposit = d_hab_mote_4
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_volatile_motes_5 } }
-						add_deposit = d_hab_mote_5
-					}
-
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_zro_deposit_1 } }
-						add_deposit = d_hab_zro_1
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_zro_deposit_2 } }
-						add_deposit = d_hab_zro_2
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_zro_deposit_3 } }
-						add_deposit = d_hab_zro_3
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_zro_deposit_4 } }
-						add_deposit = d_hab_zro_4
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_zro_deposit_5 } }
-						add_deposit = d_hab_zro_5
-					}
-
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_dark_matter_deposit_1 } }
-						add_deposit = d_hab_dark_matter_1
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_dark_matter_deposit_2 } }
-						add_deposit = d_hab_dark_matter_2
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_dark_matter_deposit_3 } }
-						add_deposit = d_hab_dark_matter_3
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_dark_matter_deposit_10 } }
-						add_deposit = d_hab_dark_matter_10
-					}
-
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_living_metal_deposit } }
-						add_deposit = d_hab_living_metal_1
-					}
-
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_alloys_1 } }
-						add_deposit = d_hab_alloy_1
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_alloys_2 } }
-						add_deposit = d_hab_alloy_2
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_alloys_3 } }
-						add_deposit = d_hab_alloy_3
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_alloys_4 } }
-						add_deposit = d_hab_alloy_4
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_alloys_5 } }
-						add_deposit = d_hab_alloy_5
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_alloys_10 } }
-						add_deposit = d_hab_alloy_10
-					}
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_alloys_25 } }
-						add_deposit = d_hab_alloy_25
-					}
-
-					if = {
-						limit = { fromfrom.planet = { has_deposit = d_nanites_deposit } }
-						add_deposit = d_hab_nanites_1
-						set_planet_flag = research_habitat
-					}
-					if = {
-						limit = {
-							fromfrom.planet = { has_deposit = d_artifacts_1 }
-						}
-						add_deposit = d_artifacts_planet_1
-					}
-
-					if = {
-						limit = {
-							fromfrom.planet = { has_deposit = d_artifacts_2 }
-						}
-						add_deposit = d_artifacts_planet_2
-					}
-
-					if = {
-						limit = {
-							fromfrom.planet = { has_deposit = d_artifacts_3 }
-						}
-						add_deposit = d_artifacts_planet_3
-					}
-					# Gigas resources
-						if = {
-							limit = {
-								has_global_flag = giga_game_started
-							}
-							# iodizium
-							while = { count = fromfrom.planet.value:giga_count_resource|resource|sr_iodizium| add_deposit = @d_giga_hab_iodizium_1 }
-
-							# supertensiles
-							if = {
-								limit = { fromfrom.planet = { has_resource = { type = @giga_sr_amb_megaconstruction amount > 0 } } }
-								set_planet_flag = mining_habitat
-								change_variable = {
-									which = tec_hab_menial_districts
-									value = 1
-								}
-							}
-							while = { count = fromfrom.planet.value:giga_count_resource|resource|giga_sr_amb_megaconstruction| add_deposit = @d_giga_hab_supertensiles_1 }
-						}
-					# /
-
-					# if = {
-					# 	limit = {
-					# 		from = {
-					# 			OR = {
-					# 				has_origin = origin_void_dwellers
-					# 				is_ai = yes
-					# 			}
-					# 		}
-					# 	}
-					# 	create_colony = {
-					# 		owner = From
-					# 	}
-					# }
-				}
+			}
+			spawn_habitat_effect = {
+				DISTANCE = 19.798
+			}
+		}
+		else = {
+			spawn_habitat_effect = {
+				DISTANCE = 9.899
 			}
 		}
 		fromfrom.solar_system = {
@@ -654,6 +314,11 @@ habitat_central_complex = {
 				BODY = major
 				TYPE = resource
 			}
+			# EVOLVED To avoid overwriting the effect
+				event_target:target_planet = {
+					remove_planet_flag = has_megastructure
+				}
+			# /
 		}
 
 		else = {
@@ -661,6 +326,11 @@ habitat_central_complex = {
 				BODY = major
 				TYPE = generic
 			}
+			# EVOLVED To avoid overwriting the effect
+				event_target:target_planet = {
+					remove_planet_flag = has_megastructure
+				}
+			# /
 		}
 
 		remove_megastructure = fromfrom
@@ -701,6 +371,568 @@ habitat_central_complex = {
 	}
 }
 
+# -------------- Orbitals --------------
+
+# Major Orbital
+major_orbital = {
+	entity = "habitat_phase_02_entity"
+	construction_entity = "habitat_phase_02_entity"
+	portrait = "GFX_megastructure_habitat_background"
+	place_entity_on_planet_plane = no
+	show_galactic_map_icon = no
+	hide_name = yes
+	show_in_outliner = no
+	entity_offset = { x = -7 y = -7 }
+	build_time = @tec_major_orbital_build_time
+
+	resources = {
+		category = megastructures_habitat
+		cost = {
+			alloys = @tec_major_orbital_alloy_cost
+		}
+	}
+
+	construction_blocks_and_blocked_by = none
+
+	potential = {
+		OR = {
+			has_technology = tech_habitat_1
+			has_civic = civic_diadochi
+			has_civic = civic_great_khans_legacy
+			has_country_flag = democratic_khanate_flag
+		}
+	}
+
+	possible = {
+		exists = starbase
+		custom_tooltip = {
+			fail_text = "requires_inside_border"
+			is_inside_border = from
+		}
+		custom_tooltip = {
+			fail_text = "requires_habitat_central_complex"
+			any_system_planet = {
+				has_planet_flag = habitat
+			}
+		}
+	}
+
+	placement_rules = {
+		planet_possible = {
+			custom_tooltip = {
+				fail_text = "requires_surveyed_planet"
+				is_surveyed = {			# prevent leaking habitability information
+					who = prev.from
+					status = yes
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_anomaly"
+				NOT = { has_anomaly = yes }
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_existing_megastructure"
+				#can_build_megastructure_on_planet = yes
+				NOR = {
+					has_planet_flag = megastructure
+					# EVOLVED
+						has_planet_flag = has_megastructure
+						#has_planet_flag = tec_has_orbital
+					# /
+					# /
+					solar_system = {
+						OR = {
+							has_star_flag = ring_world_built
+							has_star_flag = ithomes_gate
+						}
+					}
+					is_planet_class = pc_ringworld_habitable
+					is_planet_class = pc_ringworld_habitable_damaged
+					is_planet_class = pc_ringworld_tech
+					is_planet_class = pc_ringworld_tech_damaged
+					is_planet_class = pc_ringworld_seam
+					is_planet_class = pc_ringworld_seam_damaged
+					is_planet_class = pc_habitat
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_orbital_debris"
+				NOR = {
+					has_planet_flag = has_orbital_debris
+				}
+			}
+
+			# balance for habitats
+			custom_tooltip = {
+				fail_text = "requires_not_minor_planetary_body"
+				NOR = {
+					is_asteroid = yes
+					is_moon = yes
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_not_astral_scar"
+				is_astral_scar = no
+			}
+			custom_tooltip = {
+				fail_text = "requires_not_solarpunk"
+				NOT = {
+					solar_system = {
+						has_star_flag = solarpunk_system_02
+					}
+				}
+			}
+		} # use these for all non-star megastructures
+	}
+
+	# root = system
+	# from = country
+	ai_weight = {
+		factor = 2
+
+		# AI Void Dwellers shouldn't build orbitals until it has a few habitats
+		modifier = {
+			factor = 0.5
+			from = {
+				has_origin = origin_void_dwellers
+				count_owned_planet = {
+					count < 3
+					limit = {
+						has_planet_flag = habitat
+					}
+				}
+			}
+		}
+
+		modifier = {
+			factor = 2
+			any_system_planet = {
+				has_planet_flag = habitat
+				free_district_slots < 2
+			}
+		}
+
+		modifier = {
+			factor = 2
+			any_system_planet = {
+				has_planet_flag = habitat
+				free_building_slots < 1
+			}
+		}
+	}
+
+	on_build_complete = {
+		fromfrom.planet = {
+			save_event_target_as = target_planet
+		}
+		if = {
+			limit = {
+				event_target:target_planet = {
+					OR = {
+						has_deposit_for = shipclass_research_station
+						has_deposit_for = shipclass_mining_station
+					}
+
+				}
+			}
+			on_orbital_complete_effect = {
+				BODY = major
+				TYPE = resource
+			}
+			## EVOLVED To avoid overwriting the effect
+			#	event_target:target_planet = {
+			#		remove_planet_flag = has_megastructure
+			#		set_planet_flag = tec_has_orbital
+			#	}
+			## /
+		}
+
+		else = {
+			on_orbital_complete_effect = {
+				BODY = major
+				TYPE = generic
+			}
+			## EVOLVED To avoid overwriting the effect
+			#	event_target:target_planet = {
+			#		remove_planet_flag = has_megastructure
+			#		set_planet_flag = tec_has_orbital
+			#	}
+			## /
+		}
+		event_target:target_habitat = {
+			add_deposit_if_missing = {
+				DEPOSIT = d_system_resources
+			}
+			add_deposit_if_missing = {
+				DEPOSIT = d_orbital_research
+			}
+			add_deposit_if_missing = {
+				DEPOSIT = d_orbital_energy
+			}
+			add_deposit_if_missing = {
+				DEPOSIT = d_orbital_mining
+			}
+		}
+		from = { country_event = { id = megastructures.11 } }
+	}
+}
+
+# Minor Orbital
+minor_orbital = {
+	entity = "habitat_phase_01_entity"
+	construction_entity = "habitat_phase_01_entity"
+	portrait = "GFX_megastructure_habitat_background"
+	place_entity_on_planet_plane = no
+	show_galactic_map_icon = no
+	hide_name = yes
+	show_in_outliner = no
+	entity_offset = { x = -7 y = -7 }
+	build_time = @tec_minor_orbital_build_time
+
+	resources = {
+		category = megastructures_habitat
+		cost = {
+			alloys = @tec_minor_orbital_alloy_cost
+		}
+	}
+
+	construction_blocks_and_blocked_by = none
+
+	potential = {
+		OR = {
+			has_technology = tech_habitat_1
+			has_civic = civic_diadochi
+			has_civic = civic_great_khans_legacy
+			has_country_flag = democratic_khanate_flag
+		}
+	}
+
+	possible = {
+		exists = starbase
+		custom_tooltip = {
+			fail_text = "requires_inside_border"
+			is_inside_border = from
+		}
+		custom_tooltip = {
+			fail_text = "requires_habitat_central_complex"
+			any_system_planet = {
+				has_planet_flag = habitat
+			}
+		}
+	}
+
+	placement_rules = {
+		planet_possible = {
+			custom_tooltip = {
+				fail_text = "requires_surveyed_planet"
+				is_surveyed = {			# prevent leaking habitability information
+					who = prev.from
+					status = yes
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_anomaly"
+				NOT = { has_anomaly = yes }
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_existing_megastructure"
+				#can_build_megastructure_on_planet = yes
+				NOR = {
+					has_planet_flag = megastructure
+					# EVOLVED
+						has_planet_flag = has_megastructure
+						#has_planet_flag = tec_has_orbital
+					# /
+					solar_system = {
+						OR = {
+							has_star_flag = ring_world_built
+							has_star_flag = ithomes_gate
+						}
+					}
+					is_planet_class = pc_ringworld_habitable
+					is_planet_class = pc_ringworld_habitable_damaged
+					is_planet_class = pc_ringworld_tech
+					is_planet_class = pc_ringworld_tech_damaged
+					is_planet_class = pc_ringworld_seam
+					is_planet_class = pc_ringworld_seam_damaged
+					is_planet_class = pc_habitat
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_orbital_debris"
+				NOR = {
+					has_planet_flag = has_orbital_debris
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_is_minor_planetary_body"
+				OR = {
+					is_asteroid = yes
+					is_moon = yes
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_not_star"
+				is_star = no
+			}
+			custom_tooltip = {
+				fail_text = "requires_not_astral_scar"
+				is_astral_scar = no
+			}
+			custom_tooltip = {
+				fail_text = "requires_not_solarpunk"
+				NOT = {
+					solar_system = {
+						has_star_flag = solarpunk_system_02
+					}
+				}
+			}
+		} # use these for all non-star megastructures
+	}
+
+	# root = system
+	# from = country
+	ai_weight = {
+		factor = 2
+
+		# AI Void Dwellers shouldn't build orbitals until it has a few habitats
+		modifier = {
+			factor = 0.5
+			from = {
+				has_origin = origin_void_dwellers
+				count_owned_planet = {
+					count < 3
+					limit = {
+						has_planet_flag = habitat
+					}
+				}
+			}
+		}
+
+		modifier = {
+			factor = 2
+			any_system_planet = {
+				has_planet_flag = habitat
+				free_building_slots < 1
+			}
+		}
+	}
+
+	on_build_complete = {
+		fromfrom.planet = {
+			save_event_target_as = target_planet
+		}
+		if = {
+			limit = {
+				event_target:target_planet = {
+					OR = {
+						has_deposit_for = shipclass_research_station
+						has_deposit_for = shipclass_mining_station
+					}
+
+				}
+			}
+			on_orbital_complete_effect = {
+				BODY = minor
+				TYPE = resource
+			}
+		}
+
+		else = {
+			on_orbital_complete_effect = {
+				BODY = minor
+				TYPE = generic
+			}
+			## EVOLVED To avoid overwriting the effect
+			#	event_target:target_planet = {
+			#		remove_planet_flag = has_megastructure
+			#		set_planet_flag = tec_has_orbital
+			#	}
+			## /
+		}
+		event_target:target_habitat = {
+			add_deposit_if_missing = {
+				DEPOSIT = d_system_resources
+			}
+			add_deposit_if_missing = {
+				DEPOSIT = d_orbital_research
+			}
+			add_deposit_if_missing = {
+				DEPOSIT = d_orbital_energy
+			}
+			add_deposit_if_missing = {
+				DEPOSIT = d_orbital_mining
+			}
+		}
+		from = { country_event = { id = megastructures.11 } }
+	}
+}
+
+# Knights of the Toxic God
+major_orbital_knights = {
+	entity = "habitat_phase_02_entity"
+	construction_entity = "habitat_phase_02_entity"
+	portrait = "GFX_megastructure_habitat_background"
+	place_entity_on_planet_plane = no
+	show_galactic_map_icon = no
+	hide_name = yes
+	show_in_outliner = no
+	entity_offset = { x = -7 y = -7 }
+	build_time = @tec_major_orbital_build_time
+
+	resources = {
+		category = megastructures_habitat
+		cost = {
+			alloys = @tec_major_orbital_alloy_cost
+		}
+	}
+
+	construction_blocks_and_blocked_by = none
+
+	potential = {
+		owner = {
+			has_origin = origin_toxic_knights
+			has_relic = r_toxic_god
+		}
+	}
+
+	possible = {
+		exists = starbase
+		custom_tooltip = {
+			fail_text = "requires_inside_border"
+			is_inside_border = from
+		}
+		custom_tooltip = {
+			fail_text = "requires_habitat_central_complex"
+			any_system_planet = {
+				has_planet_flag = habitat
+			}
+		}
+	}
+
+	placement_rules = {
+		planet_possible = {
+			custom_tooltip = {
+				fail_text = "requires_surveyed_planet"
+				is_surveyed = {			# prevent leaking habitability information
+					who = prev.from
+					status = yes
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_knights_castle_or_keep"
+				solar_system = {
+					any_system_planet = {
+						has_planet_flag = habitat
+						OR = {
+							has_building = building_order_castle
+							has_building = building_order_keep
+						}
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_anomaly"
+				NOT = { has_anomaly = yes }
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_existing_megastructure"
+				#can_build_megastructure_on_planet = yes
+				NOR = {
+					has_planet_flag = megastructure
+					# EVOLVED
+						has_planet_flag = has_megastructure
+						#has_planet_flag = tec_has_orbital
+					# /
+					solar_system = {
+						OR = {
+							has_star_flag = ring_world_built
+							has_star_flag = ithomes_gate
+						}
+					}
+					is_planet_class = pc_ringworld_habitable
+					is_planet_class = pc_ringworld_habitable_damaged
+					is_planet_class = pc_ringworld_tech
+					is_planet_class = pc_ringworld_tech_damaged
+					is_planet_class = pc_ringworld_seam
+					is_planet_class = pc_ringworld_seam_damaged
+					is_planet_class = pc_habitat
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_orbital_debris"
+				NOR = {
+					has_planet_flag = has_orbital_debris
+				}
+			}
+
+			# balance for habitats
+			custom_tooltip = {
+				fail_text = "requires_not_minor_planetary_body"
+				NOR = {
+					is_asteroid = yes
+					is_moon = yes
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_not_star"
+				is_star = no
+			}
+			custom_tooltip = {
+				fail_text = "requires_not_astral_scar"
+				is_astral_scar = no
+			}
+			custom_tooltip = {
+				fail_text = "requires_not_solarpunk"
+				NOT = {
+					solar_system = {
+						has_star_flag = solarpunk_system_02
+					}
+				}
+			}
+		} # use these for all non-star megastructures
+	}
+
+	# root = system
+	# from = country
+	ai_weight = {
+		factor = 0	# Other Orbitals are better for the AI.
+	}
+
+	on_build_complete = {
+		fromfrom.planet = {
+			save_event_target_as = target_planet
+		}
+		on_orbital_complete_effect = {
+			BODY = major
+			TYPE = knights
+		}
+		## EVOLVED To avoid overwriting the effect
+		#	event_target:target_planet = {
+		#		remove_planet_flag = has_megastructure
+		#		set_planet_flag = tec_has_orbital
+		#	}
+		## /
+		event_target:target_habitat = {
+			add_deposit_if_missing = {
+				DEPOSIT = d_system_resources
+			}
+			add_deposit_if_missing = {
+				DEPOSIT = d_orbital_research
+			}
+			add_deposit_if_missing = {
+				DEPOSIT = d_orbital_energy
+			}
+			add_deposit_if_missing = {
+				DEPOSIT = d_orbital_mining
+			}
+		}
+		from = { country_event = { id = megastructures.11 } }
+	}
+}
+# /
+
+# -------------- discarded/unused --------------
 # Ark ship etc
 tec_arkship_0 = {
 	entity = ""

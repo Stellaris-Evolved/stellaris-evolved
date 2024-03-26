@@ -41,3 +41,8 @@ or for linux
 ```bash
 python -m tools.uml.cli generate-loc --config ./tools/uml/config.yml --output ./localisation/english/replace/zzzz_uml_modifier_l_english.yml --base-mod-path . --missing-sprites-output "./interface/\!\!_missing_sprites_cleanup.gfx"
 ```
+## Generating moddability support
+
+```bash
+python -m tools.uml.cli create-compat-inlines --config ./tools/uml/config.yml  
+```

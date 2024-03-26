@@ -4,6 +4,7 @@
 
 # % production will always be before
 # ------------- ENERGY -----------------
+ # Regular
 	building_energy_grid = {
 		base_buildtime = @b1_time
 		base_cap_amount = 1
@@ -37,13 +38,19 @@
 				NOT = {
 					uses_habitat_capitals = yes
 				}
-				AND = {
-					exists = owner
-					owner = { is_gestalt = yes }
-				}
 				tec_energy_prod_building_exception = yes
 			}
 			tec_ai_destroy_energy_boosting_building = no
+		}
+
+		allow = {
+			tec_ai_allow_energy_boosting_building = yes
+		}
+
+		convert_to = {
+			building_energy_grid
+			building_tec_biohive_energy_grid
+			#building_tec_lithohive_energy_grid
 		}
 
 		resources = {
@@ -52,16 +59,14 @@
 				script = buildings/resources/inline_evolved_resource_cost
 				tier = 1
 			}
-
-			inline_script = {
-				script = buildings/resources/inline_evolved_machine_production_cost
-				tier = 1
-			}
 		}
 
 		# Modifiers
-			planet_modifier = {
-				planet_technician_energy_produces_add = 1
+			inline_script = {
+				script = modifiers/inline_evolved_technician_efficiency
+				count = 1
+				mult = 1
+				trigger = ""
 			}
 
 			triggered_planet_modifier = {
@@ -71,57 +76,37 @@
 				}
 				planet_tec_batteries_energy_produces_add = 1
 			}
-
-			inline_script = {
-				script = buildings/effects/inline_evolved_quantum
-				max = 2
-			}
-
-			inline_script = {
-				script = buildings/effects/inline_evolved_production_extra_districts
-				district = district_generator
-				trigger = "
-					owner = { is_robot_empire = yes }
-				"
-				tier = 1
-			}
 		# /
 
 		# Jobs
 			inline_script = {
 				script = jobs/inline_evolved_technician
 				regular_count = 1
+				regular_secondary_count = 1
 				hive_count = 1
+				hive_secondary_count = 1
 				machine_count = 1
-				machine_aquatic_count = 1
+				machine_secondary_count = 1
 				mult = 1
 				display = with_desc
 				trigger = ""
 			}
-
-			inline_script = {	# Syndical
-				script = buildings/effects/inline_evolved_labour_hero_civics_jobs
-				LABOUR_HERO_COUNT = 1
-				MENIAL_JOB = technician
-				MENIAL_COUNT = 0.5
-				MENIAL_MULT = planet.value:tec_capital_tier_generic_scaling|CACHED|yes|
-				MENIAL_DESC = no_desc
-			}
 		# /
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_energy_grid
+			tier = 1
+		}
 
 		# AI
 			inline_script = {
 				script = buildings/inline_evolved_aibait
 				trigger = "
-					check_variable_arithmetic = {
-						which = value:generator_combined_value
-						value >= 4
-					}
+					tec_ai_allow_energy_boosting_building = yes
 				"
 			}
 		# /
 	}
-
 	building_energy_nexus = {
 		base_buildtime = @b2_time
 		can_build = no
@@ -139,6 +124,10 @@
 			tec_is_biohive = no
 		}
 
+		upgrades = {
+			"building_energy_complex"
+		}
+
 		potential = {
 			exists = owner
 			owner = {
@@ -151,10 +140,6 @@
 			OR = {
 				NOT = {
 					uses_habitat_capitals = yes
-				}
-				AND = {
-					exists = owner
-					owner = { is_gestalt = yes }
 				}
 				tec_energy_prod_building_exception = yes
 			}
@@ -169,8 +154,10 @@
 			}
 		}
 
-		upgrades = {
-			"building_energy_complex"
+		convert_to = {
+			building_energy_nexus
+			building_tec_biohive_energy_nexus
+			#building_tec_lithohive_energy_nexus
 		}
 
 		resources = {
@@ -187,11 +174,6 @@
 			}
 
 			inline_script = {
-				script = buildings/resources/inline_evolved_machine_production_cost
-				tier = 2
-			}
-
-			inline_script = {
 				script = buildings/resources/inline_evolved_ring_production_cost
 				rare = exotic_gases
 				type = menial
@@ -199,8 +181,11 @@
 		}
 
 		# Modifiers
-			planet_modifier = {
-				planet_technician_energy_produces_add = 2
+			inline_script = {
+				script = modifiers/inline_evolved_technician_efficiency
+				count = 2
+				mult = 1
+				trigger = ""
 			}
 
 			triggered_planet_modifier = {
@@ -211,27 +196,13 @@
 				planet_tec_batteries_energy_produces_add = 2
 			}
 
-			triggered_planet_modifier = {
-				potential = {
-					has_ringworld_output_boost = yes
-				}
-				modifier = {
-					planet_technician_energy_produces_add = 1
-				}
-			}
-
 			inline_script = {
-				script = buildings/effects/inline_evolved_quantum
-				max = 3
-			}
-		
-			inline_script = {
-				script = buildings/effects/inline_evolved_production_extra_districts
-				district = district_generator
+				script = modifiers/inline_evolved_technician_efficiency
+				count = 1
+				mult = 1
 				trigger = "
-					owner = { is_robot_empire = yes }
+					has_ringworld_output_boost = yes
 				"
-				tier = 2
 			}
 		# /
 
@@ -239,23 +210,21 @@
 			inline_script = {
 				script = jobs/inline_evolved_technician
 				regular_count = 2
+				regular_secondary_count = 2
 				hive_count = 2
+				hive_secondary_count = 2
 				machine_count = 2
-				machine_aquatic_count = 2
+				machine_secondary_count = 2
 				mult = 1
 				display = with_desc
 				trigger = ""
 			}
-
-			inline_script = {	# Syndical
-				script = buildings/effects/inline_evolved_labour_hero_civics_jobs
-				LABOUR_HERO_COUNT = 1
-				MENIAL_JOB = technician
-				MENIAL_COUNT = 1
-				MENIAL_MULT = planet.value:tec_capital_tier_generic_scaling|CACHED|yes|
-				MENIAL_DESC = no_desc
-			}
 		# /
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_energy_grid
+			tier = 2
+		}
 
 		# AI
 			inline_script = {
@@ -264,7 +233,6 @@
 			}
 		# /
 	}
-
 	building_energy_complex = {
 		icon = building_tec_energy_complex
 		base_buildtime = @b3_time
@@ -295,10 +263,6 @@
 				NOT = {
 					uses_habitat_capitals = yes
 				}
-				AND = {
-					exists = owner
-					owner = { is_gestalt = yes }
-				}
 				tec_energy_prod_building_exception = yes
 			}
 			tec_ai_destroy_energy_boosting_building = no
@@ -313,6 +277,12 @@
 			tec_ai_allow_exotic_dependant_building = {
 				exotic = sr_living_metal
 			}
+		}
+
+		convert_to = {
+			building_energy_complex
+			building_tec_biohive_energy_complex
+			#building_tec_lithohive_energy_complex
 		}
 			
 		resources = {
@@ -330,8 +300,367 @@
 			}
 
 			inline_script = {
-				script = buildings/resources/inline_evolved_machine_production_cost
+				script = buildings/resources/inline_evolved_exotic_resource_cost
+				exotic = sr_living_metal
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_ring_production_cost
+				rare = exotic_gases
+				type = menial
+			}
+		}
+
+		# Modifiers
+			inline_script = {
+				script = modifiers/inline_evolved_technician_efficiency
+				count = 3
+				mult = 1
+				trigger = ""
+			}
+
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = { is_machine_empire = yes }
+				}
+				planet_tec_batteries_energy_produces_add = 3
+			}
+
+
+			inline_script = {
+				script = modifiers/inline_evolved_technician_efficiency
+				count = 2
+				mult = 1
+				trigger = "
+					has_ringworld_output_boost = yes
+				"
+			}
+		# /
+
+		# Jobs
+			inline_script = {
+				script = jobs/inline_evolved_technician
+				regular_count = 4
+				regular_secondary_count = 4
+				hive_count = 4
+				hive_secondary_count = 4
+				machine_count = 4
+				machine_secondary_count = 4
+				mult = 1
+				display = with_desc
+				trigger = ""
+			}
+		# /
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_energy_grid
+			tier = 3
+		}
+
+		# AI
+			inline_script = {
+				script = buildings/inline_evolved_aibait
+				trigger = ""
+			}
+		# /
+	}
+ # /
+ # Biohive
+	building_tec_biohive_energy_grid = {
+		base_buildtime = @b1_time
+		base_cap_amount = 1
+		position_priority = 210		# Basic boost
+		ai_estimate_without_unemployment = yes
+		icon = building_energy_grid		#BIOHIVE ART PLACEHOLDER!!!!
+
+		category = resource
+
+		prerequisites = {
+			tech_power_hub_1
+		}
+
+		show_tech_unlock_if = {
+			tec_is_biohive = yes
+		}
+		
+		upgrades = {
+			building_tec_biohive_energy_nexus
+		}
+
+		potential = {
+			exists = owner
+			owner = {
+				tec_is_biohive = yes
+			}
+			NOR = {
+				has_modifier = resort_colony
+				has_modifier = crucible_colony
+			}
+			OR = {
+				NOT = {
+					uses_habitat_capitals = yes
+				}
+				tec_energy_prod_building_exception = yes
+			}
+			tec_ai_destroy_energy_boosting_building = no
+		}
+
+		allow = {
+			tec_ai_allow_energy_boosting_building = yes
+		}
+
+		convert_to = {
+			building_energy_grid
+			building_tec_biohive_energy_grid
+			#building_tec_lithohive_energy_grid
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 1
+			}
+		}
+
+		# Modifiers
+			inline_script = {
+				script = modifiers/inline_evolved_technician_efficiency
+				count = 1
+				mult = 1
+				trigger = ""
+			}
+
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = { is_machine_empire = yes }
+				}
+				planet_tec_batteries_energy_produces_add = 1
+			}
+		# /
+
+		# Jobs
+			inline_script = {
+				script = jobs/inline_evolved_technician
+				regular_count = 1
+				regular_secondary_count = 1
+				hive_count = 1
+				hive_secondary_count = 1
+				machine_count = 1
+				machine_secondary_count = 1
+				mult = 1
+				display = with_desc
+				trigger = ""
+			}
+		# /
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_energy_grid
+			tier = 1
+		}
+
+		# AI
+			inline_script = {
+				script = buildings/inline_evolved_aibait
+				trigger = "
+					tec_ai_allow_energy_boosting_building = yes
+				"
+			}
+		# /
+	}
+	building_tec_biohive_energy_nexus = {
+		base_buildtime = @b2_time
+		can_build = no
+		position_priority = 210		# Basic boost
+		ai_estimate_without_unemployment = yes
+		icon = building_energy_nexus		#BIOHIVE ART PLACEHOLDER!!!!
+
+		category = resource
+
+		prerequisites = {
+			tech_power_hub_2
+		}
+
+		show_tech_unlock_if = {
+			tec_is_biohive = yes
+		}
+
+		upgrades = {
+			"building_tec_biohive_energy_complex"
+		}
+
+		potential = {
+			exists = owner
+			owner = {
+				tec_is_biohive = yes
+			}
+			NOR = {
+				has_modifier = resort_colony
+				has_modifier = crucible_colony
+			}
+			OR = {
+				NOT = {
+					uses_habitat_capitals = yes
+				}
+				tec_energy_prod_building_exception = yes
+			}
+			tec_ai_destroy_energy_boosting_building = no
+		}
+
+		allow = {
+			has_upgraded_capital = yes
+			tec_ai_allow_rare_dependant_building = {
+				tier = 2
+				rare = exotic_gases
+			}
+		}
+
+		convert_to = {
+			building_energy_nexus
+			building_tec_biohive_energy_nexus
+			#building_tec_lithohive_energy_nexus
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_rare_resource_cost
+				tier = 2
+				rare = exotic_gases
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_ring_production_cost
+				rare = exotic_gases
+				type = menial
+			}
+		}
+
+		# Modifiers
+			inline_script = {
+				script = modifiers/inline_evolved_technician_efficiency
+				count = 2
+				mult = 1
+				trigger = ""
+			}
+
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = { is_machine_empire = yes }
+				}
+				planet_tec_batteries_energy_produces_add = 2
+			}
+
+			inline_script = {
+				script = modifiers/inline_evolved_technician_efficiency
+				count = 1
+				mult = 1
+				trigger = "
+					has_ringworld_output_boost = yes
+				"
+			}
+		# /
+
+		# Jobs
+			inline_script = {
+				script = jobs/inline_evolved_technician
+				regular_count = 2
+				regular_secondary_count = 2
+				hive_count = 2
+				hive_secondary_count = 2
+				machine_count = 2
+				machine_secondary_count = 2
+				mult = 1
+				display = with_desc
+				trigger = ""
+			}
+		# /
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_energy_grid
+			tier = 2
+		}
+
+		# AI
+			inline_script = {
+				script = buildings/inline_evolved_aibait
+				trigger = ""
+			}
+		# /
+	}
+	building_tec_biohive_energy_complex = {
+		icon = building_tec_energy_complex
+		base_buildtime = @b3_time
+		can_build = no
+		position_priority = 210		# Basic boost
+		ai_estimate_without_unemployment = yes
+		icon = building_tec_energy_complex		#BIOHIVE ART PLACEHOLDER!!!!
+
+		category = resource
+
+		prerequisites = {
+			"tech_tec_power_hub_3"
+		}
+
+		show_tech_unlock_if = {
+			tec_is_biohive = yes
+		}
+
+		potential = {
+			exists = owner
+			owner = {
+				tec_is_biohive = yes
+			}
+			NOR = {
+				has_modifier = resort_colony
+				has_modifier = crucible_colony
+			}
+			OR = {
+				NOT = {
+					uses_habitat_capitals = yes
+				}
+				tec_energy_prod_building_exception = yes
+			}
+			tec_ai_destroy_energy_boosting_building = no
+		}
+
+		allow = {
+			has_upgraded_capital = yes
+			tec_ai_allow_rare_dependant_building = {
 				tier = 3
+				rare = exotic_gases
+			}
+			tec_ai_allow_exotic_dependant_building = {
+				exotic = sr_living_metal
+			}
+		}
+
+		convert_to = {
+			building_energy_complex
+			building_tec_biohive_energy_complex
+			#building_tec_lithohive_energy_complex
+		}
+
+		resources = {
+			category = planet_buildings
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 4
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_rare_resource_cost
+				tier = 3
+				rare = exotic_gases
 			}
 
 			inline_script = {
@@ -347,8 +676,11 @@
 		}
 
 		# Modifiers
-			planet_modifier = {
-				planet_technician_energy_produces_add = 3
+			inline_script = {
+				script = modifiers/inline_evolved_technician_efficiency
+				count = 3
+				mult = 1
+				trigger = ""
 			}
 
 			triggered_planet_modifier = {
@@ -359,27 +691,14 @@
 				planet_tec_batteries_energy_produces_add = 3
 			}
 
-			triggered_planet_modifier = {
-				potential = {
-					has_ringworld_output_boost = yes
-				}
-				modifier = {
-					planet_technician_energy_produces_add = 2
-				}
-			}
 
 			inline_script = {
-				script = buildings/effects/inline_evolved_quantum
-				max = 4
-			}
-
-			inline_script = {
-				script = buildings/effects/inline_evolved_production_extra_districts
-				district = district_generator
+				script = modifiers/inline_evolved_technician_efficiency
+				count = 2
+				mult = 1
 				trigger = "
-					owner = { is_robot_empire = yes }
+					has_ringworld_output_boost = yes
 				"
-				tier = 3
 			}
 		# /
 
@@ -387,23 +706,21 @@
 			inline_script = {
 				script = jobs/inline_evolved_technician
 				regular_count = 4
+				regular_secondary_count = 4
 				hive_count = 4
+				hive_secondary_count = 4
 				machine_count = 4
-				machine_aquatic_count = 4
+				machine_secondary_count = 4
 				mult = 1
 				display = with_desc
 				trigger = ""
 			}
-
-			inline_script = {	# Syndical
-				script = buildings/effects/inline_evolved_labour_hero_civics_jobs
-				LABOUR_HERO_COUNT = 2
-				MENIAL_JOB = technician
-				MENIAL_COUNT = 2
-				MENIAL_MULT = planet.value:tec_capital_tier_generic_scaling|CACHED|yes|
-				MENIAL_DESC = no_desc
-			}
 		# /
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_energy_grid
+			tier = 3
+		}
 
 		# AI
 			inline_script = {
@@ -412,8 +729,15 @@
 			}
 		# /
 	}
+ # /
+ # Lithohive
+	#building_tec_lithohive_energy_grid = {
+	#building_tec_lithohive_energy_nexus = {
+	#building_tec_lithohive_energy_complex = {
+ # /
 # /
 # ------------- MINERALS -----------------
+ # Regular
 	building_mineral_purification_plant = {
 		base_buildtime = @b1_time
 		base_cap_amount = 1
@@ -444,14 +768,21 @@
 				has_modifier = crucible_colony
 			}
 
-			NOR = { # Ringworlds don't have mines
-				tec_is_ringworld = yes
-			}
 			OR = { # Habitats only have mines if they're built on an appropriate deposit
 				uses_habitat_capitals = no
 				tec_mining_prod_building_exception = yes
 			}
 			tec_ai_destroy_minerals_boosting_building = no
+		}
+
+		allow = {
+			tec_ai_allow_minerals_boosting_building = yes
+		}
+
+		convert_to = {
+			building_mineral_purification_plant
+			building_tec_biohive_mineral_purification_plant
+			#building_tec_lithohive_mineral_purification_plant
 		}
 
 		resources = {
@@ -460,36 +791,14 @@
 				script = buildings/resources/inline_evolved_resource_cost
 				tier = 1
 			}
-
-			inline_script = {
-				script = buildings/resources/inline_evolved_machine_production_cost
-				tier = 1
-			}
 		}
 		
 		# Modifiers
-			planet_modifier = {
-				planet_miners_minerals_produces_add = 1
-			}
-
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						is_machine_empire = no
-						allows_slavery = yes
-					}
-				}
-				planet_livestock_lithoid_minerals_produces_add = 1
-			}
-
 			inline_script = {
-				script = buildings/effects/inline_evolved_production_extra_districts
-				district = district_mining
-				trigger = "
-					owner = { is_robot_empire = yes }
-				"
-				tier = 1
+				script = modifiers/inline_evolved_miner_efficiency
+				count = 1
+				mult = 1
+				trigger = ""
 			}
 		# /
 
@@ -497,24 +806,21 @@
 			inline_script = {
 				script = jobs/inline_evolved_miner
 				regular_count = 1
-				regular_aquatic_count = 1
+				regular_secondary_count = 1
 				hive_count = 1
-				hive_aquatic_count = 1
+				hive_secondary_count = 1
 				machine_count = 1
+				machine_secondary_count = 1
 				mult = 1
 				display = with_desc
 				trigger = ""
 			}
-
-			inline_script = {	# Syndical
-				script = buildings/effects/inline_evolved_labour_hero_civics_jobs
-				LABOUR_HERO_COUNT = 1
-				MENIAL_JOB = miner
-				MENIAL_COUNT = 0.5
-				MENIAL_MULT = planet.value:tec_capital_tier_generic_scaling|CACHED|yes|
-				MENIAL_DESC = no_desc
-			}
 		# /
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_mineral_purification_plant
+			tier = 1
+		}
 
 		# Descs
 			triggered_desc = {
@@ -532,15 +838,11 @@
 			inline_script = {
 				script = buildings/inline_evolved_aibait
 				trigger = "
-					check_variable_arithmetic = {
-						which = value:mining_combined_value
-						value >= 4
-					}
+					tec_ai_allow_minerals_boosting_building = yes
 				"
 			}
 		# /
 	}
-
 	building_mineral_purification_hub = {
 		base_buildtime = @b2_time
 		can_build = no
@@ -557,6 +859,10 @@
 			tec_is_biohive = no
 		}
 
+		upgrades = {
+			"building_mineral_purification_complex"
+		}
+
 		potential = {
 			exists = owner
 			owner = {
@@ -565,10 +871,6 @@
 			NOR = {
 				has_modifier = resort_colony
 				has_modifier = crucible_colony
-			}
-
-			NOR = { # Ringworlds don't have mines
-				tec_is_ringworld = yes
 			}
 			OR = { # Habitats only have mines if they're built on an appropriate deposit
 				uses_habitat_capitals = no
@@ -585,8 +887,10 @@
 			}
 		}
 
-		upgrades = {
-			"building_mineral_purification_complex"
+		convert_to = {
+			building_mineral_purification_hub
+			building_tec_biohive_mineral_purification_hub
+			#building_tec_lithohive_mineral_purification_hub
 		}
 
 		resources = {
@@ -603,11 +907,6 @@
 			}
 
 			inline_script = {
-				script = buildings/resources/inline_evolved_machine_production_cost
-				tier = 2
-			}
-
-			inline_script = {
 				script = buildings/resources/inline_evolved_ring_production_cost
 				rare = rare_crystals
 				type = menial
@@ -615,64 +914,20 @@
 		}
 
 		# Modifiers
-			triggered_planet_modifier = {
-				potential = {
-					NOT = { tec_has_scrap_miner = { cached = yes } }
-				}
-				modifier = {
-					planet_miners_minerals_produces_add = 2
-				}
-			}
-
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						is_machine_empire = no
-						allows_slavery = yes
-					}
-				}
-				planet_livestock_lithoid_minerals_produces_add = 2
-			}
-
-			triggered_planet_modifier = {
-				potential = {
-					tec_has_scrap_miner = { cached = yes }
-				}
-				modifier = {
-					planet_miners_minerals_produces_add = 1
-					planet_miners_alloys_produces_add = 0.5
-				}
-			}
-
-			triggered_planet_modifier = {
-				potential = {
-					has_ringworld_output_boost = yes
-					NOT = { tec_has_scrap_miner = { cached = yes } }
-				}
-				modifier = {
-					planet_miners_minerals_produces_add = 1
-				}
-			}
-
-			triggered_planet_modifier = {
-				potential = {
-					has_ringworld_output_boost = yes
-					tec_has_scrap_miner = { cached = yes }
-				}
-				modifier = {
-					planet_miners_minerals_produces_add = 0.5
-					planet_miners_alloys_produces_add = 0.25
-				}
+			inline_script = {
+				script = modifiers/inline_evolved_miner_efficiency
+				count = 2
+				mult = 1
+				trigger = ""
 			}
 
 			inline_script = {
-				script = buildings/effects/inline_evolved_production_extra_districts
-				district = district_mining
+				script = modifiers/inline_evolved_miner_efficiency
+				count = 1
+				mult = 1
 				trigger = "
-					owner = { is_robot_empire = yes }
+					has_ringworld_output_boost = yes
 				"
-				tier = 2
 			}
 		# /
 
@@ -680,22 +935,14 @@
 			inline_script = {
 				script = jobs/inline_evolved_miner
 				regular_count = 2
-				regular_aquatic_count = 2
+				regular_secondary_count = 2
 				hive_count = 2
-				hive_aquatic_count = 2
+				hive_secondary_count = 2
 				machine_count = 2
+				machine_secondary_count = 2
 				mult = 1
 				display = with_desc
 				trigger = ""
-			}
-
-			inline_script = {	# Syndical
-				script = buildings/effects/inline_evolved_labour_hero_civics_jobs
-				LABOUR_HERO_COUNT = 1
-				MENIAL_JOB = miner
-				MENIAL_COUNT = 1
-				MENIAL_MULT = planet.value:tec_capital_tier_generic_scaling|CACHED|yes|
-				MENIAL_DESC = no_desc
 			}
 		# /
 
@@ -712,11 +959,15 @@
 		# /
 
 		inline_script = {
+			script = buildings/effects/type/inline_evolved_mineral_purification_plant
+			tier = 2
+		}
+
+		inline_script = {
 			script = buildings/inline_evolved_aibait
 			trigger = ""
 		}
 	}
-
 	building_mineral_purification_complex = {
 		base_buildtime = @b3_time
 		can_build = no
@@ -742,10 +993,6 @@
 				has_modifier = resort_colony
 				has_modifier = crucible_colony
 			}
-
-			NOR = { # Ringworlds don't have mines
-				tec_is_ringworld = yes
-			}
 			OR = { # Habitats only have mines if they're built on an appropriate deposit
 				uses_habitat_capitals = no
 				tec_mining_prod_building_exception = yes
@@ -764,6 +1011,12 @@
 			}
 		}
 
+		convert_to = {
+			building_mineral_purification_complex
+			building_tec_biohive_mineral_purification_complex
+			#building_tec_lithohive_mineral_purification_complex
+		}
+
 		resources = {
 			category = planet_buildings
 			inline_script = {
@@ -775,11 +1028,6 @@
 				script = buildings/resources/inline_evolved_rare_resource_cost
 				tier = 3
 				rare = rare_crystals
-			}
-
-			inline_script = {
-				script = buildings/resources/inline_evolved_machine_production_cost
-				tier = 3
 			}
 
 			inline_script = {
@@ -795,64 +1043,20 @@
 		}
 
 		# Modifiers
-			triggered_planet_modifier = {
-				potential = {
-					NOT = { tec_has_scrap_miner = { cached = yes } }
-				}
-				modifier = {
-					planet_miners_minerals_produces_add = 3
-				}
-			}
-
-			triggered_planet_modifier = {
-				potential = {
-					tec_has_scrap_miner = { cached = yes }
-				}
-				modifier = {
-					planet_miners_minerals_produces_add = 2
-					planet_miners_alloys_produces_add = 1
-				}
-			}
-			
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						is_machine_empire = no
-						allows_slavery = yes
-					}
-				}
-				planet_livestock_lithoid_minerals_produces_add = 3
-			}
-
-			triggered_planet_modifier = {
-				potential = {
-					has_ringworld_output_boost = yes
-					NOT = { tec_has_scrap_miner = { cached = yes } }
-				}
-				modifier = {
-					planet_miners_minerals_produces_add = 2
-				}
-			}
-
-			triggered_planet_modifier = {
-				potential = {
-					has_ringworld_output_boost = yes
-					tec_has_scrap_miner = { cached = yes }
-				}
-				modifier = {
-					planet_miners_minerals_produces_add = 1
-					planet_miners_alloys_produces_add = 0.5
-				}
+			inline_script = {
+				script = modifiers/inline_evolved_miner_efficiency
+				count = 3
+				mult = 1
+				trigger = ""
 			}
 
 			inline_script = {
-				script = buildings/effects/inline_evolved_production_extra_districts
-				district = district_mining
+				script = modifiers/inline_evolved_miner_efficiency
+				count = 2
+				mult = 1
 				trigger = "
-					owner = { is_robot_empire = yes }
+					has_ringworld_output_boost = yes
 				"
-				tier = 3
 			}
 		# /
 
@@ -860,24 +1064,22 @@
 			inline_script = {
 				script = jobs/inline_evolved_miner
 				regular_count = 4
-				regular_aquatic_count = 4
+				regular_secondary_count = 4
 				hive_count = 4
-				hive_aquatic_count = 4
+				hive_secondary_count = 4
 				machine_count = 4
+				machine_secondary_count = 4
 				mult = 1
 				display = with_desc
 				trigger = ""
 			}
-
-			inline_script = {	# Syndical
-				script = buildings/effects/inline_evolved_labour_hero_civics_jobs
-				LABOUR_HERO_COUNT = 2
-				MENIAL_JOB = miner
-				MENIAL_COUNT = 2
-				MENIAL_MULT = planet.value:tec_capital_tier_generic_scaling|CACHED|yes|
-				MENIAL_DESC = no_desc
-			}
 		# /
+
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_mineral_purification_plant
+			tier = 3
+		}
 
 		# Descs
 			triggered_desc = {
@@ -898,6 +1100,378 @@
 			}
 		# /
 	}
+ # /
+ # Biohive
+	building_tec_biohive_mineral_purification_plant = {
+		base_buildtime = @b1_time
+		base_cap_amount = 1
+		position_priority = 210		# Basic boost
+		ai_estimate_without_unemployment = yes
+		icon = building_mineral_purification_plant		#BIOHIVE ART PLACEHOLDER!!!!
+
+		category = resource
+
+		prerequisites = {
+			tech_mineral_purification_1
+		}
+
+		show_tech_unlock_if = {
+			tec_is_biohive = yes
+		}
+
+		upgrades = {
+			building_tec_biohive_mineral_purification_hub
+		}
+
+		potential = {
+			exists = owner
+			owner = {
+				tec_is_biohive = yes
+			}
+			NOR = {
+				has_modifier = resort_colony
+				has_modifier = crucible_colony
+			}
+			OR = { # Habitats only have mines if they're built on an appropriate deposit
+				uses_habitat_capitals = no
+				tec_mining_prod_building_exception = yes
+			}
+			tec_ai_destroy_minerals_boosting_building = no
+		}
+
+		allow = {
+			tec_ai_allow_minerals_boosting_building = yes
+		}
+
+		convert_to = {
+			building_mineral_purification_plant
+			building_tec_biohive_mineral_purification_plant
+			#building_tec_lithohive_mineral_purification_plant
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 1
+			}
+		}
+		
+		# Modifiers
+			inline_script = {
+				script = modifiers/inline_evolved_miner_efficiency
+				count = 1
+				mult = 1
+				trigger = ""
+			}
+		# /
+
+		# Jobs
+			inline_script = {
+				script = jobs/inline_evolved_miner
+				regular_count = 1
+				regular_secondary_count = 1
+				hive_count = 1
+				hive_secondary_count = 1
+				machine_count = 1
+				machine_secondary_count = 1
+				mult = 1
+				display = with_desc
+				trigger = ""
+			}
+		# /
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_mineral_purification_plant
+			tier = 1
+		}
+
+		# Descs
+			triggered_desc = {
+				trigger = { tec_has_scrap_miner = no }
+				text = building_mineral_purification_plant_desc
+			}
+
+			triggered_desc = {
+				trigger = { tec_has_scrap_miner = yes }
+				text = building_scrap_processing_plant_desc
+			}
+		# /
+
+		# AI
+			inline_script = {
+				script = buildings/inline_evolved_aibait
+				trigger = "
+					tec_ai_allow_minerals_boosting_building = yes
+				"
+			}
+		# /
+	}
+	building_tec_biohive_mineral_purification_hub = {
+		base_buildtime = @b2_time
+		can_build = no
+		position_priority = 210		# Basic boost
+		ai_estimate_without_unemployment = yes
+		icon = building_mineral_purification_hub		#BIOHIVE ART PLACEHOLDER!!!!
+
+		category = resource
+
+		prerequisites = {
+			tech_mineral_purification_2
+		}
+
+		show_tech_unlock_if = {
+			tec_is_biohive = yes
+		}
+
+		upgrades = {
+			"building_tec_biohive_mineral_purification_complex"
+		}
+
+		potential = {
+			exists = owner
+			owner = {
+				tec_is_biohive = yes
+			}
+			NOR = {
+				has_modifier = resort_colony
+				has_modifier = crucible_colony
+			}
+			OR = { # Habitats only have mines if they're built on an appropriate deposit
+				uses_habitat_capitals = no
+				tec_mining_prod_building_exception = yes
+			}
+			tec_ai_destroy_minerals_boosting_building = no
+		}
+
+		allow = {
+			has_upgraded_capital = yes
+			tec_ai_allow_rare_dependant_building = {
+				tier = 2
+				rare = rare_crystals
+			}
+		}
+
+		convert_to = {
+			building_mineral_purification_hub
+			building_tec_biohive_mineral_purification_hub
+			#building_tec_lithohive_mineral_purification_hub
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_rare_resource_cost
+				tier = 2
+				rare = rare_crystals
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_ring_production_cost
+				rare = rare_crystals
+				type = menial
+			}
+		}
+
+		# Modifiers
+			inline_script = {
+				script = modifiers/inline_evolved_miner_efficiency
+				count = 2
+				mult = 1
+				trigger = ""
+			}
+
+			inline_script = {
+				script = modifiers/inline_evolved_miner_efficiency
+				count = 1
+				mult = 1
+				trigger = "
+					has_ringworld_output_boost = yes
+				"
+			}
+		# /
+
+		# Jobs
+			inline_script = {
+				script = jobs/inline_evolved_miner
+				regular_count = 2
+				regular_secondary_count = 2
+				hive_count = 2
+				hive_secondary_count = 2
+				machine_count = 2
+				machine_secondary_count = 2
+				mult = 1
+				display = with_desc
+				trigger = ""
+			}
+		# /
+
+		# Descs
+			triggered_desc = {
+				trigger = { tec_has_scrap_miner = no }
+				text = building_mineral_purification_hub_desc
+			}
+
+			triggered_desc = {
+				trigger = { tec_has_scrap_miner = yes }
+				text = building_scrap_processing_hub_desc
+			}
+		# /
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_mineral_purification_plant
+			tier = 2
+		}
+
+		inline_script = {
+			script = buildings/inline_evolved_aibait
+			trigger = ""
+		}
+	}
+	building_tec_biohive_mineral_purification_complex = {
+		base_buildtime = @b3_time
+		can_build = no
+		position_priority = 210		# Basic boost
+		ai_estimate_without_unemployment = yes
+		icon = building_mineral_purification_complex		#BIOHIVE ART PLACEHOLDER!!!!
+
+		category = resource
+
+		prerequisites = {
+			"tech_tec_mineral_purification_3"
+		}
+
+		show_tech_unlock_if = {
+			tec_is_biohive = yes
+		}
+
+		potential = {
+			exists = owner
+			owner = {
+				tec_is_biohive = yes
+			}
+			NOR = {
+				has_modifier = resort_colony
+				has_modifier = crucible_colony
+			}
+			OR = { # Habitats only have mines if they're built on an appropriate deposit
+				uses_habitat_capitals = no
+				tec_mining_prod_building_exception = yes
+			}
+			tec_ai_destroy_minerals_boosting_building = no
+		}
+
+		allow = {
+			has_upgraded_capital = yes
+			tec_ai_allow_rare_dependant_building = {
+				tier = 3
+				rare = rare_crystals
+			}
+			tec_ai_allow_exotic_dependant_building = {
+				exotic = sr_living_metal
+			}
+		}
+
+		convert_to = {
+			building_mineral_purification_complex
+			building_tec_biohive_mineral_purification_complex
+			#building_tec_lithohive_mineral_purification_complex
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 4
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_rare_resource_cost
+				tier = 3
+				rare = rare_crystals
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_ring_production_cost
+				rare = rare_crystals
+				type = menial
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_exotic_resource_cost
+				exotic = sr_living_metal
+			}
+		}
+
+		# Modifiers
+			inline_script = {
+				script = modifiers/inline_evolved_miner_efficiency
+				count = 3
+				mult = 1
+				trigger = ""
+			}
+
+			inline_script = {
+				script = modifiers/inline_evolved_miner_efficiency
+				count = 2
+				mult = 1
+				trigger = "
+					has_ringworld_output_boost = yes
+				"
+			}
+		# /
+
+		# Jobs
+			inline_script = {
+				script = jobs/inline_evolved_miner
+				regular_count = 4
+				regular_secondary_count = 4
+				hive_count = 4
+				hive_secondary_count = 4
+				machine_count = 4
+				machine_secondary_count = 4
+				mult = 1
+				display = with_desc
+				trigger = ""
+			}
+		# /
+
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_mineral_purification_plant
+			tier = 3
+		}
+
+		# Descs
+			triggered_desc = {
+				trigger = { tec_has_scrap_miner = no }
+				text = building_mineral_purification_hub_desc
+			}
+
+			triggered_desc = {
+				trigger = { tec_has_scrap_miner = yes }
+				text = building_scrap_processing_hub_desc
+			}
+		# /
+
+		# AI
+			inline_script = {
+				script = buildings/inline_evolved_aibait
+				trigger = ""
+			}
+		# /
+	}
+ # /
+ # Lithohive
+	#building_tec_lithohive_mineral_purification_plant = {
+	#building_tec_lithohive_mineral_purification_hub = {
+	#building_tec_lithohive_mineral_purification_complex = {
+ # /
 # /
 # ------------- FOOD -----------------
  # Regular
@@ -934,8 +1508,14 @@
 			tec_ai_destroy_food_boosting_building = no
 		}
 
+		allow = {
+			tec_ai_allow_food_boosting_building = yes
+		}
+
 		convert_to = {
+			building_food_processing_facility
 			building_tec_biohive_food_processing_facility
+			#building_tec_lithohive_food_processing_facility
 		}
 
 		resources = {
@@ -944,41 +1524,14 @@
 				script = buildings/resources/inline_evolved_resource_cost
 				tier = 1
 			}
-
-			inline_script = {
-				script = buildings/resources/inline_evolved_machine_production_cost
-				tier = 1
-			}
 		}
 
 		# Modifiers
-			planet_modifier = {
-				planet_farmers_food_produces_add = 1
-			}
-
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						is_machine_empire = no
-						allows_slavery = yes
-					}
-				}
-				planet_livestock_biological_food_produces_add = 1
-			}
-
 			inline_script = {
-				script = buildings/effects/inline_evolved_catalytic
-				max = 2
-			}
-
-			inline_script = {
-				script = buildings/effects/inline_evolved_production_extra_districts
-				district = district_farming
-				trigger = "
-					owner = { is_robot_empire = yes }
-				"
-				tier = 1
+				script = modifiers/inline_evolved_farmer_efficiency
+				count = 1
+				mult = 1
+				trigger = ""
 			}
 		# /
 
@@ -986,38 +1539,31 @@
 			inline_script = {
 				script = jobs/inline_evolved_farmer
 				regular_count = 1
-				regular_aquatic_count = 1
+				regular_secondary_count = 1
 				hive_count = 1
-				hive_aquatic_count = 1
+				hive_secondary_count = 1
 				machine_count = 1
+				machine_secondary_count = 1
 				mult = 1
 				display = with_desc
 				trigger = ""
 			}
-
-			inline_script = {	# Syndical
-				script = buildings/effects/inline_evolved_labour_hero_civics_jobs
-				LABOUR_HERO_COUNT = 1
-				MENIAL_JOB = farmer
-				MENIAL_COUNT = 0.5
-				MENIAL_MULT = planet.value:tec_capital_tier_generic_scaling|CACHED|yes|
-				MENIAL_DESC = no_desc
-			}
 		# /
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_food_processing_facility
+			tier = 1
+		}
 
 		# AI
 			inline_script = {
 				script = buildings/inline_evolved_aibait
 				trigger = "
-					check_variable_arithmetic = {
-						which = value:farming_combined_value
-						value >= 4
-					}
+					tec_ai_allow_food_boosting_building = yes
 				"
 			}
 		# /
 	}
-
 	building_food_processing_center = {
 		base_buildtime = @b2_time
 		can_build = no
@@ -1061,7 +1607,9 @@
 		}
 
 		convert_to = {
+			building_food_processing_center
 			building_tec_biohive_food_processing_center
+			#building_tec_lithohive_food_processing_center
 		}
 		
 		resources = {
@@ -1078,11 +1626,6 @@
 			}
 
 			inline_script = {
-				script = buildings/resources/inline_evolved_machine_production_cost
-				tier = 2
-			}
-
-			inline_script = {
 				script = buildings/resources/inline_evolved_ring_production_cost
 				rare = volatile_motes
 				type = menial
@@ -1091,67 +1634,42 @@
 
 		# Modifiers
 			# Standard
-				planet_modifier = {
-					planet_farmers_food_produces_add = 2
+				inline_script = {
+					script = modifiers/inline_evolved_farmer_efficiency
+					count = 2
+					mult = 1
+					trigger = ""
 				}
 
-				triggered_planet_modifier = {
-					potential = {
-						exists = owner
-						owner = {
-							is_machine_empire = no
-							allows_slavery = yes
-						}
-					}
-					planet_livestock_biological_food_produces_add = 2
-				}
-
-				triggered_planet_modifier = {
-					potential = {
+				inline_script = {
+					script = modifiers/inline_evolved_farmer_efficiency
+					count = 1
+					mult = 1
+					trigger = "
 						has_ringworld_output_boost = yes
-					}
-					modifier = {
-						planet_farmers_food_produces_add = 1
-					}
+					"
 				}
 			# /
-			inline_script = {
-				script = buildings/effects/inline_evolved_catalytic
-				max = 3
-			}
-
-			inline_script = {
-				script = buildings/effects/inline_evolved_production_extra_districts
-				district = district_farming
-				trigger = "
-					owner = { is_robot_empire = yes }
-				"
-				tier = 2
-			}
 		# /
 
 		# Jobs
 			inline_script = {
 				script = jobs/inline_evolved_farmer
 				regular_count = 2
-				regular_aquatic_count = 2
+				regular_secondary_count = 2
 				hive_count = 2
-				hive_aquatic_count = 2
+				hive_secondary_count = 2
 				machine_count = 2
+				machine_secondary_count = 2
 				mult = 1
 				display = with_desc
 				trigger = ""
 			}
-
-			inline_script = {	# Syndical
-				script = buildings/effects/inline_evolved_labour_hero_civics_jobs
-				LABOUR_HERO_COUNT = 1
-				MENIAL_JOB = farmer
-				MENIAL_COUNT = 1
-				MENIAL_MULT = planet.value:tec_capital_tier_generic_scaling|CACHED|yes|
-				MENIAL_DESC = no_desc
-			}
 		# /
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_food_processing_facility
+			tier = 2
+		}
 
 		# AI
 			inline_script = {
@@ -1168,7 +1686,6 @@
 			}
 		# /
 	}
-
 	building_food_processing_complex = {
 		base_buildtime = @b3_time
 		can_build = no
@@ -1210,7 +1727,9 @@
 		}
 
 		convert_to = {
+			building_food_processing_complex
 			building_tec_biohive_food_processing_complex
+			#building_tec_lithohive_food_processing_complex
 		}
 		
 		resources = {
@@ -1227,11 +1746,6 @@
 			}
 
 			inline_script = {
-				script = buildings/resources/inline_evolved_machine_production_cost
-				tier = 3
-			}
-
-			inline_script = {
 				script = buildings/resources/inline_evolved_ring_production_cost
 				rare = volatile_motes
 				type = menial
@@ -1245,67 +1759,42 @@
 
 		# Modifiers
 			# Standard
-				planet_modifier = {
-					planet_farmers_food_produces_add = 3
+				inline_script = {
+					script = modifiers/inline_evolved_farmer_efficiency
+					count = 3
+					mult = 1
+					trigger = ""
 				}
-
-				triggered_planet_modifier = {
-					potential = {
-						exists = owner
-						owner = {
-							is_machine_empire = no
-							allows_slavery = yes
-						}
-					}
-					planet_livestock_biological_food_produces_add = 3
-				}
-
-				triggered_planet_modifier = {
-					potential = {
+				inline_script = {
+					script = modifiers/inline_evolved_farmer_efficiency
+					count = 2
+					mult = 1
+					trigger = "
 						has_ringworld_output_boost = yes
-					}
-					modifier = {
-						planet_farmers_food_produces_add = 2
-					}
+					"
 				}
 			# /
-			inline_script = {
-				script = buildings/effects/inline_evolved_catalytic
-				max = 4
-			}
-
-			inline_script = {
-				script = buildings/effects/inline_evolved_production_extra_districts
-				district = district_farming
-				trigger = "
-					owner = { is_robot_empire = yes }
-				"
-				tier = 3
-			}
 		# /
 
 		# Jobs
 			inline_script = {
 				script = jobs/inline_evolved_farmer
 				regular_count = 4
-				regular_aquatic_count = 4
+				regular_secondary_count = 4
 				hive_count = 4
-				hive_aquatic_count = 4
+				hive_secondary_count = 4
 				machine_count = 4
+				machine_secondary_count = 4
 				mult = 1
 				display = with_desc
 				trigger = ""
 			}
-
-			inline_script = {	# Syndical
-				script = buildings/effects/inline_evolved_labour_hero_civics_jobs
-				LABOUR_HERO_COUNT = 2
-				MENIAL_JOB = farmer
-				MENIAL_COUNT = 2
-				MENIAL_MULT = planet.value:tec_capital_tier_generic_scaling|CACHED|yes|
-				MENIAL_DESC = no_desc
-			}
 		# /
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_food_processing_facility
+			tier = 3
+		}
 
 		# AI
 			inline_script = {
@@ -1329,6 +1818,7 @@
 		base_cap_amount = 1
 		position_priority = 210		# Basic boost
 		ai_estimate_without_unemployment = yes
+		icon = building_food_processing_facility		#BIOHIVE ART PLACEHOLDER!!!!
 
 		category = resource
 
@@ -1352,8 +1842,19 @@
 			NOR = {
 				uses_district_set = machine_world
 				has_modifier = resort_colony
+				has_modifier = crucible_colony
 			}
-			has_any_farming_district_or_buildings = no
+			tec_ai_destroy_food_boosting_building = no
+		}
+
+		allow = {
+			tec_ai_allow_food_boosting_building = yes
+		}
+
+		convert_to = {
+			building_food_processing_facility
+			building_tec_biohive_food_processing_facility
+			#building_tec_lithohive_food_processing_facility
 		}
 
 		resources = {
@@ -1364,53 +1865,50 @@
 			}
 		}
 
-		planet_modifier = {
-			planet_farmers_food_produces_add = 1
-			planet_livestock_biological_food_produces_add = 1
-		}
+		# Modifiers
+			inline_script = {
+				script = modifiers/inline_evolved_farmer_efficiency
+				count = 1
+				mult = 1
+				trigger = ""
+			}
+		# /
+
+		# Jobs
+			inline_script = {
+				script = jobs/inline_evolved_farmer
+				regular_count = 1
+				regular_secondary_count = 1
+				hive_count = 1
+				hive_secondary_count = 1
+				machine_count = 1
+				machine_secondary_count = 1
+				mult = 1
+				display = with_desc
+				trigger = ""
+			}
+		# /
 
 		inline_script = {
-			script = buildings/effects/inline_evolved_catalytic
-			max = 2
-		}
-
-		inline_script = {
-			script = buildings/effects/inline_evolved_production_extra_districts
-			district = district_farming
-			trigger = "
-				owner = { tec_is_biohive = yes }
-			"
+			script = buildings/effects/type/inline_evolved_food_processing_facility
 			tier = 1
 		}
 
-		inline_script = {
-			script = jobs/inline_evolved_farmer
-			regular_count = 1
-			regular_aquatic_count = 1
-			hive_count = 1
-			hive_aquatic_count = 1
-			machine_count = 1
-			mult = 1
-			display = with_desc
-			trigger = ""
-		}
-
-		inline_script = {
-			script = buildings/inline_evolved_aibait
-			trigger = "
-				check_variable_arithmetic = {
-					which = value:farming_combined_value
-					value >= 4
-				}
-			"
-		}
+		# AI
+			inline_script = {
+				script = buildings/inline_evolved_aibait
+				trigger = "
+					tec_ai_allow_food_boosting_building = yes
+				"
+			}
+		# /
 	}
-
 	building_tec_biohive_food_processing_center = {
 		base_buildtime = @b2_time
 		can_build = no
 		position_priority = 210		# Basic boost
 		ai_estimate_without_unemployment = yes
+		icon = building_food_processing_center		#BIOHIVE ART PLACEHOLDER!!!!
 		
 		category = resource
 
@@ -1434,11 +1932,11 @@
 			NOR = {
 				uses_district_set = machine_world
 				has_modifier = resort_colony
+				has_modifier = crucible_colony
 			}
-			
-			has_any_farming_district_or_buildings = no
+			tec_ai_destroy_food_boosting_building = no
 		}
-		
+
 		allow = {
 			exists = owner
 			has_upgraded_capital = yes
@@ -1446,6 +1944,12 @@
 				tier = 2
 				rare = volatile_motes
 			}
+		}
+
+		convert_to = {
+			building_food_processing_center
+			building_tec_biohive_food_processing_center
+			#building_tec_lithohive_food_processing_center
 		}
 
 		resources = {
@@ -1468,56 +1972,64 @@
 			}
 		}
 
-		planet_modifier = {
-			planet_farmers_food_produces_add = 2
-			planet_livestock_biological_food_produces_add = 2
-		}
+		# Modifiers
+			inline_script = {
+				script = modifiers/inline_evolved_farmer_efficiency
+				count = 2
+				mult = 1
+				trigger = ""
+			}
+			inline_script = {
+				script = modifiers/inline_evolved_farmer_efficiency
+				count = 1
+				mult = 1
+				trigger = "
+					has_ringworld_output_boost = yes
+				"
+			}
+		# /
 
-		triggered_planet_modifier = {
-			potential = {
-				has_ringworld_output_boost = yes
+		# Jobs
+			inline_script = {
+				script = jobs/inline_evolved_farmer
+				regular_count = 2
+				regular_secondary_count = 2
+				hive_count = 2
+				hive_secondary_count = 2
+				machine_count = 2
+				machine_secondary_count = 2
+				mult = 1
+				display = with_desc
+				trigger = ""
 			}
-			modifier = {
-				planet_farmers_food_produces_add = 1
-			}
-		}
+		# /
 
 		inline_script = {
-			script = buildings/effects/inline_evolved_catalytic
-			max = 3
-		}
-
-		inline_script = {
-			script = buildings/effects/inline_evolved_production_extra_districts
-			district = district_farming
-			trigger = "
-				owner = { tec_is_biohive = yes }
-			"
+			script = buildings/effects/type/inline_evolved_food_processing_facility
 			tier = 2
 		}
-		inline_script = {
-			script = jobs/inline_evolved_farmer
-			regular_count = 2
-			regular_aquatic_count = 2
-			hive_count = 2
-			hive_aquatic_count = 2
-			machine_count = 2
-			mult = 1
-			display = with_desc
-			trigger = ""
-		}
 
-		inline_script = {
-			script = buildings/inline_evolved_aibait
-			trigger = ""
-		}
+		# AI
+			inline_script = {
+				script = buildings/inline_evolved_aibait
+				trigger = "
+					exists = owner
+					owner = {
+						has_monthly_income = {
+							resource = food
+							value < 50
+						}
+					}
+				"
+			}
+		# /
 	}
-
 	building_tec_biohive_food_processing_complex = {
 		base_buildtime = @b3_time
 		can_build = no
 		position_priority = 210		# Basic boost
 		ai_estimate_without_unemployment = yes
+		icon = building_food_processing_complex		#BIOHIVE ART PLACEHOLDER!!!!
 
 		category = resource
 
@@ -1537,8 +2049,9 @@
 			NOR = {
 				uses_district_set = machine_world
 				has_modifier = resort_colony
+				has_modifier = crucible_colony
 			}
-			has_any_farming_district_or_buildings = no
+			tec_ai_destroy_food_boosting_building = no
 		}
 
 		allow = {
@@ -1550,6 +2063,12 @@
 			tec_ai_allow_exotic_dependant_building = {
 				exotic = sr_living_metal
 			}
+		}
+
+		convert_to = {
+			building_food_processing_complex
+			building_tec_biohive_food_processing_complex
+			#building_tec_lithohive_food_processing_complex
 		}
 		
 		resources = {
@@ -1577,44 +2096,41 @@
 			}
 		}
 
-		planet_modifier = {
-			planet_farmers_food_produces_add = 3
-			planet_livestock_biological_food_produces_add = 3
-		}
+		# Modifiers
+			inline_script = {
+				script = modifiers/inline_evolved_farmer_efficiency
+				count = 3
+				mult = 1
+				trigger = ""
+			}
+			inline_script = {
+				script = modifiers/inline_evolved_farmer_efficiency
+				count = 2
+				mult = 1
+				trigger = "
+					has_ringworld_output_boost = yes
+				"
+			}
+		# /
 
-		triggered_planet_modifier = {
-			potential = {
-				has_ringworld_output_boost = yes
+		# Jobs
+			inline_script = {
+				script = jobs/inline_evolved_farmer
+				regular_count = 4
+				regular_secondary_count = 4
+				hive_count = 4
+				hive_secondary_count = 4
+				machine_count = 4
+				machine_secondary_count = 4
+				mult = 1
+				display = with_desc
+				trigger = ""
 			}
-			modifier = {
-				planet_farmers_food_produces_add = 2
-			}
-		}
+		# /
 
 		inline_script = {
-			script = buildings/effects/inline_evolved_catalytic
-			max = 4
-		}
-
-		inline_script = {
-			script = buildings/effects/inline_evolved_production_extra_districts
-			district = district_farming
-			trigger = "
-				owner = { tec_is_biohive = yes }
-			"
+			script = buildings/effects/type/inline_evolved_food_processing_facility
 			tier = 3
-		}
-
-		inline_script = {
-			script = jobs/inline_evolved_farmer
-			regular_count = 4
-			regular_aquatic_count = 4
-			hive_count = 4
-			hive_aquatic_count = 4
-			machine_count = 4
-			mult = 1
-			display = with_desc
-			trigger = ""
 		}
 
 		inline_script = {
@@ -1623,10 +2139,16 @@
 		}
 	}
  # /
+ # Lithohive
+	#building_tec_lithohive_food_processing_facility = {
+	#building_tec_lithohive_food_processing_center = {
+	#building_tec_lithohive_food_processing_complex = {
+ # /
 # /
 
 # Basic production
 # ------------- ENERGY -----------------
+ # Regular
 	building_tec_energrid_1 = {
 		base_buildtime = @b2_time
 		position_priority = 220		# Basic Production
@@ -1659,6 +2181,11 @@
 			tec_ai_allow_energy_building = yes
 		}
 
+		convert_to = {
+			building_tec_energrid_1
+			building_tec_biohive_energrid_1
+			#building_tec_lithohive_energrid_1
+		}
 
 		resources = {
 			category = planet_buildings
@@ -1671,15 +2198,21 @@
 		inline_script = {
 			script = jobs/inline_evolved_technician
 			regular_count = 2
+			regular_secondary_count = 2
 			hive_count = 2
+			hive_secondary_count = 2
 			machine_count = 2
-			machine_aquatic_count = 2
+			machine_secondary_count = 2
 			mult = 1
 			display = with_desc
 			trigger = ""
 		}
-	}
 
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_tec_energrid
+			tier = 1
+		}
+	}
 	building_tec_energrid_2 = {
 		base_buildtime = @b3_time
 		can_build = no
@@ -1706,6 +2239,12 @@
 				tec_is_biohive = no
 			}
 			tec_ai_destroy_energy_building = no
+		}
+
+		convert_to = {
+			building_tec_energrid_2
+			building_tec_biohive_energrid_2
+			#building_tec_lithohive_energrid_2
 		}
 
 		resources = {
@@ -1741,12 +2280,19 @@
 		inline_script = {
 			script = jobs/inline_evolved_technician
 			regular_count = 3
+			regular_secondary_count = 3
 			hive_count = 3
+			hive_secondary_count = 3
 			machine_count = 3
-			machine_aquatic_count = 3
+			machine_secondary_count = 3
 			mult = 1
 			display = with_desc
 			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_tec_energrid
+			tier = 2
 		}
 
 		inline_script = { # tier 2 is inexpensive and provides automated production
@@ -1754,7 +2300,6 @@
 			trigger = ""
 		}
 	}
-
 	building_tec_energrid_3 = {
 		base_buildtime = @b4_time
 		can_build = no
@@ -1777,6 +2322,12 @@
 				tec_is_biohive = no
 			}
 			tec_ai_destroy_energy_building = no
+		}
+
+		convert_to = {
+			building_tec_energrid_3
+			building_tec_biohive_energrid_3
+			#building_tec_lithohive_energrid_3
 		}
 
 		resources = {
@@ -1816,16 +2367,268 @@
 		inline_script = {
 			script = jobs/inline_evolved_technician
 			regular_count = 4
+			regular_secondary_count = 4
 			hive_count = 4
+			hive_secondary_count = 4
 			machine_count = 4
-			machine_aquatic_count = 4
+			machine_secondary_count = 4
 			mult = 1
 			display = with_desc
 			trigger = ""
 		}
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_tec_energrid
+			tier = 3
+		}
 	}
+ # /
+ # Biohive
+	building_tec_biohive_energrid_1 = {
+		base_buildtime = @b2_time
+		position_priority = 220		# Basic Production
+		base_cap_amount = 5
+		icon = building_tec_energrid_1		#BIOHIVE ART PLACEHOLDER!!!!
+
+		category = resource
+		
+		prerequisites = {
+			"tech_tec_energy_plant"
+		}
+
+		show_tech_unlock_if = {
+			tec_is_biohive = yes
+		}
+
+		upgrades = {
+			building_tec_biohive_energrid_2
+		}
+
+		potential = {
+			NOT = { has_modifier = resort_colony }
+			exists = owner
+			owner = {
+				tec_is_biohive = yes
+			}
+			tec_ai_destroy_energy_building = no
+		}
+
+		allow = {
+			tec_ai_allow_energy_building = yes
+		}
+
+		convert_to = {
+			building_tec_energrid_1
+			building_tec_biohive_energrid_1
+			#building_tec_lithohive_energrid_1
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 1
+			}
+		}
+
+		inline_script = {
+			script = jobs/inline_evolved_technician
+			regular_count = 2
+			regular_secondary_count = 2
+			hive_count = 2
+			hive_secondary_count = 2
+			machine_count = 2
+			machine_secondary_count = 2
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_tec_energrid
+			tier = 1
+		}
+	}
+	building_tec_biohive_energrid_2 = {
+		base_buildtime = @b3_time
+		can_build = no
+		position_priority = 220		# Basic Production
+		icon = building_tec_energrid_2		#BIOHIVE ART PLACEHOLDER!!!!
+
+		category = resource
+		
+		prerequisites = {
+			"tech_tec_energy_plant_2"
+		}
+
+		show_tech_unlock_if = {
+			tec_is_biohive = yes
+		}
+
+		upgrades = {
+			building_tec_biohive_energrid_3
+		}
+
+		potential = {
+			NOT = { has_modifier = resort_colony }
+			exists = owner
+			owner = {
+				tec_is_biohive = yes
+			}
+			tec_ai_destroy_energy_building = no
+		}
+
+		convert_to = {
+			building_tec_energrid_2
+			building_tec_biohive_energrid_2
+			#building_tec_lithohive_energrid_2
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
+			}
+
+			# New production
+			inline_script = {
+				script = districts/resources/inline_evolved_tec_automation_energy
+				trigger = ""
+				base = 3
+			}
+		}
+
+		# overlord_resources = {
+		# 	category = planet_requisitioned_energy
+		# 	produces = {
+		# 		trigger = {
+		# 			planet = {
+		# 				has_planet_flag = has_energy_requisitorium
+		# 			}
+		# 		}
+		# 		energy = @requisitorium_energy_overlord
+		# 	}
+		# }
+
+		triggered_desc = {
+			text = tec_building_affect_production_menialbuilding
+		}
+		inline_script = {
+			script = jobs/inline_evolved_technician
+			regular_count = 3
+			regular_secondary_count = 3
+			hive_count = 3
+			hive_secondary_count = 3
+			machine_count = 3
+			machine_secondary_count = 3
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_tec_energrid
+			tier = 2
+		}
+
+		inline_script = { # tier 2 is inexpensive and provides automated production
+			script = buildings/inline_evolved_aibait
+			trigger = ""
+		}
+	}
+	building_tec_biohive_energrid_3 = {
+		base_buildtime = @b4_time
+		can_build = no
+		position_priority = 220		# Basic Production
+		icon = building_tec_energrid_3		#BIOHIVE ART PLACEHOLDER!!!!
+
+		category = resource
+		
+		prerequisites = {
+			"tech_tec_energy_plant_3"
+		}
+
+		show_tech_unlock_if = {
+			tec_is_biohive = yes
+		}
+
+		potential = {
+			NOT = { has_modifier = resort_colony }
+			exists = owner
+			owner = {
+				tec_is_biohive = yes
+			}
+			tec_ai_destroy_energy_building = no
+		}
+
+		convert_to = {
+			building_tec_energrid_3
+			building_tec_biohive_energrid_3
+			#building_tec_lithohive_energrid_3
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 3
+			}
+
+			inline_script = {
+				script = buildings/resources/inline_evolved_exotic_resource_cost
+				exotic = nanites
+			}
+			inline_script = {
+				script = districts/resources/inline_evolved_tec_automation_energy
+				trigger = ""
+				base = 6
+			}
+		}
+
+		# overlord_resources = {
+		# 	category = planet_requisitioned_energy
+		# 	produces = {
+		# 		trigger = {
+		# 			planet = {
+		# 				has_planet_flag = has_energy_requisitorium
+		# 			}
+		# 		}
+		# 		energy = @requisitorium_energy_overlord
+		# 	}
+		# }
+
+		triggered_desc = {
+			text = tec_building_affect_production_menialbuilding
+		}
+
+		inline_script = {
+			script = jobs/inline_evolved_technician
+			regular_count = 4
+			regular_secondary_count = 4
+			hive_count = 4
+			hive_secondary_count = 4
+			machine_count = 4
+			machine_secondary_count = 4
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_tec_energrid
+			tier = 3
+		}
+	}
+ # /
+ # Lithohive
+	#building_tec_lithohive_energrid_1 = {
+	#building_tec_lithohive_energrid_2 = {
+	#building_tec_lithohive_energrid_3 = {
+ # /
 # /
 # ------------- MINERALS -----------------
+ # Regular
 	building_tec_stripmine_1 = {
 		base_buildtime = @b2_time
 		position_priority = 220		# Basic Production
@@ -1887,7 +2690,9 @@
 		}
 
 		convert_to = {
-			building_tec_biohive_mining_1
+			building_tec_stripmine_1
+			building_tec_biohive_stripmine_1
+			#building_tec_lithohive_stripmine_1
 		}
 
 		resources = {
@@ -1901,16 +2706,21 @@
 		inline_script = {
 			script = jobs/inline_evolved_miner
 			regular_count = 2
-			regular_aquatic_count = 2
+			regular_secondary_count = 2
 			hive_count = 2
-			hive_aquatic_count = 2
+			hive_secondary_count = 2
 			machine_count = 2
+			machine_secondary_count = 2
 			mult = 1
 			display = with_desc
 			trigger = ""
 		}
-	}
 
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_tec_energrid
+			tier = 1
+		}
+	}
 	building_tec_stripmine_2 = {
 		base_buildtime = @b3_time
 		can_build = no
@@ -1964,12 +2774,13 @@
 			owner = {
 				tec_is_biohive = no
 			}
-			
 			tec_ai_destroy_minerals_building = no
 		}
 
 		convert_to = {
-			building_tec_biohive_mining_2
+			building_tec_stripmine_2
+			building_tec_biohive_stripmine_2
+			#building_tec_lithohive_stripmine_2
 		}
 
 		resources = {
@@ -2006,13 +2817,19 @@
 		inline_script = {
 			script = jobs/inline_evolved_miner
 			regular_count = 3
-			regular_aquatic_count = 3
+			regular_secondary_count = 3
 			hive_count = 3
-			hive_aquatic_count = 3
+			hive_secondary_count = 3
 			machine_count = 3
+			machine_secondary_count = 3
 			mult = 1
 			display = with_desc
 			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_tec_energrid
+			tier = 2
 		}
 
 		inline_script = { # tier 2 is inexpensive and provides automated production
@@ -2020,7 +2837,6 @@
 			trigger = ""
 		}
 	}
-
 	building_tec_stripmine_3 = {
 		base_buildtime = @b4_time
 		can_build = no
@@ -2070,12 +2886,13 @@
 			owner = {
 				tec_is_biohive = no
 			}
-			
 			tec_ai_destroy_minerals_building = no
 		}
 
 		convert_to = {
-			building_tec_biohive_mining_3
+			building_tec_stripmine_3
+			building_tec_biohive_stripmine_3
+			#building_tec_lithohive_stripmine_3
 		}
 
 		resources = {
@@ -2116,25 +2933,33 @@
 		inline_script = {
 			script = jobs/inline_evolved_miner
 			regular_count = 4
-			regular_aquatic_count = 4
+			regular_secondary_count = 4
 			hive_count = 4
-			hive_aquatic_count = 4
+			hive_secondary_count = 4
 			machine_count = 4
+			machine_secondary_count = 4
 			mult = 1
 			display = with_desc
 			trigger = ""
 		}
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_tec_energrid
+			tier = 3
+		}
 	}
-# /
-	building_tec_biohive_mining_1 = {
+ # /
+ # Biohive
+	building_tec_biohive_stripmine_1 = {
 		base_buildtime = @b2_time
 		position_priority = 220		# Basic Production
 		base_cap_amount = 5
+		icon = building_tec_stripmine_1		#BIOHIVE ART PLACEHOLDER!!!!
 
 		category = resource
 		
 		desc = {
-			text = building_tec_biohive_mining_1_desc
+			text = building_tec_biohive_stripmine_1_desc
 			trigger = {
 				NOR = {
 					uses_habitat_capitals = yes
@@ -2144,7 +2969,7 @@
 			}
 		}
 		desc = {
-			text = building_tec_biohive_mining_1_hab_desc
+			text = building_tec_biohive_stripmine_1_desc_hab
 			trigger = {
 				OR = {
 					uses_habitat_capitals = yes
@@ -2163,7 +2988,7 @@
 		}
 
 		upgrades = {
-			building_tec_biohive_mining_2
+			building_tec_biohive_stripmine_2
 		}
 
 		potential = {
@@ -2179,7 +3004,6 @@
 			owner = {
 				tec_is_biohive = yes
 			}
-			
 			tec_ai_destroy_minerals_building = no
 		}
 
@@ -2189,179 +3013,46 @@
 
 		convert_to = {
 			building_tec_stripmine_1
+			building_tec_biohive_stripmine_1
+			#building_tec_lithohive_stripmine_1
 		}
 
 		resources = {
 			category = planet_buildings
-			cost = {
-				food = @b1_half_minerals
-				minerals = @b1_half_minerals
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 1
 			}
-			upkeep = {
-				energy = @b1_upkeep
-			}
-			cost = {
-				trigger = {
-					owner = { tec_is_bioarch_empire = yes }
-				}
-				minerals = @b1_minus_minerals
-				food = @b1_half_minerals
-			}
-
-			#Energy
-				produces = {
-					energy = 5
-				}
-
-				produces = {
-					trigger = {
-						owner = {
-							has_technology = tech_power_plant_2
-						}
-					}
-					energy = 1
-				}
-				produces = {
-					trigger = {
-						owner = {
-							has_technology = tech_power_plant_3
-						}
-					}
-					energy = 1
-				}
-				produces = {
-					trigger = {
-						owner = {
-							has_technology = tech_power_plant_4
-						}
-					}
-					energy = 1
-				}
-			# /
-			
-			# Minerals
-				produces = {
-					minerals = 5
-				}
-
-				produces = {
-					trigger = {
-						owner = {
-							has_technology = tech_mining_1
-						}
-					}
-					minerals = 1
-				}
-				produces = {
-					trigger = {
-						owner = {
-							has_technology = tech_mining_2
-						}
-					}
-					minerals = 1
-				}
-				produces = {
-					trigger = {
-						owner = {
-							has_technology = tech_mining_3
-						}
-					}
-					minerals = 1
-				}
-			# /
 		}
 
-		triggered_planet_modifier = {	# Gestalt
-			potential = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
-				}
-				planet = {
-					has_mining_designation = no
-					has_generator_designation = no
-				}
-			}
-			modifier = {
-				job_mining_drone_add = 1
-				job_technician_drone_add = 1
-			}
+		inline_script = {
+			script = jobs/inline_evolved_miner
+			regular_count = 2
+			regular_secondary_count = 2
+			hive_count = 2
+			hive_secondary_count = 2
+			machine_count = 2
+			machine_secondary_count = 2
+			mult = 1
+			display = with_desc
+			trigger = ""
 		}
-		triggered_planet_modifier = {	# Gestalt
-			potential = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
-				}
-				planet = {
-					has_mining_designation = yes
-				}
-			}
-			modifier = {
-				job_mining_drone_add = 2
-			}
-		}
-		triggered_planet_modifier = {	# Gestalt
-			potential = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
-				}
-				planet = {
-					has_generator_designation = yes
-				}
-			}
-			modifier = {
-				job_technician_drone_add = 2
-			}
-		}
-		triggered_desc = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
-				}
-				planet = {
-					OR = {
-						AND = {
-							has_mining_designation = no
-							has_generator_designation = no
-						}
-						has_mining_designation = yes
-					}
-				}
-			}
-			text = job_mining_drone_effect_desc
-		}
-		triggered_desc = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
-				}
-				planet = {
-					OR = {
-						AND = {
-							has_mining_designation = no
-							has_generator_designation = no
-						}
-						has_generator_designation = yes
-					}
-				}
-			}
-			text = job_technician_drone_effect_desc
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_tec_energrid
+			tier = 1
 		}
 	}
-
-	building_tec_biohive_mining_2 = {
+	building_tec_biohive_stripmine_2 = {
 		base_buildtime = @b3_time
 		can_build = no
 		position_priority = 220		# Basic Production
+		icon = building_tec_stripmine_2		#BIOHIVE ART PLACEHOLDER!!!!
 
 		category = resource
 		
 		desc = {
-			text = building_tec_biohive_mining_2_desc
+			text = building_tec_biohive_stripmine_2_desc
 			trigger = {
 				NOR = {
 					uses_habitat_capitals = yes
@@ -2371,7 +3062,7 @@
 			}
 		}
 		desc = {
-			text = building_tec_biohive_mining_2_hab_desc
+			text = building_tec_biohive_stripmine_2_desc_hab
 			trigger = {
 				OR = {
 					uses_habitat_capitals = yes
@@ -2390,7 +3081,7 @@
 		}
 
 		upgrades = {
-			building_tec_biohive_mining_3
+			building_tec_biohive_stripmine_3
 		}
 
 		potential = {
@@ -2411,171 +3102,57 @@
 
 		convert_to = {
 			building_tec_stripmine_2
+			building_tec_biohive_stripmine_2
+			#building_tec_lithohive_stripmine_2
 		}
 
 		resources = {
 			category = planet_buildings
-			cost = {
-				food = @b2_half_minerals
-				minerals = @b2_half_minerals
-			}
-			upkeep = {
-				energy = @b2_upkeep
-			}
-			cost = {
-				trigger = {
-					owner = { tec_is_bioarch_empire = yes }
-				}
-				minerals = @b2_minus_minerals
-				food = @b2_half_minerals
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
 			}
 
-			#Energy
-				produces = {
-					energy = 10
-				}
-
-				produces = {
-					trigger = {
-						owner = {
-							has_technology = tech_power_plant_2
-						}
-					}
-					energy = 2
-				}
-				produces = {
-					trigger = {
-						owner = {
-							has_technology = tech_power_plant_3
-						}
-					}
-					energy = 2
-				}
-				produces = {
-					trigger = {
-						owner = {
-							has_technology = tech_power_plant_4
-						}
-					}
-					energy = 2
-				}
-			# /
-			
-			# Minerals
-				produces = {
-					minerals = 10
-				}
-
-				produces = {
-					trigger = {
-						owner = {
-							has_technology = tech_mining_1
-						}
-					}
-					minerals = 2
-				}
-				produces = {
-					trigger = {
-						owner = {
-							has_technology = tech_mining_2
-						}
-					}
-					minerals = 2
-				}
-				produces = {
-					trigger = {
-						owner = {
-							has_technology = tech_mining_3
-						}
-					}
-					minerals = 2
-				}
-			# /
+			inline_script = {
+				script = districts/resources/inline_evolved_tec_automation_minerals
+				trigger = ""
+				base = 2
+			}
 		}
+
+		# overlord_resources = {
+		# 	category = planet_requisitioned_minerals
+		# 	produces = {
+		# 		trigger = {
+		# 			planet = {
+		# 				has_planet_flag = has_material_requisitorium
+		# 			}
+		# 		}
+		# 		minerals = @requisitorium_minerals_overlord
+		# 	}
+		# }
+		
 
 		triggered_desc = {
 			text = tec_building_affect_production_menialbuilding
 		}
 
-		triggered_planet_modifier = {	# Gestalt
-			potential = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
-				}
-				planet = {
-					has_mining_designation = no
-					has_generator_designation = no
-				}
-			}
-			modifier = {
-				job_mining_drone_add = 2
-				job_technician_drone_add = 2
-			}
+		inline_script = {
+			script = jobs/inline_evolved_miner
+			regular_count = 3
+			regular_secondary_count = 3
+			hive_count = 3
+			hive_secondary_count = 3
+			machine_count = 3
+			machine_secondary_count = 3
+			mult = 1
+			display = with_desc
+			trigger = ""
 		}
-		triggered_planet_modifier = {	# Gestalt
-			potential = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
-				}
-				planet = {
-					has_mining_designation = yes
-				}
-			}
-			modifier = {
-				job_mining_drone_add = 4
-			}
-		}
-		triggered_planet_modifier = {	# Gestalt
-			potential = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
-				}
-				planet = {
-					has_generator_designation = yes
-				}
-			}
-			modifier = {
-				job_technician_drone_add = 4
-			}
-		}
-		triggered_desc = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
-				}
-				planet = {
-					OR = {
-						AND = {
-							has_mining_designation = no
-							has_generator_designation = no
-						}
-						has_mining_designation = yes
-					}
-				}
-			}
-			text = job_mining_drone_effect_desc
-		}
-		triggered_desc = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
-				}
-				planet = {
-					OR = {
-						AND = {
-							has_mining_designation = no
-							has_generator_designation = no
-						}
-						has_generator_designation = yes
-					}
-				}
-			}
-			text = job_technician_drone_effect_desc
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_tec_energrid
+			tier = 2
 		}
 
 		inline_script = { # tier 2 is inexpensive and provides automated production
@@ -2583,16 +3160,16 @@
 			trigger = ""
 		}
 	}
-
-	building_tec_biohive_mining_3 = {
+	building_tec_biohive_stripmine_3 = {
 		base_buildtime = @b4_time
 		can_build = no
 		position_priority = 220		# Basic Production
+		icon = building_tec_stripmine_3		#BIOHIVE ART PLACEHOLDER!!!!
 
 		category = resource
 		
 		desc = {
-			text = building_tec_biohive_mining_3_desc
+			text = building_tec_biohive_stripmine_3_desc
 			trigger = {
 				NOR = {
 					uses_habitat_capitals = yes
@@ -2602,7 +3179,7 @@
 			}
 		}
 		desc = {
-			text = building_tec_biohive_mining_3_hab_desc
+			text = building_tec_biohive_stripmine_3_desc_hab
 			trigger = {
 				OR = {
 					uses_habitat_capitals = yes
@@ -2638,178 +3215,69 @@
 
 		convert_to = {
 			building_tec_stripmine_3
+			building_tec_biohive_stripmine_3
+			#building_tec_lithohive_stripmine_3
 		}
 
 		resources = {
 			category = planet_buildings
-			cost = {
-				food = @b3_half_minerals
-				minerals = @b3_half_minerals
-				#rare_crystals = @b2_rare_cost
-				nanites = 25
-			}
-			upkeep = {
-				energy = @b3_upkeep
-				#rare_crystals = @b2_rare_upkeep
-				nanites = 1
-			}
-			cost = {
-				trigger = {
-					owner = { tec_is_bioarch_empire = yes }
-				}
-				minerals = @b3_minus_minerals
-				food = @b3_half_minerals
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 3
 			}
 
-			#Energy
-				produces = {
-					energy = 15
-				}
-
-				produces = {
-					trigger = {
-						owner = {
-							has_technology = tech_power_plant_2
-						}
-					}
-					energy = 5
-				}
-				produces = {
-					trigger = {
-						owner = {
-							has_technology = tech_power_plant_3
-						}
-					}
-					energy = 5
-				}
-				produces = {
-					trigger = {
-						owner = {
-							has_technology = tech_power_plant_4
-						}
-					}
-					energy = 5
-				}
-			# /
+			inline_script = {
+				script = buildings/resources/inline_evolved_exotic_resource_cost
+				exotic = nanites
+			}
 			
-			# Minerals
-				produces = {
-					minerals = 15
-				}
-
-				produces = {
-					trigger = {
-						owner = {
-							has_technology = tech_mining_1
-						}
-					}
-					minerals = 5
-				}
-				produces = {
-					trigger = {
-						owner = {
-							has_technology = tech_mining_2
-						}
-					}
-					minerals = 5
-				}
-				produces = {
-					trigger = {
-						owner = {
-							has_technology = tech_mining_3
-						}
-					}
-					minerals = 5
-				}
-			# /
+			inline_script = {
+				script = districts/resources/inline_evolved_tec_automation_minerals
+				trigger = ""
+				base = 4
+			}
 		}
+
+		# overlord_resources = {
+		# 	category = planet_requisitioned_minerals
+		# 	produces = {
+		# 		trigger = {
+		# 			planet = {
+		# 				has_planet_flag = has_material_requisitorium
+		# 			}
+		# 		}
+		# 		minerals = @requisitorium_minerals_overlord
+		# 	}
+		# }
 
 		triggered_desc = {
 			text = tec_building_affect_production_menialbuilding
 		}
 
-		triggered_planet_modifier = {	# Gestalt
-			potential = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
-				}
-				planet = {
-					has_mining_designation = no
-					has_generator_designation = no
-				}
-			}
-			modifier = {
-				job_mining_drone_add = 3
-				job_technician_drone_add = 3
-			}
-		}
-		triggered_planet_modifier = {	# Gestalt
-			potential = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
-				}
-				planet = {
-					has_mining_designation = yes
-				}
-			}
-			modifier = {
-				job_mining_drone_add = 6
-			}
-		}
-		triggered_planet_modifier = {	# Gestalt
-			potential = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
-				}
-				planet = {
-					has_generator_designation = yes
-				}
-			}
-			modifier = {
-				job_technician_drone_add = 6
-			}
-		}
-		triggered_desc = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
-				}
-				planet = {
-					OR = {
-						AND = {
-							has_mining_designation = no
-							has_generator_designation = no
-						}
-						has_mining_designation = yes
-					}
-				}
-			}
-			text = job_mining_drone_effect_desc
-		}
-		triggered_desc = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
-				}
-				planet = {
-					OR = {
-						AND = {
-							has_mining_designation = no
-							has_generator_designation = no
-						}
-						has_generator_designation = yes
-					}
-				}
-			}
-			text = job_technician_drone_effect_desc
+		inline_script = {
+			script = jobs/inline_evolved_miner
+			regular_count = 4
+			regular_secondary_count = 4
+			hive_count = 4
+			hive_secondary_count = 4
+			machine_count = 4
+			machine_secondary_count = 4
+			mult = 1
+			display = with_desc
+			trigger = ""
 		}
 
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_tec_energrid
+			tier = 3
+		}
 	}
+ # /
+ # Lithohive
+	#building_tec_lithohive_stripmine_1 = {
+	#building_tec_lithohive_stripmine_2 = {
+	#building_tec_lithohive_stripmine_3 = {
+ # /
 # /
 # ------------- FOOD -----------------
  # Regular
@@ -2857,7 +3325,9 @@
 		}
 
 		convert_to = {
-			building_tec_biomass_farm_1
+			building_hydroponics_farm
+			building_tec_biohive_hydroponics_farm_1
+			#building_tec_lithohive_hydroponics_farm_1
 		}
 
 		resources = {
@@ -2873,7 +3343,7 @@
 				potential = {
 					tec_is_habitat = yes
 				}
-				district_tec_hab_food_max = 1
+				district_tec_hab_food_max = 2
 			}
 		# /
 
@@ -2881,17 +3351,22 @@
 			inline_script = {
 				script = jobs/inline_evolved_farmer
 				regular_count = 2
-				regular_aquatic_count = 2
+				regular_secondary_count = 2
 				hive_count = 2
-				hive_aquatic_count = 2
+				hive_secondary_count = 2
 				machine_count = 2
+				machine_secondary_count = 2
 				mult = 1
 				display = with_desc
 				trigger = ""
 			}
 		# /
-	}
 
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_hydroponics_farm
+			tier = 1
+		}
+	}
 	building_hydroponics_farm_2 = {
 		base_buildtime = @b3_time
 		can_build = no
@@ -2932,9 +3407,10 @@
 		}
 
 		convert_to = {
-			building_tec_biomass_farm_2
+			building_hydroponics_farm_2
+			building_tec_biohive_hydroponics_farm_2
+			#building_tec_lithohive_hydroponics_farm_2
 		}
-
 
 		resources = {
 			category = planet_buildings
@@ -2972,29 +3448,34 @@
 				potential = {
 					tec_is_habitat = yes
 				}
-				district_tec_hab_food_max = 2
+				district_tec_hab_food_max = 3
 			}
 		# /
 		# Jobs
 			inline_script = {
 				script = jobs/inline_evolved_farmer
 				regular_count = 3
-				regular_aquatic_count = 3
+				regular_secondary_count = 3
 				hive_count = 3
-				hive_aquatic_count = 3
+				hive_secondary_count = 3
 				machine_count = 3
+				machine_secondary_count = 3
 				mult = 1
 				display = with_desc
 				trigger = ""
 			}
 		# /
 
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_hydroponics_farm
+			tier = 2
+		}
+
 		inline_script = { # tier 2 is inexpensive and provides automated production
 			script = buildings/inline_evolved_aibait
 			trigger = ""
 		}
 	}
-
 	building_hydroponics_farm_3 = {
 		base_buildtime = @b4_time
 		can_build = no
@@ -3031,7 +3512,9 @@
 		}
 
 		convert_to = {
-			building_tec_biomass_farm_3
+			building_hydroponics_farm_3
+			building_tec_biohive_hydroponics_farm_3
+			#building_tec_lithohive_hydroponics_farm_3
 		}
 
 		resources = {
@@ -3074,29 +3557,36 @@
 				potential = {
 					tec_is_habitat = yes
 				}
-				district_tec_hab_food_max = 3
+				district_tec_hab_food_max = 4
 			}
 		# /
 		# Jobs
 			inline_script = {
 				script = jobs/inline_evolved_farmer
 				regular_count = 4
-				regular_aquatic_count = 4
+				regular_secondary_count = 4
 				hive_count = 4
-				hive_aquatic_count = 4
+				hive_secondary_count = 4
 				machine_count = 4
+				machine_secondary_count = 4
 				mult = 1
 				display = with_desc
 				trigger = ""
 			}
 		# /
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_hydroponics_farm
+			tier = 3
+		}
 	}
  # /
  # Biohive
-	building_tec_biomass_farm_1 = {
+	building_tec_biohive_hydroponics_farm_1 = {
 		base_buildtime = @b1_time
 		position_priority = 220		# Basic Production
 		base_cap_amount = 5
+		icon = building_hydroponics_farm		#BIOHIVE ART PLACEHOLDER!!!!
 
 		category = resource
 		
@@ -3109,7 +3599,7 @@
 		}
 
 		upgrades = {
-			building_hydroponics_farm_2
+			building_tec_biohive_hydroponics_farm_2
 		}
 
 		potential = {
@@ -3117,57 +3607,73 @@
 			owner = {
 				tec_is_biohive = yes
 			}
+			if = {
+				limit = {
+					owner = {
+						is_ai = yes
+					}
+				}
+				owner = {
+					country_uses_food = yes
+				}
+			}
 			NOT = { uses_district_set = machine_world }
+			NOT = { has_modifier = resort_colony }
+			tec_ai_destroy_food_building = no
+		}
+		
+		allow = {
+			tec_ai_allow_food_building = yes
 		}
 
 		convert_to = {
-			building_tec_biomass_farm_1
+			building_hydroponics_farm
+			building_tec_biohive_hydroponics_farm_1
+			#building_tec_lithohive_hydroponics_farm_1
 		}
 
 		resources = {
 			category = planet_buildings
-			cost = {
-				food = @b1_half_minerals
-				minerals = @b1_half_minerals
-			}
-			upkeep = {
-				energy = @b1_upkeep 
-			}
-			cost = {
-				trigger = {
-					owner = { tec_is_bioarch_empire = yes }
-				}
-				minerals = @b1_minus_minerals
-				food = @b1_half_minerals
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 1
 			}
 		}
 
-		triggered_planet_modifier = {
-			potential = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
+		# Modifiers
+			triggered_planet_modifier = {
+				potential = {
+					tec_is_habitat = yes
 				}
+				district_tec_hab_food_max = 2
 			}
-			modifier = {
-				job_tec_biomass_drone_add = @b1_jobs
+		# /
+
+		# Jobs
+			inline_script = {
+				script = jobs/inline_evolved_farmer
+				regular_count = 2
+				regular_secondary_count = 2
+				hive_count = 2
+				hive_secondary_count = 2
+				machine_count = 2
+				machine_secondary_count = 2
+				mult = 1
+				display = with_desc
+				trigger = ""
 			}
-		}
-		triggered_desc = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
-				}
-			}
-			text = job_tec_biomass_drone_effect_desc
+		# /
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_hydroponics_farm
+			tier = 1
 		}
 	}
-
-	building_tec_biomass_farm_2 = {
+	building_tec_biohive_hydroponics_farm_2 = {
 		base_buildtime = @b3_time
 		can_build = no
 		position_priority = 220		# Basic Production
+		icon = building_hydroponics_farm_2		#BIOHIVE ART PLACEHOLDER!!!!
 
 		category = resource
 
@@ -3180,7 +3686,7 @@
 		}
 		
 		upgrades = {
-			building_hydroponics_farm_3
+			building_tec_biohive_hydroponics_farm_3
 		}
 
 		potential = {
@@ -3188,118 +3694,84 @@
 			owner = {
 				tec_is_biohive = yes
 			}
+			if = {
+				limit = {
+					owner = {
+						is_ai = yes
+					}
+				}
+				owner = {
+					country_uses_food = yes
+				}
+			}
 			NOT = { uses_district_set = machine_world }
+			NOT = { has_modifier = resort_colony }
+			tec_ai_destroy_food_building = no
 		}
 
 		convert_to = {
-			building_tec_biomass_farm_2
+			building_hydroponics_farm_2
+			building_tec_biohive_hydroponics_farm_2
+			#building_tec_lithohive_hydroponics_farm_2
 		}
-
 
 		resources = {
 			category = planet_buildings
-			cost = {
-				food = @b2_half_minerals
-				minerals = @b2_half_minerals
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
 			}
-			upkeep = {
-				energy = @b2_upkeep 
-			}
-			cost = {
-				trigger = {
-					owner = { tec_is_bioarch_empire = yes }
-				}
-				minerals = @b2_minus_minerals
-				food = @b2_half_minerals
-			}
-
-			# New production
-			produces = {
-				food = 5
-			}
-
-			produces = {
-				trigger = {
-					planet = {
-						has_active_building = building_food_processing_facility
-					}
-				}
-				food = 1
-			}
-			produces = {
-				trigger = {
-					planet = {
-						has_active_building = building_food_processing_center
-					}
-				}
-				food = 2
-			}
-			produces = {
-				trigger = {
-					planet = {
-						has_active_building = building_food_processing_complex
-					}
-				}
-				food = 3
-			}
-
-			produces = {
-				trigger = {
-					owner = {
-						has_technology = tech_eco_simulation
-					}
-				}
-				food = 1
-			}
-			produces = {
-				trigger = {
-					owner = {
-						has_technology = tech_gene_crops
-					}
-				}
-				food = 1
-			}
-			produces = {
-				trigger = {
-					owner = {
-						has_technology = tech_nano_vitality_crops
-					}
-				}
-				food = 1
-			}
-			produces = {
-				trigger = {
-					owner = {
-						has_technology = tech_nutrient_replication
-					}
-				}
-				food = 1
+			
+			inline_script = {
+				script = districts/resources/inline_evolved_tec_automation_food
+				trigger = ""
+				base = 3
 			}
 		}
+
+		# overlord_resources = {
+		# 	category = planet_requisitioned_food
+		# 	produces = {
+		# 		trigger = {
+		# 			planet = {
+		# 				has_planet_flag = has_produce_requisitorium
+		# 			}
+		# 		}
+		# 		food = @requisitorium_food_overlord
+		# 	}
+		# }
+
 
 		triggered_desc = {
 			text = tec_building_affect_production_menialbuilding
 		}
-		
-		triggered_planet_modifier = {	# Gestalt
-			potential = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
+
+		# Modifiers
+			triggered_planet_modifier = {
+				potential = {
+					tec_is_habitat = yes
 				}
+				district_tec_hab_food_max = 3
 			}
-			modifier = {
-				job_tec_biomass_drone_add = 3
+		# /
+		# Jobs
+			inline_script = {
+				script = jobs/inline_evolved_farmer
+				regular_count = 3
+				regular_secondary_count = 3
+				hive_count = 3
+				hive_secondary_count = 3
+				machine_count = 3
+				machine_secondary_count = 3
+				mult = 1
+				display = with_desc
+				trigger = ""
 			}
-		}
-		triggered_desc = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
-				}
-			}
-			text = job_tec_biomass_drone_effect_desc
+		# /
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_hydroponics_farm
+			tier = 2
 		}
 
 		inline_script = { # tier 2 is inexpensive and provides automated production
@@ -3307,11 +3779,11 @@
 			trigger = ""
 		}
 	}
-
-	building_tec_biomass_farm_3 = {
+	building_tec_biohive_hydroponics_farm_3 = {
 		base_buildtime = @b4_time
 		can_build = no
 		position_priority = 220		# Basic Production
+		icon = building_hydroponics_farm_3		#BIOHIVE ART PLACEHOLDER!!!!
 
 		category = resource
 
@@ -3328,135 +3800,100 @@
 			owner = {
 				tec_is_biohive = yes
 			}
+			if = {
+				limit = {
+					owner = {
+						is_ai = yes
+					}
+				}
+				owner = {
+					country_uses_food = yes
+				}
+			}
 			NOT = { uses_district_set = machine_world }
+			NOT = { has_modifier = resort_colony }
+			tec_ai_destroy_food_building = no
 		}
 
 		convert_to = {
-			building_tec_biomass_farm_3
+			building_hydroponics_farm_3
+			building_tec_biohive_hydroponics_farm_3
+			#building_tec_lithohive_hydroponics_farm_3
 		}
 
 		resources = {
 			category = planet_buildings
-			cost = {
-				food = @b3_half_minerals
-				minerals = @b3_half_minerals
-				#volatile_motes = @b2_rare_cost
-				nanites = 25
-			}
-			upkeep = {
-				energy = @b3_upkeep
-				#volatile_motes = @b2_rare_upkeep
-				nanites = 1
-			}
-			cost = {
-				trigger = {
-					owner = { tec_is_bioarch_empire = yes }
-				}
-				minerals = @b3_minus_minerals
-				food = @b3_half_minerals
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 3
 			}
 
-			# New production
-			produces = {
-				food = 20
+			inline_script = {
+				script = buildings/resources/inline_evolved_exotic_resource_cost
+				exotic = nanites
 			}
-
-			produces = {
-				trigger = {
-					planet = {
-						has_active_building = building_food_processing_facility
-					}
-				}
-				food = 1
-			}
-			produces = {
-				trigger = {
-					planet = {
-						has_active_building = building_food_processing_center
-					}
-				}
-				food = 2
-			}
-			produces = {
-				trigger = {
-					planet = {
-						has_active_building = building_food_processing_complex
-					}
-				}
-				food = 3
-			}
-
-			produces = {
-				trigger = {
-					owner = {
-						has_technology = tech_eco_simulation
-					}
-				}
-				food = 2
-			}
-			produces = {
-				trigger = {
-					owner = {
-						has_technology = tech_gene_crops
-					}
-				}
-				food = 2
-			}
-			produces = {
-				trigger = {
-					owner = {
-						has_technology = tech_nano_vitality_crops
-					}
-				}
-				food = 2
-			}
-			produces = {
-				trigger = {
-					owner = {
-						has_technology = tech_nutrient_replication
-					}
-				}
-				food = 1
+			
+			inline_script = {
+				script = districts/resources/inline_evolved_tec_automation_food
+				trigger = ""
+				base = 6
 			}
 		}
+
+		# overlord_resources = {
+		# 	category = planet_requisitioned_food
+		# 	produces = {
+		# 		trigger = {
+		# 			planet = {
+		# 				has_planet_flag = has_produce_requisitorium
+		# 			}
+		# 		}
+		# 		food = @requisitorium_food_overlord
+		# 	}
+		# }
 
 		triggered_desc = {
 			text = tec_building_affect_production_menialbuilding
 		}
-		
-		triggered_planet_modifier = {	# Gestalt
-			potential = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
+
+		# Modifiers
+			triggered_planet_modifier = {
+				potential = {
+					tec_is_habitat = yes
 				}
+				district_tec_hab_food_max = 4
 			}
-			modifier = {
-				job_tec_biomass_drone_add = 4
+		# /
+		# Jobs
+			inline_script = {
+				script = jobs/inline_evolved_farmer
+				regular_count = 4
+				regular_secondary_count = 4
+				hive_count = 4
+				hive_secondary_count = 4
+				machine_count = 4
+				machine_secondary_count = 4
+				mult = 1
+				display = with_desc
+				trigger = ""
 			}
-		}
-		triggered_desc = {	# Gestalt
-			trigger = {
-				exists = owner
-				owner = {
-					is_gestalt = yes
-				}
-			}
-			text = job_tec_biomass_drone_effect_desc
+		# /
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_hydroponics_farm
+			tier = 3
 		}
 	}
  # /
-	## /
-	## MISC
-	## -AND = {
-	#				is_planet_class = pc_habitat
-	#				check_modifier_value = {
-	#					modifier = district_hab_mining_max
-	#					value > 0
-	#				}
-	#			}
+ # Lithohive
+	#building_tec_lithohive_hydroponics_farm = {
+	#building_tec_lithohive_hydroponics_farm_2 = {
+	#building_tec_lithohive_hydroponics_farm_3 = {
+ # /
+# /
 			
 # ------------- STORAGE -----------------
+ # Regular
 	building_resource_silo = {
 		base_buildtime = @b1_time
 		position_priority = 400		# Other/Misc
@@ -3467,7 +3904,19 @@
 			"tech_basic_industry"
 		}
 
+		show_tech_unlock_if = {
+			tec_is_biohive = no
+		}
+
+		upgrades = {
+			building_tec_resource_silo_2
+		}
+
 		potential = {
+			exists = owner
+			owner = {
+				tec_is_biohive = no
+			}
 			NOR = {
 				has_modifier = resort_colony
 				has_modifier = slave_colony
@@ -3479,8 +3928,10 @@
 			tec_ai_allow_silo_building = yes
 		}
 
-		upgrades = {
-			building_tec_resource_silo_2
+		convert_to = {
+			building_resource_silo
+			building_tec_biohive_resource_silo_1
+			#building_tec_lithohive_resource_silo_1
 		}
 
 		resources = {
@@ -3522,11 +3973,10 @@
 		}
 
 		inline_script = {
-			script = buildings/effects/inline_evolved_tec_hoarder
-			count = 1
+			script = buildings/effects/type/inline_evolved_resource_silo
+			tier = 1
 		}
 	}
-
 	building_tec_resource_silo_2 = {
 		base_buildtime = @b2_time
 		can_build = no
@@ -3538,7 +3988,19 @@
 			"tech_housing_1"
 		}
 
+		show_tech_unlock_if = {
+			tec_is_biohive = no
+		}
+
+		upgrades = {
+			building_tec_resource_silo_3
+		}
+
 		potential = {
+			exists = owner
+			owner = {
+				tec_is_biohive = no
+			}
 			NOR = {
 				has_modifier = resort_colony
 				has_modifier = slave_colony
@@ -3546,8 +4008,10 @@
 			}
 		}
 
-		upgrades = {
-			building_tec_resource_silo_3
+		convert_to = {
+			building_tec_resource_silo_2
+			building_tec_biohive_resource_silo_2
+			#building_tec_lithohive_resource_silo_2
 		}
 
 		resources = {
@@ -3589,12 +4053,10 @@
 		}
 
 		inline_script = {
-			script = buildings/effects/inline_evolved_tec_hoarder
-			count = 1
+			script = buildings/effects/type/inline_evolved_resource_silo
+			tier = 2
 		}
-
 	}
-
 	building_tec_resource_silo_3 = {
 		base_buildtime = @b3_time
 		can_build = no
@@ -3606,12 +4068,26 @@
 			"tech_housing_2"
 		}
 
+		show_tech_unlock_if = {
+			tec_is_biohive = no
+		}
+
 		potential = {
+			exists = owner
+			owner = {
+				tec_is_biohive = no
+			}
 			NOR = {
 				has_modifier = resort_colony
 				has_modifier = slave_colony
 				has_modifier = crucible_colony
 			}
+		}
+
+		convert_to = {
+			building_tec_resource_silo_3
+			building_tec_biohive_resource_silo_3
+			#building_tec_lithohive_resource_silo_3
 		}
 
 		resources = {
@@ -3653,22 +4129,272 @@
 		}
 
 		inline_script = {
-			script = buildings/effects/inline_evolved_tec_hoarder
-			count = 2
+			script = buildings/effects/type/inline_evolved_resource_silo
+			tier = 3
 		}
 	}
+ # /
+ # Biohive
+	building_tec_biohive_resource_silo_1 = {
+		base_buildtime = @b1_time
+		position_priority = 400		# Other/Misc
+		icon = building_resource_silo		#BIOHIVE ART PLACEHOLDER!!!!
+
+		category = resource
+
+		prerequisites = {
+			"tech_basic_industry"
+		}
+
+		show_tech_unlock_if = {
+			tec_is_biohive = yes
+		}
+
+		upgrades = {
+			building_tec_biohive_resource_silo_2
+		}
+
+		potential = {
+			exists = owner
+			owner = {
+				tec_is_biohive = yes
+			}
+			NOR = {
+				has_modifier = resort_colony
+				has_modifier = slave_colony
+				has_modifier = crucible_colony
+			}
+		}
+
+		allow = {
+			tec_ai_allow_silo_building = yes
+		}
+
+		convert_to = {
+			building_resource_silo
+			building_tec_biohive_resource_silo_1
+			#building_tec_lithohive_resource_silo_1
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 1
+			}
+		}
+
+		country_modifier = {
+			country_resource_max_add = 5000
+		}
+
+		triggered_country_modifier = {
+			potential = {
+				exists = owner
+				owner = {
+					has_technology = tech_construction_templates
+				}
+			}
+			country_resource_max_add = 5000
+		}
+
+		inline_script = {
+			script = jobs/inline_evolved_clerk
+			count = 1
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+
+		inline_script = {
+			script = jobs/inline_evolved_maintenance_drone
+			count = 1
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_resource_silo
+			tier = 1
+		}
+	}
+	building_tec_biohive_resource_silo_2 = {
+		base_buildtime = @b2_time
+		can_build = no
+		position_priority = 400		# Other/Misc
+		icon = building_tec_resource_silo_2		#BIOHIVE ART PLACEHOLDER!!!!
+
+		category = resource
+
+		prerequisites = {
+			"tech_housing_1"
+		}
+
+		show_tech_unlock_if = {
+			tec_is_biohive = yes
+		}
+
+		upgrades = {
+			building_tec_biohive_resource_silo_3
+		}
+
+		potential = {
+			exists = owner
+			owner = {
+				tec_is_biohive = yes
+			}
+			NOR = {
+				has_modifier = resort_colony
+				has_modifier = slave_colony
+				has_modifier = crucible_colony
+			}
+		}
+
+		convert_to = {
+			building_tec_resource_silo_2
+			building_tec_biohive_resource_silo_2
+			#building_tec_lithohive_resource_silo_2
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
+			}
+		}
+
+		country_modifier = {
+			country_resource_max_add = 10000
+		}
+
+		triggered_country_modifier = {
+			potential = {
+				exists = owner
+				owner = {
+					has_technology = tech_construction_templates
+				}
+			}
+			country_resource_max_add = 5000
+		}
+		
+		inline_script = {
+			script = jobs/inline_evolved_clerk
+			count = 2
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+
+		inline_script = {
+			script = jobs/inline_evolved_maintenance_drone
+			count = 2
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_resource_silo
+			tier = 2
+		}
+	}
+	building_tec_biohive_resource_silo_3 = {
+		base_buildtime = @b3_time
+		can_build = no
+		position_priority = 400		# Other/Misc
+		icon = building_tec_resource_silo_3		#BIOHIVE ART PLACEHOLDER!!!!
+
+		category = resource
+
+		prerequisites = {
+			"tech_housing_2"
+		}
+
+		show_tech_unlock_if = {
+			tec_is_biohive = yes
+		}
+
+		potential = {
+			exists = owner
+			owner = {
+				tec_is_biohive = yes
+			}
+			NOR = {
+				has_modifier = resort_colony
+				has_modifier = slave_colony
+				has_modifier = crucible_colony
+			}
+		}
+
+		convert_to = {
+			building_tec_resource_silo_3
+			building_tec_biohive_resource_silo_3
+			#building_tec_lithohive_resource_silo_3
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 3
+			}
+		}
+
+		country_modifier = {
+			country_resource_max_add = 15000
+		}
+
+		triggered_country_modifier = {
+			potential = {
+				exists = owner
+				owner = {
+					has_technology = tech_global_production_strategy
+				}
+			}
+			country_resource_max_add = 5000
+		}
+
+		inline_script = {
+			script = jobs/inline_evolved_clerk
+			count = 4
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+
+		inline_script = {
+			script = jobs/inline_evolved_maintenance_drone
+			count = 4
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+
+		inline_script = {
+			script = buildings/effects/type/inline_evolved_resource_silo
+			tier = 3
+		}
+	}
+ # /
+ # Lithohive
+	#building_tec_lithohive_resource_silo_1
+	#building_tec_lithohive_resource_silo_2
+	#building_tec_lithohive_resource_silo_3
+ # /
 # /
 # ------------- HOARDERS -----------------
-
-@tec_vault_scale = 0.001
-@tec_vault_advanced = 2
-@tec_vault_strategic = 4
+	@tec_vault_scale = 0.001
+	@tec_vault_advanced = 2
+	@tec_vault_strategic = 4
 
 	building_tec_vault_of_plenty = {
 		base_buildtime = @b3_time
 		position_priority = 30		# Other/Misc
 		ai_estimate_without_unemployment = yes
 
+		base_cap_amount = 1
 		empire_limit = 1
 
 		category = resource
@@ -3801,12 +4527,12 @@
 			"
 		}
 	}
-
 	building_tec_vault_of_acquisition = {
 		base_buildtime = @b3_time
 		position_priority = 30		# Other/Misc
 		ai_estimate_without_unemployment = yes
 
+		base_cap_amount = 1
 		empire_limit = 1
 
 		category = resource
@@ -3939,13 +4665,12 @@
 			"
 		}
 	}
-
-
 	building_tec_vault_of_unity = {
 		base_buildtime = @b3_time
 		position_priority = 30		# Other/Misc
 		ai_estimate_without_unemployment = yes
 
+		base_cap_amount = 1
 		empire_limit = 1
 
 		category = resource
@@ -4079,7 +4804,6 @@
 			"
 		}
 	}
-
 	building_tec_vault_of_wealth = {
 		base_buildtime = @b4_time
 		position_priority = 30		# Other/Misc
@@ -4087,7 +4811,6 @@
 		ai_estimate_without_unemployment = yes
 
 		category = resource
-
 		
 		prerequisites = {
 			"tech_galactic_markets"
@@ -4188,8 +4911,7 @@
 		}
 
 		inline_script = {
-			script = jobs/inline_evolved_job
-			job = merchant
+			script = jobs/inline_evolved_merchant
 			count = 1
 			mult = 1
 			display = with_desc
@@ -4264,7 +4986,176 @@
 # /
 # ------------- BIOREACTOR -----------------
 # - wip for the future - will be improved
+	building_bio_reactor = {
+		base_buildtime = @b1_time
+		base_cap_amount = 1
+		position_priority = 211		# Basic boost
+		ai_estimate_without_unemployment = yes
 
+		category = resource
+
+		prerequisites = {
+			"tech_bio_reactor"
+		}
+
+		upgrades = {
+			building_bio_reactor_2
+		}
+
+		potential = {
+			exists = owner
+			NOR = {
+				uses_district_set = machine_world
+				has_modifier = resort_colony
+				has_modifier = crucible_colony
+			}
+
+			OR = {
+				owner = {
+					is_ai = no
+				}
+				has_any_farming_district_or_buildings = yes
+			}
+		}
+
+		destroy_trigger = {
+			exists = owner
+			OR = {
+				owner = {
+					is_ai = yes
+					country_uses_food = no
+				}
+				uses_district_set = machine_world
+				has_modifier = resort_colony
+				has_modifier = crucible_colony
+				AND = {
+					owner = {
+						is_ai = yes
+					}
+					has_any_farming_district_or_buildings = no
+				}
+			}
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
+			}
+			upkeep = {
+				food = @b1_upkeep
+				energy = @b1_minus_upkeep
+			}
+		}
+		# Modifiers
+			planet_modifier = {
+				planet_farmers_food_produces_add = -2
+				planet_farmers_energy_produces_add = 2
+			}
+		# /
+
+		# Jobs
+			inline_script = {
+				script = jobs/inline_evolved_farmer
+				regular_count = 1
+				regular_secondary_count = 1
+				hive_count = 1
+				hive_secondary_count = 1
+				machine_count = 1
+				machine_secondary_count = 1
+				mult = 1
+				display = with_desc
+				trigger = ""
+			}
+		# /
+	}
+
+	building_bio_reactor_2 = {
+		base_buildtime = @b2_time
+		can_build = no
+		position_priority = 211		# Basic boost
+		ai_estimate_without_unemployment = yes
+
+		category = resource
+
+		prerequisites = {
+			tech_bio_reactor_2
+		}
+
+		potential = {
+			exists = owner
+			NOR = {
+				uses_district_set = machine_world
+				has_modifier = resort_colony
+				has_modifier = crucible_colony
+			}
+
+			OR = {
+				owner = {
+					is_ai = no
+				}
+				has_any_farming_district_or_buildings = yes
+			}
+		}
+
+		allow = {
+			has_upgraded_capital = yes
+		}
+
+		destroy_trigger = {
+			exists = owner
+			OR = {
+				owner = {
+					is_ai = yes
+					country_uses_food = no
+				}
+				uses_district_set = machine_world
+				has_modifier = resort_colony
+				has_modifier = crucible_colony
+				AND = {
+					owner = {
+						is_ai = yes
+					}
+					has_any_farming_district_or_buildings = no
+				}
+			}
+		}
+
+		resources = {
+			category = planet_buildings
+			inline_script = {
+				script = buildings/resources/inline_evolved_resource_cost
+				tier = 2
+			}
+			upkeep = {
+				food = @b2_upkeep
+				energy = @b2_minus_upkeep
+			}
+		}
+
+		# Modifiers
+			planet_modifier = {
+				planet_farmers_food_produces_add = -3
+				planet_farmers_energy_produces_add = 2
+				planet_farmers_exotic_gases_produces_add = 0.1
+			}
+		# /
+		# Jobs
+			inline_script = {
+				script = jobs/inline_evolved_farmer
+				regular_count = 2
+				regular_secondary_count = 2
+				hive_count = 2
+				hive_secondary_count = 2
+				machine_count = 2
+				machine_secondary_count = 2
+				mult = 1
+				display = with_desc
+				trigger = ""
+			}
+		# /
+	}
 # /
 # ------------- DESICCATOR -----------------
 	building_tec_machine_anglers_extractor = {
@@ -4314,11 +5205,6 @@
 				tier = 1
 			}
 
-			inline_script = {
-				script = buildings/resources/inline_evolved_machine_production_cost
-				tier = 1
-			}
-
 			produces = {
 				energy = 1
 				multiplier = value:tec_automated_production|BASE|4|ECO_CAT|planet_technician|RESOURCE|energy|REQUISITION|has_energy_requisitorium|REQUISITION_AMOUNT|@requisitorium_energy_reduction|
@@ -4344,23 +5230,26 @@
 		inline_script = {
 			script = jobs/inline_evolved_technician
 			regular_count = 1
+			regular_secondary_count = 1
 			hive_count = 1
+			hive_secondary_count = 1
 			machine_count = 1
-			machine_aquatic_count = 1
+			machine_secondary_count = 1
 			mult = 1
 			display = with_desc
 			trigger = ""
 		}
 
 		inline_script = {
-			script = jobs/inline_evolved_technician_swaps
+			script = jobs/inline_evolved_technician_secondary
+			regular_count = 1
+			hive_count = 1
 			machine_count = 1
 			mult = 1
 			display = with_desc
 			trigger = ""
 		}
 	}
-
 	building_tec_machine_anglers_extractor_on = {
 		base_buildtime = @b2_time
 		base_cap_amount = 5
@@ -4412,11 +5301,6 @@
 				tier = 1
 			}
 
-			inline_script = {
-				script = buildings/resources/inline_evolved_machine_production_cost
-				tier = 1
-			}
-
 			produces = {
 				energy = 1
 				multiplier = value:tec_automated_production|BASE|6|BASE_VALUE|tec_machine_angler_extractor_base_production|ECO_CAT|planet_technician|RESOURCE|energy|REQUISITION|has_energy_requisitorium|REQUISITION_AMOUNT|@requisitorium_energy_reduction|
@@ -4438,16 +5322,20 @@
 		inline_script = {
 			script = jobs/inline_evolved_technician
 			regular_count = 1
+			regular_secondary_count = 1
 			hive_count = 1
+			hive_secondary_count = 1
 			machine_count = 1
-			machine_aquatic_count = 1
+			machine_secondary_count = 1
 			mult = 1
 			display = with_desc
 			trigger = ""
 		}
 
 		inline_script = {
-			script = jobs/inline_evolved_technician_swaps
+			script = jobs/inline_evolved_technician_secondary
+			regular_count = 1
+			hive_count = 1
 			machine_count = 1
 			mult = 1
 			display = with_desc
@@ -4457,10 +5345,10 @@
 
 	building_tec_machine_anglers_nexus_A = {
 		base_buildtime = @b4_time
+		base_cap_amount = 1
 		empire_limit = {
 			base = 1
 		}
-		base_cap_amount = 1
 		position_priority = 30		# Unique
 		ai_estimate_without_unemployment = yes
 
@@ -4492,6 +5380,7 @@
 			inline_script = {
 				script = buildings/resources/inline_evolved_machine_production_cost
 				tier = 3
+				trigger = ""
 			}
 
 			produces = {
@@ -4515,16 +5404,20 @@
 		inline_script = {
 			script = jobs/inline_evolved_technician
 			regular_count = 2
+			regular_secondary_count = 2
 			hive_count = 2
+			hive_secondary_count = 2
 			machine_count = 2
-			machine_aquatic_count = 2
+			machine_secondary_count = 2
 			mult = 1
 			display = with_desc
 			trigger = ""
 		}
 
 		inline_script = {
-			script = jobs/inline_evolved_technician_swaps
+			script = jobs/inline_evolved_technician_secondary
+			regular_count = 1
+			hive_count = 1
 			machine_count = 1
 			mult = 1
 			display = with_desc
@@ -4579,18 +5472,11 @@
 		}
 
 		# Food plus
-			planet_modifier = {
-				planet_farmers_food_produces_add = 1
-			}
-			triggered_planet_modifier = {
-				potential = {
-					exists = owner
-					owner = {
-						is_machine_empire = no
-						allows_slavery = yes
-					}
-				}
-				planet_livestock_biological_food_produces_add = 1
+			inline_script = {
+				script = modifiers/inline_evolved_farmer_efficiency
+				count = 1
+				mult = 1
+				trigger = ""
 			}
 		# /
 
@@ -4635,10 +5521,11 @@
 		inline_script = {	# Jobs
 			script = jobs/inline_evolved_farmer
 			regular_count = 2
-			regular_aquatic_count = 2
+			regular_secondary_count = 2
 			hive_count = 2
-			hive_aquatic_count = 2
+			hive_secondary_count = 2
 			machine_count = 2
+			machine_secondary_count = 2
 			mult = 1
 			display = with_desc
 			trigger = ""

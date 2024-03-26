@@ -103,6 +103,7 @@ country_base = {
 }
 
 trade = {
+	parent = country
 	use_for_ai_budget = yes
 }
 
@@ -138,6 +139,14 @@ edicts = {
 		upkeep
 	}
 	modifier_category = country
+	add_unscaled_value_to_tooltip = yes
+	scaled_value_key = "ECONOMICS_SCALED_RESOURCES_EMPIRE_SIZE_STRING"
+}
+
+edicts_unscaled = {
+	use_for_ai_budget = yes
+	parent = edicts
+	add_unscaled_value_to_tooltip = no
 }
 
 rare_edicts = {
@@ -247,6 +256,15 @@ megastructures_habitat = {
 		cost
 		upkeep
 		produces
+	}
+	modifier_category = megastructure
+}
+
+megastructures_gateways = {
+	use_for_ai_budget = yes
+	parent = megastructures
+	generate_mult_modifiers = {
+		cost
 	}
 	modifier_category = megastructure
 }
@@ -435,20 +453,6 @@ ships = {
 	}
 
 	triggered_cost_modifier = {
-		key = ship_science
-		use_parent_icon = yes
-		modifier_types = {
-			mult
-			add
-		}
-
-		trigger = {
-			is_scope_valid = yes
-			is_ship_class = shipclass_science_ship
-		}
-	}
-
-	triggered_cost_modifier = {
 		key = ship_military
 		use_parent_icon = yes
 		modifier_types = {
@@ -479,34 +483,6 @@ ships = {
 				is_ship_class = shipclass_military
 				is_ship_class = shipclass_military_special
 			}
-		}
-	}
-
-	triggered_cost_modifier = {
-		key = ship_science
-		use_parent_icon = yes
-		modifier_types = {
-			add
-			mult
-		}
-
-		trigger = {
-			is_scope_valid = yes
-			is_ship_class = shipclass_science_ship
-		}
-	}
-	
-	triggered_upkeep_modifier = {
-		key = ship_science
-		use_parent_icon = yes
-		modifier_types = {
-			add
-			mult
-		}
-
-		trigger = {
-			is_scope_valid = yes
-			is_ship_class = shipclass_science_ship
 		}
 	}
 }
@@ -643,15 +619,71 @@ starbase_stations = {
 			mult
 			add
 		}
-
 		trigger = {
-			is_scope_valid = yes #When called from ship designer the design is not valid yet.
+			is_scope_valid = yes
+			# ^ When called from ship designer the design is not valid yet.
 			OR = {
 				is_ship_size = starbase_outpost
-				is_ship_size = orbital_ring_tier_1 #TODOJM: Remove?
+				is_ship_size = orbital_ring_tier_1
 			}
 		}
 	}
+
+	# Why i left this here? i dont know, it is just there, commented out, watching you from afar
+		#triggered_cost_modifier = {
+		#	key = starbase_starport
+		#	modifier_types = {
+		#		mult
+		#		add
+		#	}
+		#	trigger = {
+		#		is_scope_valid = yes #When called from ship designer the design is not valid yet.
+		#		OR = {
+		#			is_ship_size = starbase_starport
+		#			is_ship_size = orbital_ring_tier_2
+		#		}
+		#	}
+		#}
+
+		#triggered_cost_modifier = {
+		#	key = starbase_starhold
+		#	modifier_types = {
+		#		mult
+		#		add
+		#	}
+		#	trigger = {
+		#		is_scope_valid = yes #When called from ship designer the design is not valid yet.
+		#		OR = {
+		#			is_ship_size = starbase_starhold
+		#			is_ship_size = orbital_ring_tier_3
+		#		}
+		#	}
+		#}
+
+		#triggered_cost_modifier = {
+		#	key = starbase_starfortress
+		#	modifier_types = {
+		#		mult
+		#		add
+		#	}
+		#	trigger = {
+		#		is_scope_valid = yes #When called from ship designer the design is not valid yet.
+		#		is_ship_size = starbase_starfortress
+		#	}
+		#}
+
+		#triggered_cost_modifier = {
+		#	key = starbase_citadel
+		#	modifier_types = {
+		#		mult
+		#		add
+		#	}
+		#	trigger = {
+		#		is_scope_valid = yes #When called from ship designer the design is not valid yet.
+		#		is_ship_size = starbase_citadel
+		#	}
+		#}
+	# /
 }
 
 starbase_constructions = {
@@ -854,6 +886,7 @@ terraforming = {
 	generate_add_modifiers = {
 		cost
 	}
+
 	modifier_category = planet
 }
 
@@ -867,6 +900,7 @@ terraforming_ocean = {
 	generate_add_modifiers = {
 		cost
 	}
+
 	modifier_category = planet
 }
 
@@ -1380,6 +1414,14 @@ planet_jobs = {
 					has_job_category = tec_brood_drone
 				"
 			}
+
+			inline_script = {
+				script = economic_categories/inline_evolved_triggered_modifiers
+				key = planet_jobs_tec_free_agent
+				trigger = "
+					is_pop_category = tec_free_agent
+				"
+			}
 		# /
 	# /
 
@@ -1658,20 +1700,6 @@ planet_jobs = {
 	inline_script = economic_categories/inline_evolved_xvcv_pop_category_drones
 	inline_script = economic_categories/inline_evolved_pd_biosynths
 }
-
-planet_criminals = {
-	parent = planet_jobs
-	generate_mult_modifiers = {
-		produces
-		upkeep
-	}
-	generate_add_modifiers = {
-		produces
-		upkeep
-	}
-	modifier_category = pop
-}
-
 planet_jobs_productive = { #this should contain all categories that primarily produce resources (rather than e.g. amenities, trade, stability)
 	parent = planet_jobs
 	generate_mult_modifiers = {
@@ -1739,6 +1767,19 @@ planet_pop_assemblers = {
 		upkeep
 		cost
 	}
+}
+
+planet_criminals = {
+	parent = planet_jobs_productive
+	generate_mult_modifiers = {
+		produces
+		upkeep
+	}
+	generate_add_modifiers = {
+		produces
+		upkeep
+	}
+	modifier_category = pop
 }
 
 planet_farmers = {
@@ -1999,7 +2040,36 @@ planet_livestock = {
 		produces
 		upkeep
 	}
+	
+	# Inherited Modifiers
+	triggered_produces_modifier = {
+		key = planet_farmers
+		modifier_types = {
+			mult
+			add
+		}
+		trigger = {
+			has_job = livestock	# This check is done so that livestock working zoo jobs don't inherit the modifier
+			is_organic_species = yes
+			is_lithoid = no
+		}
+		use_parent_icon = yes
+	}
+	triggered_produces_modifier = {
+		key = planet_miners
+		modifier_types = {
+			mult
+			add
+		}
+		trigger = {
+			has_job = livestock	# This check is done so that livestock working zoo jobs don't inherit the modifier
+			is_organic_species = yes
+			is_lithoid = yes
+		}
+		use_parent_icon = yes
+	}
 
+	# Evolved
 	triggered_produces_modifier = {
 		key = planet_livestock_biological
 		modifier_types = {
@@ -2294,8 +2364,64 @@ planet_soldiers = {
 	modifier_category = pop
 }
 
+
 planet_squires = {
-	parent = planet_jobs
+	parent = planet_jobs_productive
+	generate_add_modifiers = {
+		produces
+	}
+}
+
+planet_knights = {
+	parent = planet_jobs_productive
+	modifier_category = pop
+	generate_mult_modifiers = {
+		produces
+	}
+	# Inherited Modifiers
+	triggered_produces_modifier = {
+		key = planet_researchers
+		modifier_types = {
+			mult
+			add
+		}
+		trigger = {
+			always = yes
+		}
+		use_parent_icon = yes
+	}
+	triggered_upkeep_modifier = {
+		key = planet_researchers
+		modifier_types = {
+			mult
+			add
+		}
+		trigger = {
+			always = yes
+		}
+		use_parent_icon = yes
+	}
+	triggered_produces_modifier = {
+		key = planet_administrators
+		modifier_types = {
+			mult
+			add
+		}
+		trigger = {
+			always = yes
+		}
+		use_parent_icon = yes
+	}
+	triggered_upkeep_modifier = {
+		key = planet_administrators
+		modifier_types = {
+			mult
+		}
+		trigger = {
+			always = yes
+		}
+		use_parent_icon = yes
+	}
 }
 
 # Evolved
@@ -2341,6 +2467,7 @@ planet_enforcers = {
 
 planet_clerks = {
 	parent = planet_jobs
+	modifier_category = pop
 	generate_mult_modifiers = {
 		produces
 		upkeep
@@ -2349,11 +2476,11 @@ planet_clerks = {
 		produces
 		upkeep
 	}
-	modifier_category = pop
 }
 
 planet_traders = {
 	parent = planet_jobs
+	modifier_category = pop
 	generate_mult_modifiers = {
 		produces
 		upkeep
@@ -2362,7 +2489,13 @@ planet_traders = {
 		produces
 		upkeep
 	}
-	modifier_category = pop
+	
+	# Subtypes
+		inline_script = {
+			script = economic_categories/inline_evolved_subtype_inheritance
+			subtype = planet_clerks
+		}
+	#
 }
 
 planet_telepaths = {
@@ -2486,14 +2619,6 @@ planet_bath_attendants_machine = {
 		upkeep
 	}
 	modifier_category = pop
-}
-
-#DO NOT ASSIGN A PARENT TO THIS.
-#It is a special hack. The normal job modifiers apply via knights_unity/research_output_modifier script values in the jobs
-knights_independent_category = {
-	generate_mult_modifiers = {
-		produces
-	}
 }
 
 # Evolved
@@ -2989,7 +3114,7 @@ leaders = {
 	parent = country
 }
 
-leader_admirals = {
+leader_commanders = {
 	parent = leaders
 	modifier_category = leader
 	generate_add_modifiers = {
@@ -3009,31 +3134,16 @@ leader_admirals = {
 
 	inline_script = {
 		script = economic_categories/inline_evolved_pse_leader_psionic
-		class = admirals
+		class = commanders
 	}
 }
 
+leader_admirals = {
+	parent = leader_commanders
+}
+
 leader_generals = {
-	parent = leaders
-	modifier_category = leader
-	generate_add_modifiers = {
-		cost
-		produces
-		upkeep
-	}
-	generate_mult_modifiers = {
-		cost
-		produces
-		upkeep
-	}
-	inline_script = economic_categories/inline_evolved_leaders
-
-	inline_script = economic_categories/inline_evolved_leaders_resources
-
-	inline_script = {
-		script = economic_categories/inline_evolved_pse_leader_psionic
-		class = generals
-	}
+	parent = leader_commanders
 }
 
 leader_scientists = {
@@ -3059,7 +3169,7 @@ leader_scientists = {
 	}
 }
 
-leader_governors = {
+leader_officials = {
 	parent = leaders
 	modifier_category = leader
 	generate_add_modifiers = {
@@ -3078,8 +3188,12 @@ leader_governors = {
 
 	inline_script = {
 		script = economic_categories/inline_evolved_pse_leader_psionic
-		class = governors
+		class = officials
 	}
+}
+
+leader_governors = {
+	parent = leader_officials
 }
 
 leader_envoys = {
@@ -3312,6 +3426,10 @@ pop_factions = {
 
 subjects = {
 	parent = diplomacy
+	generate_add_modifiers = {
+		produces
+	}
+	modifier_category = country
 }
 
 federation = {
@@ -3334,30 +3452,77 @@ rivalries = {
 
 non_aggression_pacts = {
 	parent = diplomacy
+	generate_mult_modifiers = {
+		produces
+		upkeep
+		cost
+	}
+
+	generate_add_modifiers = {
+		produces
+		upkeep
+		cost
+	}
 }
 
 migration_pacts = {
 	parent = diplomacy
+	generate_mult_modifiers = {
+		produces
+		upkeep
+		cost
+	}
+
+	generate_add_modifiers = {
+		produces
+		upkeep
+		cost
+	}
 }
 
 research_agreements = {
 	parent = diplomacy
 	generate_mult_modifiers = {
-		cost
 		produces
+		upkeep
+		cost
 	}
 
 	generate_add_modifiers = {
 		produces
+		upkeep
+		cost
 	}
 }
 
 commercial_pacts = {
 	parent = diplomacy
+	generate_mult_modifiers = {
+		produces
+		upkeep
+		cost
+	}
+
+	generate_add_modifiers = {
+		produces
+		upkeep
+		cost
+	}
 }
 
 defensive_pacts = {
 	parent = diplomacy
+	generate_mult_modifiers = {
+		produces
+		upkeep
+		cost
+	}
+
+	generate_add_modifiers = {
+		produces
+		upkeep
+		cost
+	}
 }
 
 guarantees = {

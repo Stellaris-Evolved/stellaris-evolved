@@ -1,52 +1,69 @@
+# common\script_values\zz_evolved_leader_script_values.txt
+
+tec_leader_upkeep = {
+	base = 1
+	modifier = {	# Halved for specific civics
+		# Modifier condition
+			#tec_leader_is_true_idle = no
+			OR = {
+				is_idle = no
+				AND = {
+					is_idle = yes
+					OR = {
+						is_councilor = yes
+						is_ruler = yes
+					}
+				}
+			}
+			# ^ This is used since leaders can be idle and in council 
+			exists = owner
+			switch = {
+				trigger = leader_class
+				official = {
+					owner = {
+						tec_reduces_upkeep_from_officials = yes
+					}
+				}
+				commander = {
+					owner = {
+						tec_reduces_upkeep_from_commanders = yes
+					}
+				}
+				scientist = {
+					owner = {
+						tec_reduces_upkeep_from_scientists = yes
+					}
+				}
+			}
+		# /
+		mult = 0.5
+	}
+	mult = trigger:has_skill
+}
+
 # Scope: leader
-tec_max_leader_skill = {	# Lets keep it existing just in case
+tec_max_leader_skill = {
 	base = @tec_base_max_leader_skill_defines
-	add = modifier:leader_skill_levels
+	add = modifier:leader_initial_skill
 	modifier = {
 		is_ruler = yes
 		add = modifier:ruler_skill_levels
 	}
-	
+
 	modifier = {
-		leader_class = admiral
-		add = modifier:admiral_skill_levels
+		leader_class = official
+		add = owner.modifier:official_initial_skill
 	}
 	modifier = {
-		leader_class = general
-		add = modifier:general_skill_levels
-	}
-	modifier = {
-		leader_class = governor
-		add = modifier:governor_skill_levels
+		leader_class = commander
+		add = owner.modifier:commander_initial_skill
 	}
 	modifier = {
 		leader_class = scientist
-		add = modifier:scientist_skill_levels
+		add = owner.modifier:scientist_initial_skill
 	}
 	
 	max = @tec_max_leader_skill_defines
-}
-
-# Scope: leader
-tec_leader_starting_skill_add = {
-	base = 0
-	add = modifier:tec_leader_starting_skill_add
-	modifier = {
-		leader_class = admiral
-		add = modifier:tec_admiral_starting_skill_add
-	}
-	modifier = {
-		leader_class = general
-		add = modifier:tec_general_starting_skill_add
-	}
-	modifier = {
-		leader_class = governor
-		add = modifier:tec_governor_starting_skill_add
-	}
-	modifier = {
-		leader_class = scientist
-		add = modifier:tec_scientist_starting_skill_add
-	}
 }
 
 # Scope: leader
@@ -54,20 +71,16 @@ tec_leader_starting_traits_add = {
 	base = 0
 	add = modifier:tec_leader_starting_traits_add
 	modifier = {
-		leader_class = admiral
-		add = modifier:tec_admiral_starting_traits_add
+		leader_class = official
+		add = modifier:tec_leader_official_starting_traits_add
 	}
 	modifier = {
-		leader_class = general
-		add = modifier:tec_general_starting_traits_add
+		leader_class = commander
+		add = modifier:tec_leader_commander_starting_traits_add
 	}
 	modifier = {
 		leader_class = scientist
-		add = modifier:tec_scientist_starting_traits_add
-	}
-	modifier = {
-		leader_class = governor
-		add = modifier:tec_governor_starting_traits_add
+		add = modifier:tec_leader_scientist_starting_traits_add
 	}
 }
 
@@ -75,18 +88,18 @@ tec_leader_starting_traits_add = {
 # Scope: leader
 tec_leader_experience_needed_for_level_up = {
 	base = 300
-	mult = value:_tec_leader_skill_adjusted
+	mult = value:tec_leader_skill_adjusted
 	# 300 * (level - 1) ^ 2 - the second (level - 1) is below
 
 	add = 100
-	mult = value:_tec_leader_skill_adjusted
+	mult = value:tec_leader_skill_adjusted
 	# 100 * (level - 1)
 
 	add = 400
 	# 400
 }
 
-_tec_leader_skill_adjusted = {
+tec_leader_skill_adjusted = {
 	add = trigger:has_skill
 	subtract = 1
 }
@@ -100,20 +113,16 @@ tec_leader_exp_gain = {
 		add = modifier:councilor_exp_gain
 	}
 	modifier = {
-		leader_class = admiral
-		add = modifier:admiral_exp_gain
+		leader_class = official
+		add = modifier:official_exp_gain
 	}
 	modifier = {
-		leader_class = general
-		add = modifier:general_exp_gain
+		leader_class = commander
+		add = modifier:commander_exp_gain
 	}
 	modifier = {
 		leader_class = scientist
 		add = modifier:scientist_exp_gain
-	}
-	modifier = {
-		leader_class = governor
-		add = modifier:governor_exp_gain
 	}
 	# no way to handle specific councilor exp gain so whatever
 }
@@ -125,16 +134,12 @@ tec_leader_not_count_towards_leader_cap_modifier_total = {
 		add = modifier:tec_councilor_not_count_towards_leader_cap
 	}
 	modifier = {
-		leader_class = admiral
-		add = modifier:tec_admiral_not_count_towards_leader_cap
+		leader_class = commander
+		add = modifier:tec_commander_not_count_towards_leader_cap
 	}
 	modifier = {
-		leader_class = general
-		add = modifier:tec_general_not_count_towards_leader_cap
-	}
-	modifier = {
-		leader_class = governor
-		add = modifier:tec_governor_not_count_towards_leader_cap
+		leader_class = official
+		add = modifier:tec_official_not_count_towards_leader_cap
 	}
 	modifier = {
 		leader_class = scientist
@@ -142,7 +147,6 @@ tec_leader_not_count_towards_leader_cap_modifier_total = {
 	}
 	
 }
-
 
 tec_leader_scientist_trait_production = {
 	base = 1
@@ -159,4 +163,62 @@ tec_leader_scientist_trait_production = {
 	#	years_passed <= 30
 	#	#has_global_flag = tec_rubberbanding_2
 	#}
+}
+
+# Destiny traits balance
+tec_leader_destiny_weight = {
+	base = 1
+	complex_trigger_modifier = {
+		trigger = count_owned_leader
+		parameters = {
+			limit = {
+				has_level >= 8
+				has_trait = $TRAIT$
+				NOR = {
+					has_leader_flag = renowned_leader
+					has_leader_flag = legendary_leader
+				}
+			}
+		}
+		mode = add
+		mult = $MULT$
+	}
+	pow = -1
+	pow = 2
+	# eventually another pow = 2 to make exponential 
+}
+# mult = owner.value:tec_leader_destiny_weight|TRAIT|trait_whatever|MULT|0.5|
+
+# Deprecated 
+# ====================================
+
+	# Scope: leader
+	#tec_leader_starting_skill_add = {	# UNUSED
+	#	base = 0
+	#	add = modifier:tec_leader_starting_skill_add
+	#	modifier = {
+	#		leader_class = official
+	#		add = modifier:tec_leader_official_starting_skill_add
+	#	}
+	#	modifier = {
+	#		leader_class = commander
+	#		add = modifier:tec_leader_commander_starting_skill_add
+	#	}
+	#	modifier = {
+	#		leader_class = scientist
+	#		add = modifier:tec_leader_scientist_starting_skill_add
+	#	}
+	#}
+
+# /
+tec_leader_effective_council_skill = {
+	add = trigger:has_skill
+	modifier = {
+		is_ruler = yes
+		add = modifier:ruler_skill_add
+	}
+	modifier = {
+		is_councilor = yes
+		add = modifier:councilor_skill_add
+	}
 }

@@ -25,6 +25,57 @@ has_encountered_other_species = {
 	}
 }
 
+can_be_leader = {
+	has_citizenship_rights = yes
+	NOT = { has_trait = trait_syncretic_proles }
+	can_think = yes
+
+	OR = {
+		is_robot_pop = no
+		root = {
+			OR = {
+				has_technology = tech_synthetic_leaders
+				is_machine_empire = yes
+				is_mechanical_empire = yes
+				# Evolved
+				has_valid_civic = civic_tec_origin_mecha_perfectionists
+			}
+		}
+	}
+	OR = {
+		is_same_species = root
+		root = {
+			NAND = {
+				has_origin = origin_necrophage
+				has_trait = trait_necrophage
+			}
+		}
+	}
+	# Evolved
+	OR = {
+		NOT = {
+			has_trait = @trait_tec_bioservant
+		}
+		root = { has_technology = tech_tec_bioservant_3 }
+	}
+	if = {
+		limit = {
+			has_trait = @trait_tec_se_subspecies
+		}
+		OR = {
+			is_same_species = root
+			root = {
+				OR = {
+					has_country_flag = tec_gene_elder_cured
+					has_country_flag = tec_replicant_elder_cured
+					has_country_flag = tec_biopsionic_elder_cured
+				}
+			}
+		}
+	}
+	# /
+}
+
 species_can_be_necrophaged = {
 	NOR = {
 		is_archetype = MACHINE
@@ -78,6 +129,7 @@ is_hive_empire = {
 		has_authority = auth_hive_mind
 		has_authority = auth_tec_hive_biological
 		has_authority = auth_tec_hive_cybernetic
+		#has_authority = auth_tec_hive_biomechanical
 	}
 }
 
@@ -243,42 +295,19 @@ can_remove_cybernetic_traits = {
 	}
 }
 
-# Ruler upkeep
-has_leader_upkeep = {
-	exists = owner
+has_psionic_species_trait = {
 	OR = {
-		is_idle = yes
-		AND = {
-			owner = { tec_removes_unity_upkeep_from_all_leaders = no }
-			switch = {
-				trigger = leader_class
-				governor = {
-					owner = {
-						tec_removes_unity_upkeep_from_governors = no
-					}
-				}
-				scientist = {
-					owner = {
-						tec_removes_unity_upkeep_from_scientists = no
-					}
-				}
-				admiral = {
-					owner = {
-						tec_removes_unity_upkeep_from_admirals = no
-					}
-				}
-				general = {
-					owner = {
-						tec_removes_unity_upkeep_from_generals = no
-					}
-				}
-				default = {
-					always = no
-				}
-			}
-		}
+		has_trait = trait_latent_psionic
+		has_trait = trait_psionic
+		# Evolved
+		has_trait = @trait_tec_hive_psionic_resonance
+		has_trait = @trait_tec_hive_psionic_entanglement
+
+		has_trait = @trait_tec_biopsionic_main
+		has_trait = @trait_tec_cyberpsionic_main
 	}
 }
+
 
 can_think = {
 	NOR = {
@@ -373,6 +402,7 @@ has_energy_upkeep = {
 	OR = {
 		is_robotic_or_voidspawn_species = yes
 		has_trait = trait_cyborg_power_intensive
+		has_trait = trait_exd
 	}
 }
 
@@ -417,28 +447,28 @@ has_any_industry_district = {
 
 has_any_farming_district_or_buildings = {
 	check_variable_arithmetic = {
-		which = value:farming_combined_value
+		which = value:farming_combined_value|CACHED|yes|
 		value > 0
 	}
 }
 
 has_any_mining_district = {
 	check_variable_arithmetic = {
-		which = value:mining_combined_value
+		which = value:mining_combined_value|CACHED|yes|
 		value > 0
 	}
 }
 
 has_any_generator_district_or_building = {
 	check_variable_arithmetic = {
-		which = value:generator_combined_value
+		which = value:generator_combined_value|CACHED|yes|
 		value > 0
 	}
 }
 
 has_research_building = {
 	check_variable_arithmetic = {
-		which = value:research_combined_value
+		which = value:research_combined_value|CACHED|yes|
 		value > 0
 	}
 }
@@ -460,10 +490,10 @@ should_ai_focus_on_trade = {	# Paragon
 
 is_gestalt_node = {	# Paragon
 	OR = {
-		is_councilor_type = councilor_gestalt_governor
-		is_councilor_type = councilor_gestalt_scientist
-		is_councilor_type = councilor_gestalt_admiral
-		is_councilor_type = councilor_gestalt_general
+		is_councilor_type = councilor_gestalt_growth
+		is_councilor_type = councilor_gestalt_cognitive
+		is_councilor_type = councilor_gestalt_legion
+		is_councilor_type = councilor_gestalt_regulatory
 	}
 }
 
@@ -540,3 +570,115 @@ values_others = {
 		tec_is_fruitful_empire = yes
 	}
 }
+
+has_councilor = {
+	exists = owner
+	owner = {
+		check_variable_arithmetic = {
+			which = value:councilor_level|TYPE|$COUNCILOR$|
+			value > 0
+		}
+	}
+}
+
+is_xenophage = {
+	tec_is_xenophage = { cached = yes }
+}
+
+blocks_minister_of_state = {
+	OR = {
+		is_gestalt = yes
+		has_valid_civic = civic_inwards_perfection
+		has_valid_civic = civic_fanatic_purifiers
+	}
+}
+
+# Will leave these for later TODO
+has_engineered_evolution_synergy = {
+	OR = {
+		has_origin = origin_syncretic_evolution
+		has_origin = origin_life_seeded
+		has_origin = origin_necrophage
+		has_origin = origin_clone_army
+	}
+}
+
+has_flesh_is_weak_anti_synergy = {
+	is_materialist = no
+}
+
+has_organo_machine_interfacing_assimilator_synergy = {
+	has_civic = civic_machine_assimilator
+}
+
+has_synthetic_evolution_synergy = {
+	has_origin = origin_mechanists
+}
+
+has_synthetic_evolution_anti_synergy = {
+	is_materialist = no
+}
+
+blocks_ai_synthetic_evolution = {
+	OR = {
+		has_policy_flag = ai_outlawed
+		has_policy_flag = robots_outlawed
+		has_origin = origin_necrophage
+		has_origin = origin_clone_army
+		has_origin = origin_overtuned
+		has_origin = origin_slavers
+		has_valid_civic = civic_idyllic_bloom
+		has_valid_civic = civic_hive_idyllic_bloom
+	}
+}
+
+has_mind_over_matter_synergy = {
+	OR = {
+		has_ascension_perk = ap_become_the_crisis
+		has_origin = origin_demonic_incursion
+		has_country_flag = knights_met_end_of_cycle
+	}
+}
+
+has_mind_over_matter_anti_synergy = {
+	is_spiritualist = no
+}
+
+has_synthetic_age_anti_synergy = {
+	has_civic = civic_machine_assimilator
+}
+
+
+
+# ========================	U N U S E D		/	D E P R E C A T E D	========================
+# Ruler upkeep
+#has_leader_upkeep = {	# UNUSED
+	#exists = owner
+	#OR = {
+	#	is_idle = yes
+	#	AND = {
+	#		owner = { tec_removes_unity_upkeep_from_all_leaders = no }
+	#		switch = {
+	#			trigger = leader_class
+	#			official = {
+	#				owner = {
+	#					tec_reduces_upkeep_from_officials = no
+	#				}
+	#			}
+	#			commander = {
+	#				owner = {
+	#					tec_reduces_upkeep_from_commanders = no
+	#				}
+	#			}
+	#			scientist = {
+	#				owner = {
+	#					tec_reduces_upkeep_from_scientists = no
+	#				}
+	#			}
+	#			default = {
+	#				always = no
+	#			}
+	#		}
+	#	}
+	#}
+#}

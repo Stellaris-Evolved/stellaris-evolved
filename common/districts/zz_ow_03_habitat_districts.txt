@@ -30,12 +30,6 @@
 	# /
 # /
 
-@hab_cost = 500
-@hab_maintenance = 2
-@low_hab_maintenance = 0.2
-@hab_time = 240
-@hab_jobs = 2
-
 # --------------- Habitation
 district_hab_housing = {
 	base_buildtime = @hab_time
@@ -71,7 +65,7 @@ district_hab_housing = {
 				always = yes
 			"
 			use_for_jobs = "
-				tec_has_maintenance_drone_jobs_available = no
+				tec_ai_allow_city_district_for_jobs = yes
 			"
 		}
 	}
@@ -81,12 +75,17 @@ district_hab_housing = {
 
 	resources = {
 		category = planet_districts_cities
-		cost = {
-			minerals = @hab_cost
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_hab_cost
+			upkeep = @tec_district_hab_upkeep
 		}
 		upkeep = {
-			energy = @hab_maintenance
-			alloys = @low_hab_maintenance
+			alloys = @tec_district_hab_upkeep_alloys
 		}
 	}
 
@@ -135,10 +134,7 @@ district_hab_housing = {
 				count = 1
 				mult = owner.value:hab_void_dweller_jobs
 				display = with_desc
-				trigger = "
-					exists = owner
-					owner = { is_gestalt = no }
-				"
+				trigger = ""
 			}
 		# /
 		# Gestalt
@@ -147,10 +143,7 @@ district_hab_housing = {
 				count = 1
 				mult = owner.value:hab_void_dweller_jobs
 				display = with_desc
-				trigger = "
-					exists = owner
-					owner = { is_gestalt = yes }
-				"
+				trigger = ""
 			}
 		# /
 	# /
@@ -198,12 +191,17 @@ district_hab_industrial = {
 	
 	resources = {
 		category = planet_districts_hab_industrial
-		cost = {
-			minerals = @hab_cost
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_hab_cost
+			upkeep = @tec_district_hab_upkeep
 		}
 		upkeep = {
-			energy = @hab_maintenance
-			alloys = @low_hab_maintenance
+			alloys = @tec_district_hab_upkeep_alloys
 		}
 
 		inline_script = districts/resources/inline_evolved_tec_unleashed_industrialization_resources
@@ -287,13 +285,18 @@ district_tec_hab_extraction = {	# Evolved
 
 	resources = {
 		category = planet_districts_hab
-		cost = {
-			minerals = @hab_cost
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_hab_cost
+			upkeep = @tec_district_hab_upkeep_low
 		}
-		#upkeep = {
-		#	energy = @hab_maintenance
-		#	alloys = @low_hab_maintenance
-		#}
+		upkeep = {
+			alloys = @tec_district_hab_upkeep_alloys
+		}
 
 		# Base production
 			inline_script = {
@@ -306,7 +309,7 @@ district_tec_hab_extraction = {	# Evolved
 					}
 				"
 				base = 0
-				mult = 0.5
+				mult = 0.25
 			}
 			inline_script = {
 				script = districts/resources/inline_evolved_tec_hab_automation_minerals
@@ -318,7 +321,7 @@ district_tec_hab_extraction = {	# Evolved
 					}
 				"
 				base = 0
-				mult = 0.5
+				mult = 0.25
 			}
 			inline_script = {
 				script = districts/resources/inline_evolved_tec_hab_automation_food
@@ -330,7 +333,7 @@ district_tec_hab_extraction = {	# Evolved
 					}
 				"
 				base = 0
-				mult = 0.5
+				mult = 0.25
 			}
 		# /
 		# Base from districts
@@ -386,6 +389,25 @@ district_tec_hab_extraction = {	# Evolved
 			}
 			text = district_tec_hab_extraction_effect_orbitals
 		}
+		# Disabled production
+		triggered_desc = {
+			trigger = {
+				has_planet_flag = energy_habitat
+			}
+			text = district_tec_hab_extraction_no_energy
+		}
+		triggered_desc = {
+			trigger = {
+				has_planet_flag = mining_habitat
+			}
+			text = district_tec_hab_extraction_no_minerals
+		}
+		triggered_desc = {
+			trigger = {
+				has_planet_flag = tec_food_habitat
+			}
+			text = district_tec_hab_extraction_no_food
+		}
 	# /
 	# Modifiers
 		# nothing
@@ -430,12 +452,17 @@ district_tec_hab_food = {		# Evolved
 
 	resources = {
 		category = planet_districts_hab_food
-		cost = {
-			minerals = @hab_cost
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_hab_cost
+			upkeep = @tec_district_hab_upkeep
 		}
 		upkeep = {
-			energy = @hab_maintenance
-			alloys = @low_hab_maintenance
+			alloys = @tec_district_hab_upkeep_alloys
 		}
 
 		# Base production
@@ -445,7 +472,7 @@ district_tec_hab_food = {		# Evolved
 					always = yes
 				"
 				base = 0
-				mult = 1
+				mult = 0.5
 			}
 		# /
 		inline_script = {
@@ -481,10 +508,11 @@ district_tec_hab_food = {		# Evolved
 		inline_script = {
 			script = jobs/inline_evolved_farmer
 			regular_count = 1
-			regular_aquatic_count = 1
+			regular_secondary_count = 1
 			hive_count = 1
-			hive_aquatic_count = 1
+			hive_secondary_count = 1
 			machine_count = 1
+			machine_secondary_count = 1
 			mult = 1
 			display = with_desc
 			trigger = "
@@ -494,24 +522,32 @@ district_tec_hab_food = {		# Evolved
 		inline_script = {
 			script = jobs/inline_evolved_farmer
 			regular_count = 1
-			regular_aquatic_count = 0
+			regular_secondary_count = 0
 			hive_count = 2
-			hive_aquatic_count = 1
+			hive_secondary_count = 1
 			machine_count = 1
+			machine_secondary_count = 0
 			mult = 1
 			display = no_desc
 			trigger = "
-				tec_is_fully_upgraded_habitat = yes
+				OR = {
+					is_capital = yes
+					tec_is_fully_upgraded_habitat = yes
+				}
 			"
 		}
 		inline_script = {
-			script = jobs/inline_evolved_farmer_swaps
+			script = jobs/inline_evolved_farmer_secondary
 			regular_count = 1
 			hive_count = 1
+			machine_count = 1
 			mult = 1
 			display = with_desc
 			trigger = "
-				tec_is_fully_upgraded_habitat = yes
+				OR = {
+					is_capital = yes
+					tec_is_fully_upgraded_habitat = yes
+				}
 			"
 		}
 	# /
@@ -562,12 +598,17 @@ district_hab_energy = {
 
 	resources = {
 		category = planet_districts_hab_energy
-		cost = {
-			minerals = @hab_cost
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_hab_cost
+			upkeep = @tec_district_hab_upkeep
 		}
 		upkeep = {
-			energy = @hab_maintenance
-			alloys = @low_hab_maintenance
+			alloys = @tec_district_hab_upkeep_alloys
 		}
 
 		# New production
@@ -577,7 +618,7 @@ district_hab_energy = {
 					always = yes
 				"
 				base = 0
-				mult = 1
+				mult = 0.5
 			}
 		# /
 		inline_script = {
@@ -613,34 +654,49 @@ district_hab_energy = {
 		inline_script = {
 			script = jobs/inline_evolved_technician
 			regular_count = 1
+			regular_secondary_count = 1
 			hive_count = 1
+			hive_secondary_count = 1
 			machine_count = 1
-			machine_aquatic_count = 1
+			machine_secondary_count = 1
 			mult = 1
 			display = with_desc
 			trigger = "
-				tec_is_upgraded_habitat = yes
+				OR = {
+					is_capital = yes
+					tec_is_fully_upgraded_habitat = no
+				}
 			"
 		}
 		inline_script = {
 			script = jobs/inline_evolved_technician
 			regular_count = 1
+			regular_secondary_count = 0
 			hive_count = 2
+			hive_secondary_count = 1
 			machine_count = 1
-			machine_aquatic_count = 0
+			machine_secondary_count = 0
 			mult = 1
 			display = no_desc
 			trigger = "
-				tec_is_fully_upgraded_habitat = yes
+				OR = {
+					is_capital = yes
+					tec_is_fully_upgraded_habitat = yes
+				}
 			"
 		}
 		inline_script = {
-			script = jobs/inline_evolved_technician_swaps
+			script = jobs/inline_evolved_technician_secondary
+			regular_count = 1
+			hive_count = 1
 			machine_count = 1
 			mult = 1
 			display = with_desc
 			trigger = "
-				tec_is_fully_upgraded_habitat = yes
+				OR = {
+					is_capital = yes
+					tec_is_fully_upgraded_habitat = yes
+				}
 			"
 		}
 	# /		
@@ -686,12 +742,17 @@ district_hab_mining = {
 
 	resources = {
 		category = planet_districts_hab_mining
-		cost = {
-			minerals = @hab_cost
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_hab_cost
+			upkeep = @tec_district_hab_upkeep
 		}
 		upkeep = {
-			energy = @hab_maintenance
-			alloys = @low_hab_maintenance
+			alloys = @tec_district_hab_upkeep_alloys
 		}
 
 		# New production
@@ -700,8 +761,8 @@ district_hab_mining = {
 				trigger = "
 					always = yes
 				"
-				base = "0"
-				mult = "1"
+				base = 0
+				mult = 0.5
 			}
 		# /
 		inline_script = {
@@ -737,10 +798,11 @@ district_hab_mining = {
 		inline_script = {
 			script = jobs/inline_evolved_miner
 			regular_count = 1
-			regular_aquatic_count = 1
+			regular_secondary_count = 1
 			hive_count = 1
-			hive_aquatic_count = 1
+			hive_secondary_count = 1
 			machine_count = 1
+			machine_secondary_count = 1
 			mult = 1
 			display = with_desc
 			trigger = "
@@ -750,24 +812,32 @@ district_hab_mining = {
 		inline_script = {
 			script = jobs/inline_evolved_miner
 			regular_count = 1
-			regular_aquatic_count = 0
+			regular_secondary_count = 0
 			hive_count = 2
-			hive_aquatic_count = 1
+			hive_secondary_count = 1
 			machine_count = 1
+			machine_secondary_count = 0
 			mult = 1
 			display = no_desc
 			trigger = "
-				tec_is_fully_upgraded_habitat = yes
+				OR = {
+					is_capital = yes
+					tec_is_fully_upgraded_habitat = yes
+				}
 			"
 		}
 		inline_script = {
-			script = jobs/inline_evolved_miner_swaps
+			script = jobs/inline_evolved_miner_secondary
 			regular_count = 1
 			hive_count = 1
+			machine_count = 1
 			mult = 1
 			display = with_desc
 			trigger = "
-				tec_is_fully_upgraded_habitat = yes
+				OR = {
+					is_capital = yes
+					tec_is_fully_upgraded_habitat = yes
+				}
 			"
 		}
 	# /
@@ -793,8 +863,16 @@ district_tec_hab_utility = {	# UP TO HERE!!!!
 		tec_uses_habitat_districts = yes
 		# Specs
 			NOR = {
+				# Research
 				has_planet_flag = research_habitat
+				has_planet_flag = tec_research_habitat
+				# Trade
 				has_planet_flag = commercial_habitat
+				has_planet_flag = tec_trade_habitat
+				# Unity
+				has_planet_flag = tec_unity_habitat
+				# Military
+				has_planet_flag = tec_military_habitat
 			}
 			tec_is_arcology_habitat = no
 		# /
@@ -803,10 +881,18 @@ district_tec_hab_utility = {	# UP TO HERE!!!!
 	potential = {
 		tec_uses_habitat_districts = yes
 		# Specs
-		NOR = {
-			has_planet_flag = research_habitat
-			has_planet_flag = commercial_habitat
-		}
+			NOR = {
+				# Research
+				has_planet_flag = research_habitat
+				has_planet_flag = tec_research_habitat
+				# Trade
+				has_planet_flag = commercial_habitat
+				has_planet_flag = tec_trade_habitat
+				# Unity
+				has_planet_flag = tec_unity_habitat
+				# Military
+				has_planet_flag = tec_military_habitat
+			}
 			tec_is_arcology_habitat = no
 		# /
 	}
@@ -825,12 +911,18 @@ district_tec_hab_utility = {	# UP TO HERE!!!!
 
 	resources = {
 		category = planet_districts_hab_research
-		cost = {
-			minerals = @hab_cost
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_hab_cost
+			upkeep = @tec_district_hab_upkeep_low
 		}
-		#upkeep = {
-		#	energy = @hab_maintenance
-		#}
+		upkeep = {
+			alloys = @tec_district_hab_upkeep_alloys
+		}
 
 		# Base production
 		inline_script = {
@@ -838,8 +930,8 @@ district_tec_hab_utility = {	# UP TO HERE!!!!
 			trigger = "
 				always = yes
 			"
-			base = "0"
-			mult = "0.5"
+			base = 0
+			mult = 0.5
 		}
 	# /
 	}
@@ -882,7 +974,11 @@ district_tec_hab_utility = {	# UP TO HERE!!!!
 
 district_hab_science = {
 	base_buildtime = @hab_time
-	is_capped_by_modifier = yes
+	is_capped_by_modifier = no
+
+	prerequisites = {
+		tech_basic_science_lab_1
+	}
 
 	show_on_uncolonized = {
 		tec_uses_habitat_districts = yes
@@ -910,13 +1006,19 @@ district_hab_science = {
 
 	resources = {
 		category = planet_districts_hab_research
-		cost = {
-			minerals = @hab_cost
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_hab_cost
+			upkeep = @tec_district_hab_upkeep
 		}
 		upkeep = {
-			energy = @hab_maintenance
-			alloys = @low_hab_maintenance
+			alloys = @tec_district_hab_upkeep_alloys
 		}
+
 		# Base production
 		inline_script = {
 			script = districts/resources/inline_evolved_tec_hab_automation_research
@@ -924,7 +1026,7 @@ district_hab_science = {
 				always = yes
 			"
 			base = 0
-			mult = 1
+			mult = 0.5
 		}
 	}
 
@@ -987,12 +1089,6 @@ district_hab_commercial = {
 		tec_ai_force_research_habitat_district = no
 		AND = {
 			tec_ai_allow_trade_building = yes
-			NOR = {
-				has_planet_flag = tec_food_habitat
-				has_planet_flag = mining_habitat
-				has_planet_flag = energy_habitat
-				has_planet_flag = research_habitat
-			}
 		}
 	}
 
@@ -1000,12 +1096,6 @@ district_hab_commercial = {
 		OR = {
 			tec_ai_force_research_habitat_district = yes
 			AND = {
-				OR = {
-					has_planet_flag = tec_food_habitat
-					has_planet_flag = mining_habitat
-					has_planet_flag = energy_habitat
-					has_planet_flag = research_habitat
-				}
 				tec_ai_allow_trade_building = no
 			}
 		}
@@ -1017,12 +1107,17 @@ district_hab_commercial = {
 
 	resources = {
 		category = planet_districts_hab_trade
-		cost = {
-			minerals = @hab_cost
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_hab_cost
+			upkeep = @tec_district_hab_upkeep
 		}
 		upkeep = {
-			energy = @hab_maintenance
-			alloys = @low_hab_maintenance
+			alloys = @tec_district_hab_upkeep_alloys
 		}
 	}
 
@@ -1035,9 +1130,7 @@ district_hab_commercial = {
 	# Effect Types
 		inline_script = {
 			script = districts/type/inline_evolved_trade
-			scale = 1
 			trader_scale = 1
-			trigger = ""
 			trader_trigger = "
 				tec_is_upgraded_habitat = yes
 			"
@@ -1065,15 +1158,23 @@ district_hab_commercial = {
 				"
 			}
 			inline_script = {
-				script = jobs/inline_evolved_trader
+				script = jobs/inline_evolved_clerk
 				count = 1
 				mult = 1
-				display = with_desc
+				display = no_desc
 				trigger = "
 					owner = {
 						is_gestalt = no
 					}
+					tec_is_fully_upgraded_habitat = yes
 				"
+			}
+			inline_script = {
+				script = jobs/inline_evolved_trader
+				count = 1
+				mult = 1
+				display = with_desc
+				trigger = ""
 			}
 		# /
 
@@ -1147,6 +1248,235 @@ district_hab_commercial = {
 	inline_script = districts/inline_evolved_aibait_habitat_district
 }
 
+district_tec_hab_unity = {	# Evolved
+	icon = district_tec_elysium_coordination
+	base_buildtime = @hab_time
+	is_capped_by_modifier = no
+
+	show_on_uncolonized = {
+		tec_uses_habitat_districts = yes
+		# Specs
+			has_planet_flag = tec_unity_habitat
+			tec_is_arcology_habitat = no
+		# /
+	}
+
+	potential = {
+		tec_uses_habitat_districts = yes
+		# Specs
+			has_planet_flag = tec_unity_habitat
+			tec_is_arcology_habitat = no
+		# /
+	}
+
+	conversion_ratio = 0.5
+	inline_script = districts/convert_to/inline_evolved_research_districts
+	inline_script = districts/convert_to/inline_evolved_industrial_districts
+
+	resources = {
+		category = planet_districts_hab
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_hab_cost
+			upkeep = @tec_district_hab_upkeep
+		}
+		upkeep = {
+			alloys = @tec_district_hab_upkeep_alloys
+		}
+	}
+
+	# Standard
+		inline_script = {
+			script = districts/inline_evolved_habitat_scaling_district
+			district = district_tec_hab_unity
+		}
+	# /
+
+	# Jobs
+	 # Regular
+		inline_script = {
+			script = jobs/inline_evolved_bureaucrat
+			count = 1
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+
+		inline_script = {
+			script = jobs/inline_evolved_bureaucrat
+			count = 1
+			mult = 1
+			display = no_desc
+			trigger = "
+				tec_is_upgraded_habitat = yes
+			"
+		}
+		inline_script = {
+			script = jobs/inline_evolved_bureaucrat
+			count = 1
+			mult = 1
+			display = no_desc
+			trigger = "
+				tec_is_fully_upgraded_habitat = yes
+			"
+		}
+	 # /
+	 # Hive
+		inline_script = {
+			script = jobs/inline_evolved_synapse
+			count = 1
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+		inline_script = {
+			script = jobs/inline_evolved_synapse
+			count = 1
+			mult = 1
+			display = no_desc
+			trigger = "
+				tec_is_upgraded_habitat = yes
+			"
+		}
+		inline_script = {
+			script = jobs/inline_evolved_synapse
+			count = 1
+			mult = 1
+			display = no_desc
+			trigger = "
+				tec_is_fully_upgraded_habitat = yes
+			"
+		}
+	 # /
+	 # Machine
+		inline_script = {
+			script = jobs/inline_evolved_coordinator
+			count = 1
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+		inline_script = {
+			script = jobs/inline_evolved_coordinator
+			count = 1
+			mult = 1
+			display = no_desc
+			trigger = "
+				tec_is_upgraded_habitat = yes
+			"
+		}
+		inline_script = {
+			script = jobs/inline_evolved_coordinator
+			count = 1
+			mult = 1
+			display = no_desc
+			trigger = "
+				tec_is_fully_upgraded_habitat = yes
+			"
+		}
+	 # /
+	# /
+
+	inline_script = districts/inline_evolved_aibait_habitat_district
+}
+
+district_tec_hab_military = {	# Evolved
+	icon = district_tec_elysium_shipyard
+	base_buildtime = @hab_time
+	is_capped_by_modifier = no
+
+	show_on_uncolonized = {
+		tec_uses_habitat_districts = yes
+		# Specs
+			has_planet_flag = tec_military_habitat
+			tec_is_arcology_habitat = no
+		# /
+	}
+
+	potential = {
+		tec_uses_habitat_districts = yes
+		# Specs
+			has_planet_flag = tec_military_habitat
+			tec_is_arcology_habitat = no
+		# /
+	}
+
+	conversion_ratio = 0.5
+	inline_script = districts/convert_to/inline_evolved_research_districts
+	inline_script = districts/convert_to/inline_evolved_industrial_districts
+
+	resources = {
+		category = planet_districts_hab
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_hab_cost
+			upkeep = @tec_district_hab_upkeep
+		}
+		upkeep = {
+			alloys = @tec_district_hab_upkeep_alloys
+		}
+	}
+
+	# Standard
+		inline_script = {
+			script = districts/inline_evolved_habitat_scaling_district
+			district = district_tec_hab_unity
+		}
+	# /
+
+	# Jobs
+		inline_script = {
+			script = jobs/inline_evolved_soldier
+			count = 1
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+
+		inline_script = {
+			script = jobs/inline_evolved_warrior_drone
+			count = 1
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+		# Upgraded
+		inline_script = {
+			script = jobs/inline_evolved_soldier
+			count = 1
+			mult = 1
+			display = no_desc
+			trigger = "tec_is_upgraded_habitat = yes"
+		}
+	
+		inline_script = {
+			script = jobs/inline_evolved_warrior_drone
+			count = 1
+			mult = 1
+			display = no_desc
+			trigger = "tec_is_upgraded_habitat = yes"
+		}
+		# Fully upgraded
+		inline_script = {
+			script = jobs/inline_evolved_tec_naval_operator
+			count = 1
+			mult = 1
+			display = with_desc
+			trigger = "tec_is_fully_upgraded_habitat = yes"
+		}
+	# /
+
+	inline_script = districts/inline_evolved_aibait_habitat_district
+}
+
 # --------------- Utility
 district_hab_cultural = {
 	base_buildtime = @hab_time
@@ -1204,12 +1534,17 @@ district_hab_cultural = {
 
 	resources = {
 		category = planet_districts_hab_leisure
-		cost = {
-			minerals = @hab_cost
+
+		inline_script = {
+			script = districts/resources/inline_evolved_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_hab_cost
+			upkeep = @tec_district_hab_upkeep
 		}
 		upkeep = {
-			energy = @hab_maintenance
-			alloys = @low_hab_maintenance
+			alloys = @tec_district_hab_upkeep_alloys
 		}
 	}
 

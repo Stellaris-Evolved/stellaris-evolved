@@ -15,23 +15,87 @@ country_event = {	# Change ruler to the appropiate portrait - gamestart
 	}
 
 	immediate = {
+		# Creates ruler
 		tec_country_create_aiauth_ruler_replace = {
 			RULER = ruler
 		}
 
-		# Create council
-		tec_country_unlock_council_selection = yes
-		tec_country_create_aiauth_councilor = {
-			CLASS = scientist
-			NAME = councilor_tec_aiauth_development
-			COUNCIL_POS = councilor_tec_aiauth_development
-			DESC = councilor_tec_aiauth_development_desc
+		if = { # Create council research
+			limit = {
+				NOT = {
+					has_councilor = {
+						COUNCILOR = councilor_tec_aiauth_development
+					}
+				}
+			}
+			unlock_council_slots = 1
+			#(+1)
+			set_council_position_to_council = councilor_tec_aiauth_development
+			tec_country_create_aiauth_councilor = {
+				CLASS = scientist
+				NAME = councilor_tec_aiauth_development
+				COUNCIL_POS = councilor_tec_aiauth_development
+				DESC = councilor_tec_aiauth_development_desc
+			}
 		}
-		tec_country_create_aiauth_councilor = {
-			CLASS = admiral
-			NAME = councilor_tec_aiauth_firewall
-			COUNCIL_POS = councilor_tec_aiauth_firewall
-			DESC = councilor_tec_aiauth_firewall_desc
+		if = { # Create council naval
+			limit = {
+				NOT = {
+					has_councilor = {
+						COUNCILOR = councilor_tec_aiauth_firewall
+					}
+				}
+			}
+			unlock_council_slots = 1
+			#(+2)
+			set_council_position_to_council = councilor_tec_aiauth_firewall
+			tec_country_create_aiauth_councilor = {
+				CLASS = commander
+				NAME = councilor_tec_aiauth_firewall
+				COUNCIL_POS = councilor_tec_aiauth_firewall
+				DESC = councilor_tec_aiauth_firewall_desc
+			}
+		}
+		
+		# Create council state
+		unlock_council_slots = 1
+		#(+3)
+		if = {
+			# If the state clone is blocked this isn't generated
+			limit = {
+				blocks_minister_of_state = no
+			}
+			set_council_position_to_council = councilor_tec_aiauth_manager
+			tec_country_create_aiauth_councilor = {
+				CLASS = official
+				NAME = councilor_tec_aiauth_manager
+				COUNCIL_POS = councilor_tec_aiauth_manager
+				DESC = councilor_tec_aiauth_manager_desc
+			}
+		}
+		else_if = {	# blocks_minister_of_state = yes
+			limit = {
+				has_valid_civic = civic_inwards_perfection
+			}
+			set_council_position_to_council = councilor_inwards_perfection
+			tec_country_create_aiauth_councilor = {
+				CLASS = commander
+				NAME = councilor_inwards_perfection
+				COUNCIL_POS = councilor_inwards_perfection
+				DESC = councilor_inwards_perfection_desc
+			}
+		}
+		else_if = {
+			limit = {
+				has_valid_civic = civic_fanatic_purifiers
+			}
+			set_council_position_to_council = councilor_fanatic_purifiers
+			tec_country_create_aiauth_councilor = {
+				CLASS = commander
+				NAME = councilor_fanatic_purifiers
+				COUNCIL_POS = councilor_fanatic_purifiers
+				DESC = councilor_fanatic_purifiers_desc
+			}
 		}
 	}
 }
@@ -146,7 +210,7 @@ country_event = {	# Removes ruler and nodes when the aiauth is removed
 		ordered_owned_leader = {
 			limit = {
 				OR = {
-					leader_class = governor
+					leader_class = official
 					leader_class = scientist
 				}
 				is_councilor = no
@@ -158,8 +222,8 @@ country_event = {	# Removes ruler and nodes when the aiauth is removed
 		ordered_owned_leader = {
 			limit = {
 				OR = {
-					leader_class = admiral
-					leader_class = governor
+					leader_class = commander
+					leader_class = official
 				}
 				is_councilor = no
 			}
@@ -189,18 +253,59 @@ country_event = {	# Creates leader when the aiauth is added - POST
 		tec_country_create_aiauth_ruler = yes
 
 		# Create council
-		tec_country_unlock_council_selection = yes
+		unlock_council_slots = 3
+		#tec_country_unlock_council_selection = yes
+		# ^ this is hopefully not longer necessart
+		set_council_position_to_council = councilor_tec_aiauth_development
 		tec_country_create_aiauth_councilor = {
 			CLASS = scientist
 			NAME = councilor_tec_aiauth_development
 			COUNCIL_POS = councilor_tec_aiauth_development
 			DESC = councilor_tec_aiauth_development_desc
 		}
+		set_council_position_to_council = councilor_tec_aiauth_firewall
 		tec_country_create_aiauth_councilor = {
-			CLASS = admiral
+			CLASS = commander
 			NAME = councilor_tec_aiauth_firewall
 			COUNCIL_POS = councilor_tec_aiauth_firewall
 			DESC = councilor_tec_aiauth_firewall_desc
+		}
+		if = {
+			# If the state clone is blocked this isn't generated
+			limit = {
+				blocks_minister_of_state = no
+			}
+			set_council_position_to_council = councilor_tec_aiauth_manager
+			tec_country_create_aiauth_councilor = {
+				CLASS = official
+				NAME = councilor_tec_aiauth_manager
+				COUNCIL_POS = councilor_tec_aiauth_manager
+				DESC = councilor_tec_aiauth_manager_desc
+			}
+		}
+		else_if = {	# blocks_minister_of_state = yes
+			limit = {
+				has_valid_civic = civic_inwards_perfection
+			}
+			set_council_position_to_council = councilor_inwards_perfection
+			tec_country_create_aiauth_councilor = {
+				CLASS = commander
+				NAME = councilor_inwards_perfection
+				COUNCIL_POS = councilor_inwards_perfection
+				DESC = councilor_inwards_perfection_desc
+			}
+		}
+		else_if = {
+			limit = {
+				has_valid_civic = civic_fanatic_purifiers
+			}
+			set_council_position_to_council = councilor_fanatic_purifiers
+			tec_country_create_aiauth_councilor = {
+				CLASS = commander
+				NAME = councilor_fanatic_purifiers
+				COUNCIL_POS = councilor_fanatic_purifiers
+				DESC = councilor_fanatic_purifiers_desc
+			}
 		}
 	}
 }
@@ -283,9 +388,8 @@ country_event = { # Recruit councilor node
 				tec_leader_force_update_modifiers = yes
 			}
 			remove_country_flag = tec_fragmenting_node
-			remove_country_flag = tec_fragmenting_admiral
-			remove_country_flag = tec_fragmenting_general
-			remove_country_flag = tec_fragmenting_governor
+			remove_country_flag = tec_fragmenting_commander
+			remove_country_flag = tec_fragmenting_official
 			remove_country_flag = tec_fragmenting_scientist
 		}
 	}
@@ -304,8 +408,8 @@ country_event = { # Recruit node,
 	event_window_type = leader_recruit
 
 	immediate = {
-		event_target:tec_aiauth_planetary_node = {
-			exile_leader_as = tec_aiauth_planetary_node
+		event_target:tec_aiauth_planetary_governing_node = {
+			exile_leader_as = tec_aiauth_planetary_governing_node
 			set_leader_flag = is_in_recruit_window
 		}
 		set_country_flag = tec_fragmenting_node
@@ -313,25 +417,25 @@ country_event = { # Recruit node,
 	}
 
 	picture_event_data = {
-		portrait = event_target:tec_aiauth_planetary_node
+		portrait = event_target:tec_aiauth_planetary_governing_node
 		room = machine_room
-		planet_background = event_target:tec_aiauth_planetary_node_planet
+		planet_background = event_target:tec_aiauth_planetary_governing_node_planet
 	}
 
-	location = event_target:tec_aiauth_planetary_node_planet
+	location = event_target:tec_aiauth_planetary_governing_node_planet
 
 	option = {
 		name = DISMISS
 		tag = dismiss_leader
 		custom_tooltip = tec_cui_aiauth_planetary_dismiss
 		hidden_effect = {
-			event_target:tec_aiauth_planetary_node = {
+			event_target:tec_aiauth_planetary_governing_node = {
 				kill_leader = { show_notification = no }
 			}
 
 			remove_country_flag = tec_fragmenting_node
 
-			event_target:tec_aiauth_planetary_node_planet = {
+			event_target:tec_aiauth_planetary_governing_node_planet = {
 				remove_building = building_tec_planetary_node_center
 			}
 		}
@@ -342,10 +446,10 @@ country_event = { # Recruit node,
 		inline_script = events/inline_evolved_tec_aiauth_node_refragment_option
 		custom_tooltip = tec_cui_aiauth_refragment_node
 		hidden_effect = {
-			event_target:tec_aiauth_planetary_node = {
+			event_target:tec_aiauth_planetary_governing_node = {
 				save_event_target_as = tec_aiauth_node_old
 				tec_country_refragment_aiauth_node = {
-					FRAGMENT_EFFECT = tec_country_create_aiauth_planetary_node
+					FRAGMENT_EFFECT = tec_country_create_aiauth_planetary_governing_node
 				}
 			}
 			event_target:tec_aiauth_node_old = {
@@ -358,8 +462,15 @@ country_event = { # Recruit node,
 	}
 
 	inline_script = {
+		script = events/inline_evolved_tec_aiauth_node_all_class_options
+		TARGET = event_target:tec_aiauth_planetary_governing_node
+		EVENT_ID = tec_aiauth.21
+		FRAGMENT_EFFECT = tec_country_create_aiauth_planetary_governing_node
+	}
+
+	inline_script = {
 		script = events/inline_evolved_tec_aiauth_node_all_ethic_options
-		TARGET = event_target:tec_aiauth_planetary_node
+		TARGET = event_target:tec_aiauth_planetary_governing_node
 		EVENT_ID = tec_aiauth.21
 	}
 
@@ -368,21 +479,21 @@ country_event = { # Recruit node,
 		tag = hire_leader
 		custom_tooltip = tec_cui_aiauth_finish_fragmenting_node
 		hidden_effect = {
-			event_target:tec_aiauth_planetary_node_planet = {
-				assign_leader = event_target:tec_aiauth_planetary_node
+			event_target:tec_aiauth_planetary_governing_node_planet = {
+				assign_leader = event_target:tec_aiauth_planetary_governing_node
 			}
-			event_target:tec_aiauth_planetary_node = {
-				set_owner = event_target:tec_aiauth_planetary_node_planet.owner
+			event_target:tec_aiauth_planetary_governing_node = {
+				set_owner = event_target:tec_aiauth_planetary_governing_node_planet.owner
 				set_cooldown = 360000
 				remove_leader_flag = is_in_recruit_window
 				set_name = {
-					key = "tec_aiauth_planetary_governor"
-					variable_string = "[tec_aiauth_planetary_governor_planet]"
+					key = "tec_aiauth_planetary_governing_node"
+					variable_string = "\\[tec_aiauth_planetary_governing_node_planet\\]"
 				}
 				tec_leader_force_update_modifiers = yes
 			}
 			remove_country_flag = tec_fragmenting_node
-			remove_country_flag = tec_fragmenting_governor
+			remove_country_flag = tec_fragmenting_official
 		}
 	}
 }
@@ -466,9 +577,8 @@ country_event = { # Recruit node,
 				tec_leader_force_update_modifiers = yes
 			}
 			remove_country_flag = tec_fragmenting_node
-			remove_country_flag = tec_fragmenting_admiral
-			remove_country_flag = tec_fragmenting_general
-			remove_country_flag = tec_fragmenting_governor
+			remove_country_flag = tec_fragmenting_commander
+			remove_country_flag = tec_fragmenting_official
 			remove_country_flag = tec_fragmenting_scientist
 			remove_country_flag = tec_aiauth_block_ruler_reforming
 		}
@@ -673,7 +783,7 @@ situation_event = {
 		owner = {
 			ordered_owned_planet = {
 				limit = { is_capital = no }
-				order_by = value:research_combined_value
+				order_by = value:research_combined_value|CACHED|yes|
 				position = 0
 				save_event_target_as = tec_repurposed_planet
 			}

@@ -1,36 +1,3 @@
-tec_ai_upgradable_habitats = {
-	base = 0
-	complex_trigger_modifier = {
-		trigger = count_owned_planet
-		parameters = {
-			limit = {
-				prev = { has_technology = tech_habitat_2 }
-				is_planet_class = pc_habitat
-				NOR = { 
-					has_planet_flag = advanced_habitat
-					has_planet_flag = payback_habitat
-				}
-			}
-		}
-		mode = add
-	}
-	complex_trigger_modifier = {
-		trigger = count_owned_planet
-		parameters = {
-			limit = {
-				prev = { has_technology = tech_habitat_3 }
-				is_planet_class = pc_habitat
-				NOR = { 
-					has_planet_flag = advanced_habitat_2
-					has_planet_flag = payback_habitat
-				}
-			}
-		}
-		mode = add
-	}
-	mult = $FACTOR|1$
-}
-
 tec_ai_vd_habitat_meet_target = {
 	add = trigger:years_passed
 	divide = 10
@@ -60,4 +27,631 @@ tec_ai_starbase_soldiers_in_system = {
 		mult = value:tec_soldier_jobs_value
 	}
 	[[FACTOR] mult = $FACTOR$]
+}
+
+tec_ai_leader_is_councilor = {
+	base = @tec_block_trait_weight_mult
+	modifier = {
+		add = @[2 - tec_block_trait_weight_mult]
+		is_councilor = yes
+	}
+}
+
+tec_ai_leader_is_ruler = {
+	base = 1
+	modifier = {
+		add = 1
+		is_ruler = yes
+	}
+}
+
+tec_ai_leader_is_fleet_commander = {
+	base = @tec_block_trait_weight_mult
+	modifier = {
+		set = 1
+		exists = fleet
+	}
+	modifier = {
+		mult = @tec_block_trait_weight_mult
+		is_councilor = yes
+	}
+}
+
+tec_ai_leader_wants_aggressive_traits = {
+	base = 0
+	modifier = {
+		add = @tec_reduced_trait_weight
+		exists = owner
+		owner = {
+			OR = {
+				any_neighbor_country = {
+					is_rival = prev.owner
+				}
+			}
+			NOT = { has_country_flag = tec_empire_aggro_turtle }
+		}
+	}
+	modifier = {
+		add = @tec_reduced_trait_weight
+		exists = owner
+		owner = {
+			has_country_flag = tec_empire_aggro_skilled
+		}
+	}
+	modifier = {
+		add = @tec_small_increase_trait_weight
+		exists = owner
+		owner = {
+			OR = {
+				has_ascension_perk = ap_galactic_contender
+				has_ascension_perk = ap_galactic_force_projection
+				has_tradition = tr_supremacy_adopt
+			}
+		}
+	}
+}
+
+tec_ai_leader_wants_defensive_traits = {
+	base = 0
+	modifier = {
+		add = @tec_reduced_trait_weight
+		exists = owner
+		owner = {
+			OR = {
+				any_neighbor_country = {
+					OR = {
+						AND = {
+							relative_power = {
+								category = fleet
+								who = prev
+								value < equivalent
+							}
+							tec_is_default_country = yes
+						}
+						is_homicidal = yes
+					}
+				}
+			}
+			NOT = { has_country_flag = tec_empire_aggro_skilled }
+		}
+	}
+	modifier = {
+		add = @tec_reduced_trait_weight
+		exists = owner
+		owner = {
+			has_country_flag = tec_empire_aggro_turtle
+		}
+	}
+	modifier = {
+		add = @tec_small_increase_trait_weight
+		exists = owner
+		owner = {
+			OR = {
+				has_ascension_perk = ap_eternal_vigilance
+				has_tradition = tr_unyielding_adopt
+			}
+		}
+	}
+	modifier = {
+		add = @tec_reduced_trait_weight
+		exists = owner
+		owner = {
+			is_specialist_subject_type = {
+				TYPE = bulwark
+			}
+		}
+	}
+}
+
+tec_ai_leader_has_ship_matching_flat = {
+	base = 0
+	modifier = {
+		add = fleet.value:_tec_ai_leader_has_ship_matching_flat|TRIGGER|$TRIGGER$|
+		exists = fleet
+	}
+	mult = $MULT|1$
+}
+
+_tec_ai_leader_has_ship_matching_flat = {
+	base = 0
+	complex_trigger_modifier = {
+		trigger = count_owned_ship
+		parameters = {
+			limit = {
+				$TRIGGER$ = yes
+			}
+		}
+		mode = add
+	}
+	divide = trigger:num_ships
+}
+
+tec_ai_leader_years_passed = {
+	base = 0
+	modifier = {
+		add = @tec_small_increase_trait_weight
+		NOT = { years_passed > $YEARS$ }
+	}
+	modifier = {
+		add = @tec_small_increase_trait_weight
+		years_passed > @\[ $YEARS$ + $OFFSET$ ]
+	}
+	modifier = {
+		add = @tec_small_increase_trait_weight
+		years_passed > @\[ $YEARS$ + $OFFSET$ + 5 ]
+	}
+	modifier = {
+		add = @tec_small_increase_trait_weight
+		years_passed > @\[ $YEARS$ + $OFFSET$ + 10 ]
+	}
+}
+
+tec_ai_leader_xp_trait_mult = {
+	base = @tec_max_leader_skill_defines
+	subtract = trigger:has_skill
+	divide = @tec_max_leader_skill_defines
+}
+
+tec_ai_leader_avoid_stack_trait_mult = {
+	base = $MULT|0.75$
+	complex_trigger_modifier = {
+		trigger = count_owned_leader
+		trigger_scope = owner
+		parameters = {
+			limit = {
+				tec_leader_trait_already_exists_in_empire = {
+					trait = $TRAIT$
+					tiers = $TIERS|1$
+				}
+			}
+		}
+		mode = pow
+	}
+}
+
+tec_ai_leader_trait_intimidator_mult = {
+	base = 0
+	modifier = {
+		add = owner.trigger:used_naval_capacity_integer
+		exists = owner
+	}
+	modifier = {
+		divide = owner.value:tec_trigger|TRIGGER|empire_size|MIN|50|
+		exists = owner
+	}
+}
+
+tec_ai_leader_is_army_general = {
+	base = @tec_block_trait_weight_mult
+	modifier = {
+		set = 1
+		OR = {
+			exists = fleet
+		}
+	}
+	modifier = {
+		mult = @tec_block_trait_weight_mult
+		is_councilor = yes
+	}
+}
+
+tec_ai_leader_is_planet_general = {
+	base = @tec_block_trait_weight_mult
+	modifier = { 
+		set = 1
+		exists = planet
+		planet = {
+			exists = army_leader
+			army_leader = {
+				is_same_value = prevprev
+			}
+		}
+	}
+	modifier = {
+		mult = @tec_block_trait_weight_mult
+		is_councilor = yes
+	}
+}
+
+tec_ai_leader_wants_diplomatic_traits = {
+	base = 0
+	modifier = {
+		add = @tec_small_increase_trait_weight
+		exists = owner
+		owner = {
+			OR = {
+				is_xenophile = yes
+				has_ethic = ethic_gestalt_empathy
+			}
+		}
+	}
+	modifier = {
+		add = @tec_small_increase_trait_weight
+		exists = owner
+		owner = {
+			has_ethic = ethic_fanatic_xenophile
+		}
+	}
+	modifier = {
+		add = @tec_reduced_trait_weight
+		exists = owner
+		owner = {
+			has_ascension_perk = ap_shared_destiny
+		}
+	}
+	modifier = {
+		add = @tec_reduced_trait_weight
+		exists = owner
+		owner = {
+			tec_has_diplomatic_civic = yes
+		}
+	}
+
+	modifier = {
+		subtract = @tec_base_trait_weight
+		exists = owner
+		owner = {
+			is_homicidal = yes
+		}
+	}
+}
+
+tec_ai_leader_wants_overlord_traits = {
+	base = 0
+	modifier = {
+		add = @tec_small_increase_trait_weight
+		exists = owner
+		owner = {
+			is_authoritarian = yes
+		}
+	}
+	modifier = {
+		add = @tec_small_increase_trait_weight
+		exists = owner
+		owner = {
+			has_ethic = ethic_fanatic_authoritarian
+		}
+	}
+	modifier = {
+		add = @tec_reduced_trait_weight
+		exists = owner
+		owner = {
+			has_ascension_perk = ap_shared_destiny
+		}
+	}
+	modifier = {
+		subtract = @tec_good_trait_weight
+		exists = owner
+		owner = { is_overlord = no }
+	}
+	complex_trigger_modifier = {
+		trigger = count_subject
+		trigger_scope = owner
+		parameters = { limit = { always = yes } }
+		mode = add
+		mult = @tec_small_increase_trait_weight
+	}
+}
+
+tec_ai_leader_wants_fight_effect_traits = {
+	base = 0
+	modifier = {
+		add = @tec_base_trait_weight
+		exists = owner
+		owner = {
+			OR = {
+				has_valid_civic = civic_crusader_spirit
+				has_valid_civic = civic_crusader_spirit_corporate
+				tec_is_hoarder_empire = yes
+				is_slaver = yes
+			}
+		}
+	}
+}
+
+tec_ai_leader_wants_spy_traits = {
+	base = 0
+	modifier = {
+		add = @tec_reduced_trait_weight
+		exists = owner
+		owner = {
+			has_tradition = tr_subterfuge_adopt
+		}
+	}
+	modifier = {
+		add = @tec_reduced_trait_weight
+		exists = owner
+		owner = {
+			tec_has_spy_civic = yes
+		}
+	}
+}
+
+tec_ai_leader_wants_slaver_traits = {
+	base = 0
+	modifier = {
+		add = @tec_small_increase_trait_weight
+		exists = owner
+		owner = {
+			is_slaver = yes
+		}
+	}
+	modifier = {
+		add = @tec_reduced_trait_weight
+		exists = owner
+		owner = {
+			tec_has_slaver_civic = yes
+		}
+	}
+
+	modifier = {
+		add = planet.value:tec_ai_leader_planet_slaves_perc
+		exists = planet
+	}
+
+	modifier = {
+		subtract = @tec_base_trait_weight
+		is_councilor = no
+		exists = planet
+		planet = {
+			NOT = {
+				any_owned_pop = {
+					is_pop_category = slave
+				}
+			}
+		}
+	}
+}
+
+tec_ai_leader_planet_slaves_perc = {
+	base = 0
+	complex_trigger_modifier = {
+		trigger = count_owned_pop
+		parameters = {
+			limit = {
+				is_pop_category = slave
+			}
+		}
+		mode = add
+	}
+	divide = trigger:num_pops
+	mult = @tec_base_trait_weight
+}
+
+tec_ai_leader_wants_scrap_traits = {
+	base = 0
+	modifier = {
+		add = @tec_base_trait_weight
+		exists = owner
+		owner = {
+			is_scavenger = yes
+		}
+	}
+}
+
+tec_ai_leader_needs_naval_cap_mult = {
+	base = 1
+	modifier = {
+		add = 1
+		exists = owner
+		owner = { used_naval_capacity_percent > 0.9 }
+	}
+	modifier = {
+		add = 0.5
+		exists = owner
+		owner = { used_naval_capacity_percent > 1 }
+	}
+}
+
+tec_ai_leader_is_behind_tech_mult = {
+	base = 0.5
+	modifier = {
+		add = 0.5
+		exists = owner
+		owner = {
+			any_neighbor_country = {
+				relative_power = {
+					category = technology
+					who = prev
+					value < equivalent
+				}
+			}
+		}
+	}
+}
+
+tec_ai_leader_wants_anticrime_traits = {
+	base = 0
+	modifier = {
+		add = @tec_base_trait_weight
+		is_councilor = yes
+		exists = owner
+		owner = {
+			any_owned_planet = {
+				OR = {
+					planet_crime > 50
+					AND = {
+						has_branch_office = yes
+						exists = branch_office_owner
+						branch_office_owner = {
+							is_criminal_syndicate = yes
+						}
+					}
+				}
+			}
+		}
+	}
+	modifier = {
+		add = @tec_reduced_trait_weight
+		exists = owner
+		owner = {
+			OR = {
+				has_valid_civic = civic_police_state
+			}
+		}
+	}
+
+	modifier = {
+		add = @tec_reduced_trait_weight
+		exists = planet
+		planet = {
+			planet_crime > 50
+		}
+	}
+}
+
+tec_ai_leader_wants_soldier_traits = {
+	base = 0
+	modifier = {
+		add = @tec_reduced_trait_weight
+		exists = owner
+		owner = {
+			OR = {
+				tec_has_soldier_swap = yes
+				tec_has_warrior_drone_swap = yes
+			}
+		}
+	}
+
+	modifier = {
+		add = planet.value:tec_soldier_jobs_value|FACTOR|@tec_job_scale_planet_trait_weight_mult|
+		exists = planet
+	}
+
+	modifier = {
+		add = owner.value:tec_soldier_jobs_value|FACTOR|@tec_job_scale_country_trait_weight_mult|
+		NOT = { exists = planet }
+		exists = owner
+		is_councilor = yes
+	}
+}
+
+tec_ai_leader_wants_resource_production_traits = {
+	base = 0
+	modifier = {
+		add = @tec_reduced_trait_weight
+		OR = {
+			leader_class = commander
+			leader_class = official
+		}
+	}
+	modifier = {
+		add = @tec_reduced_trait_weight
+		years_passed < 20
+	}
+	modifier = {
+		add = @tec_reduced_trait_weight
+		exists = owner
+		owner = {
+			has_deficit = $RESOURCE$
+		}
+	}
+	modifier = {
+		subtract = @tec_good_trait_weight
+		OR = {
+			leader_class = commander
+			leader_class = scientist
+		}
+	}
+}
+
+tec_ai_leader_is_governing_planet = {
+	base = @tec_block_trait_weight_mult
+	modifier = {
+		set = 1
+		exists = planet
+	}
+	modifier = {
+		mult = @tec_block_trait_weight_mult
+		is_councilor = yes
+	}
+}
+
+tec_ai_leader_wants_blocker_traits = {
+	base = 0
+	modifier = {
+		add = planet.trigger:num_uncleared_blockers
+		exists = planet
+	}
+	mult = @tec_small_increase_trait_weight
+}
+
+tec_ai_leader_is_exploring = {
+	base = @tec_block_trait_weight_mult
+	modifier = {
+		set = 1
+		exists = fleet
+		fleet = {
+			OR = {
+				has_fleet_order = survey_planet_order
+				has_fleet_order = excavate_archaeological_site_fleet_order
+				has_fleet_order = research_anomaly_order
+				has_fleet_order = research_discovery_order
+				has_fleet_order = auto_explore_order
+				has_fleet_order = explore_bypass_order
+				has_fleet_order = move_to_system_point_order
+				has_fleet_order = experimental_subspace_navigation_fleet_order
+			}
+		}
+	}
+	modifier = {
+		mult = @tec_block_trait_weight_mult
+		is_councilor = yes
+	}
+}
+
+tec_ai_leader_is_assisting_research = {
+	base = @tec_block_trait_weight_mult
+	#modifier = {
+	#	set = 1
+	#	exists = leader
+	#	fleet = {
+	#		OR = {
+	#			has_fleet_order = assist_research_order
+	#		}
+	#	}
+	#}
+	modifier = {
+		mult = @tec_block_trait_weight_mult
+		is_councilor = yes
+	}
+}
+
+tec_ai_leader_wants_councilor_destiny_trait = {
+	base = 1
+	modifier = {
+		set = @tec_block_trait_weight_mult
+		is_councilor = yes
+	}
+}
+
+tec_ai_count_productive_worker_pops = {
+	base = 0
+	complex_trigger_modifier = {
+		trigger = count_owned_pop
+		parameters = {
+			limit = {
+				is_pop_category = worker
+				NOR = {
+					has_job = clerk
+					has_job = servant
+					has_job = soldier
+				}
+			}
+		}
+		mode = add
+	}
+}
+
+tec_ai_count_non_worker_pops = {
+	base = 0
+	complex_trigger_modifier = {
+		trigger = count_owned_pop
+		parameters = {
+			limit = {
+				NOT = { is_pop_category = worker }
+			}
+		}
+		mode = add
+	}
 }

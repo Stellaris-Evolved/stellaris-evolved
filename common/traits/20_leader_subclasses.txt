@@ -1,0 +1,606 @@
+# common\traits\20_leader_subclasses.txt
+
+@ai_selection_high = 5
+@ai_selection_low = 0.1
+
+#############
+# COMMANDER #
+#############
+
+subclass_commander_admiral = {	# EVOLVED NOTE: Admiral
+	custom_subtitle = commander_subclass
+	leader_trait_type = subclass
+	inline_script = {
+		script = trait/icon_subclass
+		SUBCLASS = commander_admiral
+		COUNCIL = no
+	}
+	custom_tooltip_with_modifiers = admiral_subclass_tt
+	modifier = {
+		ship_weapon_damage = 0.05
+		ship_fire_rate_mult = 0.05
+		ship_disengage_chance_mult = 0.05
+	}
+	leader_potential_add = {
+		NAND = {
+			owner = { has_civic = civic_distinguished_admiralty }
+			is_heir = yes
+		}
+	}
+	ai_weight = {
+		modifier = {
+			is_councilor = yes
+			factor = @ai_selection_low
+		}
+		modifier = {
+			is_councilor = no
+			factor = @ai_selection_high
+		}
+		modifier = {
+			exists = fleet
+			NOT = {
+				fleet = {
+					is_ship_class = shipclass_transport
+				}
+			}
+			factor = @ai_selection_high
+		}
+		modifier = {
+			NOT = {
+				exists = fleet
+			}
+			factor = @ai_selection_low
+		}
+	}
+	leader_class = { commander }
+	background_icon = "GFX_leader_subclass_commander_admiral_background"
+}
+
+subclass_commander_general = {	# EVOLVED NOTE: General
+	custom_subtitle = commander_subclass
+	leader_trait_type = subclass
+	inline_script = {
+		script = trait/icon_subclass
+		SUBCLASS = commander_general
+		COUNCIL = no
+	}
+	custom_tooltip_with_modifiers = general_subclass_tt
+
+	fleet_modifier = {
+		ship_damage_against_starbases_mult = 0.05
+		ship_orbital_bombardment_mult = 0.05
+	}
+
+	army_modifier = {
+		army_damage_mult = 0.05
+	}
+
+	leader_potential_add = {
+		trait_is_crisis_faction_check = no
+		NAND = {
+			owner = { has_civic = civic_distinguished_admiralty }
+			is_heir = yes
+		}
+	}
+	ai_weight = {
+		modifier = {
+			is_councilor = yes
+			factor = @ai_selection_low
+		}
+		modifier = {
+			is_councilor = no
+			factor = @ai_selection_high
+		}
+		modifier = {
+			OR = {
+				AND = {
+					exists = fleet
+					fleet = {
+						is_ship_class = shipclass_transport
+					}
+				}
+				owner = {
+					any_owned_army = {
+						exists = leader
+						leader = {
+							is_same_value = root
+						}
+					}
+				}
+			}
+			factor = @ai_selection_high
+		}
+		modifier = {
+			NOT = {
+				owner = {
+					any_owned_army = {
+						exists = leader
+						leader = {
+							is_same_value = root
+						}
+					}
+				}
+			}
+			factor = @ai_selection_low
+		}
+	}
+	leader_class = { commander }
+	background_icon = "GFX_leader_subclass_commander_general_background"
+}
+
+subclass_commander_governor = {	# EVOLVED NOTE: Governor
+	custom_subtitle = commander_subclass
+	leader_trait_type = subclass
+	inline_script = {
+		script = trait/icon_subclass
+		SUBCLASS = commander_governor
+		COUNCIL = no
+	}
+	custom_tooltip_with_modifiers = governor_subclass_tt
+	leader_potential_add = {
+		trait_is_crisis_faction_check = no
+	}
+	#triggered_planet_modifier = {
+	#	potential = {
+	#		trait_is_gestalt_check = no
+	#	}
+	#	job_soldier_add = 2
+	#}
+	#triggered_sector_modifier = {
+	#	potential = {
+	#		trait_is_gestalt_check = no
+	#	}
+	#	job_soldier_add = 1
+	#}
+	#triggered_planet_modifier = {
+	#	potential = {
+	#		trait_is_gestalt_check = yes
+	#	}
+	#	job_warrior_drone_add = 2
+	#}
+	#triggered_sector_modifier = {
+	#	potential = {
+	#		trait_is_gestalt_check = yes
+	#	}
+	#	job_warrior_drone_add = 1
+	#}
+	planet_modifier = {
+		job_soldier_stability_add = 1
+	}
+	sector_modifier = {
+		job_soldier_stability_add = 0.5
+	}
+
+	inline_script = {
+		script =  leaders/inline_evolved_improved_governor
+		PLANET_MODIFIER = "
+			planet_jobs_ruler_produces_mult = @tec_c_planet_ruler_output_inverted
+			planet_jobs_specialist_produces_mult = @tec_c_planet_spec_output_inverted
+		"
+		SECTOR_MODIFIER = "
+			planet_jobs_ruler_produces_mult = @tec_c_planet_ruler_output_inverted
+			planet_jobs_specialist_produces_mult = @tec_c_planet_spec_output_inverted
+		"
+		MULT = "mult = trigger:has_skill"
+	}
+	ai_weight = {
+		modifier = {
+			is_councilor = yes
+			factor = @ai_selection_low
+		}
+		modifier = {
+			is_councilor = no
+			factor = @ai_selection_high
+		}
+		modifier = {
+			exists =  planet
+			factor = @ai_selection_high
+		}
+		modifier = {
+			NOT = { exists =  planet }
+			factor = @ai_selection_low
+		}
+	}
+	leader_class = { commander }
+	background_icon = "GFX_leader_subclass_commander_governor_background"
+}
+
+subclass_commander_councilor = {	# EVOLVED NOTE: .... xd
+	custom_subtitle = councilor_subclass_commander
+	leader_trait_type = subclass
+	inline_script = {
+		script = trait/icon_subclass
+		SUBCLASS = commander_councilor
+		COUNCIL = yes
+	}
+	custom_tooltip_with_modifiers = councilor_subclass_tt
+	triggered_councilor_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_gestalt = no }
+		}
+		shipclass_military_build_speed_mult = 0.1
+	}
+	leader_potential_add = {
+		trait_is_crisis_faction_check = no
+		NAND = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+	}
+	ai_weight = {
+		modifier = {
+			is_councilor = yes
+			factor = @ai_selection_high
+		}
+		modifier = {
+			is_councilor = no
+			factor = @ai_selection_low
+		}
+	}
+	leader_class = { commander }
+	background_icon = "GFX_leader_subclass_commander_councilor_background"
+}
+
+#############
+# OFFICIAL #
+#############
+
+subclass_official_delegate = {	# EVOLVED NOTE: Fed&Galcom
+	custom_subtitle = governor_subclass
+	leader_trait_type = subclass
+	inline_script = {
+		script = trait/icon_subclass
+		SUBCLASS = official_delegate
+		COUNCIL = no
+	}
+	leader_class = { official }
+	custom_tooltip_with_modifiers = delegate_subclass_tt
+
+	federation_modifier = {
+		cohesion_add = 0.5
+	}
+
+	galcom_modifier = {
+		diplo_weight_mult = 0.05
+	}
+	ai_weight = {
+		modifier = {
+			is_councilor = yes
+			factor = @ai_selection_low
+		}
+		modifier = {
+			is_councilor = no
+			factor = @ai_selection_high
+		}
+		modifier = {
+			OR = {
+				is_assigned_to_federation = yes
+				is_assigned_to_galcom = yes
+			}
+			factor = @ai_selection_high
+		}
+		modifier = {
+			OR = {
+				is_assigned_to_federation = no
+				is_assigned_to_galcom = no
+			}
+			factor = @ai_selection_low
+		}
+	}
+	background_icon = "GFX_leader_subclass_official_delegate_background"
+}
+
+subclass_official_governor = {	# EVOLVED NOTE: Governor
+	custom_subtitle = governor_subclass
+	leader_trait_type = subclass
+	inline_script = {
+		script = trait/icon_subclass
+		SUBCLASS = official_governor
+		COUNCIL = no
+	}
+	custom_tooltip_with_modifiers = governor_subclass_tt
+
+	planet_modifier = {
+		planet_jobs_specialist_produces_mult = 0.05
+		pop_amenities_usage_mult = -0.1
+	}
+	sector_modifier = {
+		planet_jobs_specialist_produces_mult = 0.025
+		pop_amenities_usage_mult = -0.05
+	}
+
+	inline_script = {
+		script =  leaders/inline_evolved_improved_governor
+		PLANET_MODIFIER = "
+			planet_researchers_produces_mult = 0.01
+		"
+		SECTOR_MODIFIER = "
+			planet_researchers_produces_mult = 0.005
+		"
+		MULT = "mult = trigger:has_skill"
+	}
+
+	leader_class = { official }
+
+	ai_weight = {
+		modifier = {
+			is_councilor = yes
+			factor = @ai_selection_low
+		}
+		modifier = {
+			is_councilor = no
+			factor = @ai_selection_high
+		}
+		modifier = {
+			exists =  planet
+			factor = @ai_selection_high
+		}
+		modifier = {
+			NOT = { exists =  planet }
+			factor = @ai_selection_low
+		}
+	}
+
+	background_icon = "GFX_leader_subclass_official_governor_background"
+}
+
+subclass_official_diplomacy_councilor = {	# EVOLVED NOTE: Councilor Diplo
+	custom_subtitle = councilor_subclass_governor
+	leader_trait_type = subclass
+	inline_script = {
+		script = trait/icon_subclass
+		SUBCLASS = official_diplomacy_councilor
+		COUNCIL = yes
+	}
+	custom_tooltip_with_modifiers = councilor_subclass_tt
+
+	triggered_councilor_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_gestalt = no }
+		}
+		country_trust_growth = 0.05
+	}
+
+	leader_potential_add = {
+		NAND = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+	}
+	ai_weight = {
+		modifier = {
+			is_councilor = yes
+			factor = @ai_selection_high
+		}
+		modifier = {
+			is_councilor = no
+			factor = @ai_selection_low
+		}
+	}
+	leader_class = { official }
+	background_icon = "GFX_leader_subclass_official_diplomacy_councilor_background"
+}
+
+subclass_official_economy_councilor = {		# EVOLVED NOTE: Councilor Eco
+	custom_subtitle = councilor_subclass_governor
+	leader_trait_type = subclass
+	inline_script = {
+		script = trait/icon_subclass
+		SUBCLASS = official_economy_councilor
+		COUNCIL = yes
+	}
+	custom_tooltip_with_modifiers = councilor_subclass_tt
+
+	triggered_councilor_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_gestalt = no }
+		}
+		planet_pops_upkeep_mult = -0.05
+		trade_value_mult = 0.05
+	}
+
+	leader_potential_add = {
+		NAND = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+	}
+	ai_weight = {
+		modifier = {
+			is_councilor = yes
+			factor = @ai_selection_high
+		}
+		modifier = {
+			is_councilor = no
+			factor = @ai_selection_low
+		}
+	}
+	leader_class = { official }
+	background_icon = "GFX_leader_subclass_official_economy_councilor_background"
+}
+
+#############
+# SCIENTIST #
+#############
+subclass_scientist_explorer = {		# EVOLVED NOTE: Exploration
+	custom_subtitle = scientist_subclass
+	leader_trait_type = subclass
+	inline_script = {
+		script = trait/icon_subclass
+		SUBCLASS = scientist_explorer
+		COUNCIL = no
+	}
+	custom_tooltip_with_modifiers = explorer_subclass_tt
+	modifier = {
+		ship_sensor_range_add = 1
+		science_ship_survey_speed = 0.1
+		ship_anomaly_generation_chance_mult = 0.1
+	}
+
+	ai_weight = {
+		modifier = {
+			is_councilor = yes
+			factor = @ai_selection_low
+		}
+		modifier = {
+			is_councilor = no
+			factor = @ai_selection_high
+		}
+		modifier = {
+			exists = fleet
+			NOT = {
+				fleet = {
+					is_ship_class = shipclass_transport
+				}
+			}
+			factor = @ai_selection_high
+		}
+		modifier = {
+			NOT = {
+				exists = fleet
+			}
+			factor = @ai_selection_low
+		}
+	}
+
+	leader_class = { scientist }
+	background_icon = "GFX_leader_subclass_scientist_explorer_background"
+}
+
+subclass_scientist_scholar = {		# EVOLVED NOTE: Events
+	custom_subtitle = scientist_subclass
+	leader_trait_type = subclass
+	inline_script = {
+		script = trait/icon_subclass
+		SUBCLASS = scientist_scholar
+		COUNCIL = no
+	}
+	custom_tooltip_with_modifiers = scholar_subclass_tt
+
+	modifier = {
+		ship_anomaly_research_speed_mult = 0.1
+		ship_archaeological_site_excavation_speed_mult = 0.1
+		country_astral_rift_speed_mult = 0.1
+	}
+	ai_weight = {
+		modifier = {
+			is_councilor = yes
+			factor = @ai_selection_low
+		}
+		modifier = {
+			is_councilor = no
+			factor = @ai_selection_high
+		}
+		modifier = {
+			exists = fleet
+			NOT = {
+				fleet = {
+					is_ship_class = shipclass_transport
+				}
+			}
+			factor = @ai_selection_high
+		}
+		modifier = {
+			NOT = {
+				exists = fleet
+			}
+			factor = @ai_selection_low
+		}
+	}
+
+	leader_class = { scientist }
+	background_icon = "GFX_leader_subclass_scientist_scholar_background"
+}
+
+subclass_scientist_governor = {		# EVOLVED NOTE: Governor
+	custom_subtitle = scientist_subclass
+	leader_trait_type = subclass
+	inline_script = {
+		script = trait/icon_subclass
+		SUBCLASS = scientist_governor
+		COUNCIL = no
+	}
+	custom_tooltip_with_modifiers = governor_subclass_tt
+	planet_modifier = {
+		planet_jobs_physics_research_produces_mult = 0.10
+		planet_jobs_society_research_produces_mult = 0.10
+		planet_jobs_engineering_research_produces_mult = 0.10
+	}
+	sector_modifier = {
+		planet_jobs_physics_research_produces_mult = 0.05
+		planet_jobs_society_research_produces_mult = 0.05
+		planet_jobs_engineering_research_produces_mult = 0.05
+	}
+
+	inline_script = {
+		script =  leaders/inline_evolved_improved_governor
+		PLANET_MODIFIER = "
+			planet_administrators_produces_mult = 0.01
+		"
+		SECTOR_MODIFIER = "
+			planet_administrators_produces_mult = 0.005
+		"
+		MULT = "mult = trigger:has_skill"
+	}
+	ai_weight = {
+		modifier = {
+			is_councilor = yes
+			factor = @ai_selection_low
+		}
+		modifier = {
+			is_councilor = no
+			factor = @ai_selection_high
+		}
+		modifier = {
+			exists =  planet
+			factor = @ai_selection_high
+		}
+		modifier = {
+			NOT = { exists =  planet }
+			factor = @ai_selection_low
+		}
+	}
+
+	leader_class = { scientist }
+	background_icon = "GFX_leader_subclass_scientist_governor_background"
+}
+
+subclass_scientist_councilor = {	# EVOLVED NOTE: Councilor
+	custom_subtitle = councilor_subclass_scientist
+	leader_trait_type = subclass
+	inline_script = {
+		script = trait/icon_subclass
+		SUBCLASS = scientist_councilor
+		COUNCIL = yes
+	}
+	custom_tooltip_with_modifiers = councilor_subclass_tt
+
+	triggered_councilor_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_gestalt = no }
+		}
+		all_technology_research_speed = 0.05
+	}
+	leader_potential_add = {
+		NAND = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+	}
+	ai_weight = {
+		modifier = {
+			is_councilor = yes
+			factor = @ai_selection_high
+		}
+		modifier = {
+			is_councilor = no
+			factor = @ai_selection_low
+		}
+	}
+	leader_class = { scientist }
+	background_icon = "GFX_leader_subclass_scientist_councilor_background"
+}

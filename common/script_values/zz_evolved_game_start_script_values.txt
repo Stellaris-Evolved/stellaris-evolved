@@ -132,7 +132,14 @@ tec_start_farming_to_mining_district_swap = {
 }
 
 tec_start_farming_to_generator_district_swap = {
-	add = 0
+	modifier = {
+		owner = {
+			tec_is_quantum_alloys_empire = yes
+			is_machine_empire = no
+			is_lithoid_empire = no
+		}
+		add = 1
+	}
 }
 
 tec_start_species_specific_district_count = {
@@ -155,6 +162,57 @@ tec_start_species_specific_district_count = {
 }
 
 # TODO: fix `has_country_flag = non_lithoid_subspecies` checks, cause no food districts
+tec_start_generator_district_count = {
+	add = value:tec_start_scale_payback_value|BASE|2|
+
+	modifier = {
+		owner = { is_machine_empire = yes }
+		add = value:tec_start_species_specific_district_count
+	}
+
+	modifier = {
+		owner = { is_megacorp = yes }
+		add = -1
+	}
+
+
+	modifier = {
+		owner = {
+			has_origin = origin_mechanists
+		}
+		add = 1
+	}
+
+	modifier = {
+		owner = {
+			tec_is_biohive = yes
+		}
+		add = -1
+	}
+	modifier = {
+		owner = {
+			tec_is_biohive = yes
+			is_catalytic_empire = yes
+		}
+		add = -1
+	}
+
+	add = value:tec_start_farming_to_generator_district_swap
+	add = value:tec_start_mining_to_generator_district_swap
+	subtract = value:tec_start_generator_to_farming_district_swap
+	subtract = value:tec_start_generator_to_mining_district_swap
+
+	min = 0
+	modifier = { # safety nets
+		min = 1
+		owner = {
+			OR = {
+				is_machine_empire = yes
+				tec_is_quantum_alloys_empire = yes
+			}
+		}
+	}
+}
 
 tec_start_farming_district_count = {
 	# Starter
@@ -180,9 +238,25 @@ tec_start_farming_district_count = {
 			any_owned_species = {
 				OR = {
 					has_trait = trait_tec_machine_biobrain
-					has_trait = trait_tec_machine_biomass	
+					has_trait = trait_tec_machine_biomass
 				}
 			}
+		}
+		add = 1
+	}
+
+	modifier = {
+		owner = {
+			tec_is_biohive = yes
+			is_lithoid_empire = no
+		}
+		add = 2
+	}
+
+	modifier = {
+		owner = {
+			tec_is_biohive = yes
+			is_catalytic_empire = yes
 		}
 		add = 1
 	}
@@ -192,9 +266,19 @@ tec_start_farming_district_count = {
 	subtract = value:tec_start_farming_to_mining_district_swap
 	subtract = value:tec_start_farming_to_generator_district_swap
 	min = 0
+
 	modifier = { # safety nets
 		min = 1
-		owner = {  country_uses_food = yes }
+		owner = {
+			OR = {
+				AND = {
+					is_machine_empire = no
+					is_lithoid_empire = no
+				}
+				has_country_flag = non_lithoid_subspecies
+				is_catalytic_empire = yes
+			}
+		}
 	}
 }
 
@@ -225,6 +309,22 @@ tec_start_mining_district_count = {
 		add = 1
 	}
 
+	modifier = {
+		owner = {
+			tec_is_biohive = yes
+			is_lithoid_empire = no
+		}
+		add = -1
+	}
+
+	modifier = {
+		owner = {
+			tec_is_biohive = yes
+			is_lithoid_empire = yes
+		}
+		add = 2
+	}
+
 	add = value:tec_start_farming_to_mining_district_swap
 	add = value:tec_start_generator_to_mining_district_swap
 	subtract = value:tec_start_mining_to_farming_district_swap
@@ -232,44 +332,18 @@ tec_start_mining_district_count = {
 	min = 0
 	modifier = { # safety nets
 		min = 1
-		owner = {  is_lithoid_empire = yes }
-	}
-}
-
-
-tec_start_generator_district_count = {
-	add = value:tec_start_scale_payback_value|BASE|2|
-
-	modifier = {
-		owner = { is_machine_empire = yes }
-		add = value:tec_start_species_specific_district_count
-	}
-
-	modifier = {
-		owner = { is_megacorp = yes }
-		add = -1
-	}
-
-
-	modifier = {
 		owner = {
-			has_origin = origin_mechanists
+			OR = {
+				is_lithoid_empire = yes
+				AND = {
+					is_catalytic_empire = no
+					tec_is_quantum_alloys_empire = no
+				}
+				has_country_flag = lithoid_subspecies
+			}
 		}
-		add = 1
-	}
-
-	add = value:tec_start_farming_to_generator_district_swap
-	add = value:tec_start_mining_to_generator_district_swap
-	subtract = value:tec_start_generator_to_farming_district_swap
-	subtract = value:tec_start_generator_to_mining_district_swap
-
-	min = 0
-	modifier = { # safety nets
-		min = 1
-		owner = { is_machine_empire = yes }
 	}
 }
-
 
 tec_start_industrial_district_count = {
 	add = value:tec_start_scale_payback_value|BASE|2|
@@ -376,10 +450,12 @@ tec_start_pops_secondary_count = {
 }
 
 # Balance
-	# mult = value:tec_difficulty_scaling|DIVIDE|0.5|
+	# mult = value:tec_difficulty_scaling|FACTOR|0.5|
 	tec_difficulty_scaling = {
 		add = trigger:is_difficulty
-		divide = $DIVIDE$
+		mult = $FACTOR$
+	}
+# /
 		# is_difficulty - Checks the game's difficulty level (0 to 6, with 0 as Civilian and 6 as Grand Admiral
 		# is_difficulty = 0 = Civillian
 		# is_difficulty = 1 = Cadet
@@ -388,5 +464,3 @@ tec_start_pops_secondary_count = {
 		# is_difficulty = 4 = Commodore
 		# is_difficulty = 5 = Admiral
 		# is_difficulty = 6 = Grand Admiral
-	}
-# /

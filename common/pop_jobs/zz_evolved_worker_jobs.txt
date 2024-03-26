@@ -31,7 +31,7 @@
 						has_generator_designation = no
 					}
 				}
-				minerals = 3
+				minerals = 2
 			}
 			produces = {
 				trigger = {
@@ -39,7 +39,7 @@
 						has_mining_designation = yes
 					}
 				}
-				minerals = 9
+				minerals = 6
 			}
 
 			# food
@@ -50,7 +50,7 @@
 						has_generator_designation = no
 					}
 				}
-				food = 3
+				food = 2
 			}
 			produces = {
 				trigger = {
@@ -58,7 +58,7 @@
 						has_farming_designation = yes
 					}
 				}
-				food = 9
+				food = 6
 			}
 
 			# energy
@@ -69,7 +69,7 @@
 						has_farming_designation = no
 					}
 				}
-				energy = 3
+				energy = 2
 			}
 			produces = {
 				trigger = {
@@ -77,7 +77,7 @@
 						has_generator_designation = yes
 					}
 				}
-				energy = 9
+				energy = 6
 			}
 			produces = {
 				unity = 2
@@ -88,7 +88,7 @@
 			potential = {
 				exists = owner
 				owner = {
-					tec_is_trade_gestalt = no
+					is_megacorp = no
 				}
 			}
 			planet_amenities_no_happiness_add = -2
@@ -98,7 +98,7 @@
 			potential = {
 				exists = owner
 				owner = {
-					tec_is_trade_gestalt = yes
+					is_megacorp = yes
 				}
 			}
 			trade_value_add = -2
@@ -193,9 +193,13 @@
 			modifier = {
 				factor = 10
 				exists = planet
-				planet = { has_modifier = martial_law }
+				planet = {
+					exists = leader
+					leader = {
+						leader_class = commander
+					}
+				}
 			}
-
 
 			modifier = {
 				factor = 2
@@ -621,7 +625,7 @@
 
 	tec_labrat = {				# Creative Testing
 		category = worker
-		condition_string = SPECIALIST_JOB_TRIGGER
+		condition_string = WORKER_JOB_TRIGGER
 		building_icon = building_research_lab_1
 		clothes_texture_index = 3
 
@@ -761,6 +765,117 @@
 		}
 	}
 
+	tec_scrapper = {			# Scrappers
+		category = worker
+		condition_string = WORKER_JOB_TRIGGER
+		building_icon = building_tec_scavenge_center
+		clothes_texture_index = 2
+	
+		possible_pre_triggers = {
+			has_owner = yes
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+	
+		possible_precalc = can_fill_worker_job
+		possible = {
+			hidden_trigger = { exists = owner }
+			owner = {
+				is_gestalt = no
+			}
+		}
+		
+		resources = {
+			category = planet_metallurgists
+			produces = {
+				alloys = 2
+			}
+	
+			inline_script = {
+				script = jobs/resources/inline_evolved_alloy_and_refinery_job_upkeep
+				minerals = 3
+				multiplier = 1
+				trigger = "
+					exists = owner
+					owner = {
+						OR = {
+							is_catalytic_empire = yes
+							tec_is_quantum_alloys_empire = yes
+						}
+						tec_is_dystopian_empire = no
+					}
+				"
+			}
+			# No requisition as the job is criminal :D
+		}
+	
+		inline_script = jobs/effects/type/inline_evolved_foundry_effect
+
+		# Trade & Amenities
+			triggered_planet_modifier = {	# Amenity upkeep
+				potential = {
+					exists = owner
+					owner = {
+						is_megacorp = no
+						is_catalytic_empire = no
+						tec_is_quantum_alloys_empire = no
+						tec_is_dystopian_empire = no
+					}
+				}
+				planet_amenities_add = -2
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+
+			triggered_planet_modifier = {	# Trade Upkeep
+				potential = {
+					exists = owner
+					owner = {
+						is_megacorp = yes
+						is_catalytic_empire = no
+						tec_is_quantum_alloys_empire = no
+						tec_is_dystopian_empire = no
+					}
+				}
+				trade_value_add = -2
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+		# /
+
+		# Crime upkeep
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						tec_is_dystopian_empire = no
+					}
+				}
+				planet_crime_add = 2
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						tec_is_dystopian_empire = yes
+					}
+				}
+				planet_crime_add = 5
+				mult = value:tec_alternative_modifier_upkeep|MODIFIER1|planet_jobs_upkeep_mult|MODIFIER2|planet_jobs_productive_upkeep_mult|
+			}
+		# /
+
+		weight = {
+			# Specialist job Weight
+			weight = @specialist_job_weight
+			mult = value:job_weights_modifier|JOB|tec_scrapper|RESOURCE|alloys|
+			modifier = {
+				factor = 5
+				has_job = tec_scrapper
+			}
+		}
+	}
+
 	tec_reef_miner = {			# Aquatic
 		category = worker
 		icon = tec_reef_drone
@@ -788,6 +903,7 @@
 			produces = {
 				minerals = 6
 			}
+			inline_script = jobs/resources/inline_evolved_councilor_anglers_miner
 			# Species bonuses/maluses
 				#produces = {
 				#	trigger = {
@@ -1293,7 +1409,7 @@
 					tec_is_shackled_robot = { cached = yes }
 				}
 				can_take_servant_job = no
-				can_fill_specialist_job = no
+				can_fill_specialist_job_trigger = no
 			}
 
 			modifier = {
@@ -1403,7 +1519,12 @@
 			modifier = {
 				factor = 10
 				exists = planet
-				planet = { has_modifier = martial_law }
+				planet = {
+					exists = leader
+					leader = {
+						leader_class = commander
+					}
+				}
 			}
 
 			modifier = {
@@ -1488,25 +1609,17 @@
 				alloys = 1.5
 				multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_production_mult|
 			}
-			upkeep = {
+
+			inline_script = {
+				script = jobs/resources/inline_evolved_alloy_and_refinery_job_upkeep
 				minerals = 3
 				multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+				trigger = ""
 			}
-		
-			# Quantum alloys
-				inline_script = {
-					script = jobs/resources/inline_evolved_tec_quantum_alloys
-					minerals = 1.5
-					energy = 2.5
-					mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
-					trigger = ""
-				}
-			# /
 
 			inline_script = {
 				script = jobs/resources/inline_evolved_material_foundry_requisition_resources
 				minerals = 1
-				food = 0
 				alloys = @[ requisitorium_alloys_reduction / 2 ]
 				mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
 			}
@@ -1516,7 +1629,7 @@
 			category = planet_requisitioned_alloys
 			inline_script = {
 				script = jobs/resources/inline_evolved_material_foundry_requisition_overlord_resources
-				alloys = @[ requisitorium_alloys_overlord / 2]
+				alloys = @[ requisitorium_alloys_overlord / 2 ]
 				mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
 			}
 		}
@@ -1581,14 +1694,13 @@
 			}
 
 			upkeep = {
-				food = 4
+				food = @[3 * tec_catalytic_conversion_rate]
 				multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
 			}
 
 			inline_script = {
 				script = jobs/resources/inline_evolved_material_foundry_requisition_resources
-				minerals = 0
-				food = 1.5
+				minerals = 1
 				alloys = @[ requisitorium_alloys_reduction / 2 ]
 				mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
 			}
@@ -1666,7 +1778,7 @@
 			inline_script = {
 				script = jobs/resources/inline_evolved_cg_job_upkeep
 				upkeep = 3
-				multiplier = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
+				mult = value:scripted_modifier_mult|MODIFIER|tec_hired_job_base_upkeep_mult|
 				trigger = ""
 			}
 
@@ -1889,7 +2001,7 @@
 			mult = value:tec_hired_job_trade_add
 		}
 
-		inline_script = jobs/effects/inline_evolved_pleasure_seeker_entertainer
+		inline_script = jobs/effects/type/inline_evolved_entertainer_effect
 
 		weight = {
 			# Specialist job Weight
