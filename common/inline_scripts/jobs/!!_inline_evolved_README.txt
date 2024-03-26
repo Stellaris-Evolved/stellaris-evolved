@@ -2,7 +2,7 @@
 # for the purpose of standardization and reducing repetition.
 
 # Below we will document general parameter names used in the inlines in this
-# folder, with the prefix `inline_evolved_`
+# folder, with the prefix `tec_`
 
 # trigger - allows passing a trigger when a job is added/description is displayed.
 	# Some jobs have some innate conditions, the trigger in this cases being extra

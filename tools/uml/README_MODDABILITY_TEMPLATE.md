@@ -32,13 +32,13 @@ A list of all available suffixes will be available below.
 
 ### Inline scripts
 
-Inline scripts that have `mod_support/inline_evolved_inlines_include` inside their logic
+Inline scripts that have `mod_support/tec_inlines_include` inside their logic
 allow themselves to be extended by creating an inline inside the `common/inline_scripts/evolved_support`
 with the path of the inline you want to extend.
 
 For example if we want to extend as above the main cult swaps of priests,
-you will want to extend the `jobs/inline_evolved_priest` inline, which you can do by making
-a file at the path `common/inline_scripts/evolved_support/jobs/inline_evolved_priest_<suffix>`, the `<suffix>`
+you will want to extend the `jobs/tec_priest` inline, which you can do by making
+a file at the path `common/inline_scripts/evolved_support/jobs/tec_priest_<suffix>`, the `<suffix>`
 being a specific identifier that we can create and add to evolved for your patch/mod/addon etc.
 
 All parameters of the extended inline will be available in your inline too.
@@ -46,10 +46,10 @@ All parameters of the extended inline will be available in your inline too.
 IE, something like below, if your `<suffix>` is `sam`:
 
 ```
-# file: common/inline_scripts/evolved_support/jobs/inline_evolved_priest_sam.txt
+# file: common/inline_scripts/evolved_support/jobs/tec_priest_sam.txt
 
 inline_script = {	
-    script = jobs/inline_evolved_job
+    script = jobs/tec_job
     trigger = "
         exists = owner
 
