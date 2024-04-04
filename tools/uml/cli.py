@@ -247,9 +247,9 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                     value = @tec_{s}_addon_present
                     equal = 1
                     inline = evolved_support/$include_script$_{s}
-                    parameters = '
+                    parameters = "
                         $parameters$
-                    '
+                    "
                 }}
             """))
 
