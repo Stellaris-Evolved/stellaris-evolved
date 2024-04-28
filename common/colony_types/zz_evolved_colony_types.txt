@@ -5,156 +5,6 @@
 @stickiness = 10
 @stickiness_low = 5
 
-#trade bonus for ecu
-col_ecu_trade = {
-	icon = GFX_colony_type_habitat_trade
-
-	potential = {
-		exists = owner
-		owner = {
-			tec_uses_trade_value = yes
-		}
-		OR = {
-			uses_district_set = city_world
-			tec_is_pd_ecu_with_trade = yes
-		}
-		tec_ai_allow_designation_type = { type = trade }
-	}
-
-	planet_modifier = {
-		planet_structures_upkeep_mult = -0.10
-		trade_value_mult = 0.25
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			trade_value_mult = 0.05
-		}
-	}
-
-	weight_modifier = {
-		modifier = {
-			add = @stickiness
-			has_designation = col_ecu_trade
-		}
-		add = value:housing_districts_value|FACTOR|2|
-		add = value:tec_trader_jobs_value
-		complex_trigger_modifier = {
-			trigger = num_districts
-			parameters = {
-				type = district_tec_arcology_trade
-			}
-			mode = add
-			mult = 10
-		}
-	}
-}
-
-# Habitat Farming
-col_tec_habitat_food = {
-	icon = GFX_colony_type_tec_habitat_food
-
-	potential = {
-		tec_uses_habitat_districts = yes
-		tec_is_arcology_habitat = no
-		is_capital = no
-
-		tec_ai_allow_designation_type = { type = farming }
-	}
-	planet_modifier = {	
-		planet_farmers_produces_mult = 0.25
-		planet_building_hydroponics_farm_build_speed_mult = 0.25
-		planet_district_tec_hab_food_build_speed_mult = 0.25
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = { planet_farmers_produces_mult = 0.1 }
-	}
-
-	inline_script = colony_types/effects/tec_resolution_greatergood
-	# Evolved
-		inline_script = colony_types/effects/tec_land_of_plenty_farming
-		inline_script = colony_types/effects/tec_planets_t2a_farming
-	# /
-
-	weight_modifier = {
-		modifier = {
-			add = @stickiness
-			has_designation = col_tec_habitat_food
-		}
-		modifier = {
-			add = 5
-			has_planet_flag = tec_food_habitat
-		}
-		modifier = {
-			add = 10
-			tec_has_food_processing_buildings = yes
-		}
-		modifier = {
-			add = 5
-			has_building = building_baol_organic_plant
-		}
-		add = value:farming_combined_value|FACTOR|2|CACHED|yes|
-	}
-}
-
-# Ringworld Mining
-col_tec_ring_mining = {
-	icon = GFX_colony_type_mine
-
-	potential = {
-		tec_uses_ringworld_districts = yes
-		is_capital = no
-		tec_is_unspecced_ringworld = yes
-
-		tec_ai_allow_designation_type = { type = mining }
-	}
-
-	planet_modifier = {
-		planet_jobs_minerals_produces_mult = 0.25
-		pop_growth_speed = 0.1
-		planet_pop_assembly_mult = 0.1
-		planet_pop_assembly_organic_mult = 0.1
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_jobs_minerals_produces_mult = 0.1
-		}
-	}
-
-	inline_script = colony_types/effects/tec_resolution_greatergood
-
-	# Evolved
-		inline_script = colony_types/effects/tec_land_of_plenty_mining
-		inline_script = colony_types/effects/tec_planets_t2a_mining
-	# /
-
-	weight_modifier = {
-		modifier = {
-			add = @stickiness
-			has_designation = col_tec_ring_mining
-		}
-		modifier = {
-			add = 10
-			tec_has_mineral_processing_buildings = yes
-		}
-		add = value:mining_districts_value|FACTOR|3|
-	}
-}
-
 # Capital Colonies
 #col_tec_capital_menial
 #col_tec_capital_industrial
@@ -170,7 +20,7 @@ col_tec_capital_research = {
 			AND = {
 				tec_is_default_country = yes
 				is_gestalt = no
-				
+
 				OR = {
 					is_ai = no
 					AND = {
@@ -184,38 +34,23 @@ col_tec_capital_research = {
 	}
 
 	planet_modifier = {
-		planet_stability_add = 5
-		planet_amenities_add = 10
+		planet_stability_add = @tec_capital_designation_and_colony_stability
+		planet_amenities_add = @tec_capital_designation_and_colony_amenities
 		pop_government_ethic_attraction = 1
-		planet_resettlement_unemployed_destination_mult = 0.1
-		planet_jobs_physics_research_produces_mult = 0.15
-		planet_jobs_society_research_produces_mult = 0.15
-		planet_jobs_engineering_research_produces_mult = 0.15
-		empire_size_districts_mult = -0.5
+		planet_resettlement_unemployed_destination_mult = @tec_capital_designation_resettlement
+		planet_jobs_physics_research_produces_mult = @tec_capital_designation_output_specialized_bonus
+		planet_jobs_society_research_produces_mult = @tec_capital_designation_output_specialized_bonus
+		planet_jobs_engineering_research_produces_mult = @tec_capital_designation_output_specialized_bonus
+		empire_size_districts_mult = @tec_capital_designation_district_sprawl
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_jobs_produces_mult = 0.05
-		}
-	}
 
+	inline_script = colony_types/effects/tec_adaptability_capital
 	inline_script = colony_types/effects/tec_ringworld
 
 	# Evolved
 		inline_script = colony_types/effects/tec_land_of_plenty_capital
 	# /
-
-	inline_script = {
-		script = modifiers/tec_rural_generator_district_build_speed
-		value = 0.25
-		mult = 1
-		trigger = "tec_is_ecoworld = yes"
-	}
 
 	weight_modifier = {
 		base = 0
@@ -246,28 +81,19 @@ col_tec_capital_unity = {
 	}
 
 	planet_modifier = {
-		planet_stability_add = 5
-		planet_amenities_add = 10
+		planet_stability_add = @tec_capital_designation_and_colony_stability
+		planet_amenities_add = @tec_capital_designation_and_colony_amenities
 		pop_government_ethic_attraction = 1
-		planet_resettlement_unemployed_destination_mult = 0.1
-		planet_jobs_unity_produces_mult = 0.15
-		empire_size_districts_mult = -0.5
+		planet_resettlement_unemployed_destination_mult = @tec_capital_designation_resettlement
+		planet_jobs_unity_produces_mult = @tec_capital_designation_output_specialized_bonus
+		empire_size_districts_mult = @tec_capital_designation_district_sprawl
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_jobs_produces_mult = 0.05
-		}
-	}
-
+	inline_script = colony_types/effects/tec_adaptability_capital
 	inline_script = colony_types/effects/tec_ringworld
 
 	# Evolved
-		inline_script = colony_types/effects/tec_land_of_plenty_capital
+	inline_script = colony_types/effects/tec_land_of_plenty_capital
 	# /
 
 	inline_script = colony_types/effects/tec_all_the_priests_1
@@ -301,28 +127,20 @@ col_tec_capital_unity_spiritualist = {
 	}
 
 	planet_modifier = {
-		planet_stability_add = 5
-		planet_amenities_add = 10
+		planet_stability_add = @tec_capital_designation_and_colony_stability
+		planet_amenities_add = @tec_capital_designation_and_colony_amenities
 		pop_government_ethic_attraction = 1
-		planet_resettlement_unemployed_destination_mult = 0.1
-		planet_jobs_unity_produces_mult = 0.15
-		empire_size_districts_mult = -0.5
+		planet_resettlement_unemployed_destination_mult = @tec_capital_designation_resettlement
+		planet_jobs_unity_produces_mult = @tec_capital_designation_output_specialized_bonus
+		empire_size_districts_mult = @tec_capital_designation_district_sprawl
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_jobs_produces_mult = 0.05
-		}
-	}
 
+	inline_script = colony_types/effects/tec_adaptability_capital
 	inline_script = colony_types/effects/tec_ringworld
 
 	# Evolved
-		inline_script = colony_types/effects/tec_land_of_plenty_capital
+	inline_script = colony_types/effects/tec_land_of_plenty_capital
 	# /
 
 	inline_script = colony_types/effects/tec_all_the_priests_1
@@ -331,6 +149,135 @@ col_tec_capital_unity_spiritualist = {
 		base = 0
 	}
 }
+
+
+# Habitat Farming
+col_tec_habitat_food = {
+	icon = GFX_colony_type_tec_habitat_food
+
+	potential = {
+		tec_uses_habitat_districts = yes
+		tec_is_arcology_habitat = no
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = farming }
+	}
+	planet_modifier = {
+		planet_farmers_produces_mult = @tec_habitat_designation_menial_output
+		planet_building_hydroponics_farm_build_speed_mult = @tec_designation_build_speed
+		planet_district_tec_hab_food_build_speed_mult = @tec_designation_build_speed
+	}
+
+	inline_script = colony_types/effects/tec_adaptability_farming
+	inline_script = colony_types/effects/tec_resolution_greatergood
+	# Evolved
+	inline_script = colony_types/effects/tec_land_of_plenty_farming
+	inline_script = colony_types/effects/tec_planets_t2a_farming
+	# /
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_tec_habitat_food
+		}
+		modifier = {
+			add = 5
+			has_planet_flag = tec_food_habitat
+		}
+		modifier = {
+			add = 10
+			tec_has_food_processing_buildings = yes
+		}
+		modifier = {
+			add = 5
+			has_building = building_baol_organic_plant
+		}
+		add = value:farming_combined_value|FACTOR|2|CACHED|yes|
+	}
+}
+
+#trade bonus for ecu
+col_ecu_trade = {
+	icon = GFX_colony_type_habitat_trade
+
+	potential = {
+		exists = owner
+		owner = {
+			tec_uses_trade_value = yes
+		}
+		OR = {
+			uses_district_set = city_world
+			tec_is_pd_ecu_with_trade = yes
+		}
+		tec_ai_allow_designation_type = { type = trade }
+	}
+
+	planet_modifier = {
+		planet_structures_upkeep_mult = @tec_ecu_designation_trade_upkeep
+		trade_value_mult = @tec_ecu_designation_trade
+	}
+
+	inline_script = colony_types/effects/tec_adaptability_trade
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_ecu_trade
+		}
+		add = value:housing_districts_value|FACTOR|2|
+		add = value:tec_trader_jobs_value
+		complex_trigger_modifier = {
+			trigger = num_districts
+			parameters = {
+				type = district_tec_arcology_trade
+			}
+			mode = add
+			mult = 10
+		}
+	}
+}
+
+# Ringworld Mining
+col_tec_ring_mining = {
+	icon = GFX_colony_type_mine
+
+	potential = {
+		tec_uses_ringworld_districts = yes
+		is_capital = no
+		tec_is_unspecced_ringworld = yes
+
+		tec_ai_allow_designation_type = { type = mining }
+	}
+
+	planet_modifier = {
+		planet_jobs_minerals_produces_mult = @tec_ring_designation_menial_output
+		pop_growth_speed = 0.1
+		planet_pop_assembly_mult = 0.1
+		planet_pop_assembly_organic_mult = 0.1
+	}
+
+	inline_script = colony_types/effects/tec_adaptability_mining
+	inline_script = colony_types/effects/tec_resolution_greatergood
+
+	# Evolved
+		inline_script = colony_types/effects/tec_land_of_plenty_mining
+		inline_script = colony_types/effects/tec_planets_t2a_mining
+	# /
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_tec_ring_mining
+		}
+		modifier = {
+			add = 10
+			tec_has_mineral_processing_buildings = yes
+		}
+		add = value:mining_districts_value|FACTOR|3|
+	}
+}
+
+
 
 # Core sector colonies
 #col_tec_coreworld_capital

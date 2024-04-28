@@ -5,13 +5,319 @@
 @stickiness = 10
 @stickiness_low = 5
 
+###################################################
+###		CAPITAL WORLD DESIGNATIONS				###
+###################################################
+col_capital = {
+	icon = GFX_colony_type_capital
+
+	potential = {
+		is_capital = yes
+		NAND = {
+			exists = owner
+			owner = {
+				OR = {
+					NOT = { tec_is_default_country = yes }
+					is_gestalt = yes
+				}
+			}
+		}
+	}
+
+	planet_modifier = {
+		planet_stability_add = @tec_capital_designation_and_colony_stability
+		planet_amenities_add = @tec_capital_designation_and_colony_amenities
+		pop_government_ethic_attraction = 1
+		planet_resettlement_unemployed_destination_mult = @tec_capital_designation_resettlement
+		planet_jobs_produces_mult = @tec_capital_designation_output_generic_bonus
+		empire_size_districts_mult = @tec_capital_designation_district_sprawl
+	}
+
+	inline_script = colony_types/effects/tec_adaptability_capital
+	inline_script = colony_types/effects/tec_ringworld
+
+	# Evolved
+	inline_script = colony_types/effects/tec_land_of_plenty_capital
+	# /
+
+	weight_modifier = {
+		base = 1000
+	}
+}
+
+col_capital_foundry = {
+	icon = GFX_colony_type_capital_foundry
+
+	potential = {
+		is_capital = yes
+		owner = {
+			AND = {
+				tec_is_default_country = yes
+				is_gestalt = no
+
+				OR = {
+					is_ai = no
+					AND = {
+						years_passed > 25
+						num_owned_planets >= 5
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				owner = {
+					is_ai = yes
+				}
+			}
+			owner = { # to not cause swings
+				any_owned_planet = {
+					has_factory_designation = yes
+				}
+			}
+		}
+		tec_ai_allow_designation_type = { type = foundry }
+	}
+
+	planet_modifier = {
+		planet_stability_add = @tec_capital_designation_and_colony_stability
+		planet_amenities_add = @tec_capital_designation_and_colony_amenities
+		pop_government_ethic_attraction = 1
+		planet_resettlement_unemployed_destination_mult = @tec_capital_designation_resettlement
+		planet_metallurgists_produces_mult = @tec_capital_designation_output_specialized_bonus
+		empire_size_districts_mult = @tec_capital_designation_district_sprawl
+	}
+
+
+	inline_script = colony_types/effects/tec_adaptability_capital
+	inline_script = colony_types/effects/tec_ringworld
+
+	# Evolved
+	inline_script = colony_types/effects/tec_land_of_plenty_capital
+	# /
+
+
+	inline_script = colony_types/tec_foundry_conversion
+	custom_tooltip = col_foundry_custom
+
+	weight_modifier = {
+		base = 0
+	}
+}
+
+col_capital_factory = {
+	icon = GFX_colony_type_capital_factory
+
+	potential = {
+		is_capital = yes
+		owner = {
+			AND = {
+				tec_is_default_country = yes
+				is_gestalt = no
+				is_ai = no # block ai from being dumb and destroying their alloys
+			}
+		}
+
+		tec_ai_allow_designation_type = { type = factory }
+	}
+
+	planet_modifier = {
+		planet_stability_add = @tec_capital_designation_and_colony_stability
+		planet_amenities_add = @tec_capital_designation_and_colony_amenities
+		pop_government_ethic_attraction = 1
+		planet_resettlement_unemployed_destination_mult = @tec_capital_designation_resettlement
+		planet_artisans_produces_mult = @tec_capital_designation_output_specialized_bonus
+		empire_size_districts_mult = @tec_capital_designation_district_sprawl
+	}
+
+
+	inline_script = colony_types/effects/tec_adaptability_capital
+	inline_script = colony_types/effects/tec_ringworld
+
+	# Evolved
+		inline_script = colony_types/effects/tec_land_of_plenty_capital
+	# /
+
+
+
+	inline_script = colony_types/tec_factory_conversion
+	custom_tooltip = col_factory_custom
+
+	weight_modifier = {
+		base = 0
+	}
+}
+
+col_capital_trade = {
+	icon = GFX_colony_type_capital_trade
+
+	potential = {
+		is_capital = yes
+		owner = {
+			AND = {
+				tec_is_default_country = yes
+				is_gestalt = no
+				OR = {
+					is_ai = no
+					AND = {
+						years_passed > 25
+						num_owned_planets >= 5
+					}
+				}
+			}
+		}
+		tec_ai_allow_designation_type = { type = trade }
+	}
+
+	planet_modifier = {
+		planet_stability_add = @tec_capital_designation_and_colony_stability
+		planet_amenities_add = @tec_capital_designation_and_colony_amenities
+		pop_government_ethic_attraction = 1
+		planet_resettlement_unemployed_destination_mult = @tec_capital_designation_resettlement
+		trade_value_mult = @tec_capital_designation_output_specialized_bonus
+		empire_size_districts_mult = @tec_capital_designation_district_sprawl
+	}
+
+
+	inline_script = colony_types/effects/tec_adaptability_capital
+	inline_script = colony_types/effects/tec_ringworld
+
+	# Evolved
+	inline_script = colony_types/effects/tec_land_of_plenty_capital
+	# /
+
+	weight_modifier = {
+		base = 0
+	}
+}
+
+col_capital_extraction = {
+	icon = GFX_colony_type_capital_extraction
+
+	potential = {
+		is_capital = yes
+		owner = {
+			AND = {
+				tec_is_default_country = yes
+				is_gestalt = no
+
+				OR = {
+					is_ai = no
+					AND = {
+						years_passed > 25
+						num_owned_planets >= 5
+					}
+				}
+			}
+		}
+		tec_ai_allow_designation_type = { type = rural }
+
+		if = {
+			limit = {
+				owner = {
+					is_ai = yes
+				}
+			}
+			check_variable_arithmetic = {
+				which = value:tec_ai_count_productive_worker_pops
+				value > value:tec_ai_count_non_worker_pops
+			}
+		}
+	}
+
+	planet_modifier = {
+		planet_stability_add = @tec_capital_designation_and_colony_stability
+		planet_amenities_add = @tec_capital_designation_and_colony_amenities
+		pop_government_ethic_attraction = 1
+		planet_resettlement_unemployed_destination_mult = @tec_capital_designation_resettlement
+		planet_jobs_worker_produces_mult = @tec_capital_designation_output_specialized_bonus
+		empire_size_districts_mult = @tec_capital_designation_district_sprawl
+	}
+
+
+	inline_script = colony_types/effects/tec_adaptability_capital
+	inline_script = colony_types/effects/tec_ringworld
+
+	# Evolved
+	inline_script = colony_types/effects/tec_land_of_plenty_capital
+	# /
+
+	weight_modifier = {
+		base = 1000
+	}
+}
+
+# Capital Planet - Hive Mind
+col_capital_hive = {
+	icon = GFX_colony_type_capital
+
+	potential = {
+		is_capital = yes
+		exists = owner
+		owner = {
+			tec_is_default_country = yes
+			is_hive_empire = yes
+		}
+	}
+
+	planet_modifier = {
+		planet_stability_add = @tec_capital_designation_and_colony_stability
+		planet_amenities_no_happiness_add = @tec_capital_designation_and_colony_amenities
+		planet_crime_no_happiness_add = @tec_capital_designation_gestalt_crime
+		planet_jobs_produces_mult = @tec_capital_designation_output_generic_bonus
+		planet_resettlement_unemployed_destination_mult = @tec_capital_designation_resettlement
+		empire_size_districts_mult = @tec_capital_designation_district_sprawl
+	}
+
+
+	inline_script = colony_types/effects/tec_adaptability_capital
+	inline_script = colony_types/effects/tec_ringworld
+
+	weight_modifier = {
+		base = 0
+	}
+}
+
+# Capital Planet - Machine Empire
+col_capital_machine = {
+	icon = GFX_colony_type_capital
+
+	potential = {
+		is_capital = yes
+		exists = owner
+		owner = {
+			tec_is_default_country = yes
+			is_machine_empire = yes
+		}
+	}
+
+	planet_modifier = {
+		planet_stability_add = @tec_capital_designation_and_colony_stability
+		planet_amenities_no_happiness_add = @tec_capital_designation_and_colony_amenities
+		planet_crime_no_happiness_add = @tec_capital_designation_gestalt_crime
+		planet_jobs_produces_mult = @tec_capital_designation_output_generic_machine_bonus
+		planet_resettlement_unemployed_destination_mult = @tec_capital_designation_resettlement
+		empire_size_districts_mult = @tec_capital_designation_resettlement
+	}
+
+
+	inline_script = colony_types/effects/tec_adaptability_capital
+	inline_script = colony_types/effects/tec_ringworld
+
+	weight_modifier = {
+		base = 1000
+	}
+}
+
+
+
 # Colony
 col_default = {
 	icon = GFX_colony_type_normal_colony
 
 	potential = {
 		exists = owner
-		owner = { is_regular_empire = yes}
+		owner = { is_regular_empire = yes }
 		has_upgraded_capital = no
 		is_special_colony_type = no
 		num_sapient_pops < 5
@@ -19,20 +325,13 @@ col_default = {
 	}
 
 	planet_modifier = {
-		planet_stability_add = 5
-		planet_amenities_add = 10
+		planet_stability_add = @tec_capital_designation_and_colony_stability
+		planet_amenities_add = @tec_capital_designation_and_colony_amenities
+		planet_resettlement_unemployed_destination_mult = @tec_colony_designation_resettlement
 		pop_happiness = 0.10
-		planet_resettlement_unemployed_destination_mult = 0.25
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = { pop_happiness = 0.05 }
-	}
-
+	inline_script = colony_types/effects/tec_adaptability_colony
 	inline_script = colony_types/effects/tec_ringworld
 
 	# Evolved
@@ -58,9 +357,9 @@ col_default_machine = {
 	}
 
 	planet_modifier = {
-		planet_stability_add = 5
-		planet_amenities_no_happiness_add = 10
-		planet_resettlement_unemployed_destination_mult = 0.25
+		planet_stability_add = @tec_capital_designation_and_colony_stability
+		planet_amenities_no_happiness_add = @tec_capital_designation_and_colony_amenities
+		planet_resettlement_unemployed_destination_mult = @tec_colony_designation_resettlement
 	}
 
 	inline_script = colony_types/effects/tec_ringworld
@@ -88,8 +387,10 @@ col_city = {
 	}
 
 	planet_modifier = {
-		trade_value_mult = 0.20
-		planet_structures_upkeep_mult = -0.10
+		trade_value_mult = @tec_regular_designation_urban_trade
+		planet_structures_upkeep_mult = @tec_regular_designation_urban_upkeep
+		planet_building_build_speed_mult = @tec_regular_designation_urban_speed
+		planet_decision_enact_speed_mult = @tec_regular_designation_urban_speed
 	}
 
 	triggered_planet_modifier = {
@@ -97,7 +398,7 @@ col_city = {
 			tec_is_ecoworld = no
 		}
 		modifier = {
-			planet_district_city_build_speed_mult = 0.25
+			planet_district_city_build_speed_mult = @tec_designation_build_speed
 		}
 	}
 
@@ -106,35 +407,11 @@ col_city = {
 			tec_is_ecoworld = yes
 		}
 		modifier = {
-			planet_district_tec_eco_arcology_build_speed_mult = 0.25
+			planet_district_tec_eco_arcology_build_speed_mult =@tec_designation_build_speed
 		}
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = {
-				has_tradition = tr_adaptability_finish
-				# TO DO no trade empire
-			}
-		}
-		modifier = {
-			trade_value_mult = 0.05
-		}
-	}
-
-	#triggered_planet_modifier = {	# Adaptability
-	#	potential = {
-	#		exists = owner
-	#		owner = {
-	#			has_tradition = tr_adaptability_finish
-	#			# TO DO no trade empire
-	#		}
-	#	}
-	#	modifier = {
-	#		planet_amenities_mult = 0.05
-	#	}
-	#}
+	inline_script = colony_types/effects/tec_adaptability_trade
 
 	weight_modifier = {
 		modifier = {
@@ -143,6 +420,83 @@ col_city = {
 		}
 		add = value:housing_districts_value
 		add = value:tec_trader_jobs_value
+	}
+}
+
+# Hive Planet/Nest planet
+col_hive = {
+	icon = GFX_colony_type_urban
+
+	potential = {
+		NOR = {
+			tec_uses_ringworld_districts = yes
+			uses_district_set = habitat
+			tec_is_pd_nonconventional_world = yes
+		}
+		exists = owner
+		owner = { is_hive_empire = yes }
+		is_special_colony_type = no
+		is_capital = no
+	}
+
+	planet_modifier = {
+		planet_jobs_complex_drone_produces_mult = @tec_regular_designation_urban_output
+		planet_structures_upkeep_mult = @tec_regular_designation_urban_upkeep
+		planet_building_build_speed_mult = @tec_regular_designation_urban_speed
+		planet_decision_enact_speed_mult = @tec_regular_designation_urban_speed
+	}
+
+	inline_script = colony_types/effects/tec_adaptability_gestalt
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_hive
+		}
+		add = value:housing_districts_value|FACTOR|2|
+	}
+}
+
+# Nexus Planet
+col_nexus = {
+	icon = GFX_colony_type_urban
+
+	potential = {
+		NOR = {
+			uses_district_set = machine_world
+			tec_uses_ringworld_districts = yes
+			uses_district_set = habitat
+			tec_is_pd_nonconventional_world = yes
+		}
+		exists = owner
+		owner = { is_machine_empire = yes }
+		is_special_colony_type = no
+		is_capital = no
+	}
+
+	planet_modifier = {
+		planet_jobs_complex_drone_produces_mult = @tec_regular_designation_urban_output
+		planet_structures_upkeep_mult = @tec_regular_designation_urban_upkeep
+		planet_building_build_speed_mult = @tec_regular_designation_urban_speed
+		planet_decision_enact_speed_mult = @tec_regular_designation_urban_speed
+	}
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_nexus
+		}
+		add = value:housing_districts_value|FACTOR|2|
+		#modifier = {
+		#add = 5
+		#modifier = {
+		#	add = 5
+		#	check_variable_arithmetic = {
+		#		which = value:housing_districts_value
+		#		value >= @built_districts_high_threshold
+		#	}
+		#}
+		#}
 	}
 }
 
@@ -164,25 +518,18 @@ col_mining = {
 	}
 
 	planet_modifier = {
-		planet_miners_produces_mult = 0.25
-		planet_building_tec_stripmine_1_build_speed_mult = 0.25
+		planet_miners_produces_mult = @tec_regular_designation_menial_output
+		planet_building_tec_stripmine_1_build_speed_mult = @tec_designation_build_speed
 	}
 
 	inline_script = {
 		script = modifiers/tec_rural_mining_district_build_speed
-		value = 0.25
+		value = @tec_designation_build_speed
 		mult = 1
 		trigger = ""
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = { planet_miners_produces_mult = 0.1 }
-	}
-
+	inline_script = colony_types/effects/tec_adaptability_mining
 	inline_script = colony_types/effects/tec_resolution_greatergood
 	# Evolved
 		inline_script = colony_types/effects/tec_land_of_plenty_mining
@@ -247,25 +594,18 @@ col_farming = {
 	}
 
 	planet_modifier = {
-		planet_farmers_produces_mult = 0.25
-		planet_building_hydroponics_farm_build_speed_mult = 0.25
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = { planet_farmers_produces_mult = 0.1 }
+		planet_farmers_produces_mult = @tec_regular_designation_menial_output
+		planet_building_hydroponics_farm_build_speed_mult = @tec_designation_build_speed
 	}
 
 	inline_script = {
 		script = modifiers/tec_rural_farming_district_build_speed
-		value = 0.25
+		value = @tec_designation_build_speed
 		mult = 1
 		trigger = ""
 	}
 
+	inline_script = colony_types/effects/tec_adaptability_farming
 	inline_script = colony_types/effects/tec_resolution_greatergood
 	# Evolved
 		inline_script = colony_types/effects/tec_land_of_plenty_farming
@@ -340,25 +680,22 @@ col_generator = {
 	}
 
 	planet_modifier = {
-		planet_technician_produces_mult = 0.25
-		planet_building_tec_energrid_1_build_speed_mult = 0.25
+		planet_technician_produces_mult = @tec_regular_designation_menial_output
+		planet_building_tec_energrid_1_build_speed_mult = @tec_designation_build_speed
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = { planet_technician_produces_mult = 0.1 }
-	}
+	inline_script = colony_types/effects/tec_machine_anglers_generator
+
+
 
 	inline_script = {
 		script = modifiers/tec_rural_generator_district_build_speed
-		value = 0.25
+		value = @tec_designation_build_speed
 		mult = 1
 		trigger = ""
 	}
 
+	inline_script = colony_types/effects/tec_adaptability_generator
 	inline_script = colony_types/effects/tec_resolution_greatergood
 
 	# Evolved
@@ -407,82 +744,158 @@ col_generator = {
 	}
 }
 
-# Hive Planet/Nest planet
-col_hive = {
-	icon = GFX_colony_type_urban
+# Rural Planet
+col_rural = {
+	icon = GFX_colony_type_rural
 
 	potential = {
+		exists = owner
+		owner = { is_gestalt = no }
 		NOR = {
-			tec_uses_ringworld_districts = yes
 			uses_district_set = habitat
+			tec_uses_ringworld_districts = yes
+			uses_district_set = city_world
 			tec_is_pd_nonconventional_world = yes
 		}
-		exists = owner
-		owner = { is_hive_empire = yes }
 		is_special_colony_type = no
 		is_capital = no
+		tec_ai_allow_designation_type = { type = rural }
 	}
 
 	planet_modifier = {
-		planet_jobs_complex_drone_produces_mult = 0.05
-		planet_structures_upkeep_mult = -0.10
+		planet_jobs_worker_produces_mult = @tec_regular_designation_output
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = { planet_jobs_complex_drone_produces_mult = 0.025 }
+	inline_script = {
+		script = modifiers/tec_rural_generator_district_build_speed
+		value = @tec_designation_build_speed
+		mult = 1
+		trigger = ""
 	}
+
+	inline_script = {
+		script = modifiers/tec_rural_mining_district_build_speed
+		value = @tec_designation_build_speed
+		mult = 1
+		trigger = ""
+	}
+
+
+	inline_script = {
+		script = modifiers/tec_rural_farming_district_build_speed
+		value = @tec_designation_build_speed
+		mult = 1
+		trigger = ""
+	}
+
+	inline_script = colony_types/effects/tec_adaptability_rural
+	# Evolved
+		inline_script = colony_types/effects/tec_land_of_plenty_generic
+	# /
 
 	weight_modifier = {
 		modifier = {
-			add = @stickiness
-			has_designation = col_hive
+			add = @stickiness_low
+			has_designation = col_rural
 		}
-		add = value:housing_districts_value|FACTOR|2|
+		modifier = {
+			add = 5
+			OR = {
+				tec_has_energy_processing_buildings = yes
+				tec_has_mineral_processing_buildings = yes
+				tec_has_food_processing_buildings = yes
+			}
+		}
+		modifier = {
+			add = 5
+			has_building = building_baol_organic_plant
+		}
+		modifier = {
+			add = 2
+			tec_has_betharian_deposit = yes
+		}
+		modifier = {
+			add = 3
+			tec_has_betharian_deposit = yes
+			owner = { has_technology = tech_mine_betharian }
+		}
 	}
 }
 
-# Nexus Planet
-col_nexus = {
-	icon = GFX_colony_type_urban
+# Rural Planet - Gestalt
+col_rural_gestalt = {
+	icon = GFX_colony_type_fringe
 
 	potential = {
 		NOR = {
-			uses_district_set = machine_world
-			tec_uses_ringworld_districts = yes
 			uses_district_set = habitat
+			tec_uses_ringworld_districts = yes
+			uses_district_set = machine_world
+			uses_district_set = hive_world
 			tec_is_pd_nonconventional_world = yes
 		}
 		exists = owner
-		owner = { is_machine_empire = yes }
+		owner = { is_gestalt = yes }
 		is_special_colony_type = no
 		is_capital = no
+
+		tec_ai_allow_designation_type = { type = rural }
 	}
 
 	planet_modifier = {
-		planet_jobs_complex_drone_produces_mult = 0.05
-		planet_structures_upkeep_mult = -0.10
+		planet_jobs_worker_produces_mult = @tec_regular_designation_output
 	}
+
+	inline_script = {
+		script = modifiers/tec_rural_generator_district_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
+	}
+
+	inline_script = {
+		script = modifiers/tec_rural_mining_district_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
+	}
+
+
+	inline_script = {
+		script = modifiers/tec_rural_farming_district_build_speed
+		value = 0.25
+		mult = 1
+		trigger = ""
+	}
+
+	inline_script = colony_types/effects/tec_adaptability_rural
 
 	weight_modifier = {
 		modifier = {
-			add = @stickiness
-			has_designation = col_nexus
+			add = @stickiness_low
+			has_designation = col_rural_gestalt
 		}
-		add = value:housing_districts_value|FACTOR|2|
-		#modifier = {
-			#add = 5
-			#modifier = {
-			#	add = 5
-			#	check_variable_arithmetic = {
-			#		which = value:housing_districts_value
-			#		value >= @built_districts_high_threshold
-			#	}
-			#}
-		#}
+		modifier = {
+			add = 5
+			OR = {
+				tec_has_energy_processing_buildings = yes
+				tec_has_mineral_processing_buildings = yes
+				tec_has_food_processing_buildings = yes
+			}
+		}
+		modifier = {
+			add = 5
+			has_building = building_baol_organic_plant
+		}
+		modifier = {
+			add = 2
+			tec_has_betharian_deposit = yes
+		}
+		modifier = {
+			add = 3
+			tec_has_betharian_deposit = yes
+			owner = { has_technology = tech_mine_betharian }
+		}
 	}
 }
 
@@ -505,8 +918,10 @@ col_industrial = {
 	}
 
 	planet_modifier = {
-		planet_artisans_upkeep_mult = -0.10
-		planet_metallurgists_upkeep_mult = -0.10
+		planet_artisans_upkeep_mult = @tec_regular_designation_split_upkeep
+		planet_metallurgists_upkeep_mult = @tec_regular_designation_split_upkeep
+		planet_artisans_produces_mult = @tec_regular_designation_split_output
+		planet_metallurgists_produces_mult = @tec_regular_designation_split_output
 	}
 
 	triggered_planet_modifier = {
@@ -514,37 +929,26 @@ col_industrial = {
 			tec_is_ecoworld = no
 		}
 		modifier = {
-			planet_district_industrial_build_speed_mult = 0.25
-		}
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_artisans_produces_mult = 0.05
-			planet_metallurgists_produces_mult = 0.05
+			planet_district_industrial_build_speed_mult = @tec_designation_build_speed
 		}
 	}
 
 	inline_script = {
 		script = modifiers/tec_rural_mining_district_build_speed
-		value = 0.15
+		value = @tec_designation_build_speed
 		mult = 1
 		trigger = "tec_is_ecoworld = yes"
 	}
 
 	inline_script = {
 		script = modifiers/tec_rural_farming_district_build_speed
-		value = 0.15
+		value = @tec_designation_build_speed
 		mult = 1
 		trigger = "tec_is_ecoworld = yes"
 	}
 
+	inline_script = colony_types/effects/tec_adaptability_industrial
 	inline_script = colony_types/effects/tec_ringworld
-
 	inline_script = colony_types/effects/tec_resolution_industry_industrial
 
 	weight_modifier = {
@@ -596,37 +1000,29 @@ col_foundry = {
 	custom_tooltip = col_foundry_custom
 
 	planet_modifier = {
-		planet_metallurgists_upkeep_mult = -0.20
+		planet_metallurgists_upkeep_mult = @tec_regular_designation_upkeep
+		planet_metallurgists_produces_mult = @tec_regular_designation_output
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_metallurgists_produces_mult = 0.05
-		}
-	}
 
 	triggered_planet_modifier = {
 		potential = {
 			tec_is_ecoworld = no
 		}
 		modifier = {
-			planet_district_industrial_build_speed_mult = 0.25
+			planet_district_industrial_build_speed_mult = @tec_designation_build_speed
 		}
 	}
 
 	inline_script = {
 		script = modifiers/tec_rural_mining_district_build_speed
-		value = 0.25
+		value = @tec_designation_build_speed
 		mult = 1
 		trigger = "tec_is_ecoworld = yes"
 	}
 
+	inline_script = colony_types/effects/tec_adaptability_foundry
 	inline_script = colony_types/effects/tec_ringworld
-
 	inline_script = colony_types/effects/tec_resolution_industry_foundry
 
 	weight_modifier = {
@@ -696,35 +1092,28 @@ col_factory = {
 	inline_script = colony_types/tec_factory_conversion
 	custom_tooltip = col_factory_custom
 	planet_modifier = {
-		planet_artisans_upkeep_mult = -0.20
+		planet_artisans_upkeep_mult = @tec_regular_designation_upkeep
+		planet_artisans_produces_mult = @tec_regular_designation_output
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_artisans_produces_mult = 0.05
-		}
-	}
 
 	triggered_planet_modifier = {
 		potential = {
 			tec_is_ecoworld = no
 		}
 		modifier = {
-			planet_district_industrial_build_speed_mult = 0.25
+			planet_district_industrial_build_speed_mult = @tec_designation_build_speed
 		}
 	}
 
 	inline_script = {
 		script = modifiers/tec_rural_farming_district_build_speed
-		value = 0.25
+		value = @tec_designation_build_speed
 		mult = 1
 		trigger = "tec_is_ecoworld = yes"
 	}
 
+	inline_script = colony_types/effects/tec_adaptability_factory
 	inline_script = colony_types/effects/tec_resolution_industry_factory
 
 	weight_modifier = {
@@ -788,22 +1177,12 @@ col_bureau = {
 	}
 
 	planet_modifier = {
-		planet_administrators_produces_mult = 0.10
-		planet_administrators_upkeep_mult = -0.10
+		planet_administrators_produces_mult = @tec_regular_designation_output
+		planet_administrators_upkeep_mult = @tec_regular_designation_upkeep
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_administrators_produces_mult = 0.05
-		}
-	}
-
+	inline_script = colony_types/effects/tec_adaptability_unity
 	inline_script = colony_types/effects/tec_ringworld
-
 	inline_script = colony_types/effects/tec_all_the_priests_1
 
 	weight_modifier = {
@@ -833,22 +1212,12 @@ col_bureau_spiritualist = {
 	}
 
 	planet_modifier = {
-		planet_administrators_produces_mult = 0.10
-		planet_administrators_upkeep_mult = -0.10
+		planet_administrators_produces_mult = @tec_regular_designation_output
+		planet_administrators_upkeep_mult = @tec_regular_designation_upkeep
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_administrators_produces_mult = 0.05
-		}
-	}
-
+	inline_script = colony_types/effects/tec_adaptability_unity
 	inline_script = colony_types/effects/tec_ringworld
-
 	inline_script = colony_types/effects/tec_all_the_priests_1
 
 	weight_modifier = {
@@ -875,20 +1244,11 @@ col_bureau_hive = {
 	}
 
 	planet_modifier = {
-		planet_administrators_produces_mult = 0.10
-		planet_administrators_upkeep_mult = -0.10
+		planet_administrators_produces_mult = @tec_regular_designation_output
+		planet_administrators_upkeep_mult = @tec_regular_designation_upkeep
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_administrators_produces_mult = 0.05
-		}
-	}
-
+	inline_script = colony_types/effects/tec_adaptability_unity
 	inline_script = colony_types/effects/tec_ringworld
 
 	weight_modifier = {
@@ -918,10 +1278,11 @@ col_bureau_machine = {
 	}
 
 	planet_modifier = {
-		planet_administrators_produces_mult = 0.10
-		planet_administrators_upkeep_mult = -0.10
+		planet_administrators_produces_mult = @tec_regular_designation_output
+		planet_administrators_upkeep_mult = @tec_regular_designation_upkeep
 	}
 
+	inline_script = colony_types/effects/tec_adaptability_unity
 	inline_script = colony_types/effects/tec_ringworld
 
 	weight_modifier = {
@@ -952,27 +1313,14 @@ col_refinery = {
 	}
 
 	planet_modifier = {
-		planet_refiners_produces_mult = 0.15
-		planet_translucers_produces_mult = 0.15
-		planet_chemists_produces_mult = 0.15
-		planet_sr_miners_produces_mult = 0.15
+		planet_refiners_produces_mult = @tec_regular_designation_refinery_output
+		planet_translucers_produces_mult = @tec_regular_designation_refinery_output
+		planet_chemists_produces_mult = @tec_regular_designation_refinery_output
+		planet_sr_miners_produces_mult = @tec_regular_designation_refinery_output
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_refiners_produces_mult = 0.05
-			planet_translucers_produces_mult = 0.05
-			planet_chemists_produces_mult = 0.05
-			planet_sr_miners_produces_mult = 0.05
-		}
-	}
-
+	inline_script = colony_types/effects/tec_adaptability_refinery
 	inline_script = colony_types/effects/tec_ringworld
-
 	inline_script = colony_types/effects/tec_resolution_industry_refinery
 
 	weight_modifier = {
@@ -1003,26 +1351,19 @@ col_research = {
 	}
 
 	planet_modifier = {
-		planet_researchers_upkeep_mult = -0.2
-		planet_building_research_lab_1_build_speed_mult = 0.25
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_researchers_produces_mult = 0.05
-		}
+		planet_researchers_produces_mult = @tec_regular_designation_output
+		planet_researchers_upkeep_mult = @tec_regular_designation_upkeep
+		planet_building_research_lab_1_build_speed_mult = @tec_designation_build_speed
 	}
 
 	inline_script = {
 		script = modifiers/tec_rural_generator_district_build_speed
-		value = 0.25
+		value = @tec_designation_build_speed
 		mult = 1
 		trigger = "tec_is_ecoworld = yes"
 	}
+
+	inline_script = colony_types/effects/tec_adaptability_research
 
 	weight_modifier = {
 		modifier = {
@@ -1068,33 +1409,26 @@ col_fortress = {
 	}
 
 	planet_modifier = {
-		planet_orbital_bombardment_damage = -0.10
-		army_defense_damage_mult = 0.20
+		planet_orbital_bombardment_damage = @tec_fortress_designation_bombardment
+		army_damage_mult = @tec_fortress_designation_damage
+		planet_army_build_speed_mult = @tec_fortress_designation_speed
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_orbital_bombardment_damage = -0.1
-		}
-	}
-	
 	inline_script = {
 		script = modifiers/tec_army_building_build_speed
-		value = 0.25
+		value = @tec_designation_build_speed
 		mult = 1
 		trigger = ""
 	}
 
 	inline_script = {
 		script = modifiers/tec_naval_building_build_speed
-		value = 0.25
+		value = @tec_designation_build_speed
 		mult = 1
 		trigger = ""
 	}
+
+	inline_script = colony_types/effects/tec_adaptability_fortress
 
 	weight_modifier = {
 		modifier = {
@@ -1105,366 +1439,6 @@ col_fortress = {
 	}
 }
 
-###################################################
-###		CAPITAL WORLD DESIGNATIONS				###
-###################################################
-col_capital = {
-	icon = GFX_colony_type_capital
-
-	potential = {
-		is_capital = yes
-		NAND = {
-			exists = owner
-			owner = {
-				OR = {
-					NOT = { tec_is_default_country = yes }
-					is_gestalt = yes
-				}
-			}
-		}
-	}
-
-	planet_modifier = {
-		planet_stability_add = 5
-		planet_amenities_add = 10
-		pop_government_ethic_attraction = 1
-		planet_resettlement_unemployed_destination_mult = 0.1
-		planet_jobs_produces_mult = 0.1
-		empire_size_districts_mult = -0.5
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_jobs_produces_mult = 0.05
-		}
-	}
-
-	inline_script = colony_types/effects/tec_ringworld
-
-	# Evolved
-		inline_script = colony_types/effects/tec_land_of_plenty_capital
-	# /
-
-	weight_modifier = {
-		base = 1000
-	}
-}
-
-col_capital_foundry = {
-	icon = GFX_colony_type_capital_foundry
-
-	potential = {
-		is_capital = yes
-		owner = {
-			AND = {
-				tec_is_default_country = yes
-				is_gestalt = no
-				
-				OR = {
-					is_ai = no
-					AND = {
-						years_passed > 25
-						num_owned_planets >= 5
-					}
-				}
-			}
-		}
-		if = {
-			limit = {
-				owner = {
-					is_ai = yes
-				}
-			}
-			owner = { # to not cause swings
-				any_owned_planet = {
-					has_factory_designation = yes
-				}
-			}
-		}
-		tec_ai_allow_designation_type = { type = foundry }
-	}
-
-	planet_modifier = {
-		planet_stability_add = 5
-		planet_amenities_add = 10
-		pop_government_ethic_attraction = 1
-		planet_resettlement_unemployed_destination_mult = 0.1
-		planet_metallurgists_produces_mult = 0.15
-		empire_size_districts_mult = -0.5
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_jobs_produces_mult = 0.05
-		}
-	}
-
-	inline_script = colony_types/effects/tec_ringworld
-
-	# Evolved
-		inline_script = colony_types/effects/tec_land_of_plenty_capital
-	# /
-
-	
-	inline_script = colony_types/tec_foundry_conversion
-	custom_tooltip = col_foundry_custom
-
-	weight_modifier = {
-		base = 0
-	}
-}
-
-col_capital_factory = {
-	icon = GFX_colony_type_capital_factory
-
-	potential = {
-		is_capital = yes
-		owner = {
-			AND = {
-				tec_is_default_country = yes
-				is_gestalt = no
-				is_ai = no # block ai from being dumb and destroying their alloys
-			}
-		}
-
-		tec_ai_allow_designation_type = { type = factory }
-	}
-
-	planet_modifier = {
-		planet_stability_add = 5
-		planet_amenities_add = 10
-		pop_government_ethic_attraction = 1
-		planet_resettlement_unemployed_destination_mult = 0.1
-		planet_artisans_produces_mult = 0.15
-		empire_size_districts_mult = -0.5
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_jobs_produces_mult = 0.05
-		}
-	}
-
-	inline_script = colony_types/effects/tec_ringworld
-
-	# Evolved
-		inline_script = colony_types/effects/tec_land_of_plenty_capital
-	# /
-
-
-
-	inline_script = colony_types/tec_factory_conversion
-	custom_tooltip = col_factory_custom
-
-	weight_modifier = {
-		base = 0
-	}
-}
-
-col_capital_trade = {
-	icon = GFX_colony_type_capital_trade
-
-	potential = {
-		is_capital = yes
-		owner = {
-			AND = {
-				tec_is_default_country = yes
-				is_gestalt = no
-				OR = {
-					is_ai = no
-					AND = {
-						years_passed > 25
-						num_owned_planets >= 5
-					}
-				}
-			}
-		}
-		tec_ai_allow_designation_type = { type = trade }
-	}
-
-	planet_modifier = {
-		planet_stability_add = 5
-		planet_amenities_add = 10
-		pop_government_ethic_attraction = 1
-		planet_resettlement_unemployed_destination_mult = 0.1
-		trade_value_mult = 0.15
-		empire_size_districts_mult = -0.5
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_jobs_produces_mult = 0.05
-		}
-	}
-
-	inline_script = colony_types/effects/tec_ringworld
-
-	# Evolved
-		inline_script = colony_types/effects/tec_land_of_plenty_capital
-	# /
-
-	weight_modifier = {
-		base = 0
-	}
-}
-
-col_capital_extraction = {
-	icon = GFX_colony_type_capital_extraction
-
-	potential = {
-		is_capital = yes
-		owner = {
-			AND = {
-				tec_is_default_country = yes
-				is_gestalt = no
-
-				OR = {
-					is_ai = no
-					AND = {
-						years_passed > 25
-						num_owned_planets >= 5
-					}
-				}
-			}
-		}
-		tec_ai_allow_designation_type = { type = rural }
-
-		if = {
-			limit = {
-				owner = {
-					is_ai = yes
-				}
-			}
-			check_variable_arithmetic = {
-				which = value:tec_ai_count_productive_worker_pops
-				value > value:tec_ai_count_non_worker_pops
-			}
-		}
-	}
-
-	planet_modifier = {
-		planet_stability_add = 5
-		planet_amenities_add = 10
-		pop_government_ethic_attraction = 1
-		planet_resettlement_unemployed_destination_mult = 0.1
-		planet_jobs_worker_produces_mult = 0.15
-		empire_size_districts_mult = -0.5
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_jobs_produces_mult = 0.05
-		}
-	}
-
-	inline_script = colony_types/effects/tec_ringworld
-
-	# Evolved
-		inline_script = colony_types/effects/tec_land_of_plenty_capital
-	# /
-
-	weight_modifier = {
-		base = 1000
-	}
-}
-
-# Capital Planet - Hive Mind
-col_capital_hive = {
-	icon = GFX_colony_type_capital
-
-	potential = {
-		is_capital = yes
-		exists = owner
-		owner = {
-			tec_is_default_country = yes
-			is_hive_empire = yes
-		}
-	}
-
-	planet_modifier = {
-		planet_stability_add = 5
-		planet_amenities_no_happiness_add = 10
-		planet_crime_no_happiness_add = -20
-		planet_jobs_produces_mult = 0.1
-		planet_resettlement_unemployed_destination_mult = 0.1
-		empire_size_districts_mult = -0.5
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_jobs_produces_mult = 0.05
-		}
-	}
-
-	inline_script = colony_types/effects/tec_ringworld
-
-	weight_modifier = {
-		base = 0
-	}
-}
-
-# Capital Planet - Machine Empire
-col_capital_machine = {
-	icon = GFX_colony_type_capital
-
-	potential = {
-		is_capital = yes
-		exists = owner
-		owner = {
-			tec_is_default_country = yes
-			is_machine_empire = yes
-		}
-	}
-
-	planet_modifier = {
-		planet_stability_add = 5
-		planet_amenities_no_happiness_add = 10
-		planet_crime_no_happiness_add = -20
-		planet_jobs_produces_mult = 0.15
-		planet_resettlement_unemployed_destination_mult = 0.1
-		empire_size_districts_mult = -0.5
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_jobs_produces_mult = 0.05
-		}
-	}
-
-	inline_script = colony_types/effects/tec_ringworld
-
-	weight_modifier = {
-		base = 1000
-	}
-}
 
 # Habitat
 col_habitat = {	# tweaked
@@ -1482,19 +1456,11 @@ col_habitat = {	# tweaked
 	}
 
 	planet_modifier = {
-		planet_stability_add = 5
-		planet_amenities_add = 10
+		planet_stability_add = @tec_capital_designation_and_colony_stability
+		planet_amenities_add = @tec_capital_designation_and_colony_amenities
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_jobs_produces_mult = 0.05
-		}
-	}
+	inline_script = colony_types/effects/tec_adaptability_capital
 
 	weight_modifier = {
 		base = 4
@@ -1516,24 +1482,17 @@ col_habitat_energy = {	# tweaked
 	}
 
 	planet_modifier = {
-		planet_technician_produces_mult = 0.1
-		planet_building_tec_energrid_1_build_speed_mult = 0.25
+		planet_technician_produces_mult = @tec_habitat_designation_menial_output
+		planet_building_tec_energrid_1_build_speed_mult = @tec_designation_build_speed
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = { planet_technician_produces_mult = 0.1 }
-	}
 
 	triggered_planet_modifier = {
 		potential = {
 			tec_is_arcology_habitat = no
 		}
 		modifier = {
-			planet_district_hab_energy_build_speed_mult = 0.25
+			planet_district_hab_energy_build_speed_mult = @tec_designation_build_speed
 		}
 	}
 
@@ -1543,10 +1502,11 @@ col_habitat_energy = {	# tweaked
 			owner = { is_gestalt = yes }
 		}
 		modifier = {
-			planet_district_tec_hab_arcology_maintenance_build_speed_mult = 0.25
+			planet_district_tec_hab_arcology_maintenance_build_speed_mult = @tec_designation_build_speed
 		}
 	}
 
+	inline_script = colony_types/effects/tec_adaptability_generator
 	inline_script = colony_types/effects/tec_resolution_greatergood
 	# Evolved
 		inline_script = colony_types/effects/tec_land_of_plenty_generator
@@ -1570,6 +1530,150 @@ col_habitat_energy = {	# tweaked
 			tec_has_energy_processing_buildings = yes
 		}
 		add = value:generator_combined_value|FACTOR|2|CACHED|yes|
+	}
+}
+
+col_habitat_mining = {		# tweaked
+	icon = GFX_colony_type_habitat_mining
+
+	potential = {
+		tec_uses_habitat_districts = yes
+		tec_is_arcology_habitat = no
+		check_modifier_value = {
+			modifier = district_hab_mining_max
+			value > 0
+		}
+		is_capital = no
+		tec_ai_allow_designation_type = { type = mining }
+	}
+
+	planet_modifier = {
+		planet_miners_produces_mult = @tec_habitat_designation_menial_output
+		planet_district_hab_mining_build_speed_mult = @tec_designation_build_speed
+		planet_building_tec_stripmine_1_build_speed_mult = @tec_designation_build_speed
+	}
+
+
+	inline_script = colony_types/effects/tec_adaptability_mining
+	inline_script = colony_types/effects/tec_resolution_greatergood
+	# Evolved
+		inline_script = colony_types/effects/tec_land_of_plenty_mining
+		inline_script = colony_types/effects/tec_planets_t2a_mining
+	# /
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_habitat_mining
+		}
+		modifier = {
+			add = 5
+			check_modifier_value = {
+				modifier = district_hab_mining_max
+				value > 0
+			}
+		}
+		modifier = {
+			add = 10
+			tec_has_mineral_processing_buildings = yes
+		}
+		add = value:mining_combined_value|FACTOR|2|CACHED|yes|
+	}
+}
+
+# Habitat Farming
+col_habitat_farming = { # Mine better - disabled
+	icon = GFX_colony_type_habitat_farming
+
+	potential = {
+		always = no
+		uses_district_set = habitat
+		tec_is_arcology_habitat = no
+		is_capital = no
+		tec_ai_allow_designation_type = { type = farming }
+	}
+	#custom_tooltip = col_habitat_farming_custom
+	planet_modifier = {
+		planet_farmers_produces_mult = @tec_habitat_designation_menial_output
+		planet_building_hydroponics_farm_build_speed_mult = @tec_designation_build_speed
+	}
+
+	inline_script = colony_types/effects/tec_adaptability_farming
+	inline_script = colony_types/effects/tec_resolution_greatergood
+
+	# Evolved
+		inline_script = colony_types/effects/tec_land_of_plenty_farming
+		inline_script = colony_types/effects/tec_planets_t2a_farming
+	# /
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_habitat_farming
+		}
+
+		modifier = {
+			add = 5
+			has_planet_flag = tec_food_habitat
+		}
+		modifier = {
+			add = 10
+			tec_has_food_processing_buildings = yes
+		}
+		modifier = {
+			add = 5
+			has_building = building_baol_organic_plant
+		}
+		add = value:farming_combined_value|FACTOR|2|CACHED|yes|
+	}
+}
+
+col_habitat_gestalt_farming = {	# Mine better - disabled
+	icon = GFX_colony_type_habitat_farming
+
+	potential = {
+		always = no
+		uses_district_set = habitat
+		exists = owner
+		owner = {
+			is_gestalt = yes
+		}
+		tec_is_arcology_habitat = no
+		is_capital = no
+		tec_ai_allow_designation_type = { type = farming }
+	}
+	custom_tooltip = col_habitat_farming_gestalt_custom
+	planet_modifier = {
+		planet_farmers_produces_mult = @tec_habitat_designation_menial_output
+		planet_building_hydroponics_farm_build_speed_mult = @tec_designation_build_speed
+	}
+
+	inline_script = colony_types/effects/tec_adaptability_farming
+	inline_script = colony_types/effects/tec_resolution_greatergood
+
+	# Evolved
+		inline_script = colony_types/effects/tec_land_of_plenty_farming
+		inline_script = colony_types/effects/tec_planets_t2a_farming
+	# /
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_habitat_gestalt_farming
+		}
+
+		modifier = {
+			add = 5
+			has_planet_flag = tec_food_habitat
+		}
+		modifier = {
+			add = 10
+			tec_has_food_processing_buildings = yes
+		}
+		modifier = {
+			add = 5
+			has_building = building_baol_organic_plant
+		}
+		add = value:farming_combined_value|FACTOR|2|CACHED|yes|
 	}
 }
 
@@ -1598,30 +1702,21 @@ col_habitat_leisure = {	# tweaked
 			tec_is_arcology_habitat = no
 		}
 		modifier = {
-			planet_district_hab_cultural_build_speed_mult = 0.25
+			planet_district_hab_cultural_build_speed_mult = @tec_designation_build_speed
 		}
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = {
-				has_tradition = tr_adaptability_finish
-			}
-		}
-		modifier = {
-			planet_amenities_mult = 0.05
-		}
-	}
 
 	triggered_planet_modifier = {
 		potential = {
 			tec_is_arcology_habitat = yes
 		}
 		modifier = {
-			planet_district_tec_hab_arcology_leisure_build_speed_mult = 0.25
+			planet_district_tec_hab_arcology_leisure_build_speed_mult = @tec_designation_build_speed
 		}
 	}
+
+	inline_script = colony_types/effects/tec_adaptability_leisure
 
 	weight_modifier = {
 		modifier = {
@@ -1664,19 +1759,7 @@ col_habitat_trade = {	# tweaked
 	}
 
 	planet_modifier = {
-		trade_value_mult = 0.20
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = {
-				has_tradition = tr_adaptability_finish
-			}
-		}
-		modifier = {
-			trade_value_mult = 0.05
-		}
+		trade_value_mult = @tec_habitat_designation_urban_trade
 	}
 
 	triggered_planet_modifier = {
@@ -1684,7 +1767,7 @@ col_habitat_trade = {	# tweaked
 			tec_is_arcology_habitat = no
 		}
 		modifier = {
-			planet_district_hab_commercial_build_speed_mult = 0.25
+			planet_district_hab_commercial_build_speed_mult = @tec_designation_build_speed
 		}
 	}
 
@@ -1693,9 +1776,11 @@ col_habitat_trade = {	# tweaked
 			tec_is_arcology_habitat = yes
 		}
 		modifier = {
-			planet_district_tec_hab_arcology_trade_build_speed_mult = 0.25
+			planet_district_tec_hab_arcology_trade_build_speed_mult = @tec_designation_build_speed
 		}
 	}
+
+	inline_script = colony_types/effects/tec_adaptability_trade
 
 	weight_modifier = {
 		modifier = {
@@ -1725,17 +1810,7 @@ col_habitat_research = {	# tweaked
 	}
 
 	planet_modifier = {
-		planet_researchers_produces_mult = 0.1
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_researchers_produces_mult = 0.05
-		}
+		planet_researchers_produces_mult = @tec_habitat_designation_output
 	}
 
 	triggered_planet_modifier = {
@@ -1743,7 +1818,7 @@ col_habitat_research = {	# tweaked
 			tec_is_arcology_habitat = no
 		}
 		modifier = {
-			planet_district_hab_science_build_speed_mult = 0.25
+			planet_district_hab_science_build_speed_mult = @tec_designation_build_speed
 		}
 	}
 
@@ -1752,9 +1827,11 @@ col_habitat_research = {	# tweaked
 			tec_is_arcology_habitat = yes
 		}
 		modifier = {
-			planet_district_tec_hab_arcology_research_build_speed_mult = 0.25
+			planet_district_tec_hab_arcology_research_build_speed_mult = @tec_designation_build_speed
 		}
 	}
+
+	inline_script = colony_types/effects/tec_adaptability_research
 
 	weight_modifier = {
 		modifier = {
@@ -1773,171 +1850,6 @@ col_habitat_research = {	# tweaked
 	}
 }
 
-col_habitat_mining = {		# tweaked
-	icon = GFX_colony_type_habitat_mining
-
-	potential = {
-		tec_uses_habitat_districts = yes
-		tec_is_arcology_habitat = no
-		check_modifier_value = {
-			modifier = district_hab_mining_max
-			value > 0
-		}
-		is_capital = no
-		tec_ai_allow_designation_type = { type = mining }
-	}
-
-	planet_modifier = {
-		planet_miners_produces_mult = 0.1
-		planet_district_hab_mining_build_speed_mult = 0.25
-		planet_building_tec_stripmine_1_build_speed_mult = 0.25
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = { planet_miners_produces_mult = 0.1 }
-	}
-
-	inline_script = colony_types/effects/tec_resolution_greatergood
-
-	# Evolved
-		inline_script = colony_types/effects/tec_land_of_plenty_mining
-		inline_script = colony_types/effects/tec_planets_t2a_mining
-	# /
-	weight_modifier = {
-		modifier = {
-			add = @stickiness
-			has_designation = col_habitat_mining
-		}
-		modifier = {
-			add = 5
-			check_modifier_value = {
-				modifier = district_hab_mining_max
-				value > 0
-			}
-		}
-		modifier = {
-			add = 10
-			tec_has_mineral_processing_buildings = yes
-		}
-		add = value:mining_combined_value|FACTOR|2|CACHED|yes|
-	}
-}
-
-# Habitat Farming
-col_habitat_farming = { # Mine better - disabled
-	icon = GFX_colony_type_habitat_farming
-
-	potential = {
-		always = no
-		uses_district_set = habitat
-		tec_is_arcology_habitat = no
-		is_capital = no
-		tec_ai_allow_designation_type = { type = farming }
-	}
-	#custom_tooltip = col_habitat_farming_custom
-	planet_modifier = {
-		planet_farmers_produces_mult = 0.25
-		planet_building_hydroponics_farm_build_speed_mult = 0.25
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = { planet_farmers_produces_mult = 0.1 }
-	}
-
-	inline_script = colony_types/effects/tec_resolution_greatergood
-
-	# Evolved
-		inline_script = colony_types/effects/tec_land_of_plenty_farming
-		inline_script = colony_types/effects/tec_planets_t2a_farming
-	# / 
-
-	weight_modifier = {
-		modifier = {
-			add = @stickiness
-			has_designation = col_habitat_farming
-		}
-		
-		modifier = {
-			add = 5
-			has_planet_flag = tec_food_habitat
-		}
-		modifier = {
-			add = 10
-			tec_has_food_processing_buildings = yes
-		}
-		modifier = {
-			add = 5
-			has_building = building_baol_organic_plant
-		}
-		add = value:farming_combined_value|FACTOR|2|CACHED|yes|
-	}
-}
-
-col_habitat_gestalt_farming = {	# Mine better - disabled
-	icon = GFX_colony_type_habitat_farming
-
-	potential = {
-		always = no
-		uses_district_set = habitat
-		exists = owner
-		owner = {
-			is_gestalt = yes
-		}
-		tec_is_arcology_habitat = no
-		is_capital = no
-		tec_ai_allow_designation_type = { type = farming }
-	}
-	custom_tooltip = col_habitat_farming_gestalt_custom
-	planet_modifier = {
-		planet_building_hydroponics_farm_build_speed_mult = 0.25
-		planet_farmers_produces_mult = 0.25
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = { planet_farmers_produces_mult = 0.1 }
-	}
-
-	inline_script = colony_types/effects/tec_resolution_greatergood
-
-	# Evolved
-		inline_script = colony_types/effects/tec_land_of_plenty_farming
-		inline_script = colony_types/effects/tec_planets_t2a_farming
-	# / 
-
-	weight_modifier = {
-		modifier = {
-			add = @stickiness
-			has_designation = col_habitat_gestalt_farming
-		}
-		
-		modifier = {
-			add = 5
-			has_planet_flag = tec_food_habitat
-		}
-		modifier = {
-			add = 10
-			tec_has_food_processing_buildings = yes
-		}
-		modifier = {
-			add = 5
-			has_building = building_baol_organic_plant
-		}
-		add = value:farming_combined_value|FACTOR|2|CACHED|yes|
-	}
-}
-
 col_habitat_fortress = {	# tweaked
 	icon = GFX_colony_type_habitat_fortress
 
@@ -1949,42 +1861,28 @@ col_habitat_fortress = {	# tweaked
 
 	planet_modifier = {
 		planet_orbital_bombardment_damage = -0.10
-		army_defense_damage_mult = 0.20
+		army_damage_mult = 0.20
+		planet_army_build_speed_mult = 0.10
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_orbital_bombardment_damage = -0.1
-		}
-	}
 
 	inline_script = {
 		script = modifiers/tec_army_building_build_speed
-		value = 0.25
+		value = @tec_designation_build_speed
 		mult = 1
 		trigger = ""
 	}
 
 	inline_script = {
 		script = modifiers/tec_naval_building_build_speed
-		value = 0.25
+		value = @tec_designation_build_speed
 		mult = 1
 		trigger = ""
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			OR = {
-				has_building = building_order_keep
-				has_building = building_order_castle
-			}
-		}
-		planet_knights_produces_mult = 0.1
-	}
+	inline_script = colony_types/effects/tec_adaptability_fortress
+	inline_script = colony_types/effects/tec_knights_order_fortress
+
 	weight_modifier = {
 		modifier = {
 			add = @stickiness
@@ -2014,27 +1912,17 @@ col_habitat_industrial = {	# tweaked
 	}
 
 	planet_modifier = {
-		planet_metallurgists_upkeep_mult = -0.1
-		planet_artisans_upkeep_mult = -0.1
+		planet_artisans_produces_mult = @tec_habitat_designation_split_output
+		planet_metallurgists_produces_mult = @tec_habitat_designation_split_output
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_artisans_produces_mult = 0.05
-			planet_metallurgists_produces_mult = 0.05
-		}
-	}
 
 	triggered_planet_modifier = {
 		potential = {
 			tec_is_arcology_habitat = no
 		}
 		modifier = {
-			planet_district_hab_industrial_build_speed_mult = 0.25
+			planet_district_hab_industrial_build_speed_mult = @tec_designation_build_speed
 		}
 	}
 
@@ -2049,6 +1937,7 @@ col_habitat_industrial = {	# tweaked
 		}
 	}
 
+	inline_script = colony_types/effects/tec_adaptability_industrial
 	inline_script = colony_types/effects/tec_resolution_industry_industrial
 
 	weight_modifier = {
@@ -2087,17 +1976,7 @@ col_habitat_foundry = {		# tweaked
 	}
 
 	planet_modifier = {
-		planet_metallurgists_upkeep_mult = -0.2
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_metallurgists_produces_mult = 0.05
-		}
+		planet_metallurgists_produces_mult = @tec_habitat_designation_output
 	}
 
 	triggered_planet_modifier = {
@@ -2105,7 +1984,7 @@ col_habitat_foundry = {		# tweaked
 			tec_is_arcology_habitat = no
 		}
 		modifier = {
-			planet_district_hab_industrial_build_speed_mult = 0.25
+			planet_district_hab_industrial_build_speed_mult = @tec_designation_build_speed
 		}
 	}
 
@@ -2115,10 +1994,11 @@ col_habitat_foundry = {		# tweaked
 			has_planet_flag = tec_industrial_habitat
 		}
 		modifier = {
-			planet_district_tec_hab_arcology_foundry_build_speed_mult = 0.25
+			planet_district_tec_hab_arcology_foundry_build_speed_mult = @tec_designation_build_speed
 		}
 	}
 
+	inline_script = colony_types/effects/tec_adaptability_foundry
 	inline_script = colony_types/effects/tec_resolution_industry_foundry
 
 	inline_script = colony_types/tec_foundry_conversion
@@ -2177,25 +2057,16 @@ col_habitat_factory = {		# tweaked
 	}
 
 	planet_modifier = {
-		planet_artisans_upkeep_mult = -0.2
+		planet_artisans_produces_mult = @tec_habitat_designation_output
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_artisans_produces_mult = 0.05
-		}
-	}
 
 	triggered_planet_modifier = {
 		potential = {
 			tec_is_arcology_habitat = no
 		}
 		modifier = {
-			planet_district_hab_industrial_build_speed_mult = 0.25
+			planet_district_hab_industrial_build_speed_mult = @tec_designation_build_speed
 		}
 	}
 
@@ -2205,10 +2076,11 @@ col_habitat_factory = {		# tweaked
 			has_planet_flag = tec_industrial_habitat
 		}
 		modifier = {
-			planet_district_tec_hab_arcology_industry_build_speed_mult = 0.25
+			planet_district_tec_hab_arcology_industry_build_speed_mult = @tec_designation_build_speed
 		}
 	}
 
+	inline_script = colony_types/effects/tec_adaptability_factory
 	inline_script = colony_types/effects/tec_resolution_industry_factory
 
 	inline_script = colony_types/tec_factory_conversion
@@ -2271,20 +2143,10 @@ col_habitat_bureau = {
 	}
 
 	planet_modifier = {
-		planet_administrators_produces_mult = 0.10
-		planet_administrators_upkeep_mult = -0.10
+		planet_administrators_produces_mult = @tec_habitat_designation_output
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_administrators_produces_mult = 0.05
-		}
-	}
-
+	inline_script = colony_types/effects/tec_adaptability_unity
 	inline_script = colony_types/effects/tec_all_the_priests_1
 
 	weight_modifier = {
@@ -2312,27 +2174,11 @@ col_habitat_bureau_spiritualist = {
 	}
 
 	planet_modifier = {
-		planet_administrators_produces_mult = 0.10
-		planet_administrators_upkeep_mult = -0.10
+		planet_administrators_produces_mult = @tec_habitat_designation_output
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_administrators_produces_mult = 0.05
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner.federation
-			owner.federation = { has_federation_perk = all_the_priests_1 }
-		}
-		job_priest_per_pop = 0.04
-	}
+	inline_script = colony_types/effects/tec_adaptability_unity
+	inline_script = colony_types/effects/tec_all_the_priests_1
 
 	weight_modifier = {
 		modifier = {
@@ -2356,19 +2202,10 @@ col_habitat_bureau_hive = {
 	}
 
 	planet_modifier = {
-		planet_administrators_produces_mult = 0.10
-		planet_administrators_upkeep_mult = -0.10
+		planet_administrators_produces_mult = @tec_habitat_designation_output
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_administrators_produces_mult = 0.05
-		}
-	}
+	inline_script = colony_types/effects/tec_adaptability_unity
 
 	weight_modifier = {
 		modifier = {
@@ -2392,9 +2229,10 @@ col_habitat_bureau_machine = {
 	}
 
 	planet_modifier = {
-		planet_administrators_produces_mult = 0.10
-		planet_administrators_upkeep_mult = -0.10
+		planet_administrators_produces_mult = @tec_habitat_designation_output
 	}
+
+	inline_script = colony_types/effects/tec_adaptability_unity
 
 	weight_modifier = {
 		modifier = {
@@ -2415,25 +2253,13 @@ col_habitat_refinery = {	# tweaked
 	}
 
 	planet_modifier = {
-		planet_refiners_produces_mult = 0.15
-		planet_translucers_produces_mult = 0.15
-		planet_chemists_produces_mult = 0.15
-		planet_sr_miners_produces_mult = 0.15
+		planet_refiners_produces_mult = @tec_habitat_designation_refinery_output
+		planet_translucers_produces_mult = @tec_habitat_designation_refinery_output
+		planet_chemists_produces_mult = @tec_habitat_designation_refinery_output
+		planet_sr_miners_produces_mult = @tec_habitat_designation_refinery_output
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_refiners_produces_mult = 0.05
-			planet_translucers_produces_mult = 0.05
-			planet_chemists_produces_mult = 0.05
-			planet_sr_miners_produces_mult = 0.05
-		}
-	}
-
+	inline_script = colony_types/effects/tec_adaptability_refinery
 	inline_script = colony_types/effects/tec_resolution_industry_refinery
 
 	weight_modifier = {
@@ -2442,413 +2268,6 @@ col_habitat_refinery = {	# tweaked
 			has_designation = col_habitat_refinery
 		}
 		add = value:refinery_combined_value|FACTOR|2|CACHED|yes|
-	}
-}
-
-# Rural Planet - Gestalt
-col_rural_gestalt = {
-	icon = GFX_colony_type_fringe
-
-	potential = {
-		NOR = {
-			uses_district_set = habitat
-			tec_uses_ringworld_districts = yes
-			uses_district_set = machine_world
-			uses_district_set = hive_world
-			tec_is_pd_nonconventional_world = yes
-		}
-		exists = owner
-		owner = { is_gestalt = yes }
-		is_special_colony_type = no
-		is_capital = no
-
-		tec_ai_allow_designation_type = { type = rural }
-	}
-
-	planet_modifier = {
-		planet_jobs_simple_drone_produces_mult = 0.10
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_jobs_simple_drone_produces_mult = 0.05
-		}
-	}
-
-	inline_script = {
-		script = modifiers/tec_rural_generator_district_build_speed
-		value = 0.25
-		mult = 1
-		trigger = ""
-	}
-
-	inline_script = {
-		script = modifiers/tec_rural_mining_district_build_speed
-		value = 0.25
-		mult = 1
-		trigger = ""
-	}
-
-	
-	inline_script = {
-		script = modifiers/tec_rural_farming_district_build_speed
-		value = 0.25
-		mult = 1
-		trigger = ""
-	}
-
-	weight_modifier = {
-		modifier = {
-			add = @stickiness_low
-			has_designation = col_rural_gestalt
-		}
-		modifier = {
-			add = 5
-			OR = {
-				tec_has_energy_processing_buildings = yes
-				tec_has_mineral_processing_buildings = yes
-				tec_has_food_processing_buildings = yes
-			}
-		}
-		modifier = {
-			add = 5
-			has_building = building_baol_organic_plant
-		}
-		modifier = {
-			add = 2
-			tec_has_betharian_deposit = yes
-		}
-		modifier = {
-			add = 3
-			tec_has_betharian_deposit = yes
-			owner = { has_technology = tech_mine_betharian }
-		}
-	}
-}
-
-# Rural Planet
-col_rural = {
-	icon = GFX_colony_type_rural
-
-	potential = {
-		exists = owner
-		owner = { is_gestalt = no }
-		NOR = {
-			uses_district_set = habitat
-			tec_uses_ringworld_districts = yes
-			uses_district_set = city_world
-			tec_is_pd_nonconventional_world = yes
-		}
-		is_special_colony_type = no
-		is_capital = no
-		tec_ai_allow_designation_type = { type = rural }
-	}
-
-	planet_modifier = {
-		planet_jobs_worker_produces_mult = 0.10
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_jobs_worker_produces_mult = 0.05
-		}
-	}
-
-	inline_script = {
-		script = modifiers/tec_rural_generator_district_build_speed
-		value = 0.25
-		mult = 1
-		trigger = ""
-	}
-
-	inline_script = {
-		script = modifiers/tec_rural_mining_district_build_speed
-		value = 0.25
-		mult = 1
-		trigger = ""
-	}
-
-	
-	inline_script = {
-		script = modifiers/tec_rural_farming_district_build_speed
-		value = 0.25
-		mult = 1
-		trigger = ""
-	}
-
-	# Evolved
-		inline_script = colony_types/effects/tec_land_of_plenty_generic
-	# /
-
-	weight_modifier = {
-		modifier = {
-			add = @stickiness_low
-			has_designation = col_rural
-		}
-		modifier = {
-			add = 5
-			OR = {
-				tec_has_energy_processing_buildings = yes
-				tec_has_mineral_processing_buildings = yes
-				tec_has_food_processing_buildings = yes
-			}
-		}
-		modifier = {
-			add = 5
-			has_building = building_baol_organic_plant
-		}
-		modifier = {
-			add = 2
-			tec_has_betharian_deposit = yes
-		}
-		modifier = {
-			add = 3
-			tec_has_betharian_deposit = yes
-			owner = { has_technology = tech_mine_betharian }
-		}
-	}
-}
-
-# Ringworld Mixed
-col_ring_mix = {
-	icon = GFX_colony_type_workers
-
-	potential = {
-		tec_uses_ringworld_districts = yes
-		is_capital = no
-	}
-
-	planet_modifier = {
-		planet_immigration_pull_mult = 0.2
-		planet_jobs_produces_mult = 0.05
-		pop_growth_speed = 0.15
-		planet_pop_assembly_mult = 0.15
-		planet_pop_assembly_organic_mult = 0.15
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_jobs_produces_mult = 0.05
-		}
-	}
-
-	weight_modifier = {
-		modifier = {
-			add = @stickiness
-			has_designation = col_ring_mix
-		}
-
-		modifier = {
-			add = 10
-			num_sapient_pops < 15
-		}
-	}
-}
-
-col_ring_research = {
-	icon = GFX_colony_type_research
-
-	potential = {
-		tec_uses_ringworld_districts = yes
-		is_capital = no
-
-		tec_ai_allow_designation_type = { type = research }
-	}
-
-	planet_modifier = {
-		planet_jobs_engineering_research_produces_mult = 0.15
-		planet_jobs_physics_research_produces_mult = 0.15
-		planet_jobs_society_research_produces_mult = 0.15
-		pop_growth_speed = 0.1
-		planet_pop_assembly_mult = 0.1
-		planet_pop_assembly_organic_mult = 0.1
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_jobs_engineering_research_produces_mult = 0.05
-			planet_jobs_physics_research_produces_mult = 0.05
-			planet_jobs_society_research_produces_mult = 0.05
-		}
-	}
-
-	weight_modifier = {
-		modifier = {
-			add = @stickiness
-			has_designation = col_ring_research
-		}
-		add = value:research_combined_value|FACTOR|3|CACHED|yes|
-	}
-}
-
-col_ring_farming = {
-	icon = GFX_colony_type_farm
-
-	potential = {
-		tec_uses_ringworld_districts = yes
-		tec_is_unspecced_ringworld = yes
-		is_capital = no
-
-		tec_ai_allow_designation_type = { type = farming }
-	}
-
-	planet_modifier = {
-		planet_jobs_food_produces_mult = 0.25
-		pop_growth_speed = 0.1
-		planet_pop_assembly_mult = 0.1
-		planet_pop_assembly_organic_mult = 0.1
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_jobs_food_produces_mult = 0.1
-		}
-	}
-
-	inline_script = colony_types/effects/tec_resolution_greatergood
-
-	# Evolved
-		inline_script = colony_types/effects/tec_land_of_plenty_farming
-		inline_script = colony_types/effects/tec_planets_t2a_farming
-	# /
-
-	weight_modifier = {
-		modifier = {
-			add = @stickiness
-			has_designation = col_ring_farming
-		}
-		add = value:farming_combined_value|FACTOR|2|CACHED|yes|
-		modifier = {
-			add = 10
-			tec_has_food_processing_buildings = yes
-		}
-		modifier = {
-			add = 5
-			has_building = building_baol_organic_plant
-		}
-	}
-}
-
-col_ring_trade = {
-	icon = GFX_colony_type_urban
-
-	potential = {
-		tec_uses_ringworld_districts = yes
-		exists = owner
-		owner = {
-			OR = {
-				is_gestalt = no
-				tec_is_trade_gestalt = yes
-			}
-		}
-		is_capital = no
-		tec_ai_allow_designation_type = { type = trade }
-	}
-
-	planet_modifier = {
-		trade_value_mult = 0.2
-		pop_growth_speed = 0.1
-		planet_pop_assembly_mult = 0.1
-		planet_pop_assembly_organic_mult = 0.1
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = {
-				has_tradition = tr_adaptability_finish
-			}
-		}
-		modifier = {
-			trade_value_mult = 0.1
-		}
-	}
-
-	weight_modifier = {
-		modifier = {
-			add = @stickiness
-			has_designation = col_ring_trade
-		}
-		complex_trigger_modifier = {
-			trigger = num_districts
-			parameters = {
-				type = district_rw_commercial
-			}
-			mode = add
-			mult = 10
-		}
-		complex_trigger_modifier = {
-			trigger = num_districts
-			parameters = {
-				type = district_tec_rw_trade
-			}
-			mode = add
-			mult = 10
-		}
-	}
-}
-
-col_ring_generator = {
-	icon = GFX_colony_type_generator
-
-	potential = {
-		tec_uses_ringworld_districts = yes
-		tec_is_unspecced_ringworld = yes
-		is_capital = no
-
-		tec_ai_allow_designation_type = { type = generator }
-	}
-
-	planet_modifier = {
-		planet_jobs_energy_produces_mult = 0.25
-		pop_growth_speed = 0.1
-		planet_pop_assembly_mult = 0.1
-		planet_pop_assembly_organic_mult = 0.1
-	}
-
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_jobs_energy_produces_mult = 0.1
-		}
-	}
-
-	inline_script = colony_types/effects/tec_resolution_greatergood
-
-	# Evolved
-		inline_script = colony_types/effects/tec_land_of_plenty_generator
-		inline_script = colony_types/effects/tec_planets_t2a_generator
-	# /
-
-	weight_modifier = {
-		modifier = {
-			add = @stickiness
-			has_designation = col_ring_generator
-		}
-		add = value:generator_combined_value|FACTOR|2|CACHED|yes|
 	}
 }
 
@@ -2862,19 +2281,12 @@ col_ecu_mix = {				# tweaked
 	}
 
 	planet_modifier = {
-		planet_structures_upkeep_mult = -0.25
-		planet_building_build_speed_mult = 0.25
+		planet_structures_upkeep_mult = @tec_ecu_designation_urban_upkeep
+		planet_building_build_speed_mult = @tec_designation_build_speed
+		planet_decision_enact_speed_mult = @tec_designation_build_speed
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_jobs_produces_mult = 0.05
-		}
-	}
+	inline_script = colony_types/effects/tec_adaptability_capital
 
 	weight_modifier = {
 		modifier = {
@@ -2914,23 +2326,16 @@ col_ecu_industrial = {
 	}
 
 	planet_modifier = {
-		planet_artisans_upkeep_mult = -0.10
-		planet_metallurgists_upkeep_mult = -0.10
-		planet_district_arcology_civilian_industry_build_speed_mult = 0.25
-		planet_district_arcology_arms_industry_build_speed_mult = 0.25
+		planet_artisans_upkeep_mult = @tec_ecu_designation_split_upkeep
+		planet_metallurgists_upkeep_mult = @tec_ecu_designation_split_upkeep
+		planet_artisans_produces_mult = @tec_ecu_designation_split_output
+		planet_metallurgists_produces_mult = @tec_ecu_designation_split_output
+
+		planet_district_arcology_civilian_industry_build_speed_mult = @tec_designation_build_speed
+		planet_district_arcology_arms_industry_build_speed_mult = @tec_designation_build_speed
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_artisans_produces_mult = 0.05
-			planet_metallurgists_produces_mult = 0.05
-		}
-	}
-
+	inline_script = colony_types/effects/tec_adaptability_industrial
 	inline_script = colony_types/effects/tec_resolution_industry_industrial
 
 	weight_modifier = {
@@ -2980,21 +2385,14 @@ col_ecu_foundry = {			# tweaked
 	}
 
 	planet_modifier = {
-		planet_metallurgists_upkeep_mult = -0.2
-		planet_building_foundry_1_build_speed_mult = 0.25
-		planet_district_arcology_arms_industry_build_speed_mult = 0.25
+		planet_metallurgists_upkeep_mult = @tec_ecu_designation_upkeep
+		planet_metallurgists_produces_mult = @tec_ecu_designation_output
+
+		planet_building_foundry_1_build_speed_mult = @tec_designation_build_speed
+		planet_district_arcology_arms_industry_build_speed_mult = @tec_designation_build_speed
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_metallurgists_produces_mult = 0.05
-		}
-	}
-
+	inline_script = colony_types/effects/tec_adaptability_foundry
 	inline_script = colony_types/effects/tec_resolution_industry_foundry
 
 	weight_modifier = {
@@ -3063,21 +2461,14 @@ col_ecu_factory = {			# tweaked
 	}
 
 	planet_modifier = {
-		planet_artisans_upkeep_mult = -0.2
-		planet_building_factory_1_build_speed_mult = 0.25
-		planet_district_arcology_civilian_industry_build_speed_mult = 0.25
+		planet_artisans_upkeep_mult = @tec_ecu_designation_upkeep
+		planet_artisans_produces_mult = @tec_ecu_designation_output
+
+		planet_building_factory_1_build_speed_mult = @tec_designation_build_speed
+		planet_district_arcology_civilian_industry_build_speed_mult = @tec_designation_build_speed
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_artisans_produces_mult = 0.05
-		}
-	}
-
+	inline_script = colony_types/effects/tec_adaptability_factory
 	inline_script = colony_types/effects/tec_resolution_industry_factory
 
 	weight_modifier = {
@@ -3126,20 +2517,14 @@ col_ecu_research = {
 	}
 
 	planet_modifier = {
-		planet_researchers_upkeep_mult = -0.2
-		planet_building_research_lab_1_build_speed_mult = 0.25
-		planet_district_tec_arcology_research_build_speed_mult = 0.25
+		planet_researchers_upkeep_mult = @tec_ecu_designation_upkeep
+		planet_researchers_produces_mult = @tec_ecu_designation_output
+
+		planet_building_research_lab_1_build_speed_mult = @tec_designation_build_speed
+		planet_district_tec_arcology_research_build_speed_mult = @tec_designation_build_speed
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_researchers_produces_mult = 0.05
-		}
-	}
+	inline_script = colony_types/effects/tec_adaptability_research
 
 	weight_modifier = {
 		modifier = {
@@ -3149,6 +2534,197 @@ col_ecu_research = {
 		add = value:research_combined_value|FACTOR|3|CACHED|yes|
 	}
 }
+
+# Ringworld Mixed
+col_ring_mix = {
+	icon = GFX_colony_type_workers
+
+	potential = {
+		tec_uses_ringworld_districts = yes
+		is_capital = no
+	}
+
+	planet_modifier = {
+		planet_immigration_pull_mult = 0.2
+		planet_jobs_produces_mult = 0.05
+		pop_growth_speed = 0.15
+		planet_pop_assembly_mult = 0.15
+		planet_pop_assembly_organic_mult = 0.15
+	}
+
+	inline_script = colony_types/effects/tec_adaptability_capital
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_ring_mix
+		}
+
+		modifier = {
+			add = 10
+			num_sapient_pops < 15
+		}
+	}
+}
+
+col_ring_research = {
+	icon = GFX_colony_type_research
+
+	potential = {
+		tec_uses_ringworld_districts = yes
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = research }
+	}
+
+	planet_modifier = {
+		planet_jobs_engineering_research_produces_mult = @tec_ring_designation_output
+		planet_jobs_physics_research_produces_mult = @tec_ring_designation_output
+		planet_jobs_society_research_produces_mult = @tec_ring_designation_output
+		pop_growth_speed = 0.1
+		planet_pop_assembly_mult = 0.1
+		planet_pop_assembly_organic_mult = 0.1
+	}
+
+	inline_script = colony_types/effects/tec_adaptability_research
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_ring_research
+		}
+		add = value:research_combined_value|FACTOR|3|CACHED|yes|
+	}
+}
+
+col_ring_farming = {
+	icon = GFX_colony_type_farm
+
+	potential = {
+		tec_uses_ringworld_districts = yes
+		tec_is_unspecced_ringworld = yes
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = farming }
+	}
+
+	planet_modifier = {
+		planet_jobs_food_produces_mult = @tec_ring_designation_menial_output
+		pop_growth_speed = 0.1
+		planet_pop_assembly_mult = 0.1
+		planet_pop_assembly_organic_mult = 0.1
+	}
+
+	inline_script = colony_types/effects/tec_adaptability_farming
+	inline_script = colony_types/effects/tec_resolution_greatergood
+
+	# Evolved
+		inline_script = colony_types/effects/tec_land_of_plenty_farming
+		inline_script = colony_types/effects/tec_planets_t2a_farming
+	# /
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_ring_farming
+		}
+		add = value:farming_combined_value|FACTOR|2|CACHED|yes|
+		modifier = {
+			add = 10
+			tec_has_food_processing_buildings = yes
+		}
+		modifier = {
+			add = 5
+			has_building = building_baol_organic_plant
+		}
+	}
+}
+
+col_ring_trade = {
+	icon = GFX_colony_type_urban
+
+	potential = {
+		tec_uses_ringworld_districts = yes
+		exists = owner
+		owner = {
+			OR = {
+				is_gestalt = no
+				tec_is_trade_gestalt = yes
+			}
+		}
+		is_capital = no
+		tec_ai_allow_designation_type = { type = trade }
+	}
+
+	planet_modifier = {
+		trade_value_mult = @tec_ring_designation_trade_output
+		pop_growth_speed = 0.1
+		planet_pop_assembly_mult = 0.1
+		planet_pop_assembly_organic_mult = 0.1
+	}
+
+	inline_script = colony_types/effects/tec_adaptability_trade
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_ring_trade
+		}
+		complex_trigger_modifier = {
+			trigger = num_districts
+			parameters = {
+				type = district_rw_commercial
+			}
+			mode = add
+			mult = 10
+		}
+		complex_trigger_modifier = {
+			trigger = num_districts
+			parameters = {
+				type = district_tec_rw_trade
+			}
+			mode = add
+			mult = 10
+		}
+	}
+}
+
+col_ring_generator = {
+	icon = GFX_colony_type_generator
+
+	potential = {
+		tec_uses_ringworld_districts = yes
+		tec_is_unspecced_ringworld = yes
+		is_capital = no
+
+		tec_ai_allow_designation_type = { type = generator }
+	}
+
+	planet_modifier = {
+		planet_jobs_energy_produces_mult = @tec_ring_designation_menial_output
+		pop_growth_speed = 0.1
+		planet_pop_assembly_mult = 0.1
+		planet_pop_assembly_organic_mult = 0.1
+	}
+
+	inline_script = colony_types/effects/tec_adaptability_generator
+	inline_script = colony_types/effects/tec_resolution_greatergood
+
+	# Evolved
+		inline_script = colony_types/effects/tec_land_of_plenty_generator
+		inline_script = colony_types/effects/tec_planets_t2a_generator
+	# /
+
+	weight_modifier = {
+		modifier = {
+			add = @stickiness
+			has_designation = col_ring_generator
+		}
+		add = value:generator_combined_value|FACTOR|2|CACHED|yes|
+	}
+}
+
+
 
 # Machine World
 col_mac = {
@@ -3160,22 +2736,24 @@ col_mac = {
 	}
 
 	planet_modifier = {
-		planet_jobs_simple_drone_produces_mult = 0.05
+		planet_jobs_worker_produces_mult = @tec_machine_designation_menial_output
 	}
 
 	inline_script = {
 		script = modifiers/tec_rural_generator_district_build_speed
-		value = 0.25
+		value = @tec_designation_build_speed
 		mult = 1
 		trigger = ""
 	}
 
 	inline_script = {
 		script = modifiers/tec_rural_mining_district_build_speed
-		value = 0.25
+		value = @tec_designation_build_speed
 		mult = 1
 		trigger = ""
 	}
+
+	inline_script = colony_types/effects/tec_adaptability_rural
 
 	weight_modifier = {
 		modifier = {
@@ -3200,12 +2778,14 @@ col_mac_foundry = {
 	}
 
 	planet_modifier = {
-		planet_jobs_alloys_produces_mult = 0.1
-		planet_metallurgists_upkeep_mult = -0.2
-		planet_district_industrial_build_speed_mult = 0.25
+		planet_jobs_alloys_produces_mult = @tec_machine_designation_industrial_output
+		planet_metallurgists_upkeep_mult = @tec_machine_designation_industrial_upkeep
+		planet_district_industrial_build_speed_mult = @tec_designation_build_speed
 	}
+
 	custom_tooltip = col_foundry_custom
 
+	inline_script = colony_types/effects/tec_adaptability_foundry
 	inline_script = colony_types/effects/tec_resolution_industry_foundry
 
 	weight_modifier = {
@@ -3270,11 +2850,12 @@ col_mac_factory = {
 
 	custom_tooltip = col_factory_custom
 	planet_modifier = {
-		planet_jobs_consumer_goods_produces_mult = 0.1
-		planet_artisans_upkeep_mult = -0.2
-		planet_district_industrial_build_speed_mult = 0.25
+		planet_jobs_consumer_goods_produces_mult = @tec_machine_designation_industrial_output
+		planet_artisans_upkeep_mult = @tec_machine_designation_industrial_upkeep
+		planet_district_industrial_build_speed_mult = @tec_designation_build_speed
 	}
 
+	inline_script = colony_types/effects/tec_adaptability_factory
 	inline_script = colony_types/effects/tec_resolution_industry_factory
 
 	weight_modifier = {
@@ -3328,36 +2909,28 @@ col_hiv = {
 	}
 
 	planet_modifier = {
-		planet_jobs_simple_drone_produces_mult = 0.1
+		planet_jobs_worker_produces_mult = @tec_hive_designation_menial_output
 	}
 
-	triggered_planet_modifier = {	# Adaptability
-		potential = {
-			exists = owner
-			owner = { has_tradition = tr_adaptability_finish }
-		}
-		modifier = {
-			planet_jobs_simple_drone_produces_mult = 0.05
-		}
-	}
+	inline_script = colony_types/effects/tec_adaptability_rural
 
 	inline_script = {
 		script = modifiers/tec_rural_generator_district_build_speed
-		value = 0.25
+		value = @tec_designation_build_speed
 		mult = 1
 		trigger = ""
 	}
 
 	inline_script = {
 		script = modifiers/tec_rural_mining_district_build_speed
-		value = 0.25
+		value = @tec_designation_build_speed
 		mult = 1
 		trigger = ""
 	}
 
 	inline_script = {
 		script = modifiers/tec_rural_farming_district_build_speed
-		value = 0.25
+		value = @tec_designation_build_speed
 		mult = 1
 		trigger = ""
 	}
@@ -3381,8 +2954,9 @@ col_hiv_foundry = {
 	}
 
 	planet_modifier = {
-		planet_metallurgists_upkeep_mult = -0.20
-		planet_district_industrial_build_speed_mult = 0.25
+		planet_jobs_alloys_produces_mult = @tec_hive_designation_industrial_output
+		planet_metallurgists_upkeep_mult = @tec_hive_designation_industrial_upkeep
+		planet_district_industrial_build_speed_mult = @tec_designation_build_speed
 	}
 
 	triggered_planet_modifier = {	# Adaptability
@@ -3454,7 +3028,7 @@ col_trophy_machine = {
 	}
 
 	planet_modifier = {
-		planet_bio_trophies_produces_mult = 0.10
+		planet_bio_trophies_produces_mult = @tec_regular_designation_output
 		pop_growth_speed = 0.10
 		planet_pop_assembly_organic_mult = 0.1
 	}
