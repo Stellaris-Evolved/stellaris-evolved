@@ -166,26 +166,6 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                         if matches:
                             scripted_effects[s] = (filename[len(str(base_mod_path)) + 1:], i + 1)
 
-    councilor_checks = []
-
-    for filename in glob.iglob(str(base_mod_path / f"common/**/**"), recursive=True):
-        if '.txt' in filename:
-            with open(filename, 'r') as f:
-                lines = f.readlines()
-                for i, line in enumerate(lines):
-                    matches = re.match("\\s*tec_has_councilor\\s*=\\s*{\\s*COUNCILOR\\s*=\\s*\"?([a-z_A-Z\\d]*)\"?", line)
-                    if matches and matches.group(1):
-                        councilor_checks.append(matches.group(1))
-                    matches = re.match(".*value:tec_councilor_level_multiplier.*\|COUNCILOR\|([a-z_A-Z\\d]*)", line)
-                    if matches and matches.group(1):
-                        councilor_checks.append(matches.group(1))
-                    matches = re.match(".*value:tec_councilor_level_multiplier.*\|COUNCILOR_2\|([a-z_A-Z\\d]*)", line)
-                    if matches and matches.group(1):
-                        councilor_checks.append(matches.group(1))
-
-    councilor_checks = list(set(councilor_checks))
-    councilor_checks.sort()
-
     suffixes = cfg['addons']['suffixes']
     scripted_trigger_defaults = cfg['addons'].get('scripted_trigger_defaults', [])
 
