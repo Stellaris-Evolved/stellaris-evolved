@@ -1,34 +1,38 @@
 # common\scripted_effects\zz_evolved_scripted_effects.txt
 
 tec_cache = {
+	inline_script = {
+		script = tec_type_hint
+		flag_scope_type = $scope$
+		scripted_trigger = $trigger$
+		[[scope_redirect] scope = $scope_redirect$ ]
+	}
+
 	optimize_memory
-	[[scope_redirect]
-		if = {
-			limit = {
+	if = {
+		limit = {
+			[[scope_redirect]
 				exists = $scope_redirect$
 				$scope_redirect$ = {
 					$trigger$ = yes
 				}
-			}
-			set_$scope$_flag = tec_cache_$trigger$
-		} else = {
-			remove_$scope$_flag = tec_cache_$trigger$
-		}
-	]
-	[[!scope_redirect]
-		if = {
-			limit = {
+			]
+			[[!scope_redirect]
 				$trigger$ = yes
-			}
-			set_$scope$_flag = tec_cache_$trigger$
-		} else = {
-			remove_$scope$_flag = tec_cache_$trigger$
+			]
 		}
-	]
-
+		set_$scope$_flag = tec_cache_$trigger$
+	} else = {
+		remove_$scope$_flag = tec_cache_$trigger$
+	}
 }
 
 tec_cache_value = {
+	inline_script = {
+		script = tec_type_hint
+		script_value = $value$
+	}
+
 	optimize_memory
 	set_variable = {
 		which = tec_cache_$value$
@@ -224,7 +228,7 @@ tec_cache_combined_values = {
 	}
 
 	tec_effect_mod_support = {
-		effect = tec_cache_value_triggers
+		effect = tec_cache_combined_values
 	}
 }
 
@@ -276,7 +280,7 @@ tec_cache_shackled_triggers = {
 		scope = pop
 		trigger = tec_is_shackled_bioservant
 	}
-	
+
 	tec_cache = {
 		scope = pop
 		trigger = tec_is_non_sapient_bioservant
@@ -334,7 +338,7 @@ tec_cache_species_traits_triggers = {
 		scope = species
 		trigger = tec_has_stapled_trait
 	}
-	
+
 	tec_cache = {
 		scope = species
 		trigger = tec_has_ruler_job_invalidation_trait
@@ -530,7 +534,7 @@ tec_cache_country_civic_triggers = {
 		scope = country
 		trigger = tec_has_ruler_civic
 	}
-	
+
 	tec_cache = {
 		scope = country
 		trigger = tec_has_ruler_civic_hive
@@ -539,7 +543,7 @@ tec_cache_country_civic_triggers = {
 		scope = country
 		trigger = tec_has_maintenance_drone_swap_civic_hive
 	}
-	
+
 	tec_cache = {
 		scope = country
 		trigger = tec_has_ruler_civic_machine
@@ -641,32 +645,6 @@ tec_cache_country_civic_triggers = {
 	}
 }
 
-tec_cache_councilor = {
-	optimize_memory
-	if = {
-		limit = { 
-			is_councilor_type = $type$
-		}
-		prev = { set_country_flag = tec_cache_tec_has_councilor_$type$ }
-	}
-}
-
-tec_clean_councilor_cache = {
-	optimize_memory
-	remove_country_flag = tec_cache_tec_has_councilor_$type$
-}
-
-tec_cache_country_councilor_triggers = {
-	optimize_memory
-	# Clean flags
-	tec_cache_country_councilor_triggers_autogen = yes
-
-	tec_effect_mod_support = {
-		effect = tec_cache_country_councilor_triggers
-	}
-}
-
-
 # scope: country
 tec_cache_opinions = {
 	optimize_memory
@@ -689,11 +667,11 @@ tec_cache_opinions = {
 			}
 			target = {
 				set_variable = {
-					which = tec_cache_tec_opinion 
+					which = tec_cache_tec_opinion
 					value = 0
 				}
 				set_variable = {
-					which = tec_cache_tec_their_opinion 
+					which = tec_cache_tec_their_opinion
 					value = 0
 				}
 				export_trigger_value_to_variable = { # we reverse them due to using this on target
@@ -737,6 +715,11 @@ tec_cache_everything = {
 }
 
 tec_hoarders_recover_resource = {
+	inline_script = {
+		script = tec_type_hint
+		resource = $RESOURCE$
+	}
+
 	if = {
 		limit = {
 			is_variable_set = tec_$RESOURCE$_stockpile
@@ -765,6 +748,11 @@ tec_hoarders_recover_resource = {
 }
 
 tec_hoarders_withdraw_resource = {
+	inline_script = {
+		script = tec_type_hint
+		resource = $RESOURCE$
+	}
+
 	if = {
 		limit = {
 			is_variable_set = tec_$RESOURCE$_stockpile
@@ -777,10 +765,14 @@ tec_hoarders_withdraw_resource = {
 		}
 		clear_variable = tec_$RESOURCE$_stockpile
 	}
-	
 }
 
 tec_hoarders_manage_resource = {
+	inline_script = {
+		script = tec_type_hint
+		resource = $RESOURCE$
+	}
+
 	if = {
 		limit = {
 			has_planet_flag = tec_vault_manage_$RESOURCE$
@@ -1051,7 +1043,7 @@ tec_engineer_arcology_deposit_effect = {
 					has_rural_designation = yes
 				}
 			}
-			add_deposit = d_tec_preserved_eco_ring_2			
+			add_deposit = d_tec_preserved_eco_ring_2
 		}
 		10 = {
 			modifier = {
@@ -1158,15 +1150,14 @@ tec_country_get_robot_species = {
 			OR = {
 				any_galaxy_species = {
 					OR = {
-						has_species_flag = mechanical_species@root
+						has_species_flag = mechanical_species@prev
 					}
-					
 				}
 			}
 		}
 		random_galaxy_species = {
 			limit = {
-				has_species_flag = mechanical_species@root
+				has_species_flag = mechanical_species@prev
 			}
 			save_event_target_as = tec_robot_search_species
 		}
@@ -1176,15 +1167,15 @@ tec_country_get_robot_species = {
 			OR = {
 				any_galaxy_species = {
 					OR = {
-						has_species_flag = mechanical_species_fake_@root
+						has_species_flag = mechanical_species_fake_@prev
 					}
-					
+
 				}
 			}
 		}
 		random_galaxy_species = {
 			limit = {
-				has_species_flag = mechanical_species_fake_@root
+				has_species_flag = mechanical_species_fake_@prev
 			}
 			save_event_target_as = tec_robot_search_species
 		}
@@ -1213,10 +1204,16 @@ tec_country_aiauth_prepare_ai_species = {
 }
 
 tec_country_create_aiauth_ruler  = {
+	inline_script = {
+		script = tec_type_hint
+		[[class] leader_class = $class$ ]
+		[[ethic] ethic = $ethic$ ]
+	}
+
 	set_country_flag = tec_force_councilor_traits
 	tec_country_aiauth_prepare_ai_species = yes
 	create_leader = {
-		class = $CLASS|official$
+		class = $class|official$
 		species = event_target:tec_ai_species
 		name = tec_aiauth_ruler
 		skill = 1
@@ -1228,7 +1225,7 @@ tec_country_create_aiauth_ruler  = {
 		hide_leader = no
 		custom_description = councilor_tec_aiauth_ruler_desc
 		randomize_traits = yes
-		background_ethic = $ETHIC|ethic_gestalt_consciousness$
+		background_ethic = $ethic|ethic_gestalt_consciousness$
 		effect = {
 			save_event_target_as = tec_aiauth_ruler
 		}
@@ -1249,11 +1246,16 @@ tec_country_create_aiauth_ruler  = {
 }
 
 tec_country_create_aiauth_ruler_replace = {
+	inline_script = {
+		script = tec_type_hint
+		leader_scope = $ruler$
+	}
+
 	set_country_flag = tec_force_councilor_traits
 	set_country_flag = tec_no_starting_traits_modification
 	set_country_flag = tec_no_starting_skill_modification
 	tec_country_aiauth_prepare_ai_species = yes
-	$RULER$ = {
+	$ruler$ = {
 		save_event_target_as = tec_replaced_ruler
 	}
 	clone_leader = {
@@ -1295,33 +1297,19 @@ tec_country_create_aiauth_ruler_replace = {
 }
 
 tec_country_refragment_aiauth_ruler  = {
-	if = {
-		limit = {
-			has_country_flag = tec_fragmenting_official
-		}
-		tec_country_create_aiauth_ruler = {
-			CLASS = official
-			ETHIC = $ETHIC|ethic_gestalt_consciousness$
-		}
+	inline_script = {
+		script = tec_type_hint
+		[[ethic] ethic = $ethic$ ]
 	}
-	else_if = {
-		limit = {
-			has_country_flag = tec_fragmenting_commander
-		}
-		tec_country_create_aiauth_ruler = {
-			CLASS = commander
-			ETHIC = $ETHIC|ethic_gestalt_consciousness$
-		}
+
+	inline_script = {
+		script = iterators/tec_iterate_leader_class
+		include_script = iterators/leader_class/tec_refragment_aiauth_ruler
+		parameters = "
+			ethic = $ethic|ethic_gestalt_consciousness$
+		"
 	}
-	else_if = {
-		limit = {
-			has_country_flag = tec_fragmenting_scientist
-		}
-		tec_country_create_aiauth_ruler = {
-			CLASS = scientist
-			ETHIC = $ETHIC|ethic_gestalt_consciousness$
-		}
-	}
+
 	event_target:tec_aiauth_ruler = {
 		if = {
 			limit = {
@@ -1338,12 +1326,21 @@ tec_country_refragment_aiauth_ruler  = {
 }
 
 tec_country_create_aiauth_councilor = {
+	inline_script = {
+		script = tec_type_hint
+		localisation = $name$
+		localisation = $desc$
+		leader_class = $class$
+		[[council_pos] councilor = $council_pos$ ]
+		[[ethic] ethic = $ethic$ ]
+	}
+
 	set_country_flag = tec_force_councilor_traits
 	tec_country_aiauth_prepare_ai_species = yes
 	create_leader = {
-		class = $CLASS$
+		class = $class$
 		species = event_target:tec_ai_species
-		name = $NAME$
+		name = $name$
 		skill = 1
 		gender = indeterminable
 		event_leader = yes
@@ -1351,9 +1348,9 @@ tec_country_create_aiauth_councilor = {
 		can_manually_change_location = no
 		can_assign_to_council = yes
 		hide_leader = no
-		custom_description = $DESC$
+		custom_description = $desc$
 		randomize_traits = yes
-		background_ethic = $ETHIC|ethic_gestalt_consciousness$
+		background_ethic = $ethic|ethic_gestalt_consciousness$
 		effect = {
 			if = {	# Avoids sudden synth trait to appear
 				limit = {
@@ -1369,46 +1366,38 @@ tec_country_create_aiauth_councilor = {
 		set_owner = prev
 		add_trait_no_notify = leader_trait_tec_aiauth_node
 		tec_leader_add_councilor_trait = yes
-		[[COUNCIL_POS]
-			set_council_position = $COUNCIL_POS$
+		[[council_pos]
+			set_council_position = $council_pos$
 		]
 		tec_leader_handle_starting_modifiers = {
 			from = prev
 		}
 		set_gestalt_node_protrait_effect = yes
 		set_leader_flag = leader_death_events_blocked
-		add_skill_without_trait_selection = owner.modifier:leader_initial_skill
-		switch = {
-			trigger = leader_class
-			commander = {
-				add_skill_without_trait_selection = owner.modifier:commander_initial_skill
-			}
-			official = {
-				add_skill_without_trait_selection = owner.modifier:official_initial_skill
-			}
-			scientist = {
-				add_skill_without_trait_selection = owner.modifier:scientist_initial_skill
-			}
-		}
+		tec_leader_add_starting_skill = yes
 	}
-	[[!ETHIC]
-	if = {	# Removes gestalt ethic
-		limit = {
-			event_target:tec_aiauth_councilor = {
-				has_ethic = ethic_gestalt_consciousness
+	[[!ethic]
+		if = {	# Removes gestalt ethic
+			limit = {
+				event_target:tec_aiauth_councilor = {
+					has_ethic = ethic_gestalt_consciousness
+				}
+			}
+			# this = country
+			# event_target:tec_aiauth_councilor = node
+			tec_country_aiauth_councilor_assign_ethic = {
+				target_scope = event_target:tec_aiauth_councilor
 			}
 		}
-		# this = country
-		# event_target:tec_aiauth_councilor = node
-		tec_country_aiauth_councilor_assign_ethic = {
-			TARGET_SCOPE = event_target:tec_aiauth_councilor
-		}
-	}
 	]
 	remove_country_flag = tec_force_councilor_traits
 }
 
 tec_country_aiauth_councilor_assign_ethic = {
+	inline_script = {
+		script = tec_type_hint
+		leader_scope = $target_scope$
+	}
 	random_owned_pop = {
 		limit = {
 			# Happiness = ethic
@@ -1435,82 +1424,12 @@ tec_country_aiauth_councilor_assign_ethic = {
 		switch = {
 			trigger = has_ethic
 			# Vanilla
-			ethic_authoritarian = {
-				$TARGET_SCOPE$ = {
-					change_background_ethic = ethic_authoritarian
-				}
-			}
-			ethic_egalitarian = {
-				$TARGET_SCOPE$ = {
-					change_background_ethic = ethic_egalitarian
-				}
-			}
-			ethic_xenophobe = {
-				$TARGET_SCOPE$ = {
-					change_background_ethic = ethic_xenophobe
-				}
-			}
-			ethic_xenophile = {
-				$TARGET_SCOPE$ = {
-					change_background_ethic = ethic_xenophile
-				}
-			}
-			ethic_militarist = {
-				$TARGET_SCOPE$ = {
-					change_background_ethic = ethic_militarist
-				}
-			}
-			ethic_pacifist = {
-				$TARGET_SCOPE$ = {
-					change_background_ethic = ethic_pacifist
-				}
-			}
-			ethic_spiritualist = {
-				$TARGET_SCOPE$ = {
-					change_background_ethic = ethic_spiritualist
-				}
-			}
-			ethic_materialist = {
-				$TARGET_SCOPE$ = {
-					change_background_ethic = ethic_materialist
-				}
-			}
-			# Evolved
-			ethic_cooperative = {
-				$TARGET_SCOPE$ = {
-					change_background_ethic = ethic_cooperative
-				}
-			}
-			ethic_competitive = {
-				$TARGET_SCOPE$ = {
-					change_background_ethic = ethic_competitive
-				}
-			}
-			ethic_ecologist = {
-				$TARGET_SCOPE$ = {
-					change_background_ethic = ethic_ecologist
-				}
-			}
-			ethic_industrialist = {
-				$TARGET_SCOPE$ = {
-					change_background_ethic = ethic_industrialist
-				}
-			}
-			ethic_elitist = {
-				$TARGET_SCOPE$ = {
-					change_background_ethic = ethic_elitist
-				}
-			}
-			ethic_pluralist = {
-				$TARGET_SCOPE$ = {
-					change_background_ethic = ethic_pluralist
-				}
-			}
-			# Gestalt
-			ethic_gestalt_consciousness = {
-				$TARGET_SCOPE$ = {
-					change_background_ethic = ethic_gestalt_consciousness
-				}
+			inline_script = {
+				script = iterators/tec_iterate_ethic_regular
+				include_script = iterators/ethic_regular/tec_aiauth_councilor_assign_ethic
+				parameters = "
+					target_scope = $target_scope$
+				"
 			}
 		}
 	}
@@ -1522,121 +1441,64 @@ tec_country_aiauth_councilor_assign_ethic = {
 #}
 
 
-tec_country_refragment_aiauth_councilor = {
-	if = {
-		limit = {
-			has_country_flag = tec_fragmenting_official
-		}
-		tec_country_create_aiauth_councilor = {
-			CLASS = official
-			NAME = councilor_tec_aiauth_fragment_official
-			DESC = councilor_tec_aiauth_fragment_official_desc
-			ETHIC = $ETHIC|ethic_gestalt_consciousness$
-		}
-	}
-	else_if = {
-		limit = {
-			has_country_flag = tec_fragmenting_commander
-		}
-		tec_country_create_aiauth_councilor = {
-			CLASS = commander
-			NAME = councilor_tec_aiauth_fragment_commander
-			DESC = councilor_tec_aiauth_fragment_commander_desc
-			ETHIC = $ETHIC|ethic_gestalt_consciousness$
-		}
-	}
-	else_if = {
-		limit = {
-			has_country_flag = tec_fragmenting_scientist
-		}
-		tec_country_create_aiauth_councilor = {
-			CLASS = scientist
-			NAME = councilor_tec_aiauth_fragment_scientist
-			DESC = councilor_tec_aiauth_fragment_scientist_desc
-			ETHIC = $ETHIC|ethic_gestalt_consciousness$
-		}
+tec_country_cleanup_aiauth_fragment_class_flags = {
+	inline_script = {
+		script = iterators/tec_iterate_leader_class
+		include_script = iterators/leader_class/tec_country_cleanup_aiauth_fragment_flags
+		parameters = ""
 	}
 }
 
+tec_country_refragment_aiauth_councilor = {
+	inline_script = {
+		script = tec_type_hint
+		[[ethic] ethic = $ethic$ ]
+	}
+	inline_script = {
+		script = iterators/tec_iterate_leader_class
+		include_script = iterators/leader_class/tec_refragment_aiauth_councilor
+		parameters = "
+			ethic = $ethic|ethic_gestalt_consciousness$
+		"
+	}
+}
+
+tec_country_aiauth_set_fragmenting_class_flag = {
+	inline_script = {
+		script = tec_type_hint
+		leader_scope = $leader$
+	}
+
+	$leader$ = {
+		switch = {
+			trigger = leader_class
+			inline_script = {
+				script = iterators/tec_iterate_leader_class
+				include_script = iterators/leader_class/tec_country_aiauth_set_fragmenting_class_flag
+				parameters = ""
+			}
+		}
+	}
+
+}
+
 tec_country_create_aiauth_planetary_governing_node = {
+	inline_script = {
+		script = tec_type_hint
+		[[ethic] ethic = $ethic$ ]
+	}
+
 	set_country_flag = tec_force_normal_traits
 	tec_country_aiauth_prepare_ai_species = yes
-	if = {
-		limit = {
-			has_country_flag = tec_fragmenting_official
-		}
-		create_leader = {
-			class = official
-			species = event_target:tec_ai_species
-			name = tec_aiauth_planetary_governing_node
-			skill = 1
-			gender = indeterminable
-			event_leader = yes
-			skip_background_generation = yes
-			can_manually_change_location = no
-			hide_leader = no
-			can_assign_to_council = no
-			custom_description = tec_aiauth_planetary_governing_node_desc
-			randomize_traits = yes
-			background_ethic = $ETHIC|ethic_gestalt_consciousness$
-			effect = {
-				if = {	# Avoids sudden synth trait to appear
-					limit = {
-						has_trait = leader_trait_synthetic
-					}
-					remove_trait = leader_trait_synthetic
-				}
-				set_leader_flag = tec_no_species_traits
-				save_event_target_as = tec_aiauth_planetary_governing_node
-			}
-		}
+	inline_script = {
+		script = iterators/tec_iterate_leader_class
+		include_script = iterators/leader_class/tec_create_aiauth_planetary_governing_node
+		parameters = "
+			ethic = $ethic|ethic_gestalt_consciousness$
+		"
 	}
-	else_if = {
-		limit = {
-			has_country_flag = tec_fragmenting_commander
-		}
-		create_leader = {
-			class = commander
-			species = event_target:tec_ai_species
-			name = tec_aiauth_planetary_governing_node
-			skill = 1
-			gender = indeterminable
-			event_leader = yes
-			skip_background_generation = yes
-			can_manually_change_location = no
-			hide_leader = no
-			can_assign_to_council = no
-			custom_description = tec_aiauth_planetary_governing_node_desc
-			randomize_traits = yes
-			background_ethic = $ETHIC|ethic_gestalt_consciousness$
-			effect = {
-				save_event_target_as = tec_aiauth_planetary_governing_node
-			}
-		}
-	}
-	else_if = {
-		limit = {
-			has_country_flag = tec_fragmenting_scientist
-		}
-		create_leader = {
-			class = scientist
-			species = event_target:tec_ai_species
-			name = tec_aiauth_planetary_governing_node
-			skill = 1
-			gender = indeterminable
-			event_leader = yes
-			skip_background_generation = yes
-			can_manually_change_location = no
-			hide_leader = no
-			can_assign_to_council = no
-			custom_description = tec_aiauth_planetary_governing_node_desc
-			randomize_traits = yes
-			background_ethic = $ETHIC|ethic_gestalt_consciousness$
-			effect = {
-				save_event_target_as = tec_aiauth_planetary_governing_node
-			}
-		}
-	}
+
+
 	event_target:tec_aiauth_planetary_governing_node = {
 		set_leader_flag = tec_no_species_traits
 		add_trait_no_notify = leader_trait_tec_aiauth_planetary_governing_node
@@ -1645,19 +1507,7 @@ tec_country_create_aiauth_planetary_governing_node = {
 		tec_leader_handle_starting_modifiers = {
 			from = prev
 		}
-		add_skill_without_trait_selection = owner.modifier:leader_initial_skill
-		switch = {
-			trigger = leader_class
-			commander = {
-				add_skill_without_trait_selection = owner.modifier:commander_initial_skill
-			}
-			official = {
-				add_skill_without_trait_selection = owner.modifier:official_initial_skill
-			}
-			scientist = {
-				add_skill_without_trait_selection = owner.modifier:scientist_initial_skill
-			}
-		}
+		tec_leader_add_starting_skill = yes
 		set_name = {
 			key = "tec_aiauth_planetary_governing_node"
 			variable_string = "\\[tec_aiauth_planetary_governing_node_planet\\]"
@@ -1669,127 +1519,21 @@ tec_country_create_aiauth_planetary_governing_node = {
 }
 
 tec_country_refragment_aiauth_node = {
-	save_event_target_as = tec_aiauth_pre_refragment
-	switch = {
-		trigger = has_ethic
-		ethic_materialist = {
-			kill_leader = { show_notification = no }
-			prev = {
-				$FRAGMENT_EFFECT$ = {
-					ETHIC = ethic_materialist
-				}
-			}
-		}
-		ethic_spiritualist = {
-			kill_leader = { show_notification = no }
-			prev = {
-				$FRAGMENT_EFFECT$ = {
-					ETHIC = ethic_spiritualist
-				}
-			}
-		}
-		ethic_egalitarian = {
-			kill_leader = { show_notification = no }
-			prev = {
-				$FRAGMENT_EFFECT$ = {
-					ETHIC = ethic_egalitarian
-				}
-			}
-		}
-		ethic_authoritarian = {
-			kill_leader = { show_notification = no }
-			prev = {
-				$FRAGMENT_EFFECT$ = {
-					ETHIC = ethic_authoritarian
-				}
-			}
-		}
-		ethic_pacifist = {
-			kill_leader = { show_notification = no }
-			prev = {
-				$FRAGMENT_EFFECT$ = {
-					ETHIC = ethic_pacifist
-				}
-			}
-		}
-		ethic_militarist = {
-			kill_leader = { show_notification = no }
-			prev = {
-				$FRAGMENT_EFFECT$ = {
-					ETHIC = ethic_militarist
-				}
-			}
-		}
-		ethic_xenophile = {
-			kill_leader = { show_notification = no }
-			prev = {
-				$FRAGMENT_EFFECT$ = {
-					ETHIC = ethic_xenophile
-				}
-			}
-		}
-		ethic_xenophobe = {
-			kill_leader = { show_notification = no }
-			prev = {
-				$FRAGMENT_EFFECT$ = {
-					ETHIC = ethic_xenophobe
-				}
-			}
-		}
-		ethic_cooperative = {
-			kill_leader = { show_notification = no }
-			prev = {
-				$FRAGMENT_EFFECT$ = {
-					ETHIC = ethic_cooperative
-				}
-			}
-		}
-		ethic_competitive = {
-			kill_leader = { show_notification = no }
-			prev = {
-				$FRAGMENT_EFFECT$ = {
-					ETHIC = ethic_competitive
-				}
-			}
-		}
-		ethic_ecologist = {
-			kill_leader = { show_notification = no }
-			prev = {
-				$FRAGMENT_EFFECT$ = {
-					ETHIC = ethic_ecologist
-				}
-			}
-		}
-		ethic_industrialist = {
-			kill_leader = { show_notification = no }
-			prev = {
-				$FRAGMENT_EFFECT$ = {
-					ETHIC = ethic_industrialist
-				}
-			}
-		}
-		ethic_pluralist = {
-			kill_leader = { show_notification = no }
-			prev = {
-				$FRAGMENT_EFFECT$ = {
-					ETHIC = ethic_pluralist
-				}
-			}
-		}
-		ethic_elitist = {
-			kill_leader = { show_notification = no }
-			prev = {
-				$FRAGMENT_EFFECT$ = {
-					ETHIC = ethic_elitist
-				}
-			}
-		}
-		ethic_gestalt_consciousness = {
-			kill_leader = { show_notification = no }
-			prev = {
-				$FRAGMENT_EFFECT$ = {
-					ETHIC = ethic_gestalt_consciousness
-				}
+	inline_script = {
+		script = tec_type_hint
+		scripted_effect = $fragment_effect$
+		leader_scope = $leader$
+	}
+	$leader$ = {
+		save_event_target_as = tec_aiauth_pre_refragment
+		switch = {
+			trigger = has_ethic
+			inline_script = {
+				script = iterators/tec_iterate_ethic_regular
+				include_script = iterators/ethic_regular/tec_country_refragment_aiauth_node
+				parameters = "
+					fragment_effect = $fragment_effect$
+				"
 			}
 		}
 	}
@@ -1834,19 +1578,6 @@ tec_country_defaulted_aiauth_ai_power_effect = {
 	custom_tooltip = tec_end_ai_power_deficit_effect_tooltip
 }
 
-
-tec_country_unlock_council_selection = {
-	if = {
-		limit = {
-			has_paragon_dlc = yes
-		}
-		unlock_council_selection = yes
-	}
-	else = {
-		force_add_civic = civic_tec_force_debug
-		force_remove_civic = civic_tec_force_debug
-	}
-}
 
 tec_planet_force_update_desgnation = {
 	set_planet_flag = tec_force_designation_refresh
