@@ -58,15 +58,10 @@ district_tec_rw_trade = { # megacorp
 		}
 	}
 
-
-	triggered_desc = {
-		trigger = {
-			planet = {
-				has_deposit = d_arcane_generator
-				NOT = { has_district = district_rw_commercial }
-			}
-		}
-		text = arcane_generator_upkeep_desc
+	inline_script = {
+		script = districts/effects/tec_ringworld_arcane_generator
+		count = 1
+		trigger = ""
 	}
 
 	# Modifiers
@@ -192,14 +187,10 @@ district_tec_rw_replicator = {
 		inline_script = districts/resources/tec_improved_mining_empire_upkeep
 	}
 
-	triggered_desc = {
-		trigger = {
-			planet = {
-				has_deposit = d_arcane_generator
-				NOT = { has_district = district_tec_rw_replicator }
-			}
-		}
-		text = arcane_generator_upkeep_desc
+	inline_script = {
+		script = districts/effects/tec_ringworld_arcane_generator
+		count = 2
+		trigger = ""
 	}
 
 	# Modifiers
@@ -366,14 +357,10 @@ district_tec_rw_administrative = {
 		}
 	}
 
-	triggered_desc = {
-		trigger = {
-			planet = {
-				has_deposit = d_arcane_generator
-				NOT = { has_district = district_tec_rw_administrative }
-			}
-		}
-		text = arcane_generator_upkeep_desc
+	inline_script = {
+		script = districts/effects/tec_ringworld_arcane_generator
+		count = 1
+		trigger = ""
 	}
 
 	# Modifiers
@@ -487,14 +474,10 @@ district_tec_rw_administrative_gestalt = {
 		}
 	}
 
-	triggered_desc = {
-		trigger = {
-			planet = {
-				has_deposit = d_arcane_generator
-				NOT = { has_district = district_tec_rw_administrative_gestalt }
-			}
-		}
-		text = arcane_generator_upkeep_desc
+	inline_script = {
+		script = districts/effects/tec_ringworld_arcane_generator
+		count = 1
+		trigger = ""
 	}
 
 	# Modifiers
@@ -585,14 +568,11 @@ district_tec_rw_research = {
 		}
 	}
 
-	triggered_desc = {
-		trigger = {
-			planet = {
-				has_deposit = d_arcane_generator
-				NOT = { has_district = district_tec_rw_research }
-			}
-		}
-		text = arcane_generator_upkeep_desc
+
+	inline_script = {
+		script = districts/effects/tec_ringworld_arcane_generator
+		count = 1
+		trigger = ""
 	}
 
 	# Modifiers
@@ -661,15 +641,12 @@ district_tec_rw_refinery = {
 		}
 	}
 
-	triggered_desc = {
-		trigger = {
-			planet = {
-				has_deposit = d_arcane_generator
-				NOT = { has_district = district_rw_science }
-			}
-		}
-		text = arcane_generator_upkeep_desc
+	inline_script = {
+		script = districts/effects/tec_ringworld_arcane_generator
+		count = 1
+		trigger = ""
 	}
+
 
 	# Modifiers
 		# Standard
@@ -723,19 +700,26 @@ district_tec_rw_forge = {
 
 	show_on_uncolonized = {
 		tec_uses_ringworld_districts = yes
-		tec_is_industry_ringworld = yes
+		OR = {
+			tec_is_unspecced_ringworld = yes
+			tec_is_industry_ringworld = yes
+		}
 		tec_is_precursor_ringworld = no
 	}
 
 	potential = {
 		tec_uses_ringworld_districts = yes
-		tec_is_industry_ringworld = yes
+		OR = {
+			tec_is_unspecced_ringworld = yes
+			tec_is_industry_ringworld = yes
+		}
 		tec_is_precursor_ringworld = no
 	}
 
 	conversion_ratio = 1
 	inline_script = districts/convert_to/tec_rw_replicator_district_swaps
 	inline_script = districts/convert_to/tec_industrial_districts
+	inline_script = districts/convert_to/tec_factory_districts
 
 	resources = {
 		category = planet_districts
@@ -754,27 +738,45 @@ district_tec_rw_forge = {
 				always = yes
 			"
 			rare = volatile_motes
-			rare_cost = @tec_district_rw_sr_cost
-			rare_upkeep = @tec_district_rw_sr_upkeep
+			rare_cost = @[tec_district_rw_sr_cost / 2]
+			rare_upkeep = @[tec_district_rw_sr_upkeep / 2]
+		}
+
+		inline_script = {
+			script = districts/resources/tec_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				tec_is_industry_ringworld = yes
+			"
+			rare = volatile_motes
+			rare_cost = @[tec_district_rw_sr_cost / 2]
+			rare_upkeep = @[tec_district_rw_sr_upkeep / 2]
 		}
 
 		inline_script = districts/resources/tec_industrial_maintenance_upkeep
 	}
 
-	triggered_desc = {
-		trigger = {
-			planet = {
-				has_deposit = d_arcane_generator
-				NOT = { has_district = district_tec_rw_forge }
-			}
-		}
-		text = arcane_generator_upkeep_desc
+	inline_script = {
+		script = districts/effects/tec_ringworld_arcane_generator
+		count = 2
+		trigger = "
+			tec_is_unspecced_ringworld = yes
+		"
+	}
+
+	inline_script = {
+		script = districts/effects/tec_ringworld_arcane_generator
+		count = 1
+		trigger = "
+			tec_is_unspecced_ringworld = no
+		"
 	}
 
 	# Standard
 		planet_modifier = {
 			planet_housing_add = 10
 		}
+		inline_script = districts/effects/tec_ringworld_damaged_section
+		inline_script = districts/effects/tec_ringworld_unspecialized_industry
 	# /
 	# Edicts
 		inline_script = districts/effects/tec_industrial_maintenance
@@ -786,6 +788,33 @@ district_tec_rw_forge = {
 			mult = 1
 			display = with_desc
 			trigger = ""
+		}
+		inline_script = {
+			script = jobs/tec_foundry
+			count = -4
+			mult = 1
+			trigger = "
+				tec_is_unspecced_ringworld = yes
+			"
+			display = no_desc
+		}
+		inline_script = {
+			script = jobs/tec_foundry
+			count = -1
+			mult = 1
+			trigger = "
+				has_deposit = d_tec_rw_minor_structural_damage
+			"
+			display = no_desc
+		}
+		inline_script = {
+			script =  jobs/tec_foundry
+			count = -2
+			mult = 1
+			trigger = "
+					has_deposit = d_tec_rw_major_structural_damage
+				"
+			display = no_desc
 		}
 	# /
 	# Planet
@@ -808,19 +837,26 @@ district_tec_rw_industry = {
 
 	show_on_uncolonized = {
 		tec_uses_ringworld_districts = yes
-		tec_is_industry_ringworld = yes
+		OR = {
+			tec_is_unspecced_ringworld = yes
+			tec_is_industry_ringworld = yes
+		}
 		tec_is_precursor_ringworld = no
 
 	}
 
 	potential = {
 		tec_uses_ringworld_districts = yes
-		tec_is_industry_ringworld = yes
+		OR = {
+			tec_is_unspecced_ringworld = yes
+			tec_is_industry_ringworld = yes
+		}
 		tec_is_precursor_ringworld = no
 	}
 
 	conversion_ratio = 1
 	inline_script = districts/convert_to/tec_rw_farming_district_swaps
+	inline_script = districts/convert_to/tec_factory_districts
 	inline_script = districts/convert_to/tec_industrial_districts
 
 	resources = {
@@ -840,28 +876,48 @@ district_tec_rw_industry = {
 				always = yes
 			"
 			rare = rare_crystals
-			rare_cost = @tec_district_rw_sr_cost
-			rare_upkeep = @tec_district_rw_sr_upkeep
+			rare_cost = @[tec_district_rw_sr_cost / 2]
+			rare_upkeep = @[tec_district_rw_sr_upkeep / 2]
 		}
+
+		inline_script = {
+			script = districts/resources/tec_district_rare_resource_cost
+			rare_upkeep_trigger = "
+				tec_is_industry_ringworld = yes
+			"
+			rare = rare_crystals
+			rare_cost = @[tec_district_rw_sr_cost / 2]
+			rare_upkeep = @[tec_district_rw_sr_upkeep / 2]
+		}
+
 
 		inline_script = districts/resources/tec_industrial_maintenance_upkeep
 	}
 
-	triggered_desc = {
-		trigger = {
-			planet = {
-				has_deposit = d_arcane_generator
-				NOT = { has_district = district_tec_rw_forge }
-			}
-		}
-		text = arcane_generator_upkeep_desc
+	inline_script = {
+		script = districts/effects/tec_ringworld_arcane_generator
+		count = 2
+		trigger = "
+			tec_is_unspecced_ringworld = yes
+		"
+	}
+
+	inline_script = {
+		script = districts/effects/tec_ringworld_arcane_generator
+		count = 1
+		trigger = "
+			tec_is_unspecced_ringworld = no
+		"
 	}
 
 	# Standard
 		planet_modifier = {
 			planet_housing_add = 10
 		}
+		inline_script = districts/effects/tec_ringworld_damaged_section
+		inline_script = districts/effects/tec_ringworld_unspecialized_industry
 	# /
+
 	# Edicts
 		inline_script = districts/effects/tec_industrial_maintenance
 	# /
@@ -872,6 +928,34 @@ district_tec_rw_industry = {
 			mult = 1
 			display = with_desc
 			trigger = ""
+		}
+		inline_script = {
+			script = jobs/tec_artisan
+			count = -4
+			mult = 1
+			trigger = "
+				tec_is_unspecced_ringworld = yes
+			"
+			display = no_desc
+		}
+		inline_script = {
+			script = jobs/tec_artisan
+			count = -1
+			mult = 1
+			trigger = "
+				has_deposit = d_tec_rw_minor_structural_damage
+			"
+
+			display = no_desc
+		}
+		inline_script = {
+			script =  jobs/tec_artisan
+			count = -2
+			mult = 1
+			trigger = "
+				has_deposit = d_tec_rw_major_structural_damage
+			"
+			display = no_desc
 		}
 	# /
 	# Planet
@@ -930,15 +1014,12 @@ district_tec_rw_naval = {
 		}
 	}
 
-	triggered_desc = {
-		trigger = {
-			planet = {
-				has_deposit = d_arcane_generator
-				NOT = { has_district = district_tec_rw_naval }
-			}
-		}
-		text = arcane_generator_upkeep_desc
+	inline_script = {
+		script = districts/effects/tec_ringworld_arcane_generator
+		count = 1
+		trigger = ""
 	}
+
 
 	# Modifiers
 		# Standard
@@ -1055,14 +1136,11 @@ district_tec_rw_leisure = {
 		}
 	}
 
-	triggered_desc = {
-		trigger = {
-			planet = {
-				has_deposit = d_arcane_generator
-				NOT = { has_district = district_tec_rw_leisure }
-			}
-		}
-		text = arcane_generator_upkeep_desc
+
+	inline_script = {
+		script = districts/effects/tec_ringworld_arcane_generator
+		count = 1
+		trigger = ""
 	}
 
 	# Modifiers
@@ -1206,14 +1284,10 @@ district_tec_rw_maintenance = {
 		}
 	}
 
-	triggered_desc = {
-		trigger = {
-			planet = {
-				has_deposit = d_arcane_generator
-				NOT = { has_district = district_tec_rw_maintenance }
-			}
-		}
-		text = arcane_generator_upkeep_desc
+	inline_script = {
+		script = districts/effects/tec_ringworld_arcane_generator
+		count = 1
+		trigger = ""
 	}
 
 	# Modifiers

@@ -1246,11 +1246,6 @@ tec_country_create_aiauth_ruler  = {
 }
 
 tec_country_create_aiauth_ruler_replace = {
-	inline_script = {
-		script = tec_type_hint
-		leader_scope = $ruler$
-	}
-
 	set_country_flag = tec_force_councilor_traits
 	set_country_flag = tec_no_starting_traits_modification
 	set_country_flag = tec_no_starting_skill_modification
@@ -1269,14 +1264,12 @@ tec_country_create_aiauth_ruler_replace = {
 		hide_leader = no
 		custom_description = councilor_tec_aiauth_ruler_desc
 		randomize_traits = no
-		effect = {
-			save_event_target_as = tec_aiauth_ruler
-			copy_flags_and_variables_from = event_target:tec_replaced_ruler
-		}
 	}
-	event_target:tec_aiauth_ruler = {
+	last_created_leader = {
+		save_event_target_as = tec_aiauth_ruler
 		set_leader_flag = tec_no_species_traits
 		change_background_job = none
+		copy_flags_and_variables_from = event_target:tec_replaced_ruler
 		change_leader_portrait = event_target:tec_ai_species
 		set_name = event_target:tec_replaced_ruler
 		add_trait_no_notify = leader_trait_tec_aiauth_ruler
@@ -1294,6 +1287,11 @@ tec_country_create_aiauth_ruler_replace = {
 	event_target:tec_replaced_ruler = {
 		exile_leader_as = destitute_ruler_ai_auth
 	}
+
+	inline_script = {
+		script = tec_type_hint
+		leader_scope = $ruler$
+	}
 }
 
 tec_country_refragment_aiauth_ruler  = {
@@ -1305,9 +1303,7 @@ tec_country_refragment_aiauth_ruler  = {
 	inline_script = {
 		script = iterators/tec_iterate_leader_class
 		include_script = iterators/leader_class/tec_refragment_aiauth_ruler
-		parameters = "
-			ethic = $ethic|ethic_gestalt_consciousness$
-		"
+		ethic = $ethic|ethic_gestalt_consciousness$
 	}
 
 	event_target:tec_aiauth_ruler = {
@@ -1334,7 +1330,6 @@ tec_country_create_aiauth_councilor = {
 		[[council_pos] councilor = $council_pos$ ]
 		[[ethic] ethic = $ethic$ ]
 	}
-
 	set_country_flag = tec_force_councilor_traits
 	tec_country_aiauth_prepare_ai_species = yes
 	create_leader = {
@@ -1344,7 +1339,7 @@ tec_country_create_aiauth_councilor = {
 		skill = 1
 		gender = indeterminable
 		event_leader = yes
-		skip_background_generation = yes
+		background_planet = home_planet
 		can_manually_change_location = no
 		can_assign_to_council = yes
 		hide_leader = no
@@ -1352,17 +1347,19 @@ tec_country_create_aiauth_councilor = {
 		randomize_traits = yes
 		background_ethic = $ethic|ethic_gestalt_consciousness$
 		effect = {
+			set_leader_flag = tec_no_species_traits
+			save_event_target_as = tec_aiauth_councilor
+			log = "Teeeeest"
 			if = {	# Avoids sudden synth trait to appear
 				limit = {
 					has_trait = leader_trait_synthetic
 				}
 				remove_trait = leader_trait_synthetic
 			}
-			set_leader_flag = tec_no_species_traits
-			save_event_target_as = tec_aiauth_councilor
 		}
 	}
-	event_target:tec_aiauth_councilor = {
+	last_created_leader = {
+		save_event_target_as = tec_aiauth_councilor
 		set_owner = prev
 		add_trait_no_notify = leader_trait_tec_aiauth_node
 		tec_leader_add_councilor_trait = yes
@@ -1386,7 +1383,7 @@ tec_country_create_aiauth_councilor = {
 			# this = country
 			# event_target:tec_aiauth_councilor = node
 			tec_country_aiauth_councilor_assign_ethic = {
-				target_scope = event_target:tec_aiauth_councilor
+				target_scope = "event_target:tec_aiauth_councilor"
 			}
 		}
 	]
@@ -1394,10 +1391,7 @@ tec_country_create_aiauth_councilor = {
 }
 
 tec_country_aiauth_councilor_assign_ethic = {
-	inline_script = {
-		script = tec_type_hint
-		leader_scope = $target_scope$
-	}
+
 	random_owned_pop = {
 		limit = {
 			# Happiness = ethic
@@ -1427,25 +1421,17 @@ tec_country_aiauth_councilor_assign_ethic = {
 			inline_script = {
 				script = iterators/tec_iterate_ethic_regular
 				include_script = iterators/ethic_regular/tec_aiauth_councilor_assign_ethic
-				parameters = "
-					target_scope = $target_scope$
-				"
+				target_scope = $target_scope$
 			}
 		}
 	}
 }
-# Example
-#tec_country_aiauth_councilor_assign_ethic = {
-#	SCOPE_PREV = scope
-#	TARGET_SCOPE = target
-#}
 
 
 tec_country_cleanup_aiauth_fragment_class_flags = {
 	inline_script = {
 		script = iterators/tec_iterate_leader_class
 		include_script = iterators/leader_class/tec_country_cleanup_aiauth_fragment_flags
-		parameters = ""
 	}
 }
 
@@ -1454,12 +1440,11 @@ tec_country_refragment_aiauth_councilor = {
 		script = tec_type_hint
 		[[ethic] ethic = $ethic$ ]
 	}
+	print_scope_effect = yes
 	inline_script = {
 		script = iterators/tec_iterate_leader_class
 		include_script = iterators/leader_class/tec_refragment_aiauth_councilor
-		parameters = "
-			ethic = $ethic|ethic_gestalt_consciousness$
-		"
+		ethic = $ethic|ethic_gestalt_consciousness$
 	}
 }
 
@@ -1475,7 +1460,6 @@ tec_country_aiauth_set_fragmenting_class_flag = {
 			inline_script = {
 				script = iterators/tec_iterate_leader_class
 				include_script = iterators/leader_class/tec_country_aiauth_set_fragmenting_class_flag
-				parameters = ""
 			}
 		}
 	}
@@ -1493,13 +1477,12 @@ tec_country_create_aiauth_planetary_governing_node = {
 	inline_script = {
 		script = iterators/tec_iterate_leader_class
 		include_script = iterators/leader_class/tec_create_aiauth_planetary_governing_node
-		parameters = "
-			ethic = $ethic|ethic_gestalt_consciousness$
-		"
+		ethic = $ethic|ethic_gestalt_consciousness$
 	}
 
 
-	event_target:tec_aiauth_planetary_governing_node = {
+	last_created_leader = {
+		save_event_target_as = tec_aiauth_planetary_governing_node
 		set_leader_flag = tec_no_species_traits
 		add_trait_no_notify = leader_trait_tec_aiauth_planetary_governing_node
 		set_owner = prev
@@ -1531,9 +1514,7 @@ tec_country_refragment_aiauth_node = {
 			inline_script = {
 				script = iterators/tec_iterate_ethic_regular
 				include_script = iterators/ethic_regular/tec_country_refragment_aiauth_node
-				parameters = "
-					fragment_effect = $fragment_effect$
-				"
+				fragment_effect = $fragment_effect$
 			}
 		}
 	}
