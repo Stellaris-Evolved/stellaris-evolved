@@ -2397,11 +2397,14 @@ empire_warfare_policy_slider = {
 			}
 
 			valid = {
-				NOR = {
-					has_valid_civic = civic_machine_terminator
-					has_valid_civic = civic_hive_devouring_swarm
-					has_valid_civic = civic_fanatic_purifiers
-					has_valid_civic = civic_tec_regular_secured_domain
+				OR = {
+					NOR = {
+						has_valid_civic = civic_machine_terminator
+						has_valid_civic = civic_hive_devouring_swarm
+						has_valid_civic = civic_fanatic_purifiers
+						has_valid_civic = civic_tec_regular_secured_domain
+					}
+					is_primitive = yes
 				}
 			}
 		}
@@ -3910,36 +3913,6 @@ empire_warfare_policy_slider = {
 			}
 		}
 	}
-
-	roboticist_output = {
-		potential = {
-			# This is intentionally removed
-			always = no
-			has_tradition = tr_cybernetics_assembly_standards
-			is_regular_empire = yes
-		}
-
-		option = {
-			name = build_robots
-
-			policy_flags = {
-				roboticist_output_build_robots
-			}
-
-		}
-
-		option = {
-			name = build_cyborgs
-
-			policy_flags = {
-				roboticist_output_build_cyborgs
-			}
-
-			AI_weight = {
-				factor = 2
-			}
-		}
-	}
 # /
 # Population -------------------------------------------------------------------
  population_policy_slider = {
@@ -4505,7 +4478,7 @@ empire_warfare_policy_slider = {
 				OR = {
 					is_gestalt = yes
 					is_xenophobe = yes
-					has_menace_perk = menp_undertaker	# Unlocked with Crisis Level 1
+					has_crisis_perk = menp_undertaker	# Unlocked with Crisis Level 1
 				}
 			}
 
@@ -5022,6 +4995,7 @@ empire_warfare_policy_slider = {
 						is_sapient = no
 					}
 				}
+				is_guided_sapience_empire = yes
 			}
 		}
 
@@ -5063,6 +5037,7 @@ empire_warfare_policy_slider = {
 					has_valid_civic = civic_machine_terminator
 					has_valid_civic = civic_hive_devouring_swarm
 					has_valid_civic = civic_fanatic_purifiers
+					is_guided_sapience_empire = yes
 				}
 			}
 
@@ -5087,8 +5062,9 @@ empire_warfare_policy_slider = {
 			potential = {
 				host_has_dlc = "Utopia"
 				is_synthetic_empire = no
-				NOT = {
+				NOR = {
 					has_valid_civic = civic_fanatic_purifiers
+					is_guided_sapience_empire = yes
 				}
 			}
 
@@ -5127,6 +5103,7 @@ empire_warfare_policy_slider = {
 				NOR = {
 					has_ethic = "ethic_xenophile"
 					has_ethic = "ethic_fanatic_xenophile"
+					is_guided_sapience_empire = yes
 				}
 			}
 
@@ -5296,6 +5273,7 @@ slave_policy_slider = {
 					NOR = {
 						has_valid_civic = "civic_slaver_guilds"
 						has_trait = "trait_decadent"
+						has_trait = "trait_robot_decadent"
 					}
 				}
 			}
@@ -5755,11 +5733,16 @@ AI_policy_slider = {
 			OR = {
 				can_set_ai_policy = yes
 				has_country_flag = synthetic_empire
+				is_individual_machine = yes
 			}
 		}
 
 		option = {
 			name = "ai_outlawed"
+
+			potential = {
+				is_individual_machine = no
+			}
 
 			valid = {
 				NOR = {
@@ -5769,11 +5752,13 @@ AI_policy_slider = {
 							has_country_flag = tec_hates_robots
 						}
 					}
-					tec_is_robot_lover_spiritualist = yes
+					has_origin = origin_synthetic_fertility
 					custom_tooltip = {
 						success_text = is_a_synthetic_empire
 						has_country_flag = synthetic_empire	
 					}
+					is_individual_machine = yes
+					tec_is_robot_lover_spiritualist = yes
 				}
 			}
 
@@ -5829,13 +5814,19 @@ AI_policy_slider = {
 		option = {
 			name = "ai_servitude"
 
+			potential = {
+				is_individual_machine = no
+			}
+
 			valid = {
+				NOT = {	has_origin = origin_synthetic_fertility }
 				custom_tooltip = {
 					fail_text = is_a_synthetic_empire_fail
 					NOT = {
 						is_synthetic_empire = yes
 					}
 				}
+				is_individual_machine = no
 			}
 
 			policy_flags = {
@@ -5894,6 +5885,10 @@ AI_policy_slider = {
 						}
 					}
 				}
+				modifier = {
+					factor = 0.1
+					is_individual_machine = yes
+				}
 			}
 		}
 
@@ -5916,6 +5911,7 @@ AI_policy_slider = {
 							tec_is_robot_lover_spiritualist = yes
 						}
 					}
+					is_individual_machine = yes
 				}
 				NOR = {
 					has_policy_flag = robots_outlawed
@@ -5985,8 +5981,9 @@ AI_policy_slider = {
 
 		potential = {
 			OR = {
-				NOT = {
+				NOR = {
 					has_ethic = ethic_gestalt_consciousness
+					is_individual_machine = yes
 				}
 				# Stellaris Evolved
 				AND = {
@@ -6013,6 +6010,8 @@ AI_policy_slider = {
 				NOR = {
 					has_country_flag = synthetic_empire
 					has_valid_civic = civic_tec_regular_machine_cult
+					has_origin = origin_synthetic_fertility
+					is_individual_machine = yes
 				}
 			}
 
@@ -6061,6 +6060,14 @@ AI_policy_slider = {
 
 			policy_flags = {
 				robots_allowed
+			}
+
+			on_enabled = {
+				hidden_effect = {
+					country_event = {	# TODO MACHINE AGE UPDATE - MAKE THIS BETTER!!!
+						id = action.56 # Failsafe if you don't have a robot species to assemble.
+					}
+				}
 			}
 
 			AI_weight = {
