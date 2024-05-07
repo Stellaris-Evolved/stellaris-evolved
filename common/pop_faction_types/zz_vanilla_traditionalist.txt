@@ -12,7 +12,7 @@ traditionalist = {
 	resources = {
 		category = pop_factions
 		produces = {
-			unity = @faction_base_unity
+			unity = @faction_base_output
 		}
 		inline_script = {
 			script = pop_faction_types/tec_political_virtue
@@ -27,9 +27,30 @@ traditionalist = {
 		inline_script = pop_faction_types/tec_idealistic_foundation
 	}
 
+	extortion_resource = {
+		category = pop_factions
+		produces = {
+			trigger = {
+				is_lithoid_empire = no
+			}
+			food = @faction_base_output
+			mult = @faction_extortion_food_ratio
+		}
+		produces = {
+			trigger = {
+				is_lithoid_empire = yes
+			}
+			minerals = @faction_base_output
+			mult = @faction_extortion_minerals_ratio
+		}
+	}
+
 	#Note: number of potential or actual members is checked by POP_FACTION_MIN_POTENTIAL_MEMBERS define
 	is_potential = {
 		is_faction_allowed = yes
+		NOT = {
+			has_origin = origin_cybernetic_creed
+		}
 	}
 
 	parameters = {
@@ -85,7 +106,10 @@ traditionalist = {
 		modifier = {
 			factor = 0
 			owner = {
-				tec_is_robot_lover_spiritualist = no
+				NOR = {
+					tec_is_robot_lover_spiritualist = no
+					is_individual_machine = no
+				}
 			}
 			species = {
 				has_trait = "trait_mechanical"
@@ -211,10 +235,12 @@ traditionalist = {
 					owner = {
 						NOR = {
 							has_origin = origin_shroudwalker_apprentice
+							has_origin = origin_cybernetic_creed
 							has_ascension_perk = ap_tec_cybernetic_revolution
 							has_ascension_perk = ap_synthetic_evolution
 							has_ascension_perk = ap_tec_genetic_perfection
 						}
+						is_individual_machine = no
 						has_technology = tech_psionic_theory
 						OR = {
 							num_ascension_perks > 0
@@ -415,7 +441,7 @@ traditionalist = {
 
 		# Neut
 			# Cybernetic, psionics, flesh is weak and etc
-			demand = { # NEUT - THE FLESH IS STRONG
+			demand = { # NEUT - THE FLESH IS STRONG  # Standard Traditionalist variant: reject full cyberization
 				title = "TEC_FAC_SPI_FLESH_IS_STRONG"
 				unfulfilled_title = "TEC_FAC_SPI_FLESH_IS_WEAK"
 				desc = "TEC_FAC_SPI_FLESH_IS_STRONG_DESC"
@@ -478,6 +504,7 @@ traditionalist = {
 					}
 				}
 			}
+			# TODO MACHINE AGE REVIEW - INDIVIDUALIST MACHINE DEMANDS
 		# /
 
 		# Bad
@@ -497,6 +524,7 @@ traditionalist = {
 							has_policy_flag = ai_full_rights 
 							tec_is_robot_lover_spiritualist = yes
 						}
+						is_individual_machine = no
 					}
 				}
 				trigger = {
@@ -542,6 +570,7 @@ traditionalist = {
 							has_origin = origin_tec_bioservant
 						}
 						has_ethic = ethic_fanatic_spiritualist
+						is_individual_machine = no
 					}
 				}
 				trigger = {
@@ -571,6 +600,7 @@ traditionalist = {
 						has_policy_flag = ai_full_rights
 						has_technology = tech_synthetic_workers
 						tec_is_robot_lover_spiritualist = no
+						is_individual_machine = no
 					}
 				}
 				trigger = {
@@ -702,8 +732,8 @@ traditionalist = {
 	}
 	
 	inline_script = { 
-			script = factions/tec_actions
-			ETHIC = spiritualist
-		
+		script = factions/tec_actions
+		ETHIC = spiritualist
+		CYBER_EXTORTION_RESOURCE = food
 	}
 }
