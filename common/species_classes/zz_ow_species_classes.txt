@@ -1,0 +1,106 @@
+# common\species_classes\zz_ow_species_classes.txt
+
+# MANDATORY OVERWRITES due to auths
+
+# The Species Classes defined here are generally not available to the character creator, but will instead appear in AI empires across the galaxy.
+# There is also portrait_sets database that contains sets of portraits associated with species classes.
+# 'graphical_culture' is connected to the looks used for ships and cities; see "common/graphical_culture/".
+# playable = yes/no/trigger (default: yes)		if this species class can is playable
+# randomized = yes/no/trigger (default: yes)	if this species class is randomized
+# species_trait_points							base number of species trait points available for this species class
+# species_max_traits							maximum number of traits that species of this class can have (doesn't count those with cost == 0)
+# possible										ethics/government requirements; see common/governments/readme_requirements.txt
+# gender = yes/no (default: yes)				whether the species has a gender
+# portrait_modding yes/no (default: yes)		whether the portrait can be modified with e.g. genemodding or robomodding
+
+HUM = {
+	archetype = BIOLOGICAL
+
+	possible = {
+		authority = {
+			NOR = {
+				value = auth_machine_intelligence
+				value = auth_tec_machine_consensus
+				#value = auth_tec_machine_nanites
+				text = SPECIES_CLASS_MUST_NOT_USE_MACHINE_INTELLIGENCE
+			}
+		}
+	}
+
+	graphical_culture = humanoid_01
+	move_pop_sound_effect = "moving_pop_confirmation"
+}
+
+MACHINE = {
+	archetype = MACHINE
+
+	possible = {
+		OR = {
+			AND = {
+				host_has_dlc = "The Machine Age"
+				authority = {
+					NOR = {
+						value = auth_hive_mind
+						value = auth_tec_hive_cybernetic
+						value = auth_tec_hive_biological
+						#value = auth_tec_hive_biomechanical
+					}
+				}
+			}
+			authority = {
+				OR = { 
+					value = auth_machine_intelligence
+					value = auth_tec_machine_consensus
+					#value = auth_tec_machine_nanites
+					text = SPECIES_CLASS_MUST_USE_MACHINE_INTELLIGENCE 
+				}
+			}
+		}
+	}
+	possible_secondary = {
+		OR = {
+			AND = {
+				host_has_dlc = "The Machine Age"
+				civics = {
+					NOT = {
+						value = civic_machine_servitor
+					}
+				}
+			}
+			OR = {
+				always = no
+				text = SECONDARY_SPECIES_CLASS_INVALID
+			}
+		}
+	}
+
+	playable = {
+		OR = {
+			host_has_dlc = "Synthetic Dawn Story Pack"
+			has_machine_age_dlc = yes
+		}
+	}
+	randomized = {
+		OR = {
+			host_has_dlc = "Synthetic Dawn Story Pack"
+			has_machine_age_dlc = yes
+		}
+		# The create_species effect can't properly take the possible trigger below into account.
+		# Work around this by disabling this class for species randomization after game start.
+		NOT = {
+			has_global_flag = game_started
+		}
+	}
+
+	trait = trait_machine_unit
+	gender = yes
+	use_climate_preference = no
+	portrait_modding = yes
+
+	leader_age_min = 5
+	leader_age_max = 10
+
+	graphical_culture = synthetics_01
+	move_pop_sound_effect = "robot_pops_move"
+	resources = {}
+}
