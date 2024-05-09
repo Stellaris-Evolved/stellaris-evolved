@@ -133,7 +133,12 @@ country_event = {
 
 	trigger = {
 		from = {
-			species = { has_trait = trait_cybernetic }
+			species = {
+				OR = {
+					has_trait = trait_cybernetic
+					has_trait = trait_limited_cybernetic
+				}
+			}
 		}
 		# Our change, only give trait if cybernetic trait on exceptions if cybernetic path is started
 		if = {
@@ -145,9 +150,32 @@ country_event = {
 	}
 
 	immediate = {
-		from = {
-			add_trait_no_notify = leader_trait_cyborg
+		if = {
+			limit = {
+				has_policy_flag = cyberization_standards_limited
+				from = {
+					species = { has_trait = trait_limited_cybernetic }
+					has_ethic = ethic_spiritualist
+				}
+			}
+			from = {
+				add_trait_no_notify = leader_trait_limited_cyborg
+			}
 		}
+		else = {
+			from = {
+				add_trait_no_notify = leader_trait_cyborg
+			}
+			if = {
+				limit = {
+					has_country_flag = firewall_built
+				}
+				from = {
+					add_trait_no_notify = leader_trait_firewalled
+				}
+			}
+		}
+		# skipped driven_neural_chorus due to using tec_leader_cyborg_initial_skill modifier
 	}
 }
 
