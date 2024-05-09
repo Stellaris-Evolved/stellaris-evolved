@@ -11,22 +11,22 @@ citizenship_full = {
 		from = {
 			is_machine_empire = no
 		}
-		NOR = {
-			AND = {
-				has_trait = trait_mechanical
-				is_shackled_robot_species_rights = yes
-				#from = {
-					#has_policy_flag = ai_servitude
-				#}
-			}
-			AND = {
-				has_trait = @trait_tec_bioservant
-				tec_is_shackled_bioservant_species_rights = yes
-				#from = {
-					#has_policy_flag = bioservant_servitude 
-				#}
-			}
-		}
+		#NOR = {
+		#	AND = {
+		#		has_trait = trait_mechanical
+		#		is_shackled_robot_species_rights = yes
+		#		#from = {
+		#			#has_policy_flag = ai_servitude
+		#		#}
+		#	}
+		#	AND = {
+		#		has_trait = @trait_tec_bioservant
+		#		tec_is_shackled_bioservant_species_rights = yes
+		#		#from = {
+		#			#has_policy_flag = bioservant_servitude 
+		#		#}
+		#	}
+		#}
 	}
 
 	allow = {
@@ -39,10 +39,6 @@ citizenship_full = {
 		custom_tooltip = {
 			fail_text = "lonely_hive_mind_pops_kill_themselves_citizenship"
 			is_lonely_hive_mind_pop = no
-		}
-		custom_tooltip = {
-			fail_text = "disconnected_machine_pops_kill_themselves_citizenship"
-			is_disconnected_machine_pop = no
 		}
 		custom_tooltip = {
 			fail_text = "HIVE_MIND_SPECIES_CITIZENS_ONLY"
@@ -62,16 +58,24 @@ citizenship_full = {
 		}
 		custom_tooltip = {
 			fail_text = too_alien
-			OR = {
-				is_same_species = from
-				from = {
-					AND = {
-						tec_is_selective_kinship_empire = yes
-						is_same_species_class = root
+			if = {
+				limit = {
+					from = {
+						NOT = { has_origin = origin_synthetic_fertility }
 					}
+					has_trait = trait_mechanical
 				}
-				from = {
-					is_xenophobe = no
+				OR = {
+					is_same_species = from
+					from = {
+						AND = {
+							tec_is_selective_kinship_empire = yes
+							is_same_species_class = root
+						}
+					}
+					from = {
+						is_xenophobe = no
+					}
 				}
 			}
 		}
@@ -94,6 +98,31 @@ citizenship_full = {
 			}
 		}
 		custom_tooltip = {
+			fail_text = ROBOTS_ARE_OUTLAWED
+			if = {
+				limit = {
+					OR = {
+						has_trait = trait_mechanical
+						has_trait = trait_machine_unit
+					}
+				}
+				from = {
+					has_policy_flag = ai_full_rights
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = TEC_BIOSERVANTS_ARE_OUTLAWED
+			if = {
+				limit = {
+					has_trait = trait_tec_bioservant
+				}
+				from = {
+					has_policy_flag = bioservant_full_rights
+				}
+			}
+		}
+		custom_tooltip = {
 			fail_text = no_bioservant_no_citizenship
 			tec_is_shackled_bioservant_species_rights = no
 		}
@@ -104,6 +133,15 @@ citizenship_full = {
 	}
 	ai_will_do = {
 		factor = 1
+		modifier = {
+			factor = 35
+			root = {
+				is_robotic_species = yes
+			}
+			from = {
+				is_individual_machine = yes
+			}
+		}
 	}
 }
 
@@ -111,7 +149,10 @@ citizenship_full_machine = {
 	is_full_citizenship = yes
 
 	potential = {
-		host_has_dlc = "Synthetic Dawn Story Pack"
+		OR = {
+			has_synthetic_dawn = yes
+			has_machine_age_dlc = yes
+		}
 		exists = from
 		from = { is_machine_empire = yes }
 	}
@@ -162,8 +203,9 @@ citizenship_assimilation = {
 	# root = species
 	potential = {
 		OR = {
-			has_synthethic_dawn = yes
+			has_synthetic_dawn = yes
 			has_utopia = yes
+			has_machine_age_dlc = yes
 		}
 		exists = this # avoid console errors, somehow invalid/inexistent species is checked lol
 		exists = from
@@ -3305,7 +3347,7 @@ citizenship_assimilation = {
 
 citizenship_organic_trophy = {
 	potential = {
-		host_has_dlc = "Synthetic Dawn Story Pack"
+		has_synthetic_dawn = yes
 		exists = from
 		from = {
 			is_machine_empire = yes
@@ -3381,7 +3423,10 @@ citizenship_limited = {
 			}
 		}
 		NOR = {
-			has_trait = trait_machine_unit
+			AND = {
+				from = { is_individual_machine = no }
+				has_trait = trait_machine_unit
+			}
 			is_shackled_robot_species_rights = yes
 			tec_is_shackled_bioservant_species_rights = yes
 		}
@@ -3413,7 +3458,10 @@ citizenship_limited = {
 						has_trait = trait_hive_mind
 					}
 					from = {
-						has_ethic = ethic_gestalt_empathy
+						OR = {
+							has_ethic = ethic_gestalt_empathy
+							has_valid_civic = civic_hive_guided_sapience
+						}
 					}
 				}
 			}
@@ -3505,6 +3553,13 @@ citizenship_slavery = {
 			NAND = {
 				exists = this
 				OR = {
+					AND = {
+						from = { is_individual_machine = yes }
+						OR = {
+							has_trait = trait_machine_unit
+							has_trait = trait_mechanical
+						}
+					}
 					has_trait = trait_machine_unit
 					has_trait = trait_mechanical				
 				}
@@ -3731,6 +3786,7 @@ citizenship_robot_servitude = {
 		}
 		OR = {
 			has_trait = trait_mechanical
+			has_trait = trait_machine_unit
 			has_trait = @trait_tec_bioservant
 		}
 	}
@@ -3783,6 +3839,12 @@ citizenship_robot_servitude = {
 	ai_will_do = {
 		factor = 30
 		modifier = {
+			factor = 35
+			from = {
+				is_individual_machine = yes
+			}
+		}
+		modifier = {
 			factor = 1000
 			from = {
 				has_ethic = ethic_gestalt_consciousness
@@ -3819,27 +3881,24 @@ citizenship_purge = {
 		}
 		if = {
 			# Note: is_robotic_species cause issues with machines
-			limit = { has_trait = trait_mechanical }
+			limit = {
+				OR = {
+					has_trait = trait_mechanical
+					has_trait = trait_machine_unit
+				}
+			}
 			from = {
 				has_policy_flag = robots_outlawed
 			}
 		}
-		# Prev effect
-			#OR = {
-			#	NOT = { has_trait = trait_mechanical }
-			#	from = { has_policy_flag = robots_outlawed }
-			#	AND = {
-			#		from = { is_hive_empire = yes }
-			#		is_robotic = yes
-			#	}
-			#}
-		# /
 	}
 
 	allow = {
 		hidden_trigger = { exists = from }
 		if = {
-			limit = { is_lonely_hive_mind_pop = yes }
+			limit = {
+				is_lonely_hive_mind_pop = yes
+			}
 			hidden_trigger = { always = yes }
 		}
 		else = {
@@ -3909,6 +3968,17 @@ citizenship_purge = {
 							}
 						}
 					}
+				}
+			}
+			if = {
+				limit = {
+					from = {
+						has_authority = auth_hive_mind
+					}
+				}
+				custom_tooltip = {
+					fail_text = hive_cant_purge_hive
+					NOT = { has_trait = trait_hive_mind }
 				}
 			}
 			custom_tooltip = {
@@ -4108,6 +4178,7 @@ citizenship_purge_machine = {
 					has_ethic = ethic_gestalt_apathy
 				}
 			}
+			from = { has_ascension_perk = ap_become_the_crisis }
 		}
 	}
 
