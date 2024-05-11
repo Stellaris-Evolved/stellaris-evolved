@@ -58,7 +58,14 @@ generate_start_buildings_and_districts = {
 			}
 
 			if = {
-				limit = { owner = { last_created_species = { is_lithoid = yes } }}
+				limit = {
+					owner = {
+						OR = {
+							last_created_species = { is_lithoid = yes }
+							last_created_species = { has_trait = trait_machine_unit }
+						}
+					}
+				}
 				owner = {
 					set_country_flag = lithoid_subspecies
 				}
@@ -85,14 +92,12 @@ generate_start_buildings_and_districts = {
 		# total - 24 jobs
 
 		# 3 jobs - EVOLVED NOTE - city and swaps
-
 		while = {
 			count = value:tec_start_city_district_count
 			add_district_and_planet_size_if_needed_effect = {
 				district = district_city
 			}
 		}
-
 
 		# 4 - 6 jobs - EVOLVED NOTE - farming and swaps
 		while = {
@@ -391,7 +396,7 @@ generate_start_buildings_and_districts = {
 	# Moved aux buildings at end
 	
 	tec_start_add_assembly_building = yes
-	tec_start_add_aux_building = yes
+	tec_start_add_aux_features = yes
 
 	# Additional resources based on empire type and possible subspecies
 	owner = {
@@ -1965,6 +1970,14 @@ tec_start_add_amenities_building = {
 			}
 			add_building = building_temple # it will automatically convert to other
 		}
+		else_if = {
+			limit = {
+				owner = {
+					has_valid_civic = civic_augmentation_bazaars
+				}
+			}
+			add_building = building_augmentation_bazaars
+		}
 		else = {
 			add_building = building_commercial_zone
 		}
@@ -1974,7 +1987,6 @@ tec_start_add_amenities_building = {
 			owner = {
 				is_hive_empire = yes
 			}
-			
 		}
 		if = {
 			limit = {
@@ -1991,7 +2003,6 @@ tec_start_add_amenities_building = {
 			owner = {
 				is_machine_empire = yes
 			}
-			
 		}
 		if = {
 			limit = {
@@ -2087,27 +2098,19 @@ tec_start_add_assembly_building = {
 			add_building = building_machine_assembly_plant
 		}
 	}
+	else = {
+		if = {	# TODO MACHINE AGE - create specific building for machine individualistic empires
+			limit = {
+				owner = { is_individual_machine = yes }
+			}
+			add_building = building_machine_assembly_plant
+		}
+	}
 }
 
-tec_start_add_aux_building = {
-	if = {
-		limit = {
-			owner = {
-				has_valid_civic = civic_permanent_employment
-			}
-		}
-		if = {
-			limit = {
-				free_building_slots <= 0
-			}
-			
-			add_district_and_planet_size_if_needed_effect = {
-				district = $city|district_city$
-			}
-		}
-		add_building = building_posthumous_employment_center
-	}
-	if = {
+tec_start_add_aux_features = {
+	# Origins
+	if = {	# origin_payback
 		limit = {
 			owner = {
 				NOT = {
@@ -2120,32 +2123,7 @@ tec_start_add_aux_building = {
 		add_building = building_ranger_lodge
 		add_blocker = { type = d_big_nature_preserve_blocker }
 	}
-	if = {
-		limit = { owner = { has_origin = origin_machine } }
-		if = {
-			limit = { owner = { has_civic = civic_machine_assimilator } }
-			add_deposit = d_organic_slurry
-		}
-		add_deposit = d_resource_consolidation_1
-	}
-	if = {
-		limit = {
-			owner = {
-				tec_is_idyllic_bloom_empire = yes
-				NOT = { has_origin = origin_life_seeded }
-			}
-		}
-		add_building = building_gaiaseeders_1
-	}
-	if = {	# Relentless
-		limit = {
-			owner = {
-				is_relentless_industrialist_empire = yes
-			}
-		}
-		add_building = building_coordinated_fulfillment_center_1
-	}
-	if = {
+	if = {	# Necrophage
 		limit = {
 			owner = {
 				has_origin = origin_necrophage
@@ -2166,8 +2144,7 @@ tec_start_add_aux_building = {
 		}
 		add_building = building_necrophage_elevation_chamber
 	}
-
-	if = {
+	if = {	# Clone army
 		limit = {
 			owner = {
 				has_origin = origin_clone_army
@@ -2190,6 +2167,179 @@ tec_start_add_aux_building = {
 			id = clones.10
 			days = 1095
 			random = 730
+		}
+	}
+	if = {	# origin_machine
+		limit = { owner = { has_origin = origin_machine } }
+		if = {
+			limit = { owner = { has_civic = civic_machine_assimilator } }
+			add_deposit = d_organic_slurry
+		}
+		add_deposit = d_resource_consolidation_1
+	}
+	if = {	# Swaps Cybernetic Creed Buildings
+		limit = {
+			owner = { has_origin = origin_cybernetic_creed }
+		}
+		# fix for Agrarian Idyll
+		if = {
+			limit = {
+				owner = { has_civic = civic_agrarian_idyll }
+			}
+			add_district = district_farming
+		}
+		remove_building = building_research_lab_1
+		remove_building = building_temple
+		remove_building = building_temple
+		remove_district = district_industrial
+		remove_district = district_generator
+		remove_district = district_farming
+		add_building = building_amphitheater_of_the_mind
+		add_building = building_forge_of_the_fellowship
+		add_building = building_battlement_of_steel
+		add_building = building_sanctuary_of_toil
+		owner = {
+			set_country_flag = suppress_vanilla_factions
+			begin_event_chain = {
+				event_chain = "cybernetic_creed_chain"
+				target = this
+			}
+			country_event = {
+				id = machine_age.2150
+				days = 30
+			}
+			every_owned_leader = {
+				limit = {
+					is_ruler = yes
+					NOT = { has_trait = leader_trait_ritualistic_implants_cyborg	}
+				}
+				add_trait = leader_trait_ritualistic_implants_cyborg
+			}
+		}
+	}
+	if = {	# Swaps Synthetic Fertility Buildings, Tech
+		limit = {
+			owner = { has_origin = origin_synthetic_fertility }
+		}
+		set_planet_size = 20
+		remove_building = building_research_lab_1
+		add_building = building_identity_repository
+		add_building = building_abandoned_gene_clinic
+		while = {
+			count = 2
+			add_district = district_city
+		}
+		if = {
+			limit = {
+				exists = owner
+				owner = {
+					is_lithoid_empire = no
+				}
+			}
+			add_district_and_planet_size_if_needed_effect = {
+				district = district_farming
+			}
+		}
+		else = {
+			add_district_and_planet_size_if_needed_effect = {
+				district = district_mining
+			}
+		}
+		add_district_and_planet_size_if_needed_effect = {
+			district = district_generator
+		}
+		add_district_and_planet_size_if_needed_effect = {
+			district = district_industrial
+		}
+		add_district_and_planet_size_if_needed_effect = {
+			district = district_mining
+		}
+		while = {
+			count = 2
+			add_deposit = d_abandoned_cities
+		}
+		owner = {
+			set_variable = {
+				which = num_dead_identities
+				value = 3
+			}
+			give_technology = {	tech = tech_administrative_ai message = no }
+			give_technology = {	tech = tech_self_aware_logic message = no }
+			give_technology = {	tech = tech_sapient_ai message = no }
+		}
+		while = {
+			count = 4
+			remove_deposit = d_hibernating_lithoids
+		}
+	}
+	# Civics
+	if = {	# Permanent employment
+		limit = {
+			owner = {
+				has_valid_civic = civic_permanent_employment
+			}
+		}
+		if = {
+			limit = {
+				free_building_slots <= 0
+			}
+			
+			add_district_and_planet_size_if_needed_effect = {
+				district = $city|district_city$
+			}
+		}
+		add_building = building_posthumous_employment_center
+	}
+	if = {	# Idyllic bloom
+		limit = {
+			owner = {
+				tec_is_idyllic_bloom_empire = yes
+				NOT = { has_origin = origin_life_seeded }
+			}
+		}
+		add_building = building_gaiaseeders_1
+	}
+	if = {	# Relentless
+		limit = {
+			owner = {
+				is_relentless_industrialist_empire = yes
+			}
+		}
+		add_building = building_coordinated_fulfillment_center_1
+	}
+	if = {	# Tactical Cogitators
+		limit = {
+			owner = {
+				has_valid_civic = civic_machine_tactical_algorithms
+			}
+		}
+		owner = {
+			give_technology = {
+				tech = tech_centralized_command
+				message = no
+			}
+		}
+		add_building = building_military_academy
+	}
+	if = {	# Natural Design Buildings
+		limit = {
+			owner = { is_natural_design_empire = yes }
+		}
+		if = {
+			limit = {
+				owner = {
+					is_hive_empire = yes
+				}
+			}
+			add_building = building_hive_transcendental_retreat
+		}
+		if = {
+			limit = {
+				owner = {
+					is_hive_empire = no
+				}
+			}
+			add_building = building_transcendental_retreat
 		}
 	}
 }
@@ -2409,7 +2559,7 @@ tec_start_hab_try_add_aux = {
 			free_building_slots >= 1
 			owner = { NOT = { has_country_flag = tec_vd_added_aux } }
 		}
-		tec_start_add_aux_building = yes
+		tec_start_add_aux_features = yes
 		owner = { set_country_flag = tec_vd_added_aux }
 	}
 }
