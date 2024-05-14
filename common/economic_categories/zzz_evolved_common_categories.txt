@@ -537,7 +537,6 @@ stations = {
 	}
 
 	parent = country
-	modifier_category = deposit #it applies to the planet
 }
 
 station_gatherers = {
@@ -1016,6 +1015,11 @@ planet_buildings_clone_vats = {
 
 	generate_mult_modifiers = {
 		upkeep
+		produces
+	}
+	generate_add_modifiers = {
+		upkeep
+		produces
 	}
 	modifier_category = planet
 }
@@ -1358,14 +1362,7 @@ planet_jobs = {
 			}
 			trigger = {
 				tec_is_cyborg_species = yes
-				OR = {
-					is_pop_category = worker
-					AND = {
-						is_pop_category = slave # Yes, slave should count towards both worker and slave
-						has_job_category = worker
-					}
-					is_pop_category = simple_drone
-				}
+				tec_ecocat_planet_jobs_worker = { CACHED = yes }
 			}
 		}
 	
@@ -1376,10 +1373,13 @@ planet_jobs = {
 			}
 			trigger = {
 				OR = {
-					is_pop_category = worker
-					is_pop_category = simple_drone
-					is_pop_category = robot_servant
+					is_robot_pop = yes
+					# Evolved
+					species = {
+						tec_is_replicant_species = yes
+					}
 				}
+				tec_ecocat_planet_jobs_worker = { CACHED = yes }
 			}
 		}
 
@@ -2375,14 +2375,17 @@ planet_tec_labour_heroes = {
 		inline_script = {
 			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_miners
+			trigger = ""
 		}
 		inline_script = {
 			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_farmers
+			trigger = ""
 		}
 		inline_script = {
 			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_technician
+			trigger = ""
 		}
 	# /
 }
@@ -2404,14 +2407,17 @@ planet_tec_peasants = {
 		inline_script = {
 			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_miners
+			trigger = ""
 		}
 		inline_script = {
 			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_farmers
+			trigger = ""
 		}
 		inline_script = {
 			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_technician
+			trigger = ""
 		}
 	# /
 }
@@ -2431,16 +2437,19 @@ planet_tec_transcendents = {
 
 	# subtypes
 		inline_script = {
-			script = economic_categories/tec_subtype_inheritance_only_mult
+			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_administrators
+			trigger = ""
 		}
 		inline_script = {
 			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_priests
+			trigger = ""
 		}
 		inline_script = {
 			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_telepaths
+			trigger = ""
 		}
 	# /
 }
@@ -2460,16 +2469,19 @@ planet_tec_techno_priests = {
 
 	# Subtypes
 		inline_script = {
-			script = economic_categories/tec_subtype_inheritance_only_mult
+			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_administrators
+			trigger = ""
 		}
 		inline_script = {
 			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_priests
+			trigger = ""
 		}
 		inline_script = {
 			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_pop_assemblers
+			trigger = ""
 		}
 	# /
 }
@@ -2489,16 +2501,19 @@ planet_tec_occultists = {
 
 	# Subtypes
 		inline_script = {
-			script = economic_categories/tec_subtype_inheritance_only_mult
+			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_administrators
+			trigger = ""
 		}
 		inline_script = {
 			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_priests
+			trigger = ""
 		}
 		inline_script = {
 			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_researchers
+			trigger = ""
 		}
 
 		triggered_produces_modifier = {
@@ -2529,13 +2544,15 @@ planet_tec_druids = {
 
 	# Subtypes
 		inline_script = {
-			script = economic_categories/tec_subtype_inheritance_only_mult
+			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_administrators
+			trigger = ""
 		}
 
 		inline_script = {
 			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_priests
+			trigger = ""
 		}
 	#
 }
@@ -2557,10 +2574,12 @@ planet_tec_necromancers = {
 		inline_script = {
 			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_researchers
+			trigger = ""
 		}
 		inline_script = {
 			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_soldiers
+			trigger = ""
 		}
 	#
 }
@@ -2578,75 +2597,33 @@ planet_livestock = {
 	}
 	
 	# Inherited Modifiers
-	triggered_produces_modifier = {
-		key = planet_farmers
-		modifier_types = {
-			mult
-			add
-		}
-		trigger = {
-			has_job = livestock	# This check is done so that livestock working zoo jobs don't inherit the modifier
+	inline_script = {
+		script = economic_categories/tec_subtype_inheritance
+		subtype = planet_farmers 	# This check is done so that livestock working zoo jobs don't inherit the modifier
+		trigger = "
+			has_job = livestock
 			is_organic_species = yes
 			is_lithoid = no
-		}
-		use_parent_icon = yes
+		"
 	}
-	triggered_produces_modifier = {
-		key = planet_miners
-		modifier_types = {
-			mult
-			add
-		}
-		trigger = {
-			has_job = livestock	# This check is done so that livestock working zoo jobs don't inherit the modifier
+	inline_script = {
+		script = economic_categories/tec_subtype_inheritance
+		subtype = planet_miners 	# This check is done so that livestock working zoo jobs don't inherit the modifier
+		trigger = "
+			has_job = livestock
 			is_organic_species = yes
 			is_lithoid = yes
-		}
-		use_parent_icon = yes
+		"
 	}
-
-	# Evolved
-	triggered_produces_modifier = {
-		key = planet_livestock_biological
-		modifier_types = {
-			mult
-			add
-		}
-		trigger = {
-			is_organic_species = yes
-			is_lithoid = no
-		}
-		use_parent_icon = yes
-	}
-
-	triggered_produces_modifier = {
-		key = planet_livestock_lithoid
-		modifier_types = {
-			mult
-			add
-		}
-		trigger = {
-			is_lithoid = yes
-		}
-		use_parent_icon = yes
-	}
-
 }
 
 planet_organic_batteries = {
 	parent = planet_jobs_productive
 	modifier_category = pop
-	# Inherited Modifiers
-	triggered_produces_modifier = {
-		key = planet_technician
-		modifier_types = {
-			mult
-			add
-		}
-		trigger = {
-			always = yes
-		}
-		use_parent_icon = yes
+	inline_script = {
+		script = economic_categories/tec_subtype_inheritance
+		subtype = planet_technician 	# This check is done so that livestock working zoo jobs don't inherit the modifier
+		trigger = ""
 	}
 }
 
@@ -2667,28 +2644,16 @@ planet_tec_labrats = {
 		inline_script = {
 			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_researchers
+			trigger = ""
 		}
 		inline_script = {
 			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_livestock
+			trigger = ""
 		}
 	#
 }
 
-
-planet_tec_batteries = {	# Evolved
-	icon = "job_organic_battery"
-	parent = planet_jobs_productive
-	modifier_category = pop
-	generate_mult_modifiers = {
-		produces
-		upkeep
-	}
-	generate_add_modifiers = {
-		produces
-		upkeep
-	}
-}
 
 planet_colonists = {
 	parent = planet_jobs_productive
@@ -2755,15 +2720,11 @@ planet_managers = {
 	}
 	modifier_category = pop
 	# Inherited Modifiers
-	triggered_produces_modifier = {
-		key = planet_administrators
-		modifier_types = {
-			add
-		}
-		trigger = {
-			always = yes
-		}
-		use_parent_icon = yes
+
+	inline_script = {
+		script = economic_categories/tec_subtype_inheritance_only_add
+		subtype = planet_administrators
+		trigger = ""
 	}
 }
 
@@ -2792,6 +2753,13 @@ planet_rangers = {
 		produces
 		upkeep
 	}
+
+	inline_script = {
+		script = economic_categories/tec_subtype_inheritance_only_add
+		subtype = planet_researchers
+		trigger = ""
+	}
+
 	modifier_category = pop
 }
 
@@ -2847,6 +2815,11 @@ planet_evaluators = {
 	generate_add_modifiers = {
 		produces
 		upkeep
+	}
+	inline_script = {
+		script = economic_categories/tec_subtype_inheritance_only_add
+		subtype = planet_administrators
+		trigger = ""
 	}
 }
 
@@ -2941,50 +2914,20 @@ planet_knights = {
 	modifier_category = pop
 	generate_mult_modifiers = {
 		produces
+		upkeep
 	}
 	# Inherited Modifiers
-	triggered_produces_modifier = {
-		key = planet_researchers
-		modifier_types = {
-			mult
-			add
-		}
-		trigger = {
-			always = yes
-		}
-		use_parent_icon = yes
+
+	inline_script = {
+		script = economic_categories/tec_subtype_inheritance
+		subtype = planet_administrators
+		trigger = ""
 	}
-	triggered_upkeep_modifier = {
-		key = planet_researchers
-		modifier_types = {
-			mult
-			add
-		}
-		trigger = {
-			always = yes
-		}
-		use_parent_icon = yes
-	}
-	triggered_produces_modifier = {
-		key = planet_administrators
-		modifier_types = {
-			mult
-			add
-		}
-		trigger = {
-			always = yes
-		}
-		use_parent_icon = yes
-	}
-	triggered_upkeep_modifier = {
-		key = planet_administrators
-		modifier_types = {
-			mult
-		}
-		trigger = {
-			always = yes
-		}
-		use_parent_icon = yes
+
+	inline_script = {
+		script = economic_categories/tec_subtype_inheritance
+		subtype = planet_researchers
+		trigger = ""
 	}
 }
 
@@ -3015,15 +2958,10 @@ planet_priests = {
 	}
 	modifier_category = pop
 	# Inherited Modifiers
-	triggered_produces_modifier = {
-		key = planet_administrators
-		modifier_types = {
-			add
-		}
-		trigger = {
-			always = yes
-		}
-		use_parent_icon = yes
+	inline_script = {
+		script = economic_categories/tec_subtype_inheritance_only_add
+		subtype = planet_administrators
+		trigger = ""
 	}
 }
 
@@ -3069,6 +3007,7 @@ planet_traders = {
 		inline_script = {
 			script = economic_categories/tec_subtype_inheritance
 			subtype = planet_clerks
+			trigger = ""
 		}
 	#
 }
@@ -3085,16 +3024,12 @@ planet_telepaths = {
 	}
 	modifier_category = pop
 	# Inherited Modifiers
-	triggered_produces_modifier = {
-		key = planet_administrators
-		modifier_types = {
-			add
+
+		inline_script = {
+			script = economic_categories/tec_subtype_inheritance_only_add
+			subtype = planet_administrators
+			trigger = ""
 		}
-		trigger = {
-			always = yes
-		}
-		use_parent_icon = yes
-	}
 }
 
 planet_doctors = {
@@ -3218,13 +3153,27 @@ planet_bath_attendants_machine = {
 planet_bath_attendants_individual_machine = {
 	icon = "job_bath_attendant"
 	parent = planet_jobs
+	generate_mult_modifiers = {
+		produces
+		upkeep
+	}
+	generate_add_modifiers = {
+		produces
+		upkeep
+	}
+	modifier_category = pop
 }
 
 planet_neural_chips = {
 	icon = "job_neural_chip"
 	parent = planet_jobs_productive
+	generate_mult_modifiers = {
+		produces
+		upkeep
+	}
 	generate_add_modifiers = {
 		produces
+		upkeep
 	}
 	modifier_category = pop
 }
