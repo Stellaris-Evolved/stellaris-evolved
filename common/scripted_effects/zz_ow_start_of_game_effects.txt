@@ -146,24 +146,12 @@ generate_start_buildings_and_districts = {
 		tec_start_add_unity_building = yes
 
 		# 2 jobs - EVOLVED NOTE - research
-		if = {
-			limit = {
-				owner = {
-					is_low_tech_start = no
-				}
-			}
-			tec_start_add_research_building = yes
-		}
+
+		tec_start_add_research_building = yes
 		# 1-2 job - EVOLVED NOTE - aux - moved at end
 		# 4-5 jobs - EVOLVED NOTE - amenities - ANOTHER NOTE - INDUSTRIAL and FOOD adds moved to district logic
-		if = {
-			limit = {
-				owner = {
-					tec_is_agrarian_idyll_empire = no
-				}
-			}
-			tec_start_add_amenities_building = yes
-		}
+
+		tec_start_add_amenities_building = yes
 	}
 
 	if = {	# Shattered ring
@@ -266,24 +254,11 @@ generate_start_buildings_and_districts = {
 		tec_start_add_unity_building = yes
 
 		# 2 jobs - EVOLVED NOTE - research
-		if = {
-			limit = {
-				owner = {
-					is_low_tech_start = no
-				}
-			}
-			tec_start_add_research_building = yes
-		}
+		tec_start_add_research_building = yes
 		# 1-2 job - EVOLVED NOTE - aux - moved at end
 		# 4-5 jobs - EVOLVED NOTE - amenities - ANOTHER NOTE - INDUSTRIAL and FOOD adds moved to district logic
-		if = {
-			limit = {
-				owner = {
-					tec_is_agrarian_idyll_empire = no
-				}
-			}
-			tec_start_add_amenities_building = yes
-		}
+
+		tec_start_add_amenities_building = yes
 
 		# Replace capital building for machine empires
 		if = {
@@ -1790,50 +1765,77 @@ lost_colony_generate_parent_effect = {	#Caelum
 
 # UTILS
 tec_start_add_research_building = {
-	if = {	# Archaeotech review balance
-		limit = {
-			exists = owner
-			owner = {
-				has_origin = origin_remnants
-				has_ancrel = yes
-			}
-		}
-		owner = {
-			give_technology = {
-				tech = tech_archaeostudies
-				message = no
-			}
-		}
-		add_building = building_archaeostudies_faculty
-	}
-	else_if = {
+	if = {
 		limit = {
 			owner = {
-				tec_is_occult_cult = yes
+				tec_country_blocks_starting_research_building = no
 			}
 		}
-		add_building = building_tec_occultist_lodge_1
-	}
-	else_if = {
-		limit = {
-			exists = owner
-			owner = {
-				tec_is_reanimator_empire = yes
-			}
-		}
-		add_building = building_dread_encampment
-	}
-	else = {	# Fallbacks
-		if = {
+
+		if = {	# Archaeotech review balance
 			limit = {
+				exists = owner
 				owner = {
-					tec_is_biohive = yes
+					has_origin = origin_remnants
+					has_ancrel = yes
 				}
 			}
-			add_building = building_tec_biohive_research_lab_1
+			owner = {
+				give_technology = {
+					tech = tech_archaeostudies
+					message = no
+				}
+			}
+			add_building = building_archaeostudies_faculty
 		}
-		else = {
-			add_building = building_research_lab_1
+		else_if = {
+			limit = {
+				exists = owner
+				owner = {
+					has_origin = origin_synthetic_fertility
+				}
+			}
+
+			owner = {
+				set_variable = {
+					which = num_dead_identities
+					value = 3
+				}
+				give_technology = {	tech = tech_administrative_ai message = no }
+				give_technology = {	tech = tech_self_aware_logic message = no }
+				give_technology = {	tech = tech_sapient_ai message = no }
+			}
+			add_building = building_identity_repository
+		}
+		else_if = {
+			limit = {
+				owner = {
+					tec_is_occult_cult = yes
+				}
+			}
+			add_building = building_tec_occultist_lodge_1
+		}
+		else_if = {
+			limit = {
+				exists = owner
+				owner = {
+					tec_is_reanimator_empire = yes
+				}
+			}
+			add_building = building_dread_encampment
+		}
+		else = {	# Fallbacks
+			if = {
+				limit = {
+					owner = {
+						tec_is_biohive = yes
+					}
+				}
+				add_building = building_tec_biohive_research_lab_1
+			}
+			else = {
+				add_building = building_research_lab_1
+			}
 		}
 	}
 
@@ -1877,156 +1879,171 @@ tec_start_add_research_building = {
 			}
 		}
 	}
-
 }
 
 tec_start_add_unity_building = {
 	if = {
 		limit = {
 			owner = {
-				is_regular_empire = yes
+				tec_country_blocks_starting_unity_building = no
 			}
 		}
 		if = {
 			limit = {
 				owner = {
-					is_spiritualist = yes
+					is_regular_empire = yes
 				}
 			}
-			add_building = building_temple # it will automatically convert to other
-		}
-		else = {
-			add_building = building_bureaucratic_1 # will convert for ai auths
-		}
-	}
-	else_if = {
-		limit = { 
-			owner = {
-				is_hive_empire = yes
+			if = {
+				limit = {
+					owner = {
+						is_spiritualist = yes
+					}
+				}
+				add_building = building_temple # it will automatically convert to other
+			}
+			else = {
+				add_building = building_bureaucratic_1 # will convert for ai auths
 			}
 		}
-		if = {
+		else_if = {
 			limit = {
 				owner = {
-					tec_is_biohive = yes
+					is_hive_empire = yes
 				}
 			}
-			add_building = building_tec_biohive_node
-		}
-		else = {
-			add_building = building_hive_node # it will automatically convert to other
-		}
-	}
-	else_if = {
-		limit = {
-			owner = {
-				is_machine_empire = yes
+			if = {
+				limit = {
+					owner = {
+						tec_is_biohive = yes
+					}
+				}
+				add_building = building_tec_biohive_node
+			}
+			else = {
+				add_building = building_hive_node # it will automatically convert to other
 			}
 		}
-		if = {
-			limit = { 
+		else_if = {
+			limit = {
 				owner = {
-					has_valid_civic = civic_machine_servitor
-				} 
+					is_machine_empire = yes
+				}
 			}
-			add_building = building_organic_sanctuary
-		}
-		else = {
-			add_building = building_uplink_node
+			if = {
+				limit = {
+					owner = {
+						has_valid_civic = civic_machine_servitor
+					}
+				}
+				add_building = building_organic_sanctuary
+			}
+			else = {
+				add_building = building_uplink_node
+			}
 		}
 	}
+
 }
 
 tec_start_add_amenities_building = {
 	if = {
 		limit = {
 			owner = {
-				is_regular_empire = yes
+				tec_country_blocks_starting_amenities_building = no
 			}
 		}
 		if = {
 			limit = {
 				owner = {
-					is_spiritualist = no
-					is_pleasure_seeker = yes
+					is_regular_empire = yes
 				}
 			}
-			add_building = building_holo_theatres
+			if = {
+				limit = {
+					owner = {
+						is_spiritualist = no
+						is_pleasure_seeker = yes
+					}
+				}
+				add_building = building_holo_theatres
+			}
+			else_if = {
+				limit = {
+					owner = {
+						has_valid_civic = civic_augmentation_bazaars
+					}
+				}
+				add_building = building_augmentation_bazaars
+			}
+			else_if = {
+				limit = {
+					owner = {
+						has_valid_civic = civic_private_healthcare_corporate
+					}
+					NOT = {	# Avoid doubledipping
+						has_building = building_clinic
+					}
+				}
+				add_building = building_clinic
+			}
+			else_if = {
+				limit = {
+					owner = {
+						is_spiritualist = yes
+					}
+				}
+				add_building = building_temple # it will automatically convert to other
+			}
+			else = {
+				add_building = building_commercial_zone
+			}
 		}
 		else_if = {
 			limit = {
 				owner = {
-					has_valid_civic = civic_private_healthcare_corporate
-				}
-				NOT = {	# Avoid doubledipping
-					has_building = building_clinic
+					is_hive_empire = yes
 				}
 			}
-			add_building = building_clinic
+			if = {
+				limit = {
+					owner = { has_origin = origin_progenitor_hive }
+				}
+				add_building = building_offspring_nest
+			}
+			else = {
+				add_building = building_tec_gestalt_parts_1
+			}
 		}
 		else_if = {
 			limit = {
 				owner = {
-					is_spiritualist = yes
+					is_machine_empire = yes
 				}
 			}
-			add_building = building_temple # it will automatically convert to other
-		}
-		else_if = {
-			limit = {
-				owner = {
-					has_valid_civic = civic_augmentation_bazaars
+			if = {
+				limit = {
+					owner = {
+						tec_is_aquatic_empire = yes
+					}
 				}
+				add_building = building_tec_machine_anglers_nexus_A
 			}
-			add_building = building_augmentation_bazaars
-		}
-		else = {
-			add_building = building_commercial_zone
+			else_if = {
+				limit = {
+					owner = {
+						tec_is_trade_gestalt = yes
+					}
+				}
+				add_building = building_tec_trade_machine_1
+			}
+			else = {
+
+				add_building = building_tec_gestalt_parts_1
+			}
 		}
 	}
-	else_if = {
-		limit = {
-			owner = {
-				is_hive_empire = yes
-			}
-		}
-		if = {
-			limit = {
-				owner = { has_origin = origin_progenitor_hive }
-			}
-			add_building = building_offspring_nest
-		}
-		else = {
-			add_building = building_tec_gestalt_parts_1
-		}
-	}
-	else_if = {
-		limit = {
-			owner = {
-				is_machine_empire = yes
-			}
-		}
-		if = {
-			limit = {
-				owner = {
-					tec_is_aquatic_empire = yes
-				}
-			}
-			add_building = building_tec_machine_anglers_nexus_A
-		}
-		else_if = {
-			limit = {
-				owner = {
-					tec_is_trade_gestalt = yes
-				}
-			}
-			add_building = building_tec_trade_machine_1
-		}
-		else = {
-			
-			add_building = building_tec_gestalt_parts_1
-		}
-	}
+
 }
 
 tec_start_add_assembly_building = {
@@ -2183,19 +2200,6 @@ tec_start_add_aux_features = {
 		limit = {
 			owner = { has_origin = origin_cybernetic_creed }
 		}
-		# fix for Agrarian Idyll
-		if = {
-			limit = {
-				owner = { has_civic = civic_agrarian_idyll }
-			}
-			add_district = district_farming
-		}
-		remove_building = building_research_lab_1
-		remove_building = building_temple
-		remove_building = building_temple
-		remove_district = district_industrial
-		remove_district = district_generator
-		remove_district = district_farming
 		add_building = building_amphitheater_of_the_mind
 		add_building = building_forge_of_the_fellowship
 		add_building = building_battlement_of_steel
@@ -2223,51 +2227,16 @@ tec_start_add_aux_features = {
 		limit = {
 			owner = { has_origin = origin_synthetic_fertility }
 		}
-		set_planet_size = 20
-		remove_building = building_research_lab_1
-		add_building = building_identity_repository
+		if = {
+			limit = {
+				planet_size < 20
+			}
+			set_planet_size = 20
+		}
 		add_building = building_abandoned_gene_clinic
 		while = {
 			count = 2
-			add_district = district_city
-		}
-		if = {
-			limit = {
-				exists = owner
-				owner = {
-					is_lithoid_empire = no
-				}
-			}
-			add_district_and_planet_size_if_needed_effect = {
-				district = district_farming
-			}
-		}
-		else = {
-			add_district_and_planet_size_if_needed_effect = {
-				district = district_mining
-			}
-		}
-		add_district_and_planet_size_if_needed_effect = {
-			district = district_generator
-		}
-		add_district_and_planet_size_if_needed_effect = {
-			district = district_industrial
-		}
-		add_district_and_planet_size_if_needed_effect = {
-			district = district_mining
-		}
-		while = {
-			count = 2
 			add_deposit = d_abandoned_cities
-		}
-		owner = {
-			set_variable = {
-				which = num_dead_identities
-				value = 3
-			}
-			give_technology = {	tech = tech_administrative_ai message = no }
-			give_technology = {	tech = tech_self_aware_logic message = no }
-			give_technology = {	tech = tech_sapient_ai message = no }
 		}
 		while = {
 			count = 4
