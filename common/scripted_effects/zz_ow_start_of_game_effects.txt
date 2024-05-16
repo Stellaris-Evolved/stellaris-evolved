@@ -417,6 +417,7 @@ generate_start_pops = {
 					has_valid_civic = civic_machine_servitor 
 				}
 			}
+			tec_start_handle_secondary_species_gets_special_traits = yes
 			tec_start_handle_biothrophy_species = yes
 		}
 
@@ -426,6 +427,7 @@ generate_start_pops = {
 					has_valid_civic = civic_machine_assimilator 
 				}
 			}
+			tec_start_handle_secondary_species_gets_special_traits = yes
 			tec_start_handle_assimilator_species = yes
 		}
 
@@ -490,6 +492,7 @@ generate_start_pops = {
 		tec_start_handle_mechanists = yes
 	}
 
+
 	while = {
 		limit = { num_pops < owner.value:tec_start_pops_count }
 		create_pop = {
@@ -514,6 +517,17 @@ generate_start_pops = {
 			}
 		}
 		tec_start_handle_zombies = yes
+	}
+
+
+	# Cybernetic Creed: add Unique Traits
+	if = {
+		limit = {
+			owner = {
+				has_origin = origin_cybernetic_creed
+			}
+		}
+		tec_start_handle_cybernetic_creed = yes
 	}
 }
 
@@ -2055,6 +2069,12 @@ tec_start_add_assembly_building = {
 		}
 		if = {
 			limit = {
+				owner = { is_individual_machine = yes }
+			}
+			add_building = building_machine_assembly_plant # will convert
+		}
+		else_if = {
+			limit = {
 				owner = {
 					has_origin = origin_mechanists
 				}
@@ -2113,14 +2133,6 @@ tec_start_add_assembly_building = {
 						has_valid_civic = civic_tec_machine_reimaginator_cluster
 					}
 				}
-			}
-			add_building = building_machine_assembly_plant
-		}
-	}
-	else = {
-		if = {	# TODO MACHINE AGE - create specific building for machine individualistic empires
-			limit = {
-				owner = { is_individual_machine = yes }
 			}
 			add_building = building_machine_assembly_plant
 		}
@@ -2214,13 +2226,7 @@ tec_start_add_aux_features = {
 				id = machine_age.2150
 				days = 30
 			}
-			every_owned_leader = {
-				limit = {
-					is_ruler = yes
-					NOT = { has_trait = leader_trait_ritualistic_implants_cyborg	}
-				}
-				add_trait = leader_trait_ritualistic_implants_cyborg
-			}
+			# check tec_leaders_replace.machine_age_2235
 		}
 	}
 	if = {	# Swaps Synthetic Fertility Buildings, Tech
@@ -2722,9 +2728,57 @@ tec_make_syncretic_elder_uplifted_species = {
 	}
 }
 
+tec_start_handle_secondary_species_gets_special_traits = {
+	owner = {
+		switch = {
+			trigger = has_origin
+			origin_void_machines = {
+				last_created_species = {
+					change_species_characteristics = {
+						add_trait = trait_void_dweller_1
+						add_traits_at_start_of_list = yes
+					}
+				}
+			}
+			origin_post_apocalyptic_machines = {
+				last_created_species = {
+					change_species_characteristics = {
+						add_trait = trait_survivor
+						add_traits_at_start_of_list = yes
+					}
+				}
+			}
+			origin_subterranean_machines = {
+				last_created_species = {
+					change_species_characteristics = {
+						add_trait = trait_cave_dweller
+						add_traits_at_start_of_list = yes
+					}
+				}
+			}
+		}
+	}
+}
+
+tec_start_handle_secondary_species_planet_class = {
+	if = {
+		limit = {
+			root = {
+				tec_is_nuked_world = no
+				tec_is_relic_world = no
+			}
+		}
+		modify_species = {
+			species = this
+			ideal_planet_class = home_planet
+		}
+	}
+}
+
 tec_start_handle_biothrophy_species = {
 	last_created_species = {
 		set_species_flag = tec_original_biotrophy_@root.owner
+		tec_start_handle_secondary_species_planet_class = yes
 		set_citizenship_type = {
 			country = root.owner
 			type = citizenship_organic_trophy
@@ -2740,6 +2794,7 @@ tec_start_handle_biothrophy_species = {
 tec_start_handle_assimilator_species = {
 	last_created_species = {
 		set_species_flag = cyborg_assimilated@root.owner
+		tec_start_handle_secondary_species_planet_class = yes
 		set_citizenship_type = {
 			country = root.owner
 			type = citizenship_full_machine
@@ -2754,88 +2809,18 @@ tec_start_handle_assimilator_species = {
 
 tec_start_handle_mechanists = {
 	owner = {
-		tec_create_built_robot_species = yes
+		create_built_robot_species = yes
 		set_country_flag = done_first_robot
+	}
+	last_created_species = {
+		change_species_characteristics = {
+			add_trait = trait_auto_mod_robotic
+		}
 	}
 	while = {
 		count = 10
 		create_pop = {
 			species = last_created_species
-		}
-	}
-	calculate_modifier = yes
-	every_owned_pop = {
-		limit = {
-			OR = {
-				has_job = miner
-				has_job = tec_reef_miner
-				has_job = mining_drone
-				has_job = tec_reef_drone
-			}
-			is_robotic_species = yes
-		}
-		modify_species = {
-			species = this
-			add_trait = trait_robot_power_drills
-			add_trait = trait_robot_bulky
-			add_traits_at_start_of_list = yes
-		}
-	}
-	every_owned_pop = {
-		limit = {
-			OR = {
-				has_job = farmer
-				has_job = angler
-				has_job = agri_drone
-				has_job = tec_aqua_drone
-			}
-			is_robotic_species = yes
-		}
-		modify_species = {
-			species = this
-			add_trait = trait_robot_harvesters
-			add_trait = trait_robot_bulky
-			add_traits_at_start_of_list = yes
-		}
-	}
-	every_owned_pop = {
-		limit = {
-			OR = {
-				has_job = technician
-				has_job = technician_drone
-				has_job = tec_thermogenerator_drone
-			}
-			is_robotic_species = yes
-		}
-		modify_species = {
-			species = this
-			add_trait = trait_robot_superconductive
-			add_trait = trait_robot_bulky
-			add_traits_at_start_of_list = yes
-		}
-	}
-	every_owned_pop = {
-		limit = {
-			is_robotic_species = yes
-			NOT = { has_trait = trait_robot_bulky }
-		}
-		modify_species = {
-			species = this
-			add_trait = trait_robot_bulky
-			add_traits_at_start_of_list = yes
-		}
-	}
-	every_owned_pop = {
-		limit = {
-			is_robotic_species = yes
-		}
-		set_citizenship_type = { 
-			country = root.owner
-			type = citizenship_robot_servitude
-		}
-		set_living_standard = {
-			country = root.owner
-			type = living_standard_servitude
 		}
 	}
 }
@@ -2853,6 +2838,54 @@ tec_start_handle_zombies = {
 				NOT = { has_trait = trait_zombie }
 			}
 			make_pop_zombie = yes
+		}
+	}
+}
+
+tec_start_handle_cybernetic_creed = {
+	while = {
+		limit = {
+			any_owned_pop = {
+				is_robotic_species = no
+				has_ethic = ethic_spiritualist
+				has_cybernetic_creed_trait = no
+			}
+		}
+		random_owned_pop = {
+			limit = {
+				is_robotic_species = no
+				has_ethic = ethic_spiritualist
+				has_cybernetic_creed_trait = no
+			}
+			modify_species = {
+				species = this
+				add_trait = trait_cyborg_ritualistic_implants
+				add_traits_at_start_of_list = yes
+			}
+		}
+	}
+	while = {
+		limit = {
+			any_owned_pop = {
+				has_cybernetic_creed_trait = no
+				OR = {
+					is_pop_category = ruler
+					is_pop_category = specialist
+				}
+			}
+		}
+		random_owned_pop = {
+			limit = {
+				has_cybernetic_creed_trait = no
+			}
+			clear_pop_category = yes
+		}
+	}
+	owner = {
+		set_policy = {
+			policy = robot_pop_policy
+			option = robot_pops_allowed
+			cooldown = no
 		}
 	}
 }

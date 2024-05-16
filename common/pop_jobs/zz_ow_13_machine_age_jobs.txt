@@ -28,7 +28,7 @@ haruspex = {
 	resources = {
 		category = planet_priests
 		produces = {
-			unity = 2
+			unity = 4
 			engineering_research = 2
 		}
 		produces = {	# Reduced production to make up for the trade value
@@ -53,37 +53,6 @@ haruspex = {
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
 
-	triggered_planet_modifier = { # Common to all Priests
-		potential = {
-			planet = {
-				has_active_building = building_league_offices
-			}
-		}
-		planet_amenities_add = 1
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
-	}
-
-	triggered_country_modifier = { # Common to all Priests
-		potential = {
-			exists = owner
-			owner = { has_valid_civic = civic_efficient_bureaucracy }
-		}
-		country_edict_fund_add = 2
-		mult = value:job_total_output_modifier|JOB|haruspex|RESOURCE|unity|
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			planet = {
-				exists = owner
-				owner = {
-					has_tradition = tr_modularity_4
-				}
-			}
-		}
-		planet_jobs_worker_produces_mult = 0.02
-	}
-
 	triggered_planet_modifier = {	# Inheriting trade value from Prosperity Preachers
 		potential = {
 			exists = owner
@@ -96,14 +65,9 @@ haruspex = {
 		mult = value:preacher_trade_value
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_councilor = { COUNCILOR = "councilor_dimensional_worship_corporate" } }
-		}
-		trade_value_add = @councilor_dimensional_worship_priest_trade_value
-		mult = value:scripted_modifier_councilor_level_mult|MODIFIER|pop_job_trade_mult|TYPE|councilor_dimensional_worship_corporate|
-	}
+	inline_script = jobs/effects/type/tec_administrator_effect
+	inline_script = jobs/effects/type/tec_priest_effect
+
 
 	weight = {
 		weight = @specialist_job_weight
@@ -131,6 +95,10 @@ haruspex = {
 			factor = 0.1
 			is_enslaved = yes
 			has_slavery_type = { type = slavery_indentured }
+		}
+		modifier = {
+			factor = 100 # force pops to take em
+			has_cybernetic_creed_trait = yes
 		}
 	}
 
@@ -162,21 +130,30 @@ technophant = {
 	resources = {
 		category = planet_priests
 		produces = {
-			unity = 4
+			unity = 6
 			engineering_research = 4
 		}
 		upkeep = {
 			consumer_goods = 2
 		}
+		inline_script = jobs/resources/tec_rulers
 	}
 
 	triggered_planet_modifier = {
 		potential = {
-			always = yes
+			exists = owner
+			owner = { tec_is_dystopian_empire = no }
 		}
-		planet_amenities_add = 5
+		planet_amenities_add = @tec_ruler_job_amenities_high
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
+
+	inline_script = jobs/effects/type/tec_administrator_effect
+
+	inline_script = jobs/effects/type/tec_priest_effect
+
+	inline_script = jobs/effects/tec_civic_tec_regular_social_prosperity
+
 
 	weight = {
 		weight = @ruler_job_weight
@@ -203,6 +180,10 @@ technophant = {
 					is_country_type = ai_empire
 				}
 			}
+		}
+		modifier = {
+			factor = 100 # force pops to take em
+			has_cybernetic_creed_trait = yes
 		}
 	}
 
