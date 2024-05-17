@@ -573,7 +573,60 @@ tec_ai_allow_artifacts_dependant_building = { # to not block ai build plans
 	}
 }
 
+tec_ai_allow_fe_alloy_dependant_building = {
+	if = {
+		limit = {
+			exists = owner
+			owner = { is_ai = yes }
+		}
+		OR = {
+			has_building_construction = yes
+			owner = {
+				resource_stockpile_compare = {
+					resource = alloys
+					value >= @b$tier$_minerals
+					mult = 2
+				}
+				has_monthly_income = {
+					resource = alloys
+					value >= @b$tier$_alloy_upkeep
+				}
+			}
+		}
+	}
+	else = {
+		always = yes
+	}
+}
 
+tec_ai_allow_fe_rare_dependant_building = { # Still blocked the AI so increased stockpile requirements (budgets issue)
+	if = {
+		limit = {
+			exists = owner
+			owner = { is_ai = yes }
+		}
+		OR = {
+			#works well
+			#This allows the building to not get instantly unupgraded by the AI if the allows are not met AFTER the construction started (there is also a problem with it not refunding resources if the construction gets cancelled under these circumstances)
+			#Since the AI can't queue stuff, this is a good solution
+			has_building_construction = yes
+			owner = {
+				resource_stockpile_compare = {
+					resource = $rare$
+					value >= @fe_sr_cost
+					mult = 2
+				}
+				has_monthly_income = {
+					resource = $rare$
+					value >= 2
+				}
+			}
+		}
+	}
+	else = {
+		always = yes
+	}
+}
 
 tec_ai_destroy_refinery_boosting_building = {
 	if = {
@@ -589,6 +642,10 @@ tec_ai_destroy_refinery_boosting_building = {
 }
 
 tec_ai_allow_refinery_building = {
+	inline_script = {
+		script = tec_type_hint
+		resource = $resource$
+	}
 	if = {
 		limit = {
 			exists = owner
@@ -596,6 +653,33 @@ tec_ai_allow_refinery_building = {
 		}
 		OR = {
 			has_refinery_designation = yes
+			inline_script = {
+				script = conditional/tec_equal
+				value = $resource$
+				equal = exotic_gases
+				code = "
+					has_building = building_gas_extractors
+					has_building = building_tec_biohive_gas_extractors
+				"
+			}
+			inline_script = {
+				script = conditional/tec_equal
+				value = $resource$
+				equal = rare_crystals
+				code = "
+					has_building = building_crystal_mines
+					has_building = building_tec_biohive_crystal_mines
+				"
+			}
+			inline_script = {
+				script = conditional/tec_equal
+				value = $resource$
+				equal = volatile_motes
+				code = "
+					has_building = building_mote_harvesters
+					has_building = building_tec_biohive_mote_harvesters
+				"
+			}
 			AND = {
 				is_capital = no
 				owner = {
@@ -1792,5 +1876,108 @@ tec_ai_allow_strategic_war_edicts = {
 	}
 	else = {
 		always = yes
+	}
+}
+
+tec_ai_can_reduce_colonist_jobs = {
+	exists = owner
+	owner = {
+		NOR = {
+			has_valid_civic = civic_tec_corporate_settlers
+			has_valid_civic = civic_tec_regular_star_settlers
+			tec_is_dystopian_empire = yes
+		}
+	}
+}
+
+tec_ai_can_increase_colonist_jobs = {
+	tec_ai_can_reduce_colonist_jobs = no
+}
+
+tec_ai_can_reduce_clerk_job = {
+	OR = {
+		AND = {
+			num_unemployed < 1
+			free_amenities > 5
+		}
+		tec_has_possible_job = { job = entertainer }
+		tec_has_possible_job = { job = duelist }
+	}
+	exists = owner
+	owner = { should_ai_focus_on_trade = no }
+}
+
+tec_ai_can_increase_clerk_job = {
+	OR = {
+		tec_has_non_emigrant_pops_unemployed = yes
+		free_amenities < -10
+		AND = {
+			exists = owner
+			owner = { should_ai_focus_on_trade = yes }
+		}
+	}
+}
+
+tec_ai_can_reduce_maintenance_drone_job = {
+	OR = {
+		AND = {
+			num_unemployed < 1
+			free_amenities > 10
+		}
+		tec_has_possible_job = { job = tec_spareparts_drone }
+	}
+}
+
+tec_ai_can_increase_maintenance_drone_job = {
+	NOR = {
+		tec_has_possible_job = { job = tec_spareparts_drone }
+	}
+	OR = {
+		tec_has_non_emigrant_pops_unemployed = yes
+		free_amenities < 0
+	}
+}
+
+tec_ai_can_reduce_crime_job = {
+	planet_crime <= 0
+	tec_has_crime_modifiers = no
+	exists = owner
+	owner = {
+		tec_is_dystopian_empire = no
+	}
+}
+
+tec_ai_can_increase_crime_job = {
+	OR = {
+		tec_has_crime_modifiers = yes
+		planet_crime > 27
+	}
+}
+
+tec_ai_can_reduce_artisan_job = {
+	exists = owner
+	owner = {
+		has_monthly_income = {
+			resource = consumer_goods
+			value > @[economic_plan_consumer_goods_target * 3]
+		}
+	}
+	NOR = {
+		has_industrial_designation = yes
+		has_factory_designation = yes
+	}
+}
+
+tec_ai_can_increase_artisan_job = {
+	exists = owner
+	OR = {
+		owner = {
+			has_monthly_income = {
+				resource = consumer_goods
+				value < @economic_plan_consumer_goods_target
+			}
+		}
+		has_industrial_designation = yes
+		has_factory_designation = yes
 	}
 }
