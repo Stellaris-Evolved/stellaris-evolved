@@ -113,7 +113,7 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                 for line in f.readlines():
                     matches = re.match(f"\\s*include_script\\s*=\\s*\"?([a-z_A-Z\\d/$]*)\"?", line)
                     if matches and matches.group(1) and 'iterators' not in matches.group(1):
-                        inlines[matches.group(1)] = os.path.relpath(filename, base_mod_path)
+                        inlines[matches.group(1)] = os.path.relpath(filename, base_mod_path).replace('\\', '/')
 
     scripted_triggers = {}
 
