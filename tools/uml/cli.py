@@ -110,10 +110,11 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                 and 'evolved_support' not in filename
                 and 'mod_support/tec_inlines_include' not in filename):
             with open(filename, 'r') as f:
-                for line in f.readlines():
+                lines = f.readlines()
+                for i, line in enumerate(lines):
                     matches = re.match(f"\\s*include_script\\s*=\\s*\"?([a-z_A-Z\\d/$]*)\"?", line)
                     if matches and matches.group(1) and 'iterators' not in matches.group(1):
-                        inlines[matches.group(1)] = os.path.relpath(filename, base_mod_path).replace('\\', '/')
+                        inlines[matches.group(1)] = (os.path.relpath(filename, base_mod_path).replace('\\', '/'), i + 1)
 
     scripted_triggers = {}
 
@@ -328,7 +329,7 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
             
             ## Current supported inline_scripts
             
-            {new_line.join(f"            * [{s[0]}]({s[1]})" for s in doc_inlines).strip()}
+            {new_line.join(f"            * [{s[0]}]({s[1][0]}#L{s[1][1]})" for s in doc_inlines).strip()}
         """))
 
 
