@@ -3,13 +3,22 @@
 Stellaris Evolved supports internally a way of extending existing inlines and triggers 
 without needing to overwrite Evolved defined files.
 
+## Setup on your side of the mod
+
+Create a scripted variable in `common/scripted_variables` folder in a file with `!!` prefix. You will have
+to create a variable with your `suffix` in it like below.
+
+```
+@tec_<suffix>_addon_present = 1
+```
+
 ## How to identify what can be extended
 
-### Scripted triggers
+### Scripted triggers and effects
 
-Scripted triggers that have the `tec_trigger_mod_support` inside their logic,
-usually inside an `OR` statement can be extended by creating a scripted trigger
-of your own with a suffix appended to the trigger name.
+Scripted triggers that have the `tec_trigger_mod_support`, and scripted effects that have the `tec_effect_mod_support`
+inside their logic, usually inside an `OR` statement can be extended by creating a scripted trigger
+of your own with a suffix appended to the trigger/effect name.
 
 For example, if you want to add a spiritualist main cult, and have it supported
 by automatically disabling normal temples and swapping you priest, you might want
