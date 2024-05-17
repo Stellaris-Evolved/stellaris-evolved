@@ -137,7 +137,7 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                     for s in found_triggers:
                         matches = re.match(f"\\s*{s}\\s*=\\s*{{", line)
                         if matches:
-                            scripted_triggers[s] = (filename[len(str(base_mod_path)) + 1:], i + 1)
+                            scripted_triggers[s] = (filename[len(str(base_mod_path)) + 1:].replace('\\', '/'), i + 1)
 
     scripted_effects = {}
 
@@ -161,7 +161,7 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                     for s in found_effects:
                         matches = re.match(f"\\s*{s}\\s*=\\s*{{", line)
                         if matches:
-                            scripted_effects[s] = (filename[len(str(base_mod_path)) + 1:], i + 1)
+                            scripted_effects[s] = (filename[len(str(base_mod_path)) + 1:].replace('\\', '/'), i + 1)
 
     suffixes = cfg['addons']['suffixes']
     scripted_trigger_defaults = cfg['addons'].get('scripted_trigger_defaults', [])
