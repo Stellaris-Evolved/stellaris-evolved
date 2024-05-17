@@ -102,21 +102,18 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
     cfg |= local_cfg
     base_mod_path = Path(base_mod_path).resolve()
 
-    inlines = []
+    inlines = {}
 
     for filename in glob.iglob(str(base_mod_path / f"common/inline_scripts/**/**"), recursive=True):
-        if ('inline_evolved' in filename
+        if ('tec_' in filename
                 and '.txt' in filename
                 and 'evolved_support' not in filename
                 and 'mod_support/tec_inlines_include' not in filename):
             with open(filename, 'r') as f:
                 for line in f.readlines():
-                    matches = re.match(f"\\s*include_script\\s*=\\s*\"?([a-z_A-Z\\d/]*)\"?", line)
-                    if matches and matches.group(1):
-                        inlines.append(matches.group(1))
-
-    inlines = list(set(inlines))
-    inlines.sort()
+                    matches = re.match(f"\\s*include_script\\s*=\\s*\"?([a-z_A-Z\\d/$]*)\"?", line)
+                    if matches and matches.group(1) and 'iterators' not in matches.group(1):
+                        inlines[matches.group(1)] = os.path.relpath(filename, base_mod_path)
 
     scripted_triggers = {}
 
@@ -174,10 +171,27 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
     if (base_mod_path / f"common/inline_scripts/evolved_support").exists():
         shutil.rmtree(base_mod_path / f"common/inline_scripts/evolved_support")
 
-    for inline, suffix in itertools.product(inlines, suffixes):
-        os.makedirs(os.path.dirname(base_mod_path / f"common/inline_scripts/evolved_support/{inline}_{suffix}.txt"),
-                    exist_ok=True)
-        (base_mod_path / f"common/inline_scripts/evolved_support/{inline}_{suffix}.txt").touch()
+    auth_inlines = set()
+
+    for inline, suffix in itertools.product(inlines.items(), suffixes):
+        print(inline)
+        if '$authority$' in inline[0]:
+            for authority in cfg['authorities']:
+                os.makedirs(os.path.dirname(base_mod_path / f"common/inline_scripts/evolved_support/{inline[0].replace('$authority$', authority)}_{suffix}.txt"),
+                            exist_ok=True)
+                (base_mod_path / f"common/inline_scripts/evolved_support/{inline[0].replace('$authority$', authority)}_{suffix}.txt").touch()
+            auth_inlines.add(inline)
+        else:
+            os.makedirs(os.path.dirname(base_mod_path / f"common/inline_scripts/evolved_support/{inline[0]}_{suffix}.txt"),
+                        exist_ok=True)
+            (base_mod_path / f"common/inline_scripts/evolved_support/{inline[0]}_{suffix}.txt").touch()
+
+    doc_inlines = dict(inlines)
+    for inline in auth_inlines:
+        for authority in cfg['authorities']:
+            doc_inlines[inline[0].replace('$authority$', authority)] = inline[1]
+
+    doc_inlines = sorted(doc_inlines.items(), key=lambda x: x[0])
 
     with open(base_mod_path / "common/inline_scripts/mod_support/tec_trigger_placeholders.txt", 'w') as f:
         f.write("# mod_support/tec_trigger_placeholders\n")
@@ -314,7 +328,7 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
             
             ## Current supported inline_scripts
             
-            {new_line.join(f"            * [{s}](common/inline_scripts/{s}.txt)" for s in inlines).strip()}
+            {new_line.join(f"            * [{s[0]}]({s[1]})" for s in doc_inlines).strip()}
         """))
 
 
