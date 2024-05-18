@@ -15,7 +15,11 @@ automate_ai_manage_jobs = {
 
 	available = {
 		exists = owner
-		owner = { is_ai = yes }
+		owner = {
+			is_ai = yes
+			# virtual empire has no need for this mechanism
+			is_virtual_empire = no
+		}
 	}
 
 	emergency = yes
@@ -26,14 +30,7 @@ automate_ai_manage_jobs = {
 			colonist_reduce = {
 				available = {
 					tec_can_reduce_job_further = { job = colonist }
-					exists = owner
-					owner = {
-						NOR = {
-							has_valid_civic = civic_tec_corporate_settlers
-							has_valid_civic = civic_tec_regular_star_settlers
-							tec_is_dystopian_empire = yes
-						}
-					}
+					tec_ai_can_reduce_colonist_jobs = yes
 				}
 
 				job = colonist
@@ -43,14 +40,7 @@ automate_ai_manage_jobs = {
 			colonist_increase = {
 				available = {
 					tec_can_increase_job_further = { job = colonist }
-					exists = owner
-					owner = {
-						OR = {
-							has_valid_civic = civic_tec_corporate_settlers
-							has_valid_civic = civic_tec_regular_star_settlers
-							tec_is_dystopian_empire = yes
-						}
-					}
+					tec_ai_can_increase_colonist_jobs = yes
 				}
 
 				job = colonist
@@ -61,15 +51,7 @@ automate_ai_manage_jobs = {
 			clerk_reduce = {
 				available = {
 					tec_can_reduce_job_further = { job = clerk }
-					OR = {
-						AND = {
-							num_unemployed < 1
-							free_amenities > 5
-						}
-						tec_has_possible_job = { job = entertainer }
-						tec_has_possible_job = { job = duelist }
-					}
-					owner = { should_ai_focus_on_trade = no }
+					tec_ai_can_reduce_clerk_job = yes
 				}
 
 				job = clerk
@@ -79,14 +61,7 @@ automate_ai_manage_jobs = {
 			clerk_increase = {
 				available = {
 					tec_can_increase_job_further = { job = clerk }
-					OR = {
-						tec_has_non_emigrant_pops_unemployed = yes
-						free_amenities < -10
-						AND = {
-							exists = owner
-							owner = { should_ai_focus_on_trade = yes }
-						}
-					}
+					tec_ai_can_increase_clerk_job = yes
 				}
 
 				job = clerk
@@ -115,39 +90,6 @@ automate_ai_manage_jobs = {
 		# /
 
 		# Amenities Gestalt
-			maintenance_drone_reduce = {
-				available = {
-					tec_can_reduce_job_further = { job = maintenance_drone }
-					OR = {
-						AND = {
-							num_unemployed < 1
-							free_amenities > 10
-						}
-						tec_has_possible_job = { job = tec_spareparts_drone }
-					}
-				}
-
-				job = maintenance_drone
-				amount = -1
-			}
-
-			maintenance_drone_increase = {
-				available = {
-					tec_can_increase_job_further = { job = maintenance_drone }
-					NOR = {
-						tec_has_possible_job = { job = tec_spareparts_drone }
-					}
-					OR = {
-						tec_has_non_emigrant_pops_unemployed = yes
-						free_amenities < 0
-					}
-				}
-
-				job = maintenance_drone
-				amount = 1
-			}
-
-
 			tec_spareparts_drone_reduce = {
 				available = {
 					tec_can_reduce_job_further = { job = tec_spareparts_drone }
@@ -167,18 +109,34 @@ automate_ai_manage_jobs = {
 				job = tec_spareparts_drone
 				amount = 1
 			}
+
+			maintenance_drone_reduce = {
+				available = {
+					tec_can_reduce_job_further = { job = maintenance_drone }
+					tec_ai_can_reduce_maintenance_drone_job = yes
+				}
+
+				job = maintenance_drone
+				amount = -1
+			}
+
+			maintenance_drone_increase = {
+				available = {
+					tec_can_increase_job_further = { job = maintenance_drone }
+					tec_ai_can_increase_maintenance_drone_job = yes
+				}
+
+				job = maintenance_drone
+				amount = 1
+			}
+
 		# /
 
 		# Crime Regular
 			enforcer_reduce = {
 				available = {
 					tec_can_reduce_job_further = { job = enforcer }
-					planet_crime < 1
-					tec_has_crime_modifiers = no
-					exists = owner
-					owner = {
-						tec_is_dystopian_empire = no
-					}
+					tec_ai_can_reduce_crime_job = yes
 
 				}
 
@@ -189,10 +147,7 @@ automate_ai_manage_jobs = {
 			enforcer_increase = {
 				available = {
 					tec_can_increase_job_further = { job = enforcer }
-					OR = {
-						tec_has_crime_modifiers = yes
-						planet_crime > 27
-					}
+					tec_ai_can_increase_crime_job = yes
 				}
 
 				job = enforcer
@@ -204,7 +159,7 @@ automate_ai_manage_jobs = {
 			patrol_drone_reduce = {
 				available = {
 					tec_can_reduce_job_further = { job = patrol_drone }
-					planet_crime < 1
+					tec_ai_can_reduce_crime_job = yes
 				}
 
 				job = patrol_drone
@@ -214,7 +169,7 @@ automate_ai_manage_jobs = {
 			patrol_drone_increase = {
 				available = {
 					tec_can_increase_job_further = { job = patrol_drone }
-					planet_crime > 27
+					tec_ai_can_increase_crime_job = yes
 				}
 
 				job = patrol_drone
@@ -226,13 +181,7 @@ automate_ai_manage_jobs = {
 			artisan_reduce = {
 				available = {
 					tec_can_reduce_job_further = { job = artisan }
-					exists = owner
-					owner = {
-						has_monthly_income = {
-							resource = consumer_goods
-							value > @[economic_plan_consumer_goods_target * 3]
-						}
-					}
+					tec_ai_can_reduce_artisan_job = yes
 				}
 
 				job = artisan
@@ -242,13 +191,7 @@ automate_ai_manage_jobs = {
 			artisan_increase = {
 				available = {
 					tec_can_increase_job_further = { job = artisan }
-					exists = owner
-					owner = {
-						has_monthly_income = {
-							resource = consumer_goods
-							value < @economic_plan_consumer_goods_target
-						}
-					}
+					tec_ai_can_increase_artisan_job = yes
 				}
 
 				job = artisan
@@ -258,13 +201,7 @@ automate_ai_manage_jobs = {
 			artificer_reduce = {
 				available = {
 					tec_can_reduce_job_further = { job = artificer }
-					exists = owner
-					owner = {
-						has_monthly_income = {
-							resource = consumer_goods
-							value > @[economic_plan_consumer_goods_target * 3]
-						}
-					}
+					tec_ai_can_reduce_artisan_job = yes
 				}
 
 				job = artificer
@@ -274,13 +211,7 @@ automate_ai_manage_jobs = {
 			artificer_increase = {
 				available = {
 					tec_can_increase_job_further = { job = artificer }
-					exists = owner
-					owner = {
-						has_monthly_income = {
-							resource = consumer_goods
-							value < @economic_plan_consumer_goods_target
-						}
-					}
+					tec_ai_can_increase_artisan_job = yes
 				}
 
 				job = artificer
@@ -290,16 +221,7 @@ automate_ai_manage_jobs = {
 			artisan_drone_reduce = {
 				available = {
 					tec_can_reduce_job_further = { job = artisan_drone }
-					exists = owner
-					owner = {
-						OR = {
-							country_uses_consumer_goods = no
-							has_monthly_income = {
-								resource = consumer_goods
-								value > @[economic_plan_consumer_goods_target * 3]
-							}
-						}
-					}
+					tec_ai_can_reduce_artisan_job = yes
 				}
 
 				job = artisan_drone
@@ -309,17 +231,37 @@ automate_ai_manage_jobs = {
 			artisan_drone_increase = {
 				available = {
 					tec_can_increase_job_further = { job = artisan_drone }
-					exists = owner
-					owner = {
-						country_uses_consumer_goods = yes
-						has_monthly_income = {
-							resource = consumer_goods
-							value < @economic_plan_consumer_goods_target
-						}
-					}
+					tec_ai_can_increase_artisan_job = yes
 				}
 
 				job = artisan_drone
+				amount = 1
+			}
+
+			#Colonies that only serve as pop worlds shouldn't have broodlords slot open in order to limit resettlement costs and back and forth (it costs 250 credits base!)
+			broodlord_drone_reduce = {
+				available = {
+					tec_can_reduce_job_further = { job = tec_broodlord_drone }
+					habitability = {
+						who = owner_main_species
+						value < 0.55
+					}
+				}
+
+				job = tec_broodlord_drone
+				amount = -1
+			}
+
+			broodlord_drone_increase = {
+				available = {
+					tec_can_increase_job_further = { job = tec_broodlord_drone }
+					habitability = {
+						who = owner_main_species
+						value >= 0.55
+					}
+				}
+
+				job = tec_broodlord_drone
 				amount = 1
 			}
 		# /

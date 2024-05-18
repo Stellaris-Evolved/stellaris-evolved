@@ -86,6 +86,10 @@ ruler_job_check_trigger = {	# Seems to be deprecated
 
 complex_specialist_job_check_trigger = {
 	hidden_trigger = {
+		[[cached]
+			has_pop_flag = tec_cache_complex_specialist_job_check_trigger
+		]
+		[[!cached]
 		exists = owner
 		OR = {
 			NOT = { has_trait = trait_mechanical }
@@ -101,6 +105,7 @@ complex_specialist_job_check_trigger = {
 				owner = { NOT = { has_policy_flag = intelligent_bioservants_outlawed } }
 			}
 		}
+		]
 	}
 }
 
@@ -150,6 +155,10 @@ specialist_job_check_trigger = {
 entertainer_job_check_trigger = {
 	custom_tooltip = SPECIALIST_JOB_TRIGGER
 	hidden_trigger = {
+		[[cached]
+			has_pop_flag = tec_cache_entertainer_job_check_trigger
+		]
+		[[!cached]
 		exists = owner
 		OR = {
 			is_enslaved = no
@@ -178,6 +187,7 @@ entertainer_job_check_trigger = {
 			}
 			divinity_right_to_work_job_check_trigger_specialist = yes
 		}
+		]
 	}
 }
 
@@ -185,6 +195,10 @@ battle_thrall_job_check_trigger = {
 	custom_tooltip = SPECIALIST_JOB_TRIGGER
 	hidden_trigger = {
 		exists = owner
+		[[cached]
+			has_pop_flag = tec_cache_battle_thrall_job_check_trigger
+		]
+		[[!cached]
 		OR = {
 			is_enslaved = no
 			has_slavery_type = { type = slavery_military }
@@ -215,6 +229,7 @@ battle_thrall_job_check_trigger = {
 			}
 			divinity_right_to_work_job_check_trigger_specialist = yes
 		}
+		]
 	}
 }
 
@@ -334,86 +349,194 @@ is_lithoid = {
 }
 
 # New
-can_fill_ruler_job = {
-	if = {
-		limit = {
-			exists = owner
-			owner = {
-				has_origin = origin_necrophage
-				has_trait = trait_necrophage
+can_fill_ruler_job_trigger = {
+	custom_tooltip = {
+		[[cached]
+			text = TEC_RULER_JOB_TRIGGER_DYNAMIC
+			has_pop_flag = tec_cache_can_fill_ruler_job_trigger
+		]
+		[[!cached]
+			if = {
+				limit = {
+					exists = owner
+					owner = {
+						has_origin = origin_necrophage
+						has_trait = trait_necrophage
+					}
+				}
+				custom_tooltip = {
+					text = RULER_JOB_NECROPHAGE_TRIGGER
+					has_trait = trait_necrophage
+					is_enslaved = no
+					is_being_purged = no
+					is_being_assimilated = no
+				}
 			}
-		}
-		custom_tooltip = {
-			text = RULER_JOB_NECROPHAGE_TRIGGER
-			has_trait = trait_necrophage
-			is_enslaved = no
-			is_being_purged = no
-			is_being_assimilated = no
+			# disabled for performance
+			# else_if = {	# Evolved - wip
+			# 	limit = {
+			# 		has_global_flag = stellarisevolved
+			# 		exists = owner
+			# 		owner = {
+			# 			has_origin = origin_tec_slavetothesystem
+			# 			has_trait = trait_mechanical
+			# 		}
+			# 	}
+			# 	custom_tooltip = {
+			# 		text = RULER_JOB_NECROPHAGE_TRIGGER
+			# 		has_trait = trait_mechanical
+			# 		is_enslaved = no
+			# 		is_being_purged = no
+			# 		is_being_assimilated = no
+			# 	}
+			# }
+			else = {
+				custom_tooltip = RULER_JOB_TRIGGER
+				hidden_trigger = {
+					NOT = { has_ethic = ethic_gestalt_consciousness }
+					exists = owner
+					is_enslaved = no
+					is_being_purged = no
+					is_being_assimilated = no
+					## Rule out Traits for servitude & lack of free will
+					#NOR = {
+					#	has_trait = trait_syncretic_proles
+					#	has_trait = trait_zombie
+					#	has_trait = trait_nerve_stapled
+					#}	handled below
+					# Evolved -----------------------------------------------------
+					NOR = {
+						tec_has_ruler_job_invalidation_trait = { cached = yes }
+						tec_has_stapled_trait = { cached = yes }
+					}
+					NAND = {	# Avoid elevated pops becoming specialists
+						has_trait = @trait_tec_se_subspecies
+						days_passed < 2
+					}
+					# /
+					# Rule out Machine Pops, unless they're rendered sapient
+					OR = {
+						NOT = { has_trait = trait_mechanical }
+						AND = {
+							owner = { has_technology = tech_synthetic_workers }
+							owner = { has_policy_flag = ai_full_rights }
+						}
+					}
+					# Rule out Organic Trophies
+					NOT = {
+						has_citizenship_type = {
+							type = citizenship_organic_trophy
+							country = owner
+						}
+					}
+					# Evolved -----------------------------------------------------
+					OR = {
+						NOT = { has_trait = @trait_tec_bioservant }
+						AND = {
+							owner = { has_technology = tech_tec_bioservant_3 }
+							owner = { has_policy_flag = bioservant_full_rights }
+						}
+					}
+					# JOB POLICIES
+					#if = {	# Xenos
+					#	limit = {
+					#		NOR = {
+					#			tec_is_crafted_nonsapient_pop = yes
+					#			tec_is_crafted_sentient_pop = yes
+					#		}
+					#		owner = {
+					#			OR = {
+					#				has_policy_flag = tec_xenos_jobs_norulers
+					#				has_policy_flag = tec_xenos_jobs_restricted
+					#				has_policy_flag = tec_xenos_jobs_servants
+					#			}
+					#		}
+					#		is_same_species = owner_species
+					#	}
+					#}
+					#if = {	# Crafted jobs
+					#	limit = {
+					#		OR = {
+					#			tec_is_crafted_nonsapient_pop = yes
+					#			tec_is_crafted_sentient_pop = yes
+					#		}
+					#		owner = {
+					#			OR = {
+					#				has_policy_flag = tec_crafted_jobs_norulers
+					#				has_policy_flag = tec_crafted_jobs_restricted
+					#				has_policy_flag = tec_crafted_jobs_servants
+					#			}
+					#		}
+					#		NOR = {
+					#			has_trait = trait_mechanical
+					#			has_trait = @trait_tec_bioservant
+					#		}
+					#	}
+					#}
+					# /
+					NOT = { has_citizenship_type = { type = citizenship_organic_trophy country = owner } }
+					# Rule out violations of the 'Right to Work' Resolution (prioritises organic workers)
+					if = {
+						limit = {
+							divinity_right_to_work_job_check_trigger_exempt = no
+						}
+						divinity_right_to_work_job_check_trigger_ruler = yes
+					}
+				}
+			}
+		]
+	}
+}
+
+divinity_right_to_work_job_check_trigger_ruler = {
+	NOT = {
+		planet = {
+			tec_planet_divinity_right_to_work_job_check_trigger_ruler = { cached = yes }
 		}
 	}
-	else_if = {	# Evolved - wip
-		limit = {
-			has_global_flag = stellarisevolved
-			exists = owner
-			owner = {
-				has_origin = origin_tec_slavetothesystem
-				has_trait = trait_mechanical
-			}
-		}
-		custom_tooltip = {
-			text = RULER_JOB_NECROPHAGE_TRIGGER
-			has_trait = trait_mechanical
-			is_enslaved = no
-			is_being_purged = no
-			is_being_assimilated = no
-		}
+}
+
+tec_planet_divinity_right_to_work_job_check_trigger_ruler = {
+	[[cached]
+		has_planet_flag = tec_cache_tec_planet_divinity_right_to_work_job_check_trigger_ruler
+	]
+	[[!cached]
+	any_owned_pop = {
+		is_unemployed = yes
+		is_robotic_species = no
 	}
-	else = {
-		custom_tooltip = RULER_JOB_TRIGGER
-		hidden_trigger = {
+	]
+}
+
+can_fill_specialist_job_trigger = {
+	custom_tooltip = SPECIALIST_JOB_TRIGGER
+	hidden_trigger = {
+		[[cached]
+			has_pop_flag = tec_cache_can_fill_specialist_job_trigger
+		]
+		[[!cached]
 			NOT = { has_ethic = ethic_gestalt_consciousness }
 			exists = owner
-			is_enslaved = no
+			OR = {
+				is_enslaved = no
+				has_slavery_type = { type = slavery_indentured }
+			}
 			is_being_purged = no
 			is_being_assimilated = no
-			## Rule out Traits for servitude & lack of free will
-			#NOR = {
-			#	has_trait = trait_syncretic_proles
-			#	has_trait = trait_zombie
-			#	has_trait = trait_nerve_stapled
-			#}	handled below
-			# Evolved -----------------------------------------------------
-				NOR = {
-					tec_has_ruler_job_invalidation_trait = { cached = yes }
-					tec_has_stapled_trait = { cached = yes }
-				}
-				NAND = {	# Avoid elevated pops becoming specialists
-					has_trait = @trait_tec_se_subspecies
-					days_passed < 2
-				}
-			# /
-			# Rule out Machine Pops, unless they're rendered sapient
+			# Rule out Traits for servitude & lack of free will
+			NOT = { tec_has_stapled_trait = { cached = yes } }
 			OR = {
-				NOT = { has_trait = trait_mechanical }
-				AND = {
-					owner = { has_technology = tech_synthetic_workers }
-					owner = { has_policy_flag = ai_full_rights }
+				NOT = {
+					has_trait = trait_mechanical
 				}
-			}
-			# Rule out Organic Trophies
-			NOT = {
-				has_citizenship_type = {
-					type = citizenship_organic_trophy
-					country = owner
-				}
+				owner = { has_technology = tech_droid_workers }
 			}
 			# Evolved -----------------------------------------------------
 				OR = {
-					NOT = { has_trait = @trait_tec_bioservant }
-					AND = {
-						owner = { has_technology = tech_tec_bioservant_3 }
-						owner = { has_policy_flag = bioservant_full_rights }
+					NOT = {
+						has_trait = @trait_tec_bioservant
 					}
+					owner = { has_technology = tech_tec_bioservant_2 }
 				}
 				# JOB POLICIES
 				#if = {	# Xenos
@@ -424,7 +547,6 @@ can_fill_ruler_job = {
 				#		}
 				#		owner = {
 				#			OR = {
-				#				has_policy_flag = tec_xenos_jobs_norulers
 				#				has_policy_flag = tec_xenos_jobs_restricted
 				#				has_policy_flag = tec_xenos_jobs_servants
 				#			}
@@ -440,7 +562,6 @@ can_fill_ruler_job = {
 				#		}
 				#		owner = {
 				#			OR = {
-				#				has_policy_flag = tec_crafted_jobs_norulers
 				#				has_policy_flag = tec_crafted_jobs_restricted
 				#				has_policy_flag = tec_crafted_jobs_servants
 				#			}
@@ -453,151 +574,131 @@ can_fill_ruler_job = {
 				#}
 			# /
 			NOT = { has_citizenship_type = { type = citizenship_organic_trophy country = owner } }
-			# Rule out violations of the 'Right to Work' Resolution (prioritises organic workers)
 			if = {
 				limit = {
 					divinity_right_to_work_job_check_trigger_exempt = no
 				}
-				divinity_right_to_work_job_check_trigger_ruler = yes
+				divinity_right_to_work_job_check_trigger_specialist = yes
 			}
+		]
+	}
+}
+
+divinity_right_to_work_job_check_trigger_specialist = {
+	NOT = {
+		planet = {
+			tec_planet_divinity_right_to_work_job_check_trigger_specialist = { cached = yes }
 		}
 	}
 }
 
-can_fill_specialist_job_trigger = {
-	custom_tooltip = SPECIALIST_JOB_TRIGGER
-	hidden_trigger = {
-		NOT = { has_ethic = ethic_gestalt_consciousness }
-		exists = owner
-		OR = {
-			is_enslaved = no
-			has_slavery_type = { type = slavery_indentured }
-		}
-		is_being_purged = no
-		is_being_assimilated = no
-		# Rule out Traits for servitude & lack of free will
-		NOT = { tec_has_stapled_trait = { cached = yes } }
-		OR = {
-			NOT = {
-				has_trait = trait_mechanical
-			}
-			owner = { has_technology = tech_droid_workers }
-		}
-		# Evolved -----------------------------------------------------
+tec_planet_divinity_right_to_work_job_check_trigger_specialist = {
+	[[cached]
+		has_planet_flag = tec_cache_tec_planet_divinity_right_to_work_job_check_trigger_specialist
+	]
+	[[!cached]
+		any_owned_pop = {
+			is_unemployed = yes
+			is_robotic_species = no
 			OR = {
-				NOT = {
-					has_trait = @trait_tec_bioservant
-				}
-				owner = { has_technology = tech_tec_bioservant_2 }
+				is_pop_category = specialist
+				is_pop_category = worker
 			}
-			# JOB POLICIES
-			#if = {	# Xenos
-			#	limit = {
-			#		NOR = {
-			#			tec_is_crafted_nonsapient_pop = yes
-			#			tec_is_crafted_sentient_pop = yes
-			#		}
-			#		owner = {
-			#			OR = {
-			#				has_policy_flag = tec_xenos_jobs_restricted
-			#				has_policy_flag = tec_xenos_jobs_servants
-			#			}
-			#		}
-			#		is_same_species = owner_species
-			#	}
-			#}
-			#if = {	# Crafted jobs
-			#	limit = {
-			#		OR = {
-			#			tec_is_crafted_nonsapient_pop = yes
-			#			tec_is_crafted_sentient_pop = yes
-			#		}
-			#		owner = {
-			#			OR = {
-			#				has_policy_flag = tec_crafted_jobs_restricted
-			#				has_policy_flag = tec_crafted_jobs_servants
-			#			}
-			#		}
-			#		NOR = {
-			#			has_trait = trait_mechanical
-			#			has_trait = @trait_tec_bioservant
-			#		}
-			#	}
-			#}
-		# /
-		NOT = { has_citizenship_type = { type = citizenship_organic_trophy country = owner } }
-		if = {
-			limit = {
-				divinity_right_to_work_job_check_trigger_exempt = no
-			}
-			divinity_right_to_work_job_check_trigger_specialist = yes
 		}
-	}
+	]
 }
 
-can_fill_worker_job = {
+
+can_fill_worker_job_trigger = {
 	custom_tooltip = WORKER_JOB_TRIGGER
 	hidden_trigger = {
-		if = {
-			limit = {
-				planet = {
-					is_planet_class = pc_cosmogenesis_world #Everyone can become a chip slave
-				}
-			}
-			always = yes
-		}
-		else = {
-			NOT = { has_ethic = ethic_gestalt_consciousness }
-			exists = owner
-			is_being_purged = no
-			is_being_assimilated = no
-			NOT = { has_citizenship_type = { type = citizenship_organic_trophy country = owner } }
-			NAND = {
-				has_citizenship_type = { type = citizenship_slavery country = owner }
-				OR = {
-					has_slavery_type = { type = slavery_livestock country = owner }
-					has_slavery_type = { type = slavery_matrix country = owner }
-				}
-			}
+		[[cached]
+			has_pop_flag = tec_cache_can_fill_worker_job_trigger
+		]
+		[[!cached]
 			if = {
 				limit = {
-					divinity_right_to_work_job_check_trigger_exempt = no
+					planet = {
+						is_planet_class = pc_cosmogenesis_world #Everyone can become a chip slave
+					}
 				}
-				divinity_right_to_work_job_check_trigger_worker = yes
+				always = yes
 			}
-			# Evolved
-				# JOB POLICIES
-				#if = {	# Xenos
-				#	limit = {
-				#		NOR = {
-				#			tec_is_crafted_nonsapient_pop = yes
-				#			tec_is_crafted_sentient_pop = yes
-				#		}
-				#		owner = {
-				#			has_policy_flag = tec_xenos_jobs_servants
-				#		}
-				#		is_same_species = owner_species
-				#	}
-				#}
-				#if = {	# Crafted jobs
-				#	limit = {
-				#		OR = {
-				#			tec_is_crafted_nonsapient_pop = yes
-				#			tec_is_crafted_sentient_pop = yes
-				#		}
-				#		owner = {
-				#			has_policy_flag = tec_crafted_jobs_servants
-				#		}
-				#		NOR = {
-				#			has_trait = trait_mechanical
-				#			has_trait = @trait_tec_bioservant
-				#		}
-				#	}
-				#}
-			# /
+			else = {
+				NOT = { has_ethic = ethic_gestalt_consciousness }
+				exists = owner
+				is_being_purged = no
+				is_being_assimilated = no
+				NOT = { has_citizenship_type = { type = citizenship_organic_trophy country = owner } }
+				NAND = {
+					has_citizenship_type = { type = citizenship_slavery country = owner }
+					OR = {
+						has_slavery_type = { type = slavery_livestock country = owner }
+						has_slavery_type = { type = slavery_matrix country = owner }
+					}
+				}
+				if = {
+					limit = {
+						divinity_right_to_work_job_check_trigger_exempt = no
+					}
+					divinity_right_to_work_job_check_trigger_worker = yes
+				}
+				# Evolved
+					# JOB POLICIES
+					#if = {	# Xenos
+					#	limit = {
+					#		NOR = {
+					#			tec_is_crafted_nonsapient_pop = yes
+					#			tec_is_crafted_sentient_pop = yes
+					#		}
+					#		owner = {
+					#			has_policy_flag = tec_xenos_jobs_servants
+					#		}
+					#		is_same_species = owner_species
+					#	}
+					#}
+					#if = {	# Crafted jobs
+					#	limit = {
+					#		OR = {
+					#			tec_is_crafted_nonsapient_pop = yes
+					#			tec_is_crafted_sentient_pop = yes
+					#		}
+					#		owner = {
+					#			has_policy_flag = tec_crafted_jobs_servants
+					#		}
+					#		NOR = {
+					#			has_trait = trait_mechanical
+					#			has_trait = @trait_tec_bioservant
+					#		}
+					#	}
+					#}
+				# /
+			}
+		]
+	}
+}
+
+divinity_right_to_work_job_check_trigger_worker = {
+	NOT = {
+		planet = {
+			tec_planet_divinity_right_to_work_job_check_trigger_worker = { cached = yes }
 		}
 	}
 }
+
+tec_planet_divinity_right_to_work_job_check_trigger_worker = {
+	[[cached]
+		has_planet_flag = tec_cache_tec_planet_divinity_right_to_work_job_check_trigger_worker
+	]
+	[[!cached]
+		any_owned_pop = {
+			is_unemployed = yes
+			is_robotic_species = no
+			is_pop_category = worker
+		}
+	]
+}
+
 
 is_organic_species = {
 	species = {

@@ -1,18 +1,37 @@
 # economic_plans/tec_base_plan
 
 $plan$ = {
+	#Here we have 2 subplans, one for each of the halfs of food convertion
+	#Slightly more for biohive due to getting a ton more pop and a bunch more food usage
+
+	#food focus for both organic architecture and bioswarm at game start
 	subplan = {
-		scaling = yes
-		set_name = "evolved empire food for food dependent empires"
+		set_name = "evolved empire food for organic architectures empires initial focus"
 		potential = {
-			OR = {
-				tec_is_bioarch_empire = yes
-				tec_is_biohive = yes
-			}
+			tec_is_bioarch_empire = yes
 		}
 
 		income = {
-			food = 10
+			food = 90
+		}
+
+		focus = {
+			food = 75
+		}
+	}
+
+	subplan = {
+		set_name = "evolved empire food for bioswarm empires initial focus"
+		potential = {
+			tec_is_biohive = yes
+		}
+
+		income = {
+			food = 90
+		}
+
+		focus = {
+			food = 75
 		}
 	}
 
@@ -107,13 +126,119 @@ $plan$ = {
 		naval_cap = 50
 	}
 
+	#Overwrite so bioswarm stops spamming pop production when in food deficit
+	subplan = {
+		set_name = "base pops"
+		potential = {
+			tec_is_biohive = no
+			has_monthly_income = { resource = energy value > @economic_plan_energy_target }
+			has_monthly_income = { resource = minerals value > @economic_plan_minerals_target }
+			has_monthly_income = { resource = physics_research value > @economic_plan_research_target }
+			has_monthly_income = { resource = society_research value > @economic_plan_research_target }
+			has_monthly_income = { resource = engineering_research value > @economic_plan_research_target }
+		}
+		pops = @economic_plan_pops_target
+	}
+
+	#"lifeline" resource which is the one used by mono empires
+	#i suppose you could copy it for other mono resource empires
+	subplan = {
+		set_name = "evolved base pops biohive"
+		potential = {
+			tec_is_biohive = yes
+			has_monthly_income = { resource = food value > @tec_economic_plan_lifeline_resource_target }
+			has_monthly_income = { resource = energy value > @economic_plan_energy_target }
+			has_monthly_income = { resource = minerals value > @economic_plan_minerals_target }
+			has_monthly_income = { resource = physics_research value > @economic_plan_research_target }
+			has_monthly_income = { resource = society_research value > @economic_plan_research_target }
+			has_monthly_income = { resource = engineering_research value > @economic_plan_research_target }
+		}
+		pops = @economic_plan_pops_target
+	}
+
+	#Overwrite for biohive
+	subplan = {
+		set_name = "base unity hivemind"
+		potential = {
+			is_hive_empire = yes
+			tec_is_biohive = no
+			has_monthly_income = { resource = energy value > @economic_plan_energy_target }
+		}
+		income = {
+			unity = @economic_plan_unity_target
+		}
+	}
+
+	subplan = {
+		set_name = "base unity biohive"
+		potential = {
+			tec_is_biohive = yes
+			has_monthly_income = { resource = energy value > @economic_plan_energy_target }
+			has_monthly_income = { resource = food value > @tec_economic_plan_lifeline_resource_target }
+		}
+		income = {
+			unity = @economic_plan_unity_target
+		}
+	}
+
+	
+	subplan = {
+		scaling = yes
+		set_name = "evolved empire food for organic architectures empires"
+		potential = {
+			tec_is_bioarch_empire = yes
+		}
+
+		income = {
+			food = 10
+		}
+		focus = {
+			food = 5
+		}
+	}
+
+	subplan = {
+		scaling = yes
+		set_name = "evolved empire food for bioswarm empires"
+		potential = {
+			tec_is_biohive = yes
+		}
+
+		income = {
+			food = 20
+		}
+
+		focus = {
+			food = 10
+		}
+	}
+
+	#bioswarm variant
 	subplan = {
 		scaling = yes
 		optional = yes
 		set_name = "evolved science"
 		potential = {
+			tec_is_biohive = no
 			has_monthly_income = { resource = energy value > @economic_plan_energy_target }
 			has_monthly_income = { resource = minerals value > @economic_plan_minerals_target }
+		}
+
+		income = {
+			physics_research = 15
+			society_research = 15
+			engineering_research = 15
+		}
+	}
+
+	subplan = {
+		scaling = yes
+		optional = yes
+		set_name = "evolved science bioswarm"
+		potential = {
+			tec_is_biohive = yes
+			has_monthly_income = { resource = energy value > @economic_plan_energy_target }
+			has_monthly_income = { resource = food value > @tec_economic_plan_lifeline_resource_target }
 		}
 
 		income = {
@@ -163,6 +288,75 @@ $plan$ = {
 		}
 		income = {
 			consumer_goods = @economic_plan_scaling_consumer_goods_target
+		}
+	}
+
+	#Overwrite so bioswarm doesn't get hit with it
+	subplan = {
+		set_name = "base science hivemind"
+		potential = {
+			is_hive_empire = yes
+			tec_is_biohive = no
+			has_monthly_income = { resource = minerals value > @economic_plan_minerals_target }
+		}
+		income = {
+			physics_research = @economic_plan_research_target
+			society_research = @economic_plan_research_target
+			engineering_research = @economic_plan_research_target
+		}
+	}
+
+	subplan = {
+		set_name = "base science bioswarm"
+		potential = {
+			tec_is_biohive = yes
+			has_monthly_income = { resource = food value > @tec_economic_plan_lifeline_resource_target }
+		}
+		income = {
+			physics_research = @economic_plan_research_target
+			society_research = @economic_plan_research_target
+			engineering_research = @economic_plan_research_target
+		}
+	}
+
+	#General scaling subplan overwrite for bioswarm
+	subplan = {
+		scaling = yes
+		set_name = "general scaling"
+		potential = {
+			tec_is_biohive = no
+			has_monthly_income = { resource = energy value > @economic_plan_energy_target }
+			has_monthly_income = { resource = minerals value > @economic_plan_minerals_target }
+		}
+
+		income = {
+			alloys = 10
+			minerals = 10
+			energy = 10
+			physics_research = @economic_plan_scaling_research_target
+			society_research = @economic_plan_scaling_research_target
+			engineering_research = @economic_plan_scaling_research_target
+			unity = 20
+		}
+	}
+
+	subplan = {
+		scaling = yes
+		set_name = "general scaling bioswarm"
+		potential = {
+			tec_is_biohive = yes
+			has_monthly_income = { resource = energy value > @economic_plan_energy_target }
+			has_monthly_income = { resource = food value > @tec_economic_plan_lifeline_resource_target }
+		}
+
+		income = {
+			alloys = 10
+			food = 10
+			energy = 10
+			physics_research = @economic_plan_scaling_research_target
+			society_research = @economic_plan_scaling_research_target
+			engineering_research = @economic_plan_scaling_research_target
+			unity = 20
 		}
 	}
 }

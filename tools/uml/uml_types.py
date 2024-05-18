@@ -4,6 +4,7 @@ from typing import TypeAlias, TypedDict, Literal, Optional
 TemplateKey: TypeAlias = str
 TemplateStr: TypeAlias = str
 LanguageStr: TypeAlias = str
+AuthorityStr: TypeAlias = str
 ResourceStr: TypeAlias = str | tuple[str, Optional[str], Optional[str], Optional[str]]
 EconomicCategoryKey: TypeAlias = str
 EconomicCategory: TypeAlias = tuple[str, TemplateKey]
@@ -60,6 +61,7 @@ class Addons(TypedDict):
 class Config(TypedDict):
     languages: dict[LanguageStr, LanguageConfig]
     resources: list[ResourceStr]
+    authorities: list[AuthorityStr]
     paths: Paths
     mod_paths: Paths
     missing_sprites: Optional[MissingSpritesConfig]

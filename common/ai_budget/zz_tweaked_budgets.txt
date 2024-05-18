@@ -174,22 +174,6 @@ tec_expenditure_zro_blockers = {	# extremehigh and priority because psionics
 		}
 	}
 
-	tec_minerals_expenditure_starbases_high = {
-		resource = minerals
-		type = expenditure
-		category = stations
-
-		potential = {
-			resource_stockpile_compare = { resource = minerals value >= 2000 }
-			tec_is_biohive = yes
-			is_lithoid_empire = yes
-			tec_uses_food_buildings = no
-		}
-
-		weight = {
-			weight = 0.5
-		}
-	}
 # /
 
 # Food for buildings and decisions
@@ -207,7 +191,11 @@ tec_expenditure_zro_blockers = {	# extremehigh and priority because psionics
 		}
 
 		weight = {
-			weight = 0.5
+			weight = 0.8
+		}
+
+		desired_min = {
+			base = 600
 		}
 	}
 
@@ -223,7 +211,11 @@ tec_expenditure_zro_blockers = {	# extremehigh and priority because psionics
 		}
 
 		weight = {
-			weight = 0.8
+			weight = 1
+		}
+
+		desired_min = {
+			base = 800
 		}
 	}
 
@@ -238,7 +230,11 @@ tec_expenditure_zro_blockers = {	# extremehigh and priority because psionics
 		}
 
 		weight = {
-			weight = 0.6
+			weight = 1.8
+		}
+
+		desired_min = {
+			base = 1000
 		}
 	}
 # /
@@ -274,7 +270,7 @@ tec_expenditure_zro_blockers = {	# extremehigh and priority because psionics
 		}
 
 		weight = {
-			weight = 0.4
+			weight = 0.25
 		}
 	}
 
@@ -289,7 +285,7 @@ tec_expenditure_zro_blockers = {	# extremehigh and priority because psionics
 		}
 
 		weight = {
-			weight = 0.5
+			weight = 0.15
 		}
 	}
 
@@ -320,7 +316,7 @@ tec_expenditure_zro_blockers = {	# extremehigh and priority because psionics
 		}
 	
 		weight = {
-			weight = 0.1
+			weight = 0.15
 		}
 	}
 	
@@ -335,7 +331,7 @@ tec_expenditure_zro_blockers = {	# extremehigh and priority because psionics
 		}
 	
 		weight = {
-			weight = 0.05
+			weight = 0.1
 		}
 	}
 # /
@@ -346,6 +342,7 @@ tec_food_expenditure_decisions = {
 	category = decisions
 
 	potential = {
+		tec_uses_food_buildings = no
 		resource_stockpile_compare = { resource = food value >= 500 }
 	}
 
@@ -363,12 +360,93 @@ tec_food_expenditure_decision_doit = {
 		resource_stockpile_compare = { resource = food value >= 500 }
 		AND = {
 			is_ai = yes
+			tec_uses_food_buildings = no
 			has_country_flag = tec_ai_use_food_for_worlds
 		}
 	}
 
 	weight = {
 		weight = 0.8
+	}
+}
+
+#food user fix since ratios were way too high for them
+
+food_expenditure_buffer_food_user = { # Buffer, will not be spent
+	resource = food
+	type = expenditure
+	category = buffer
+
+	potential = {
+		tec_uses_food_buildings = yes
+	}
+
+	weight = {
+		weight = 0.05
+	}
+}
+
+tec_food_expenditure_decisions_food_user = {
+	resource = food
+	type = expenditure
+	category = decisions
+
+	potential = {
+		tec_uses_food_buildings = yes
+		resource_stockpile_compare = { resource = food value >= 500 }
+	}
+
+	weight = {
+		weight = 0.1
+	}
+}
+
+tec_food_expenditure_decision_doit_food_user = {
+	resource = food
+	type = expenditure
+	category = decisions
+
+	potential = {
+		resource_stockpile_compare = { resource = food value >= 500 }
+		AND = {
+			is_ai = yes
+			tec_uses_food_buildings = yes
+			has_country_flag = tec_ai_use_food_for_worlds
+		}
+	}
+
+	weight = {
+		weight = 0.1
+	}
+}
+
+#Colonies for food empire, more at low food, lower at higher food
+#It sometimes happened that the AI was locked during war, making it stockpile budget for colonies it couldn't spend. This fixes that.
+#slightly reduced over vanilla
+food_expenditure_colonies_expand_food_user = {
+	resource = food
+	type = expenditure
+	category = colonies
+
+	potential = {
+		is_machine_empire = no
+		is_lithoid_empire = no
+		tec_uses_food_buildings = yes
+		NOT = { has_origin = origin_tree_of_life }
+		ai_colonize_plans > 0
+		has_resource = { type = food amount > 400 }
+		has_monthly_income = {
+			resource = food
+			value > 0
+		}
+	}
+
+	weight = {
+		weight = 1.0
+	}
+
+	desired_max = {
+		base = 550
 	}
 }
 
@@ -460,6 +538,52 @@ tec_energy_expenditure_starbases_high = {
 
 	weight = {
 		weight = 0.5
+	}
+}
+
+tec_energy_expenditure_stations_low = {
+	resource = energy
+	type = expenditure
+	category = stations
+
+	potential = {
+		tec_uses_energy_buildings = yes
+		resource_stockpile_compare = { resource = energy value < 1000 }
+	}
+
+	weight = {
+		weight = 0.2
+	}
+}
+
+tec_energy_expenditure_stations_med = {
+	resource = energy
+	type = expenditure
+	category = stations
+
+	potential = {
+		tec_uses_energy_buildings = yes
+		resource_stockpile_compare = { resource = energy value >= 1000 }
+		resource_stockpile_compare = { resource = energy value < 2000 }
+	}
+
+	weight = {
+		weight = 0.15
+	}
+}
+
+tec_energy_expenditure_stations_high = {
+	resource = energy
+	type = expenditure
+	category = stations
+
+	potential = {
+		tec_uses_energy_buildings = yes
+		resource_stockpile_compare = { resource = energy value >= 2000 }
+	}
+
+	weight = {
+		weight = 0.1
 	}
 }
 
