@@ -328,8 +328,62 @@ namespace = tec_ascension
 			# /
 		}
 	}
+	country_event = { # Synthetic Age picked
+		id = tec_ascension.30
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			has_ascension_perk = ap_synthetic_age
+			NOR = {
+				# Evolved
+				has_country_flag = ap_synthetic_age_singularity
+				# Vanilla short-transformation paths
+				has_country_flag = ap_synthetic_age_modularity
+				has_country_flag = ap_synthetic_age_nanites
+				has_country_flag = ap_synthetic_age_virtual
+			}
+		}
+
+		immediate = {
+			set_country_flag = ap_synthetic_age
+			# Global controller
+				event_target:global_event_country = {
+					change_variable = {
+						which = tec_number_of_technoascended_empires
+						value = 1
+					}
+				}
+			# /
+			# Situation
+				# Note: Directly jumps into the event for now - TODO ASCENSION
+				if = {
+					limit = {
+						has_country_flag = tec_advanced_ascension
+					}
+					tec_give_t1_synthetic_age_effect = yes
+				}
+				else = {
+					country_event = {
+						id = tec_ascension.301
+					}
+				}
+			# /	
+			# Techs
+				if = {	# Robomodding
+					limit = {
+						NOR = {
+							has_tech_option = tech_robomodding_m
+							has_technology = tech_robomodding_m
+						}
+					}
+					add_research_option = tech_robomodding_m
+				}
+			# /
+		}
+	}
 	# TODO ASCENSION check and confirm
-	# TODO ASCENSION Synthetic age?
  # /
 
  # Gate situations
@@ -3690,7 +3744,7 @@ namespace = tec_ascension
 		title = "tec_ascension.301.name"
 		# Descs
 			# Regular
-			desc = {
+			desc = {	# Individualist machines
 				text = "tec_ascension.301.desc.regular"
 				trigger = {
 					is_machine_empire = no
@@ -3754,17 +3808,9 @@ namespace = tec_ascension
 					icon_background = GFX_situation_approach_bg_yellow
 					text = tec_situation_final_decision
 				}
-				trigger = {
-					hidden_trigger = {
-						is_gestalt = yes
-						NOT = {
-							has_valid_civic = civic_machine_servitor
-						}
-					}
-				}
 				event_target:tec_target_country = {
 					start_situation = {
-						type = situation_tec_ascension_technosynthetics_neutral_t1
+						type = situation_tec_ascension_technosynthetics_neutral_t1_machine
 						target = event_target:tec_target_country.capital_scope
 						effect = {
 							save_event_target_as = new_situation
@@ -3778,6 +3824,7 @@ namespace = tec_ascension
 				if = {
 					limit = {
 						hidden_trigger = {
+							# TODO ASCENSION
 							always = no
 						}
 					}
@@ -3786,11 +3833,15 @@ namespace = tec_ascension
 				if = {
 					limit = {
 						hidden_trigger = {
+							# TODO ASCENSION
 							always = no
 							is_machine_empire = yes
 						}
 					}
 					custom_tooltip = "tec_situation_slower_notech_machines"
+				}
+				ai_chance = {
+					factor = 1
 				}
 			}
 			option = {	# Submit to a transformation
@@ -3801,13 +3852,37 @@ namespace = tec_ascension
 					icon_background = GFX_situation_approach_bg_yellow
 					text = tec_situation_final_decision
 				}
-				trigger = {
-					always = no
-					# TODO MACHINE AGE
+				allow = {
+					has_machine_age_dlc = yes
 				}
-				event_target:new_situation = {
-					set_situation_locked = yes
-					set_situation_approach = situation_tec_ascension_technosynthetics_neutral_t1_approach_fast
+				if = {
+					limit = {
+						hidden_trigger = {
+							# TODO ASCENSION
+							always = no
+						}
+					}
+					custom_tooltip = "tec_situation_slower_notech_synthetics"
+				}
+				if = {
+					limit = {
+						hidden_trigger = {
+							# TODO ASCENSION
+							always = no
+							is_machine_empire = yes
+						}
+					}
+					custom_tooltip = "tec_situation_slower_notech_machines"
+				}
+				hidden_effect = {
+					country_event = {
+						id = machine_age.4000
+					}
+				}
+				# Until Evolved ascensions are ready, lets funnel ais towards this one
+				# TODO ASCENSION
+				ai_chance = {
+					factor = 2
 				}
 			}
 		# /
@@ -3925,7 +4000,7 @@ namespace = tec_ascension
 				set_situation_approach = situation_tec_ascension_technosynthetics_robots_t1_machine_approach_fast
 			}
 			# Machine
-						option = {	# Fast
+			option = {	# Basic
 				name = "tec_ascension.30105.approach.normal.machine"
 				custom_tooltip = "tec_ascension.30105.approach.normal.machine.tooltip"
 				icon = {
@@ -3941,9 +4016,9 @@ namespace = tec_ascension
 						}
 					}
 				}
-				set_situation_approach = situation_tec_ascension_technosynthetics_robots_t1_machine_approach_basic
+				set_situation_approach = situation_tec_ascension_technosynthetics_neutral_t1_machine_approach_basic
 			}
-			option = {	# No Tech
+			option = {	# Fast
 				name = "tec_ascension.30105.approach.fast.machine"
 				custom_tooltip = "tec_ascension.30105.approach.fast.machine.tooltip"
 				icon = {
@@ -3959,7 +4034,7 @@ namespace = tec_ascension
 						}
 					}
 				}
-				set_situation_approach = situation_tec_ascension_technosynthetics_robots_t1_machine_approach_fast
+				set_situation_approach = situation_tec_ascension_technosynthetics_neutral_t1_machine_approach_fast
 			}
 		# /
 	}
