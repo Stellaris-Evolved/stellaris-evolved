@@ -23,11 +23,19 @@ is_new_colony = {
 
 # This = pop
 pop_generates_crime = {
-	tec_pop_generates_crime_trigger = { cached = yes }
+	inline_script = {
+	    script = tec_read_cache
+	    scope = pop
+	    trigger = tec_pop_generates_crime_trigger
+	}
 }
 
 can_vote_in_democratic_election = {
-	tec_can_vote_in_democratic_election_trigger = { cached = yes }
+	inline_script = {
+		script = tec_read_cache
+		scope = pop
+		trigger = tec_can_vote_in_democratic_election_trigger
+	}
 }
 
 #Root = planet
@@ -407,7 +415,7 @@ can_species_be_assembled = {
 			}
 		}
 	}
-	tec_can_assemble_species_due_to_purity_assembly_policy = yes
+	# tec_can_assemble_species_due_to_purity_assembly_policy = yes
 	has_population_control = {
 		type = no
 		country = root.owner
@@ -491,22 +499,29 @@ can_species_be_assembled = {
 				}
 			}
 			# PD
-				else_if = {
-					limit = {
-						has_planetary_diversity = yes
-						is_organic_fourschildren = yes
-					}
-					root = {
-						# Event 'clones.3' should cover this, but extra safety check.
-						has_building = @building_techno_04_clone_vat
-						NOT = {
-							check_variable = {
-								which = techno_pops_missing
-								value = 0
+				inline_script = {
+					script = conditional/tec_number
+					value = @has_planetary_diversity_unique_worlds
+					equal = 1
+					code = "
+						else_if = {
+							limit = {
+								has_planetary_diversity = yes
+								is_organic_fourschildren = yes
+							}
+							root = {
+								# Event 'clones.3' should cover this, but extra safety check.
+								has_building = @building_techno_04_clone_vat
+								NOT = {
+									check_variable = {
+										which = techno_pops_missing
+										value = 0
+									}
+								}
 							}
 						}
-					}
-				} 
+					"
+				}
 			# /
 			else = {	# Regular assembly
 				root = {
@@ -635,20 +650,35 @@ can_fill_drone_job = {
 #this/root = pop
 #checked if job's possible_precalc = can_fill_worker_job
 can_fill_worker_job = {
-	can_fill_worker_job_trigger = { cached = yes }
+	inline_script = {
+		script = tec_read_cache_tooltip
+		scope = pop
+		trigger = can_fill_worker_job_trigger
+		tooltip = WORKER_JOB_TRIGGER
+	}
 }
 
 #this/root = pop
 #checked if job's possible_precalc = can_fill_specialist_job
 can_fill_specialist_job = {
-	can_fill_specialist_job_trigger = { cached = yes }
+	inline_script = {
+		script = tec_read_cache_tooltip
+		scope = pop
+		trigger = can_fill_specialist_job_trigger
+		tooltip = SPECIALIST_JOB_TRIGGER
+	}
 	# Defined in 01_scripted_triggers_jobs.txt
 }
 
 #this/root = pop
 #checked if job's possible_precalc = can_fill_ruler_job
 can_fill_ruler_job = {
-	can_fill_ruler_job_trigger = { cached = yes }
+	inline_script = {
+		script = tec_read_cache_tooltip
+		scope = pop
+		trigger = can_fill_worker_job_trigger
+		tooltip = TEC_RULER_JOB_TRIGGER_DYNAMIC
+	}
 }
 # -------------------------- Megacorp rules
 # This = country
