@@ -95,51 +95,153 @@ namespace = tec_megastructures
 	# From = Megastructure
 	# FromFrom = System
 	# FromFromFrom = Fleet
-	#country_event = {	
-	#	id = tec_megastructures.10
-	#	hide_window = yes
-	#	location = from
+	country_event = {	
+		id = tec_megastructures.10
+		hide_window = yes
+		location = from
 
-	#	is_triggered_only = yes
+		is_triggered_only = yes
 
-	#	trigger = {
-	#		NOT = {
-	#			has_modifier = modifier_tec_mega_scaling
-	#		}
-	#	}
-	#	immediate = {
-	#		from = {
-	#			add_modifier = {
-	#				modifier = modifier_tec_mega_scaling
-	#				multiplier = value:tec_mega_scaling
-	#				# TODO HABITAT REWORK - scripted value
-	#			}
-	#		}
-	#	}
-	#}
+		trigger = {
+			NOT = {
+				has_modifier = modifier_tec_mega_scaling
+			}
+		}
+		immediate = {
+			from = {
+				add_modifier = {
+					modifier = modifier_tec_mega_scaling
+					multiplier = value:tec_mega_scaling|SCOPE|event_target:tec_habitat_of_@from.solar_system|
+				}
+			}
+		}
+	}
 
 	# on_megastructure_upgraded
 	# Root = Country
 	# From = Megastructure
 	# FromFrom = System
-	#country_event = {	# Recalcs value
-	#	id = tec_megastructures.15
-	#	hide_window = yes
-	#	location = from
+	country_event = {	# Recalcs value
+		id = tec_megastructures.15
+		hide_window = yes
+		location = from
 
-	#	is_triggered_only = yes
+		is_triggered_only = yes
 
-	#	immediate = {
-	#		# recalcs the mega scaling
-	#		from = {
-	#			add_modifier = {
-	#				modifier = modifier_tec_mega_scaling
-	#				multiplier = value:tec_mega_scaling
-	#				# TODO HABITAT REWORK - scripted value
-	#			}
-	#		}
-	#	}
-	#}
+		immediate = {
+			# recalcs the mega scaling
+			from = {
+				add_modifier = {
+					modifier = modifier_tec_mega_scaling
+					multiplier = value:tec_mega_scaling|SCOPE|event_target:tec_habitat_of_@from.solar_system|
+				}
+			}
+		}
+	}
+
+	# On monthly pulse country - debug purposes
+	country_event = {	# Recalcs value
+		id = tec_megastructures.20
+		hide_window = yes
+		location = from
+
+		is_triggered_only = yes
+
+		immediate = {
+			# recalcs the mega scaling
+			every_owned_megastructure = {
+				limit = {
+					solar_system = {
+						is_capital_system = no
+					}
+					NOT = {
+						tec_is_non_productive_megastructure = yes
+					}
+				}
+				add_modifier = {
+					modifier = modifier_tec_mega_scaling
+					multiplier = value:tec_mega_scaling|SCOPE|event_target:tec_habitat_of_@solar_system|
+				}
+				set_megastructure_flag = non_capital_megastructureTEST
+			}
+			# for some reason capiotal ones need a diff scoping
+			every_owned_megastructure = {
+				limit = {
+					solar_system = {
+						is_capital_system = yes
+					}
+					NOT = {
+						tec_is_non_productive_megastructure = yes
+					}
+				}
+				add_modifier = {
+					modifier = modifier_tec_mega_scaling
+					multiplier = value:tec_mega_scaling|SCOPE|event_target:tec_habitat_of_@capital_scope.solar_system|
+				}
+				set_megastructure_flag = capital_megastructureTEST
+			}
+		}
+	}
+
+	#on_colony_monthly_pulse 
+	planet_event = {	# Recalcs value
+		id = tec_megastructures.25
+		hide_window = yes
+		location = from
+
+		is_triggered_only = yes
+
+		trigger = {
+			uses_district_set = habitat
+			check_modifier_value = {
+				modifier = tec_mega_production_mult
+				value > 0
+			}
+		}
+
+		immediate = {
+			set_timed_planet_flag = {
+				flag = tec_on_colony_monthly_pulse
+				days = 30
+			}
+			owner = {
+				# recalcs the mega scaling
+				every_owned_megastructure = {
+					limit = {
+						solar_system = {
+							is_same_value = root.solar_system
+							is_capital_system = no
+						}
+						NOT = {
+							tec_is_non_productive_megastructure = yes
+						}
+					}
+					add_modifier = {
+						modifier = modifier_tec_mega_scaling
+						multiplier = value:tec_mega_scaling|SCOPE|event_target:tec_habitat_of_@solar_system|
+					}
+					set_megastructure_flag = non_capital_megastructureTEST
+				}
+				# for some reason capiotal ones need a diff scoping
+				every_owned_megastructure = {
+					limit = {
+						solar_system = {
+							is_same_value = root.solar_system
+							is_capital_system = yes
+						}
+						NOT = {
+							tec_is_non_productive_megastructure = yes
+						}
+					}
+					add_modifier = {
+						modifier = modifier_tec_mega_scaling
+						multiplier = value:tec_mega_scaling|SCOPE|event_target:tec_habitat_of_@capital_scope.solar_system|
+					}
+					set_megastructure_flag = capital_megastructureTEST
+				}
+			}
+		}
+	}
 
 # /
 
@@ -147,11 +249,74 @@ namespace = tec_megastructures
 # ------ ESPECIFIC
 
 # ------------------------------------------------- Habitats
-# The AI always picks the 3 menial and research options successively (i think) upon having a habitat, the rest are disallowed
-# If it needs anything else, then it can use a building to make some
 
 namespace = tec_habitats
+	# Marks habitat as global event target - on_colonized
+	# Scope = Planet
+	planet_event = {
+		id = tec_habitats.10
+		hide_window = yes
+		is_triggered_only = yes
+		location = this
+		
+		immediate = {
+			solar_system = {
+				save_event_target_as = tec_habitat_system
+			}
+			save_event_target_as = tec_habitat_of_@event_target:tec_habitat_system
+			set_planet_flag = tec_habitat_of_@event_target:tec_habitat_system
+		}
+	}
+	# Backup - on_megastructure_built - scans and checks
+	# Root = Country
+	# From = Megastructure
+	# FromFrom = System
+	# FromFromFrom = Fleet
+	# Initial Ring World Built
+	country_event = {
+		id = tec_habitats.11
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			FROM = {
+				OR = {
+					is_megastructure_type = habitat_central_complex
+					is_megastructure_type = habitat_central_complex_restored
+				}
+			}
+		}
+
+		immediate = {
+			fromfrom = {	# System
+				# Delayed event because habitat generation is triggered after
+				system_event = {
+					id = tec_habitats.12
+					days = 2
+				}
+			}
+		}
+	}
+	system_event = {
+		id = tec_habitats.12
+		hide_window = yes
+		is_triggered_only = yes
+
+		immediate = {
+			save_event_target_as = tec_habitat_system
+			random_system_planet = {
+				limit = {
+					is_planet_class = pc_habitat
+				}
+				save_global_event_target_as = tec_habitat_of_@event_target:tec_habitat_system
+				set_planet_flag = tec_habitat_of_@event_target:tec_habitat_system
+			}
+		}
+	}
+
 	# Specialize events
+	# The AI always picks the 3 menial and research options successively (i think) upon having a habitat, the rest are disallowed
+	# If it needs anything else, then it can use a building to make some
 	planet_event = {
 		id = tec_habitats.100
 		title = tec_habitats.100.name
