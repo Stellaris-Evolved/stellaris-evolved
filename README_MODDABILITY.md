@@ -81,17 +81,18 @@ inline_script = {
 * serente
 * kes
 * modded_other
+* tec_experimental
 
 ## Current supported scripted_triggers
 
-* [tec_blocks_industrial_designations](common/scripted_triggers/zzz_evolved_scripted_triggers.txt#L4559)
-* [tec_blocks_non_industrial_designations](common/scripted_triggers/zzz_evolved_scripted_triggers.txt#L4573)
-* [tec_blocks_regular_designations](common/scripted_triggers/zzz_evolved_scripted_triggers.txt#L4519)
-* [tec_blocks_rural_designations](common/scripted_triggers/zzz_evolved_scripted_triggers.txt#L4546)
-* [tec_blocks_urban_designations](common/scripted_triggers/zzz_evolved_scripted_triggers.txt#L4531)
-* [tec_country_has_autocratic_authority](common/scripted_triggers/zzz_evolved_country_scripted_triggers.txt#L1792)
-* [tec_country_has_democratic_authority](common/scripted_triggers/zzz_evolved_country_scripted_triggers.txt#L1772)
-* [tec_country_has_oligarchic_authority](common/scripted_triggers/zzz_evolved_country_scripted_triggers.txt#L1782)
+* [tec_blocks_industrial_designations](common/scripted_triggers/zzz_evolved_scripted_triggers.txt#L4576)
+* [tec_blocks_non_industrial_designations](common/scripted_triggers/zzz_evolved_scripted_triggers.txt#L4590)
+* [tec_blocks_regular_designations](common/scripted_triggers/zzz_evolved_scripted_triggers.txt#L4536)
+* [tec_blocks_rural_designations](common/scripted_triggers/zzz_evolved_scripted_triggers.txt#L4563)
+* [tec_blocks_urban_designations](common/scripted_triggers/zzz_evolved_scripted_triggers.txt#L4548)
+* [tec_country_has_autocratic_authority](common/scripted_triggers/zzz_evolved_country_scripted_triggers.txt#L1790)
+* [tec_country_has_democratic_authority](common/scripted_triggers/zzz_evolved_country_scripted_triggers.txt#L1771)
+* [tec_country_has_oligarchic_authority](common/scripted_triggers/zzz_evolved_country_scripted_triggers.txt#L1780)
 * [tec_has_artisan_upkeep_planet_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L429)
 * [tec_has_artisan_upkeep_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L420)
 * [tec_has_bureaucratic_buildings_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L333)
@@ -105,6 +106,7 @@ inline_script = {
 * [tec_has_enforcer_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L22)
 * [tec_has_entertainer_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L7)
 * [tec_has_farmer_planet_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L201)
+* [tec_has_farmer_production_planet_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L448)
 * [tec_has_farmer_production_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L438)
 * [tec_has_farmer_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L183)
 * [tec_has_forced_living_standard_civic](common/scripted_triggers/zzz_evolved_country_scripted_triggers.txt#L636)
@@ -117,6 +119,7 @@ inline_script = {
 * [tec_has_maintenance_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L98)
 * [tec_has_matter_miner](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L267)
 * [tec_has_miner_planet_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L234)
+* [tec_has_miner_production_planet_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L467)
 * [tec_has_miner_production_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L457)
 * [tec_has_miner_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L217)
 * [tec_has_monument_buildings_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L357)
@@ -134,8 +137,10 @@ inline_script = {
 * [tec_has_spy_civic](common/scripted_triggers/zzz_evolved_country_scripted_triggers.txt#L1147)
 * [tec_has_stronghold_buildings_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L378)
 * [tec_has_technician_planet_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L303)
+* [tec_has_technician_production_planet_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L488)
 * [tec_has_technician_production_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L478)
 * [tec_has_technician_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L286)
+* [tec_has_temple_swap_exception](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L496)
 * [tec_has_warrior_drone_swap](common/scripted_triggers/zzz_evolved_swaps_triggers.txt#L126)
 * [tec_is_special_researcher_empire](common/scripted_triggers/zzz_evolved_country_scripted_triggers.txt#L161)
 * [tec_is_spiritualist_main_cult](common/scripted_triggers/zzz_evolved_country_scripted_triggers.txt#L331)
@@ -144,15 +149,15 @@ inline_script = {
 
 ## Current supported scripted_effects
 
-* [tec_cache_building_triggers](common/scripted_effects/zz_evolved_scripted_effects.txt#L196)
-* [tec_cache_capital_triggers](common/scripted_effects/zz_evolved_scripted_effects.txt#L158)
-* [tec_cache_colony_triggers](common/scripted_effects/zz_evolved_scripted_effects.txt#L235)
-* [tec_cache_combined_values](common/scripted_effects/zz_evolved_scripted_effects.txt#L203)
-* [tec_cache_country_civic_triggers](common/scripted_effects/zz_evolved_scripted_effects.txt#L483)
-* [tec_cache_country_monthly_triggers](common/scripted_effects/zz_evolved_scripted_effects.txt#L415)
+* [tec_cache_building_triggers](common/scripted_effects/zz_evolved_scripted_effects.txt#L230)
+* [tec_cache_capital_triggers](common/scripted_effects/zz_evolved_scripted_effects.txt#L175)
+* [tec_cache_colony_triggers](common/scripted_effects/zz_evolved_scripted_effects.txt#L307)
+* [tec_cache_combined_values](common/scripted_effects/zz_evolved_scripted_effects.txt#L256)
+* [tec_cache_country_civic_triggers](common/scripted_effects/zz_evolved_scripted_effects.txt#L661)
+* [tec_cache_country_monthly_triggers](common/scripted_effects/zz_evolved_scripted_effects.txt#L566)
 * [tec_cache_planet_type_triggers](common/scripted_effects/zz_evolved_scripted_effects.txt#L43)
-* [tec_cache_pop_triggers](common/scripted_effects/zz_evolved_scripted_effects.txt#L310)
-* [tec_cache_species_traits_triggers](common/scripted_effects/zz_evolved_scripted_effects.txt#L393)
+* [tec_cache_pop_triggers](common/scripted_effects/zz_evolved_scripted_effects.txt#L425)
+* [tec_cache_species_traits_triggers](common/scripted_effects/zz_evolved_scripted_effects.txt#L528)
 
 ## Current supported inline_scripts
 
@@ -298,7 +303,6 @@ inline_script = {
 * [mod_support/tec_auth_corporate_swaps](common/inline_scripts/mod_support/tec_auth_swaps.txt#L10)
 * [mod_support/tec_auth_democratic_swaps](common/inline_scripts/mod_support/tec_auth_swaps.txt#L10)
 * [mod_support/tec_auth_dictatorial_swaps](common/inline_scripts/mod_support/tec_auth_swaps.txt#L10)
-* [mod_support/tec_auth_direct_democratic_swaps](common/inline_scripts/mod_support/tec_auth_swaps.txt#L10)
 * [mod_support/tec_auth_hive_mind_swaps](common/inline_scripts/mod_support/tec_auth_swaps.txt#L10)
 * [mod_support/tec_auth_imperial_swaps](common/inline_scripts/mod_support/tec_auth_swaps.txt#L10)
 * [mod_support/tec_auth_machine_intelligence_swaps](common/inline_scripts/mod_support/tec_auth_swaps.txt#L10)
