@@ -16,7 +16,8 @@ to create a variable with your `suffix` in it like below.
 
 ### Scripted triggers and effects
 
-Scripted triggers that have the `tec_trigger_mod_support`, and scripted effects that have the `tec_effect_mod_support`
+Scripted triggers that have an inline_script called in them like `mod_support/tec_trigger_include`, and scripted effects 
+that have the  `mod_support/tec_effect_include` or script value that have `mod_support/tec_value_include`
 inside their logic, usually inside an `OR` statement can be extended by creating a scripted trigger
 of your own with a suffix appended to the trigger/effect name.
 
