@@ -91,7 +91,7 @@ district_hab_housing = {
 
 	# Modifiers
 		planet_modifier = {
-			planet_housing_add = 5
+			planet_housing_add = 4
 			planet_max_buildings_add = 0.25
 		}
 		# Planet
@@ -101,7 +101,7 @@ district_hab_housing = {
 						tec_is_upgraded_habitat = yes
 					}
 				}
-				planet_housing_add = 3
+				planet_housing_add = 4
 				planet_max_buildings_add = 0.25
 			}
 			triggered_planet_modifier = {
@@ -161,9 +161,13 @@ district_hab_housing = {
 
 # --------------- Industrial
 district_hab_industrial = {
-	#icon = district_arcology_civilian_industry
+	icon = district_arcology_arms_industry
 	base_buildtime = @hab_time
 	is_capped_by_modifier = no
+
+	prerequisites = {
+		tech_basic_industry
+	}
 
 	show_on_uncolonized = {
 		tec_uses_habitat_districts = yes
@@ -174,23 +178,20 @@ district_hab_industrial = {
 		tec_uses_habitat_districts = yes
 		tec_is_arcology_habitat = no
 	}
-
-	prerequisites = {
-		tech_basic_industry
-	}
 	
-	allow = {
-		tec_ai_force_research_habitat_district = no
-	}
+	#allow = {
+	#	tec_ai_force_research_habitat_district = no
+	#}
 
-	destroy_trigger = {
-		OR = {
-			tec_ai_force_research_habitat_district = yes
-		}
-	}
+	#destroy_trigger = {
+	#	OR = {
+	#		tec_ai_force_research_habitat_district = yes
+	#	}
+	#}
 
 	conversion_ratio = 0.5
 	inline_script = districts/convert_to/tec_industrial_districts
+	inline_script = districts/convert_to/tec_factory_districts
 	
 	resources = {
 		category = planet_districts_hab_industrial
@@ -210,19 +211,20 @@ district_hab_industrial = {
 		inline_script = districts/resources/tec_unleashed_industrialization_resources
 		inline_script = districts/resources/tec_industrial_maintenance_upkeep
 	}
-
-	# Indication
-	triggered_desc = {
-		trigger = {
-			exists = owner
-		}
-		text = tec_planet_spec_change_jobs_district
-	}
 	
 	# Standard
 		planet_modifier = {
-			planet_housing_add = 3
+			planet_housing_add = 2
 			planet_max_buildings_add = 0.25
+		}
+		triggered_planet_modifier = {
+			potential = {
+				exists = owner
+				owner = {
+					is_void_dweller_empire = yes
+				}
+			}
+			planet_housing_add = 1
 		}
 	# /
 
@@ -236,37 +238,171 @@ district_hab_industrial = {
 		inline_script = districts/effects/tec_industrial_maintenance
 	# /
 
+	# Note: 2 jobs, vd gets 3
 	inline_script = {
-		script = districts/tec_industrial_split_jobs
-		count = 1
-		mult = 1
+		script = jobs/tec_foundry
+		count = 2
+		mult = value:tec_machine_world_scaling
 		trigger = ""
 		display = with_desc
 	}
-
-	# Note: 2 jobs, in vanilla its 3
+	inline_script = {
+		script = jobs/tec_foundry
+		count = 2
+		mult = 1
+		trigger = "
+			exists = owner
+			owner = {
+				is_void_dweller_empire = yes
+			}
+		"
+		display = with_desc
+	}
 
 	inline_script = districts/tec_aibait_habitat_district
 }
 
-#district_tec_hab_factory
-
-district_tec_hab_logistic = {
+district_tec_hab_factory = {
+	icon = district_arcology_civilian_industry
 	base_buildtime = @hab_time
 	is_capped_by_modifier = no
-	exempt_from_ai_planet_specialization = yes
+
+	prerequisites = {
+		tech_basic_industry
+	}
+
+	show_on_uncolonized = {
+		exists = from
+		from = {
+			country_uses_consumer_goods = yes
+		}
+		tec_uses_habitat_districts = yes
+		tec_is_arcology_habitat = no
+	}
+	
+	potential = {
+		exists = owner
+		owner = {
+			country_uses_consumer_goods = yes
+		}
+		tec_uses_habitat_districts = yes
+		tec_is_arcology_habitat = no
+	}
+	
+	#allow = {
+	#	tec_ai_force_research_habitat_district = no
+	#}
+
+	#destroy_trigger = {
+	#	OR = {
+	#		tec_ai_force_research_habitat_district = yes
+	#	}
+	#}
+
+	conversion_ratio = 0.5
+	inline_script = districts/convert_to/tec_industrial_districts
+	inline_script = districts/convert_to/tec_factory_districts
+	
+	resources = {
+		category = planet_districts_hab_industrial
+
+		inline_script = {
+			script = districts/resources/tec_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_hab_cost
+			upkeep = @tec_district_hab_upkeep
+		}
+		upkeep = {
+			alloys = @tec_district_hab_upkeep_alloys
+		}
+
+		inline_script = districts/resources/tec_unleashed_industrialization_resources
+		inline_script = districts/resources/tec_industrial_maintenance_upkeep
+	}
+	
+	# Standard
+		planet_modifier = {
+			planet_housing_add = 2
+			planet_max_buildings_add = 0.25
+		}
+		triggered_planet_modifier = {
+			potential = {
+				exists = owner
+				owner = {
+					is_void_dweller_empire = yes
+				}
+			}
+			planet_housing_add = 1
+		}
+	# /
+
+	# Traditions
+		inline_script = districts/effects/tec_artifice_final_1
+	# /
+	# Civics
+		inline_script = districts/effects/tec_unleashed_industrialization
+	# /
+	# Edicts
+		inline_script = districts/effects/tec_industrial_maintenance
+	# /
+
+	# Note: 2 jobs, vd gets 3
+	inline_script = {
+		script = jobs/tec_artisan
+		count = 2
+		mult = value:tec_machine_world_scaling
+		trigger = ""
+		display = with_desc
+	}
+	inline_script = {
+		script = jobs/tec_artisan
+		count = 2
+		mult = 1
+		trigger = "
+			exists = owner
+			owner = {
+				is_void_dweller_empire = yes
+			}
+		"
+		display = with_desc
+	}
+
+	inline_script = districts/tec_aibait_habitat_district
+}
+
+district_tec_hab_logistic = {
+	#icon = district_arcology_civilian_industry
+	base_buildtime = @hab_time
+	is_capped_by_modifier = no
+
+	prerequisites = {
+		tech_basic_industry
+	}
 
 	show_on_uncolonized = {
 		tec_uses_habitat_districts = yes
 	}
-
+	
 	potential = {
 		tec_uses_habitat_districts = yes
 	}
+	
+	#allow = {
+	#	tec_ai_force_research_habitat_district = no
+	#}
 
-	allow = {
-	}
+	#destroy_trigger = {
+	#	OR = {
+	#		tec_ai_force_research_habitat_district = yes
+	#	}
+	#}
 
+	conversion_ratio = 0.5
+	inline_script = districts/convert_to/tec_industrial_districts
+	inline_script = districts/convert_to/tec_factory_districts
+	
 	resources = {
 		category = planet_districts_hab_industrial
 
@@ -283,82 +419,625 @@ district_tec_hab_logistic = {
 		}
 	}
 
-	# Modifiers
+	# Loc
+		triggered_desc = {
+			text = district_tec_hab_logistic_effect
+		}
+	# /
+	
+	# Standard
 		planet_modifier = {
-			planet_housing_add = 5
+			planet_housing_add = 2
 			planet_max_buildings_add = 0.25
 		}
-		# Planet
-			triggered_planet_modifier = {
-				potential = {
-					planet = {
-						tec_is_upgraded_habitat = yes
-					}
+		triggered_planet_modifier = {
+			potential = {
+				exists = owner
+				owner = {
+					is_void_dweller_empire = yes
 				}
-				planet_housing_add = 3
-				planet_max_buildings_add = 0.25
 			}
-			triggered_planet_modifier = {
-				potential = {
-					planet = {
-						tec_is_fully_upgraded_habitat = yes
-					}
-				}
-				planet_housing_add = 2
-			}
-		# /
-	# /
-	# Effect Types
-		inline_script = {
-			script = districts/type/tec_housing_generic
-			scale = 1
-			secondary_scale = 2
-			trigger = ""
-		}
-		inline_script = {
-			script = districts/type/tec_housing_habitat
-			scale = 1
-			secondary_scale = 2
-			trigger = ""
+			planet_housing_add = 1
 		}
 	# /
 
-	# Jobs
-		# Regular
-			inline_script = {
-				script = jobs/tec_clerk
-				count = 1
-				secondary_count = 1
-				mult = owner.value:hab_void_dweller_jobs
-				display = with_desc
-				trigger = ""
-			}
-		# /
-		# Gestalt
-			inline_script = {
-				script = jobs/tec_maintenance_drone
-				count = 1
-				mult = owner.value:hab_void_dweller_jobs
-				display = with_desc
-				trigger = ""
-			}
-		# /
+	# Traditions
+		inline_script = districts/effects/tec_artifice_final_1
 	# /
 
+	# Note: 2 jobs, vd gets 3
 	inline_script = {
-		script = districts/tec_aibait_housing
-		has_building_slots = "
-			always = yes
-		"
+		script = jobs/tec_megastructure_logistician
+		count = 1
+		mult = owner.value:hab_void_dweller_jobs
+		trigger = ""
+		display = with_desc
 	}
+	inline_script = {	# 2 extra for arcology
+		script = jobs/tec_megastructure_logistician
+		count = 1
+		mult = 2
+		trigger = "
+			has_planet_flag = tec_arcology_habitat
+		"
+		display = with_desc
+	}
+
+	inline_script = districts/tec_aibait_habitat_district
 }
 
 # --------------- Menial
+district_hab_energy = {
+	base_buildtime = @hab_time
+	is_capped_by_modifier = no
+
+	show_on_uncolonized = {
+		tec_uses_habitat_districts = yes
+		#has_planet_flag = energy_habitat
+		check_modifier_value = {
+			modifier = district_hab_energy_max
+			value > 0
+		}
+		tec_is_arcology_habitat = no
+	}
+
+	potential = {
+		tec_uses_habitat_districts = yes
+		#has_planet_flag = energy_habitat
+		check_modifier_value = {
+			modifier = district_hab_energy_max
+			value > 0
+		}
+		tec_is_arcology_habitat = no
+	}
+
+	allow = {
+		tec_ai_allow_generator_district = yes
+	}
+
+	destroy_trigger = {
+		OR = {
+			tec_ai_allow_generator_district = no
+		}
+	}
+
+	conversion_ratio = 0.5
+	inline_script = districts/convert_to/tec_generator_districts
+	inline_script = districts/convert_to/tec_trade_districts
+
+	resources = {
+		category = planet_districts_hab_energy
+
+		inline_script = {
+			script = districts/resources/tec_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_hab_cost
+			upkeep = @tec_district_hab_upkeep
+		}
+		upkeep = {
+			alloys = @tec_district_hab_upkeep_alloys
+		}
+
+		# New production
+			#inline_script = {
+			#	script = districts/resources/tec_hab_automation_energy
+			#	trigger = "
+			#		always = yes
+			#	"
+			#	base = 0
+			#	mult = 0.5
+			#}
+		# /
+		inline_script = {
+			script = districts/resources/tec_generate_basic_resources
+			resource = energy
+		}
+		# Improved Technician Empire Upkeep
+		inline_script = districts/resources/tec_improved_technician_empire_upkeep
+	}
+	# overlord_resources = {
+		#category = planet_requisitioned_energy
+		#produces = {
+		#	trigger = {
+		#		planet = {
+		#			has_planet_flag = has_energy_requisitorium
+		#		}
+		#	}
+		#	energy = @requisitorium_energy_overlord
+		#}
+	# }
+
+	# Modifiers
+		inline_script = {
+			script = districts/tec_habitat_scaling_district
+			district = district_hab_energy
+		}
+
+		# Improved Technician Empire Modifier
+		inline_script = districts/effects/tec_improved_technician_empire_bonus
+	# /
+
+	# Jobs
+		inline_script = {
+			script = jobs/tec_technician
+			regular_count = 1
+			regular_secondary_count = 1
+			hive_count = 1
+			hive_secondary_count = 1
+			machine_count = 1
+			machine_secondary_count = 1
+			mult = owner.value:hab_void_dweller_jobs
+			display = with_desc
+			trigger = "
+				always = yes
+			"
+		}
+		inline_script = {
+			script = jobs/tec_technician
+			regular_count = 1
+			regular_secondary_count = 0
+			hive_count = 1
+			hive_secondary_count = 1
+			machine_count = 1
+			machine_secondary_count = 0
+			mult = 1
+			display = no_desc
+			trigger = "
+				tec_is_fully_upgraded_habitat = yes
+			"
+		}
+		inline_script = {
+			script = jobs/tec_technician_secondary
+			regular_count = 1
+			hive_count = 1
+			machine_count = 1
+			mult = 1
+			display = with_desc
+			trigger = "
+				tec_is_fully_upgraded_habitat = yes
+			"
+		}
+		# Hive extra job
+		inline_script = {
+			script = jobs/tec_technician
+			regular_count = 0
+			regular_secondary_count = 0
+			hive_count = 1
+			hive_secondary_count = 0
+			machine_count = 0
+			machine_secondary_count = 0
+			mult = 1
+			display = no_desc
+			trigger = "
+				exists = owner
+				owner = { is_hive_empire = yes }
+			"
+		}
+	# /		
+
+	# Starnet
+	inline_script = {
+		script = districts/compat/tec_starnet_generator_district
+		count = 1
+	}
+
+	inline_script = districts/tec_aibait_habitat_district
+}
+
+district_hab_mining = {
+	base_buildtime = @hab_time
+	is_capped_by_modifier = no
+
+	show_on_uncolonized = {
+		tec_uses_habitat_districts = yes
+		#has_planet_flag = mining_habitat
+		check_modifier_value = {
+			modifier = district_hab_mining_max
+			value > 0
+		}
+		tec_is_arcology_habitat = no
+	}
+
+	potential = {
+		tec_uses_habitat_districts = yes
+		#has_planet_flag = mining_habitat
+		check_modifier_value = {
+			modifier = district_hab_mining_max
+			value > 0
+		}
+		tec_is_arcology_habitat = no
+	}
+
+	conversion_ratio = 0.5
+	inline_script = districts/convert_to/tec_industrial_districts
+	inline_script = districts/convert_to/tec_mining_districts
+
+	resources = {
+		category = planet_districts_hab_mining
+
+		inline_script = {
+			script = districts/resources/tec_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_hab_cost
+			upkeep = @tec_district_hab_upkeep
+		}
+		upkeep = {
+			alloys = @tec_district_hab_upkeep_alloys
+		}
+
+		inline_script = {
+			script = districts/resources/tec_generate_basic_resources
+			resource = minerals
+		}
+		# Improved Mining Empire Upkeep
+		inline_script = districts/resources/tec_improved_mining_empire_upkeep
+	}
+	# overlord_resources = {
+		#category = planet_requisitioned_minerals
+		#produces = {
+		#	trigger = {
+		#		planet = {
+		#			has_planet_flag = has_material_requisitorium
+		#		}
+		#	}
+		#	minerals = @requisitorium_minerals_overlord
+		#}
+	# }
+
+	# Modifiers
+		inline_script = {
+			script = districts/tec_habitat_scaling_district
+			district = district_hab_mining
+		}
+
+		# Improved Mining Empire Modifier
+		inline_script = districts/effects/tec_improved_mining_empire_bonus
+	# /
+
+	# Jobs
+		inline_script = {
+			script = jobs/tec_miner
+			regular_count = 1
+			regular_secondary_count = 1
+			hive_count = 1
+			hive_secondary_count = 1
+			machine_count = 1
+			machine_secondary_count = 1
+			mult = owner.value:hab_void_dweller_jobs
+			display = with_desc
+			trigger = "
+				always = yes
+			"
+		}
+		inline_script = {
+			script = jobs/tec_miner
+			regular_count = 1
+			regular_secondary_count = 0
+			hive_count = 1
+			hive_secondary_count = 1
+			machine_count = 1
+			machine_secondary_count = 0
+			mult = 1
+			display = no_desc
+			trigger = "
+				tec_is_fully_upgraded_habitat = yes
+			"
+		}
+		inline_script = {
+			script = jobs/tec_miner_secondary
+			regular_count = 1
+			hive_count = 1
+			machine_count = 1
+			mult = 1
+			display = with_desc
+			trigger = "
+				tec_is_fully_upgraded_habitat = yes
+			"
+		}
+		# Hive extra job
+		inline_script = {
+			script = jobs/tec_miner
+			regular_count = 0
+			regular_secondary_count = 0
+			hive_count = 1
+			hive_secondary_count = 0
+			machine_count = 0
+			machine_secondary_count = 0
+			mult = 1
+			display = no_desc
+			trigger = "
+				exists = owner
+				owner = { is_hive_empire = yes }
+			"
+		}
+	# /
+
+	# Starnet
+		inline_script = {
+			script = districts/compat/tec_starnet_mining_district
+			count = 1
+		}
+	# /
+
+	# AI
+		inline_script = districts/tec_aibait_habitat_district
+	# /
+}
+
+district_tec_hab_food = {		# Evolved
+	base_buildtime = @hab_time
+	is_capped_by_modifier = no
+
+	show_on_uncolonized = {
+		tec_uses_habitat_districts = yes
+		#has_planet_flag = tec_food_habitat
+		check_modifier_value = {
+			modifier = district_tec_hab_food_max
+			value > 0
+		}
+		tec_is_arcology_habitat = no
+	}
+
+	potential = {
+		tec_uses_habitat_districts = yes
+		#has_planet_flag = tec_food_habitat
+		check_modifier_value = {
+			modifier = district_tec_hab_food_max
+			value > 0
+		}
+		tec_is_arcology_habitat = no
+	}
+
+	allow = {
+		tec_ai_allow_farming_district = yes
+	}
+
+	destroy_trigger = {
+		OR = {
+			tec_ai_allow_farming_district = no
+		}
+	}
+
+	conversion_ratio = 0.5
+	inline_script = districts/convert_to/tec_farming_districts
+	inline_script = districts/convert_to/tec_industrial_districts
+
+	resources = {
+		category = planet_districts_hab_food
+
+		inline_script = {
+			script = districts/resources/tec_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_hab_cost
+			upkeep = @tec_district_hab_upkeep
+		}
+		upkeep = {
+			alloys = @tec_district_hab_upkeep_alloys
+		}
+
+		inline_script = {
+			script = districts/resources/tec_generate_basic_resources
+			resource = food
+		}
+		# Improved Farming Empire Upkeep
+		inline_script = districts/resources/tec_improved_farming_empire_upkeep
+	}
+	# overlord_resources = {
+	# 	category = planet_requisitioned_food
+	# 	produces = {
+	# 		trigger = {
+	# 			planet = {
+	# 				has_planet_flag = has_produce_requisitorium
+	# 			}
+	# 		}
+	# 		food = @requisitorium_food_overlord
+	# 	}
+	# }
+	
+	# Modifiers
+		inline_script = {
+			script = districts/tec_habitat_scaling_district
+			district = district_tec_hab_food
+		}
+
+		# Improved Farming Empire Modifier
+		inline_script = districts/effects/tec_improved_farming_empire_bonus
+	# /
+
+	# Jobs
+		inline_script = {
+			script = jobs/tec_farmer
+			regular_count = 1
+			regular_secondary_count = 1
+			hive_count = 1
+			hive_secondary_count = 1
+			machine_count = 1
+			machine_secondary_count = 1
+			mult = owner.value:hab_void_dweller_jobs
+			display = with_desc
+			trigger = "
+				always = yes
+			"
+		}
+		inline_script = {
+			script = jobs/tec_farmer
+			regular_count = 1
+			regular_secondary_count = 0
+			hive_count = 1
+			hive_secondary_count = 1
+			machine_count = 1
+			machine_secondary_count = 0
+			mult = 1
+			display = no_desc
+			trigger = "
+				tec_is_fully_upgraded_habitat = yes
+			"
+		}
+		inline_script = {
+			script = jobs/tec_farmer_secondary
+			regular_count = 1
+			hive_count = 1
+			machine_count = 1
+			mult = 1
+			display = with_desc
+			trigger = "
+				tec_is_fully_upgraded_habitat = yes
+			"
+		}
+		# Hive extra job
+		inline_script = {
+			script = jobs/tec_farmer
+			regular_count = 0
+			regular_secondary_count = 0
+			hive_count = 1
+			hive_secondary_count = 0
+			machine_count = 0
+			machine_secondary_count = 0
+			mult = 1
+			display = no_desc
+			trigger = "
+				exists = owner
+				owner = { is_hive_empire = yes }
+			"
+		}
+	# /
+
+	# Starnet
+		inline_script = {
+			script = districts/compat/tec_starnet_farming_district
+			count = 1
+		}
+	# /
+
+	# AI
+		inline_script = districts/tec_aibait_habitat_district
+	# /
+}
+
+# --------------- Deprecated but maybe reusable
+
+district_hab_science = {
+	base_buildtime = @hab_time
+	is_capped_by_modifier = no
+
+	prerequisites = {
+		tech_basic_science_lab_1
+	}
+
+	show_on_uncolonized = {
+		always = no
+		tec_uses_habitat_districts = yes
+		# Specs
+			has_planet_flag = research_habitat
+			tec_is_arcology_habitat = no
+		# /
+	}
+
+	potential = {
+		always = no
+		tec_uses_habitat_districts = yes
+		# Specs
+			has_planet_flag = research_habitat
+			tec_is_arcology_habitat = no
+		# /
+	}
+
+	allow = {
+		tec_allow_research_buildings_and_districts = yes
+	}
+
+	conversion_ratio = 0.5
+	inline_script = districts/convert_to/tec_research_districts
+	inline_script = districts/convert_to/tec_industrial_districts
+
+	resources = {
+		category = planet_districts_hab_research
+
+		inline_script = {
+			script = districts/resources/tec_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_hab_cost
+			upkeep = @tec_district_hab_upkeep
+		}
+		upkeep = {
+			alloys = @tec_district_hab_upkeep_alloys
+		}
+
+		# Base production
+		inline_script = {
+			script = districts/resources/tec_hab_automation_research
+			trigger = "
+				always = yes
+			"
+			base = 0
+			mult = 0.5
+		}
+	}
+
+	# Standard
+		inline_script = {
+			script = districts/tec_habitat_scaling_district
+			district = district_hab_science
+		}
+	# /
+
+	inline_script = {
+		script = districts/type/tec_research
+		scale = 0.5
+		secondary_scale = 0.5
+		mult = owner.value:hab_void_dweller_jobs
+		trigger = "
+			tec_is_upgraded_habitat = yes
+		"
+	}
+
+	# Jobs
+		inline_script = {
+			script = jobs/tec_researcher
+			count = 1
+			mult = 1
+			display = with_desc
+			trigger = ""
+		}
+
+		inline_script = {
+			script = jobs/tec_researcher
+			count = 1
+			mult = 1
+			display = no_desc
+			trigger = "
+				tec_is_upgraded_habitat = yes
+			"
+		}
+		inline_script = {
+			script = jobs/tec_researcher
+			count = 1
+			mult = 1
+			display = no_desc
+			trigger = "
+				tec_is_fully_upgraded_habitat = yes
+			"
+		}
+	# /
+
+	inline_script = districts/tec_aibait_habitat_district
+}
+
+
 district_tec_hab_extraction = {	# Evolved
 	base_buildtime = @hab_time
 	is_capped_by_modifier = no
 
 	show_on_uncolonized = {
+		always = no
 		tec_uses_habitat_districts = yes
 		check_variable = {
 			which = tec_hab_menial_districts
@@ -368,6 +1047,7 @@ district_tec_hab_extraction = {	# Evolved
 	}
 
 	potential = {
+		always = no
 		tec_uses_habitat_districts = yes
 		check_variable = {
 			which = tec_hab_menial_districts
@@ -527,668 +1207,6 @@ district_tec_hab_extraction = {	# Evolved
 	# /
 }
 
-district_tec_hab_food = {		# Evolved
-	base_buildtime = @hab_time
-	is_capped_by_modifier = no
-
-	show_on_uncolonized = {
-		tec_uses_habitat_districts = yes
-		has_planet_flag = tec_food_habitat
-		tec_is_arcology_habitat = no
-	}
-
-	potential = {
-		tec_uses_habitat_districts = yes
-		has_planet_flag = tec_food_habitat
-		tec_is_arcology_habitat = no
-	}
-
-	allow = {
-		#tec_ai_force_research_habitat_district = no
-		tec_ai_allow_farming_district = yes
-	}
-
-	destroy_trigger = {
-		OR = {
-			#tec_ai_force_research_habitat_district = yes
-			tec_ai_allow_farming_district = no
-		}
-	}
-
-	conversion_ratio = 0.5
-	inline_script = districts/convert_to/tec_farming_districts
-	inline_script = districts/convert_to/tec_industrial_districts
-
-	resources = {
-		category = planet_districts_hab_food
-
-		inline_script = {
-			script = districts/resources/tec_district_resource_cost
-			upkeep_trigger = "
-				always = yes
-			"
-			cost = @tec_district_hab_cost
-			upkeep = @tec_district_hab_upkeep
-		}
-		upkeep = {
-			alloys = @tec_district_hab_upkeep_alloys
-		}
-
-		# Base production
-			inline_script = {
-				script = districts/resources/tec_hab_automation_food
-				trigger = "
-					always = yes
-				"
-				base = 0
-				mult = 0.5
-			}
-		# /
-		inline_script = {
-			script = districts/resources/tec_generate_basic_resources
-			resource = food
-		}
-		# Improved Farming Empire Upkeep
-		inline_script = districts/resources/tec_improved_farming_empire_upkeep
-	}
-	# overlord_resources = {
-	# 	category = planet_requisitioned_food
-	# 	produces = {
-	# 		trigger = {
-	# 			planet = {
-	# 				has_planet_flag = has_produce_requisitorium
-	# 			}
-	# 		}
-	# 		food = @requisitorium_food_overlord
-	# 	}
-	# }
-	
-	# Modifiers
-		inline_script = {
-			script = districts/tec_habitat_scaling_district
-			district = district_tec_hab_food
-		}
-
-		# Improved Farming Empire Modifier
-		inline_script = districts/effects/tec_improved_farming_empire_bonus
-	# /
-
-	# Jobs
-		inline_script = {
-			script = jobs/tec_farmer
-			regular_count = 1
-			regular_secondary_count = 1
-			hive_count = 1
-			hive_secondary_count = 1
-			machine_count = 1
-			machine_secondary_count = 1
-			mult = 1
-			display = with_desc
-			trigger = "
-				tec_is_upgraded_habitat = yes
-			"
-		}
-		inline_script = {
-			script = jobs/tec_farmer
-			regular_count = 1
-			regular_secondary_count = 0
-			hive_count = 2
-			hive_secondary_count = 1
-			machine_count = 1
-			machine_secondary_count = 0
-			mult = 1
-			display = no_desc
-			trigger = "
-				OR = {
-					is_capital = yes
-					tec_is_fully_upgraded_habitat = yes
-				}
-			"
-		}
-		inline_script = {
-			script = jobs/tec_farmer_secondary
-			regular_count = 1
-			hive_count = 1
-			machine_count = 1
-			mult = 1
-			display = with_desc
-			trigger = "
-				OR = {
-					is_capital = yes
-					tec_is_fully_upgraded_habitat = yes
-				}
-			"
-		}
-	# /
-
-	# Starnet
-		inline_script = {
-			script = districts/compat/tec_starnet_farming_district
-			count = 1
-		}
-	# /
-
-	# AI
-		inline_script = districts/tec_aibait_habitat_district
-	# /
-}
-
-district_hab_energy = {
-	base_buildtime = @hab_time
-	is_capped_by_modifier = no
-
-	show_on_uncolonized = {
-		tec_uses_habitat_districts = yes
-		has_planet_flag = energy_habitat
-		tec_is_arcology_habitat = no
-	}
-
-	potential = {
-		tec_uses_habitat_districts = yes
-		has_planet_flag = energy_habitat
-		tec_is_arcology_habitat = no
-	}
-
-	#Removed tec_ai_force_research_habitat_district trigger because it is very troublesome for flexibility and forces the AI to make stupid choices
-	allow = {
-		#tec_ai_force_research_habitat_district = no
-		tec_ai_allow_generator_district = yes
-	}
-
-	destroy_trigger = {
-		OR = {
-			#tec_ai_force_research_habitat_district = yes
-			tec_ai_allow_generator_district = no
-		}
-	}
-
-	conversion_ratio = 0.5
-	inline_script = districts/convert_to/tec_generator_districts
-	inline_script = districts/convert_to/tec_trade_districts
-
-	resources = {
-		category = planet_districts_hab_energy
-
-		inline_script = {
-			script = districts/resources/tec_district_resource_cost
-			upkeep_trigger = "
-				always = yes
-			"
-			cost = @tec_district_hab_cost
-			upkeep = @tec_district_hab_upkeep
-		}
-		upkeep = {
-			alloys = @tec_district_hab_upkeep_alloys
-		}
-
-		# New production
-			inline_script = {
-				script = districts/resources/tec_hab_automation_energy
-				trigger = "
-					always = yes
-				"
-				base = 0
-				mult = 0.5
-			}
-		# /
-		inline_script = {
-			script = districts/resources/tec_generate_basic_resources
-			resource = energy
-		}
-		# Improved Technician Empire Upkeep
-		inline_script = districts/resources/tec_improved_technician_empire_upkeep
-	}
-	# overlord_resources = {
-	# 	category = planet_requisitioned_energy
-	# 	produces = {
-	# 		trigger = {
-	# 			planet = {
-	# 				has_planet_flag = has_energy_requisitorium
-	# 			}
-	# 		}
-	# 		energy = @requisitorium_energy_overlord
-	# 	}
-	# }
-
-	# Modifiers
-		inline_script = {
-			script = districts/tec_habitat_scaling_district
-			district = district_hab_energy
-		}
-
-		# Improved Technician Empire Modifier
-		inline_script = districts/effects/tec_improved_technician_empire_bonus
-	# /
-
-	# Jobs
-		inline_script = {
-			script = jobs/tec_technician
-			regular_count = 1
-			regular_secondary_count = 1
-			hive_count = 1
-			hive_secondary_count = 1
-			machine_count = 1
-			machine_secondary_count = 1
-			mult = 1
-			display = with_desc
-			trigger = "
-				OR = {
-					is_capital = yes
-					tec_is_fully_upgraded_habitat = no
-				}
-			"
-		}
-		inline_script = {
-			script = jobs/tec_technician
-			regular_count = 1
-			regular_secondary_count = 0
-			hive_count = 2
-			hive_secondary_count = 1
-			machine_count = 1
-			machine_secondary_count = 0
-			mult = 1
-			display = no_desc
-			trigger = "
-				OR = {
-					is_capital = yes
-					tec_is_fully_upgraded_habitat = yes
-				}
-			"
-		}
-		inline_script = {
-			script = jobs/tec_technician_secondary
-			regular_count = 1
-			hive_count = 1
-			machine_count = 1
-			mult = 1
-			display = with_desc
-			trigger = "
-				OR = {
-					is_capital = yes
-					tec_is_fully_upgraded_habitat = yes
-				}
-			"
-		}
-	# /		
-
-	# Starnet
-	inline_script = {
-		script = districts/compat/tec_starnet_generator_district
-		count = 1
-	}
-
-	inline_script = districts/tec_aibait_habitat_district
-}
-
-district_hab_mining = {
-	base_buildtime = @hab_time
-	is_capped_by_modifier = no
-
-	show_on_uncolonized = {
-		tec_uses_habitat_districts = yes
-		has_planet_flag = mining_habitat
-		tec_is_arcology_habitat = no
-	}
-
-	potential = {
-		tec_uses_habitat_districts = yes
-		has_planet_flag = mining_habitat
-		tec_is_arcology_habitat = no
-	}
-
-	allow = {
-		#tec_ai_force_research_habitat_district = no
-	}
-
-	#destroy_trigger = {
-	#	OR = {
-	#		tec_ai_force_research_habitat_district = yes
-	#	}
-	#}
-
-	conversion_ratio = 0.5
-	inline_script = districts/convert_to/tec_industrial_districts
-	inline_script = districts/convert_to/tec_mining_districts
-
-	resources = {
-		category = planet_districts_hab_mining
-
-		inline_script = {
-			script = districts/resources/tec_district_resource_cost
-			upkeep_trigger = "
-				always = yes
-			"
-			cost = @tec_district_hab_cost
-			upkeep = @tec_district_hab_upkeep
-		}
-		upkeep = {
-			alloys = @tec_district_hab_upkeep_alloys
-		}
-
-		# New production
-			inline_script = {
-				script = districts/resources/tec_hab_automation_minerals
-				trigger = "
-					always = yes
-				"
-				base = 0
-				mult = 0.5
-			}
-		# /
-		inline_script = {
-			script = districts/resources/tec_generate_basic_resources
-			resource = minerals
-		}
-		# Improved Mining Empire Upkeep
-		inline_script = districts/resources/tec_improved_mining_empire_upkeep
-	}
-	# overlord_resources = {
-	# 	category = planet_requisitioned_minerals
-	# 	produces = {
-	# 		trigger = {
-	# 			planet = {
-	# 				has_planet_flag = has_material_requisitorium
-	# 			}
-	# 		}
-	# 		minerals = @requisitorium_minerals_overlord
-	# 	}
-	# }
-
-	# Modifiers
-		inline_script = {
-			script = districts/tec_habitat_scaling_district
-			district = district_hab_mining
-		}
-
-		# Improved Mining Empire Modifier
-		inline_script = districts/effects/tec_improved_mining_empire_bonus
-	# /
-
-	# Jobs
-		inline_script = {
-			script = jobs/tec_miner
-			regular_count = 1
-			regular_secondary_count = 1
-			hive_count = 1
-			hive_secondary_count = 1
-			machine_count = 1
-			machine_secondary_count = 1
-			mult = 1
-			display = with_desc
-			trigger = "
-				tec_is_upgraded_habitat = yes
-			"
-		}
-		inline_script = {
-			script = jobs/tec_miner
-			regular_count = 1
-			regular_secondary_count = 0
-			hive_count = 2
-			hive_secondary_count = 1
-			machine_count = 1
-			machine_secondary_count = 0
-			mult = 1
-			display = no_desc
-			trigger = "
-				OR = {
-					is_capital = yes
-					tec_is_fully_upgraded_habitat = yes
-				}
-			"
-		}
-		inline_script = {
-			script = jobs/tec_miner_secondary
-			regular_count = 1
-			hive_count = 1
-			machine_count = 1
-			mult = 1
-			display = with_desc
-			trigger = "
-				OR = {
-					is_capital = yes
-					tec_is_fully_upgraded_habitat = yes
-				}
-			"
-		}
-	# /
-
-	# Starnet
-		inline_script = {
-			script = districts/compat/tec_starnet_mining_district
-			count = 1
-		}
-	# /
-
-	# AI
-		inline_script = districts/tec_aibait_habitat_district
-	# /
-}
-
-# --------------- Specs/misc
-district_tec_hab_utility = {	# UP TO HERE!!!!
-	base_buildtime = @hab_time
-	is_capped_by_modifier = no
-
-	show_on_uncolonized = {
-		tec_uses_habitat_districts = yes
-		# Specs
-			NOR = {
-				# Research
-				has_planet_flag = research_habitat
-				has_planet_flag = tec_research_habitat
-				# Trade
-				has_planet_flag = commercial_habitat
-				has_planet_flag = tec_trade_habitat
-				# Unity
-				has_planet_flag = tec_unity_habitat
-				# Military
-				has_planet_flag = tec_military_habitat
-			}
-			tec_is_arcology_habitat = no
-		# /
-	}
-
-	potential = {
-		tec_uses_habitat_districts = yes
-		# Specs
-			NOR = {
-				# Research
-				has_planet_flag = research_habitat
-				has_planet_flag = tec_research_habitat
-				# Trade
-				has_planet_flag = commercial_habitat
-				has_planet_flag = tec_trade_habitat
-				# Unity
-				has_planet_flag = tec_unity_habitat
-				# Military
-				has_planet_flag = tec_military_habitat
-			}
-			tec_is_arcology_habitat = no
-		# /
-	}
-
-	allow = {
-		tec_allow_research_buildings_and_districts = yes
-	}
-
-	destroy_trigger = {
-		#TO DO AI triggers
-		#tec_ai_force_research_habitat_district = yes
-		#tec_ai_allow_farming_district = no
-	}
-
-	#They don't convert into anything - decision swaps a part if specced
-
-	resources = {
-		category = planet_districts_hab_research
-
-		inline_script = {
-			script = districts/resources/tec_district_resource_cost
-			upkeep_trigger = "
-				always = yes
-			"
-			cost = @tec_district_hab_cost
-			upkeep = @tec_district_hab_upkeep_low
-		}
-		upkeep = {
-			alloys = @tec_district_hab_upkeep_alloys
-		}
-
-		# Base production
-		inline_script = {
-			script = districts/resources/tec_hab_automation_research
-			trigger = "
-				always = yes
-			"
-			base = 0
-			mult = 0.5
-		}
-	# /
-	}
-
-	# Text
-		# Indications
-		triggered_desc = {
-			trigger = {
-				always = yes
-			}
-			text = district_tec_hab_utility_effect_production
-		}
-		triggered_desc = {
-			trigger = {
-				always = yes
-			}
-			text = district_tec_hab_utility_effect_buildings
-		}
-		triggered_desc = {
-			trigger = {
-				always = yes
-			}
-			text = district_tec_hab_utility_effect_swap
-		}
-		triggered_desc = {
-			trigger = {
-				always = yes
-			}
-			text = district_tec_hab_utility_effect_orbitals
-		}
-	# /
-	# Modifiers
-		# Nothing
-	# /
-
-	# AI
-		inline_script = districts/tec_aibait_habitat_district
-	# /
-}
-
-district_hab_science = {
-	base_buildtime = @hab_time
-	is_capped_by_modifier = no
-
-	prerequisites = {
-		tech_basic_science_lab_1
-	}
-
-	show_on_uncolonized = {
-		tec_uses_habitat_districts = yes
-		# Specs
-			has_planet_flag = research_habitat
-			tec_is_arcology_habitat = no
-		# /
-	}
-
-	potential = {
-		tec_uses_habitat_districts = yes
-		# Specs
-			has_planet_flag = research_habitat
-			tec_is_arcology_habitat = no
-		# /
-	}
-
-	allow = {
-		tec_allow_research_buildings_and_districts = yes
-	}
-
-	conversion_ratio = 0.5
-	inline_script = districts/convert_to/tec_research_districts
-	inline_script = districts/convert_to/tec_industrial_districts
-
-	resources = {
-		category = planet_districts_hab_research
-
-		inline_script = {
-			script = districts/resources/tec_district_resource_cost
-			upkeep_trigger = "
-				always = yes
-			"
-			cost = @tec_district_hab_cost
-			upkeep = @tec_district_hab_upkeep
-		}
-		upkeep = {
-			alloys = @tec_district_hab_upkeep_alloys
-		}
-
-		# Base production
-		inline_script = {
-			script = districts/resources/tec_hab_automation_research
-			trigger = "
-				always = yes
-			"
-			base = 0
-			mult = 0.5
-		}
-	}
-
-	# Standard
-		inline_script = {
-			script = districts/tec_habitat_scaling_district
-			district = district_hab_science
-		}
-	# /
-
-	inline_script = {
-		script = districts/type/tec_research
-		scale = 0.5
-		secondary_scale = 0.5
-		mult = owner.value:hab_void_dweller_jobs
-		trigger = "
-			tec_is_upgraded_habitat = yes
-		"
-	}
-
-	# Jobs
-		inline_script = {
-			script = jobs/tec_researcher
-			count = 1
-			mult = 1
-			display = with_desc
-			trigger = ""
-		}
-
-		inline_script = {
-			script = jobs/tec_researcher
-			count = 1
-			mult = 1
-			display = no_desc
-			trigger = "
-				tec_is_upgraded_habitat = yes
-			"
-		}
-		inline_script = {
-			script = jobs/tec_researcher
-			count = 1
-			mult = 1
-			display = no_desc
-			trigger = "
-				tec_is_fully_upgraded_habitat = yes
-			"
-		}
-	# /
-
-	inline_script = districts/tec_aibait_habitat_district
-}
-
 district_hab_commercial = {
 	base_buildtime = @hab_time
 	is_capped_by_modifier = no
@@ -1200,13 +1218,14 @@ district_hab_commercial = {
 	}
 
 	potential = {
+		always = no
 		tec_uses_habitat_districts = yes
 		has_planet_flag = commercial_habitat
 		tec_is_arcology_habitat = no
 	}
 
 	allow = {
-		#tec_ai_force_research_habitat_district = no
+		always = no
 		AND = {
 			tec_ai_allow_trade_building = yes
 		}
@@ -1214,7 +1233,6 @@ district_hab_commercial = {
 
 	destroy_trigger = {
 		OR = {
-			#tec_ai_force_research_habitat_district = yes
 			AND = {
 				tec_ai_allow_trade_building = no
 			}
@@ -1378,6 +1396,7 @@ district_tec_hab_unity = {	# Evolved
 	is_capped_by_modifier = no
 
 	show_on_uncolonized = {
+		always = no
 		tec_uses_habitat_districts = yes
 		# Specs
 			has_planet_flag = tec_unity_habitat
@@ -1386,6 +1405,7 @@ district_tec_hab_unity = {	# Evolved
 	}
 
 	potential = {
+		always = no
 		tec_uses_habitat_districts = yes
 		# Specs
 			has_planet_flag = tec_unity_habitat
@@ -1524,6 +1544,7 @@ district_tec_hab_military = {	# Evolved
 	is_capped_by_modifier = no
 
 	show_on_uncolonized = {
+		always = no
 		tec_uses_habitat_districts = yes
 		# Specs
 			has_planet_flag = tec_military_habitat
@@ -1532,6 +1553,7 @@ district_tec_hab_military = {	# Evolved
 	}
 
 	potential = {
+		always = no
 		tec_uses_habitat_districts = yes
 		# Specs
 			has_planet_flag = tec_military_habitat
@@ -1610,7 +1632,6 @@ district_tec_hab_military = {	# Evolved
 
 	inline_script = districts/tec_aibait_habitat_district
 }
-
 # --------------- Utility
 district_hab_cultural = {
 	base_buildtime = @hab_time
@@ -1637,6 +1658,7 @@ district_hab_cultural = {
 	}
 
 	show_on_uncolonized = {
+		always = no
 		tec_uses_habitat_districts = yes
 
 		exists = from
@@ -1645,6 +1667,7 @@ district_hab_cultural = {
 	}
 
 	potential = {
+		always = no
 		tec_uses_habitat_districts = yes
 
 		exists = owner
@@ -1773,4 +1796,124 @@ district_hab_cultural = {
 	inline_script = districts/tec_aibait_habitat_district
 }
 
+# --------------- Specs/misc
+district_tec_hab_utility = {	# UP TO HERE!!!!
+	base_buildtime = @hab_time
+	is_capped_by_modifier = no
+
+	show_on_uncolonized = {
+		always = no
+		tec_uses_habitat_districts = yes
+		# Specs
+			NOR = {
+				# Research
+				has_planet_flag = research_habitat
+				has_planet_flag = tec_research_habitat
+				# Trade
+				has_planet_flag = commercial_habitat
+				has_planet_flag = tec_trade_habitat
+				# Unity
+				has_planet_flag = tec_unity_habitat
+				# Military
+				has_planet_flag = tec_military_habitat
+			}
+			tec_is_arcology_habitat = no
+		# /
+	}
+
+	potential = {
+		always = no
+		tec_uses_habitat_districts = yes
+		# Specs
+			NOR = {
+				# Research
+				has_planet_flag = research_habitat
+				has_planet_flag = tec_research_habitat
+				# Trade
+				has_planet_flag = commercial_habitat
+				has_planet_flag = tec_trade_habitat
+				# Unity
+				has_planet_flag = tec_unity_habitat
+				# Military
+				has_planet_flag = tec_military_habitat
+			}
+			tec_is_arcology_habitat = no
+		# /
+	}
+
+	allow = {
+		tec_allow_research_buildings_and_districts = yes
+	}
+
+	destroy_trigger = {
+		#TO DO AI triggers
+		#tec_ai_allow_farming_district = no
+	}
+
+	#They don't convert into anything - decision swaps a part if specced
+
+	resources = {
+		category = planet_districts_hab_research
+
+		inline_script = {
+			script = districts/resources/tec_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_hab_cost
+			upkeep = @tec_district_hab_upkeep_low
+		}
+		upkeep = {
+			alloys = @tec_district_hab_upkeep_alloys
+		}
+
+		# Base production
+		inline_script = {
+			script = districts/resources/tec_hab_automation_research
+			trigger = "
+				always = yes
+			"
+			base = 0
+			mult = 0.5
+		}
+	# /
+	}
+
+	# Text
+		# Indications
+		triggered_desc = {
+			trigger = {
+				always = yes
+			}
+			text = district_tec_hab_utility_effect_production
+		}
+		triggered_desc = {
+			trigger = {
+				always = yes
+			}
+			text = district_tec_hab_utility_effect_buildings
+		}
+		triggered_desc = {
+			trigger = {
+				always = yes
+			}
+			text = district_tec_hab_utility_effect_swap
+		}
+		triggered_desc = {
+			trigger = {
+				always = yes
+			}
+			text = district_tec_hab_utility_effect_orbitals
+		}
+	# /
+	# Modifiers
+		# Nothing
+	# /
+
+	# AI
+		inline_script = districts/tec_aibait_habitat_district
+	# /
+}
+
 #district_hab_religious
+

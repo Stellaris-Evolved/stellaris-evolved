@@ -2055,6 +2055,78 @@
 
 		inline_script = "jobs/automodding_priority_research"
 	}
+
+	tec_megastructure_logistician_drone = {	# Orbital logistics
+		category = complex_drone 
+		condition_string = DRONE_JOB_TRIGGER
+		building_icon = building_maintenance_depot
+
+		possible_pre_triggers = {
+			has_owner = yes
+			is_enslaved = no
+			is_being_purged = no
+			is_being_assimilated = no
+			is_sapient = yes
+		}
+
+		possible_precalc = can_fill_drone_job
+		possible = {
+			NOT = { tec_has_stapled_trait ={ cached = yes } }
+			if = {
+				limit = {
+					exists = owner
+					owner = {
+						NAND = {
+							has_valid_civic = civic_tec_origin_elders
+							has_ethic = ethic_gestalt_empathy
+						}
+					}
+				}
+				drone_individual_pop_check_trigger = no	#prevents free individuals
+			}
+		}
+
+		resources = {
+			category = planet_researchers
+			produces = {
+				physics_research = 2
+				engineering_research = 2
+			}
+			upkeep = {
+				alloys = @tec_megastructure_logistician_upkeep
+			}
+		}
+
+		inline_script = jobs/effects/type/tec_brain_drone_effect
+		inline_script = jobs/effects/type/tec_calculator_effect
+
+		planet_modifier = {
+			tec_mega_production_mult = 0.025
+			tec_subhabitat_all_add = 2
+		}
+
+		weight = {
+			weight = @complex_drone_job_weight
+			mult = value:job_weights_research_modifier|JOB|tec_megastructure_logistician_drone|
+			factor = 1.1
+			modifier = {
+				factor = 0.9
+				exists = owner
+				years_passed < 1
+				owner = { has_valid_civic = civic_machine_assimilator }
+				tec_is_cyborg_species = yes
+			}
+
+			# Robots can't get this job, unless droid
+			modifier = {
+				factor = 0
+				tec_is_non_advanced_robot = yes
+			}
+		}
+
+		inline_script = "jobs/automodding_priority_research"
+	}
+
 # /
 
 # --------------- Civics

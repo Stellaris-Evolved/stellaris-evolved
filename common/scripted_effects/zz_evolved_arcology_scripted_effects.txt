@@ -439,6 +439,8 @@
 	}
 
 	tec_on_subhabitat_complete_effect = {
+		save_event_target_as = tec_original_subhabitat
+		# Marks the habitat
 		fromfrom.solar_system = {
 			random_system_planet = {
 				limit = {
@@ -447,65 +449,238 @@
 				save_event_target_as = target_habitat
 			}
 		}
+		# Marks the planet
 		event_target:target_planet = {
 			set_planet_flag = has_megastructure
 	
 			if = {
-				limit = { has_orbital_station = yes }
+				limit = {
+					has_orbital_station = yes
+				}
 				orbital_station = {
 					dismantle = yes
 				}
 			}
-
-			event_target:target_orbital = {
-				set_name = {
-					key = TARGET_ORBITAL_NAME
-					variable_string = "\\[FROM.from.planet.GetName]"
-				}
-			}
 	
 			set_habitat_planetary_features_effect = yes
-	
+
+			# Energy + Minerals
 			if = {
 				limit = {
 					event_target:target_planet = {
-						has_deposit_for = shipclass_research_station
-					}
-				}
-				event_target:target_orbital = {
-					set_fleet_flag = science_orbital
-				}
-			}
-			if = {
-				limit = {
-					event_target:target_planet = {
+						has_orbital_energy_deposit = yes
 						has_orbital_mining_deposit = yes
 					}
 				}
-				event_target:target_orbital = {
-					set_fleet_flag = mining_orbital
+				solar_system = {
+					spawn_megastructure = {
+						type = tec_subhabitat_extraction
+						owner = event_target:tec_original_subhabitat.owner
+						planet = event_target:target_planet
+						init_effect = {
+							save_event_target_as = target_subhabitat
+						}
+					}
+				}
+				event_target:target_subhabitat = {
+					set_name = {
+						key = TEC_SUBHABITAT_EXTRACTION_NAME
+						variable_string = "\\[FROM.from.planet.GetName]"
+					}
 				}
 			}
-			if = {
+			# Energy
+			else_if = {
 				limit = {
 					event_target:target_planet = {
 						has_orbital_energy_deposit = yes
 					}
 				}
-				event_target:target_orbital = {
-					set_fleet_flag = energy_orbital
+				solar_system = {
+					spawn_megastructure = {
+						type = tec_subhabitat_energy
+						owner = event_target:tec_original_subhabitat.owner
+						planet = event_target:target_planet
+						init_effect = {
+							save_event_target_as = target_subhabitat
+						}
+					}
+				}
+				event_target:target_subhabitat = {
+					set_name = {
+						key = TEC_SUBHABITAT_ENERGY_NAME
+						variable_string = "\\[FROM.from.planet.GetName]"
+					}
 				}
 			}
-		}
-		if = {
-			limit = {
-				fromfrom = {
-					is_scope_type = megastructure
+			# Minerals
+			else_if = {
+				limit = {
+					event_target:target_planet = {
+						has_orbital_mining_deposit = yes
+					}
+				}
+				solar_system = {
+					spawn_megastructure = {
+						type = tec_subhabitat_minerals
+						owner = event_target:tec_original_subhabitat.owner
+						planet = event_target:target_planet
+						init_effect = {
+							save_event_target_as = target_subhabitat
+						}
+					}
+				}
+				event_target:target_subhabitat = {
+					set_name = {
+						key = TEC_SUBHABITAT_MINERALS_NAME
+						variable_string = "\\[FROM.from.planet.GetName]"
+					}
 				}
 			}
-			remove_megastructure = fromfrom
+			# Food
+			else_if = {
+				limit = {
+					event_target:target_planet = {
+						tec_has_orbital_food_deposit = yes
+					}
+				}
+				solar_system = {
+					spawn_megastructure = {
+						type = tec_subhabitat_food
+						owner = event_target:tec_original_subhabitat.owner
+						planet = event_target:target_planet
+						init_effect = {
+							save_event_target_as = target_subhabitat
+						}
+					}
+				}
+				event_target:target_subhabitat = {
+					set_name = {
+						key = TEC_SUBHABITAT_fOOD_NAME
+						variable_string = "\\[FROM.from.planet.GetName]"
+					}
+				}
+			}
+			# Science - More than 2 researchs
+			else_if = {
+				limit = {
+					event_target:target_planet = {
+						calc_true_if = {
+							amount >= 2
+							tec_has_orbital_physics_deposit = yes
+							tec_has_orbital_society_deposit = yes
+							tec_has_orbital_engineering_deposit = yes
+						}
+					}
+				}
+				solar_system = {
+					spawn_megastructure = {
+						type = tec_subhabitat_science
+						owner = event_target:tec_original_subhabitat.owner
+						planet = event_target:target_planet
+						init_effect = {
+							save_event_target_as = target_subhabitat
+						}
+					}
+				}
+				event_target:target_subhabitat = {
+					set_name = {
+						key = TEC_SUBHABITAT_SCIENCE_NAME
+						variable_string = "\\[FROM.from.planet.GetName]"
+					}
+				}
+			}
+			# Physics
+			else_if = {
+				limit = {
+					event_target:target_planet = {
+						tec_has_orbital_physics_deposit = yes
+					}
+				}
+				solar_system = {
+					spawn_megastructure = {
+						type = tec_subhabitat_physics
+						owner = event_target:tec_original_subhabitat.owner
+						planet = event_target:target_planet
+						init_effect = {
+							save_event_target_as = target_subhabitat
+						}
+					}
+				}
+				event_target:target_subhabitat = {
+					set_name = {
+						key = TEC_SUBHABITAT_PHYSICS_NAME
+						variable_string = "\\[FROM.from.planet.GetName]"
+					}
+				}
+			}
+			# Society
+			else_if = {
+				limit = {
+					event_target:target_planet = {
+						tec_has_orbital_society_deposit = yes
+					}
+				}
+				solar_system = {
+					spawn_megastructure = {
+						type = tec_subhabitat_society
+						owner = event_target:tec_original_subhabitat.owner
+						planet = event_target:target_planet
+						init_effect = {
+							save_event_target_as = target_subhabitat
+						}
+					}
+				}
+				event_target:target_subhabitat = {
+					set_name = {
+						key = TEC_SUBHABITAT_SOCIETY_NAME
+						variable_string = "\\[FROM.from.planet.GetName]"
+					}
+				}
+			}
+			# Engineering
+			else_if = {
+				limit = {
+					event_target:target_planet = {
+						tec_has_orbital_engineering_deposit = yes
+					}
+				}
+				solar_system = {
+					spawn_megastructure = {
+						type = tec_subhabitat_engineering
+						owner = event_target:tec_original_subhabitat.owner
+						planet = event_target:target_planet
+						init_effect = {
+							save_event_target_as = target_subhabitat
+						}
+					}
+				}
+				event_target:target_subhabitat = {
+					set_name = {
+						key = TEC_SUBHABITAT_ENGINEERING_NAME
+						variable_string = "\\[FROM.from.planet.GetName]"
+					}
+				}
+			}
+			# If all fails, fallback to extraction
+			else = {
+				solar_system = {
+					spawn_megastructure = {
+						type = tec_subhabitat_extraction
+						owner = event_target:tec_original_subhabitat.owner
+						planet = event_target:target_planet
+						init_effect = {
+							save_event_target_as = target_subhabitat
+						}
+					}
+				}
+				event_target:target_subhabitat = {
+					set_name = {
+						key = TEC_SUBHABITAT_EXTRACTION_NAME
+						variable_string = "\\[FROM.from.planet.GetName]"
+					}
+				}
+			}
 		}
 	}
-
-	
 # /
