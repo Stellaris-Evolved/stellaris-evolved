@@ -1357,7 +1357,7 @@ tec_has_enough_ethic_points = {
 		[[!cached]
 		OR = {
 			tec_is_city_world = yes
-			tec_is_elysium = yes
+			tec_uses_elysium_districts = yes
 			tec_is_ringworld = yes
 			tec_is_uncapped_planet = yes
 			AND = {
@@ -1413,7 +1413,7 @@ tec_has_enough_ethic_points = {
 				tec_is_unspecced_ringworld = yes
 			}
 			AND = {
-				tec_is_elysium = yes
+				tec_uses_elysium_districts = yes
 				tec_is_unspecced_elysium = yes
 			}
 			AND = {
@@ -1597,15 +1597,31 @@ tec_has_enough_ethic_points = {
 	tec_is_modded_uncapped_planet = {
 		OR = {
 			has_modifier = @pleasure_palace
-			uses_district_set = @giga_alderson
-			uses_district_set = @giga_birch
+
+			inline_script = {
+				script = mod_support/tec_giga_present
+				code = "
+					uses_district_set = @giga_alderson
+					uses_district_set = @giga_birch
+			    "
+			}
 		}
 
 	}
 
 	tec_is_modded_space_arcology = {
 		OR = {
-			giga_habitable_structure = yes
+			inline_script = {
+			    script = mod_support/tec_giga_present
+			    code = "
+					giga_habitable_structure = yes
+			    "
+			}
+
+			inline_script = {
+				script = mod_support/tec_trigger_include
+				trigger = tec_is_modded_space_arcology
+			}
 		}
 	}
 
@@ -1636,7 +1652,18 @@ tec_has_enough_ethic_points = {
 			# Generic
 			uses_district_set = standard
 			# PD
-			is_pd_regular = yes
+
+			inline_script = {
+			    script = mod_support/tec_pd_present
+			    code = "
+					is_pd_regular = yes
+			    "
+			}
+
+			inline_script = {
+				script = mod_support/tec_trigger_include
+				trigger = tec_uses_ringworld_districts
+			}
 		}
 	}
 
@@ -1648,6 +1675,11 @@ tec_has_enough_ethic_points = {
 		OR = {
 			tec_is_city_world = yes
 			tec_is_space_arcology = yes
+
+			inline_script = {
+			    script = mod_support/tec_trigger_include
+			    trigger = tec_is_arcology
+			}
 		}
 		]
 	}
@@ -1663,6 +1695,11 @@ tec_has_enough_ethic_points = {
 			tec_is_ringworld = yes
 			tec_is_elysium = yes
 			tec_is_modded_space_arcology = yes
+
+			inline_script = {
+				script = mod_support/tec_trigger_include
+				trigger = tec_is_space_arcology
+			}
 		}
 		]
 	}
@@ -1673,11 +1710,31 @@ tec_has_enough_ethic_points = {
 		]
 		[[!cached]
 		OR = {
+			uses_habitat_capitals = yes
 			uses_district_set = habitat
 			# PD
-			uses_district_set = @pdplanethab
+			inline_script = {
+			    script = mod_support/tec_pd_present
+			    code = "
+					uses_district_set = @pdplanethab
+					has_planet_flag = pdiceasteroidhab
+					has_planet_flag = pdcrystalasteroidhab
+					has_planet_flag = pdasteroidhab
+			    "
+			}
 			# gigas
-			is_giga_habitat = yes
+			inline_script = {
+			    script = mod_support/tec_giga_present
+			    code = "
+					is_giga_habitat = yes
+					is_non_giga_habitat = yes
+			    "
+			}
+
+			inline_script = {
+				script = mod_support/tec_trigger_include
+				trigger = tec_is_habitat
+			}
 		}
 		]
 	}
@@ -1689,7 +1746,18 @@ tec_has_enough_ethic_points = {
 		[[!cached]
 		OR = {
 			uses_district_set = ring_world
-			is_giga_ringworld = yes
+
+			inline_script = {
+				script = mod_support/tec_giga_present
+				code = "
+					is_giga_ringworld = yes
+			    "
+			}
+
+			inline_script = {
+				script = mod_support/tec_trigger_include
+				trigger = tec_is_ringworld
+			}
 		}
 		]
 	}
@@ -1702,6 +1770,18 @@ tec_has_enough_ethic_points = {
 		OR = {
 			#uses_district_set = elysium_phase_0
 			uses_district_set = elysium_phase_2
+
+			inline_script = {
+				script = mod_support/tec_giga_present
+				code = "
+					is_planet_class = pc_giga_elysium
+			    "
+			}
+
+			inline_script = {
+				script = mod_support/tec_trigger_include
+				trigger = tec_is_elysium
+			}
 		}
 		]
 	}
@@ -1713,7 +1793,17 @@ tec_has_enough_ethic_points = {
 		[[!cached]
 		OR = {
 			uses_district_set = city_world
-			is_pd_arcology = yes
+			inline_script = {
+			    script = mod_support/tec_pd_present
+			    code = "
+					is_pd_arcology = yes
+			    "
+			}
+
+			inline_script = {
+				script = mod_support/tec_trigger_include
+				trigger = tec_is_city_world
+			}
 		}
 		]
 	}
@@ -1721,18 +1811,44 @@ tec_has_enough_ethic_points = {
 	tec_uses_habitat_districts = {
 		OR = {
 			uses_district_set = habitat
+
+			inline_script = {
+				script = mod_support/tec_trigger_include
+				trigger = tec_uses_habitat_districts
+			}
 		}
 	}
 
 	tec_uses_ringworld_districts = {
 		OR = {
 			uses_district_set = ring_world
-			AND = {
-				has_stellaris_evolved_giga = yes
-				OR = {
-					uses_district_set = @penrose_ring
-					uses_district_set = @interstellar_ring
-				}
+			inline_script = {
+			    script = mod_support/tec_giga_present
+			    code = "
+			        AND = {
+        				has_stellaris_evolved_giga = yes
+        				OR = {
+        					uses_district_set = @penrose_ring
+        					uses_district_set = @interstellar_ring
+        				}
+        			}
+
+			    "
+			}
+			inline_script = {
+				script = mod_support/tec_trigger_include
+				trigger = tec_uses_ringworld_districts
+			}
+		}
+	}
+
+	tec_uses_elysium_districts = {
+		OR = {
+			uses_district_set = elysium_phase_2
+
+			inline_script = {
+				script = mod_support/tec_trigger_include
+				trigger = tec_uses_elysium_districts
 			}
 		}
 	}
@@ -1758,8 +1874,13 @@ tec_has_enough_ethic_points = {
 			tec_is_relic_world = yes
 			tec_is_gaia_world = yes
 			tec_is_ecoworld = yes
-			is_pd_unique = yes
-			is_pd_shroud_world = yes
+			inline_script = {
+			    script = mod_support/tec_pd_present
+			    code = "
+			        is_pd_unique = yes
+        			is_pd_shroud_world = yes
+			    "
+			}
 		}
 	}
 # /
@@ -1773,7 +1894,12 @@ tec_is_perfect_planet = {
 	[[!cached]
 	OR = {
 		tec_is_gaia_world = yes
-		tec_is_pd_perfect_planets = yes
+		inline_script = {
+		    script = mod_support/tec_pd_present
+		    code = "
+		        tec_is_pd_perfect_planets = yes
+		    "
+		}
 	}
 	]
 }
@@ -1794,6 +1920,10 @@ tec_is_neutral_planet = {
 
 # Aquatic species
 tec_is_wet_planet_exceptions = {	# Outside is_wet trigger
+	inline_script = {
+		script = tec_type_hint
+		country_scope = $owner$
+	}
 	OR = {
 		tec_is_gaia_world = yes
 		tec_is_flooded = yes
@@ -1807,29 +1937,46 @@ tec_is_wet_planet_exceptions = {	# Outside is_wet trigger
 }
 
 tec_is_wet_modded_planet_exceptions = {
-	[[owner]]
+	inline_script = {
+		script = tec_type_hint
+		country_scope = $owner$
+	}
 	OR = {
-		uses_district_set = giga_birch
-		uses_district_set = flusion_gaia_ecu
-		uses_district_set = giga_alderson_gaia
-		# Hive start
-		AND = {
-			$owner$ = {
-				tec_has_hive_world_origin = yes
-			}
-			uses_district_set = giga_alderson_hive
+		inline_script = {
+		    script = mod_support/tec_giga_present
+		    code = "
+		        uses_district_set = giga_birch
+        		uses_district_set = flusion_gaia_ecu
+        		uses_district_set = giga_alderson_gaia
+        		# Hive start
+        		AND = {
+        			$owner$ = {
+        				tec_has_hive_world_origin = yes
+        			}
+        			uses_district_set = giga_alderson_hive
+        		}
+        		# Machine Start
+        		AND = {
+        			$owner$ = {
+        				tec_has_machine_world_origin = yes
+        			}
+        			uses_district_set = giga_alderson_machine
+        		}
+		    "
 		}
-		# Machine Start
-		AND = {
-			$owner$ = {
-				tec_has_machine_world_origin = yes
-			}
-			uses_district_set = giga_alderson_machine
+
+		inline_script = {
+		    script = mod_support/tec_trigger_include
+		    trigger = tec_is_wet_modded_planet_exceptions
 		}
 	}
 }
 
 tec_is_wet_planet_origin_exceptions = {
+	inline_script = {
+		script = tec_type_hint
+		country_scope = $owner$
+	}
 	OR = {
 		# Nuked start 
 		AND = {
@@ -1903,44 +2050,74 @@ tec_is_arcology_specced_habitat = {
 tec_is_hive_world = {
 	OR = {
 		is_planet_class = pc_hive
-		# PD
-		is_pd_hive_world = yes
+		inline_script = {
+		    script = mod_support/tec_pd_present
+		    code = "
+		        # PD
+        		is_pd_hive_world = yes
+		    "
+		}
 	}
 }
 
 tec_is_machine_world = {
 	OR = {
 		is_planet_class = pc_machine
-		# PD
-		is_pd_machine = yes
+		inline_script = {
+		    script = mod_support/tec_pd_present
+		    code = "
+		        # PD
+        		is_pd_machine = yes
+		    "
+		}
 	}
 }
 
 tec_is_nuked_world = {
 	OR = {
 		is_planet_class = pc_nuked
-		is_pd_nuked = yes
+		inline_script = {
+		    script = mod_support/tec_pd_present
+		    code = "
+		        is_pd_nuked = yes
+		    "
+		}
 	}
 }
 
 tec_is_relic_world = {
 	OR = {
 		is_planet_class = pc_relic
-		is_pd_relic = yes
+		inline_script = {
+		    script = mod_support/tec_pd_present
+		    code = "
+		        is_pd_relic = yes
+		    "
+		}
 	}
 }
 
 tec_is_gaia_world = {
 	OR = {
 		is_planet_class = pc_gaia
-		is_pd_gaia = yes
+		inline_script = {
+		    script = mod_support/tec_pd_present
+		    code = "
+		        is_pd_gaia = yes
+		    "
+		}
 	}
 }
 
 tec_is_aquatic_planet = {
 	OR = {
 		is_planet_class = pc_ocean
-		is_pd_planet_for_aqua_trait = yes
+		inline_script = {
+		    script = mod_support/tec_pd_present
+		    code = "
+		        is_pd_planet_for_aqua_trait = yes
+		    "
+		}
 		tec_is_flooded = yes
 	}
 }
@@ -1948,14 +2125,24 @@ tec_is_aquatic_planet = {
 tec_is_standard_like_planet = {
 	OR = {
 		uses_district_set = standard
-		uses_district_set = @pdexotic_standard
+		inline_script = {
+		    script = mod_support/tec_pd_present
+		    code = "
+		        uses_district_set = @pdexotic_standard
+		    "
+		}
 	}
 }
 
 tec_has_nuked_world_origin = {
 	OR = {
 		is_apocalyptic_empire = yes
-		has_origin = @origin_pd_radiotrophic_mutants
+		inline_script = {
+		    script = mod_support/tec_pd_present
+		    code = "
+		        has_origin = @origin_pd_radiotrophic_mutants
+		    "
+		}
 		has_origin = @origin_disharmonious_unity
 		has_origin = @originsextended_starless
 		has_origin = @originsextended_magnetica
@@ -1966,7 +2153,12 @@ tec_has_nuked_world_origin = {
 tec_has_hive_world_origin = {
 	OR = {
 		has_origin = @origin_tec_hiveplanet
-		has_origin = @origin_pd_hive
+		inline_script = {
+		    script = mod_support/tec_pd_present
+		    code = "
+		        has_origin = @origin_pd_hive
+		    "
+		}
 		has_origin = @origin_hive
 		has_origin = @originsextended_infest
 	}
@@ -2119,49 +2311,67 @@ tec_has_infinite_farming_district = {
 }
 
 tec_has_standard_habitation_district = {
-	NOT = { has_deposit = d_crashed_slaver_ship }
 	OR = {
 		uses_district_set = district_resort
 		uses_district_set = standard
 		uses_district_set = hive_world
 		uses_district_set = machine_world
 		uses_district_set = shattered_ring_world
-		uses_district_set = @pdnecroplanet
-		uses_district_set = @pdscrapyard
-		uses_district_set = @pdbioforge
-		uses_district_set = @pdbiofort
-		uses_district_set = @pdfloraforge
-		uses_district_set = @pdflorafort
+
 		has_planet_flag = tec_remnants_decadent_ecu
-		AND = {
-			has_stellaris_evolved_pd = yes
-			uses_district_set = @pdexotic_standard
+
+
+		inline_script = {
+		    script = mod_support/tec_pd_present
+		    code = "
+		        uses_district_set = @pdnecroplanet
+        		uses_district_set = @pdscrapyard
+        		uses_district_set = @pdbioforge
+        		uses_district_set = @pdbiofort
+        		uses_district_set = @pdfloraforge
+        		uses_district_set = @pdflorafort
+        		AND = {
+        			has_stellaris_evolved_pd = yes
+        			uses_district_set = @pdexotic_standard
+        		}
+		    "
 		}
-		AND = {
-			has_stellaris_evolved_giga = yes
-			giga_uses_city_district = yes
+		inline_script = {
+		    script = mod_support/tec_giga_present
+		    code = "
+		        AND = {
+        			has_stellaris_evolved_giga = yes
+        			giga_uses_city_district = yes
+        		}
+		    "
+		}
+
+		inline_script = {
+		    script = mod_support/tec_trigger_include
+		    trigger = tec_has_standard_habitation_district
 		}
 	}
-	tec_is_ecoworld = no
-	NOT = { has_deposit = d_crashed_slaver_ship }
-	# Special colonies
-	NOT = { has_modifier = resort_colony }
-	NOR = {
-		# TEST HIVEWORLDS
+	tec_has_standard_habitation_district_block = no
+}
+
+tec_has_standard_habitation_district_block = {
+	OR = {
+		has_deposit = d_crashed_slaver_ship
+		has_modifier = resort_colony
 		has_planet_flag = tec_test_hiveworlds
 		has_planet_flag = tec_test_machineworlds
+		tec_is_ecoworld = yes
+
+		inline_script = {
+		    script = mod_support/tec_trigger_include
+		    trigger = tec_has_standard_habitation_district_block
+		}
 	}
 }
 
 tec_has_standard_industrial_district = {
 	OR = {
 		uses_district_industrial = yes
-		uses_district_set = @pdnecroplanet
-		uses_district_set = @pdscrapyard
-		AND = {
-			has_stellaris_evolved_pd = yes
-			uses_district_set = @pdexotic_standard
-		}
 		AND = {
 			has_planet_flag = tec_remnants_decadent_ecu
 			NOR = {
@@ -2170,28 +2380,69 @@ tec_has_standard_industrial_district = {
 				has_planet_flag = tec_ecumenopolis_spec_admin
 			}
 		}
+		inline_script = {
+		    script = mod_support/tec_pd_present
+		    code = "
+		        uses_district_set = @pdnecroplanet
+        		uses_district_set = @pdscrapyard
+        		AND = {
+        			has_stellaris_evolved_pd = yes
+        			uses_district_set = @pdexotic_standard
+        		}
+		    "
+		}
+
+		inline_script = {
+		    script = mod_support/tec_giga_present
+		    code = "
+		        giga_uses_industrial_district = yes
+		    "
+		}
+
+		inline_script = {
+		    script = mod_support/tec_trigger_include
+		    trigger = tec_has_standard_industrial_district
+		}
 	}
-	tec_is_ecoworld = no
-	NOR = {
-		# TEST HIVEWORLDS
+	tec_has_standard_industrial_district_block = no
+}
+
+tec_has_standard_industrial_district_block = {
+	OR = {
+		tec_is_ecoworld = yes
 		has_planet_flag = tec_test_hiveworlds
 		has_planet_flag = tec_test_machineworlds
+
+		inline_script = {
+		    script = mod_support/tec_trigger_include
+		    trigger = tec_has_standard_industrial_district_block
+		}
 	}
 }
 
 tec_has_rural_mimics = {
 	OR = {
-		AND = {
-			has_stellaris_evolved_pd = yes
-			uses_district_set = @pdexotic_standard
+		inline_script = {
+		    script = mod_support/tec_pd_present
+		    code = "
+		        AND = {
+        			has_stellaris_evolved_pd = yes
+        			uses_district_set = @pdexotic_standard
+        		}
+		    "
 		}
-		AND = {
-			has_stellaris_evolved_giga = yes
-			OR = {
-				giga_uses_farming_district = yes
-				giga_uses_mining_district = yes
-				giga_uses_generator_district = yes
-			}
+		inline_script = {
+		    script = mod_support/tec_giga_present
+		    code = "
+		        AND = {
+        			has_stellaris_evolved_giga = yes
+        			OR = {
+        				giga_uses_farming_district = yes
+        				giga_uses_mining_district = yes
+        				giga_uses_generator_district = yes
+        			}
+        		}
+		    "
 		}
 	}
 }
@@ -2546,9 +2797,14 @@ tec_is_flooded = {
 	# Can be used to allow flooded elysiums and ringworlds
 	OR = {
 		has_modifier = flooded_habitat
-		AND = {
-			has_modifier = @hyceanfloodedhabitat
-			owner = { has_origin = @origin_pd_hycean_aquatic }
+		inline_script = {
+		    script = mod_support/tec_pd_present
+		    code = "
+		        AND = {
+        			has_modifier = @hyceanfloodedhabitat
+        			owner = { has_origin = @origin_pd_hycean_aquatic }
+        		}
+		    "
 		}
 	}
 }
@@ -2564,8 +2820,6 @@ tec_has_hired_job = {
 		has_job = tec_hired_artisan
 		has_job = tec_hired_researcher
 		has_job = tec_hired_entertainer
-		# Preacher here too
-		has_job = preacher
 	}
 }
 
@@ -2601,10 +2855,15 @@ tec_arcology_project_relic_potential = {
 	[[!milarc]
 		is_planet_class = pc_relic
 	]
-	# PD compat
-	[[milarc]
-		is_pd_milarc_relic = yes
-	]
+	inline_script = {
+	    script = mod_support/tec_pd_present
+	    code = "
+	        # PD compat
+        	[[milarc]
+        		is_pd_milarc_relic = yes
+        	]
+	    "
+	}
 	
 	tec_invalidates_arcology_project_comp = no
 	habitable_structure = no
@@ -2641,10 +2900,14 @@ tec_arcology_project_allow = {
 			[[!eco]
 				fail_text = decision_arcology_project_requirements
 			]
-			[[eco]
-				#noinspection ParadoxScriptUnresolvedExpression
-				fail_text = decision_eco_arcology_project_requirements
-			]
+			inline_script = {
+			    script = mod_support/tec_pd_present
+			    code = "
+			        [[eco]
+        				fail_text = decision_eco_arcology_project_requirements
+        			]
+			    "
+			}
 			if = {
 				limit = {
 					owner = {
@@ -2654,9 +2917,14 @@ tec_arcology_project_allow = {
 				free_district_slots < 1
 
 				# PD compat
-				[[eco]
-					num_districts = { type = district_industrial value < 1 }
-				]
+				inline_script = {
+				    script = mod_support/tec_pd_present
+				    code = "
+				        [[eco]
+        					num_districts = { type = district_industrial value < 1 }
+        				]
+				    "
+				}
 				check_variable_arithmetic = {
 					which = value:farming_districts_value
 					value = 0
@@ -2691,9 +2959,14 @@ tec_arcology_project_allow = {
 			free_district_slots < 4
 
 			# PD compat
-			[[eco]
-				num_districts = { type = district_industrial value < 3 }
-			]
+			inline_script = {
+			    script = mod_support/tec_pd_present
+			    code = "
+			        [[eco]
+        				num_districts = { type = district_industrial value < 3 }
+        			]
+			    "
+			}
 			check_variable_arithmetic = {
 				which = value:farming_districts_value
 				value < 4
@@ -2815,7 +3088,12 @@ tec_autocolonizes_artificial_worlds = {
 tec_autocolonizable_artificial_worlds = {
 	OR = {
 		is_artificial = yes
-		is_pd_habitat = yes # they are nor marked artificial
+		inline_script = {
+		    script = mod_support/tec_pd_present
+		    code = "
+		        is_pd_habitat = yes # they are nor marked artificial
+		    "
+		}
 	}
 }
 
@@ -2861,8 +3139,13 @@ tec_can_assemble_species_due_to_purity_assembly_policy = {
 
 tec_blocks_terraforming_aps = {
 	OR = {
-		# PD blocks hive and gaia worlds for megaflora
-		has_origin = @origin_pd_tree_of_life
+		inline_script = {
+		    script = mod_support/tec_pd_present
+		    code = "
+		        # PD blocks hive and gaia worlds for megaflora
+        		has_origin = @origin_pd_tree_of_life
+		    "
+		}
 	}
 }
 
@@ -2872,7 +3155,6 @@ tec_ecologists_have_modifiers_to_fix = {
 		has_modifier = "hazardous_weather"
 		has_modifier = "weak_magnetic_field"
 		has_modifier = "unstable_tectonics"
-		has_modifier = @gpm_unstable_tectonics_2
 		has_modifier = "tidal_locked"
 		has_modifier = "high_gravity"
 		has_modifier = "mineral_poor"
@@ -2880,6 +3162,7 @@ tec_ecologists_have_modifiers_to_fix = {
 		has_modifier = "atmospheric_hallucinogen"
 		has_modifier = "bleak_planet"
 		has_modifier = "irradiated_planet"
+		has_modifier = @gpm_unstable_tectonics_2
 		has_modifier = @gpm_global_thunderstorms
 		has_modifier = @gpm_thin_atmospheres
 		has_modifier = @gpm_strong_volcanism
@@ -2957,6 +3240,7 @@ tec_has_any_basic_ap = {
 		has_ascension_perk = ap_tec_one_mind
 		has_ascension_perk = ap_technological_ascendancy
 		has_ascension_perk = ap_tec_influential
+		has_ascension_perk = ap_tec_castling
 	}
 }
 
@@ -2983,6 +3267,13 @@ tec_is_minerals_production_system = {
 		OR = {
 			is_asteroid = yes
 			is_planet_class = pc_black_hole
+
+			inline_script = {
+				script = mod_support/tec_giga_present
+				code = "
+			        giga_is_black_hole = yes
+			    "
+			}
 		}
 	}
 }
@@ -3004,6 +3295,14 @@ tec_is_energy_production_system = {
 		OR = {
 			is_planet_class = pc_neutron_star
 			is_planet_class = pc_pulsar
+			inline_script = {
+				script = mod_support/tec_giga_present
+				code = "
+			        giga_is_neutron_type_star = yes
+			        giga_is_superpower_star = yes
+			        giga_is_white_hole = yes
+			    "
+			}
 		}
 	}
 }
@@ -3013,6 +3312,16 @@ tec_is_physics_research_system = {
 		OR = {
 			is_planet_class = pc_black_hole
 			is_planet_class = pc_pulsar
+
+			is_astral_scar = yes
+
+			inline_script = {
+			    script = mod_support/tec_giga_present
+			    code = "
+			        giga_is_black_hole = yes
+			        giga_is_white_hole = yes
+			    "
+			}
 		}
 	}
 }
@@ -3035,6 +3344,22 @@ tec_is_engineering_research_system = {
 	any_system_planet = {
 		OR = {
 			is_planet_class = pc_neutron_star
+			solar_system = { # not optimal but oh well
+				has_star_flag = abandoned_gateway
+				has_star_flag = ruined_mega_shipyard_system
+				has_star_flag = ruined_dyson_system
+				has_star_flag = ruined_catapult_system
+				has_star_flag = ruined_nexus_system
+				has_star_flag = ruined_orbital_ring_system
+				has_star_flag = ruined_sentry_system
+				has_star_flag = ruined_ring_system
+			}
+			inline_script = {
+			    script = mod_support/tec_giga_present
+			    code = "
+			        giga_is_neutron_type_star = yes
+			    "
+			}
 		}
 	}
 }
@@ -3102,6 +3427,11 @@ tec_is_engineering_research_system = {
 # planet
 # doing this since a lot of clerks checks it
 tec_is_variable_set_and_not_zero = {
+	inline_script = {
+		script = tec_type_hint
+		variable = $VARIABLE$
+	}
+
 	is_variable_set = $VARIABLE$
 	check_variable_arithmetic = {
 		which = $VARIABLE$
@@ -3110,6 +3440,11 @@ tec_is_variable_set_and_not_zero = {
 }
 
 tec_has_possible_job = {
+	inline_script = {
+		script = tec_type_hint
+		job = $job$
+	}
+
 	OR = {
 		has_forbidden_jobs = $job$
 		has_available_jobs = $job$
@@ -3117,6 +3452,10 @@ tec_has_possible_job = {
 }
 
 tec_can_reduce_job_further = {
+	inline_script = {
+		script = tec_type_hint
+		job = $job$
+	}
 	OR = {
 		num_assigned_jobs = { job = $job$ value > 0 }
 		has_available_jobs = $job$
@@ -3124,6 +3463,10 @@ tec_can_reduce_job_further = {
 }
 
 tec_can_increase_job_further = {
+	inline_script = {
+		script = tec_type_hint
+		job = $job$
+	}
 	OR = {
 		has_forbidden_jobs = $job$
 	}
@@ -3164,7 +3507,12 @@ tec_has_amenity_jobs_available = {
 			tec_has_possible_job = { job = tec_spareparts_drone }
 			tec_has_possible_job = { job = tec_hydrorelay_drone }
 			tec_has_possible_job = { job = tec_cyborg_ripperdoc_drone }
-			tec_has_possible_job = { job = frame_maintenance_drone }
+			inline_script = {
+			    script = mod_support/tec_giga_present
+			    code = "
+			        tec_has_possible_job = { job = frame_maintenance_drone }
+			    "
+			}
 		}
 	}
 }
@@ -3585,187 +3933,202 @@ tec_has_opinion_level = {
 			is_same_value = prev.$WHO$
 		}
 		is_variable_set = tec_cache_tec_opinion_total
-		if = { 
-			limit = {
-				always = $EXCELLENT|no$
-			}
+
 		# 750 - 3000
-			[[GT] 
-			always = no
-			]
-			[[GTE] 
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value >= 750
+			inline_script = {
+			    script = conditional/tec_equal
+			    value = $EXCELLENT|no$
+			    equal = yes
+			    code = "
+			        [[GT]
+        			always = no
+        			]
+        			[[GTE]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value >= 750
+        			}
+        			]
+        			[[EQ]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value >= 750
+        			}
+        			]
+        			[[LTE]
+        			always = yes
+        			]
+        			[[LT]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value < 750
+        			}
+        			]
+			    "
 			}
-			]
-			[[EQ] 
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value >= 750
-			}
-			]
-			[[LTE] 
-			always = yes
-			]
-			[[LT] 
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value < 750
-			}
-			]
-		}
-		else_if = {
-			limit = {
-				always = $GOOD|no$
-			}
+
 		# 300 - 750
-			[[GT]
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value >= 750
+			inline_script = {
+			    script = conditional/tec_equal
+			    value = $GOOD|no$
+			    equal = yes
+			    code = "
+			        [[GT]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value >= 750
+        			}
+        			]
+        			[[GTE]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value >= 300
+        			}
+        			]
+        			[[EQ]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value >= 300
+        			}
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value < 750
+        			}
+        			]
+        			[[LTE]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value < 750
+        			}
+        			]
+        			[[LT]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value < 300
+        			}
+        			]
+			    "
 			}
-			]
-			[[GTE] 
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value >= 300
-			}
-			]
-			[[EQ] 
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value >= 300
-			}
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value < 750
-			}
-			]
-			[[LTE] 
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value < 750
-			}
-			]
-			[[LT] 
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value < 300
-			}
-			]
-		}
-		else_if = {
-			limit = {
-				always = $NEUTRAL|no$
-			}
+
 		# -300 - 300
-			[[GT] 
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value >= 300
+			inline_script = {
+			    script = conditional/tec_equal
+			    value = $NEUTRAL|no$
+			    equal = yes
+			    code = "
+			        [[GT]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value >= 300
+        			}
+        			]
+        			[[GTE]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value >= -300
+        			}
+        			]
+        			[[EQ]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value >= -300
+        			}
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value < 300
+        			}
+        			]
+        			[[LTE]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value < 300
+        			}
+        			]
+        			[[LT]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value < -300
+        			}
+        			]
+			    "
 			}
-			]
-			[[GTE] 
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value >= -300
-			}
-			]
-			[[EQ] 
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value >= -300
-			}
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value < 300
-			}
-			]
-			[[LTE] 
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value < 300
-			}
-			]
-			[[LT]
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value < -300
-			}
-			]
-		}
-		else_if = {
-			limit = {
-				always = $POOR|no$
-			}
+
 		# -750 - -300
-			[[GT]
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value >= -300
-			}
-			]
-			[[GTE]
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value >= -750
-			}
-			]
-			[[EQ]
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value >= -750
-			}
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value < -300
-			}
-			]
-			[[LTE]
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value < -300
-			}
-			]
-			[[LT]
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value < -750
-			}
-			]
-		}
-		else_if = {
-			limit = {
-				always = $TERRIBLE|no$
+			inline_script = {
+			    script = conditional/tec_equal
+			    value = $POOR|no$
+			    equal = yes
+			    code = "
+			        [[GT]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value >= -300
+        			}
+        			]
+        			[[GTE]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value >= -750
+        			}
+        			]
+        			[[EQ]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value >= -750
+        			}
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value < -300
+        			}
+        			]
+        			[[LTE]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value < -300
+        			}
+        			]
+        			[[LT]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value < -750
+        			}
+        			]
+			    "
 			}
 		# -3000 - -750
-			[[GT] 
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value >= -750
+			inline_script = {
+			    script = conditional/tec_equal
+			    value = $TERRIBLE|no$
+			    equal = yes
+			    code = "
+			        [[GT]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value >= -750
+        			}
+        			]
+        			[[GTE]
+        			always = yes
+        			]
+        			[[EQ]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value < -750
+        			}
+        			]
+        			[[LTE]
+        			check_variable_arithmetic = {
+        				which = tec_cache_tec_opinion_total
+        				value < -750
+        			}
+        			]
+        			[[LT]
+        			always = no
+        			]
+			    "
 			}
-			]
-			[[GTE] 
-			always = yes
-			]
-			[[EQ] 
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value < -750
-			}
-			]
-			[[LTE] 
-			check_variable_arithmetic = {
-				which = tec_cache_tec_opinion_total
-				value < -750
-			}
-			]
-			[[LT] 
-			always = no
-			]
 		}
-	}
+
 }
 
 # scope: leader
@@ -4040,16 +4403,14 @@ _tec_leader_trait_already_exists_in_empire = {
 
 tec_planet_has_swappable_industrial_district = {
 	NOR = {
-		AND = {
-			tec_is_decadent_city_planet = no
-			OR = {
-				uses_district_set = city_world
-				tec_pd_arcology_arms_trigger = yes
-			}
+		tec_has_standard_industrial_district = yes
+		OR = {
+			uses_district_set = city_world
+			tec_pd_arcology_arms_trigger = yes
 		}
-		tec_is_arcology_habitat = yes
-		tec_is_unspecced_ringworld = no
-		tec_is_unspecced_elysium = no
+		tec_uses_habitat_districts = yes
+		tec_uses_ringworld_districts = yes
+		tec_uses_elysium_districts = yes
 		tec_is_ecoworld = yes
 	}
 }
@@ -4075,20 +4436,25 @@ tec_country_composer_civics_dislike = {
 }
 
 tec_country_composer_ethics_like = {
+	inline_script = {
+		script = tec_type_hint
+		bool = $fanatic$
+	}
 	OR = {
 		has_ethic = ethic_[[fanatic]fanatic_]ecologist
 		has_ethic = ethic_[[fanatic]fanatic_]xenophile
 	}
-	[[fanatic]]
 }
 
 tec_country_composer_ethics_dislike = {
+	inline_script = {
+		script = tec_type_hint
+		bool = $fanatic$
+	}
 	OR = {
 		has_ethic = ethic_[[fanatic]fanatic_]xenophobe
 		has_ethic = ethic_[[fanatic]fanatic_]industrialist
 	}
-
-	[[fanatic]]
 }
 
 tec_country_composer_traditions_like = {
@@ -4152,18 +4518,23 @@ tec_country_eater_civics_dislike = {
 }
 
 tec_country_eater_ethics_like = {
+	inline_script = {
+		script = tec_type_hint
+		bool = $fanatic$
+	}
 	OR = {
 		has_ethic = ethic_[[fanatic]fanatic_]militarist
 	}
-	[[fanatic]]
 }
 
 tec_country_eater_ethics_dislike = {
+	inline_script = {
+		script = tec_type_hint
+		bool = $fanatic$
+	}
 	OR = {
 		has_ethic = ethic_[[fanatic]fanatic_]pacifist
 	}
-	
-	[[fanatic]]
 }
 
 tec_country_eater_traditions_like = {
@@ -4216,20 +4587,25 @@ tec_country_instrument_civics_dislike = {
 }
 
 tec_country_instrument_ethics_like = {
+	inline_script = {
+		script = tec_type_hint
+		bool = $fanatic$
+	}
 	OR = {
 		has_ethic = ethic_[[fanatic]fanatic_]authoritarian
 		has_ethic = ethic_[[fanatic]fanatic_]elitist
 	}
-	[[fanatic]]
 }
 
 tec_country_instrument_ethics_dislike = {
+	inline_script = {
+		script = tec_type_hint
+		bool = $fanatic$
+	}
 	OR = {
 		has_ethic = ethic_[[fanatic]fanatic_]egalitarian
 		has_ethic = ethic_[[fanatic]fanatic_]pluralist
 	}
-
-	[[fanatic]]
 }
 
 tec_country_instrument_traditions_like = {
@@ -4289,20 +4665,25 @@ tec_country_whisperers_civics_dislike = {
 }
 
 tec_country_whisperers_ethics_like = {
+	inline_script = {
+		script = tec_type_hint
+		bool = $fanatic$
+	}
 	OR = {
 		has_ethic = ethic_[[fanatic]fanatic_]materialist
 		has_ethic = ethic_[[fanatic]fanatic_]competitive
 	}
-	[[fanatic]]
 }
 
 tec_country_whisperers_ethics_dislike = {
+	inline_script = {
+		script = tec_type_hint
+		bool = $fanatic$
+	}
 	OR = {
 		has_ethic = ethic_[[fanatic]fanatic_]spiritualist
 		has_ethic = ethic_[[fanatic]fanatic_]cooperative
 	}
-
-	[[fanatic]]
 }
 
 tec_country_whisperers_traditions_like = {
@@ -4553,7 +4934,12 @@ tec_blocks_urban_designations = {
 		uses_district_set = city_world
 		tec_uses_ringworld_districts = yes
 		uses_district_set = habitat
-		tec_is_pd_nonconventional_world = yes
+		inline_script = {
+		    script = mod_support/tec_pd_present
+		    code = "
+		        tec_is_pd_nonconventional_world = yes
+		    "
+		}
 
 		inline_script = {
             script = mod_support/tec_trigger_include
@@ -4567,7 +4953,12 @@ tec_blocks_rural_designations = {
 		uses_district_set = city_world
 		tec_uses_ringworld_districts = yes
 		uses_district_set = habitat
-		tec_is_pd_nonconventional_world = yes
+		inline_script = {
+		    script = mod_support/tec_pd_present
+		    code = "
+		        tec_is_pd_nonconventional_world = yes
+		    "
+		}
 
 		inline_script = {
             script = mod_support/tec_trigger_include
@@ -4582,7 +4973,12 @@ tec_blocks_industrial_designations = {
 		uses_district_set = machine_world
 		uses_district_set = hive_world
 		uses_district_set = habitat
-		tec_is_pd_nonconventional_world = yes
+		inline_script = {
+		    script = mod_support/tec_pd_present
+		    code = "
+		        tec_is_pd_nonconventional_world = yes
+		    "
+		}
 
 		inline_script = {
             script = mod_support/tec_trigger_include
