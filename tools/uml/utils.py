@@ -11,6 +11,25 @@ from .uml_types import Config, ResourceStr, MissingSpritesConfig
 BASE_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
+class div_str(str):
+    def __truediv__(self, other):
+        return div_str(f"{self}/{other}")
+
+
+AUTH_SWAPS_INLINE_NAME = div_str("governments/authorities/tec_auth_swaps")
+AUTH_SWAPS_INLINE_NAME_TEMPLATE = div_str("governments/authorities/tec_{0}_swap")
+AUTH_SWAPS_INLINE_NAME_TEMPLATE_SUFFIX = "governments/authorities/tec_{0}_swaps_{1}.txt"
+TRAIT_INLINE_NAME = div_str("traits/tec_extend_trait")
+TRAIT_INLINE_NAME_TEMPLATE = div_str("traits/tec_extend_{0}")
+TRAIT_INLINE_NAME_TEMPLATE_SUFFIX = "traits/tec_extend_{0}_{1}.txt"
+SUPPORT_FOLDER = div_str("evolved_support")
+INLINE_FOLDER = div_str("common/inline_scripts")
+SCRIPTED_TRIGGERS = div_str("common/scripted_triggers")
+SCRIPTED_EFFECTS = div_str("common/scripted_effects")
+SCRIPTED_VARIABLES = div_str("common/scripted_variables")
+SCRIPT_VALUES = div_str("common/script_values")
+SUFFIX_PLACEHOLDER = "\\<suffix\\>"
+
 def load_config(path: str) -> Config:
     with open(path, 'r', encoding='utf8') as f:
         ret = yaml.load(f, FullLoader)

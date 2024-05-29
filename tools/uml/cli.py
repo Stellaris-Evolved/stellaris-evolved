@@ -11,7 +11,10 @@ import click as click
 from tools.uml.copy_locs import extract_keys_to_replace, copy_locs_from_folder, replace_keys
 from tools.uml.icon import generate_resource_icons, generate_job_icons
 from tools.uml.modifier import generate_modifiers, generate_buildings_loc, generate_jobs_loc
-from tools.uml.utils import load_config, Writer, BASE_PATH, create_sprites_for_cleanup
+from tools.uml.utils import load_config, Writer, BASE_PATH, create_sprites_for_cleanup, AUTH_SWAPS_INLINE_NAME, \
+    AUTH_SWAPS_INLINE_NAME_TEMPLATE, SUPPORT_FOLDER, INLINE_FOLDER, SCRIPTED_TRIGGERS, SCRIPT_VALUES, SCRIPTED_EFFECTS, \
+    SCRIPTED_VARIABLES, AUTH_SWAPS_INLINE_NAME_TEMPLATE_SUFFIX, SUFFIX_PLACEHOLDER, TRAIT_INLINE_NAME, \
+    TRAIT_INLINE_NAME_TEMPLATE_SUFFIX, TRAIT_INLINE_NAME_TEMPLATE
 
 
 @click.group()
@@ -112,9 +115,10 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
             with open(filename, 'r') as f:
                 lines = f.readlines()
                 for i, line in enumerate(lines):
-                    matches = re.match(f"\\s*include_script\\s*=\\s*\"?([a-z_A-Z\\d/$]*)\"?", line)
+                    matches = re.match(f"\\s*include_script\\s*=\\s*\"?([a-z_A-Z\\d/]+\s)\"?", line)
                     if matches and matches.group(1) and 'iterators' not in matches.group(1):
-                        inlines[matches.group(1)] = (os.path.relpath(filename, base_mod_path).replace('\\', '/'), i + 1)
+                        print(matches)
+                        inlines[matches.group(1).strip()] = (os.path.relpath(filename, base_mod_path).replace('\\', '/'), i + 1)
 
     scripted_triggers = {}
 
@@ -147,7 +151,7 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
             with open(filename, 'r') as f:
                 should_look_for_trigger = False
                 lines = f.readlines()
-                found_triggers = []
+                found_values = []
                 for i, line in enumerate(lines):
                     if not should_look_for_trigger:
                         matches = re.match("\\s*script\\s*=\\s*mod_support/tec_value_include", line)
@@ -156,10 +160,10 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                         should_look_for_trigger = False
                         matches = re.match(f"\\s*value\\s*=\\s*\"?([a-z_A-Z\\d]*)\"?", line)
                         if matches and matches.group(1):
-                            found_triggers.append(matches.group(1))
+                            found_values.append(matches.group(1))
 
                 for i, line in enumerate(lines):
-                    for s in found_triggers:
+                    for s in found_values:
                         matches = re.match(f"\\s*{s}\\s*=\\s*{{", line)
                         if matches:
                             script_values[s] = (filename[len(str(base_mod_path)) + 1:].replace('\\', '/'), i + 1)
@@ -188,37 +192,90 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                         if matches:
                             scripted_effects[s] = (filename[len(str(base_mod_path)) + 1:].replace('\\', '/'), i + 1)
 
+    authorities_with_swaps = {}
+
+    for filename in glob.iglob(str(base_mod_path / f"common/governments/**/**"), recursive=True):
+        if '.txt' in filename:
+            with open(filename, 'r') as f:
+                should_look_for_trigger = False
+                lines = f.readlines()
+                found_authorities = []
+                for i, line in enumerate(lines):
+                    if not should_look_for_trigger:
+                        matches = re.match(f"\\s*script\\s*=\\s*{AUTH_SWAPS_INLINE_NAME}", line)
+                        should_look_for_trigger = matches
+                    else:
+                        should_look_for_trigger = False
+                        matches = re.match(f"\\s*authority\\s*=\\s*\"?([a-z_A-Z\\d]*)\"?", line)
+                        if matches and matches.group(1):
+                            found_authorities.append(matches.group(1))
+
+                for i, line in enumerate(lines):
+                    for s in found_authorities:
+                        matches = re.match(f"\\s*{s}\\s*=\\s*{{", line)
+                        if matches:
+                            authorities_with_swaps[s] = (filename[len(str(base_mod_path)) + 1:].replace('\\', '/'), i + 1)
+
+    extendable_traits = {}
+
+    for filename in glob.iglob(str(base_mod_path / f"common/traits/**/**"), recursive=True):
+        if '.txt' in filename:
+            with open(filename, 'r') as f:
+                should_look_for_trigger = False
+                lines = f.readlines()
+                found_traits = []
+                for i, line in enumerate(lines):
+                    if not should_look_for_trigger:
+                        matches = re.match(f"\\s*script\\s*=\\s*{TRAIT_INLINE_NAME}", line)
+                        should_look_for_trigger = matches
+                    else:
+                        should_look_for_trigger = False
+                        matches = re.match(f"\\s*trait\\s*=\\s*\"?([a-z_A-Z\\d]*)\"?", line)
+                        if matches and matches.group(1):
+                            found_traits.append(matches.group(1))
+
+                for i, line in enumerate(lines):
+                    for s in found_traits:
+                        matches = re.match(f"\\s*{s}\\s*=\\s*{{", line)
+                        if matches:
+                            extendable_traits[s] = (filename[len(str(base_mod_path)) + 1:].replace('\\', '/'), i + 1)
+
     suffixes = cfg['addons']['suffixes']
     scripted_trigger_defaults = cfg['addons'].get('scripted_trigger_defaults', [])
 
     new_line = '\n'
 
-    if (base_mod_path / f"common/inline_scripts/evolved_support").exists():
-        shutil.rmtree(base_mod_path / f"common/inline_scripts/evolved_support")
-
-    auth_inlines = set()
+    if (base_mod_path / INLINE_FOLDER / SUPPORT_FOLDER).exists():
+        shutil.rmtree(base_mod_path / INLINE_FOLDER / SUPPORT_FOLDER)
 
     for inline, suffix in itertools.product(inlines.items(), suffixes):
-        print(inline)
-        if '$authority$' in inline[0]:
-            for authority in cfg['authorities']:
-                os.makedirs(os.path.dirname(base_mod_path / f"common/inline_scripts/evolved_support/{inline[0].replace('$authority$', authority)}_{suffix}.txt"),
-                            exist_ok=True)
-                (base_mod_path / f"common/inline_scripts/evolved_support/{inline[0].replace('$authority$', authority)}_{suffix}.txt").touch()
-            auth_inlines.add(inline)
-        else:
-            os.makedirs(os.path.dirname(base_mod_path / f"common/inline_scripts/evolved_support/{inline[0]}_{suffix}.txt"),
+        if '$' not in inline:
+            os.makedirs(os.path.dirname(base_mod_path / f"{INLINE_FOLDER}/{SUPPORT_FOLDER}/{inline[0]}_{suffix}.txt"),
                         exist_ok=True)
-            (base_mod_path / f"common/inline_scripts/evolved_support/{inline[0]}_{suffix}.txt").touch()
+            (base_mod_path / f"{INLINE_FOLDER}/{SUPPORT_FOLDER}/{inline[0]}_{suffix}.txt").touch()
 
     doc_inlines = dict(inlines)
-    for inline in auth_inlines:
-        for authority in cfg['authorities']:
-            doc_inlines[inline[0].replace('$authority$', authority)] = inline[1]
+    auth_inlines = {}
+    trait_inlines = {}
 
-    doc_inlines = sorted(doc_inlines.items(), key=lambda x: x[0])
+    for authority, suffix in itertools.product(authorities_with_swaps.items(), suffixes):
+        path = base_mod_path / INLINE_FOLDER / SUPPORT_FOLDER / AUTH_SWAPS_INLINE_NAME_TEMPLATE_SUFFIX.format(authority[0], suffix)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        path.touch()
+        doc_inlines[AUTH_SWAPS_INLINE_NAME_TEMPLATE.format(authority[0])] = authority[1]
+        auth_inlines[authority[0]] = (*authority[1], f"use inline {SUPPORT_FOLDER / (AUTH_SWAPS_INLINE_NAME_TEMPLATE_SUFFIX.format(authority[0], SUFFIX_PLACEHOLDER))}")
 
-    with open(base_mod_path / "common/inline_scripts/mod_support/tec_trigger_placeholders.txt", 'w') as f:
+
+    for trait, suffix in itertools.product(extendable_traits.items(), suffixes):
+        path = base_mod_path / INLINE_FOLDER / SUPPORT_FOLDER / TRAIT_INLINE_NAME_TEMPLATE_SUFFIX.format(trait[0], suffix)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        path.touch()
+        doc_inlines[TRAIT_INLINE_NAME_TEMPLATE.format(trait[0])] = trait[1]
+        trait_inlines[trait[0]] = (*trait[1], f"use inline {SUPPORT_FOLDER / (TRAIT_INLINE_NAME_TEMPLATE_SUFFIX.format(trait[0], SUFFIX_PLACEHOLDER))}")
+
+
+
+    with open(base_mod_path / f"{INLINE_FOLDER}/mod_support/tec_trigger_placeholders.txt", 'w') as f:
         f.write("# mod_support/tec_trigger_placeholders\n")
         f.write("# This file is autogenerated\n")
 
@@ -246,7 +303,7 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                 }}
             """))
 
-    with open(base_mod_path / "common/inline_scripts/mod_support/tec_trigger_include.txt", 'w') as f:
+    with open(base_mod_path / f"{INLINE_FOLDER}/mod_support/tec_trigger_include.txt", 'w') as f:
         f.write("# mod_support/tec_trigger_include\n")
         f.write("# This file is autogenerated\n")
 
@@ -270,7 +327,7 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                     }}
                 """))
 
-    with open(base_mod_path / "common/inline_scripts/mod_support/tec_effect_placeholders.txt", 'w') as f:
+    with open(base_mod_path / f"{INLINE_FOLDER}/mod_support/tec_effect_placeholders.txt", 'w') as f:
         f.write("# mod_support/tec_effect_placeholders\n")
         f.write("# This file is autogenerated\n")
 
@@ -296,7 +353,7 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                 }}
             """))
 
-    with open(base_mod_path / "common/inline_scripts/mod_support/tec_effect_include.txt", 'w') as f:
+    with open(base_mod_path / f"{INLINE_FOLDER}/mod_support/tec_effect_include.txt", 'w') as f:
         f.write("# mod_support/tec_effect_include\n")
         f.write("# This file is autogenerated\n")
 
@@ -320,7 +377,7 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                     }}
                 """))
 
-    with open(base_mod_path / "common/inline_scripts/mod_support/tec_value_placeholders.txt", 'w') as f:
+    with open(base_mod_path / f"{INLINE_FOLDER}/mod_support/tec_value_placeholders.txt", 'w') as f:
         f.write("# mod_support/tec_value_placeholders\n")
         f.write("# This file is autogenerated\n")
 
@@ -345,7 +402,7 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                     }}
                 """))
 
-    with open(base_mod_path / "common/inline_scripts/mod_support/tec_value_include.txt", 'w') as f:
+    with open(base_mod_path / f"{INLINE_FOLDER}/mod_support/tec_value_include.txt", 'w') as f:
         f.write("# mod_support/tec_value_include\n")
         f.write("# This file is autogenerated\n")
 
@@ -368,7 +425,7 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                     }}
                 """))
 
-    with open(base_mod_path / "common/inline_scripts/mod_support/tec_inlines_include.txt", 'w') as f:
+    with open(base_mod_path / f"{INLINE_FOLDER}/mod_support/tec_inlines_include.txt", 'w') as f:
         f.write("# mod_support/tec_inlines_include\n")
         f.write("# This file is autogenerated\n")
 
@@ -385,14 +442,14 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                     script = conditional/tec_number_inline
                     value = @tec_{s}_addon_present
                     equal = 1
-                    inline = evolved_support/$include_script$_{s}
+                    inline = {SUPPORT_FOLDER}/$include_script$_{s}
                     parameters = "
                         $parameters$
                     "
                 }}
             """))
 
-    with open(base_mod_path / "common/scripted_triggers/!!_evolved_addon_triggers.txt", 'w') as f:
+    with open(base_mod_path / f"{SCRIPTED_TRIGGERS}/!!_evolved_addon_triggers.txt", 'w') as f:
         f.write("# This file is autogenerated\n")
 
         for s in scripted_triggers:
@@ -405,7 +462,7 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
             """))
 
 
-    with open(base_mod_path / "common/script_values/!!_evolved_addon_script_values.txt", 'w') as f:
+    with open(base_mod_path / f"{SCRIPT_VALUES}/!!_evolved_addon_script_values.txt", 'w') as f:
         f.write("# This file is autogenerated\n")
         for s in script_values:
             f.write(textwrap.dedent(f"""\
@@ -415,7 +472,7 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                 }}
             """))
 
-    with open(base_mod_path / "common/scripted_effects/!!_evolved_addon_effects.txt", 'w') as f:
+    with open(base_mod_path / f"{SCRIPTED_EFFECTS}/!!_evolved_addon_effects.txt", 'w') as f:
         f.write("# This file is autogenerated\n")
 
         for s in scripted_effects:
@@ -426,7 +483,7 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
                 }}
             """))
 
-    with open(base_mod_path / "common/scripted_variables/zzz_evolved_addon_variables.txt", 'w') as f:
+    with open(base_mod_path / f"{SCRIPTED_VARIABLES}/zzz_evolved_addon_variables.txt", 'w') as f:
         f.write("# This file is autogenerated\n")
         f.write(textwrap.dedent(f"""\
             {new_line.join(f"@tec_{s}_addon_present = 0" for s in suffixes).strip()}
@@ -455,7 +512,15 @@ def create_compat_inlines(config: str, local_config: str, base_mod_path: str):
             
             ## Current supported inline_scripts
             
-            {new_line.join(f"            * [{s[0]}]({s[1][0]}#L{s[1][1]})" for s in doc_inlines).strip()}
+            {new_line.join(f"            * [{s[0]}]({s[1][0]}#L{s[1][1]})" for s in sorted(doc_inlines.items())).strip()}
+            
+            ## Authorities with extendable swaps without overwrites
+            
+            {new_line.join(f"            * [{s[0]}]({s[1][0]}#L{s[1][1]}) - {s[1][2]}" for s in sorted(auth_inlines.items())).strip()}
+            
+            ## Traits that can be extended without overwrites
+            
+            {new_line.join(f"            * [{s[0]}]({s[1][0]}#L{s[1][1]}) - {s[1][2]}" for s in sorted(trait_inlines.items())).strip()}
         """))
 
 
