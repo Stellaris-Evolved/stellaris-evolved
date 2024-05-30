@@ -8,14 +8,12 @@ from yaml import FullLoader
 
 from .uml_types import Config, ResourceStr, MissingSpritesConfig
 
-BASE_PATH = os.path.dirname(os.path.realpath(__file__))
-
-
 class div_str(str):
     def __truediv__(self, other):
         return div_str(f"{self}/{other}")
 
 
+BASE_PATH = div_str(os.path.dirname(os.path.realpath(__file__)))
 AUTH_SWAPS_INLINE_NAME = div_str("governments/authorities/tec_auth_swaps")
 AUTH_SWAPS_INLINE_NAME_TEMPLATE = div_str("governments/authorities/tec_{0}_swap")
 AUTH_SWAPS_INLINE_NAME_TEMPLATE_SUFFIX = "governments/authorities/tec_{0}_swaps_{1}.txt"
