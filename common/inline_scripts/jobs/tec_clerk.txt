@@ -6,7 +6,6 @@ inline_script = {
 }
 
 
-
 inline_script = { # Colonists
 	script = jobs/tec_job
 	trigger = "
@@ -14,10 +13,14 @@ inline_script = { # Colonists
 
 		$trigger$
 		
+		inline_script = {
+			script = jobs/helper/tec_planet_not_exists_or_job_trigger
+			trigger = tec_has_clerk_planet_swap
+			negate = yes
+		}
 		owner = {
-
-			tec_uses_regular_empire_jobs = { cached = yes }
-			NOT = { tec_has_clerk_swap = { cached = yes } }
+			inline_script = { script = tec_read_cache scope = country trigger = tec_uses_regular_empire_jobs }
+			NOT = { inline_script = { script = tec_read_cache scope = country trigger = tec_has_clerk_swap } }
 		}
 	"
 	job = clerk
@@ -27,14 +30,39 @@ inline_script = { # Colonists
 }
 
 inline_script = {
+	script = jobs/tec_job
+	job = resort_worker
+	count = $count$
+	mult = $mult$
+	display = $display$
+	trigger = "
+		exists = planet
+		planet = {
+			has_modifier = resort_colony
+		}
+		owner = {
+			inline_script = { script = tec_read_cache scope = country trigger = tec_uses_regular_empire_jobs }
+		}
+	"
+}
+
+inline_script = {
 	script = jobs/tec_distributism_swaps
 	trigger = "
 		$trigger$
+
+		inline_script = {
+			script = jobs/helper/tec_planet_not_exists_or_job_trigger
+			trigger = tec_has_clerk_planet_swap
+			negate = yes
+		}
 	"
 	count = $secondary_count$
 	mult = $mult$
 	display = $display$
 }
+
+
 
 inline_script = {
 	script = mod_support/tec_inlines_include
