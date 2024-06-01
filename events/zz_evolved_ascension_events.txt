@@ -7935,9 +7935,1445 @@ namespace = tec_gene_path
   # /
  # /
  # --------------- GENE T2 POSTMECHANIC
-  # ---------- Genetic gathering mechanic
-  # /
-  # ---------- Trait improvement mechanic
+  # ---------- Recombination mechanic
+	country_event = { # Agenda picked - Genetic Recombination
+		id = tec_gene_path.300
+		title = "tec_gene_path.300.name"
+		# Descs
+			# Regular
+			desc = {
+				text = "tec_gene_path.300.desc.regular"
+				trigger = {
+					is_gestalt = no
+				}
+			}
+			# Gestalt
+			desc = {
+				text = "tec_gene_path.300.desc.hive"
+				trigger = {
+					is_gestalt = yes
+				}
+			}
+			# Fallback
+			desc = "tec_gene_path.300.desc.regular"
+		# /
+		picture = GFX_evt_overtuned
+		show_sound = event_evolution_mastery
+		trackable = yes
+
+		is_triggered_only = yes
+
+		immediate = {
+			owner_main_species = {
+				save_event_target_as = tec_target_species
+			}
+			save_event_target_as = tec_temp_country
+			event_target:tec_temp_country = {
+				start_situation = {
+					type = situation_tec_ascension_genetic_recombination
+					target = event_target:tec_temp_country.capital_scope
+					effect = {
+						save_event_target_as = new_situation
+						set_situation_locked = yes
+					}
+				}
+			}
+		}
+
+		# Options
+			option = {
+				name = "tec_gene_path.300.slow"
+				custom_tooltip = "tec_gene_path.300.slow.tooltip"
+				icon = {
+					icon = GFX_situation_approach_genetics
+					icon_background = GFX_situation_approach_bg_tec_blue
+					text = set_situation_approach_icon_text
+				}
+				hidden_effect = {
+					event_target:new_situation = {
+						set_situation_approach = situation_tec_ascension_genetic_recombination_approach_slow
+						set_situation_locked = no
+					}
+				}
+			}
+			option = {
+				name = "tec_gene_path.300.standard"
+				custom_tooltip = "tec_gene_path.300.standard.tooltip"
+				icon = {
+					icon = GFX_situation_approach_research
+					icon_background = GFX_situation_approach_bg_green
+					text = set_situation_approach_icon_text
+				}
+				hidden_effect = {
+					event_target:new_situation = {
+						set_situation_approach = situation_tec_ascension_genetic_recombination_approach_basic
+						set_situation_locked = no
+					}
+				}
+			}
+			option = {
+				name = "tec_gene_path.300.fast"
+				custom_tooltip = "tec_gene_path.300.fast.tooltip"
+				icon = {
+					icon = GFX_situation_approach_tec_genecrank
+					icon_background = GFX_situation_approach_bg_yellow
+					text = set_situation_approach_icon_text
+				}
+				hidden_effect = {
+					event_target:new_situation = {
+						set_situation_approach = situation_tec_ascension_genetic_recombination_approach_fast
+						set_situation_locked = no
+					}
+				}
+			}
+		# /
+	}
+	situation_event = { # Recombination - 10% - Select the focus
+		id = tec_gene_path.30010
+		title = "tec_gene_path.30010.name"
+		# Descs
+			desc = {	# Fallback
+				text = "tec_gene_path.30010.desc.regular"
+				trigger = { always = yes }
+			}
+		# /
+		picture = GFX_evt_tec_orange_strings
+		#show_sound = event_evolution_mastery
+		is_triggered_only = yes
+		situation = this
+		location = target
+
+		immediate = {
+			hidden_effect = {
+				set_situation_locked = yes
+			}
+		}
+
+		after = {
+			hidden_effect = {
+				set_situation_locked = no
+			}
+		}
+
+		# Options
+			option = {
+				name = tec_gene_path.30010.recombine.upgrade
+				custom_tooltip = tec_gene_path.30010.recombine.upgrade.tooltip
+				icon = {
+					icon = GFX_situation_approach_genetics
+					icon_background = GFX_situation_approach_bg_tec_orange
+					text = tec_icon_text_outcome_neutral
+				}
+				allow = {
+					custom_tooltip = {
+						fail_text = tec_gene_path.30010.recombine.upgrade.nope
+						hidden_trigger = {
+							owner = {
+								tec_has_all_genetic_perfection_upgraded_trait_flags = no
+							}
+						}
+					}
+				}
+				hidden_effect = {
+					set_situation_flag = tec_gene_recombination_upgrade
+				}
+			}
+			option = {
+				name = tec_gene_path.30010.recombine.point
+				custom_tooltip = tec_gene_path.30010.recombine.point.tooltip
+				icon = {
+					icon = GFX_situation_approach_research
+					icon_background = GFX_situation_approach_bg_tec_orange
+					text = tec_icon_text_outcome_neutral
+				}
+				hidden_effect = {
+					set_situation_flag = tec_gene_recombination_point
+				}
+			}
+		# /
+	}
+	situation_event = { # Recombination - 25% - SORTER
+		id = tec_gene_path.30025
+		hide_window = yes
+		is_triggered_only = yes
+		situation = this
+		location = target
+
+		immediate = {
+			hidden_effect = {
+				if = {	# Trait upgrade
+					limit = {
+						has_situation_flag = tec_gene_recombination_upgrade
+					}
+					situation_event = {
+						id = tec_gene_path.30125
+					}
+				}
+				else_if = {	# Trait point increase
+					limit = {
+						has_situation_flag = tec_gene_recombination_point
+					}
+					situation_event = {
+						id = tec_gene_path.30925
+					}
+				}
+				else = {	# Fallback to trait increase
+					situation_event = {
+						id = tec_gene_path.30925
+					}
+				}
+			}
+		}
+	}
+	situation_event = { # Recombination - 25A% - Select the trait type
+		id = tec_gene_path.30125
+		title = "tec_gene_path.30125.name"
+		# Descs
+			desc = {	# Fallback
+				text = "tec_gene_path.30125.desc.regular"
+				trigger = { always = yes }
+			}
+		# /
+		picture = GFX_evt_tec_orange_strings
+		#show_sound = event_evolution_mastery
+		is_triggered_only = yes
+		situation = this
+		location = target
+
+		immediate = {
+			hidden_effect = {
+				set_situation_locked = yes
+			}
+		}
+
+		after = {
+			hidden_effect = {
+				set_situation_locked = no
+			}
+		}
+
+		# Options
+			option = {	# Main trait
+				name = tec_gene_path.30125.recombine.main
+				custom_tooltip = tec_gene_path.30125.recombine.main.tooltip
+				icon = {
+					icon = GFX_situation_approach_genetics
+					icon_background = GFX_situation_approach_bg_tec_orange
+					text = tec_icon_text_outcome_neutral
+				}
+				allow = {
+					custom_tooltip = {
+						fail_text = tec_gene_path.30125.already.unlocked.all
+						hidden_trigger = {
+							exists = owner
+							owner = {
+								tec_has_all_genetic_perfection_advanced_trait_flags = no
+							}
+						}
+					}
+				}
+				hidden_effect = {
+					set_situation_flag = tec_gene_recombination_main_trait
+				}
+			}
+			option = {	# Advanced trait
+				name = tec_gene_path.30125.recombine.advanced
+				custom_tooltip = tec_gene_path.30125.recombine.advanced.tooltip
+				icon = {
+					icon = GFX_situation_approach_genetics
+					icon_background = GFX_situation_approach_bg_tec_orange
+					text = tec_icon_text_outcome_neutral
+				}
+				allow = {
+					custom_tooltip = {
+						fail_text = tec_gene_path.30125.already.unlocked.all
+						hidden_trigger = {
+							exists = owner
+							owner = {
+								tec_has_all_genetic_perfection_advanced_trait_flags = no
+							}
+						}
+					}
+				}
+				hidden_effect = {
+					set_situation_flag = tec_gene_recombination_advanced_trait
+				}
+			}
+			option = {	# Normal trait
+				name = tec_gene_path.30125.recombine.normal
+				custom_tooltip = tec_gene_path.30125.recombine.normal.tooltip
+				icon = {
+					icon = GFX_situation_approach_genetics
+					icon_background = GFX_situation_approach_bg_tec_orange
+					text = tec_icon_text_outcome_neutral
+				}
+				allow = {
+					custom_tooltip = {
+						fail_text = tec_gene_path.30125.already.unlocked.all
+						hidden_trigger = {
+							exists = owner
+							owner = {
+								tec_has_all_genetic_perfection_advanced_trait_flags = no
+							}
+						}
+					}
+				}
+				hidden_effect = {
+					set_situation_flag = tec_gene_recombination_normal_trait
+				}
+			}
+			#option = {	# Rare trait - moved to trait point lotto
+			#	name = tec_gene_path.30125.recombine.rare
+			#	custom_tooltip = tec_gene_path.30125.recombine.rare.tooltip
+			#	icon = {
+			#		icon = GFX_situation_approach_genetics
+			#		icon_background = GFX_situation_approach_bg_tec_orange
+			#		text = tec_icon_text_outcome_neutral
+			#	}
+			#	allow = {
+			#		custom_tooltip = {
+			#			fail_text = tec_gene_path.30125.already.unlocked.all
+			#			hidden_trigger = {
+			#				tec_has_all_genetic_perfection_recombined_trait_flags = no
+			#			}
+			#		}
+			#	}
+			#	hidden_effect = {
+			#		set_situation_flag = tec_gene_recombination_main_trait
+			#	}
+			#}
+		# /
+	}
+	situation_event = { # Recombination - 25B% - WIP Trait increase puzzle
+		id = tec_gene_path.30925
+		title = "tec_gene_path.30925.name"
+		# Descs
+			desc = {	# Fallback
+				text = "tec_gene_path.30925.desc.regular"
+				trigger = { always = yes }
+			}
+		# /
+		picture = GFX_evt_tec_orange_strings
+		#show_sound = event_evolution_mastery
+		is_triggered_only = yes
+		situation = this
+		location = target
+
+		immediate = {
+			hidden_effect = {
+				set_situation_locked = yes
+			}
+		}
+
+		after = {
+			hidden_effect = {
+				set_situation_locked = no
+			}
+		}
+
+		# Options
+			option = {	# Option A
+				name = tec_gene_path.30925.lotto.red
+				custom_tooltip = tec_gene_path.30925.lotto.red.tooltip
+				icon = {
+					icon = GFX_situation_approach_genetics
+					icon_background = GFX_situation_approach_bg_red
+					text = tec_icon_text_outcome_neutral
+				}
+				hidden_effect = {
+					set_situation_flag = tec_gene_recombination_red
+				}
+			}
+			option = {	# Option B
+				name = tec_gene_path.30925.lotto.green
+				custom_tooltip = tec_gene_path.30925.lotto.green.tooltip
+				icon = {
+					icon = GFX_situation_approach_genetics
+					icon_background = GFX_situation_approach_bg_green
+					text = tec_icon_text_outcome_neutral
+				}
+				hidden_effect = {
+					set_situation_flag = tec_gene_recombination_green
+				}
+			}
+			option = {	# Option C
+				name = tec_gene_path.30925.lotto.blue
+				custom_tooltip = tec_gene_path.30925.lotto.blue.tooltip
+				icon = {
+					icon = GFX_situation_approach_genetics
+					icon_background = GFX_situation_approach_bg_tec_blue
+					text = tec_icon_text_outcome_neutral
+				}
+				hidden_effect = {
+					set_situation_flag = tec_gene_recombination_blue
+				}
+			}
+			option = {	# Option D
+				name = tec_gene_path.30925.lotto.yellow
+				custom_tooltip = tec_gene_path.30925.lotto.yellow.tooltip
+				icon = {
+					icon = GFX_situation_approach_genetics
+					icon_background = GFX_situation_approach_bg_yellow
+					text = tec_icon_text_outcome_neutral
+				}
+				hidden_effect = {
+					set_situation_flag = tec_gene_recombination_yellow
+				}
+			}
+		# /
+	}
+	situation_event = { # Recombination - 50% - SORTER
+		id = tec_gene_path.30050
+		hide_window = yes
+		is_triggered_only = yes
+		situation = this
+		location = target
+
+		immediate = {
+			hidden_effect = {
+				if = {
+					limit = {
+						has_situation_flag = tec_gene_recombination_main_trait
+					}
+					situation_event = {
+						id = tec_gene_path.30150
+					}
+				}
+				else_if = {
+					limit = {
+						has_situation_flag = tec_gene_recombination_advanced_trait
+					}
+					situation_event = {
+						id = tec_gene_path.30250
+					}
+				}
+				else_if = {	# Trait point increase
+					limit = {
+						has_situation_flag = tec_gene_recombination_normal_trait
+					}
+					situation_event = {
+						id = tec_gene_path.30350
+					}
+				}
+				else = {	# Fallback to trait increase
+					situation_event = {
+						id = tec_gene_path.30950
+					}
+				}
+			}
+		}
+	}
+	situation_event = { # Recombination - 50A1% - Main trait select
+		id = tec_gene_path.30150
+		title = "tec_gene_path.30150.name"
+		# Descs
+			desc = {	# Fallback
+				text = "tec_gene_path.30150.desc.regular"
+				trigger = { always = yes }
+			}
+		# /
+		picture = GFX_evt_tec_orange_strings
+		#show_sound = event_evolution_mastery
+		is_triggered_only = yes
+		situation = this
+		location = target
+
+		immediate = {
+			hidden_effect = {
+				set_situation_locked = yes
+			}
+		}
+
+		after = {
+			hidden_effect = {
+				set_situation_locked = no
+			}
+		}
+
+		# Options
+			option = {	# Main trait
+				name = tec_gene_path.30150.recombine.main
+				custom_tooltip = tec_gene_path.30150.recombine.main.tooltip
+				icon = {
+					icon = GFX_situation_approach_genetics
+					icon_background = GFX_situation_approach_bg_tec_orange
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					exists = owner
+					owner = {
+						NOR = {
+							has_country_flag = unlocked_trait_tec_gene_main_t2
+							has_country_flag = unlocked_trait_tec_gene_main_t3
+						}
+					}
+				}
+				hidden_effect = {
+					owner = {
+						if = {
+							limit = {
+								NOT = {
+									has_country_flag = unlocked_trait_tec_gene_main_t2
+								}
+							}
+							set_country_flag = tec_improve_trait_tec_gene_main_t1
+						}
+						else = {
+							set_country_flag = tec_improve_trait_tec_gene_main_t2
+						}
+					}
+				}
+			}
+		# /
+	}
+	situation_event = { # Recombination - 50A2% - Advanced trait select
+		id = tec_gene_path.30250
+		title = "tec_gene_path.30250.name"
+		# Descs
+			desc = {	# Fallback
+				text = "tec_gene_path.30250.desc.regular"
+				trigger = { always = yes }
+			}
+		# /
+		picture = GFX_evt_tec_orange_strings
+		#show_sound = event_evolution_mastery
+		is_triggered_only = yes
+		situation = this
+		location = target
+
+		immediate = {
+			hidden_effect = {
+				set_situation_locked = yes
+			}
+		}
+
+		after = {
+			hidden_effect = {
+				set_situation_locked = no
+			}
+		}
+
+		# Options
+			option = {
+				name = tec_gene_path.30250.recombine.automodding
+				custom_tooltip = tec_gene_path.30250.recombine.automodding.tooltip
+				icon = {
+					icon = "GFX_trait_tec_gene_automodding_t3"
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					exists = owner
+					owner = {
+						NOR = {
+							has_country_flag = unlocked_trait_tec_gene_automodding_t2
+							has_country_flag = unlocked_trait_tec_gene_automodding_t3
+						}
+					}
+				}
+				hidden_effect = {
+					owner = {
+						if = {
+							limit = {
+								NOT = {
+									has_country_flag = unlocked_trait_tec_gene_automodding_t2
+								}
+							}
+							set_country_flag = tec_improve_trait_tec_gene_automodding_t1
+						}
+						else = {
+							set_country_flag = tec_improve_trait_tec_gene_automodding_t2
+						}
+					}
+				}
+			}
+			option = {
+				name = tec_gene_path.30250.recombine.genius
+				custom_tooltip = tec_gene_path.30250.recombine.genius.tooltip
+				icon = {
+					icon = "GFX_trait_tec_gene_genius_t3"
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					exists = owner
+					owner = {
+						NOR = {
+							has_country_flag = unlocked_trait_tec_gene_genius_t2
+							has_country_flag = unlocked_trait_tec_gene_genius_t3
+						}
+					}
+				}
+				hidden_effect = {
+					owner = {
+						if = {
+							limit = {
+								NOT = {
+									has_country_flag = unlocked_trait_tec_gene_genius_t2
+								}
+							}
+							set_country_flag = tec_improve_trait_tec_gene_genius_t1
+						}
+						else = {
+							set_country_flag = tec_improve_trait_tec_gene_genius_t2
+						}
+					}
+				}
+			}
+			option = {
+				name = tec_gene_path.30250.recombine.will
+				custom_tooltip = tec_gene_path.30250.recombine.will.tooltip
+				icon = {
+					icon = "GFX_trait_tec_gene_will_t3"
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					exists = owner
+					owner = {
+						NOR = {
+							has_country_flag = unlocked_trait_tec_gene_will_t2
+							has_country_flag = unlocked_trait_tec_gene_will_t3
+						}
+					}
+				}
+				hidden_effect = {
+					owner = {
+						if = {
+							limit = {
+								NOT = {
+									has_country_flag = unlocked_trait_tec_gene_will_t2
+								}
+							}
+							set_country_flag = tec_improve_trait_tec_gene_will_t1
+						}
+						else = {
+							set_country_flag = tec_improve_trait_tec_gene_will_t2
+						}
+					}
+				}
+			}
+			option = {
+				name = tec_gene_path.30250.recombine.fertile
+				custom_tooltip = tec_gene_path.30250.recombine.fertile.tooltip
+				icon = {
+					icon = "GFX_trait_tec_gene_fertile_t3"
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					exists = owner
+					owner = {
+						NOR = {
+							has_country_flag = unlocked_trait_tec_gene_fertile_t2
+							has_country_flag = unlocked_trait_tec_gene_fertile_t3
+						}
+					}
+				}
+				hidden_effect = {
+					owner = {
+						if = {
+							limit = {
+								NOT = {
+									has_country_flag = unlocked_trait_tec_gene_fertile_t2
+								}
+							}
+							set_country_flag = tec_improve_trait_tec_gene_fertile_t1
+						}
+						else = {
+							set_country_flag = tec_improve_trait_tec_gene_fertile_t2
+						}
+					}
+				}
+			}
+			option = {
+				name = tec_gene_path.30250.recombine.robust
+				custom_tooltip = tec_gene_path.30250.recombine.robust.tooltip
+				icon = {
+					icon = "GFX_trait_tec_gene_robust_t3"
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					exists = owner
+					owner = {
+						NOR = {
+							has_country_flag = unlocked_trait_tec_gene_robust_t2
+							has_country_flag = unlocked_trait_tec_gene_robust_t3
+						}
+					}
+				}
+				hidden_effect = {
+					owner = {
+						if = {
+							limit = {
+								NOT = {
+									has_country_flag = unlocked_trait_tec_gene_robust_t2
+								}
+							}
+							set_country_flag = tec_improve_trait_tec_gene_robust_t1
+						}
+						else = {
+							set_country_flag = tec_improve_trait_tec_gene_robust_t2
+						}
+					}
+				}
+			}
+			option = {
+				name = tec_gene_path.30250.recombine.audacious
+				custom_tooltip = tec_gene_path.30250.recombine.audacious.tooltip
+				icon = {
+					icon = "GFX_trait_tec_gene_audacious_t3"
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					exists = owner
+					owner = {
+						NOR = {
+							has_country_flag = unlocked_trait_tec_gene_audacious_t2
+							has_country_flag = unlocked_trait_tec_gene_audacious_t3
+						}
+					}
+				}
+				hidden_effect = {
+					owner = {
+						if = {
+							limit = {
+								NOT = {
+									has_country_flag = unlocked_trait_tec_gene_audacious_t2
+								}
+							}
+							set_country_flag = tec_improve_trait_tec_gene_audacious_t1
+						}
+						else = {
+							set_country_flag = tec_improve_trait_tec_gene_audacious_t2
+						}
+					}
+				}
+			}
+			option = {
+				name = tec_gene_path.30250.recombine.lifespan
+				custom_tooltip = tec_gene_path.30250.recombine.lifespan.tooltip
+				icon = {
+					icon = "GFX_trait_tec_gene_lifespan_t3"
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					exists = owner
+					owner = {
+						NOR = {
+							has_country_flag = unlocked_trait_tec_gene_lifespan_t2
+							has_country_flag = unlocked_trait_tec_gene_lifespan_t3
+						}
+					}
+				}
+				hidden_effect = {
+					owner = {
+						if = {
+							limit = {
+								NOT = {
+									has_country_flag = unlocked_trait_tec_gene_lifespan_t2
+								}
+							}
+							set_country_flag = tec_improve_trait_tec_gene_lifespan_t1
+						}
+						else = {
+							set_country_flag = tec_improve_trait_tec_gene_lifespan_t2
+						}
+					}
+				}
+			}
+			option = {
+				name = tec_gene_path.30250.recombine.metabolic
+				custom_tooltip = tec_gene_path.30250.recombine.metabolic.tooltip
+				icon = {
+					icon = "GFX_trait_tec_gene_audacious_t3"
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					exists = owner
+					owner = {
+						NOR = {
+							has_country_flag = unlocked_trait_tec_gene_metabolic_t2
+							has_country_flag = unlocked_trait_tec_gene_metabolic_t3
+						}
+					}
+				}
+				hidden_effect = {
+					owner = {
+						if = {
+							limit = {
+								NOT = {
+									has_country_flag = unlocked_trait_tec_gene_metabolic_t2
+								}
+							}
+							set_country_flag = tec_improve_trait_tec_gene_metabolic_t1
+						}
+						else = {
+							set_country_flag = tec_improve_trait_tec_gene_metabolic_t2
+						}
+					}
+				}
+			}
+		# /
+	}
+	situation_event = { # Recombination - 50A3% - Normal trait select
+		id = tec_gene_path.30350
+		title = "tec_gene_path.30350.name"
+		# Descs
+			desc = {	# Fallback
+				text = "tec_gene_path.30350.desc.regular"
+				trigger = { always = yes }
+			}
+		# /
+		picture = GFX_evt_tec_orange_strings
+		#show_sound = event_evolution_mastery
+		is_triggered_only = yes
+		situation = this
+		location = target
+
+		immediate = {
+			hidden_effect = {
+				set_situation_locked = yes
+			}
+		}
+
+		after = {
+			hidden_effect = {
+				set_situation_locked = no
+			}
+		}
+
+		# Options
+			option = {
+				name = tec_gene_path.30350.recombine.energy
+				custom_tooltip = tec_gene_path.30350.recombine.energy.tooltip
+				icon = {
+					icon = "GFX_trait_tec_gene_energy_t3"
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					exists = owner
+					owner = {
+						NOR = {
+							has_country_flag = unlocked_trait_tec_gene_energy_t2
+							has_country_flag = unlocked_trait_tec_gene_energy_t3
+						}
+					}
+				}
+				hidden_effect = {
+					owner = {
+						if = {
+							limit = {
+								NOT = {
+									has_country_flag = unlocked_trait_tec_gene_energy_t2
+								}
+							}
+							set_country_flag = tec_improve_trait_tec_gene_energy_t1
+						}
+						else = {
+							set_country_flag = tec_improve_trait_tec_gene_energy_t2
+						}
+					}
+				}
+			}
+			option = {
+				name = tec_gene_path.30350.recombine.mining
+				custom_tooltip = tec_gene_path.30350.recombine.mining.tooltip
+				icon = {
+					icon = "GFX_trait_tec_gene_mining_t3"
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					exists = owner
+					owner = {
+						NOR = {
+							has_country_flag = unlocked_trait_tec_gene_mining_t2
+							has_country_flag = unlocked_trait_tec_gene_mining_t3
+						}
+					}
+				}
+				hidden_effect = {
+					owner = {
+						if = {
+							limit = {
+								NOT = {
+									has_country_flag = unlocked_trait_tec_gene_mining_t2
+								}
+							}
+							set_country_flag = tec_improve_trait_tec_gene_mining_t1
+						}
+						else = {
+							set_country_flag = tec_improve_trait_tec_gene_mining_t2
+						}
+					}
+				}
+			}
+			option = {
+				name = tec_gene_path.30350.recombine.farming
+				custom_tooltip = tec_gene_path.30350.recombine.farming.tooltip
+				icon = {
+					icon = "GFX_trait_tec_gene_farming_t3"
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					exists = owner
+					owner = {
+						NOR = {
+							has_country_flag = unlocked_trait_tec_gene_farming_t2
+							has_country_flag = unlocked_trait_tec_gene_farming_t3
+						}
+					}
+				}
+				hidden_effect = {
+					owner = {
+						if = {
+							limit = {
+								NOT = {
+									has_country_flag = unlocked_trait_tec_gene_farming_t2
+								}
+							}
+							set_country_flag = tec_improve_trait_tec_gene_farming_t1
+						}
+						else = {
+							set_country_flag = tec_improve_trait_tec_gene_farming_t2
+						}
+					}
+				}
+			}
+			option = {
+				name = tec_gene_path.30350.recombine.research
+				custom_tooltip = tec_gene_path.30350.recombine.research.tooltip
+				icon = {
+					icon = "GFX_trait_tec_gene_research_t3"
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					exists = owner
+					owner = {
+						NOR = {
+							has_country_flag = unlocked_trait_tec_gene_research_t2
+							has_country_flag = unlocked_trait_tec_gene_research_t3
+						}
+					}
+				}
+				hidden_effect = {
+					owner = {
+						if = {
+							limit = {
+								NOT = {
+									has_country_flag = unlocked_trait_tec_gene_research_t2
+								}
+							}
+							set_country_flag = tec_improve_trait_tec_gene_research_t1
+						}
+						else = {
+							set_country_flag = tec_improve_trait_tec_gene_research_t2
+						}
+					}
+				}
+			}
+			option = {
+				name = tec_gene_path.30350.recombine.unity
+				custom_tooltip = tec_gene_path.30350.recombine.unity.tooltip
+				icon = {
+					icon = "GFX_trait_tec_gene_unity_t3"
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					exists = owner
+					owner = {
+						NOR = {
+							has_country_flag = unlocked_trait_tec_gene_unity_t2
+							has_country_flag = unlocked_trait_tec_gene_unity_t3
+						}
+					}
+				}
+				hidden_effect = {
+					owner = {
+						if = {
+							limit = {
+								NOT = {
+									has_country_flag = unlocked_trait_tec_gene_unity_t2
+								}
+							}
+							set_country_flag = tec_improve_trait_tec_gene_unity_t1
+						}
+						else = {
+							set_country_flag = tec_improve_trait_tec_gene_unity_t2
+						}
+					}
+				}
+			}
+			option = {
+				name = tec_gene_path.30350.recombine.industry
+				custom_tooltip = tec_gene_path.30350.recombine.industry.tooltip
+				icon = {
+					icon = "GFX_trait_tec_gene_industry_t3"
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					exists = owner
+					owner = {
+						NOR = {
+							has_country_flag = unlocked_trait_tec_gene_industry_t2
+							has_country_flag = unlocked_trait_tec_gene_industry_t3
+						}
+					}
+				}
+				hidden_effect = {
+					owner = {
+						if = {
+							limit = {
+								NOT = {
+									has_country_flag = unlocked_trait_tec_gene_industry_t2
+								}
+							}
+							set_country_flag = tec_improve_trait_tec_gene_industry_t1
+						}
+						else = {
+							set_country_flag = tec_improve_trait_tec_gene_industry_t2
+						}
+					}
+				}
+			}
+			option = {
+				name = tec_gene_path.30350.recombine.amenities
+				custom_tooltip = tec_gene_path.30350.recombine.amenities.tooltip
+				icon = {
+					icon = "GFX_trait_tec_gene_amenities_t3"
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					exists = owner
+					owner = {
+						NOR = {
+							has_country_flag = unlocked_trait_tec_gene_amenities_t2
+							has_country_flag = unlocked_trait_tec_gene_amenities_t3
+						}
+					}
+				}
+				hidden_effect = {
+					owner = {
+						if = {
+							limit = {
+								NOT = {
+									has_country_flag = unlocked_trait_tec_gene_amenities_t2
+								}
+							}
+							set_country_flag = tec_improve_trait_tec_gene_amenities_t1
+						}
+						else = {
+							set_country_flag = tec_improve_trait_tec_gene_amenities_t2
+						}
+					}
+				}
+			}
+			option = {
+				name = tec_gene_path.30350.recombine.trade
+				custom_tooltip = tec_gene_path.30350.recombine.trade.tooltip
+				icon = {
+					icon = "GFX_trait_tec_gene_trade_t3"
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					exists = owner
+					owner = {
+						NOR = {
+							has_country_flag = unlocked_trait_tec_gene_trade_t2
+							has_country_flag = unlocked_trait_tec_gene_trade_t3
+						}
+					}
+				}
+				hidden_effect = {
+					owner = {
+						if = {
+							limit = {
+								NOT = {
+									has_country_flag = unlocked_trait_tec_gene_trade_t2
+								}
+							}
+							set_country_flag = tec_improve_trait_tec_gene_trade_t1
+						}
+						else = {
+							set_country_flag = tec_improve_trait_tec_gene_trade_t2
+						}
+					}
+				}
+			}
+		# /
+	}
+	situation_event = { # Recombination - 50B% - WIP Trait increase puzzle 2
+		id = tec_gene_path.30950
+		title = "tec_gene_path.30950.name"
+		# Descs
+			desc = {	# Fallback
+				text = "tec_gene_path.30950.desc.regular"
+				trigger = { always = yes }
+			}
+		# /
+		picture = GFX_evt_tec_orange_strings
+		#show_sound = event_evolution_mastery
+		is_triggered_only = yes
+		situation = this
+		location = target
+
+		immediate = {
+			hidden_effect = {
+				set_situation_locked = yes
+			}
+		}
+
+		after = {
+			hidden_effect = {
+				set_situation_locked = no
+			}
+		}
+
+		# Options
+			option = {	# Option A
+				name = tec_gene_path.30950.lotto.unchanging
+				custom_tooltip = tec_gene_path.30950.lotto.unchanging.tooltip
+				icon = {
+					icon = GFX_situation_approach_genetics
+					icon_background = GFX_situation_approach_bg_green
+					text = tec_icon_text_outcome_neutral
+				}
+				hidden_effect = {
+					set_situation_flag = tec_gene_recombination_unchanging
+				}
+			}
+			option = {	# Option B
+				name = tec_gene_path.30950.lotto.stable
+				custom_tooltip = tec_gene_path.30950.lotto.stable.tooltip
+				icon = {
+					icon = GFX_situation_approach_genetics
+					icon_background = GFX_situation_approach_bg_yellow
+					text = tec_icon_text_outcome_neutral
+				}
+				hidden_effect = {
+					set_situation_flag = tec_gene_recombination_stable
+				}
+			}
+			option = {	# Option C
+				name = tec_gene_path.30950.lotto.unstable
+				custom_tooltip = tec_gene_path.30950.lotto.unstable.tooltip
+				icon = {
+					icon = GFX_situation_approach_genetics
+					icon_background = GFX_situation_approach_bg_tec_orange
+					text = tec_icon_text_outcome_neutral
+				}
+				hidden_effect = {
+					set_situation_flag = tec_gene_recombination_unstable
+				}
+			}
+			option = {	# Option D
+				name = tec_gene_path.30950.lotto.mutative
+				custom_tooltip = tec_gene_path.30950.lotto.mutative.tooltip
+				icon = {
+					icon = GFX_situation_approach_genetics
+					icon_background = GFX_situation_approach_bg_red
+					text = tec_icon_text_outcome_neutral
+				}
+				hidden_effect = {
+					set_situation_flag = tec_gene_recombination_mutative
+				}
+			}
+		# /
+	}
+	situation_event = { # Recombination - 50% - SORTER
+		id = tec_gene_path.305
+		hide_window = yes
+		is_triggered_only = yes
+		situation = this
+		location = target
+
+		immediate = {
+			hidden_effect = {
+				if = {	# Trait upgrade
+					limit = {
+						has_situation_flag = tec_gene_recombination_upgrade
+					}
+					owner = {
+						country_event = {
+							id = tec_gene_path.30501
+						}
+					}
+				}
+				else_if = {	# Trait point increase
+					limit = {
+						has_situation_flag = tec_gene_recombination_point
+					}
+					owner = {
+						country_event = {
+							id = tec_gene_path.30502
+						}
+					}
+				}
+				else = {	# Fallback to trait increase
+					owner = {
+						country_event = {
+							id = tec_gene_path.30502
+						}
+					}
+				}
+			}
+		}
+	}
+	country_event = { # Recombination - 100A% - Trait Upgrade
+		id = tec_gene_path.30501
+		title = "tec_gene_path.30501.name"
+		# Descs
+			desc = {	# Fallback
+				text = "tec_gene_path.30501.desc.regular"
+				trigger = { always = yes }
+			}
+		# /
+		picture = GFX_evt_tec_orange_strings
+		#show_sound = event_evolution_mastery
+		is_triggered_only = yes
+
+		after = {
+			hidden_effect = {
+				# Remove all the residual flags
+				# Main
+				remove_country_flag = tec_improve_trait_tec_gene_main_t1
+				remove_country_flag = tec_improve_trait_tec_gene_main_t2
+				# Advanced
+				remove_country_flag = tec_improve_trait_tec_gene_automodding_t1
+				remove_country_flag = tec_improve_trait_tec_gene_automodding_t2
+				remove_country_flag = tec_improve_trait_tec_gene_genius_t1
+				remove_country_flag = tec_improve_trait_tec_gene_genius_t2
+				remove_country_flag = tec_improve_trait_tec_gene_will_t1
+				remove_country_flag = tec_improve_trait_tec_gene_will_t2
+				remove_country_flag = tec_improve_trait_tec_gene_fertile_t1
+				remove_country_flag = tec_improve_trait_tec_gene_fertile_t2
+				remove_country_flag = tec_improve_trait_tec_gene_robust_t1
+				remove_country_flag = tec_improve_trait_tec_gene_robust_t2
+				remove_country_flag = tec_improve_trait_tec_gene_audacious_t1
+				remove_country_flag = tec_improve_trait_tec_gene_audacious_t2
+				remove_country_flag = tec_improve_trait_tec_gene_lifespan_t1
+				remove_country_flag = tec_improve_trait_tec_gene_lifespan_t2
+				remove_country_flag = tec_improve_trait_tec_gene_metabolic_t1
+				remove_country_flag = tec_improve_trait_tec_gene_metabolic_t2
+				# Normal
+				remove_country_flag = tec_improve_trait_tec_gene_energy_t1
+				remove_country_flag = tec_improve_trait_tec_gene_energy_t2
+				remove_country_flag = tec_improve_trait_tec_gene_mining_t1
+				remove_country_flag = tec_improve_trait_tec_gene_mining_t2
+				remove_country_flag = tec_improve_trait_tec_gene_farming_t1
+				remove_country_flag = tec_improve_trait_tec_gene_farming_t2
+				remove_country_flag = tec_improve_trait_tec_gene_research_t1
+				remove_country_flag = tec_improve_trait_tec_gene_research_t2
+				remove_country_flag = tec_improve_trait_tec_gene_unity_t1
+				remove_country_flag = tec_improve_trait_tec_gene_unity_t2
+				remove_country_flag = tec_improve_trait_tec_gene_industry_t1
+				remove_country_flag = tec_improve_trait_tec_gene_industry_t2
+				remove_country_flag = tec_improve_trait_tec_gene_amenities_t1
+				remove_country_flag = tec_improve_trait_tec_gene_amenities_t2
+				remove_country_flag = tec_improve_trait_tec_gene_trade_t1
+				remove_country_flag = tec_improve_trait_tec_gene_trade_t2
+			}
+		}
+
+		# Options
+			# Main
+			option = {
+				name = tec_gene_path.30501.recombine.main.t2
+				custom_tooltip = tec_gene_path.30501.recombine.main.t2.tooltip
+				icon = {
+					icon = GFX_trait_tec_gene_main_t3
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					OR = {
+						has_country_flag = tec_improve_trait_tec_gene_main_t1
+						has_country_flag = tec_improve_trait_tec_gene_main_t2
+					}
+				}
+				hidden_effect = {
+					tec_improve_genetic_trait = yes
+				}
+			}
+			# Advanced
+			option = {
+				name = tec_gene_path.30501.recombine.automodding
+				custom_tooltip = tec_gene_path.30501.recombine.automodding.tooltip
+				icon = {
+					icon = GFX_trait_tec_gene_automodding_t3
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					OR = {
+						has_country_flag = tec_improve_trait_tec_gene_automodding_t1
+						has_country_flag = tec_improve_trait_tec_gene_automodding_t2
+					}
+				}
+				hidden_effect = {
+					tec_improve_genetic_trait = yes
+				}
+			}
+			option = {
+				name = tec_gene_path.30501.recombine.genius
+				custom_tooltip = tec_gene_path.30501.recombine.genius.tooltip
+				icon = {
+					icon = GFX_trait_tec_gene_genius_t3
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					OR = {
+						has_country_flag = tec_improve_trait_tec_gene_genius_t1
+						has_country_flag = tec_improve_trait_tec_gene_genius_t2
+					}
+				}
+				hidden_effect = {
+					tec_improve_genetic_trait = yes
+				}
+			}
+			option = {
+				name = tec_gene_path.30501.recombine.will
+				custom_tooltip = tec_gene_path.30501.recombine.will.tooltip
+				icon = {
+					icon = GFX_trait_tec_gene_will_t3
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					OR = {
+						has_country_flag = tec_improve_trait_tec_gene_will_t1
+						has_country_flag = tec_improve_trait_tec_gene_will_t2
+					}
+				}
+				hidden_effect = {
+					tec_improve_genetic_trait = yes
+				}
+			}
+			option = {
+				name = tec_gene_path.30501.recombine.fertile
+				custom_tooltip = tec_gene_path.30501.recombine.fertile.tooltip
+				icon = {
+					icon = GFX_trait_tec_gene_fertile_t3
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					OR = {
+						has_country_flag = tec_improve_trait_tec_gene_fertile_t1
+						has_country_flag = tec_improve_trait_tec_gene_fertile_t2
+					}
+				}
+				hidden_effect = {
+					tec_improve_genetic_trait = yes
+				}
+			}
+			option = {
+				name = tec_gene_path.30501.recombine.robust
+				custom_tooltip = tec_gene_path.30501.recombine.robust.tooltip
+				icon = {
+					icon = GFX_trait_tec_gene_robust_t3
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					OR = {
+						has_country_flag = tec_improve_trait_tec_gene_robust_t1
+						has_country_flag = tec_improve_trait_tec_gene_robust_t2
+					}
+				}
+				hidden_effect = {
+					tec_improve_genetic_trait = yes
+				}
+			}
+			option = {
+				name = tec_gene_path.30501.recombine.audacious
+				custom_tooltip = tec_gene_path.30501.recombine.audacious.tooltip
+				icon = {
+					icon = GFX_trait_tec_gene_audacious_t3
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					OR = {
+						has_country_flag = tec_improve_trait_tec_gene_audacious_t1
+						has_country_flag = tec_improve_trait_tec_gene_audacious_t2
+					}
+				}
+				hidden_effect = {
+					tec_improve_genetic_trait = yes
+				}
+			}
+			option = {
+				name = tec_gene_path.30501.recombine.lifespan
+				custom_tooltip = tec_gene_path.30501.recombine.lifespan.tooltip
+				icon = {
+					icon = GFX_trait_tec_gene_lifespan_t3
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					OR = {
+						has_country_flag = tec_improve_trait_tec_gene_lifespan_t1
+						has_country_flag = tec_improve_trait_tec_gene_lifespan_t2
+					}
+				}
+				hidden_effect = {
+					tec_improve_genetic_trait = yes
+				}
+			}
+			option = {
+				name = tec_gene_path.30501.recombine.metabolic
+				custom_tooltip = tec_gene_path.30501.recombine.metabolic.tooltip
+				icon = {
+					icon = GFX_trait_tec_gene_metabolic_t3
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					OR = {
+						has_country_flag = tec_improve_trait_tec_gene_metabolic_t1
+						has_country_flag = tec_improve_trait_tec_gene_metabolic_t2
+					}
+				}
+				hidden_effect = {
+					tec_improve_genetic_trait = yes
+				}
+			}
+			# Normal
+			option = {
+				name = tec_gene_path.30501.recombine.energy
+				custom_tooltip = tec_gene_path.30501.recombine.energy.tooltip
+				icon = {
+					icon = GFX_trait_tec_gene_energy_t3
+					icon_background = GFX_tec_blank
+					text = tec_icon_text_outcome_neutral
+				}
+				trigger = {
+					OR = {
+						has_country_flag = tec_improve_trait_tec_gene_energy_t1
+						has_country_flag = tec_improve_trait_tec_gene_energy_t2
+					}
+				}
+				hidden_effect = {
+					tec_improve_genetic_trait = yes
+				}
+			}
+		# /
+	}
+	#}
   # /
  # /
 # /
