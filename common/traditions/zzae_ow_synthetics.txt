@@ -4,29 +4,88 @@
 # 2	 4   5
 
 tr_synthetics_adopt = {
-	unlocks_agenda = agenda_synthetic_yield
-	
 	possible = {
 		if = {
 			limit = {
 				tec_has_synthetic_ascension_origin = yes
 			}
+			# Evolved note - As the requirements are lower the synth tech is reduced too
+			#has_technology = tech_synthetic_workers
 			has_technology = tech_droid_workers
 		}
-		else = {
+		else_if = {
+			limit = {
+				has_machine_age_dlc = yes
+				is_machine_empire = no
+				is_individual_machine = no
+			}
+			# Evolved note - Ascension t1 situation
 			custom_tooltip = {
-				text = tr_tec_synthetics_path_unlocked
+				text = tr_tec_synthetics_path_unlocked_regular
 				OR = {
 					has_country_flag = tec_synth_path_unlocked_tradition_1
 				}
 			}
 		}
+		else = { # No Machine Age DLC
+			if = {
+				limit = {
+					is_machine_empire = no
+				}
+				custom_tooltip = {
+					text = tr_tec_synthetics_path_unlocked_regular
+					OR = {
+						has_country_flag = tec_synth_path_unlocked_tradition_1
+					}
+				}
+			}
+			else = {
+				custom_tooltip = {
+					text = tr_tec_synthetics_path_unlocked_machine
+					OR = {
+						has_country_flag = tec_synth_path_unlocked_tradition_machine
+					}
+				}
+			}
+		}
 	}
 
-	custom_tooltip = tr_synthetics_adopt_tooltip
+	unlocks_agenda = agenda_synthetic_yield
+	custom_tooltip = tr_synthetics_adopt_evolved_machineage_tooltip
 
-	on_enabled = {
+	on_enabled = { # has_machine_age_dlc = yes
+		if = {
+			limit = {
+				NOT = {
+					has_technology = tech_synthetic_leaders
+				}
+			}
+			add_tech_progress = {
+				tech = tech_synthetic_leaders
+				progress = 0.1
+			}
+		}
 		hidden_effect = {
+			if = {
+				limit = {
+					has_origin = origin_synthetic_fertility
+				}
+				country_event = { id = machine_age.3125 }
+			}
+			else = {
+				country_event = { id = synth.1 }
+			}
+			if = {
+				limit = {
+					any_planet_within_border = {
+						has_planet_flag = fotd_seperatist_planet@root
+						owner = {
+							has_country_flag = fotd_seperatist_country@root
+						}
+					}
+				}
+				country_event = { id = origin.6099 days = 5 random = 2 }
+			}
 			# NOTE: Luminary does its thing on the zz_evolved_ascension_events.txt
 
 			# Synthetic assimilation
@@ -36,13 +95,63 @@ tr_synthetics_adopt = {
 		}
 	}
 
+	tradition_swap = { # has_machine_age_dlc = no
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_machine_age_dlc = no
+			is_machine_empire = no
+		}
+
+		custom_tooltip = tr_synthetics_adopt_evolved_utopia_desc
+
+		on_enabled = {
+			if = {
+				limit = {
+					NOT = {
+						has_technology = tech_synthetic_leaders
+					}
+				}
+				add_tech_progress = {
+					tech = tech_synthetic_leaders
+					progress = 0.1
+				}
+			}
+			hidden_effect = {
+				country_event = {	# TODO ASCENSION - CHECK EVENT/REDIRECT TO EVOLVED
+					id = utopia.2550
+				}
+				if = {
+					limit = {
+						any_planet_within_border = {
+							has_planet_flag = fotd_seperatist_planet@root
+							owner = {
+								has_country_flag = fotd_seperatist_country@root
+							}
+						}
+					}
+					country_event = { id = origin.6099 days = 5 random = 2 }
+				}
+			}
+		}
+		weight = {
+			factor = 1
+		}
+	}
+
 	tradition_swap = {
 		name = tr_synthetics_adopt_machine
 		inherit_name = yes
 		inherit_icon = yes
 		custom_tooltip = tr_synthetics_adopt_machine_desc
 		trigger = {
-			is_machine_empire = yes
+			OR = {
+				has_machine_age_dlc = no
+				is_machine_empire = yes
+			}
+		}
+		modifier = {
+			pop_environment_tolerance = 0.25
 		}
 		weight = {
 			factor = 1
@@ -57,6 +166,9 @@ tr_synthetics_adopt = {
 tr_synthetics_finish = {
 	custom_tooltip_with_modifiers = tr_synthetics_finish_tooltip
 	modifier = {
+		ROBOT_species_trait_picks_add = 2
+		ROBOT_species_trait_points_add = 2
+		modify_species_cost_mult = -0.5
 		ascension_perks_add = 1
 	}
 
@@ -67,6 +179,17 @@ tr_synthetics_finish = {
 		#	id = tec_synth_path.150
 		#	days = 360
 		#}
+		refresh_portraits = character
+		if = {
+			limit = {
+				has_machine_age_dlc = yes
+				has_country_flag = synthetics_traditions_unlocked
+			}
+			country_event = { # TODO ASCENSION - ALTER EVENT
+				id = synth.500
+				days = 180
+			}
+		}
 	}
 
 	ai_weight = {
@@ -84,6 +207,10 @@ tr_synthetics_finish = {
 
 		custom_tooltip_with_modifiers = tr_synthetics_finish_machine_tooltip
 		modifier = {
+			MACHINE_species_trait_picks_add = 2
+			MACHINE_species_trait_points_add = 2
+			REPLICANT_species_trait_picks_add = 2
+			modify_species_cost_mult = -0.5
 			ascension_perks_add = 1
 		}
 
@@ -100,10 +227,39 @@ tr_synthetics_finish = {
 			factor = 100
 		}
 	}
+
+	tradition_swap = {
+		name = tr_synthetics_finish_situation
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_machine_age_dlc = yes
+			NOR = {
+				has_country_flag = synthetics_traditions_unlocked
+				has_origin = origin_synthetic_fertility
+			}
+		}
+		custom_tooltip = tr_synthetics_finish_situation_effects
+	}
 }
 
 tr_synthetics_maintenance_protocols = {
-
+	possible = { # TODO ASCENSION - LINK TO THE SPECIES CHANGE EVENT AND A FLAG
+		if = {
+			limit = { has_machine_age_dlc = no }
+			if = {
+				limit = {
+					is_synthetic_empire = yes
+				}
+			}
+			else = {
+				custom_tooltip = {
+					fail_text = REQUIRES_SYNTHETIC_EMPIRE_UTOPIA
+					is_synthetic_empire = yes
+				}
+			}
+		}
+	}
 	custom_tooltip_with_modifiers = tr_synthetics_maintenance_protocols_tooltip
 	modifier = {
 		pop_amenities_usage_mult = -0.1
@@ -111,6 +267,20 @@ tr_synthetics_maintenance_protocols = {
 
 	ai_weight = {
 		factor = 1000
+	}
+
+	tradition_swap = {
+		name = tr_synthetics_maintenance_protocols_situation
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_machine_age_dlc = yes
+			NOR = {
+				has_country_flag = synthetics_traditions_unlocked
+				has_origin = origin_synthetic_fertility
+			}
+		}
+		custom_tooltip = tr_synthetics_maintenance_protocols_situation_effects
 	}
 }
 
@@ -126,79 +296,251 @@ tr_synthetics_optimization_algorithms = {
 	ai_weight = {
 		factor = 1000
 	}
+
+	tradition_swap = {
+		name = tr_synthetics_optimization_algorithms_situation
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_machine_age_dlc = yes
+			NOR = {
+				has_country_flag = synthetics_traditions_unlocked
+				has_origin = origin_synthetic_fertility
+			}
+		}
+		custom_tooltip = tr_synthetics_optimization_algorithms_situation_effects
+	}
 }
 
-tr_synthetics_synthetic_age = {	# Procedural blueprints
+#tr_synthetics_synthetic_age = {	# Procedural blueprints
 
-	custom_tooltip = tr_synthetics_synthetic_age_tooltip
-	modifier = {
-		# Added to tooltip to keep it hidden
-		ROBOT_species_trait_picks_add = 1
-		MACHINE_species_trait_picks_add = 1
-		REPLICANT_species_trait_picks_add = 1
+	#custom_tooltip = tr_synthetics_synthetic_age_tooltip
+	#modifier = {
+	#	# Added to tooltip to keep it hidden
+	#	ROBOT_species_trait_picks_add = 1
+	#	MACHINE_species_trait_picks_add = 1
+	#	REPLICANT_species_trait_picks_add = 1
+	#}
+
+	#on_enabled = {
+	#	hidden_effect = {
+	#		# Advanced synthetic traits
+	#		set_country_flag = tec_allow_t1_synthetics
+	#	}
+	#}
+
+	#ai_weight = {
+	#	factor = 1000
+	#}
+
+	##tradition_swap = {
+	#	#name = tr_synthetics_assembly_systems
+	##}
+	##tradition_swap = {
+	#	#name = tr_synthetics_power_systems
+	##}
+#}
+
+tr_synthetics_transubstatiation_synthesis = { # TODO ASCENSION
+	possible = {
+		if = {
+			limit = { has_machine_age_dlc = no }
+			if = {
+				limit = { is_synthetic_empire = yes }
+			}
+			else = {
+				custom_tooltip = {
+					fail_text = REQUIRES_SYNTHETIC_EMPIRE_UTOPIA
+					is_synthetic_empire = yes
+				}
+			}
+		}
 	}
 
 	on_enabled = {
-		hidden_effect = {
-			# Advanced synthetic traits
-			set_country_flag = tec_allow_t1_synthetics
-		}
+		set_country_flag = synth_assimilation
 	}
 
-	ai_weight = {
-		factor = 1000
-	}
-
-	#tradition_swap = {
-		#name = tr_synthetics_assembly_systems
-	#}
-	#tradition_swap = {
-		#name = tr_synthetics_power_systems
-	#}
-}
-
-tr_synthetics_prefabricated_components = {
-	possible = {
-		has_tradition = tr_synthetics_synthetic_age
-	}
-
-	modifier = {
-		MODIFY_SPECIES_COST_MULT = -0.5
-	}
-
-	ai_weight = {
-		factor = 1000
-	}
-}
-
-tr_synthetics_solid_state_actuators = {
-	possible = {
-		has_tradition = tr_synthetics_synthetic_age
-	}
-
-	modifier = {
-		ROBOT_species_trait_points_add = 3
-	}
-
-	ai_weight = {
-		factor = 1000
-	}
+	custom_tooltip = tr_synthetics_transubstatiation_synthesis_desc
 
 	tradition_swap = {
-		name = tr_synthetics_solid_state_actuators_machine
-		inherit_name = yes
+		name = tr_synthetics_solid_state_actuators
 		inherit_effects = no
-		inherit_icon = yes
+		inherit_icon = no
 		trigger = {
-			is_machine_empire = yes
+			OR = {
+				AND = {
+					has_machine_age_dlc = yes
+					has_valid_civic = civic_fanatic_purifiers
+					has_country_flag = synthetics_traditions_unlocked
+				}
+				AND = {
+					has_machine_age_dlc = no
+					has_valid_civic = civic_fanatic_purifiers
+				}
+				AND = {
+					has_machine_age_dlc = no
+					is_machine_empire = yes
+				}
+			}
 		}
-
 		modifier = {
-			MACHINE_species_trait_points_add = 3
+			leader_lifespan_mult = 0.2
 		}
 
 		weight = {
 			factor = 1
 		}
 	}
+
+	tradition_swap = {
+		name = tr_synthetics_solid_state_actuators_virtual
+		inherit_effects = no
+		inherit_icon = yes
+		trigger = {
+			AND = {
+				has_valid_civic = civic_fanatic_purifiers
+				has_country_flag = synth_virtual
+			}
+		}
+		modifier = {
+			leaders_cost_mult = -0.15
+			leaders_upkeep_mult = -0.15
+		}
+
+		weight = {
+			factor = 1
+		}
+	}
+
+	tradition_swap = {
+		name = tr_synthetics_transubstatiation_synthesis_situation
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_machine_age_dlc = yes
+			NOR = {
+				has_country_flag = synthetics_traditions_unlocked
+				has_origin = origin_synthetic_fertility
+				has_valid_civic = civic_fanatic_purifiers
+			}
+		}
+		custom_tooltip = tr_synthetics_transubstatiation_synthesis_situation_effects
+	}
+
+	tradition_swap = {
+		name = tr_synthetics_solid_state_actuators_situation
+		inherit_name = no
+		inherit_icon = no
+		trigger = {
+			has_machine_age_dlc = yes
+			has_valid_civic = civic_fanatic_purifiers
+			NOR = {
+				has_country_flag = synthetics_traditions_unlocked
+				has_origin = origin_synthetic_fertility
+			}
+		}
+		custom_tooltip = tr_synthetics_solid_state_actuators_situation_effects
+	}
 }
+
+tr_synthetics_power_systems = {
+	possible = {
+		has_tradition = tr_synthetics_transubstatiation_synthesis
+	}
+
+	modifier = {
+		planet_pops_robotics_upkeep_mult = -0.25
+		planet_pop_assemblers_upkeep_mult = -0.25
+	}
+
+	tradition_swap = {
+		name = tr_synthetics_power_systems_situation
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_machine_age_dlc = yes
+			NOR = {
+				has_country_flag = synthetics_traditions_unlocked
+				has_origin = origin_synthetic_fertility
+			}
+			is_machine_empire = no
+		}
+		custom_tooltip = tr_synthetics_power_systems_situation_effects
+	}
+}
+
+tr_synthetics_prefabricated_components = {
+	possible = {
+		has_tradition = tr_synthetics_transubstatiation_synthesis
+	}
+	modifier = {}
+
+	custom_tooltip = tr_synthetics_prefabricated_components_effects
+
+	tradition_swap = {
+		name = tr_synthetics_prefabricated_components_situation
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_machine_age_dlc = yes
+			NOR = {
+				has_country_flag = synthetics_traditions_unlocked
+				has_origin = origin_synthetic_fertility
+			}
+			is_machine_empire = no
+		}
+		weight = {
+			factor = 1
+		}
+		custom_tooltip = tr_synthetics_prefabricated_components_situation_effects
+	}
+
+	tradition_swap = {
+		name = tr_synthetics_prefabricated_components_machine
+		inherit_name = no
+		inherit_effects = no
+		inherit_icon = yes
+		trigger = {
+			has_machine_age_dlc = no
+			is_machine_empire = yes
+		}
+
+		weight = {
+			factor = 1
+		}
+		custom_tooltip = tr_synthetics_prefabricated_components_machine_effects
+	}
+}
+
+#tr_synthetics_solid_state_actuators = {
+	#possible = {
+	#	has_tradition = tr_synthetics_synthetic_age
+	#}
+
+	#modifier = {
+	#	ROBOT_species_trait_points_add = 3
+	#}
+
+	#ai_weight = {
+	#	factor = 1000
+	#}
+
+	#tradition_swap = {
+	#	name = tr_synthetics_solid_state_actuators_machine
+	#	inherit_name = yes
+	#	inherit_effects = no
+	#	inherit_icon = yes
+	#	trigger = {
+	#		is_machine_empire = yes
+	#	}
+
+	#	modifier = {
+	#		MACHINE_species_trait_points_add = 3
+	#	}
+
+	#	weight = {
+	#		factor = 1
+	#	}
+	#}
+#}

@@ -5,7 +5,6 @@
 # 3	  5
 
 tr_cybernetics_adopt = {
-	unlocks_agenda = agenda_cybernetic_advantage
 	possible = {
 		if = {
 			limit = {
@@ -24,6 +23,7 @@ tr_cybernetics_adopt = {
 		}
 	}
 
+	unlocks_agenda = agenda_cybernetic_advantage
 	custom_tooltip = tr_cybernetics_adopt_tooltip
 
 	on_enabled = {
@@ -32,6 +32,40 @@ tr_cybernetics_adopt = {
 			set_country_flag = tec_cybernetic_t1_assimilation
 			# Assimilation gives extra resources
 			# Added on previous flag
+
+			# Machine Age
+				if = { # Cyberization situation
+					limit = {
+						has_machine_age_dlc = yes
+						NOT = {
+							has_origin = origin_cybernetic_creed
+						}
+					}
+					hidden_effect = {
+						country_event = { # TODO ASCENSION CHECK SITUATION
+							id = cyber.1
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						has_machine_age_dlc = yes
+						has_origin = origin_cybernetic_creed
+					}
+					hidden_effect = {
+						country_event = {
+							id = machine_age.100
+						}
+					}
+				}
+				else = { # TODO ASCENSION EVENT FOR CYBERNETICS
+					hidden_effect = {
+						country_event = {
+							id = utopia.2500
+						}
+					}
+				}
+			# /
 		}
 	}
 
@@ -40,11 +74,37 @@ tr_cybernetics_adopt = {
 	}
 
 	tradition_swap = {
+		name = tr_cybernetics_adopt_utopia
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_machine_age_dlc = no
+			is_hive_empire = no
+		}
+		custom_tooltip = tr_cybernetics_adopt_utopia_tooltip
+		on_enabled = {
+			hidden_effect = {
+				# Allows assimilation of cyborg pops into cyborgs
+				set_country_flag = tec_cybernetic_t1_assimilation
+				# Assimilation gives extra resources
+				# Added on previous flag
+				country_event = { # TODO ASCENSION EVENT FOR CYBERNETICS
+					id = utopia.2500
+				}
+			}
+		}
+		weight = {
+			factor = 1
+		}
+	}
+
+	tradition_swap = {
 		name = tr_cybernetics_adopt_hive
 		inherit_name = yes
 		inherit_icon = yes
 		trigger = {
 			is_hive_empire = yes
+			has_machine_age_dlc = yes
 		}
 		custom_tooltip = tr_cybernetics_adopt_hive_tooltip
 		on_enabled = {
@@ -53,6 +113,34 @@ tr_cybernetics_adopt = {
 				set_country_flag = tec_cybernetic_t1_assimilation
 				# Assimilation gives extra resources
 				# Added on previous flag
+				country_event = { # TODO ASCENSION CHECK SITUATION
+					id = cyber.1
+				}
+			}
+		}
+		weight = {
+			factor = 1
+		}
+	}
+
+	tradition_swap = {
+		name = tr_cybernetics_adopt_hive_utopia
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			is_hive_empire = yes
+			has_machine_age_dlc = no
+		}
+		custom_tooltip = tr_cybernetics_adopt_hive_utopia_tooltip
+		on_enabled = {
+			hidden_effect = {
+				# Allows assimilation of cyborg pops into cyborgs
+				set_country_flag = tec_cybernetic_t1_assimilation
+				# Assimilation gives extra resources
+				# Added on previous flag
+				country_event = { # TODO ASCENSION EVENT FOR CYBERNETICS
+					id = utopia.2500
+				}
 			}
 		}
 		weight = {
@@ -64,7 +152,13 @@ tr_cybernetics_adopt = {
 tr_cybernetics_finish = {
 
 	custom_tooltip = tr_cybernetics_finish_tooltip
-	modifier = {
+	triggered_modifier = {
+		potential = {
+			OR = {
+				has_machine_age_dlc = no
+				has_country_flag = cybernetics_traditions_unlocked
+			}
+		}
 		BIOLOGICAL_species_trait_picks_add = 1
 		# BIOSERVANT_species_trait_picks_add = 1
 		# REPLICANT_species_trait_picks_add = 1
@@ -76,12 +170,24 @@ tr_cybernetics_finish = {
 	on_enabled = {
 		# T2 Gate
 		hidden_effect = {
+			refresh_portraits = character
 			set_country_flag = tec_cybernetics_gate
-			country_event = {
+			country_event = { # GATE/MIXED Announcer
 				id = tec_cybernetic_path.150
 				days = 360
 			}
-			if = {
+			if = { # MACHINE AGE
+				limit = {
+					has_machine_age_dlc = yes
+					has_country_flag = cybernetics_traditions_unlocked
+					NOT = { has_origin = origin_cybernetic_creed }
+				}
+				country_event = {
+					id = cyber.500
+					days = 180
+				}
+			}
+			if = {	# LUMINARY Things
 				limit = {
 					OR = {
 						has_origin = origin_legendary_leader_dictatorial
@@ -104,12 +210,40 @@ tr_cybernetics_finish = {
 	ai_weight = {
 		factor = 1000
 	}
+
+	tradition_swap = {
+		name = tr_cybernetics_finish_situation
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_machine_age_dlc = yes
+			NOT = { has_country_flag = cybernetics_traditions_unlocked }
+		}
+		custom_tooltip = tr_cybernetics_finish_situation_effects
+	}
 }
 
 tr_cybernetics_transubstantiation_synthesis = {
+	possible = {
+		if = {
+			limit = { has_machine_age_dlc = no }
+			if = {
+				limit = { is_cyborg_empire = yes }
+			}
+			else = {
+				custom_tooltip = {
+					fail_text = REQUIRES_CYBORG_EMPIRE_UTOPIA
+					is_cyborg_empire = yes
+				}
+			}
+		}
+	}
+	custom_tooltip = tr_cybernetics_transubstantiation_synthesis_tooltip
 
-	modifier = {
-		planet_jobs_tec_cybernetics_produces_mult = 0.1
+	on_enabled = {
+		hidden_effect = {
+			refresh_portraits = character
+		}
 	}
 
 	ai_weight = {
@@ -122,8 +256,50 @@ tr_cybernetics_transubstantiation_synthesis = {
 		inherit_icon = no
 		trigger = {
 			is_homicidal = yes
+			has_country_flag = cybernetics_traditions_unlocked
 		}
 		custom_tooltip = tr_cybernetics_organ_harvesting_tooltip
+		on_enabled = {
+			hidden_effect = {
+				refresh_portraits = character
+			}
+		}
+	}
+
+	tradition_swap = {
+		name = tr_cybernetics_transubstantiation_synthesis_situation
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_machine_age_dlc = yes
+			is_homicidal = no
+			NOT = { has_country_flag = cybernetics_traditions_unlocked }
+		}
+		custom_tooltip = tr_cybernetics_transubstantiation_synthesis_situation_effects
+
+		on_enabled = {
+			hidden_effect = {
+				refresh_portraits = character
+			}
+		}
+	}
+
+	tradition_swap = {
+		name = tr_cybernetics_organ_harvesting_situation
+		inherit_name = no
+		inherit_icon = no
+		trigger = {
+			has_machine_age_dlc = yes
+			is_homicidal = yes
+			NOT = { has_country_flag = cybernetics_traditions_unlocked }
+		}
+		custom_tooltip = tr_cybernetics_organ_harvesting_situation_effects
+
+		on_enabled = {
+			hidden_effect = {
+				refresh_portraits = character
+			}
+		}
 	}
 }
 
@@ -141,9 +317,43 @@ tr_cybernetics_metabolic_reprocessing = {
 		factor = 1000
 	}
 
-	#tradition_swap = {
-	#	name = tr_cybernetics_metabolic_reprocessing_hive
-	#}
+	tradition_swap = {
+		name = tr_cybernetics_metabolic_reprocessing_hive
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			is_hive_empire = yes
+			has_country_flag = cybernetics_traditions_unlocked
+		}
+		custom_tooltip = tr_cybernetics_metabolic_reprocessing_hive_desc
+		modifier = {
+			planet_pops_cyborgs_upkeep_mult = -0.10
+		}
+	}
+
+	tradition_swap = {
+		name = tr_cybernetics_metabolic_reprocessing_situation
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_machine_age_dlc = yes
+			is_hive_empire = no
+			NOT = { has_country_flag = cybernetics_traditions_unlocked }
+		}
+		custom_tooltip = tr_cybernetics_metabolic_reprocessing_situation_effects
+	}
+
+	tradition_swap = {
+		name = tr_cybernetics_metabolic_reprocessing_hive_situation
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_machine_age_dlc = yes
+			is_hive_empire = yes
+			NOT = { has_country_flag = cybernetics_traditions_unlocked }
+		}
+		custom_tooltip = tr_cybernetics_metabolic_reprocessing_situation_hive_effects
+	}
 }
 
 tr_cybernetics_integrated_anatomy = {
@@ -153,7 +363,7 @@ tr_cybernetics_integrated_anatomy = {
 
 	custom_tooltip = tr_cybernetics_integrated_anatomy_tooltip
 	modifier = {
-		BIOLOGICAL_species_trait_picks_add = 1
+		BIOLOGICAL_species_trait_picks_add = 2
 		# BIOSERVANT_species_trait_picks_add = 1
 		# REPLICANT_species_trait_picks_add = 1
 	}
@@ -172,30 +382,80 @@ tr_cybernetics_integrated_anatomy = {
 	ai_weight = {
 		factor = 1000
 	}
+
+	tradition_swap = {
+		name = tr_cybernetics_integrated_anatomy_situation
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_machine_age_dlc = yes
+			NOT = { has_country_flag = cybernetics_traditions_unlocked }
+		}
+		custom_tooltip = tr_cybernetics_integrated_anatomy_situation_effects
+	}
 }
 
-tr_cybernetics_assembly_standards = {
+tr_cybernetics_augmentation_overload = {
 	possible = {
 		has_tradition = tr_cybernetics_metabolic_reprocessing
 	}
-
-	custom_tooltip = tr_cybernetics_assembly_standards_tooltip
+	custom_tooltip = tr_cybernetics_augmentation_overload_desc
 
 	ai_weight = {
 		factor = 1000
 	}
 
-	#tradition_swap = {
-		#name = tr_cybernetics_synaptic_sub_processing
-		#inherit_name = no
-		#inherit_icon = no
-		#trigger = {
-		#	is_hive_empire = yes
-		#}
+	tradition_swap = {
+		name = tr_cybernetics_augmentation_centers
+		inherit_name = no
+		inherit_icon = yes
+		trigger = {
+			has_machine_age_dlc = no
+			is_hive_empire = no
+		}
+		custom_tooltip = tr_cybernetics_augmentation_centers_desc
+	}
+
+	tradition_swap = {
+		name = tr_cybernetics_augmentation_overload_situation
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_machine_age_dlc = yes
+			is_hive_empire = no
+			NOT = { has_country_flag = cybernetics_traditions_unlocked }
+		}
+		custom_tooltip = tr_cybernetics_augmentation_overload_situation_effects
+	}
+
+	tradition_swap = {
+		name = tr_cybernetics_synaptic_sub_processing
+		inherit_name = no
+		inherit_icon = no
+		trigger = {
+			always = no
+			is_hive_empire = yes
+			has_country_flag = cybernetics_traditions_unlocked
+		}
+		custom_tooltip_with_modifiers = tr_cybernetics_synaptic_sub_processing_tooltip
 		#modifier = {
+		#	# Just no LOL
 		#	empire_size_districts_mult = -0.5
 		#}
-	#}
+	}
+
+	tradition_swap = {
+		name = tr_cybernetics_synaptic_sub_processing_situation
+		inherit_name = no
+		inherit_icon = no
+		trigger = {
+			always = no
+			has_machine_age_dlc = yes
+			is_hive_empire = yes
+			NOT = { has_country_flag = cybernetics_traditions_unlocked }
+		}
+		custom_tooltip = tr_cybernetics_synaptic_sub_processing_situation_effects
+	}
 }
 
 tr_cybernetics_modular_cybernetics = {
@@ -206,8 +466,7 @@ tr_cybernetics_modular_cybernetics = {
 	custom_tooltip = tr_cybernetics_modular_cybernetics_tooltip
 	modifier = {
 		MODIFY_SPECIES_COST_MULT = -0.5
-		
-		# These are hidden as cyborg trait becomes a 'negative' fdue to cost
+		# These are hidden as cyborg trait becomes a 'negative' due to cost
 		BIOLOGICAL_species_trait_picks_add = 1
 		# BIOSERVANT_species_trait_picks_add = 1
 		# # Remove if replicant is handled differently
@@ -216,6 +475,23 @@ tr_cybernetics_modular_cybernetics = {
 
 	ai_weight = {
 		factor = 1000
+	}
+
+	tradition_swap = {
+		name = tr_cybernetics_modular_cybernetics_hive
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			is_hive_empire = yes
+			has_country_flag = cybernetics_traditions_unlocked
+		}
+		custom_tooltip = tr_cybernetics_modular_cybernetics_hive_tt
+		modifier = {
+			modify_species_cost_mult = -0.50
+		}
+		weight = {
+			factor = 1
+		}
 	}
 
 	tradition_swap = {
@@ -236,5 +512,29 @@ tr_cybernetics_modular_cybernetics = {
 			# # Remove if replicant is handled differently
 			# REPLICANT_species_trait_picks_add = 1
 		}
+	}
+
+	tradition_swap = {
+		name = tr_cybernetics_modular_cybernetics_situation
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_machine_age_dlc = yes
+			is_hive_empire = no
+			NOT = { has_country_flag = cybernetics_traditions_unlocked }
+		}
+		custom_tooltip = tr_cybernetics_modular_cybernetics_situation_effects
+	}
+
+	tradition_swap = {
+		name = tr_cybernetics_modular_cybernetics_hive_situation
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_machine_age_dlc = yes
+			is_hive_empire = yes
+			NOT = { has_country_flag = cybernetics_traditions_unlocked }
+		}
+		custom_tooltip = tr_cybernetics_modular_cybernetics_hive_situation_effects
 	}
 }
