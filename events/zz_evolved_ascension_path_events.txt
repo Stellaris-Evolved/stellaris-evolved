@@ -6813,11 +6813,7 @@ namespace = tec_gene_path
 						NEW_SITUATION_APPROACH_2 = situation_tec_ascension_biological_biogenics_t1_approach_standard
 						NEW_SITUATION_APPROACH_3 = situation_tec_ascension_biological_biogenics_t1_approach_fast
 						NEW_PROGRESS = 30
-						EXTRA_EFFECT = "
-							event_target:new_situation = {
-								set_situation_flag = tec_situation_2xspeed
-							}
-						"
+						DOUBLE_SPEED = yes
 					}
 				}
 				ai_chance = {	# We don't want ais to get confused
@@ -6872,50 +6868,14 @@ namespace = tec_gene_path
 
 		is_triggered_only = yes
 
-		immediate = {
-		}
 		after = {
 			hidden_effect = {
 				# PATH FLAG
 				set_country_flag = ap_engineered_evolution_genetics
+				# Ap mechanic flag
 				set_country_flag = tec_gene_malleability
-				set_country_flag = tec_gene_path_unlocked_tradition
-				# Announcement
-				if = {
-					limit = {
-						NOT = {
-							has_country_flag = tec_comm_1st_step
-						}
-					}
-					set_country_flag = tec_comm_1st_step
-					if = {
-						limit = {	# Prevents FE and alike from triggering the announce
-							NOT = {
-								has_country_flag = tec_advanced_ascension
-							}
-						}
-						every_country = {
-							limit = {
-								is_ai = no
-								NOR = {
-									is_same_value = root
-									# TO DO policy for muting other empire things 
-									has_country_flag = tec_mute_empire_announces
-								}
-								has_communications = root
-								root = {
-									is_primitive = no
-								}
-							}
-							country_event = {
-								id = tec_gene_path.10501
-								days = 5 
-							}
-						}
-					}
-				}
-				# Utility
-				fire_on_action = { on_action = tec_ascension_situation_finished }
+				# Tradition flag
+				set_country_flag = tec_unlocks_tradition_genetics
 			}
 		}
 		# Options
@@ -6953,16 +6913,102 @@ namespace = tec_gene_path
 			}
 		# /
 	}
+
+	# Tradition - Getting the flags and triggering situations or whatever if needed
+	country_event = { # T1 Picked Engineered Evolution adoption
+		id = tec_gene_path.110
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			has_tradition = tr_genetics_adopt
+			NOT = {
+				has_country_flag = tec_adopted_tradition_genetics
+			}
+		}
+		immediate = {
+			# Safeproofing flag
+			set_country_flag = tec_adopted_tradition_genetics
+			# In case devs do something like cybernetics
+			# check tec_cybernetic_path.110 for the situation triggers and etc
+			hidden_effect = {
+				# OG is utopia.2700
+				country_event = {
+					id = tec_gene_path.11010
+				}
+			}
+		}
+	}
+	country_event = { # T1 Picked Engineered Evolution adoption - non ??? - gives flags
+		id = tec_gene_path.11010
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+		}
+
+		immediate = {
+			# Safeproofing flag
+			set_country_flag = tec_adopted_tradition_genetics
+			# Unlocks
+			
+			# Fear of the Dark Separatists - Outraged
+				if = {
+					limit = {
+						any_planet_within_border = {
+							has_planet_flag = fotd_seperatist_planet@root
+							owner = {
+								has_country_flag = fotd_seperatist_country@root
+							}
+						}
+					}
+					country_event = { id = origin.6096 days = 10 random = 10 }
+				}
+			# /
+			# Announcement
+			if = {
+				limit = {	# Prevents FE and alike from triggering the announce
+					NOT = {
+						has_country_flag = tec_advanced_ascension
+					}
+				}
+				every_country = {
+					limit = {
+						is_ai = no
+						NOR = {
+							is_same_value = root
+							# TO DO policy for muting other empire things 
+							has_country_flag = tec_mute_empire_announces
+						}
+						has_communications = root
+						root = {
+							is_primitive = no
+						}
+					}
+					country_event = {
+						id = tec_gene_path.11090
+						days = 5 
+					}
+				}
+			}
+			fire_on_action = { on_action = tec_ascension_situation_finished }
+		}
+	}
+	# Any extra situation must be considered as interlude
+
+	# Notification for other countries
 	country_event = { # GENE T1 Notification to other empires
-		id = tec_gene_path.10501
-		title = "tec_gene_path.10501.name"
+		id = tec_gene_path.11090
+		title = "tec_gene_path.11090.name"
 		# Descs
 			desc = {
-				text = "tec_gene_path.10501.desc"
+				text = "tec_gene_path.11090.desc"
 				trigger = { always = yes }
 			}
 			# Fallback
-			desc = "tec_gene_path.10501.desc"
+			desc = "tec_gene_path.11090.desc"
 		# /
 		picture = GFX_evt_tec_cyan_strings
 		#show_sound = event_engineered_evolution
@@ -6971,28 +7017,28 @@ namespace = tec_gene_path
 
 		# Options
 			option = {
-				name = "tec_gene_path.10501.interest"
+				name = "tec_gene_path.11090.interest"
 				trigger = {
 					is_homicidal = no
 					tec_is_genetic_ascension_hater = no
 				}
 			}
 			option = {
-				name = "tec_gene_path.10501.disdain"
+				name = "tec_gene_path.11090.disdain"
 				trigger = {
 					is_homicidal = no
 					tec_is_genetic_ascension_rival = yes
 				}
 			}
 			option = {
-				name = "tec_gene_path.10501.hate"
+				name = "tec_gene_path.11090.hate"
 				trigger = {
 					is_homicidal = no
 					tec_is_genetic_ascension_hater = yes
 				}
 			}
 			option = {
-				name = "tec_gene_path.10501.same_path"
+				name = "tec_gene_path.11090.same_path"
 				trigger = {
 					is_homicidal = no
 					tec_is_genetic_ascension_empire = yes
@@ -7000,14 +7046,14 @@ namespace = tec_gene_path
 			}
 
 			option = {
-				name = "tec_gene_path.10501.concern"
+				name = "tec_gene_path.11090.concern"
 				trigger = {
 					is_homicidal = no
 					tec_is_genetic_ascension_hater = no
 				}
 			}
 			option = {
-				name = "tec_gene_path.10501.machine"
+				name = "tec_gene_path.11090.machine"
 				trigger = {
 					is_homicidal = no
 					tec_is_genetic_ascension_hater = no
@@ -7023,7 +7069,7 @@ namespace = tec_gene_path
 				}
 			}
 			option = {
-				name = "tec_gene_path.10501.assimilator"
+				name = "tec_gene_path.11090.assimilator"
 				trigger = {
 					is_homicidal = no
 					tec_is_genetic_ascension_hater = no
@@ -7035,21 +7081,21 @@ namespace = tec_gene_path
 				}
 			}
 			option = {
-				name = "tec_gene_path.10501.homicidal"
+				name = "tec_gene_path.11090.homicidal.regular"
 				trigger = {
 					is_gestalt = no
 					is_homicidal = yes
 				}
 			}
 			option = {
-				name = "tec_gene_path.10501.homicidal.hive"
+				name = "tec_gene_path.11090.homicidal.hive"
 				trigger = {
 					is_hive_empire = yes
 					is_homicidal = yes
 				}
 			}
 			option = {
-				name = "tec_gene_path.10501.homicidal.machine"
+				name = "tec_gene_path.11090.homicidal.machine"
 				trigger = {
 					is_machine_empire = yes
 					is_homicidal = yes
@@ -7061,12 +7107,12 @@ namespace = tec_gene_path
  # /
  # --------------- GENE INTERLUDE
   # --------------- GENE INTERLUDE indicator
-  	country_event = { # 1 years after - Redesigned Genome TODO ASCENSION
+	country_event = { # 1 years after - Redesigned Genome
 		id = tec_gene_path.150
 		title = "tec_gene_path.150.name"
 		# Descs
 			desc = {	# Regular
-				text = "tec_gene_path.150.desc.standard"
+				text = "tec_gene_path.150.desc.regular"
 				trigger = {
 					is_gestalt = no
 				}
@@ -7078,7 +7124,7 @@ namespace = tec_gene_path
 				}
 			}
 			# Fallback
-			desc = "tec_gene_path.150.desc.standard"
+			desc = "tec_gene_path.150.desc.regular"
 		# /
 		# TODO ASCENSION FUTURE GUI
 		#custom_gui = tec_gui_ascension_event
@@ -7101,15 +7147,38 @@ namespace = tec_gene_path
 
 		after = {
 			hidden_effect = {
-				# TODO ASCENSION
-				# Link the flags/effects for the thing
+				# Set the flag for t2 unlocks
+				set_country_flag = tec_genetics_gate_completed
 			}
 		}
 
 		# Options
 			option = {
-				name = "tec_gene_path.150.ok"
-				custom_tooltip = "tec_gene_path.150.ok.tooltip"
+				name = "tec_gene_path.150.genetics"
+				custom_tooltip = tec_gene_path.150.genetics.tooltip
+				icon = {
+					icon = GFX_situation_approach_genetics
+					icon_background = GFX_situation_approach_bg_tec_orange
+					text = tec_icon_text_path_neutral
+				}
+			}
+			option = {
+				name = "tec_gene_path.150.biomechanical"
+				custom_tooltip = tec_gene_path.150.biomechanical.tooltip
+				icon = {
+					icon = GFX_situation_approach_tec_replicants
+					icon_background = GFX_situation_approach_bg_green
+					text = tec_icon_text_path_neutral
+				}
+			}
+			option = {
+				name = "tec_gene_path.150.biopsionics"
+				custom_tooltip = tec_gene_path.150.biopsionics.tooltip
+				icon = {
+					icon = GFX_situation_approach_tec_biopsionics
+					icon_background = GFX_situation_approach_bg_tec_purple
+					text = tec_icon_text_path_neutral
+				}
 			}
 		# /
 	}
@@ -7684,11 +7753,7 @@ namespace = tec_biogenic_path
 						NEW_SITUATION_APPROACH_2 = situation_tec_ascension_biological_genetics_t1_approach_standard
 						NEW_SITUATION_APPROACH_3 = situation_tec_ascension_biological_genetics_t1_approach_fast
 						NEW_PROGRESS = 30
-						EXTRA_EFFECT = "
-							event_target:new_situation = {
-								set_situation_flag = tec_situation_2xspeed
-							}
-						"
+						DOUBLE_SPEED = yes
 					}
 				}
 				ai_chance = {	# We don't want ais to get confused
@@ -7759,7 +7824,7 @@ namespace = tec_biogenic_path
 			hidden_effect = {
 				# PATH FLAG
 				set_country_flag = tec_biogenic_unlock
-				set_country_flag = tec_biogenic_path_unlocked_tradition_1
+				set_country_flag = tec_unlocks_tradition_biogenics
 				set_country_flag = ap_engineered_evolution_biogenics
 				# Announcement
 				if = {
@@ -7858,7 +7923,7 @@ namespace = tec_biogenic_path
 			trigger = {
 				OR = {
 					# Has main gene path
-					has_country_flag = tec_gene_path_unlocked_tradition
+					has_country_flag = tec_unlocks_tradition_genetics
 					# Has mixed gene path
 					has_country_flag = tec_biopsionic_path_finished
 					has_country_flag = tec_replicant_path_finished
@@ -7868,7 +7933,7 @@ namespace = tec_biogenic_path
 		option = {	# More species unlocking their potential...
 			name = "tec_biogenic_path.10501.d"
 			trigger = {
-				has_country_flag = tec_biogenic_path_unlocked_tradition_1
+				has_country_flag = tec_unlocks_tradition_biogenics
 			}
 		}
 		option = {	# They will never outgrow our versatility.
@@ -8892,11 +8957,7 @@ namespace = tec_cybernetic_path
 						NEW_SITUATION_APPROACH_2 = situation_tec_ascension_technoorganic_bioware_t1_approach_standard
 						NEW_SITUATION_APPROACH_3 = situation_tec_ascension_technoorganic_bioware_t1_approach_fast
 						NEW_PROGRESS = 30
-						EXTRA_EFFECT = "
-							event_target:new_situation = {
-								set_situation_flag = tec_situation_2xspeed
-							}
-						"
+						DOUBLE_SPEED = yes
 					}
 				}
 				ai_chance = {	# We don't want ais to get confused
@@ -8907,36 +8968,70 @@ namespace = tec_cybernetic_path
 	}
   # /
   # --------------- CYB T1 finish
-	country_event = { # T1 Situation finished - No Hivemind
+	country_event = { # T1 Situation finished - Unlocks tradition
 		id = tec_cybernetic_path.105
 		title = "tec_cybernetic_path.105.name"
 		# Descs
+			# Regular
 			desc = {
-				text = "tec_cybernetic_path.105.desc"
+				text = "tec_cybernetic_path.105.desc.regular.nomachineage"
 				trigger = {
 					is_regular_empire = yes
 					tec_has_cybernetic_ascension_origin = no
+					has_machine_age_dlc = no
 				}
 			}
 			desc = {
-				text = "tec_cybernetic_path.105.desc.hive"
+				text = "tec_cybernetic_path.105.desc.regular.machineage"
+				trigger = {
+					is_regular_empire = yes
+					tec_has_cybernetic_ascension_origin = no
+					has_machine_age_dlc = yes
+				}
+			}
+			# Hive
+			desc = {
+				text = "tec_cybernetic_path.105.desc.hive.nomachineage"
 				trigger = {
 					is_hive_empire = yes
 					NOR = {
 						tec_is_cyberhive = yes
 						tec_has_cybernetic_ascension_origin = yes
 					}
+					has_machine_age_dlc = no
 				}
 			}
 			desc = {
-				text = "tec_cybernetic_path.105.desc.cyborg"
+				text = "tec_cybernetic_path.105.desc.hive.machineage"
+				trigger = {
+					is_hive_empire = yes
+					NOR = {
+						tec_is_cyberhive = yes
+						tec_has_cybernetic_ascension_origin = yes
+					}
+					has_machine_age_dlc = yes
+				}
+			}
+			# Cyborg
+			desc = {
+				text = "tec_cybernetic_path.105.desc.cyborg.nomachineage"
 				trigger = {
 					is_regular_empire = yes
 					tec_has_cybernetic_ascension_origin = yes
+					has_machine_age_dlc = no
 				}
 			}
 			desc = {
-				text = "tec_cybernetic_path.105.desc.cyborg.gestalt"
+				text = "tec_cybernetic_path.105.desc.cyborg.machineage"
+				trigger = {
+					is_regular_empire = yes
+					tec_has_cybernetic_ascension_origin = yes
+					has_machine_age_dlc = yes
+				}
+			}
+			# Cyborg gestalt
+			desc = {
+				text = "tec_cybernetic_path.105.desc.cyborg.gestalt.nomachineage"
 				trigger = {
 					is_regular_empire = no
 					OR = {
@@ -8944,6 +9039,19 @@ namespace = tec_cybernetic_path
 						tec_is_cyberhive = yes
 						tec_has_cybernetic_ascension_origin = yes
 					}
+					has_machine_age_dlc = no
+				}
+			}
+			desc = {
+				text = "tec_cybernetic_path.105.desc.cyborg.gestalt.machineage"
+				trigger = {
+					is_regular_empire = no
+					OR = {
+						has_valid_civic = civic_machine_assimilator
+						tec_is_cyberhive = yes
+						tec_has_cybernetic_ascension_origin = yes
+					}
+					has_machine_age_dlc = yes
 				}
 			}
 		# /
@@ -8953,115 +9061,165 @@ namespace = tec_cybernetic_path
 
 		is_triggered_only = yes
 
-		immediate = {
-			hidden_effect = {
-				# First step finished
-				set_country_flag = tec_cybernetic_path_unlocked_tradition_1
-				set_country_flag = tec_cybernetic_t1_assimilation
-				set_country_flag = ap_the_flesh_is_weak_cybernetics
-				set_country_flag = cyborg_empire
-				# Create cyborgs
-				if = {
-					limit = {
-						is_machine_empire = no
-					}
-					tec_create_cybernetic_species = yes
-				}
-				# TO DO create specific leader ascension trait handler
-				every_owned_leader = {
-					add_leader_traits_after_modification = yes
-					remove_leader_traits_after_modification = yes
-				}
-				every_pool_leader = {
-					add_leader_traits_after_modification = yes
-					remove_leader_traits_after_modification = yes
-				}
-				# Fear of the Dark Separatists - Outraged
-					if = {
-						limit = {
-							any_planet_within_border = {
-								has_planet_flag = fotd_seperatist_planet@root
-								owner = {
-									has_country_flag = fotd_seperatist_country@root
-								}
-							}
-						}
-						country_event = { id = origin.6096 days = 10 random = 10 }
-					}
-				# /
-				fire_on_action = { on_action = tec_ascension_situation_finished }
-			}
-		}
 		after = {
 			hidden_effect = {
-				if = {
-					limit = {
-						is_hive_empire = yes
-						tec_is_cyberhive = no
-					}
-					country_event = {
-						id = tec_cybernetic_path.10501
-					}
-				}
-				else = {
-					# Announcement
-					if = {
-						limit = {	# Prevents FE and alike from triggering the announce
-							NOT = {
-								has_country_flag = tec_advanced_ascension
-							}
-						}
-						every_country = {
-							limit = {
-								is_ai = no
-								NOR = {
-									is_same_value = root
-									# TO DO policy for muting other empire things 
-									has_country_flag = tec_mute_empire_announces
-								}
-								has_communications = root
-								root = {
-									is_primitive = no
-								}
-							}
-							country_event = {
-								id = tec_cybernetic_path.10510
-								days = 5 
-							}
-						}
-					}
-				}
+				# Swaps ap perk to reflect the thing
+				set_country_flag = ap_the_flesh_is_weak_cybernetics
+				# Unlocks tradition and swaps perk
+				set_country_flag = tec_unlocks_tradition_cybernetics
 			}
 		}
 
 		# Options
+			# Regular
 			option = {
-				name = "tec_cybernetic_path.105.a"
-				custom_tooltip = "tec_cybernetic_path.105.a.tooltip"
-				hidden_effect = { # Gives the special project
-					save_event_target_as = tec_cyber_1_owner
-					set_country_flag = tec_cybernetic_path_unlocked_tradition_1
+				name = "tec_cybernetic_path.105.ok.regular.nomachineage"
+				custom_tooltip = "tec_cybernetic_path.105.ok.regular.nomachineage.tooltip"
+				trigger = {
+					hidden_trigger = {
+						is_gestalt = no
+						has_machine_age_dlc = no
+					}
+				}
+			}
+			option = {
+				name = "tec_cybernetic_path.105.ok.regular.machineage"
+				custom_tooltip = "tec_cybernetic_path.105.ok.regular.nomachineage.tooltip"
+				trigger = {
+					hidden_trigger = {
+						is_gestalt = no
+						has_machine_age_dlc = yes
+					}
+				}
+			}
+			# Hive
+			option = {
+				name = "tec_cybernetic_path.105.ok.gestalt.nomachineage"
+				custom_tooltip = "tec_cybernetic_path.105.ok.gestalt.nomachineage.tooltip"
+				trigger = {
+					hidden_trigger = {
+						is_gestalt = yes
+						has_machine_age_dlc = no
+					}
+				}
+			}
+			option = {
+				name = "tec_cybernetic_path.105.ok.gestalt.machineage"
+				custom_tooltip = "tec_cybernetic_path.105.ok.gestalt.nomachineage.tooltip"
+				trigger = {
+					hidden_trigger = {
+						is_gestalt = yes
+						has_machine_age_dlc = yes
+					}
 				}
 			}
 		# /
 	}
-	# TODO ASCENSION
-	country_event = { # T1 Situation finished - Hivemind (change of auth)
-		id = tec_cybernetic_path.10501
-		title = "tec_cybernetic_path.10501.name"
-		# Descs
-			desc = {	# Regular
-				text = "tec_cybernetic_path.10501.desc"
-				trigger = { always = yes }
-			}
-		# /
-		picture = GFX_evt_robot_assembly_plant
-		show_sound = event_the_flesh_is_weak
-		trackable = yes
+
+	# Tradition - Getting the cybernetic trait or triggering the MAge situation
+	country_event = { # T1 Picked Flesh is Weak adoption
+		id = tec_cybernetic_path.110
+		hide_window = yes
 
 		is_triggered_only = yes
-		
-		after = {
+
+		trigger = {
+			OR = {
+				has_tradition = tr_cybernetics_adopt
+				has_tradition = tr_cybernetics_assimilator_adopt
+			}
+			NOT = {
+				has_country_flag = tec_adopted_tradition_cybernetics
+			}
+		}
+		immediate = {
+			# Safeproofing flag
+			set_country_flag = tec_adopted_tradition_cybernetics
+			if = {		# MAge - Cyberization situation (regular)
+				limit = {
+					has_machine_age_dlc = yes
+					NOT = {
+						has_origin = origin_cybernetic_creed
+					}
+				}
+				if = { # Assimilators
+					limit = {
+						has_machine_age_dlc = yes
+						has_civic = civic_machine_assimilator
+					}
+					hidden_effect = {
+						country_event = {
+							id = cyber.2010
+							days = 2
+						}
+					}
+				}
+				else = { # Non assimilators and etc
+					country_event = {
+						id = cyber.1
+					}
+				}
+			}
+			else_if = {	# MAge - Cybernetic creed
+				limit = {
+					has_machine_age_dlc = yes
+					has_origin = origin_cybernetic_creed
+				}
+				hidden_effect = {
+					country_event = {
+						id = machine_age.100
+					}
+				}
+			}
+			else = {	# No MAge - Gives cybernetics
+				hidden_effect = {
+					# OG is utopia.2500
+					country_event = {
+						id = tec_cybernetic_path.11010
+					}
+				}
+			}
+		}
+	}
+	country_event = { # T1 Picked Flesh is Weak adoption - non MAge - gives cybernetics
+		id = tec_cybernetic_path.11010
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+		}
+
+		immediate = {
+			# Safeproofing flag
+			set_country_flag = tec_adopted_tradition_cybernetics
+			# Create cyborgs
+			if = {	# Non machine
+				limit = {
+					is_machine_empire = no
+				}
+				tec_create_cybernetic_species_effect = yes
+			}
+			#else = {	# Machine assim
+			#	# Flip the trait
+			#}
+			# Allows cyborg assimilation
+			set_country_flag = tec_cybernetic_t1_assimilation
+			# Fear of the Dark Separatists - Outraged
+				if = {
+					limit = {
+						any_planet_within_border = {
+							has_planet_flag = fotd_seperatist_planet@root
+							owner = {
+								has_country_flag = fotd_seperatist_country@root
+							}
+						}
+					}
+					country_event = { id = origin.6096 days = 10 random = 10 }
+				}
+			# /
+			fire_on_action = { on_action = tec_ascension_situation_finished }
+			
 			hidden_effect = {
 				# Announcement
 				if = {
@@ -9083,117 +9241,23 @@ namespace = tec_cybernetic_path
 								is_primitive = no
 							}
 						}
-						set_timed_country_flag = {
-							flag = tec_hive_changed_to_cyberhive
-							years = 1
-						}
 						country_event = {
-							id = tec_cybernetic_path.10510
+							id = tec_cybernetic_path.11090
 							days = 5 
 						}
 					}
 				}
 			}
-			fire_on_action = { on_action = tec_ascension_situation_finished }
 		}
-
-		# Options
-			option = {
-				name = "tec_cybernetic_path.10501.a"
-				custom_tooltip = "tec_cybernetic_path.10501.a.tooltip"
-				hidden_effect = {
-					change_government = {
-						authority = auth_tec_hive_cybernetic
-						#remove_invalid_civics = yes
-					}
-					# Remove invalid effects
-					if = {
-						limit = {
-							has_civic = civic_tec_hive_everevolving
-						}
-						force_remove_civic = civic_tec_hive_everevolving
-						remove_modifier = modifier_tec_everevolving_primal
-						remove_modifier = modifier_tec_everevolving_young
-						remove_modifier = modifier_tec_everevolving_mature
-						remove_modifier = modifier_tec_everevolving_venerable
-					}
-					if = {
-						limit = {
-							has_civic = civic_tec_hive_cerebrates
-						}
-						force_remove_civic = civic_tec_hive_cerebrates
-					}
-					if = {
-						limit = {
-							has_civic = civic_tec_hive_necrophage
-						}
-						force_remove_civic = civic_tec_hive_necrophage
-					}
-					if = {
-						limit = {
-							has_civic = civic_tec_hive_splicers
-						}
-						force_remove_civic = civic_tec_hive_splicers
-						force_add_civic = civic_tec_hive_splicers_cyborg
-					}
-					if = {
-						limit = {
-							has_civic = civic_tec_hive_parasitic
-						}
-						force_remove_civic = civic_tec_hive_parasitic
-						force_add_civic = civic_tec_hive_parasitic_cyborg
-					}
-					if = {
-						limit = {
-							has_civic = civic_tec_hive_frenzy
-						}
-						force_remove_civic = civic_tec_hive_frenzy
-					}
-					if = {
-						limit = {
-							has_civic = civic_tec_hive_neuraxial
-						}
-						force_remove_civic = civic_tec_hive_neuraxial
-						force_add_civic = civic_tec_hive_neuraxial_cyborg
-					}
-					if = {
-						limit = {
-							has_civic = civic_tec_hive_node
-						}
-						force_remove_civic = civic_tec_hive_node
-						force_add_civic = civic_tec_hive_node_cyborg
-					}
-					if = {
-						limit = {
-							has_civic = civic_tec_hive_necrophage
-						}
-						force_remove_civic = civic_tec_hive_necrophage
-					}
-					change_government = {
-						authority = auth_tec_hive_cybernetic
-						remove_invalid_civics = yes
-					}
-				}
-			}
-			option = {
-				name = "tec_cybernetic_path.10501.b"
-				custom_tooltip = "tec_cybernetic_path.10501.b.tooltip"
-				trigger = { # Biohives are forced to change
-					hidden_trigger = {
-						tec_is_biohive = no
-					}
-				}
-			}
-		# /
 	}
-	country_event = { # T1 Notification for Other Nations
-		id = tec_cybernetic_path.10510
+	country_event = { # T1 Standard - Notification for Other Nations
+		id = tec_cybernetic_path.11090
 		picture = GFX_evt_robot_assembly_plant
 		show_sound = event_the_flesh_is_weak
-		title = "tec_cybernetic_path.10510.name"
+		title = "tec_cybernetic_path.11090.name"
 		# Descs
 			desc = {
-				text = "tec_cybernetic_path.10510.desc"
+				text = "tec_cybernetic_path.11090.desc"
 				trigger = {
 					OR = {
 						is_spiritualist = no
@@ -9208,7 +9272,7 @@ namespace = tec_cybernetic_path
 				}
 			}
 			desc = {
-				text = "tec_cybernetic_path.10510.spi.desc"
+				text = "tec_cybernetic_path.11090.spi.desc"
 				trigger = {
 					OR = {
 						has_ethic = ethic_spiritualist
@@ -9221,7 +9285,7 @@ namespace = tec_cybernetic_path
 				}
 			}
 			desc = {
-				text = "tec_cybernetic_path.10510.hive.desc"
+				text = "tec_cybernetic_path.11090.hive.desc"
 				trigger = {
 					from = {
 						is_hive_empire = yes
@@ -9232,7 +9296,7 @@ namespace = tec_cybernetic_path
 				}
 			}
 			desc = {
-				text = "tec_cybernetic_path.10510.hive.to.cyberhive.desc"
+				text = "tec_cybernetic_path.11090.hive.to.cyberhive.desc"
 				trigger = {
 					from = {
 						is_hive_empire = yes
@@ -9244,60 +9308,147 @@ namespace = tec_cybernetic_path
 
 		is_triggered_only = yes
 
+		
 		# Options
 			option = {
-				name = "tec_cybernetic_path.10510.a"
-			}
-			option = {
-				name = "tec_cybernetic_path.10510.b"
+				name = "tec_cybernetic_path.11090.interest"
 				trigger = {
-					OR = {
-						has_ethic = ethic_spiritualist
-						has_ethic = ethic_fanatic_spiritualist
-					}
-					tec_is_robot_lover_spiritualist = no
+					is_homicidal = no
+					tec_is_cybernetic_ascension_hater = no
 				}
 			}
 			option = {
-				name = "tec_cybernetic_path.10510.c"
+				name = "tec_cybernetic_path.11090.interest.similar"
 				trigger = {
+					is_homicidal = no
+					tec_is_cybernetic_ascension_hater = no
+					tec_has_cybernetic_ascension_origin = yes
+				}
+			}
+			option = {
+				name = "tec_cybernetic_path.11090.disdain"
+				trigger = {
+					is_homicidal = no
+					tec_is_cybernetic_ascension_rival = yes
+					is_spiritualist = no
+				}
+			}
+			option = {
+				name = "tec_cybernetic_path.11090.disdain.spi"
+				trigger = {
+					is_homicidal = no
+					tec_is_cybernetic_ascension_rival = yes
+				}
+			}
+			option = {
+				name = "tec_cybernetic_path.11090.hate"
+				trigger = {
+					is_homicidal = no
+					tec_is_cybernetic_ascension_hater = yes
+					is_spiritualist = no
+				}
+			}
+			option = {
+				name = "tec_cybernetic_path.11090.hate.spi"
+				trigger = {
+					is_homicidal = no
+					tec_is_cybernetic_ascension_hater = yes
+					has_ethic = ethic_fanatic_spiritualist
+				}
+			}
+			option = {
+				name = "tec_cybernetic_path.11090.same_path"
+				trigger = {
+					is_homicidal = no
+					tec_is_cybernetic_ascension_empire = yes
+				}
+			}
+			option = {
+				name = "tec_cybernetic_path.11090.same_path.similar"
+				trigger = {
+					is_homicidal = no
+					tec_has_cybernetic_ascension_origin = yes
+				}
+			}
+
+			option = {
+				name = "tec_cybernetic_path.11090.concern"
+				trigger = {
+					is_homicidal = no
+					tec_is_cybernetic_ascension_hater = no
+					is_spiritualist = no
+					is_xenophile = no
+				}
+			}
+			option = {
+				name = "tec_cybernetic_path.11090.concern.phile"
+				trigger = {
+					is_homicidal = no
+					tec_is_cybernetic_ascension_hater = no
+					is_spiritualist = no
+					is_xenophile = yes
+				}
+			}
+			option = {
+				name = "tec_cybernetic_path.11090.concern.spi"
+				trigger = {
+					is_homicidal = no
+					tec_is_cybernetic_ascension_hater = no
+					has_ethic = ethic_spiritualist
+				}
+			}
+			option = {
+				name = "tec_cybernetic_path.11090.machine"
+				trigger = {
+					is_homicidal = no
+					tec_is_cybernetic_ascension_hater = no
 					OR = {
 						is_machine_empire = yes
 						is_synthetic_empire = yes
 					}
-				}
-			}
-			option = {
-				name = "tec_cybernetic_path.10510.d"
-				trigger = {
-					OR = {
-						is_cyborg_empire = yes
-						tec_is_cyberhive = yes
+					NOR = {
+						has_ethic = ethic_gestalt_empathy
+						has_civic = civic_machine_assimilator
+						has_civic = civic_machine_servitor
 					}
 				}
 			}
 			option = {
-				name = "tec_cybernetic_path.10510.e"
+				name = "tec_cybernetic_path.11090.assimilator"
 				trigger = {
+					is_homicidal = no
+					tec_is_cybernetic_ascension_hater = no
 					OR = {
-						has_valid_civic = civic_tec_regular_machine_cult
-						has_valid_civic = civic_tec_regular_occultist
+						has_authority = auth_tec_hive_cybernetic
+						has_civic = civic_machine_assimilator
+						has_civic = civic_machine_servitor
 					}
 				}
 			}
 			option = {
-				name = "tec_cybernetic_path.10510.f"
+				name = "tec_cybernetic_path.11090.homicidal.regular"
 				trigger = {
-					OR = {
-						has_valid_civic = civic_machine_terminator
-						has_valid_civic = civic_hive_devouring_swarm
-						has_valid_civic = civic_fanatic_purifiers
-						is_at_war_with = from
-					}
+					is_gestalt = no
+					is_homicidal = yes
+				}
+			}
+			option = {
+				name = "tec_cybernetic_path.11090.homicidal.hive"
+				trigger = {
+					is_hive_empire = yes
+					is_homicidal = yes
+				}
+			}
+			option = {
+				name = "tec_cybernetic_path.11090.homicidal.machine"
+				trigger = {
+					is_machine_empire = yes
+					is_homicidal = yes
 				}
 			}
 		# /
 	}
+	#country_event = { # T1 Machine Age - Notification for Other Nations
   # /
  # /
  # --------------- CYB INTERLUDE
@@ -9307,20 +9458,19 @@ namespace = tec_cybernetic_path
 		title = "tec_cybernetic_path.150.name"
 		# Descs
 			desc = {
-				text = "tec_cybernetic_path.150.desc"
+				text = "tec_cybernetic_path.150.desc.regular"
 				trigger = {
-					is_hive_empire = no
-					is_machine_empire = no
+					is_gestalt = no
 				}
 			}
 			desc = {
-				text = "tec_cybernetic_path.150.desc_hive"
+				text = "tec_cybernetic_path.150.desc.hive"
 				trigger = {
 					is_hive_empire = yes
 				}
 			}
 			desc = {
-				text = "tec_cybernetic_path.150.desc_machine"
+				text = "tec_cybernetic_path.150.desc.machine"
 				trigger = {
 					is_machine_empire = yes
 				}
@@ -9332,49 +9482,51 @@ namespace = tec_cybernetic_path
 
 		is_triggered_only = yes
 
+		trigger = {
+			always = yes
+		}
+
 		immediate = {
-			save_event_target_as = tec_temp_country
-			event_target:tec_temp_country = {
-				start_situation = {
-					type = situation_tec_cybernetic_path_gate
-					target = event_target:tec_temp_country.capital_scope
-					effect = {
-						save_event_target_as = new_situation
-					}
+			hidden_effect = {
+				owner_main_species = {
+					save_event_target_as = tec_target_species
 				}
-				event_target:new_situation = {
-					set_situation_locked = no
-					set_situation_approach = situation_approach_tec_cybernetic_path_gate_standard
-				}
+			}
+		}
+
+		after = {
+			hidden_effect = {
+				# Set the flag for t2 unlocks
+				set_country_flag = tec_cybernetics_gate_completed
 			}
 		}
 
 		# Options
 			option = {
-				name = "tec_cybernetic_path.150.a"
-				custom_tooltip = tec_cybernetic_path.150.a.tooltip
+				name = "tec_cybernetic_path.150.cybernetics"
+				custom_tooltip = tec_cybernetic_path.150.cybernetics.tooltip
 				icon = {
 					icon = GFX_situation_approach_tec_cybernetics
+					icon_background = GFX_situation_approach_bg_tec_blue
+					text = tec_icon_text_path_neutral
+				}
+			}
+			option = {
+				name = "tec_cybernetic_path.150.technoorganic"
+				custom_tooltip = tec_cybernetic_path.150.technoorganic.tooltip
+				icon = {
+					icon = GFX_situation_approach_tec_replicants
 					icon_background = GFX_situation_approach_bg_green
-					text = tec_icon_text_approach_slow
+					text = tec_icon_text_path_neutral
 				}
 			}
 			option = {
-				name = "tec_cybernetic_path.150.b"
-				custom_tooltip = tec_cybernetic_path.150.b.tooltip
+				name = "tec_cybernetic_path.150.cybermystical"
+				custom_tooltip = tec_cybernetic_path.150.cybermystical.tooltip
 				icon = {
-					icon = GFX_situation_approach_tec_cybernetics
-					icon_background = GFX_situation_approach_bg_yellow
-					text = tec_icon_text_approach_neutral
-				}
-			}
-			option = {
-				name = "tec_cybernetic_path.150.c"
-				custom_tooltip = tec_cybernetic_path.150.c.tooltip
-				icon = {
-					icon = GFX_situation_approach_tec_cybernetics
-					icon_background = GFX_situation_approach_bg_red
-					text = tec_icon_text_approach_fast
+					icon = GFX_situation_approach_tec_cyberpsionics
+					icon_background = GFX_situation_approach_bg_tec_purple
+					text = tec_icon_text_path_neutral
 				}
 			}
 		# /
@@ -10403,9 +10555,9 @@ namespace = tec_synth_path
 			}
 			hidden_effect = {
 				# Initial finished
-				set_country_flag = tec_synth_path_unlocked_tradition_1
+				set_country_flag = tec_unlocks_tradition_synthetics
 				# Alter species
-				tec_create_synth_species = yes
+				tec_create_synth_species_effect = yes
 				# TO DO create specific leader ascension trait handler
 				every_owned_leader = {
 					add_leader_traits_after_modification = yes
@@ -10565,57 +10717,83 @@ namespace = tec_synth_path
  # /
  # --------------- SYNTH INTERLUDE
   # --------------- SYNTH INTERLUDE Pick
-
-  # /
-  # --------------- SYNTH INTERLUDE Situation
-	situation_event = { # Conscious Singularity
+	country_event = {
 		id = tec_synth_path.150
 		title = "tec_synth_path.150.name"
-		desc = "tec_synth_path.150.desc"
-
-		picture = GFX_evt_tec_synthetic_recognition
+		# Descs
+			desc = {
+				text = "tec_synth_path.150.desc.regular"
+				trigger = {
+					is_gestalt = no
+				}
+			}
+			desc = {
+				text = "tec_synth_path.150.desc.machine"
+				trigger = {
+					is_hive_empire = yes
+				}
+			}
+			desc = {
+				text = "tec_synth_path.150.desc.individualmachine"
+				trigger = {
+					is_machine_empire = yes
+				}
+			}
+		# /
+		picture = GFX_evt_machine_sapience
 		show_sound = event_synthetic_evolution
+		trackable = yes
+
 		is_triggered_only = yes
-		situation = this
-		location = target
+
+		trigger = {
+			always = yes
+		}
 
 		immediate = {
 			hidden_effect = {
-				set_situation_locked = yes
+				owner_main_species = {
+					save_event_target_as = tec_target_species
+				}
 			}
 		}
 
 		after = {
 			hidden_effect = {
-				destroy_situation = this
+				# Set the flag for t2 unlocks
+				set_country_flag = tec_synthetics_gate_completed
 			}
 		}
 
-		option = {
-			name = tec_synth_path.150.a
-			custom_tooltip = tec_synth_path.150.a.tooltip
-			icon = {
-				icon = GFX_situation_approach_tec_ai
-				icon_background = GFX_situation_approach_bg_tec_blue
-				text = tec_icon_text_outcome_good
-			}
-			hidden_effect = {
-				owner = {
-					#set_country_flag = tec_u_c_mecha
-					#set_country_flag = tec_u_c_bioimplants
-					#set_country_flag = tec_u_c_worker
-					#set_country_flag = tec_u_c_fashion
-					#set_country_flag = tec_u_c_brain
-					#set_country_flag = tec_u_c_intralink
-					#set_country_flag = tec_u_c_mindless
-					# Note: Trait unlock has been moved to the end of the chain
-					# Safe
-					owner_main_species = {
-						save_event_target_as = tec_target_species
-					}
+		# Options
+			option = {
+				name = "tec_synth_path.150.mechanical"
+				custom_tooltip = tec_synth_path.150.mechanical.tooltip
+				icon = {
+					icon = GFX_situation_approach_tec_robotics
+					icon_background = GFX_situation_approach_bg_tec_blue
+					text = tec_icon_text_path_neutral
 				}
 			}
-		}
+			option = {
+				name = "tec_synth_path.150.nanites"
+				custom_tooltip = tec_synth_path.150.nanites.tooltip
+				icon = {
+					icon = GFX_situation_approach_tec_gear
+					icon_background = GFX_situation_approach_bg_green
+					text = tec_icon_text_path_neutral
+				}
+			}
+			option = {
+				name = "tec_synth_path.150.entropy"
+				custom_tooltip = tec_synth_path.150.entropy.tooltip
+				icon = {
+					icon = GFX_situation_approach_tec_mystical
+					icon_background = GFX_situation_approach_bg_tec_purple
+					text = tec_icon_text_path_neutral
+				}
+			}
+		# /
 	}
   # /
  # /
@@ -11158,11 +11336,7 @@ namespace = tec_psionic_path
 						NEW_SITUATION_APPROACH_2 = situation_tec_ascension_mystical_psychics_t1_approach_standard
 						NEW_SITUATION_APPROACH_3 = situation_tec_ascension_mystical_psychics_t1_approach_fast
 						NEW_PROGRESS = 30
-						EXTRA_EFFECT = "
-							event_target:new_situation = {
-								set_situation_flag = tec_situation_2xspeed
-							}
-						"
+						DOUBLE_SPEED = yes
 					}
 				}
 				ai_chance = {	# We don't want ais to get confused
@@ -11789,9 +11963,9 @@ namespace = tec_psionic_path
 		immediate = {
 			hidden_effect = {
 				# Initial Finished
-				set_country_flag = tec_psionic_path_unlocked_tradition_1
+				set_country_flag = tec_unlocks_tradition_psionics
 				# Alter species
-				tec_create_latent_psionic_species = yes
+				tec_create_latent_psionic_species_effect = yes
 				# TO DO create specific leader ascension trait handler
 				every_owned_leader = {
 					add_leader_traits_after_modification = yes
@@ -11921,11 +12095,11 @@ namespace = tec_psionic_path
 			name = "tec_psionic_path.105.a"
 			custom_tooltip = "tec_psionic_path.105.a.tooltip"
 			hidden_effect = {
-				set_country_flag = tec_psionic_path_unlocked_tradition_1
+				set_country_flag = tec_unlocks_tradition_psionics
 			}
 		}
 	}
-	country_event = { # T1A Notification to other empires - og utopia.2602 tec_gene_path.10501
+	country_event = { # T1A Notification to other empires - og utopia.2602 tec_gene_path.11090
 		id = tec_psionic_path.10501
 		title = "utopia.2602.name"
 		desc = {
@@ -12066,7 +12240,7 @@ namespace = tec_psionic_path
 				#set_country_flag = tec_psionic_assimilation
 				# Moved to ap 2
 				# Alter species
-				tec_create_psionic_species = yes
+				tec_create_psionic_species_effect = yes
 				# TO DO create specific leader ascension trait handler
 				every_owned_leader = {
 					add_leader_traits_after_modification = yes
@@ -12228,44 +12402,172 @@ namespace = tec_psionic_path
 	country_event = { # Post-tradition - An awakening
 		id = tec_psionic_path.150
 		title = "tec_psionic_path.150.name"
-		desc = "tec_psionic_path.150.desc"
+		# Descs
+			desc = {	# Regular
+				text = "tec_psionic_path.150.desc.regular"
+				trigger = {
+					is_gestalt = no
+					is_materialist = no
+					is_spiritualist = no
+				}
+			}
+			desc = {	# Regular
+				text = "tec_psionic_path.150.desc.spiritualist"
+				trigger = {
+					is_gestalt = no
+					is_spiritualist = yes
+				}
+			}
+			desc = {	# Regular
+				text = "tec_psionic_path.150.desc.materialist"
+				trigger = {
+					is_gestalt = no
+					is_materialist = yes
+				}
+			}
+		# /
+		# TODO ASCENSION FUTURE GUI
+		#custom_gui = tec_gui_ascension_event
 		picture = GFX_evt_psionics
 		show_sound = event_the_great_awakening
 
 		is_triggered_only = yes
 
+		trigger = {
+			always = yes
+		}
+
 		immediate = {
 			hidden_effect = {
-				set_country_flag = tec_announced_psionic_traits
 				owner_main_species = {
 					save_event_target_as = tec_target_species
 				}
 			}
 		}
-		option = {
-			name = tec_psionic_path.150.a
-			custom_tooltip = tec_psionic_path.150.a.tooltip
-			hidden_effect = {
-				save_event_target_as = tec_target_country
-				event_target:tec_target_country = {
-					start_situation = {
-						type = situation_tec_psionic_path_gate
-						target = event_target:tec_target_country.capital_scope
-						effect = {
-							save_event_target_as = new_situation
-						}
-					}
-				}
-			}
-		}
+
 		after = {
 			hidden_effect = {
-				event_target:new_situation = {
-					set_situation_locked = no
-					set_situation_approach = situation_approach_tec_psionic_path_gate_neutral
-				}
+				# Set the flag for t2 unlocks
+				set_country_flag = tec_psionics_gate_completed
 			}
 		}
+
+		# Options
+			# Psi group
+			option = {
+				name = "tec_psionic_path.150.psionics.regular"
+				custom_tooltip = tec_psionic_path.150.psionics.tooltip
+				icon = {
+					icon = GFX_situation_approach_tec_psionics
+					icon_background = GFX_situation_approach_bg_tec_purple
+					text = tec_icon_text_path_neutral
+				}
+				trigger = {
+					is_spiritualist = no
+					is_materialist = no
+				}
+			}
+			option = {
+				name = "tec_psionic_path.150.psionics.spi"
+				custom_tooltip = tec_psionic_path.150.psionics.tooltip
+				icon = {
+					icon = GFX_situation_approach_tec_psionics
+					icon_background = GFX_situation_approach_bg_tec_purple
+					text = tec_icon_text_path_neutral
+				}
+				trigger = {
+					is_spiritualist = yes
+				}
+			}
+			option = {
+				name = "tec_psionic_path.150.psionics.mat"
+				custom_tooltip = tec_psionic_path.150.psionics.tooltip
+				icon = {
+					icon = GFX_situation_approach_tec_psionics
+					icon_background = GFX_situation_approach_bg_tec_purple
+					text = tec_icon_text_path_neutral
+				}
+				trigger = {
+					is_materialist = yes
+				}
+			}
+			# bioPsi group
+			option = {
+				name = "tec_psionic_path.150.biopsionics.regular"
+				custom_tooltip = tec_psionic_path.150.biopsionics.tooltip
+				icon = {
+					icon = GFX_situation_approach_genetics
+					icon_background = GFX_situation_approach_bg_tec_purple
+					text = tec_icon_text_path_neutral
+				}
+				trigger = {
+					is_spiritualist = no
+					is_materialist = no
+				}
+			}
+			option = {
+				name = "tec_psionic_path.150.biopsionics.spi"
+				custom_tooltip = tec_psionic_path.150.biopsionics.tooltip
+				icon = {
+					icon = GFX_situation_approach_genetics
+					icon_background = GFX_situation_approach_bg_tec_purple
+					text = tec_icon_text_path_neutral
+				}
+				trigger = {
+					is_spiritualist = yes
+				}
+			}
+			option = {
+				name = "tec_psionic_path.150.biopsionics.mat"
+				custom_tooltip = tec_psionic_path.150.biopsionics.tooltip
+				icon = {
+					icon = GFX_situation_approach_genetics
+					icon_background = GFX_situation_approach_bg_tec_purple
+					text = tec_icon_text_path_neutral
+				}
+				trigger = {
+					is_materialist = yes
+				}
+			}
+			# CyberPsi group
+			option = {
+				name = "tec_psionic_path.150.cyberpsionics.regular"
+				custom_tooltip = tec_psionic_path.150.cyberpsionics.tooltip
+				icon = {
+					icon = GFX_situation_approach_tec_cybernetics
+					icon_background = GFX_situation_approach_bg_tec_purple
+					text = tec_icon_text_path_neutral
+				}
+				trigger = {
+					is_spiritualist = no
+					is_materialist = no
+				}
+			}
+			option = {
+				name = "tec_psionic_path.150.cyberpsionics.spi"
+				custom_tooltip = tec_psionic_path.150.cyberpsionics.tooltip
+				icon = {
+					icon = GFX_situation_approach_tec_cybernetics
+					icon_background = GFX_situation_approach_bg_tec_purple
+					text = tec_icon_text_path_neutral
+				}
+				trigger = {
+					is_spiritualist = yes
+				}
+			}
+			option = {
+				name = "tec_psionic_path.150.cyberpsionics.mat"
+				custom_tooltip = tec_psionic_path.150.cyberpsionics.tooltip
+				icon = {
+					icon = GFX_situation_approach_tec_cybernetics
+					icon_background = GFX_situation_approach_bg_tec_purple
+					text = tec_icon_text_path_neutral
+				}
+				trigger = {
+					is_materialist = yes
+				}
+			}
+		# /
 	}
   # /
  # /
@@ -12764,11 +13066,7 @@ namespace = tec_psychic_path
 						NEW_SITUATION_APPROACH_2 = situation_tec_ascension_mystical_psionics_t1_approach_standard
 						NEW_SITUATION_APPROACH_3 = situation_tec_ascension_mystical_psionics_t1_approach_fast
 						NEW_PROGRESS = 30
-						EXTRA_EFFECT = "
-							event_target:new_situation = {
-								set_situation_flag = tec_situation_2xspeed
-							}
-						"
+						DOUBLE_SPEED = yes
 					}
 				}
 				ai_chance = {	# We don't want ais to get confused
@@ -13077,11 +13375,7 @@ namespace = tec_psychic_path
 				#		NEW_SITUATION_APPROACH_2 = situation_tec_ascension_mystical_psionics_t1_hivemind_approach_standard
 				#		NEW_SITUATION_APPROACH_3 = situation_tec_ascension_mystical_psionics_t1_hivemind_approach_fast
 				#		NEW_PROGRESS = 30
-				#		EXTRA_EFFECT = "
-				#			event_target:new_situation = {
-				#				set_situation_flag = tec_situation_2xspeed
-				#			}
-				#		"
+				#		DOUBLE_SPEED = yes
 				#	}
 				#}
 				#ai_chance = {	# We don't want ais to get confused
@@ -13274,7 +13568,7 @@ namespace = tec_machine_path
 			name = "tec_machine_path.105.a"
 			custom_tooltip = tec_machine_path.105.a.tooltip
 			hidden_effect = {
-				set_country_flag = tec_synth_path_unlocked_tradition_1
+				set_country_flag = tec_unlocks_tradition_synthetics
 				set_country_flag = tec_machine_synthetic_trait
 				every_owned_leader = {
 					add_leader_traits_after_modification = yes
@@ -13293,24 +13587,7 @@ namespace = tec_machine_path
  # /
  # ---------------  MACHINE T2 Gating
   # ---------------  MACHINE T2 Gating pick
-	country_event = { # T2 picked
-		id = tec_machine_path.150
-		title = "tec_machine_path.150.name"
-		desc = "tec_machine_path.150.desc"
-		picture = GFX_evt_tec_synthetic_first
-		show_sound = event_synthetic_evolution
-		trackable = yes
 
-		is_triggered_only = yes
-
-		option = {
-			name = "tec_machine_path.150.a"
-			custom_tooltip = tec_machine_path.150.a.tooltip
-			hidden_effect = {
-				set_country_flag = tec_completed_synth_t2
-			}
-		}
-	}
   # /
 
   # ---------------  MACHINE T2 Gating Situation
