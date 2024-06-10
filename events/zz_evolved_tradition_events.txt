@@ -912,6 +912,101 @@ country_event = {
 		"
 	}
 }
+
+
+# on_released_as_vassal
+country_event = {
+	id = tec_tradition.602
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		every_owned_planet = {
+			planet_event = {
+				id = tec_tradition.603
+			}
+		}
+	}
+}
+
+# on_colonized
+# on_colony_destroyed
+# on_planet_ownerless
+# on_planet_transfer
+planet_event = {
+	id = tec_tradition.603
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		remove_modifier = pm_tec_centrality_core_planet
+		remove_modifier = pm_tec_centrality_rim_planet
+		remove_modifier = pm_tec_centrality_rim_planet_gestalt
+		if = {
+			limit = {
+				exists = owner
+				owner = {
+					has_tradition = tr_tec_centrality_finish
+				}
+			}
+			if = {
+				limit = {
+					tec_planet_centrality_is_core = yes
+				}
+				add_modifier = {
+					modifier = pm_tec_centrality_core_planet
+					days = -1
+					mult = value:tec_ascension_scaling
+				}
+			}
+			else = {
+				if = {
+					limit = {
+						owner = { is_gestalt = no}
+					}
+					add_modifier = {
+						modifier = pm_tec_centrality_rim_planet
+						days = -1
+						mult = value:tec_centrality_distance_from_core
+					}
+				}
+				else = {
+					add_modifier = {
+						modifier = pm_tec_centrality_rim_planet_gestalt
+						days = -1
+						mult = value:tec_centrality_distance_from_core
+					}
+				}
+			}
+		}
+	}
+}
+
+# on_leader_assigned
+# on_leader_unassigned
+leader_event = {
+	id = tec_tradition.604
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			has_tradition = tr_tec_centrality_finish
+		}
+		leader_class = official
+	}
+
+	immediate = {
+		owner = {
+			country_event = {
+				id = tec_tradition.602
+			}
+		}
+	}
+}
+
 # ----------- Discovery ---------------
 # tr_discovery_finish
 # on tech researched
