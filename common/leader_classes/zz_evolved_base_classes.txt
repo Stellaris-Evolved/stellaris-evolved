@@ -86,6 +86,8 @@ official = {
 			or = {
 				is_pacifist = yes
 				is_egalitarian = yes
+				is_pluralist = yes
+				is_cooperative = yes
 			}
 		}
 	}
@@ -108,8 +110,44 @@ official = {
 			trigger = num_pops
 			trigger_scope = from
 			mode = add
-			mult = 1
+			mult = 0.25
 		}
+		modifier = {
+			exists = FROM
+			from = {
+				is_scope_type = planet
+			}
+			add = from.value:mining_combined_value|CACHED|yes|
+		}
+		modifier = {
+			exists = FROM
+			from = {
+				is_scope_type = planet
+			}
+			add = from.value:farming_combined_value|CACHED|yes|
+		}
+		modifier = {
+			exists = FROM
+			from = {
+				is_scope_type = planet
+			}
+			add = from.value:generator_combined_value|CACHED|yes|
+		}
+		modifier = {
+			exists = FROM
+			from = {
+				is_scope_type = planet
+			}
+			add = from.value:industrial_districts_value
+		}
+		modifier = {
+			exists = FROM
+			from = {
+				is_scope_type = planet
+			}
+			add = from.value:refinery_combined_value|CACHED|yes|
+		}
+
 		inline_script = {
 			script = paragon/num_traits_with_modifier
 			SCOPE = planet
@@ -120,6 +158,27 @@ official = {
 			SCOPE = federation
 			MODIFIER = federation
 		}
+
+
+		modifier = {
+			exists = FROM
+			FROM = {
+				is_scope_type = planet
+				OR = {
+					has_rural_designation = yes
+					has_generator_designation = yes
+					has_mining_designation = yes
+					has_farming_designation = yes
+					has_industrial_designation = yes
+					has_foundry_designation = yes
+					has_factory_designation = yes
+					has_refinery_designation = yes
+				}
+			}
+			mult = 1.5
+		}
+
+		inline_script = paragon/tec_leader_all_weights
 	}
 
 	replaces_old_class = "governor"
@@ -281,6 +340,45 @@ commander = {
 			mode = add
 			mult = 1
 		}
+		complex_trigger_modifier = {
+			potential = {
+				exists = FROM
+				from = {
+					is_scope_type = planet
+				}
+			}
+			trigger = count_owned_pop
+			trigger_scope = from
+			parameters = {
+				limit = {
+					is_enslaved = yes
+				}
+			}
+			mode = add
+			mult = 0.25
+		}
+		modifier = {
+			exists = FROM
+			from = {
+				is_scope_type = planet
+			}
+			add = from.value:mining_combined_value|CACHED|yes|FACTOR|0.5|
+		}
+		modifier = {
+			exists = FROM
+			from = {
+				is_scope_type = planet
+			}
+			add = from.value:farming_combined_value|CACHED|yes|FACTOR|0.5|
+		}
+		modifier = {
+			exists = FROM
+			from = {
+				is_scope_type = planet
+			}
+			add = from.value:generator_combined_value|CACHED|yes|FACTOR|0.5|
+		}
+
 		inline_script = {
 			script = paragon/num_traits_with_modifier
 			SCOPE = planet
@@ -296,6 +394,30 @@ commander = {
 			SCOPE = army
 			MODIFIER = army
 		}
+		modifier = {
+			exists = FROM
+			FROM = {
+				is_scope_type = planet
+				has_fortress_designation = yes
+			}
+			mult = 1.5
+		}
+		modifier = {
+			exists = FROM
+			FROM = {
+				is_scope_type = planet
+				owner = {
+					any_situation = {
+						is_situation_type = situation_planetary_revolt
+						target = {
+							is_same_value = prevprev
+						}
+					}
+				}
+			}
+			mult = 10
+		}
+		inline_script = paragon/tec_leader_all_weights
 	}
 
 	replaces_old_class = "admiral"
@@ -458,7 +580,7 @@ scientist = {
 			add = 10
 			exists = FROM
 			FROM = {
-				is_scope_type = fleet
+				is_scope_type = ship
 				is_ship_class = shipclass_science_ship
 			}
 		}
@@ -476,7 +598,11 @@ scientist = {
 				is_scope_type = planet
 				exists = owner
 				owner = {
-					has_valid_civic = civic_technocracy
+					OR = {
+						has_valid_civic = civic_technocracy
+						has_valid_civic = civic_tec_regular_science_directorate
+						has_valid_civic = civic_tec_corporate_innovative
+					}
 				}
 			}
 		}
@@ -490,7 +616,15 @@ scientist = {
 			trigger = num_pops
 			trigger_scope = from
 			mode = add
-			mult = 0.25
+			mult = 0.125
+		}
+
+		modifier = {
+			exists = FROM
+			from = {
+				is_scope_type = planet
+			}
+			add = from.value:research_combined_value|CACHED|yes|FACTOR|1.5|
 		}
 		inline_script = {
 			script = paragon/num_traits_with_modifier
@@ -507,6 +641,15 @@ scientist = {
 			SCOPE = fleet
 			MODIFIER = fleet
 		}
+		modifier = {
+			exists = FROM
+			FROM = {
+				is_scope_type = planet
+				has_research_designation = yes
+			}
+			mult = 2.5
+		}
+		inline_script = paragon/tec_leader_all_weights
 	}
 	minimum_ai_target = 3
 	leader_background_job_weight = {
