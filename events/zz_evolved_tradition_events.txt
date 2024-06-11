@@ -6,7 +6,7 @@ namespace = tec_tradition
 # 300 Artifice
 # 400 Balance
 # 500 Might
-# 600 Statecraft
+# 600 Centrality
 # 700 Invention
 
 # 1000+ AP events
@@ -825,6 +825,183 @@ country_event = {
 					modifier = modifier_tec_art_of_war_unity
 					days = -1
 				}
+			}
+		}
+	}
+}
+# ----------- Centrality ---------------
+country_event = {
+	id = tec_tradition.601
+	title = "tec_tradition.601.name"
+	desc = "tec_tradition.601.desc"
+	is_triggered_only = yes
+
+	auto_opens = yes
+	immediate = {
+		every_owned_planet = {
+			limit = {
+				sector = { has_sector_type = core_sector }
+			}
+			set_variable = {
+				which = tec_num_pops
+				value = trigger:num_pops
+			}
+		}
+		random_owned_planet = {
+			limit = { is_capital = yes }
+			save_event_target_as = tec_centrality_target_capital
+		}
+
+		export_trigger_value_to_variable = {
+			trigger = count_owned_planet
+			parameters = {
+				limit = {
+					is_capital = no
+					sector = { has_sector_type = core_sector }
+				}
+			}
+			variable = tec_candidate_count
+		}
+
+		inline_script = {
+			script = iterators/tec_iterate_number
+			start = 0
+			end = 50
+			increment = 1
+			code = "
+				if = {
+					limit = {
+						check_variable_arithmetic = {
+							which = tec_candidate_count
+							value > $current$
+						}
+					}
+					ordered_owned_planet = {
+						position = $current$
+						order_by = tec_num_pops
+						limit = {
+							is_capital = no
+							sector = { has_sector_type = core_sector }
+						}
+						save_event_target_as = tec_centrality_target_$current$
+					}
+				}
+			"
+		}
+	}
+
+	option = {
+		trigger = {
+			exists = event_target:tec_centrality_target_capital
+		}
+		name = TEC_CENTRALITY_OPTION_CAPITAL
+	}
+
+	inline_script = {
+		script = iterators/tec_iterate_number
+		start = 0
+		end = 50
+		increment = 1
+		code = "
+			option = {
+				trigger = {
+					exists = event_target:tec_centrality_target_$current$
+				}
+				name = TEC_CENTRALITY_OPTION_$current$
+			}
+		"
+	}
+}
+
+
+# on_released_as_vassal
+country_event = {
+	id = tec_tradition.602
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		every_owned_planet = {
+			planet_event = {
+				id = tec_tradition.603
+			}
+		}
+	}
+}
+
+# on_colonized
+# on_colony_destroyed
+# on_planet_ownerless
+# on_planet_transfer
+planet_event = {
+	id = tec_tradition.603
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		remove_modifier = pm_tec_centrality_core_planet
+		remove_modifier = pm_tec_centrality_rim_planet
+		remove_modifier = pm_tec_centrality_rim_planet_gestalt
+		if = {
+			limit = {
+				exists = owner
+				owner = {
+					has_tradition = tr_tec_centrality_finish
+				}
+			}
+			if = {
+				limit = {
+					tec_planet_centrality_is_core = yes
+				}
+				add_modifier = {
+					modifier = pm_tec_centrality_core_planet
+					days = -1
+					mult = value:tec_ascension_scaling
+				}
+			}
+			else = {
+				if = {
+					limit = {
+						owner = { is_gestalt = no}
+					}
+					add_modifier = {
+						modifier = pm_tec_centrality_rim_planet
+						days = -1
+						mult = value:tec_centrality_distance_from_core
+					}
+				}
+				else = {
+					add_modifier = {
+						modifier = pm_tec_centrality_rim_planet_gestalt
+						days = -1
+						mult = value:tec_centrality_distance_from_core
+					}
+				}
+			}
+		}
+	}
+}
+
+# on_leader_assigned
+# on_leader_unassigned
+leader_event = {
+	id = tec_tradition.604
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			has_tradition = tr_tec_centrality_finish
+		}
+		leader_class = official
+	}
+
+	immediate = {
+		owner = {
+			country_event = {
+				id = tec_tradition.602
 			}
 		}
 	}
