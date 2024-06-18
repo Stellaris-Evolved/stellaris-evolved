@@ -340,36 +340,49 @@ can_modify_species = {	# TODO MACHINE AGE UPDATE - adjust to our new techs and e
 				is_archetype = MACHINE
 			}
 		}
-		if = {
-			limit = {
-				ROOT = {
-					OR = {
-						AND = { ## organic trying to robomod
-							is_individual_machine = no
-							is_machine_empire = no
-						}
-						AND = { ## Machines with origins that delay them
-							OR = {
-								is_individual_machine = yes
-								is_machine_empire = yes
-							}
-							OR  = {
-								has_origin = origin_life_seeded
-								has_origin = origin_ocean_machines
-								has_origin = origin_void_machines
-							}
-						}
-					}
-				}
-			}
-			custom_tooltip = {
-				fail_text = "NEEDS_ROBOT_MODDING"
+		# if = {
+		# 	limit = {
+		# 		ROOT = {
+		# 			OR = {
+		# 				AND = { ## organic trying to robomod
+		# 					is_individual_machine = no
+		# 					is_machine_empire = no
+		# 				}
+		# 				AND = { ## Machines with origins that delay them
+		# 					OR = {
+		# 						is_individual_machine = yes
+		# 						is_machine_empire = yes
+		# 					}
+		# 					OR  = {
+		# 						has_origin = origin_life_seeded
+		# 						has_origin = origin_ocean_machines
+		# 						has_origin = origin_void_machines
+		# 						has_origin = origin_shattered_ring
+		# 					}
+		# 				}
+		# 			}
+		# 		}
+		# 	}
+		# 	custom_tooltip = {
+		# 		fail_text = "NEEDS_ROBOT_MODDING"
+		#
+		# 		ROOT = {
+		# 			OR = {
+		# 				has_technology = tech_robomodding
+		# 				has_technology = tech_robomodding_m
+		# 			}
+		# 		}
+		# 	}
+		# }
 
-				ROOT = {
-					OR = {
-						has_technology = tech_robomodding
-						has_technology = tech_robomodding_m
-					}
+		# NOTE: Just NO, NO NO NO NO , make them require tech to gene mod
+		custom_tooltip = {
+			fail_text = "NEEDS_ROBOT_MODDING"
+
+			ROOT = {
+				OR = {
+					has_technology = tech_robomodding
+					has_technology = tech_robomodding_m
 				}
 			}
 		}
@@ -382,17 +395,6 @@ can_modify_species = {	# TODO MACHINE AGE UPDATE - adjust to our new techs and e
 				has_trait = trait_self_modified
 			}
 			#is_same_species = root
-		}
-	}
-	# Ritualistic Implants
-	custom_tooltip = {
-		fail_text = "CANNOT_MODIFY_RITUALISTIC_IMPLANTS_SPECIES"
-		OR = {
-			AND = {
-				root = { has_country_flag = can_genemod_cyborg_ritualistic_pops }
-				has_cybernetic_creed_trait = yes
-			}
-			has_cybernetic_creed_trait = no
 		}
 	}
 }
@@ -616,7 +618,32 @@ can_species_procreate = {	# Aka can_species_grow_on_planet
 			}
 		}
 	# /
-	has_cybernetic_creed_trait = no
+	if = {
+		limit = {
+			has_cybernetic_creed_trait = yes
+		}
+		NOT = {
+			root = {
+				any_owned_species = {
+					has_population_control = { country = root.owner type = no }
+					is_robotic_species = no
+					has_cybernetic_creed_trait = no
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_cybernetic_creed_trait = no
+		}
+		root = {
+			any_owned_species = {
+				has_population_control = { country = root.owner type = no }
+				is_robotic_species = no
+				has_cybernetic_creed_trait = no
+			}
+		}
+	}
 }
 
 # ------------------------- Unedited - for review
@@ -680,7 +707,7 @@ can_fill_ruler_job = {
 	inline_script = {
 		script = tec_read_cache_tooltip
 		scope = pop
-		trigger = can_fill_worker_job_trigger
+		trigger = can_fill_ruler_job_trigger
 		tooltip = TEC_RULER_JOB_TRIGGER_DYNAMIC
 	}
 }
@@ -1021,6 +1048,11 @@ can_build_branch_office_on_planet = {
 		fail_text = NO_BRANCH_OFFICE_ON_NANITE_WORLD
 		NOT = { is_planet_class = pc_gray_goo }
 	}
+
+	custom_tooltip = {
+		fail_text = NO_BRANCH_OFFICE_ON_SYNAPTIC_LATHE
+		NOT = { is_planet_class = pc_cosmogenesis_world }
+	}
 }
 
 # This = country
@@ -1151,21 +1183,7 @@ can_pop_auto_migrate = {
 	}
 	custom_tooltip = {
 		fail_text = AUTO_MIGRATE_VIRTUALITY
-		if = {
-			limit = {
-				has_virtual_species_trait = yes
-				exists = owner
-				owner = {
-					is_fallen_empire = no
-				}
-			}
-			exists = owner
-			owner = {
-				NOT = {
-					has_active_tradition = tr_virtuality_finish
-				}
-			}
-		}
+		has_virtual_species_trait = no
 	}
 	if = {
 		limit = {

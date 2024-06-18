@@ -27,7 +27,7 @@
 
 	tec_ecu_logic_start = {
 		optimize_memory
-		tec_ecu_deposits_handler_before = yes
+		tec_clear_deposits_handler = yes
 		clear_deposits = yes
 
 		change_pc = $change_pc$
@@ -55,7 +55,7 @@
 			}
 		]
 		tec_ecu_ecological_resolution = yes
-		tec_ecu_deposits_handler_after = yes
+		tec_clear_deposits_handler = { restore = yes }
 	}
 
 
@@ -86,200 +86,295 @@
 		}
 	}
 
-	tec_ecu_deposits_handler_before = {
-		optimize_memory
-		# PSIONIC DEPOSITS
+	tec_ecu_count_store_deposit = {
+		inline_script = {
+			script = tec_type_hint
+			deposit = $deposit$
+			bool = $restore$
+		}
+		[[!restore]
+		if = {
+			limit = {
+				has_deposit = $deposit$
+			}
+			while = {
+				limit = {
+					has_deposit = $deposit$
+				}
+				remove_deposit = $deposit$
+				change_variable = {
+					which = tec_deposit_restore_$deposit$
+					value = 1
+				}
+			}
+		}
+		]
+		[[restore]
+		if = {
+			limit = {
+				check_variable = {
+					which = tec_deposit_restore_$deposit$
+					value > 0
+				}
+			}
+			while = {
+				limit = {
+					check_variable = {
+						which = tec_deposit_restore_$deposit$
+						value > 0
+					}
+				}
+				add_deposit = $deposit$
+				change_variable = {
+					which = tec_deposit_restore_$deposit$
+					value = -1
+				}
+			}
 			if = {
 				limit = {
-					has_deposit = d_tec_psionic_ascension_zone_1
-				}
-				while = {
-					limit = {
-						has_deposit = d_tec_psionic_ascension_zone_1
-					}
-					remove_deposit = d_tec_psionic_ascension_zone_1
-					change_variable = {
-						which = tec_temporal_psionic_d
-						value = 1
+					check_variable = {
+						which = tec_deposit_restore_$deposit$
+						value = 0
 					}
 				}
+				clear_variable = tec_deposit_restore_$deposit$
 			}
-		# /
-		# Eco deposits
-			if = {	# Soil
-				limit = {
-					has_deposit = d_tec_eco_terraformer_soil
-				}
-				while = {
-					limit = {
-						has_deposit = d_tec_eco_terraformer_soil
-					}
-					remove_deposit = d_tec_eco_terraformer_soil
-					change_variable = {
-						which = tec_temporal_d_tec_eco_terraformer_soil
-						value = 1
-					}
-				}
-			}
-			if = {	# Magnetic
-				limit = {
-					has_deposit = d_tec_eco_terraformer_magnetic
-				}
-				while = {
-					limit = {
-						has_deposit = d_tec_eco_terraformer_magnetic
-					}
-					remove_deposit = d_tec_eco_terraformer_magnetic
-					change_variable = {
-						which = tec_temporal_d_tec_eco_terraformer_magnetic
-						value = 1
-					}
-				}
-			}
-			if = {	# Atmosphere
-				limit = {
-					has_deposit = d_tec_eco_terraformer_atmosphere
-				}
-				while = {
-					limit = {
-						has_deposit = d_tec_eco_terraformer_atmosphere
-					}
-					remove_deposit = d_tec_eco_terraformer_atmosphere
-					change_variable = {
-						which = tec_temporal_d_tec_eco_terraformer_atmosphere
-						value = 1
-					}
-				}
-			}
-		# /
+		}
+		]
 	}
 
-	tec_ecu_deposits_handler_after = {
+	tec_clear_deposits_handler = {
 		optimize_memory
+		inline_script = {
+			script = tec_type_hint
+			bool = $restore$
+			bool = $event_unique$
+			bool = $origin$
+			bool = $underground$
+			bool = $industrial$
+		}
 		# PSIONIC DEPOSITS
-			if = {
-				limit = {
-					check_variable = {
-						which = tec_temporal_psionic_d
-						value > 0
-					}
-				}
-				while = {
-					limit = {
-						check_variable = {
-							which = tec_temporal_psionic_d
-							value > 0
-						}
-					}
-					add_deposit = d_tec_psionic_ascension_zone_1
-					change_variable = {
-						which = tec_temporal_psionic_d
-						value = -1
-					}
-				}
-				if = {
-					limit = {
-						check_variable = {
-							which = tec_temporal_psionic_d
-							value = 0
-						}
-					}
-					clear_variable = tec_temporal_psionic_d
-				}
+			tec_ecu_count_store_deposit = {
+				deposit = d_tec_psionic_ascension_zone_1
+				restore = $restore|no$
 			}
+		# /
+		# centrality
+			tec_ecu_count_store_deposit = {
+				deposit = d_tec_centrality_consolidated_infrastructure
+				restore = $restore|no$
+			}
+
+		# /
+		# desiccators
+			tec_ecu_count_store_deposit = {
+				deposit = d_tec_desiccators_deposit
+				restore = $restore|no$
+			}
+
 		# /
 		# Eco deposits
-			if = {	# Soil
-				limit = {
-					check_variable = {
-						which = tec_temporal_d_tec_eco_terraformer_soil
-						value > 0
-					}
-				}
-				while = {
-					limit = {
-						check_variable = {
-							which = tec_temporal_d_tec_eco_terraformer_soil
-							value > 0
-						}
-					}
-					add_deposit = d_tec_eco_terraformer_soil
-					change_variable = {
-						which = tec_temporal_d_tec_eco_terraformer_soil
-						value = -1
-					}
-				}
-				if = {
-					limit = {
-						check_variable = {
-							which = tec_temporal_d_tec_eco_terraformer_soil
-							value = 0
-						}
-					}
-					clear_variable = tec_temporal_d_tec_eco_terraformer_soil
-				}
+			tec_ecu_count_store_deposit = {
+				deposit = d_tec_eco_terraformer_soil
+				restore = $restore|no$
 			}
-			if = {	# Magnetic
-				limit = {
-					check_variable = {
-						which = tec_temporal_d_tec_eco_terraformer_magnetic
-						value > 0
-					}
-				}
-				while = {
-					limit = {
-						check_variable = {
-							which = tec_temporal_d_tec_eco_terraformer_magnetic
-							value > 0
-						}
-					}
-					add_deposit = d_tec_eco_terraformer_magnetic
-					change_variable = {
-						which = tec_temporal_d_tec_eco_terraformer_magnetic
-						value = -1
-					}
-				}
-				if = {
-					limit = {
-						check_variable = {
-							which = tec_temporal_d_tec_eco_terraformer_magnetic
-							value = 0
-						}
-					}
-					clear_variable = tec_temporal_d_tec_eco_terraformer_magnetic
-				}
+			tec_ecu_count_store_deposit = {
+				deposit = d_tec_eco_terraformer_magnetic
+				restore = $restore|no$
 			}
-			if = {	# Atmosphere
-				limit = {
-					check_variable = {
-						which = tec_temporal_d_tec_eco_terraformer_atmosphere
-						value > 0
-					}
-				}
-				while = {
-					limit = {
-						check_variable = {
-							which = tec_temporal_d_tec_eco_terraformer_atmosphere
-							value > 0
-						}
-					}
-					add_deposit = d_tec_eco_terraformer_atmosphere
-					change_variable = {
-						which = tec_temporal_d_tec_eco_terraformer_atmosphere
-						value = -1
-					}
-				}
-				if = {
-					limit = {
-						check_variable = {
-							which = tec_temporal_d_tec_eco_terraformer_atmosphere
-							value = 0
-						}
-					}
-					clear_variable = tec_temporal_d_tec_eco_terraformer_atmosphere
-				}
+			tec_ecu_count_store_deposit = {
+				deposit = d_tec_eco_terraformer_atmosphere
+				restore = $restore|no$
 			}
 		# /
+
+		# Event unique
+		inline_script = {
+			script = conditional/tec_equal
+			value = $event_unique|yes$
+			equal = yes
+			code = "
+				tec_ecu_count_store_deposit = {
+					deposit = d_dragon_monument
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_stellarite_trophy
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_crashed_slaver_ship_memorial
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_arcane_device
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_microplanet_memorial
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_federation_hegemony_monument_1
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_federation_hegemony_monument_2
+					restore = $restore|no$
+				}
+
+				tec_ecu_count_store_deposit = {
+					deposit = d_sentinels
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_sentinels_metal
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_sentinels_monument
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_landed_dragon
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_machine_care_home
+					restore = $restore|no$
+				}
+			"
+		}
+
+
+		#/
+
+		# origin
+		inline_script = {
+			script = conditional/tec_equal
+			value = $origin|yes$
+			equal = yes
+			code = "
+				tec_ecu_count_store_deposit = {
+					deposit = d_progenitor
+					restore = $restore|no$
+				}
+			"
+		}
+
+		#/
+		# underground deposits
+		inline_script = {
+			script = conditional/tec_equal
+			value = $underground|yes$
+			equal = yes
+			code = "
+				tec_ecu_count_store_deposit = {
+					deposit = d_underground_mine
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_underground_generator
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_underground_farm
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_underground_contact_zone
+					restore = $restore|no$
+				}
+			"
+		}
+		# /
+		# industrial deposits
+		inline_script = {
+			script = conditional/tec_equal
+			value = $industrial|yes$
+			equal = yes
+			code = "
+				tec_ecu_count_store_deposit = {
+					deposit = d_weapon_extraction_facility
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_bluelotus
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_bluelotus2
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_toy_factory_complex
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_odd_factory
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_ancient_particle_accelerator
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_underground_vault
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_space_time_anomaly
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_portal_research_zone
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_portal_research_zone_gestalt
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_hab_lonely_bot_deposit
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_hab_lonely_bot_deposit_2
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_hab_lonely_bot_deposit_3
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_ancient_manufactorium_working
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_stasis_prison
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_prisoner_intergration
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_star_mall_promenade
+					restore = $restore|no$
+				}
+				tec_ecu_count_store_deposit = {
+					deposit = d_astrogarbage_collector
+					restore = $restore|no$
+				}
+			"
+		}
+		# /
+		[[!restore]
+			save_deposits = yes # vanilla
+		]
+		[[restore]
+			restore_saved_deposits = yes # vanilla
+		]
 	}
 
 	# Habitat ecu handler
