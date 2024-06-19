@@ -90,6 +90,19 @@ def generate_modifiers(writer: Writer, config: LanguageConfig, resources: list[R
                 f"{economic_category_loc}",
             )
 
+            writer.write_localization(
+                f"tec_economic_category_{economic_category}_tag",
+                f"§EEconomic Category: ['concept_tec_eco_{economic_category}_alias']§! ['concept_tec_economic_category_pin_icon']",
+            )
+            writer.write_localization(
+                f"mod_tec_economic_category_{economic_category}_tag",
+                f"$tec_economic_category_{economic_category}_tag$",
+            )
+            writer.write_localization(
+                f"mod_tec_economic_category_{economic_category}_tag_short",
+                f"$tec_blank$",
+            )
+
             with writer.with_spacer():
                 for key in template:
                     if 'generic' in key:
