@@ -1646,28 +1646,39 @@ namespace = tec_psionic_path
 		hide_window = yes
 		is_triggered_only = yes
 		trigger = {
-			from = {
-				tec_is_psionic_leader = yes
-				has_skill >= 5
-			}
 			check_variable = {
 				which = tec_unlocked_psionic_leader_traits
 				value > 0
 			}
+			exists = from
+			from = {
+				tec_is_psionic_leader = yes
+				has_skill >= 5
+				# Without this, leaders can level multiple times due to the effects xD
+				NOT = {
+					has_leader_flag = tec_psionic_leader_trait_cd
+				}
+			}
 		}
 		immediate = {
-			# Psionic level 1 - leader at level 5
+			from = {
+				set_timed_leader_flag = {
+					flag = tec_psionic_leader_trait_cd
+					days = 1
+				}
+			}
+			# Psionic level 2+ - leader at level 9
 			if = {
 				limit = {
 					check_variable = {
 						which = tec_unlocked_psionic_leader_traits
-						value >= 1
+						value >= 3
 					}
 					from = {
-						has_skill >= 5
+						has_skill >= 9
 						check_variable = {
 							which = tec_psionic_leader_traits
-							value < 1
+							value < 3
 						}
 					}
 				}
@@ -1676,7 +1687,7 @@ namespace = tec_psionic_path
 				}
 			}
 			# Psionic level 2 - leader at level 7
-			if = {
+			else_if = {
 				limit = {
 					check_variable = {
 						which = tec_unlocked_psionic_leader_traits
@@ -1694,18 +1705,18 @@ namespace = tec_psionic_path
 					SCOPE = from
 				}
 			}
-			# Psionic level 2 - leader at level 9
-			if = {
+			# Psionic level 1 - leader at level 5
+			else_if = {
 				limit = {
 					check_variable = {
 						which = tec_unlocked_psionic_leader_traits
-						value >= 3
+						value >= 1
 					}
 					from = {
-						has_skill >= 9
+						has_skill >= 5
 						check_variable = {
 							which = tec_psionic_leader_traits
-							value < 3
+							value < 1
 						}
 					}
 				}
