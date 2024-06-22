@@ -32,6 +32,7 @@ building_tec_entepre_forge = {		# Alloys
 		display = with_desc
 		trigger = ""
 		default_job = tec_hired_foundry
+		default_trigger = "is_gestalt = yes"
 	}
 
 	ai_resource_production = {
@@ -70,7 +71,6 @@ building_tec_entepre_factory = {	# CG
 		mult = 1
 		display = with_desc
 		trigger = ""
-		default_job = tec_hired_artisan
 	}
 }
 
@@ -116,7 +116,6 @@ building_tec_entepre_research = {	# Research
 		mult = 1
 		display = with_desc
 		trigger = ""
-		default_job = tec_hired_researcher
 	}
 
 	inline_script = {
@@ -175,7 +174,6 @@ building_tec_entepre_theatres = {	# Amenities
 		mult = 1
 		display = with_desc
 		trigger = ""
-		default_job = tec_hired_entertainer
 	}
 
 }
@@ -343,52 +341,23 @@ building_tec_outreach_platform = {	# Outreach
 	# /
 
 	# Jobs
-		# Regular
 			inline_script = {
-				script = jobs/tec_job
-				trigger = "
-					exists = owner
-					owner = {
-						is_regular_empire = yes
-					}
-					has_upgraded_capital = yes
-				"
-				job = tec_planner
-				count = 2
+				script = jobs/tec_planner
+				trigger = ""
+				count = 1
 				mult = 1
 				display = with_desc
 				default_job = tec_planner
 			}
-		# /
-		# Gestalt
 			inline_script = {
-				script = jobs/tec_job
+				script = jobs/tec_planner
 				trigger = "
-					exists = owner
-					owner = {
-						is_gestalt = yes
-					}
-				"
-				job = tec_planner_drone
-				count = 1
-				mult = 1
-				display = with_desc
-			}
-			inline_script = {
-				script = jobs/tec_job
-				trigger = "
-					exists = owner
-					owner = {
-						is_gestalt = yes
-					}
 					has_upgraded_capital = yes
 				"
-				job = tec_planner_drone
 				count = 1
 				mult = 1
 				display = no_desc
 			}
-		# /
 	# /
 }
 
@@ -435,9 +404,15 @@ building_tec_biopsionic_convergence = {
 
 		cost = {
 			trigger = {
-				exists = owner
-				owner = {
-					is_ai = no
+				OR = {
+					is_scope_valid = no
+					AND = {
+						exists = owner
+						owner = {
+							is_ai = no
+						}
+
+					}
 				}
 			}
 			sr_zro = 50
@@ -450,6 +425,12 @@ building_tec_biopsionic_convergence = {
 				}
 			}
 			energy = 500
+		}
+		produces = {
+			trigger = {
+				is_scope_valid = no
+			}
+			sr_zro = 1
 		}
 		produces = {
 			trigger = {
@@ -525,9 +506,14 @@ building_tec_cyberpsionic_extractor = {
 		}
 		cost = {
 			trigger = {
-				exists = owner
-				owner = {
-					is_ai = no
+				OR = {
+					is_scope_valid = no
+					AND = {
+						exists = owner
+						owner = {
+							is_ai = no
+						}
+					}
 				}
 			}
 			alloys = 250
@@ -687,7 +673,7 @@ building_tec_cyberpsionic_extractor = {
 	inline_script = {
 		script = buildings/tec_aibait
 		trigger = "
-			not = { has_building = building_tec_cyberpsionic_extractor }
+			NOT = { has_building = building_tec_cyberpsionic_extractor }
 		"
 	}
 }
@@ -781,6 +767,7 @@ building_tec_cyberpsionic_transmuter = {
 			produces = {	# Other
 				trigger = {
 					NOR = {
+						is_scope_valid = yes
 						has_generator_designation = yes
 						has_mining_designation = yes
 						has_farming_designation = yes
@@ -832,23 +819,14 @@ building_tec_cyberpsionic_transmuter = {
 	}
 
 	triggered_country_modifier = {
-		potential = {
-			always = yes
-		}
 		tec_entropy = -0.05
 	}
 
 
 	triggered_desc = {
-		trigger = {
-			always = yes
-		}
 		text = building_tec_cyberpsionic_transmuter_entropy
 	}
 	triggered_desc = {
-		trigger = {
-			always = yes
-		}
 		text = building_tec_cyberpsionic_transmuter_designation
 	}
 }
@@ -902,16 +880,10 @@ building_tec_cyberpsionic_gate = {
 	# Modifiers
 	# Migration
 		triggered_planet_modifier = {
-			potential = {
-				always = yes
-			}
 			pop_resettlement_cost_mult = -1
 		}
 
 		triggered_planet_modifier = {
-			potential = {
-				always = yes
-			}
 			planet_immigration_pull_add = 5
 			planet_resettlement_unemployed_mult = 0.25
 			planet_resettlement_unemployed_destination_mult = 0.25
@@ -921,9 +893,14 @@ building_tec_cyberpsionic_gate = {
 	# Trade vs amenities
 		triggered_planet_modifier = {
 			potential = {
-				exists = owner
-				owner = {
-					tec_uses_trade_value = yes
+				OR = {
+					is_scope_valid = no
+					AND = {
+						exists = owner
+						owner = {
+							tec_uses_trade_value = yes
+						}
+					}
 				}
 			}
 			trade_value_mult = 0.15

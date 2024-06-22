@@ -1,5 +1,13 @@
 # districts/type/tec_rural_mining
 
+inline_script = {
+	script = tec_type_hint
+	job = $default_job$
+	job = $default_job_secondary$
+	float = $housing_base$
+	float = $jobs_base$
+}
+
 # resources
 	resources = {
 		category = planet_districts_mining
@@ -16,6 +24,7 @@
 				tec_planet_allows_automation = { cached = yes }
 			"
 			base = 4
+			menial_district = yes
 		}
 		inline_script = districts/resources/tec_automated_upkeep
 		# Improved Mining Empire Upkeep
@@ -24,21 +33,20 @@
 # /
 
 # Modifiers
-	inline_script = {
-		script = districts/tec_rural_district_modifiers
-		housing_base = 2
-		housing_additional_mult = value:scripted_modifier_add|MODIFIER|mining_district_housing_add|
-		building_slots_additional_mult = value:scripted_modifier_add|MODIFIER|mining_district_buildings_add|
-	}	# Note: additional mult = 1*that
+	triggered_planet_modifier = {
+		planet_housing_add = $housing_base$
+		mult = value:tec_regular_planet_district_scale
+	}
 
 	inline_script = {
-		script = districts/effects/tec_agrarian_idyll_specific
-		trigger = "
-			owner = {
-				is_lithoid_empire = yes
-			}
-		"
-	}
+		script = districts/tec_rural_district_modifiers
+		type = mining
+		housing_scale = 1
+		amenities_scale = 1
+		building_slot_scale = 1
+		mult_value = tec_regular_planet_district_scale
+	}	# Note: additional mult = 1*that
+
 	# Improved Mining Empire Modifier
 	inline_script = districts/effects/tec_improved_mining_empire_bonus
 # /
@@ -46,13 +54,14 @@
 # Jobs
 	inline_script = {
 		script = jobs/tec_miner
-		regular_count = 2
+		regular_count = 1
 		regular_secondary_count = 1
-		hive_count = 3
-		hive_secondary_count = 2
-		machine_count = 2
+		hive_count = 1
+		hive_secondary_count = 1
+		machine_count = 1
 		machine_secondary_count = 1
-		mult = 1
+		mult = value:tec_rural_jobs|BASE|$jobs_base$|TYPE|mining|MULT_VALUE|tec_regular_planet_district_scale|
+		secondary_mult = value:tec_rural_jobs|BASE|$jobs_base$|TYPE|mining|MULT_VALUE|tec_regular_planet_district_scale|MULT|0.67|
 		display = with_desc
 		trigger = ""
 		default_job = $default_job$
@@ -63,56 +72,20 @@
 		regular_count = 1
 		hive_count = 1
 		machine_count = 1
-		mult = 1
+		mult = value:tec_rural_jobs|BASE|$jobs_base$|TYPE|mining|MULT_VALUE|tec_regular_planet_district_scale|MULT|0.34|
 		display = with_desc
-		trigger = "
-			NOT = { tec_planet_allows_automation = { cached = yes } }
-		"
+		trigger = ""
 		default_job = $default_job_secondary$
 	}
 
-	inline_script = {
-		script = jobs/tec_miner
-		regular_count = -1
-		regular_secondary_count = 0
-		hive_count = -1
-		hive_secondary_count = 0
-		machine_count = -1
-		machine_secondary_count = 0
-		mult = 1
-		display = no_desc
-		trigger = "
-			tec_planet_allows_automation = { cached = yes }
-		"
-	}
-
-	inline_script = {
-		script = jobs/tec_miner
-		regular_count = 1
-		regular_secondary_count = 1
-		hive_count = 1
-		hive_secondary_count = 1
-		machine_count = 1
-		machine_secondary_count = 1
-		mult = 1
-		display = no_desc
-		trigger = "
-			owner = {
-				tec_has_extra_menial_job_all_districts = yes
-			}
-		"
-	}
-
 # /
 
-inline_script = districts/effects/tec_machine_world_mining
-
-# ai
-	inline_script = {
-		script = districts/compat/tec_starnet_mining_district
-		count = 1
+triggered_desc = {
+	trigger = {
+		tec_planet_allows_automation = { cached = yes }
 	}
-# /
+	text = tec_district_is_automated
+}
 
 inline_script = {
 	script = mod_support/tec_inlines_include

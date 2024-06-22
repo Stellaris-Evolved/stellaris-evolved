@@ -616,24 +616,54 @@
 		inline_script = {
 			script = tec_type_hint
 			[[BASE] float = $BASE$ ]
+			menial_type = $TYPE$
 		}
 
 		base = $BASE|0$
 		add = modifier:habitat_districts_housing_add # not used in vanilla but we could use it
-		add = modifier:habitat_district_jobs_add # add housing per job replaced VD check
-		modifier = {
-			add = 1
-			planet = {
+		[[TYPE]
+			add = modifier:menial_district_housing_add
+			add = modifier:$TYPE$_district_housing_add
+			modifier = {
+				add = 1
 				tec_is_fully_upgraded_habitat = yes
 			}
+		]
+	}
+
+
+	tec_hab_void_dweller_jobs = {
+		inline_script = {
+			script = tec_type_hint
+			menial_type = $TYPE$
+			bool = $INDUSTRIAL$
+			float = $BASE$
+			float = $SCALE$
+			script_value = $MULT_VALUE$
 		}
-		modifier = {
-			add = 1
-			exists = owner
-			owner = {
-				is_hive_empire = yes
+		base = $BASE$
+		add = modifier:habitat_district_jobs_add
+		[[TYPE]
+			add = modifier:menial_district_jobs_add
+			add = modifier:$TYPE$_district_jobs_add
+
+			modifier = {
+				add = 1
+				tec_is_fully_upgraded_habitat = yes
 			}
-		}
+		]
+		[[INDUSTRIAL]
+			add = modifier:industrial_district_jobs_add
+		]
+
+
+		[[SCALE] mult = $SCALE$ ]
+
+		add = $BASE$
+
+		[[MULT] mult = $MULT$ ]
+		[[MULT_VALUE] mult = value:$MULT_VALUE$ ]
+		round = yes
 	}
  # /
  # Subhabitat things
@@ -1841,7 +1871,7 @@ tec_consacrate_quality_4_weight = {
 		}
 	}
 }
-tec_machine_world_scaling = {
+tec_regular_planet_district_scale = {
 	base = 1
 	modifier = {
 		uses_district_set = machine_world
@@ -1852,7 +1882,134 @@ tec_machine_world_scaling = {
 		}
 		add = 1
 	}
+	modifier = {
+		uses_district_set = hive_world
+		exists = owner
+		owner = {
+			is_hive_empire = yes
+			has_ascension_perk = ap_hive_worlds
+		}
+		add = 1
+	}
 }
+
+tec_ring_world_industrial_district_scale = {
+	base = 1 # gamestart
+
+	modifier = {
+		has_deposit = d_tec_rw_minor_structural_damage
+		subtract = 0.1
+	}
+	modifier = {
+		has_deposit = d_tec_rw_major_structural_damage
+		subtract = 0.2
+	}
+
+	modifier = {
+		tec_is_unspecced_ringworld = yes
+		subtract = 0.4
+	}
+}
+
+tec_ring_world_menial_base_housing = {
+	inline_script = {
+		script = tec_type_hint
+		float = $BASE$
+	}
+	base = $BASE$
+	mult = value:tec_ring_world_menial_district_scale
+	round = yes
+}
+
+tec_ring_world_menial_district_scale = {
+	base = 1
+
+	modifier = {
+		has_deposit = d_tec_rw_minor_structural_damage
+		subtract = 0.11
+	}
+	modifier = {
+		has_deposit = d_tec_rw_major_structural_damage
+		subtract = 0.22
+	}
+}
+
+tec_rural_housing = {
+	inline_script = {
+		script = tec_type_hint
+		menial_type = $TYPE$
+		script_value = $MULT_VALUE$
+	}
+	base = 0
+	add = modifier:menial_district_housing_add
+	add = modifier:$TYPE$_district_housing_add
+
+	[[MULT_VALUE] mult = value:$MULT_VALUE$ ]
+
+	round = yes
+}
+
+tec_rural_building_slots = {
+	inline_script = {
+		script = tec_type_hint
+		menial_type = $TYPE$
+	}
+	base = 0
+	add = modifier:menial_district_buildings_add
+	add = modifier:$TYPE$_district_buildings_add
+}
+
+tec_rural_amenities = {
+	inline_script = {
+		script = tec_type_hint
+		menial_type = $TYPE$
+	}
+	base = 0
+	add = modifier:menial_district_amenities_add
+	add = modifier:$TYPE$_district_amenities_add
+}
+
+tec_rural_jobs = {
+	inline_script = {
+		script = tec_type_hint
+		menial_type = $TYPE$
+		float = $BASE$
+		float = $SCALE$
+		float = $MULT$
+		script_value = $MULT_VALUE$
+	}
+	add = modifier:menial_district_jobs_add
+	add = modifier:$TYPE$_district_jobs_add
+
+	[[SCALE] mult = $SCALE$ ]
+
+	add = $BASE$
+
+	[[MULT] mult = $MULT$ ]
+	[[MULT_VALUE] mult = value:$MULT_VALUE$ ]
+	round = yes
+}
+
+
+tec_industrial_jobs = {
+	inline_script = {
+		script = tec_type_hint
+		float = $BASE$
+		float = $SCALE$
+		float = $MULT$
+		script_value = $MULT_VALUE$
+	}
+	add = modifier:industrial_district_jobs_add
+
+	[[SCALE] mult = $SCALE$ ]
+
+	add = $BASE$
+
+	[[MULT] mult = $MULT$ ]
+	[[MULT_VALUE]mult = value:$MULT_VALUE$]
+	round = yes
+}
+
 
 tec_idealistic_foundation_scaling = {
 	base = @tec_fac_idealistic_foundation_max_pop
