@@ -6,8 +6,13 @@
 	@tec_bioware_scaling_mid_high = 0.75
 	@tec_bioware_scaling_high = 1
 
-	@tec_genetic_recombination_engineer_score = 0.05
+	@tec_gene_recombinator_job_situation_score = 0.25
+	@tec_gene_recombinator_agenda_start_score = 1.5
+	@tec_gene_recombinator_agenda_finish_score = 2
 	@tec_genetic_perfected_trait_scaling = 0.1
+
+	@tec_augmentor_job_situation_score = 0.25
+	@tec_augmentor_agenda_start_score = 1.5
 # /
 
 # Generic/misc
@@ -67,16 +72,38 @@
 # /
 
 # Genetics
- # --------------- Recombination scalingç
+ # --------------- Recombination scaling
 	# TODO ASCENSION
-	##mult = owner.value:tec_genetic_recombination_scaling
-	#tec_genetic_recombination_scaling = {
-	#	base = 0
-	#	add = owner.value:tec_jobs_value|SCOPE|$SCOPE|this$|JOB|tec_gene_recombinator|
-	#	add = owner.value:tec_jobs_value|SCOPE|$SCOPE|this$|JOB|tec_gene_recombinator_drone|
-	#	mult = @tec_genetic_recombination_engineer_score
-	#	add = 1
-	#}
+	##mult = owner.value:tec_gene_recombinator_job_scaling
+	tec_gene_recombinator_job_scaling = {
+		base = 0
+		[[!GESTALT]
+			add = owner.value:tec_jobs_value|SCOPE|$SCOPE|this$|JOB|tec_gene_recombinator|
+		]
+		[[GESTALT]
+			add = owner.value:tec_jobs_value|SCOPE|$SCOPE|this$|JOB|tec_gene_recombinator_drone|
+		]
+		mult = @tec_gene_recombinator_job_situation_score
+		# 0.25 situation speed per month per recombinator
+		# 20 recombinators = 2 situation speed
+		modifier = {
+			mult = @tec_gene_recombinator_agenda_start_score
+			exists = owner
+			owner = {
+				has_agenda_selected = agenda_tec_genetic_recombination
+				NOT = {
+					has_modifier = modifier_tec_agenda_tec_genetic_recombination_finish
+				}
+			}
+		}
+		modifier = {
+			mult = @tec_gene_recombinator_agenda_finish_score
+			exists = owner
+			owner = {
+				has_modifier = modifier_tec_agenda_tec_genetic_recombination_finish
+			}
+		}
+	}
  # /
  # --------------- Perfect trait scaling
 	tec_genetic_perfected_trait_scaling = {
@@ -364,19 +391,37 @@
 			modifier = {
 				add = @tec_bioware_scaling_mid
 				from = {
-					has_trait = trait_tec_gene_brain_1
+					has_trait = trait_tec_gene_genius_t1
 				}
 			}
 			modifier = {
 				add = @tec_bioware_scaling_mid_high
 				from = {
-					has_trait = trait_tec_gene_brain_2
+					has_trait = trait_tec_gene_genius_t2
 				}
 			}
 			modifier = {
 				add = @tec_bioware_scaling_high
 				from = {
-					has_trait = trait_tec_gene_brain_3
+					has_trait = trait_tec_gene_genius_t3
+				}
+			}
+			modifier = {
+				add = @tec_bioware_scaling_mid
+				from = {
+					has_trait = trait_tec_gene_research_t1
+				}
+			}
+			modifier = {
+				add = @tec_bioware_scaling_mid_high
+				from = {
+					has_trait = trait_tec_gene_research_t2
+				}
+			}
+			modifier = {
+				add = @tec_bioware_scaling_high
+				from = {
+					has_trait = trait_tec_gene_research_t3
 				}
 			}
 			# Cybernetics
