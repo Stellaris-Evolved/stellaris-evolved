@@ -158,23 +158,6 @@ holding_propaganda_office = {			# Influence
 		exists = planet
 		planet = { is_capital = yes }
 	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = no }
-		}
-		job_overlord_propagandist_add = 2
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = yes }
-		}
-		job_overlord_propagandist_drone_add = 2
-	}
-
 	resources = {
 		category = planet_holdings
 		inline_script = {
@@ -183,8 +166,14 @@ holding_propaganda_office = {			# Influence
 		}
 	}
 
-	triggered_desc = {
-		text = job_overlord_propagandist_effect_desc
+
+	inline_script = {
+		script = jobs/tec_job_overlord
+		job = overlord_propagandist
+		count = 2
+		mult = 1
+		trigger = ""
+		default_job = overlord_propagandist
 	}
 }
 
@@ -200,22 +189,6 @@ holding_satellite_campus = {			# Research
 		has_overlord_dlc = yes
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = no }
-		}
-		job_overlord_academic_add = 2
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = yes }
-		}
-		job_overlord_academic_drone_add = 2
-	}
-
 	resources = {
 		category = planet_holdings
 		cost = {
@@ -226,8 +199,13 @@ holding_satellite_campus = {			# Research
 		}
 	}
 
-	triggered_desc = {
-		text = job_overlord_academic_effect_desc
+	inline_script = {
+		script = jobs/tec_job_overlord
+		job = overlord_academic
+		count = 2
+		mult = 1
+		trigger = ""
+		default_job = overlord_academic
 	}
 }
 
@@ -239,26 +217,9 @@ holding_emporium = {					# Energy
 
 	category = amenity
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = no }
-		}
-		job_overlord_trader_add = 2
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = yes }
-		}
-		job_overlord_trader_drone_add = 2
-	}
-
 	potential = {
 		owner.overlord = {
-			is_machine_empire = no
-			is_hive_empire = no
+			tec_uses_trade_value = yes
 		}
 	}
 
@@ -273,8 +234,13 @@ holding_emporium = {					# Energy
 		}
 	}
 
-	triggered_desc = {
-		text = job_overlord_trader_effect_desc
+	inline_script = {
+		script = jobs/tec_job_overlord
+		job = overlord_trader
+		count = 2
+		mult = 1
+		trigger = ""
+		default_job = overlord_trader
 	}
 }
 
@@ -298,34 +264,17 @@ holding_aid_agency = {					# Amenities
 			fail_text = overlord_is_xenophobe
 			exists = owner.overlord
 			owner.overlord = {
-				NOR = {
-					has_ethic = ethic_xenophobe
-					has_ethic = ethic_fanatic_xenophobe
-				}
+				is_xenophobe = no
+			}
+		}
+		custom_tooltip = {
+			fail_text = tec_overlord_is_apathic
+			exists = owner.overlord
+			owner.overlord = {
+				NOT = { has_ethic = ethic_gestalt_apathy }
 			}
 		}
 	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = no }
-		}
-		job_aid_worker_add = 2
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = yes }
-		}
-		job_aid_worker_drone_add = 2
-	}
-
-	planet_modifier = {
-		monthly_loyalty = 1.5
-	}
-
 	resources = {
 		category = planet_holdings
 		inline_script = {
@@ -364,8 +313,18 @@ holding_aid_agency = {					# Amenities
 		}
 	}
 
-	triggered_desc = {
-		text = job_aid_worker_effect_desc
+	planet_modifier = {
+		monthly_loyalty = 1.5
+	}
+
+
+	inline_script = {
+		script = jobs/tec_job_overlord
+		job = aid_worker
+		count = 2
+		mult = 1
+		trigger = ""
+		default_job = aid_worker
 	}
 }
 
@@ -518,7 +477,7 @@ holding_produce_requisitorium = {		# Minus Food
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner.overlord
-			owner.overlord = { is_gestalt = no }
+			owner.overlord = { country_uses_consumer_goods = no }
 		}
 		monthly_loyalty = -0.25
 	}
@@ -542,7 +501,7 @@ holding_produce_requisitorium = {		# Minus Food
 	triggered_desc = {
 		trigger = {
 			exists = owner.overlord
-			owner.overlord = { is_gestalt = no }
+			owner.overlord = { country_uses_consumer_goods = no }
 		}
 		text = job_consumer_goods_requisitioned_effect_desc
 	}
@@ -572,6 +531,15 @@ holding_offworld_foundry = {			# Prospectorium
 		}
 	}
 
+	destroy_trigger = {
+		exists = planet.owner
+		planet.owner = {
+			NOT = {
+				is_specialist_subject_type = { TYPE = prospectorium }
+			}
+		}
+	}
+
 	resources = {
 		category = planet_holdings
 		inline_script = {
@@ -584,88 +552,12 @@ holding_offworld_foundry = {			# Prospectorium
 		monthly_loyalty = -1.5
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = {
-				is_gestalt = no
-				is_catalytic_empire = no
-			}
-		}
-		job_overlord_metallurgist_add = 2
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = {
-				is_hive_empire = yes
-				is_catalytic_empire = no
-			}
-		}
-		job_overlord_foundry_drone_add = 2
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = {
-				is_machine_empire = yes
-				is_catalytic_empire = no
-			}
-		}
-		job_overlord_fabricator_add = 2
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = {
-				is_catalytic_empire = yes
-				is_gestalt = no
-			}
-		}
-		job_overlord_catalytic_technician_add = 2
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = {
-				is_catalytic_empire = yes
-				is_gestalt = yes
-			}
-		}
-		job_overlord_catalytic_drone_add = 2
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = planet.owner
-			planet.owner = {
-				is_catalytic_empire = no
-			}
-		}
-		text = job_overlord_alloy_producer_effect_desc
-	}
-
-	destroy_trigger = {
-		exists = planet.owner
-		planet.owner = {
-			NOT = {
-				is_specialist_subject_type = { TYPE = prospectorium }
-			}
-		}
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = planet.owner
-			planet.owner = {
-				is_catalytic_empire = yes
-			}
-		}
-		text = job_overlord_alloy_producer_catalytic_effect_desc
+	inline_script = {
+		script = jobs/tec_job_overlord_foundry
+		count = 2
+		mult = 1
+		trigger = ""
+		default_job = overlord_metallurgist
 	}
 }
 
@@ -699,6 +591,15 @@ holding_overlord_vigil_command = {		# bulwark
 		}
 	}
 
+	destroy_trigger = {
+		exists = planet.owner
+		planet.owner = {
+			NOT = {
+				is_specialist_subject_type = { TYPE = bulwark }
+			}
+		}
+	}
+
 	resources = {
 		category = planet_holdings
 		inline_script = {
@@ -707,24 +608,13 @@ holding_overlord_vigil_command = {		# bulwark
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = {
-				is_gestalt = no
-			}
-		}
-		job_overlord_beholder_add = 1
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = {
-				is_gestalt = yes
-			}
-		}
-		job_overlord_beholder_drone_add = 1
+	inline_script = {
+		script = jobs/tec_job_overlord
+		job = overlord_beholder
+		count = 2
+		mult = 1
+		trigger = ""
+		default_job = overlord_beholder
 	}
 
 	triggered_country_modifier = {
@@ -763,18 +653,6 @@ holding_overlord_vigil_command = {		# bulwark
 		starbase_defense_platform_capacity_add = 4
 	}
 
-	destroy_trigger = {
-		exists = planet.owner
-		planet.owner = {
-			NOT = {
-				is_specialist_subject_type = { TYPE = bulwark }
-			}
-		}
-	}
-
-	triggered_desc = {
-		text = job_overlord_beholder_effect_desc
-	}
 }
 
 holding_parasitic_algorithms = {		# Scholarium
@@ -927,19 +805,15 @@ holding_tree_of_life_sapling = {		# Tree of life
 				country_uses_food = no
 			}
 		}
-		NOR = {
-			is_planet_class = pc_city
-			is_planet_class = pc_machine
-			is_planet_class = pc_relic
-		}
+		tec_is_city_world = no
+		tec_is_machine_world = no
+		tec_is_relic_world = no
 		is_artificial = no
 	}
 	destroy_trigger = {
-		OR = {
-			is_planet_class = pc_city
-			is_planet_class = pc_machine
-			is_planet_class = pc_relic
-		}
+		tec_is_city_world = no
+		tec_is_machine_world = no
+		tec_is_relic_world = no
 	}
 
 	planet_modifier = {
@@ -948,19 +822,13 @@ holding_tree_of_life_sapling = {		# Tree of life
 		planet_farmers_food_produces_add = 1
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = no }
-		}
-		job_overlord_arborist_add = 1
-	}
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = yes }
-		}
-		job_overlord_arborist_drone_add = 1
+	inline_script = {
+		script = jobs/tec_job_overlord
+		job = overlord_arborist
+		count = 2
+		mult = 1
+		trigger = ""
+		default_job = overlord_arborist
 	}
 }
 
@@ -988,25 +856,19 @@ holding_experimental_crater = {			# Calamitous birth
 		monthly_loyalty = -1
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = no }
-		}
-		job_miner_add = 3
-	}
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = yes }
-		}
-		job_mining_drone_add = 3
-	}
-
 	on_built = {
 		planet = {
 			planet_event = { id = subject.5005 days = 360 }
 		}
+	}
+
+	inline_script = {
+		script = jobs/tec_miner
+		count = 3
+		mult = 1
+		display = with_desc
+		trigger = ""
+		default_job = miner
 	}
 
 	triggered_desc = {
@@ -1043,22 +905,14 @@ holding_offspring_nest = {				# Progenitor Hive
 			NOT = { has_origin = origin_progenitor_hive }
 		}
 	}
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = no }
-		}
-		job_overlord_offspring_drone_feeder_add = 1
-	}
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = yes }
-		}
-		job_overlord_offspring_drone_feeder_drone_add = 1
-	}
-	triggered_desc = {
-		text = job_overlord_offspring_drone_feeder_effect_desc
+
+	inline_script = {
+		script = jobs/tec_job_overlord
+		job = overlord_offspring_drone_feeder
+		count = 2
+		mult = 1
+		trigger = ""
+		default_job = overlord_offspring_drone_feeder
 	}
 }
 
@@ -1104,20 +958,14 @@ holding_knight_commandery = {			# Knights of the Toxic God
 		monthly_loyalty = -0.5
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = no }
-		}
-		job_overlord_knight_add = 1
-	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = yes }
-		}
-		job_overlord_knight_drone_add = 1
+	inline_script = {
+		script = jobs/tec_job_overlord
+		job = overlord_knight
+		count = 1
+		mult = 1
+		trigger = ""
+		default_job = overlord_knight
 	}
 
 	triggered_country_modifier = {	# Navalcap rework
@@ -1127,13 +975,6 @@ holding_knight_commandery = {			# Knights of the Toxic God
 		country_naval_cap_add = 4
 		#mult = value:tec_scripted_modifier_mult_versatile|MODIFIER|knights_independent_category_produces_mult|MODIFIER_2|pop_job_naval_mult|
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_naval_mult|
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = planet.owner
-		}
-		text = job_overlord_knight_commandery_effect_desc
 	}
 }
 
@@ -1197,51 +1038,29 @@ holding_transcendental_retreat = {
 		planet_jobs_produces_mult = 0.1
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			planet.owner = { is_gestalt = no }
-		}
-		job_overlord_healthcare_add = 1
-	}
-	triggered_desc = {
-		trigger = {
-			exists = planet.owner
-			planet.owner = {
-				NOR = {
-					has_authority = auth_hive_mind
-					has_authority = auth_machine_intelligence
-				}
-			}
-		}
-		text = job_healthcare_effect_desc
+	inline_script = {
+		script = jobs/tec_healthcare
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = ""
+		default_job = healthcare
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			planet.owner = { has_authority = auth_hive_mind }
-		}
-		job_overlord_spawning_drone_add = 1
-	}
-	triggered_desc = {
-		trigger = {
-			exists = planet.owner
-			planet.owner = { has_authority = auth_hive_mind }
-		}
-		text = job_spawning_drone_effect_desc
+	inline_script = {
+		script = jobs/tec_spawning_drone
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = ""
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			planet.owner = { has_authority = auth_machine_intelligence }
-		}
-		job_overlord_replicator_add = 1
-	}
-	triggered_desc = {
-		trigger = {
-			exists = planet.owner
-			planet.owner = { has_authority = auth_machine_intelligence }
-		}
-		text = job_replicator_effect_desc
+	inline_script = {
+		script = jobs/tec_replicator
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = ""
 	}
 }
 
@@ -1271,20 +1090,11 @@ holding_noble_vacation_homes = {		# Aristocratic Elite
 		monthly_loyalty = -1
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = no }
-		}
-		planet_amenities_add = -15
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = yes }
-		}
-		planet_amenities_no_happiness_add = -15
+	inline_script = {
+		script = modifiers/tec_amenities
+		count = 15
+		mult = 1
+		trigger = ""
 	}
 
 	on_built = {
@@ -1337,19 +1147,14 @@ holding_dread_outpost = {				# Dread Armies
 			}
 		}
 	}
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = no }
-		}
-		job_overlord_necromancer_add = 2
-	}
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = yes }
-		}
-		job_overlord_necromancer_drone_add = 2
+
+	inline_script = {
+		script = jobs/tec_job_overlord
+		job = overlord_necromancer
+		count = 2
+		mult = 1
+		trigger = ""
+		default_job = overlord_necromancer
 	}
 
 	on_built = {
@@ -1362,9 +1167,6 @@ holding_dread_outpost = {				# Dread Armies
 		planet = {
 			remove_planet_flag = active_dread_outpost
 		}
-	}
-	triggered_desc = {
-		text = job_overlord_necromancer_effect_desc
 	}
 }
 
@@ -1401,22 +1203,13 @@ holding_sacrificial_shrine = {			# Death cults
 		monthly_loyalty = -0.5
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = no }
-		}
-		job_overlord_mortal_initiate_add = 2
-	}
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = yes }
-		}
-		job_overlord_mortal_initiate_drone_add = 2
-	}
-	triggered_desc = {
-		text = job_overlord_mortal_initiate_effect_desc
+	inline_script = {
+		script = jobs/tec_job_overlord
+		job = overlord_mortal_initiate
+		count = 2
+		mult = 1
+		trigger = ""
+		default_job = overlord_mortal_initiate
 	}
 }
 
@@ -1459,64 +1252,46 @@ holding_franchise_headquarters = {		# Franchising megacorps
 
 	planet_modifier = {
 		monthly_loyalty = -0.5
-		job_overlord_manager_add = 2
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			OR = {
+				is_scope_valid = no
+				AND = {
+					exists = owner
+					owner = { is_regular_empire = yes }
+				}
+			}
+		}
 		tec_job_clerk_trade_value_add = -1
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			owner.overlord = {
-				has_ethic = ethic_fanatic_spiritualist
-			}
-		}
-		pop_ethic_spiritualist_attraction_mult = 1
+	inline_script = {
+		script = jobs/tec_job_overlord
+		job = overlord_manager
+		count = 2
+		mult = 1
+		trigger = ""
+		default_job = overlord_manager
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			owner.overlord = {
-				has_ethic = ethic_fanatic_materialist
+	inline_script = {
+		script = iterators/tec_iterate_ethic_regular
+		code = "
+			triggered_planet_modifier = {
+				potential = {
+					exists = owner
+					owner = {
+						is_gestalt = no
+					}
+					owner.overlord = {
+						has_ethic = ethic_fanatic_$ethic$
+					}
+				}
+				pop_ethic_spiritualist_attraction_mult = 1
 			}
-		}
-		pop_ethic_materialist_attraction_mult = 1
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			owner.overlord = {
-				has_ethic = ethic_fanatic_xenophobe
-			}
-		}
-		pop_ethic_xenophobe_attraction_mult = 1
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			owner.overlord = {
-				has_ethic = ethic_fanatic_xenophile
-			}
-		}
-		pop_ethic_xenophile_attraction_mult = 1
-	}
-
-	# Just in case there's a Fan. Auth. Corporate Galactic Imperium with the civic.
-	triggered_planet_modifier = {
-		potential = {
-			owner.overlord = {
-				has_ethic = ethic_fanatic_authoritarian
-			}
-		}
-		pop_ethic_authoritarian_attraction_mult = 1
-	}
-
-	# Just in case there's a Fan. Egal. Corporate Galactic Imperium with the civic.
-	triggered_planet_modifier = {
-		potential = {
-			owner.overlord = {
-				has_ethic = ethic_fanatic_egalitarian
-			}
-		}
-		pop_ethic_egalitarian_attraction_mult = 1
+		"
 	}
 
 	triggered_desc = {
@@ -1529,10 +1304,16 @@ holding_franchise_headquarters = {		# Franchising megacorps
 
 	triggered_desc = {
 		trigger = {
-			exists = owner.overlord
-			owner.overlord = {
-				is_fanatic = no
+			OR = {
+				is_scope_valid = no
+				AND = {
+					exists = owner.overlord
+					owner.overlord = {
+						is_fanatic = no
+					}
+				}
 			}
+
 		}
 		text = holding_franchise_headquarters_ethics_effect
 	}
@@ -1608,7 +1389,7 @@ holding_idyllic_bloom = {				# Idyllic Bloom
 		category = planet_holdings
 		inline_script = {
 			script = buildings/resources/tec_rare_resource_cost
-				trigger = ""
+            trigger = ""
 			tier = 3
 			rare = exotic_gases
 		}
@@ -1662,9 +1443,14 @@ holding_idyllic_bloom = {				# Idyllic Bloom
 	# Production modifiers
 		triggered_planet_modifier = {	# Regular empires
 			potential = {
-				exists = planet.owner
-				planet.owner = {
-					is_machine_empire = no
+				OR = {
+					is_scope_valid = no
+					AND = {
+						exists = planet.owner
+						planet.owner = {
+							is_machine_empire = no
+						}
+					}
 				}
 			}
 			pop_growth_speed = 0.15
@@ -1726,9 +1512,12 @@ holding_idyllic_bloom = {				# Idyllic Bloom
 	}
 	triggered_desc = {
 		trigger = {
-			planet = {
-				NOT = {
-					has_planet_flag = anti_cheese_idyllic_bloom_flag
+			OR = {
+				is_scope_valid = no
+				planet = {
+					NOT = {
+						has_planet_flag = anti_cheese_idyllic_bloom_flag
+					}
 				}
 			}
 		}
@@ -1773,7 +1562,7 @@ holding_tec_idyllic_bloom_gaia = {		# Idyllic Bloom
 		category = planet_holdings
 		inline_script = {
 			script = buildings/resources/tec_rare_resource_cost
-				trigger = ""
+			trigger = ""
 			tier = 3
 			rare = exotic_gases
 		}
@@ -1833,9 +1622,14 @@ holding_tec_idyllic_bloom_gaia = {		# Idyllic Bloom
 	# Production modifiers
 		triggered_planet_modifier = {	# Regular empires
 			potential = {
-				exists = planet.owner
-				planet.owner = {
-					is_machine_empire = no
+				OR = {
+					is_scope_valid = no
+					AND = {
+						exists = planet.owner
+						planet.owner = {
+							is_machine_empire = no
+						}
+					}
 				}
 			}
 			pop_growth_speed = 0.15
@@ -1913,27 +1707,18 @@ holding_reemployment_center = {			# Permanent Employment
 	triggered_planet_modifier = {
 		potential = {
 			exists = planet.owner
-			planet.owner = { is_gestalt = no }
-		}
-		job_overlord_reassigner_add = 1
-	}
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = yes }
-		}
-		job_overlord_reassigner_drone_add = 1
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
 			planet.owner = { is_egalitarian = yes }
 		}
 		monthly_loyalty = -0.5
 	}
-	triggered_desc = {
-		text = job_overlord_reassigner_effect_desc
+
+	inline_script = {
+		script = jobs/tec_job_overlord
+		job = overlord_reassigner
+		count = 2
+		mult = 1
+		trigger = ""
+		default_job = overlord_reassigner
 	}
 
 	triggered_desc = {
@@ -1964,19 +1749,13 @@ holding_recruitment_office = {			# Citizen Service
 		owner.overlord = { has_valid_civic = civic_citizen_service }
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = no }
-		}
-		job_overlord_recruiter_add = 2
-	}
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = yes }
-		}
-		job_overlord_recruiter_drone_add = 2
+	inline_script = {
+		script = jobs/tec_job_overlord
+		job = overlord_recruiter
+		count = 2
+		mult = 1
+		trigger = ""
+		default_job = overlord_recruiter
 	}
 
 	triggered_country_modifier = {	# TO DO NAVALCAP REWORK
@@ -1984,7 +1763,7 @@ holding_recruitment_office = {			# Citizen Service
 			always = yes
 		}
 		country_naval_cap_add = 5
-		mult = value:scripted_modifier_mult|MODIFIER|tec_branch_building_base_production_mult|
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_naval_mult|
 	}
 
 	triggered_planet_modifier = {
@@ -1994,9 +1773,7 @@ holding_recruitment_office = {			# Citizen Service
 		}
 		monthly_loyalty = -0.5
 	}
-	triggered_desc = {
-		text = job_overlord_recruiter_effect_desc
-	}
+
 	on_built = {
 		planet = {
 			planet_event = { id = subject.5010 days = 1800 }
@@ -2026,22 +1803,14 @@ holding_park_ranger_lodge = {			# Environmentalist
 			owner = { tec_is_terraformer_environmentalist_empire = yes }
 		}
 		NOR = {
-			is_planet_class = pc_city
-			is_planet_class = pc_hive
-			is_planet_class = pc_machine
-			is_planet_class = pc_relic
+			tec_is_city_world = yes
+			tec_is_relic_world = yes
+			tec_is_machine_world = yes
+			tec_is_hive_world = yes
 		}
 		is_artificial = no
 	}
 
-	destroy_trigger = {
-		OR = {
-			is_planet_class = pc_city
-			is_planet_class = pc_hive
-			is_planet_class = pc_machine
-			is_planet_class = pc_relic
-		}
-	}
 	allow = {
 		custom_tooltip = {
 			fail_text = no_free_district_for_ranger_lodge
@@ -2054,21 +1823,15 @@ holding_park_ranger_lodge = {			# Environmentalist
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = no }
-		}
-		job_overlord_ranger_add = 1
+	inline_script = {
+		script = jobs/tec_job_overlord
+		job = overlord_ranger
+		count = 1
+		mult = 1
+		trigger = ""
+		default_job = overlord_ranger
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = yes }
-		}
-		job_overlord_ranger_drone_add = 1
-	}
 
 	on_built = {
 		planet = {
@@ -2083,10 +1846,6 @@ holding_park_ranger_lodge = {			# Environmentalist
 				remove_deposit = d_nature_preserve_blocker
 			}
 		}
-	}
-
-	triggered_desc = {
-		text = job_overlord_ranger_effect_desc
 	}
 }
 
@@ -2111,11 +1870,7 @@ holding_toxic_bath = {					# Toxic bath - regular
 
 	potential = {
 		owner.overlord = { has_toxic_baths = yes }
-		owner = { is_gestalt = no}
-	}
-
-	destroy_trigger = {
-		owner.overlord = { has_toxic_baths = no }
+		owner = { is_gestalt = no }
 	}
 
 	triggered_planet_modifier = {
@@ -2126,19 +1881,21 @@ holding_toxic_bath = {					# Toxic bath - regular
 		monthly_loyalty = -0.5
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_gestalt = no }
-		}
-		job_overlord_bath_attendant_add = 2
-	}
-
-	triggered_desc = {
-		trigger = {
+	inline_script = {
+		script = jobs/tec_job
+		job = overlord_bath_attendant
+		count = 1
+		mult = 1
+		display = no_desc
+		trigger = "
 			exists = planet.owner
 			planet.owner = { is_gestalt = no }
-		}
+		"
+		default_job = overlord_bath_attendant
+	}
+
+
+	triggered_desc = {
 		text = job_overlord_toxic_baths_effect_desc
 	}
 }
@@ -2167,10 +1924,6 @@ holding_toxic_bath_hive = {				# Toxic bath - hive
 		owner = { has_authority = auth_hive_mind }
 	}
 
-	destroy_trigger = {
-		owner.overlord = { has_toxic_baths = no }
-	}
-
 	triggered_planet_modifier = {
 		potential = {
 			exists = planet.owner
@@ -2179,19 +1932,21 @@ holding_toxic_bath_hive = {				# Toxic bath - hive
 		monthly_loyalty = -0.5
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_authority = auth_hive_mind }
-		}
-		job_overlord_bath_attendant_hive_add = 2
+
+	inline_script = {
+		script = jobs/tec_job
+		job = overlord_bath_attendant_hive
+		count = 1
+		mult = 1
+		display = no_desc
+		trigger = "
+			exists = planet.owner
+			planet.owner = { is_hive_empire = yes }
+		"
+		default_job = overlord_bath_attendant_hive
 	}
 
 	triggered_desc = {
-		trigger = {
-			exists = planet.owner
-			planet.owner = { has_authority = auth_hive_mind }
-		}
 		text = job_overlord_toxic_baths_effect_hive_desc
 	}
 }
@@ -2220,10 +1975,6 @@ holding_toxic_bath_machine = {			# Toxic bath - machine
 		owner = { has_authority = auth_machine_intelligence }
 	}
 
-	destroy_trigger = {
-		owner.overlord = { has_toxic_baths = no }
-	}
-
 	triggered_planet_modifier = {
 		potential = {
 			exists = planet.owner
@@ -2232,19 +1983,20 @@ holding_toxic_bath_machine = {			# Toxic bath - machine
 		monthly_loyalty = -0.5
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_authority = auth_machine_intelligence }
-		}
-		job_overlord_bath_attendant_machine_add = 2
+	inline_script = {
+		script = jobs/tec_job
+		job = overlord_bath_attendant_machine
+		count = 1
+		mult = 1
+		display = no_desc
+		trigger = "
+			exists = planet.owner
+			planet.owner = { is_machine_empire = yes }
+		"
+		default_job = overlord_bath_attendant_machine
 	}
 
 	triggered_desc = {
-		trigger = {
-			exists = planet.owner
-			planet.owner = { has_authority = auth_machine_intelligence }
-		}
 		text = job_overlord_toxic_baths_effect_machine_desc
 	}
 }
@@ -2290,22 +2042,13 @@ holding_splinter_hive = {				#
 		monthly_loyalty = -2
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = no }
-		}
-		job_overlord_breeder_add = 1
-	}
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = yes }
-		}
-		job_overlord_breeder_drone_add = 1
-	}
-	triggered_desc = {
-		text = job_overlord_breeder_effect_desc
+	inline_script = {
+		script = jobs/tec_job_overlord
+		job = overlord_breeder
+		count = 1
+		mult = 1
+		trigger = ""
+		default_job = overlord_breeder
 	}
 
 	on_built = {
@@ -2348,8 +2091,13 @@ holding_distributed_processing = {		# Non Servitor Machine
 
 	potential = {
 		owner.overlord = {
-			is_machine_empire = yes
-			NOT = { has_civic = civic_machine_servitor }
+			OR = {
+				AND = {
+					is_machine_empire = yes
+					NOT = { has_civic = civic_machine_servitor }
+				}
+				has_valid_civic = civic_tec_hive_mindflayers
+			}
 		}
 		has_overlord_dlc = yes
 	}
@@ -2366,24 +2114,13 @@ holding_distributed_processing = {		# Non Servitor Machine
 		monthly_loyalty = -2
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = no }
-		}
-		job_mind_thrall_add = 4
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = yes }
-		}
-		job_mind_thrall_drone_add = 4
-	}
-
-	triggered_desc = {
-		text = job_mind_thrall_effect_desc
+	inline_script = {
+		script = jobs/tec_job_overlord
+		job = mind_thrall
+		count = 4
+		mult = 1
+		trigger = ""
+		default_job = mind_thrall
 	}
 }
 
@@ -2413,23 +2150,102 @@ holding_organic_sanctuary = {			# Servitors
 
 	triggered_planet_modifier = {
 		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = no }
+			OR = {
+				is_scope_valid = no
+				AND = {
+					exists = owner
+					owner = { is_gestalt = no }
+				}
+			}
 		}
-		job_overlord_bio_trophy_add = 5
 		monthly_loyalty = 0.5
 	}
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet.owner
-			planet.owner = { is_gestalt = yes }
-		}
-		job_overlord_bio_trophy_drone_add = 5
-	}
-	triggered_desc = {
-		text = job_overlord_bio_trophy_effect_desc
+
+	inline_script = {
+		script = jobs/tec_job_overlord
+		job = overlord_bio_trophy
+		count = 5
+		mult = 1
+		trigger = ""
+		default_job = overlord_bio_trophy
 	}
 }
 
 #holding_tec_machine_assimilators_conversor
 
+holding_tec_centrality_core_administration = {
+	base_buildtime = @b2_time
+	owner_type = subject_holding
+	icon = building_temple_of_prosperity
+	base_cap_amount = 1
+
+	category = government
+
+	resources = {
+		category = planet_holdings
+		inline_script = {
+			script = buildings/resources/tec_holding_building_resource_cost
+			tier = 1
+		}
+	}
+
+	potential = {
+		owner.overlord = {
+			has_active_tradition = tr_tec_centrality_final_3
+		}
+		owner = {
+			is_subject_with_preset = {
+				PRESET = preset_tec_satellite
+			}
+		}
+
+	}
+	allow = {
+		custom_tooltip = {
+			fail_text = is_capital
+			exists = planet
+			planet = {
+				is_capital = yes
+			}
+		}
+	}
+
+	inline_script = {
+		script = jobs/tec_politician
+		count = 2
+		mult = 1
+		trigger = ""
+		display = with_desc
+		default_job = politician
+	}
+
+	inline_script = {
+		script = jobs/tec_synapse
+		count = 4
+		mult = 1
+		trigger = ""
+		display = with_desc
+	}
+
+	inline_script = {
+		script = jobs/tec_coordinator
+		count = 4
+		mult = 1
+		trigger = ""
+		display = with_desc
+	}
+
+	triggered_planet_modifier = {
+		monthly_loyalty = -0.25
+	}
+
+	triggered_country_modifier = {
+		country_admin_cap_add = 2
+		mult = planet.owner.trigger:num_owned_planets
+	}
+
+	triggered_desc = {
+		text = holding_tec_centrality_core_administration_effect
+	}
+
+}

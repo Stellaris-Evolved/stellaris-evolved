@@ -106,21 +106,135 @@
 #-----------------------------------------------------
 # Psionic Ascension
 #-----------------------------------------------------
+# Recombination mechanic
+	decision_tec_genetic_recombination = {
+		resources = {
+			category = decisions
+			cost = {
+				unity = 200
+			}
+		}
+
+		potential = {
+			exists = owner
+			owner = {
+				has_country_flag = tec_unlocked_genetic_recombination
+			}
+		}
+		allow = {
+			custom_tooltip = {
+				fail_text = decision_tec_genetic_recombination_ongoing
+				owner = {
+					NOT = {
+						any_situation = {
+							is_situation_type = situation_tec_ascension_genetic_recombination
+						}
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = decision_tec_genetic_recombination_require_genetic_archives
+				OR = {
+					has_building = building_tec_regular_genetic_archive
+					has_building = building_tec_biohive_genetic_archive
+				}
+			}
+		}
+
+		effect = {
+			custom_tooltip = decision_tec_genetic_recombination_tooltip
+			hidden_effect = {
+				owner = {
+					country_event = {
+						id = tec_gene_path.500
+					}
+				}
+			}
+		}
+
+		ai_weight = {
+			base = 2000
+		}
+	}
+# /
+
+#-----------------------------------------------------
+# Psionic Ascension
+#-----------------------------------------------------
 # Psionic ascension mechanic
-decision_tec_psionic_ascension = {
-	resources = {
-		category = decisions
-		cost = {
-			energy = 2000
+	decision_tec_psionic_ascension = {
+		resources = {
+			category = decisions
+			cost = {
+				energy = 2000
+			}
+		}
+
+		potential = {
+			exists = owner
+			owner = {
+				has_ascension_perk = ap_tec_psionic_ascendance
+				has_country_flag = tec_psionics_t2_completed
+				NOT = {
+					any_situation = {
+						is_situation_type = situation_tec_psionic_planet_ascension
+						target = {
+							is_same_value = prevprevprev
+						}
+					}
+				}
+			}
+		}
+
+		allow = {
+			custom_tooltip = {
+				fail_text = decision_tec_require_psionic_species
+				this = {
+					any_owned_species = {
+						tec_is_any_psionic_species = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					exists = owner
+					owner = {
+						is_ai = yes
+					}
+				}
+				owner = {
+					has_monthly_income = {
+						resource = sr_zro
+						value >= 5
+					}
+				}
+			}
+		}
+
+
+		effect = {
+			custom_tooltip = decision_tec_psionic_ascension_effects
+			hidden_effect = {
+				owner = {
+					start_situation = {
+						type = situation_tec_psionic_planet_ascension
+						target = prev
+					}
+				}
+			}
+		}
+		ai_weight = {
+			base = 1000
 		}
 	}
 
-	potential = {
-		exists = owner
-		owner = {
-			has_ascension_perk = ap_tec_psionic_ascendance
-			has_country_flag = tec_psionics_t2_completed
-			NOT = {
+	decision_tec_psionic_ascension_cancel = {
+
+		potential = {
+			exists = owner
+			owner = {
+				has_ascension_perk = ap_tec_psionic_ascendance
+				has_country_flag = tec_psionics_t2_completed
 				any_situation = {
 					is_situation_type = situation_tec_psionic_planet_ascension
 					target = {
@@ -129,84 +243,26 @@ decision_tec_psionic_ascension = {
 				}
 			}
 		}
-	}
 
-	allow = {
-		custom_tooltip = {
-			fail_text = decision_tec_require_psionic_species
-			this = {
-				any_owned_species = {
-					tec_is_any_psionic_species = yes
+		allow = {
+			exists = owner
+			owner = { is_ai = no }
+		}
+
+		effect = {
+			custom_tooltip = decision_tec_psionic_ascension_cancel_effects
+			hidden_effect = {
+				every_targeting_situation = {
+					limit = {
+						is_situation_type = situation_tec_psionic_planet_ascension
+					}
+					destroy_situation = this
 				}
 			}
 		}
-		if = {
-			limit = {
-				exists = owner
-				owner = {
-					is_ai = yes
-				}
-			}
-			owner = {
-				has_monthly_income = {
-					resource = sr_zro
-					value >= 5
-				}
-			}
+
+		ai_weight = {
+			weight = 0
 		}
 	}
-
-
-	effect = {
-		custom_tooltip = decision_tec_psionic_ascension_effects
-		hidden_effect = {
-			owner = {
-				start_situation = {
-					type = situation_tec_psionic_planet_ascension
-					target = prev
-				}
-			}
-		}
-	}
-	ai_weight = {
-		base = 1000
-	}
-}
-
-decision_tec_psionic_ascension_cancel = {
-
-	potential = {
-		exists = owner
-		owner = {
-			has_ascension_perk = ap_tec_psionic_ascendance
-			has_country_flag = tec_psionics_t2_completed
-			any_situation = {
-				is_situation_type = situation_tec_psionic_planet_ascension
-				target = {
-					is_same_value = prevprevprev
-				}
-			}
-		}
-	}
-
-	allow = {
-		exists = owner
-		owner = { is_ai = no }
-	}
-
-	effect = {
-		custom_tooltip = decision_tec_psionic_ascension_cancel_effects
-		hidden_effect = {
-			every_targeting_situation = {
-				limit = {
-					is_situation_type = situation_tec_psionic_planet_ascension
-				}
-				destroy_situation = this
-			}
-		}
-	}
-
-	ai_weight = {
-		weight = 0
-	}
-}
+#/

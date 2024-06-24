@@ -41,7 +41,7 @@ namespace = tec_gene_path
 			save_event_target_as = tec_temp_country
 			event_target:tec_temp_country = {
 				start_situation = {
-					type = situation_tec_gene_path_t2
+					type = situation_tec_ascension_biological_genetics_t2
 					target = event_target:tec_temp_country.capital_scope
 					effect = {
 						save_event_target_as = new_situation
@@ -55,7 +55,7 @@ namespace = tec_gene_path
 			# Regular
 			option = {
 				name = "tec_gene_path.200.approach.slow.regular"
-				custom_tooltip = "tec_gene_path.approach.slow.regular.tooltip"
+				custom_tooltip = "tec_gene_path.200.approach.slow.regular.tooltip"
 				icon = {
 					icon = GFX_situation_approach_genetics
 					icon_background = GFX_situation_approach_bg_tec_orange
@@ -68,7 +68,7 @@ namespace = tec_gene_path
 				}
 				hidden_effect = {
 					event_target:new_situation = {
-						set_situation_approach = situation_approach_tec_gene_path_t2_slow
+						set_situation_approach = situation_tec_ascension_biological_genetics_t2_approach_slow
 						set_situation_locked = no
 					}
 				}
@@ -88,7 +88,7 @@ namespace = tec_gene_path
 				}
 				hidden_effect = {
 					event_target:new_situation = {
-						set_situation_approach = situation_approach_tec_gene_path_t2_standard
+						set_situation_approach = situation_tec_ascension_biological_genetics_t2_approach_standard
 						set_situation_locked = no
 					}
 				}
@@ -108,7 +108,7 @@ namespace = tec_gene_path
 				}
 				hidden_effect = {
 					event_target:new_situation = {
-						set_situation_approach = situation_approach_tec_gene_path_t2_fast
+						set_situation_approach = situation_tec_ascension_biological_genetics_t2_approach_fast
 						set_situation_locked = no
 					}
 				}
@@ -368,10 +368,6 @@ namespace = tec_gene_path
 					}
 				}
 			}
-			desc = {	# Fallback
-				text = "tec_gene_path.20030.desc.regular"
-				trigger = { always = yes }
-			}
 		# /
 		picture = GFX_evt_tec_orange_strings
 		#show_sound = event_evolution_mastery
@@ -617,7 +613,7 @@ namespace = tec_gene_path
 		id = tec_gene_path.20150
 		title = "tec_gene_path.20150.name"
 		# Descs
-			desc = {	# Fallback
+			desc = {
 				text = "tec_gene_path.20150.desc.hive"
 				trigger = { always = yes }
 			}
@@ -689,16 +685,16 @@ namespace = tec_gene_path
 		id = tec_gene_path.20151
 		title = "tec_gene_path.20151.name"
 		# Descs
-			desc = {	# Fallback
-				text = "tec_gene_path.20151.desc.hive.hivegenetics"
-				trigger = {
-					has_situation_flag = tec_gene_path_hivegenetics
-				}
-			}
-			desc = {	# Fallback
-				text = "tec_gene_path.20151.desc.hive.focusgenetics"
+			desc = {
+				text = "tec_gene_path.20151.desc.focusgenetics.hive"
 				trigger = {
 					has_situation_flag = tec_gene_path_focusgenetics
+				}
+			}
+			desc = {
+				text = "tec_gene_path.20151.desc.hivegenetics.hive"
+				trigger = {
+					has_situation_flag = tec_gene_path_hivegenetics
 				}
 			}
 		# /
@@ -766,12 +762,45 @@ namespace = tec_gene_path
 				OR = {
 					has_origin = origin_necrophage
 					has_civic = civic_tec_origin_elders
+					#has_origin = origin_clone_army
 				}
 			}
 		}
 
-		immediate = {
-			
+		immediate = {	# TODO ASCENSION
+			#if = {
+			#	limit = {
+			#		exists = owner
+			#		owner = {
+			#			has_origin = origin_necrophage
+			#		}
+			#	}
+			#	situation_event = {
+			#		id = tec_gene_path.20175
+			#	}
+			#}
+			#else_if = {
+			#	limit = {
+			#		exists = owner
+			#		owner = {
+			#			has_civic = civic_tec_origin_elders
+			#		}
+			#	}
+			#	situation_event = {
+			#		id = tec_gene_path.20275
+			#	}
+			#}
+			#else_if = {
+			#	limit = {
+			#		exists = owner
+			#		owner = {
+			#			has_origin = origin_clone_army
+			#		}
+			#	}
+			#	situation_event = {
+			#		id = tec_gene_path.20375
+			#	}
+			#}
 		}
 	}
 
@@ -976,7 +1005,7 @@ namespace = tec_gene_path
 	#	id = tec_gene_path.20375
 
 	# Genetic editing of the population - situation on_monthly and event
-	situation_event = { # TODO ASCENSION - Event to cyberize pops except Spiritualists
+	situation_event = { # TODO ASCENSION - Mirror cyberization
 		id = tec_gene_path.201
 		hide_window = yes
 		is_triggered_only = yes
@@ -996,8 +1025,191 @@ namespace = tec_gene_path
 	}
   # /
   # --------------- GENE T2 Finish
+	country_event = { # T2A Situation finished
+		id = tec_gene_path.205
+		title = "tec_gene_path.205.name"
+		# Descs
+			desc = {
+				text = "tec_gene_path.205.desc.regular"
+				trigger = {
+					is_gestalt = no
+				}
+			}
+			desc = {
+				text = "tec_gene_path.205.desc.hive"
+				trigger = {
+					is_hive_empire = yes
+				}
+			}
+		# /
+		picture = GFX_evt_tec_orange_strings
+		show_sound = event_evolution_mastery
+		trackable = yes
 
-	#tec_unlocked_genetic_recombination
+		is_triggered_only = yes
+
+		after = {
+			hidden_effect = {
+				# Announcement
+				if = {
+					limit = {	# Prevents FE and alike from triggering the announce
+						NOT = {
+							has_country_flag = tec_advanced_ascension
+						}
+					}
+					every_country = {
+						limit = {
+							is_ai = no
+							NOR = {
+								is_same_value = root
+								# TO DO policy for muting other empire things 
+								has_country_flag = tec_mute_empire_announces
+							}
+							has_communications = root
+							root = {
+								is_primitive = no
+							}
+						}
+						country_event = {
+							id = tec_gene_path.20501
+							days = 15
+						}
+					}
+				}
+			}
+		}
+
+		# Options
+			option = {
+				name = "tec_gene_path.205.ok.regular"
+				custom_tooltip = "tec_gene_path.205.ok.regular.tooltip"
+				hidden_effect = {
+					# Path finished
+					set_country_flag = tec_gene_path_finished
+					set_country_flag = tec_unlocked_genetic_recombination
+					# Ascension effect things
+					# On the situation
+					# Alter species
+						# Note: species_mod instead of species for changing your main species only
+					tec_create_genetic_perfection_species_effect = yes
+					# TO DO create specific leader ascension trait handler
+					every_owned_leader = {
+						add_leader_traits_after_modification = yes
+						remove_leader_traits_after_modification = yes
+					}
+					every_pool_leader = {
+						add_leader_traits_after_modification = yes
+						remove_leader_traits_after_modification = yes
+					}
+					# Flags
+					set_country_flag = tec_genetic_assimilation
+					fire_on_action = { on_action = tec_ascension_situation_finished }
+				}
+			}
+		# /
+	}
+	country_event = { # T2A Notification to other empires
+		id = tec_gene_path.20501
+		title = "tec_gene_path.20501.name"
+		# Descs
+			desc = {	# Regular
+				text = "tec_gene_path.20501.desc"
+				trigger = { always = yes }
+			}
+		# /
+		picture = GFX_evt_tec_orange_strings
+		#show_sound = event_engineered_evolution
+
+		is_triggered_only = yes
+		
+		# Options
+			option = {
+				name = "tec_gene_path.20501.interest"
+				trigger = {
+					is_homicidal = no
+					tec_is_genetic_ascension_hater = no
+				}
+			}
+			option = {
+				name = "tec_gene_path.20501.disdain"
+				trigger = {
+					is_homicidal = no
+					tec_is_genetic_ascension_rival = yes
+				}
+			}
+			option = {
+				name = "tec_gene_path.20501.hate"
+				trigger = {
+					is_homicidal = no
+					tec_is_genetic_ascension_hater = yes
+				}
+			}
+			option = {
+				name = "tec_gene_path.20501.same_path"
+				trigger = {
+					is_homicidal = no
+					has_ascension_perk = ap_tec_genetic_perfection
+				}
+			}
+
+			option = {
+				name = "tec_gene_path.20501.concern"
+				trigger = {
+					is_homicidal = no
+					tec_is_genetic_ascension_hater = no
+				}
+			}
+			option = {
+				name = "tec_gene_path.20501.machine"
+				trigger = {
+					is_homicidal = no
+					tec_is_genetic_ascension_hater = no
+					OR = {
+						is_machine_empire = yes
+						is_synthetic_empire = yes
+					}
+					NOR = {
+						has_ethic = ethic_gestalt_empathy
+						has_civic = civic_machine_assimilator
+						has_civic = civic_machine_servitor
+					}
+				}
+			}
+			option = {
+				name = "tec_gene_path.20501.assimilator"
+				trigger = {
+					is_homicidal = no
+					tec_is_genetic_ascension_hater = no
+					OR = {
+						has_authority = auth_tec_hive_cybernetic
+						has_civic = civic_machine_assimilator
+						has_civic = civic_machine_servitor
+					}
+				}
+			}
+			option = {
+				name = "tec_gene_path.20501.homicidal.regular"
+				trigger = {
+					is_gestalt = no
+					is_homicidal = yes
+				}
+			}
+			option = {
+				name = "tec_gene_path.20501.homicidal.hive"
+				trigger = {
+					is_hive_empire = yes
+					is_homicidal = yes
+				}
+			}
+			option = {
+				name = "tec_gene_path.20501.homicidal.machine"
+				trigger = {
+					is_machine_empire = yes
+					is_homicidal = yes
+				}
+			}
+		# /
+	}
   # /
  # /
  # Old events
@@ -1323,126 +1535,6 @@ namespace = tec_gene_path
 	#}
   # /
   # --------------- GENE T2 Finish
-	country_event = { # T2A Situation finished
-		id = tec_gene_path.205
-		title = "tec_gene_path.205.name"
-		# Descs
-			desc = {	# Regular
-				text = "tec_gene_path.205.desc"
-				trigger = { always = yes }
-			}
-		# /
-		picture = GFX_evt_tec_orange_strings
-		show_sound = event_evolution_mastery
-		trackable = yes
-
-		is_triggered_only = yes
-
-		after = {
-			hidden_effect = {
-				# Announcement
-				if = {
-					limit = {	# Prevents FE and alike from triggering the announce
-						NOT = {
-							has_country_flag = tec_advanced_ascension
-						}
-					}
-					every_country = {
-						limit = {
-							is_ai = no
-							NOR = {
-								is_same_value = root
-								# TO DO policy for muting other empire things 
-								has_country_flag = tec_mute_empire_announces
-							}
-							has_communications = root
-							root = {
-								is_primitive = no
-							}
-						}
-						country_event = {
-							id = tec_gene_path.20501
-							days = 15
-						}
-					}
-				}
-				add_modifier = {
-					modifier = modifier_tec_free_modification
-					days = -1
-				}
-			}
-		}
-
-		# Options
-			option = {
-				name = "tec_gene_path.205.a"
-				custom_tooltip = "tec_gene_path.205.a.tooltip"
-				hidden_effect = {
-					# Path finished
-					set_country_flag = tec_gene_path_finished
-					# Alter species
-						# Note: species_mod instead of species for changing your main species only
-					tec_create_genetic_perfection_species_effect = yes
-					# TO DO create specific leader ascension trait handler
-					every_owned_leader = {
-						add_leader_traits_after_modification = yes
-						remove_leader_traits_after_modification = yes
-					}
-					every_pool_leader = {
-						add_leader_traits_after_modification = yes
-						remove_leader_traits_after_modification = yes
-					}
-					# Flags
-					set_country_flag = tec_genetic_assimilation
-					fire_on_action = { on_action = tec_ascension_situation_finished }
-				}
-			}
-		# /
-	}
-	country_event = { # T2A Notification to other empires
-		id = tec_gene_path.20501
-		title = "tec_gene_path.20501.name"
-		# Descs
-			desc = {	# Regular
-				text = "tec_gene_path.20501.desc"
-				trigger = { always = yes }
-			}
-		# /
-		picture = GFX_evt_tec_orange_strings
-		#show_sound = event_engineered_evolution
-
-		is_triggered_only = yes
-
-		# Options
-			option = {
-				name = "tec_gene_path.20501.a"
-			}
-			option = {
-				name = "tec_gene_path.20501.b"
-			}
-			option = {
-				name = "tec_gene_path.20501.c"
-				trigger = {
-					is_machine_empire = yes
-					NOR = {
-						has_ethic = ethic_gestalt_empathy
-						has_civic = civic_machine_assimilator
-						has_civic = civic_machine_servitor
-					}
-				}
-			}
-			option = {
-				name = "tec_gene_path.20501.d"
-				trigger = {
-					OR = {
-						has_civic = civic_machine_assimilator
-						has_civic = civic_machine_servitor
-						has_ascension_perk = ap_tec_genetic_perfection
-					}
-				}
-			}
-		# /
-	}
   # /
  # /
 # /

@@ -37,6 +37,7 @@ district_rw_city = {	# Regular
 	base_buildtime = @rw_district_buildtime
 	is_capped_by_modifier = no
 	exempt_from_ai_planet_specialization = yes
+	ai_estimate_without_unemployment = yes
 
 	show_on_uncolonized = {
 		exists = from
@@ -131,6 +132,7 @@ district_rw_city = {	# Regular
 					has_deposit = d_tec_rw_minor_structural_damage
 				}
 			"
+			default_job = enforcer
 		}
 
 		inline_script = {
@@ -140,6 +142,7 @@ district_rw_city = {	# Regular
 			mult = 1
 			display = with_desc
 			trigger = ""
+			default_job = clerk
 		}
 
 		inline_script = {
@@ -179,6 +182,7 @@ district_rw_hive = {	# Hivemind
 	base_buildtime = @rw_district_buildtime
 	is_capped_by_modifier = no
 	exempt_from_ai_planet_specialization = yes
+	ai_estimate_without_unemployment = yes
 
 	show_on_uncolonized = {
 		exists = from
@@ -265,6 +269,7 @@ district_rw_hive = {	# Hivemind
 			mult = 1
 			display = with_desc
 			trigger = ""
+			default_job = maintenance_drone
 		}
 		inline_script = {
 			script = jobs/tec_maintenance_drone
@@ -297,6 +302,7 @@ district_rw_nexus = {	# Machine
 	base_buildtime = @rw_district_buildtime
 	is_capped_by_modifier = no
 	exempt_from_ai_planet_specialization = yes
+	ai_estimate_without_unemployment = yes
 
 	show_on_uncolonized = {
 		exists = from
@@ -388,6 +394,7 @@ district_rw_nexus = {	# Machine
 			mult = 1
 			display = with_desc
 			trigger = ""
+			default_job = maintenance_drone
 		}
 		inline_script = {
 			script = jobs/tec_maintenance_drone
@@ -419,8 +426,9 @@ district_rw_nexus = {	# Machine
 			mult = 1
 			display = with_desc
 			trigger = "
-				has_deposit = d_tec_rw_minor_structural_damage
+				NOT = { has_deposit = d_tec_rw_minor_structural_damage }
 			"
+			default_job = technician_drone
 		}
 
 		inline_script = {
@@ -434,8 +442,9 @@ district_rw_nexus = {	# Machine
 			mult = 1
 			display = no_desc
 			trigger = "
-				has_deposit = d_tec_rw_major_structural_damage
+				NOT = { has_deposit = d_tec_rw_major_structural_damage }
 			"
+			default_job = technician_drone
 		}
 	# /
 
@@ -602,11 +611,20 @@ district_rw_generator = {
 
 	# Modifiers
 		# Standard
-			planet_modifier = {
-				planet_housing_add = 15
+			triggered_planet_modifier = {
+				planet_housing_add = 1
+				mult = value:tec_ring_world_menial_base_housing|BASE|15|
 			}
 			inline_script = districts/effects/tec_ringworld_damaged_section_menial
 		# /
+		inline_script = {
+			script = districts/tec_rural_district_modifiers
+			type = generator
+			housing_scale = 5
+			amenities_scale = 1
+			building_slot_scale = 0
+			mult_value = tec_ring_world_menial_district_scale
+		}
 		# Planet
 		triggered_planet_modifier = {
 			potential = {
@@ -617,86 +635,34 @@ district_rw_generator = {
 			planets_energy_produces_mult = 0.05
 		}
 		# /
-		
+
 		# Improved Technician Empire Modifier
 		inline_script = districts/effects/tec_improved_technician_empire_bonus
 	# /
 	# Jobs
-		inline_script = {
-			script = jobs/tec_technician
-			regular_count = 15
-			regular_secondary_count = 10
-			hive_count = 20
-			hive_secondary_count = 15
-			machine_count = 15
-			machine_secondary_count = 10
-			mult = 1
-			display = with_desc
-			trigger = ""
-		}
-		inline_script = {
-			script = jobs/tec_technician
-			regular_count = -2
-			regular_secondary_count = -1
-			hive_count = -2
-			hive_secondary_count = -1
-			machine_count = -2
-			machine_secondary_count = -1
-			mult = 1
-			display = no_desc
-			trigger = "
-				has_deposit = d_tec_rw_minor_structural_damage
-			"
-		}
-
-		inline_script = {
-			script = jobs/tec_technician
-			regular_count = -3
-			regular_secondary_count = -1
-			hive_count = -8
-			hive_secondary_count = -6
-			machine_count = -3
-			machine_secondary_count = -1
-			mult = 1
-			display = no_desc
-			trigger = "
-				has_deposit = d_tec_rw_major_structural_damage 
-			"
-		}
-
-		inline_script = {
-			script = jobs/tec_technician_secondary
-			regular_count = 5
-			hive_count = 5
-			machine_count = 5
-			mult = 1
-			display = with_desc
-			trigger = ""
-		}
-
-		inline_script = {
-			script = jobs/tec_technician_secondary
-			regular_count = -1
-			hive_count = -1
-			machine_count = -1
-			mult = 1
-			display = no_desc
-			trigger = "
-				has_deposit = d_tec_rw_minor_structural_damage
-			"
-		}
-
-		inline_script = {
-			script = jobs/tec_technician_secondary
-			regular_count = -2
-			hive_count = -2
-			machine_count = -2
-			mult = 1
-			display = no_desc
-			trigger = "
-				has_deposit = d_tec_rw_major_structural_damage 
-			"
-		}
+	inline_script = {
+		script = jobs/tec_technician
+		regular_count = 1
+		regular_secondary_count = 1
+		hive_count = 1
+		hive_secondary_count = 1
+		machine_count = 1
+		machine_secondary_count = 1
+		mult = value:tec_rural_jobs|BASE|15|TYPE|generator|MULT_VALUE|tec_ring_world_menial_district_scale|SCALE|5|
+		secondary_mult = value:tec_rural_jobs|BASE|15|TYPE|generator|MULT_VALUE|tec_ring_world_menial_district_scale|SCALE|5|MULT|0.67|
+		display = with_desc
+		trigger = ""
+		default_job = technician
+	}
+	inline_script = {
+		script = jobs/tec_technician_secondary
+		regular_count = 1
+		hive_count = 1
+		machine_count = 1
+		mult = value:tec_rural_jobs|BASE|15|TYPE|generator|MULT_VALUE|tec_ring_world_menial_district_scale|SCALE|5|MULT|0.34|
+		display = with_desc
+		trigger = ""
+	}
 	# /
 
 	# Starnet
@@ -762,11 +728,20 @@ district_rw_farming = {
 
 	# Modifiers
 		# Standard
-			planet_modifier = {
-				planet_housing_add = 15
+			triggered_planet_modifier = {
+				planet_housing_add = 1
+				mult = value:tec_ring_world_menial_base_housing|BASE|15|
 			}
 			inline_script = districts/effects/tec_ringworld_damaged_section_menial
 		# /
+		inline_script = {
+			script = districts/tec_rural_district_modifiers
+			type = farming
+			housing_scale = 5
+			amenities_scale = 1
+			building_slot_scale = 0
+			mult_value = tec_ring_world_menial_district_scale
+		}
 		# Planet
 			triggered_planet_modifier = {
 				potential = {
@@ -781,78 +756,31 @@ district_rw_farming = {
 		# Improved Farming Empire Modifier
 		inline_script = districts/effects/tec_improved_farming_empire_bonus
 	# /
+
 	
 	# Jobs
 		inline_script = {
 			script = jobs/tec_farmer
-			regular_count = 15
-			regular_secondary_count = 10
-			hive_count = 20
-			hive_secondary_count = 15
-			machine_count = 15
-			machine_secondary_count = 10
-			mult = 1
+			regular_count = 1
+			regular_secondary_count = 1
+			hive_count = 1
+			hive_secondary_count = 1
+			machine_count = 1
+			machine_secondary_count = 1
+			mult = value:tec_rural_jobs|BASE|15|TYPE|farming|MULT_VALUE|tec_ring_world_menial_district_scale|SCALE|5|
+			secondary_mult = value:tec_rural_jobs|BASE|15|TYPE|farming|MULT_VALUE|tec_ring_world_menial_district_scale|SCALE|5|MULT|0.67|
 			display = with_desc
 			trigger = ""
-		}
-		inline_script = {
-			script = jobs/tec_farmer
-			regular_count = -2
-			regular_secondary_count = -1
-			hive_count = -2
-			hive_secondary_count = -1
-			machine_count = -2
-			machine_secondary_count = -1
-			mult = 1
-			display = no_desc
-			trigger = "
-				has_deposit = d_tec_rw_minor_structural_damage
-			"
-		}
-		inline_script = {
-			script = jobs/tec_farmer
-			regular_count = -3
-			regular_secondary_count = -1
-			hive_count = -8 # include hive extra jobs
-			hive_secondary_count = -6 # include hive extra jobs
-			machine_count = -3
-			machine_secondary_count = -1
-			mult = 1
-			display = no_desc
-			trigger = "
-				has_deposit = d_tec_rw_minor_structural_damage
-			"
+			default_job = farmer
 		}
 		inline_script = {
 			script = jobs/tec_farmer_secondary
-			regular_count = 5
-			hive_count = 5
-			machine_count = 5
-			mult = 1
+			regular_count = 1
+			hive_count = 1
+			machine_count = 1
+			mult = value:tec_rural_jobs|BASE|15|TYPE|farming|MULT_VALUE|tec_ring_world_menial_district_scale|SCALE|5|MULT|0.34|
 			display = with_desc
 			trigger = ""
-		}
-		inline_script = {
-			script = jobs/tec_farmer_secondary
-			regular_count = -1
-			hive_count = -1
-			machine_count = -1
-			mult = 1
-			display = no_desc
-			trigger = "
-				has_deposit = d_tec_rw_minor_structural_damage
-			"
-		}
-		inline_script = {
-			script = jobs/tec_farmer_secondary
-			regular_count = -2
-			hive_count = -2
-			machine_count = -2
-			mult = 1
-			display = no_desc
-			trigger = "
-				has_deposit = d_tec_rw_minor_structural_damage
-			"
 		}
 	# /
 

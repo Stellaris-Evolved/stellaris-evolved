@@ -42,6 +42,7 @@ district_crashed_slaver_ship = {
 	is_capped_by_modifier = yes
 	can_demolish = no
 	exempt_from_ai_planet_specialization = yes
+	ai_estimate_without_unemployment = yes
 
 	show_on_uncolonized = {
 		always = no
@@ -106,6 +107,7 @@ district_crashed_slaver_ship = {
 						NOT = { has_country_flag = origin_broken_shackles_crashed_slaver_ship_depleted }
 					}
 				"
+				default_job = broken_shackles_scavenger
 			}
 			inline_script = {
 				script = jobs/tec_clerk
@@ -133,6 +135,7 @@ district_resort = {
 	base_buildtime = 480
 	is_capped_by_modifier = no
 	exempt_from_ai_planet_specialization = yes
+	ai_estimate_without_unemployment = yes
 
 	show_on_uncolonized = {
 		exists = from
@@ -210,6 +213,7 @@ district_resort = {
 				is_regular_empire = yes
 			}
 		"
+		default_job = resort_worker
 	}
 	inline_script = {
 		script = jobs/tec_entertainer
@@ -229,6 +233,7 @@ district_city = {
 	base_buildtime = 480
 	is_capped_by_modifier = no
 	exempt_from_ai_planet_specialization = yes
+	ai_estimate_without_unemployment = yes
 	
 	show_on_uncolonized = {
 		exists = from
@@ -325,6 +330,7 @@ district_city = {
 				mult = 1
 				display = with_desc
 				trigger = ""
+				default_job = clerk
 			}
 		# /
 	# /
@@ -341,6 +347,7 @@ district_hive = {
 	base_buildtime = 480
 	is_capped_by_modifier = no
 	exempt_from_ai_planet_specialization = yes
+	ai_estimate_without_unemployment = yes
 	
 	show_on_uncolonized = {
 		exists = from
@@ -399,20 +406,13 @@ district_hive = {
 	# /
 
 	# Modifiers
-		planet_modifier = {
+		triggered_planet_modifier = {
 			planet_housing_add = 6
+			mult = value:tec_regular_planet_district_scale
+		}
+		triggered_planet_modifier = {
 			planet_max_buildings_add = 1
 		}
-		# Planet
-			triggered_planet_modifier = {
-				potential = {
-					tec_is_hive_world = yes
-				}
-				modifier = {
-					planet_housing_add = 6
-				}
-			}
-		# /
 	# /
 	# Effect Types
 		inline_script = {
@@ -433,18 +433,10 @@ district_hive = {
 		inline_script = {
 			script = jobs/tec_maintenance_drone
 			count = 3
-			mult = 1
+			mult = value:tec_regular_planet_district_scale
 			display = with_desc
 			trigger = ""
-		}
-		inline_script = {
-			script = jobs/tec_maintenance_drone
-			count = 3
-			mult = 1
-			display = no_desc
-			trigger = "
-				tec_is_hive_world = yes
-			"
+			default_job = maintenance_drone
 		}
 	# /
 
@@ -460,6 +452,7 @@ district_nexus = {
 	base_buildtime = 480
 	is_capped_by_modifier = no
 	exempt_from_ai_planet_specialization = yes
+	ai_estimate_without_unemployment = yes
 	
 	show_on_uncolonized = {
 		exists = from
@@ -516,8 +509,11 @@ district_nexus = {
 	# /
 	
 	# Modifiers
-		planet_modifier = {
+		triggered_planet_modifier = {
 			planet_housing_add = 5
+			mult = value:tec_regular_planet_district_scale
+		}
+		triggered_planet_modifier = {
 			planet_max_buildings_add = 1
 		}
 	# /
@@ -543,6 +539,23 @@ district_nexus = {
 			mult = 1
 			display = with_desc
 			trigger = ""
+			default_job = maintenance_drone
+		}
+
+		inline_script = {
+			script = jobs/tec_job
+			job = tec_spareparts_drone
+			count = 1
+			mult = 1
+			display = with_desc
+			trigger = "
+				uses_district_set = machine_world
+				exists = owner
+				owner = {
+					is_machine_empire = yes
+					has_ascension_perk = ap_machine_worlds
+				}
+			"
 		}
 	# /
 
@@ -609,8 +622,13 @@ district_industrial = {
 		}
 	# /
 
-	# Traditions
-		inline_script = districts/effects/tec_artifice_final_1
+	inline_script = {
+		script = districts/tec_industrial_district_modifiers
+		housing_scale = 1
+		building_slot_scale = 1
+		amenities_scale = 1
+	}
+
 	# /
 	# Civics
 		inline_script = districts/effects/tec_unleashed_industrialization
@@ -622,9 +640,10 @@ district_industrial = {
 	inline_script = {
 		script = jobs/tec_foundry
 		count = 2
-		mult = value:tec_machine_world_scaling
+		mult = value:tec_regular_planet_district_scale
 		trigger = ""
 		display = with_desc
+		default_job = foundry
 
 	}
 }
@@ -685,8 +704,12 @@ district_tec_factory = {
 	}
 	# /
 
-	# Traditions
-	inline_script = districts/effects/tec_artifice_final_1
+	inline_script = {
+		script = districts/tec_industrial_district_modifiers
+		housing_scale = 1
+		building_slot_scale = 1
+		amenities_scale = 1
+	}
 	# /
 	# Civics
 	inline_script = districts/effects/tec_unleashed_industrialization
@@ -698,9 +721,10 @@ district_tec_factory = {
 	inline_script = {
 		script = jobs/tec_artisan
 		count = 2
-		mult = value:tec_machine_world_scaling
+		mult = value:tec_regular_planet_district_scale
 		trigger = ""
 		display = with_desc
+		default_job = artisan
 
 	}
 }
@@ -770,6 +794,7 @@ district_srw_commercial = {
 			mult = 1
 			display = with_desc
 			trigger = ""
+			default_job = trader
 		}
 
 		inline_script = {
@@ -782,6 +807,7 @@ district_srw_commercial = {
 					is_regular_empire = yes
 				}
 			"
+			default_job = artisan
 		}
 
 		# Machine gestalt
@@ -817,7 +843,7 @@ district_machine_coordination = {
 			is_machine_empire = yes
 			NOT = { has_valid_civic = civic_machine_servitor }
 		}
-		is_planet_class = pc_machine
+		uses_district_set = machine_world
 	}
 
 	potential = {
@@ -826,7 +852,7 @@ district_machine_coordination = {
 			is_machine_empire = yes
 			NOT = { has_valid_civic = civic_machine_servitor }
 		}
-		is_planet_class = pc_machine
+		uses_district_set = machine_world
 	}
 
 	allow = {
@@ -853,22 +879,23 @@ district_machine_coordination = {
 
 	triggered_planet_modifier = {
 		planet_housing_add = 2
-		mult = value:tec_machine_world_scaling
+		mult = value:tec_regular_planet_district_scale
 	}
 
 	inline_script = {
 		script = districts/type/tec_unity
 		scale = 1
 		secondary_scale = 1
-		mult = value:tec_machine_world_scaling
+		mult = value:tec_regular_planet_district_scale
 		trigger = ""
 	}
 
 	inline_script = {
-		script = jobs/tec_coordinator
+		script = jobs/tec_synapse
 		count = 2
-		mult = value:tec_machine_world_scaling
+		mult = value:tec_regular_planet_district_scale
 		trigger = ""
 		display = with_desc
+		default_job = tec_resonance_drone
 	}
 }

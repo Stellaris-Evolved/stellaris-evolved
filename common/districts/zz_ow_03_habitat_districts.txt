@@ -35,6 +35,7 @@ district_hab_housing = {
 	base_buildtime = @hab_time
 	is_capped_by_modifier = no
 	exempt_from_ai_planet_specialization = yes
+	ai_estimate_without_unemployment = yes
 
 	show_on_uncolonized = {
 		NOR = {
@@ -134,16 +135,17 @@ district_hab_housing = {
 				script = jobs/tec_clerk
 				count = 1
 				secondary_count = 1
-				mult = owner.value:hab_void_dweller_jobs
+				mult = value:tec_hab_void_dweller_jobs|BASE|2|
 				display = with_desc
 				trigger = ""
+				default_job = clerk
 			}
 		# /
 		# Gestalt
 			inline_script = {
 				script = jobs/tec_maintenance_drone
 				count = 1
-				mult = owner.value:hab_void_dweller_jobs
+				mult = value:tec_hab_void_dweller_jobs|BASE|2|
 				display = with_desc
 				trigger = ""
 			}
@@ -217,18 +219,17 @@ district_hab_industrial = {
 			planet_max_buildings_add = 0.25
 		}
 		triggered_planet_modifier = {
-			potential = {
-				exists = owner
-				owner = {
-					is_void_dweller_empire = yes
-				}
-			}
 			planet_housing_add = 1
+			mult = modifier:habitat_districts_housing_add
 		}
 	# /
 
-	# Traditions
-		inline_script = districts/effects/tec_artifice_final_1
+	inline_script = {
+		script = districts/tec_industrial_district_modifiers
+		housing_scale = 1
+		building_slot_scale = 1
+		amenities_scale = 1
+	}
 	# /
 	# Civics
 		inline_script = districts/effects/tec_unleashed_industrialization
@@ -241,9 +242,10 @@ district_hab_industrial = {
 	inline_script = {
 		script = jobs/tec_foundry
 		count = 1
-		mult = owner.value:hab_void_dweller_jobs
+		mult = value:tec_hab_void_dweller_jobs|BASE|2|INDUSTRIAL|yes|
 		trigger = ""
 		display = with_desc
+		default_job = foundry
 	}
 
 	inline_script = districts/tec_aibait_habitat_district
@@ -315,18 +317,16 @@ district_tec_hab_factory = {
 			planet_max_buildings_add = 0.25
 		}
 		triggered_planet_modifier = {
-			potential = {
-				exists = owner
-				owner = {
-					is_void_dweller_empire = yes
-				}
-			}
 			planet_housing_add = 1
+			mult = modifier:habitat_districts_housing_add
 		}
 	# /
-
-	# Traditions
-		inline_script = districts/effects/tec_artifice_final_1
+	inline_script = {
+		script = districts/tec_industrial_district_modifiers
+		housing_scale = 1
+		building_slot_scale = 1
+		amenities_scale = 1
+	}
 	# /
 	# Civics
 		inline_script = districts/effects/tec_unleashed_industrialization
@@ -339,9 +339,10 @@ district_tec_hab_factory = {
 	inline_script = {
 		script = jobs/tec_artisan
 		count = 1
-		mult = owner.value:hab_void_dweller_jobs
+		mult = value:tec_hab_void_dweller_jobs|BASE|2|INDUSTRIAL|yes|
 		trigger = ""
 		display = with_desc
+		default_job = artisan
 	}
 
 	inline_script = districts/tec_aibait_habitat_district
@@ -409,27 +410,18 @@ district_tec_hab_logistic = {
 			planet_max_buildings_add = 0.25
 		}
 		triggered_planet_modifier = {
-			potential = {
-				exists = owner
-				owner = {
-					is_void_dweller_empire = yes
-				}
-			}
 			planet_housing_add = 1
+			mult = modifier:habitat_districts_housing_add
 		}
 	# /
-
-	# Traditions
-		inline_script = districts/effects/tec_artifice_final_1
-	# /
-
 	# Note: 2 jobs, vd gets 3
 	inline_script = {
 		script = jobs/tec_megastructure_logistician
 		count = 1
-		mult = owner.value:hab_void_dweller_jobs
+		mult = value:tec_hab_void_dweller_jobs|BASE|2|
 		trigger = ""
 		display = with_desc
+		default_job = tec_megastructure_logistician
 	}
 	inline_script = {	# 2 extra for arcology
 		script = jobs/tec_megastructure_logistician
@@ -531,6 +523,7 @@ district_hab_energy = {
 		inline_script = {
 			script = districts/tec_habitat_scaling_district
 			district = district_hab_energy
+			type = generator
 		}
 
 		# Improved Technician Empire Modifier
@@ -546,52 +539,21 @@ district_hab_energy = {
 			hive_secondary_count = 1
 			machine_count = 1
 			machine_secondary_count = 1
-			mult = owner.value:hab_void_dweller_jobs
+			mult = value:tec_hab_void_dweller_jobs|BASE|2|TYPE|generator|
+			secondary_mult = value:tec_hab_void_dweller_jobs|BASE|2|TYPE|generator|MULT|0.67|
 			display = with_desc
-			trigger = "
-				always = yes
-			"
+			trigger = ""
+			default_job = technician
 		}
-		inline_script = {
-			script = jobs/tec_technician
-			regular_count = 1
-			regular_secondary_count = 0
-			hive_count = 1
-			hive_secondary_count = 1
-			machine_count = 1
-			machine_secondary_count = 0
-			mult = 1
-			display = no_desc
-			trigger = "
-				tec_is_fully_upgraded_habitat = yes
-			"
-		}
+
 		inline_script = {
 			script = jobs/tec_technician_secondary
 			regular_count = 1
 			hive_count = 1
 			machine_count = 1
-			mult = 1
+			mult = value:tec_hab_void_dweller_jobs|BASE|2|TYPE|generator|MULT|0.34|
 			display = with_desc
-			trigger = "
-				tec_is_fully_upgraded_habitat = yes
-			"
-		}
-		# Hive extra job
-		inline_script = {
-			script = jobs/tec_technician
-			regular_count = 0
-			regular_secondary_count = 0
-			hive_count = 1
-			hive_secondary_count = 0
-			machine_count = 0
-			machine_secondary_count = 0
-			mult = 1
-			display = no_desc
-			trigger = "
-				exists = owner
-				owner = { is_hive_empire = yes }
-			"
+			trigger = ""
 		}
 	# /		
 
@@ -670,6 +632,7 @@ district_hab_mining = {
 		inline_script = {
 			script = districts/tec_habitat_scaling_district
 			district = district_hab_mining
+			type = mining
 		}
 
 		# Improved Mining Empire Modifier
@@ -685,52 +648,21 @@ district_hab_mining = {
 			hive_secondary_count = 1
 			machine_count = 1
 			machine_secondary_count = 1
-			mult = owner.value:hab_void_dweller_jobs
+			mult = value:tec_hab_void_dweller_jobs|BASE|2|TYPE|mining|
+			secondary_mult = value:tec_hab_void_dweller_jobs|BASE|2|TYPE|mining|MULT|0.67|
 			display = with_desc
-			trigger = "
-				always = yes
-			"
+			trigger = ""
+			default_job = miner
 		}
-		inline_script = {
-			script = jobs/tec_miner
-			regular_count = 1
-			regular_secondary_count = 0
-			hive_count = 1
-			hive_secondary_count = 1
-			machine_count = 1
-			machine_secondary_count = 0
-			mult = 1
-			display = no_desc
-			trigger = "
-				tec_is_fully_upgraded_habitat = yes
-			"
-		}
+
 		inline_script = {
 			script = jobs/tec_miner_secondary
 			regular_count = 1
 			hive_count = 1
 			machine_count = 1
-			mult = 1
+			mult = value:tec_hab_void_dweller_jobs|BASE|2|TYPE|mining|MULT|0.34|
 			display = with_desc
-			trigger = "
-				tec_is_fully_upgraded_habitat = yes
-			"
-		}
-		# Hive extra job
-		inline_script = {
-			script = jobs/tec_miner
-			regular_count = 0
-			regular_secondary_count = 0
-			hive_count = 1
-			hive_secondary_count = 0
-			machine_count = 0
-			machine_secondary_count = 0
-			mult = 1
-			display = no_desc
-			trigger = "
-				exists = owner
-				owner = { is_hive_empire = yes }
-			"
+			trigger = ""
 		}
 	# /
 
@@ -822,6 +754,7 @@ district_tec_hab_food = {		# Evolved
 		inline_script = {
 			script = districts/tec_habitat_scaling_district
 			district = district_tec_hab_food
+			type = farming
 		}
 
 		# Improved Farming Empire Modifier
@@ -837,52 +770,21 @@ district_tec_hab_food = {		# Evolved
 			hive_secondary_count = 1
 			machine_count = 1
 			machine_secondary_count = 1
-			mult = owner.value:hab_void_dweller_jobs
+			mult = value:tec_hab_void_dweller_jobs|BASE|2|TYPE|farming|
+			secondary_mult = value:tec_hab_void_dweller_jobs|BASE|2|TYPE|farming|MULT|0.67|
 			display = with_desc
-			trigger = "
-				always = yes
-			"
+			trigger = ""
+			default_job = farmer
 		}
-		inline_script = {
-			script = jobs/tec_farmer
-			regular_count = 1
-			regular_secondary_count = 0
-			hive_count = 1
-			hive_secondary_count = 1
-			machine_count = 1
-			machine_secondary_count = 0
-			mult = 1
-			display = no_desc
-			trigger = "
-				tec_is_fully_upgraded_habitat = yes
-			"
-		}
+
 		inline_script = {
 			script = jobs/tec_farmer_secondary
 			regular_count = 1
 			hive_count = 1
 			machine_count = 1
-			mult = 1
+			mult = value:tec_hab_void_dweller_jobs|BASE|2|TYPE|farming|MULT|0.34|
 			display = with_desc
-			trigger = "
-				tec_is_fully_upgraded_habitat = yes
-			"
-		}
-		# Hive extra job
-		inline_script = {
-			script = jobs/tec_farmer
-			regular_count = 0
-			regular_secondary_count = 0
-			hive_count = 1
-			hive_secondary_count = 0
-			machine_count = 0
-			machine_secondary_count = 0
-			mult = 1
-			display = no_desc
-			trigger = "
-				exists = owner
-				owner = { is_hive_empire = yes }
-			"
+			trigger = ""
 		}
 	# /
 
@@ -964,6 +866,7 @@ district_hab_science = {
 		inline_script = {
 			script = districts/tec_habitat_scaling_district
 			district = district_hab_science
+			type = no
 		}
 	# /
 
@@ -984,6 +887,7 @@ district_hab_science = {
 			mult = 1
 			display = with_desc
 			trigger = ""
+			default_job = researcher
 		}
 
 		inline_script = {
@@ -994,6 +898,7 @@ district_hab_science = {
 			trigger = "
 				tec_is_upgraded_habitat = yes
 			"
+			default_job = researcher
 		}
 		inline_script = {
 			script = jobs/tec_researcher
@@ -1003,6 +908,7 @@ district_hab_science = {
 			trigger = "
 				tec_is_fully_upgraded_habitat = yes
 			"
+			default_job = researcher
 		}
 	# /
 
@@ -1241,6 +1147,7 @@ district_hab_commercial = {
 		inline_script = {
 			script = districts/tec_habitat_scaling_district
 			district = district_hab_commercial
+			type = no
 		}
 	# /
 	# Effect Types
@@ -1275,6 +1182,7 @@ district_hab_commercial = {
 						is_gestalt = no
 					}
 				"
+				default_job = clerk
 			}
 			inline_script = {
 				script = jobs/tec_clerk
@@ -1288,6 +1196,7 @@ district_hab_commercial = {
 					}
 					tec_is_fully_upgraded_habitat = yes
 				"
+				default_job = clerk
 			}
 			inline_script = {
 				script = jobs/tec_trader
@@ -1295,6 +1204,7 @@ district_hab_commercial = {
 				mult = 1
 				display = with_desc
 				trigger = ""
+				default_job = trader
 			}
 		# /
 
@@ -1415,6 +1325,7 @@ district_tec_hab_unity = {	# Evolved
 		inline_script = {
 			script = districts/tec_habitat_scaling_district
 			district = district_tec_hab_unity
+			type = no
 		}
 	# /
 
@@ -1436,6 +1347,7 @@ district_tec_hab_unity = {	# Evolved
 			mult = 1
 			display = with_desc
 			trigger = ""
+			default_job = bureaucrat
 		}
 
 		inline_script = {
@@ -1446,6 +1358,7 @@ district_tec_hab_unity = {	# Evolved
 			trigger = "
 				tec_is_upgraded_habitat = yes
 			"
+			default_job = bureaucrat
 		}
 		inline_script = {
 			script = jobs/tec_bureaucrat
@@ -1455,6 +1368,7 @@ district_tec_hab_unity = {	# Evolved
 			trigger = "
 				tec_is_fully_upgraded_habitat = yes
 			"
+			default_job = bureaucrat
 		}
 	 # /
 	 # Hive
@@ -1563,6 +1477,7 @@ district_tec_hab_military = {	# Evolved
 		inline_script = {
 			script = districts/tec_habitat_scaling_district
 			district = district_tec_hab_unity
+			type = no
 		}
 	# /
 
@@ -1573,6 +1488,7 @@ district_tec_hab_military = {	# Evolved
 			mult = 1
 			display = with_desc
 			trigger = ""
+			default_job = soldier
 		}
 
 		inline_script = {
@@ -1589,6 +1505,7 @@ district_tec_hab_military = {	# Evolved
 			mult = 1
 			display = no_desc
 			trigger = "tec_is_upgraded_habitat = yes"
+			default_job = soldier
 		}
 	
 		inline_script = {
@@ -1605,6 +1522,7 @@ district_tec_hab_military = {	# Evolved
 			mult = 1
 			display = with_desc
 			trigger = "tec_is_fully_upgraded_habitat = yes"
+			default_job = tec_naval_operator
 		}
 	# /
 
@@ -1695,12 +1613,14 @@ district_hab_cultural = {
 		inline_script = {
 			script = modifiers/tec_amenities
 			count = 1
+			mult = 1
 			trigger = "
 				owner = {
 					is_gestalt = no
 					tec_is_dystopian_empire = yes
 				}
 			"
+			default = no
 		}
 		inline_script = {
 			script = jobs/tec_enforcer
@@ -1726,6 +1646,7 @@ district_hab_cultural = {
 					tec_is_dystopian_empire = no
 				}
 			"
+			default_job = entertainer
 		}
 
 		inline_script = {
