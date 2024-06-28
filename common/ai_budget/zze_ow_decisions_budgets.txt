@@ -160,32 +160,27 @@ alloys_expenditure_starbases = {
 	weight = {
 		weight = 0.4
 
-		# spend more on starbase upgrades if at fleet cap
+		# spend more on starbase upgrades if near fleet cap
 		modifier = {
 			factor = 2
-			used_naval_capacity_percent >= 1.0
+			used_naval_capacity_percent >= 0.9
 		}
 
-		# Reduce spending on claiming new systems if we have unclaimed planets
+		#Updated to grant some leeway to colony ships, since both this, planets, and colony ships use min now.
+		#Starbases aren't as important as colonization and planets when we have little alloys
 		modifier = {
-			is_machine_empire = yes
-			has_country_resource = { type = alloys amount < 450 }
-			factor = 0.25 # more aggresive saving for robots since their colony ships cost more
-			ai_colonize_plans > 0
-		}
-		# Reduce spending on claiming new systems if we have unclaimed planets
-		modifier = {
-			is_machine_empire = no
-			has_country_resource = { type = alloys amount < 250 }
-			factor = 0.50
+			has_country_resource = { type = alloys amount < 1000 }
+			factor = 0.05 # more aggresive saving for robots since their colony ships cost more
 			ai_colonize_plans > 0
 		}
 
 		modifier = {
 			factor = 1.5
-			used_starbase_capacity_percent < 1
-			any_owned_starbase = {
-				can_be_upgraded = yes
+			OR = {
+				used_starbase_capacity_percent < 1
+				any_owned_starbase = {
+					can_be_upgraded = yes
+				}
 			}
 		}
 		modifier = {
@@ -201,13 +196,19 @@ alloys_expenditure_starbases = {
 			}
 		}
 	}
-	desired_max = {	# TODO MACHINE AGE UPDATE - prev was base was 12000 check AI
-		base = 500
+	#For some reason vanilla has a max here? So I changed it to min and made a condition to allocate a minimum amount starting from a certain amont of alloys
+	#That amount should be above cosmo/planet and colony ships alloy mins granted to budgets ideally
+	desired_min = {
+		base = 0
 		modifier = {
-			add = 5000
-			has_ascension_perk = ap_cosmogenesis
+			add = 500
+			has_country_resource = { type = alloys amount > 1000 }
 		}
 	}
+	#Commented out for compat just in case (ie NSC)
+	#desired_max = {
+	#	base = 7500
+	#}
 }
 
 
