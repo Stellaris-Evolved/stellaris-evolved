@@ -575,9 +575,9 @@ def generate_tags(config: str, local_config: str, base_mod_path: str):
         for economic_category, (economic_category_loc, template_key, *args) in cfg['languages']['english']['economic_categories'].items():
             f.write(textwrap.dedent(f"""\
                 tec_economic_category_{economic_category}_tag = {{
-                    icon = mod_planet_building_build_speed_mult
+                    icon = mod_tec_blank
                     neutral = yes
-                    category = pop
+                    category = planet
                     percentage = no
                     localize_with_value_key = yes
                 }}
