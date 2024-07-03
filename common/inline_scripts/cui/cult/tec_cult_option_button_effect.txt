@@ -2,12 +2,50 @@
 
 inline_script = {
     script = tec_type_hint
+    tec_cult = $name$
     country_trigger_block = "$potential$"
     country_trigger_block = "$allow$"
-    country_effect_block = "$on_activate$"
-    country_effect_block = "$on_deactivate$"
 }
 
+tec_cui_cult_$name$_background_effect = {
+    potential = {
+        from = {
+            $potential$
+        }
+    }
+
+    allow = {
+        if = {
+            limit = {
+                from = {
+                    tec_has_cult = {
+                        cult = $name$
+                    }
+                }
+            }
+            always = yes
+        } else = {
+            from = {
+                tec_has_cult_points_available = yes
+                $allow$
+            }
+        }
+    }
+}
+
+tec_cui_cult_$name$_glow_effect = {
+    potential = {
+        from = {
+            tec_has_cult = {
+                cult = $name$
+            }
+        }
+    }
+
+    allow = {
+        always = yes
+    }
+}
 
 tec_cui_cult_$name$_button_effect = {
     potential = {
@@ -17,37 +55,50 @@ tec_cui_cult_$name$_button_effect = {
     }
 
     allow = {
-        from = {
-            $allow$
+        custom_tooltip = tec_cult_$name$_header
+        custom_tooltip = tec_cult_$name$_desc
+        custom_tooltip = tec_loc_desc_separator
+        if = {
+            limit = {
+                from = {
+                    tec_has_cult = {
+                        cult = $name$
+                    }
+                }
+            }
+            always = yes
+        } else = {
+            from = {
+                tec_has_cult_points_available = yes
+                $allow$
+            }
         }
     }
 
     effect = {
+        custom_tooltip = tec_cult_$name$_header
+        custom_tooltip = tec_cult_$name$_desc
+        custom_tooltip = tec_blank
+        custom_tooltip = tec_loc_effects_section
         from = {
             if = {
                 limit = {
-                    NOT = { has_country_flag = tec_cui_cult_$name$ }
+                    NOT = {
+                        tec_has_cult = {
+                            cult = $name$
+                        }
+                    }
                 }
-                set_country_flag = tec_cui_cult_$name$
-                add_modifier = {
-                    modifier = tec_cui_cult_$name$_modifier
-                    days = -1
+                tec_activate_cult = {
+                    cult = $name$
+                    force = yes
+                    tooltip = no
                 }
-                set_country_flag = tec_cui_cult_$name$_last_activated
-                $on_activate$
-                fire_on_action = {
-                    on_action = tec_cult_on_activate
-                }
-                remove_country_flag = tec_cui_cult_$name$_last_activated
             } else = {
-                remove_country_flag = tec_cui_cult_$name$
-                remove_modifier = tec_cui_cult_$name$_modifier
-                set_country_flag = tec_cui_cult_$name$_last_deactivated
-                $on_deactivate$
-                fire_on_action = {
-                    on_action = tec_cult_on_deactivate
+                tec_deactivate_cult = {
+                    cult = $name$
+                    tooltip = no
                 }
-                remove_country_flag = tec_cui_cult_$name$_last_deactivated
             }
         }
     }
