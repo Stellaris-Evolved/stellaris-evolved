@@ -38,6 +38,40 @@ tec_clear_cults = {
     }
 }
 
+tec_clear_invalid_cults = {
+    custom_tooltip = tec_clear_invalid_cults
+    hidden_effect = {
+        inline_script = {
+            script = cui/cult/tec_cult_declarations
+            extra = "_step = clear_invalid_cults"
+        }
+    }
+}
+
+tec_recalculate_cult_points = {
+    hidden_effect = {
+        set_variable = {
+            which = tec_cult_points_used
+            value = 0
+        }
+        inline_script = {
+            script = iterators/tec_iterate_cult
+            code = "
+                if = {
+                    limit = {
+                        tec_has_cult = { cult = \$name\$ }
+                    }
+
+                    change_variable = {
+                        which = tec_cult_points_used
+                        value = 1
+                    }
+                }
+            "
+        }
+    }
+}
+
 tec_activate_cult = {
     inline_script = {
     	script = tec_type_hint
@@ -47,8 +81,21 @@ tec_activate_cult = {
     }
     if = {
         limit = {
-            always = $tooltip|yes$
+            always = $tooltip|no$
         }
+        inline_script = {
+            script = cui/cult/tec_cult_declarations
+
+            extra = "
+                _step = activate_cult
+                _cult = \$cult\$
+                _pass = \\\"_force = \$force\$ _tooltip = yes\\\"
+            "
+            cult = $cult$
+            force = $force|no$
+        }
+    }
+    else = {
         custom_tooltip = tec_activate_cult_$cult$
         hidden_effect = {
             inline_script = {
@@ -56,24 +103,11 @@ tec_activate_cult = {
                 extra = "
                     _step = activate_cult
                     _cult = \$cult\$
-                    _pass = \\\"_force = \$force\$\\\"
+                    _pass = \\\"_force = \$force\$ _tooltip = no\\\"
                 "
                 cult = $cult$
                 force = $force|no$
             }
-        }
-    }
-    else = {
-        inline_script = {
-            script = cui/cult/tec_cult_declarations
-
-            extra = "
-                _step = activate_cult
-                _cult = \$cult\$
-                _pass = \\\"_force = \$force\$\\\"
-            "
-            cult = $cult$
-            force = $force|no$
         }
     }
 }
@@ -86,8 +120,19 @@ tec_deactivate_cult = {
     }
     if = {
         limit = {
-            always = $tooltip|yes$
+            always = $tooltip|no$
         }
+        inline_script = {
+            script = cui/cult/tec_cult_declarations
+            extra = "
+                    _step = deactivate_cult
+                    _cult = \$cult\$
+                    _pass = \\\"_tooltip = yes\\\"
+                "
+            cult = $cult$
+            tooltip = yes
+        }
+    } else = {
         custom_tooltip = tec_deactivate_cult_$cult$
         hidden_effect = {
             inline_script = {
@@ -95,18 +140,10 @@ tec_deactivate_cult = {
                 extra = "
                     _step = deactivate_cult
                     _cult = \$cult\$
+                    _pass = \\\"_tooltip = no\\\"
                 "
                 cult = $cult$
             }
-        }
-    } else = {
-        inline_script = {
-            script = cui/cult/tec_cult_declarations
-            extra = "
-                    _step = deactivate_cult
-                    _cult = \$cult\$
-                "
-            cult = $cult$
         }
     }
 }

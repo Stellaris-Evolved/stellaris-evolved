@@ -5,7 +5,6 @@ inline_script = {
     tec_cult = $name$
     tec_cult_category = $category$
     country_trigger_block = "$potential$"
-    country_trigger_block = "$allow$"
 }
 
 tec_cui_cult_$name$_background_effect = {
@@ -29,7 +28,9 @@ tec_cui_cult_$name$_background_effect = {
         } else = {
             from = {
                 tec_has_cult_points_available = yes
-                $allow$
+                tec_is_cult_allowed = {
+                    cult = $name$
+                }
             }
         }
     }
@@ -49,12 +50,91 @@ tec_cui_cult_$name$_glow_effect = {
         always = yes
     }
 }
-
-tec_cui_cult_$name$_button_effect = {
+tec_cui_cult_$name$_button_effect_allowed = {
     potential = {
         from = {
             has_country_flag = tec_cui_cult_$category$_tab_active
             $potential$
+        }
+        from = {
+            OR = {
+                tec_has_cult = {
+                    cult = $name$
+                }
+                AND = {
+                    tec_has_cult_points_available = yes
+                    tec_is_cult_allowed = {
+                        cult = $name$
+                    }
+                }
+            }
+        }
+    }
+
+    allow = {
+        always = yes
+    }
+
+    effect = {
+        inline_script = {
+            script = cui/cult/tec_cult_option_button_effect_tooltip
+            name = $name$
+        }
+    }
+}
+
+tec_cui_cult_$name$_button_effect_not_enough_points = {
+    potential = {
+        from = {
+            has_country_flag = tec_cui_cult_$category$_tab_active
+            $potential$
+        }
+        from = {
+            NOT = {
+                tec_has_cult = {
+                    cult = $name$
+                }
+            }
+            tec_has_cult_points_available = no
+            tec_is_cult_allowed = {
+                cult = $name$
+            }
+        }
+    }
+
+    allow = {
+        always = yes
+    }
+
+    effect = {
+        tooltip = {
+            inline_script = {
+                script = cui/cult/tec_cult_option_button_effect_tooltip
+                name = $name$
+            }
+        }
+        custom_tooltip = tec_cui_cult_tooltip_not_enough_points
+    }
+}
+
+
+tec_cui_cult_$name$_button_effect_disallowed = {
+    potential = {
+        from = {
+            has_country_flag = tec_cui_cult_$category$_tab_active
+            $potential$
+        }
+        from = {
+            NOT = {
+                tec_has_cult = {
+                    cult = $name$
+                }
+            }
+            NOT = {
+                tec_is_cult_allowed = {
+                    cult = $name$
+                }
+            }
         }
     }
 
@@ -62,47 +142,17 @@ tec_cui_cult_$name$_button_effect = {
         custom_tooltip = tec_cult_$name$_header
         custom_tooltip = tec_cult_$name$_desc
         custom_tooltip = tec_loc_desc_separator
-        if = {
-            limit = {
-                from = {
-                    tec_has_cult = {
-                        cult = $name$
-                    }
-                }
-            }
-            always = yes
-        } else = {
-            from = {
-                tec_has_cult_points_available = yes
-                $allow$
+        from = {
+            tec_is_cult_allowed = {
+                cult = $name$
             }
         }
     }
-
     effect = {
-        custom_tooltip = tec_cult_$name$_header
-        custom_tooltip = tec_cult_$name$_desc
-        custom_tooltip = tec_blank
-        custom_tooltip = tec_loc_effects_section
-        from = {
-            if = {
-                limit = {
-                    NOT = {
-                        tec_has_cult = {
-                            cult = $name$
-                        }
-                    }
-                }
-                tec_activate_cult = {
-                    cult = $name$
-                    force = yes
-                    tooltip = no
-                }
-            } else = {
-                tec_deactivate_cult = {
-                    cult = $name$
-                    tooltip = no
-                }
+        tooltip = {
+            inline_script = {
+                script = cui/cult/tec_cult_option_button_effect_tooltip
+                name = $name$
             }
         }
     }
