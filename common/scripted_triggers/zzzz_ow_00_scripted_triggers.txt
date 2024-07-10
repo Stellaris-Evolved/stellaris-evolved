@@ -278,22 +278,64 @@ has_ringworld_output_boost = {
 
 }
 
+
+
+has_opposing_ethics = {
+	inline_script = {
+		script = tec_type_hint
+		country_scope = $COUNTRY1$
+		country_scope = $COUNTRY2$
+	}
+	OR = {
+		inline_script = {
+			script = iterators/tec_iterate_ethic_regular
+			code = "
+				AND = {
+					\$COUNTRY1\$ = { is_\$ethic\$ = yes }
+					\$COUNTRY2\$ = { is_\$opposing_ethic\$ = yes }
+				}
+			"
+			COUNTRY1 = $COUNTRY1$
+			COUNTRY2 = $COUNTRY2$
+		}
+	}
+}
+
+has_alternative_ethics = { # Consider THIS_SCOPE as the entity you are checking (e.g. a Pop), and REF_SCOPE as the reference point (e.g. an empire) you're checking against for ethical drift. Note that this trigger ignores directly opposing ethics.
+	inline_script = {
+		script = tec_type_hint
+		tec_scope_with_ethic = $THIS_SCOPE$
+		tec_scope_with_ethic = $REF_SCOPE$
+	}
+	OR = {
+		inline_script = {
+			script = iterators/tec_iterate_ethic_regular
+			code = "
+				AND = {
+					\$THIS_SCOPE\$ = {
+						is_\$ethic\$ = yes
+					}
+					\$REF_SCOPE\$ = {
+						is_\$ethic\$ = no
+						is_\$opposing_ethic\$ = no
+					}
+				}
+			"
+			THIS_SCOPE = $THIS_SCOPE$
+			REF_SCOPE = $REF_SCOPE$
+		}
+	}
+}
+
+
 is_fanatical = {
 	OR = {
-		has_ethic = ethic_fanatic_xenophobe
-		has_ethic = ethic_fanatic_xenophile
-		has_ethic = ethic_fanatic_materialist
-		has_ethic = ethic_fanatic_spiritualist
-		has_ethic = ethic_fanatic_authoritarian
-		has_ethic = ethic_fanatic_egalitarian
-		has_ethic = ethic_fanatic_militarist
-		has_ethic = ethic_fanatic_pacifist
-		has_ethic = ethic_fanatic_industrialist
-		has_ethic = ethic_fanatic_ecologist
-		has_ethic = ethic_fanatic_cooperative
-		has_ethic = ethic_fanatic_competitive
-		has_ethic = ethic_fanatic_pluralist
-		has_ethic = ethic_fanatic_elitist
+		inline_script = {
+			script = iterators/tec_iterate_ethic_regular
+			code = "
+				has_ethic = ethic_fanatic_\$ethic\$
+			"
+		}
 	}
 }
 
