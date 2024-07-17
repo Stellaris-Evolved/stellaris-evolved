@@ -162,6 +162,416 @@ namespace = tec_trait
 		}
 	}
 
+	# Dual Gametoids
+		# Fired by: on_pop_grown and on_pop_assembled
+	 # NOTE: NOT ON POP ADDED to avoid the effect called several times
+		# A pop has finished growing or assembling
+		# This = Planet scope From = Country FromFrom = Pop
+	planet_event = {
+		id = tec_trait.25
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			fromfrom = {
+				species = {
+					has_trait = trait_tec_dual_gametoids
+				}
+				# Just to be safe
+				NOR = {
+					has_pop_flag = tec_invalidate_dual_gametoids
+					species = {
+						has_species_flag = tec_invalidate_dual_gametoids
+					}
+				}
+			}
+		}
+
+		immediate = {
+			fromfrom = {
+				save_event_target_as = tec_pop_to_clone
+			}
+			random = {
+				chance = value:tec_dual_gametoids_scaling|SCOPE|this|
+				create_pop = {
+					species = event_target:tec_pop_to_clone
+				}
+				last_created_pop = {
+					# Just to be safe
+					set_timed_pop_flag = {
+						flag = tec_invalidate_dual_gametoids
+						days = 1
+					}
+				}
+			}
+		}
+	}
+
+	# Decaying Decomposition / planned obsolescence - growth
+	 # Fired by: on_pop_grown and on_pop_assembled
+	 # NOTE: NOT ON POP ADDED to avoid the effect called several times
+	 # A pop has finished growing or assembling
+	 # This = Planet scope From = Country FromFrom = Pop
+	planet_event = {	# TODO TRAIT
+		id = tec_trait.30
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			num_pops > 10
+			# Lets avoid bad luck rolls
+			fromfrom = {
+				species = {
+					OR = {
+						has_trait = trait_tec_decomposition
+						has_trait = trait_tec_robot_obsolescence
+					}
+				}
+				# Just to be safe
+				NOR = {
+					has_pop_flag = tec_invalidate_decomposition
+					species = {
+						has_species_flag = tec_invalidate_decomposition
+					}
+				}
+			}
+		}
+
+		immediate = {
+			fromfrom = {
+				save_event_target_as = tec_species_to_decompose
+			}
+			random = {
+				chance = value:tec_decomposition_scaling|SCOPE|this|
+				random_owned_pop = {
+					limit = {
+						is_same_species = event_target:tec_species_to_decompose
+						NOT = {
+							has_pop_flag = tec_invalidate_decomposition
+						}
+					}
+					kill_pop = yes
+				}
+				if = {	# Robotic
+					limit = {
+						fromfrom = {
+							is_robotic_species = yes
+						}
+					}
+					if = {
+						limit = {
+							NOT = {
+								has_deposit = d_tec_decomposition_robotic
+							}
+						}
+						add_deposit = d_tec_decomposition_robotic
+						set_variable = {
+							which = tec_decomposed_robots
+							value = 1
+						}
+					}
+					else = {
+						change_variable = {
+							which = tec_decomposed_robots
+							value = 1
+						}
+					}
+				}
+				if = {	# Lithoid
+					limit = {
+						fromfrom = {
+							is_lithoid = yes
+						}
+					}
+					if = {
+						limit = {
+							NOT = {
+								has_deposit = d_tec_decomposition_lithoid
+							}
+						}
+						add_deposit = d_tec_decomposition_lithoid
+						set_variable = {
+							which = tec_decomposed_lithoids
+							value = 1
+						}
+					}
+					else = {
+						change_variable = {
+							which = tec_decomposed_lithoids
+							value = 1
+						}
+					}
+				}
+				else = { # Normal
+					if = {
+						limit = {
+							NOT = {
+								has_deposit = d_tec_decomposition_organic
+							}
+						}
+						add_deposit = d_tec_decomposition_organic
+						set_variable = {
+							which = tec_decomposed_organics
+							value = 1
+						}
+					}
+					else = {
+						change_variable = {
+							which = tec_decomposed_organics
+							value = 1
+						}
+					}
+				}
+			}
+		}
+	}
+	# Decaying Decomposition / planned obsolescence - kill
+	 # NOTE: kill_pop doesn't trigger it... its a pita so death cults and etc must be adjusted properly
+	 # Fired by: on_pop_purged on_pop_declined
+	planet_event = {	# TODO TRAIT
+		id = tec_trait.31
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			fromfrom = {
+				species = {
+					OR = {
+						has_trait = trait_tec_decomposition
+						has_trait = trait_tec_robot_obsolescence
+					}
+				}
+				# Assims invalidate this
+				is_being_assimilated = no
+				# Just to be safe
+				NOT = {
+					has_pop_flag = tec_invalidate_decomposition
+					species = {
+						has_species_flag = tec_invalidate_decomposition
+					}
+				}
+			}
+		}
+
+		immediate = {
+			random = {
+				chance = 10
+				if = {	# Robotic
+					limit = {
+						fromfrom = {
+							is_robotic_species = yes
+						}
+					}
+					if = {
+						limit = {
+							NOT = {
+								has_deposit = d_tec_decomposition_robotic
+							}
+						}
+						add_deposit = d_tec_decomposition_robotic
+						set_variable = {
+							which = tec_decomposed_robots
+							value = 1
+						}
+					}
+					else = {
+						change_variable = {
+							which = tec_decomposed_robots
+							value = 1
+						}
+					}
+				}
+				if = {	# Lithoid
+					limit = {
+						fromfrom = {
+							is_lithoid = yes
+						}
+					}
+					if = {
+						limit = {
+							NOT = {
+								has_deposit = d_tec_decomposition_lithoid
+							}
+						}
+						add_deposit = d_tec_decomposition_lithoid
+						set_variable = {
+							which = tec_decomposed_lithoids
+							value = 1
+						}
+					}
+					else = {
+						change_variable = {
+							which = tec_decomposed_lithoids
+							value = 1
+						}
+					}
+				}
+				else = { # Normal
+					if = {
+						limit = {
+							NOT = {
+								has_deposit = d_tec_decomposition_organic
+							}
+						}
+						add_deposit = d_tec_decomposition_organic
+						set_variable = {
+							which = tec_decomposed_organics
+							value = 1
+						}
+					}
+					else = {
+						change_variable = {
+							which = tec_decomposed_organics
+							value = 1
+						}
+					}
+				}
+			}
+		}
+	}
+
+	# Celestial Panspermia
+	 # Fired by: on_pop_grown and on_pop_assembled
+	 # NOTE: NOT ON POP ADDED to avoid the effect called several times
+	planet_event = {	# TODO TRAIT
+		id = tec_trait.35
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			fromfrom = {
+				species = {
+					has_trait = trait_tec_celestial_panspermia
+				}
+				# Just to be safe
+				NOR = {
+					has_pop_flag = tec_invalidate_celestial_panspermia
+					species = {
+						has_species_flag = tec_invalidate_celestial_panspermia
+					}
+				}
+			}
+		}
+
+		immediate = {
+			owner = {	# Country
+				save_event_target_as = tec_celestial_owner
+			}
+			fromfrom = { # Celestial pop
+				save_event_target_as = tec_pop_to_clone
+			}
+			random_list = {
+				10 = {	# On a neighbouring colony / self colony
+					modifier = {
+						factor = 0
+						exists = owner
+						owner = {
+							num_owned_planets = 1
+						}
+					}
+					owner = {
+						random_planet_within_border = {
+							limit = {
+								is_colony = yes
+							}
+							tec_generate_celestial_panspermia_blocker = yes
+						}
+					}
+				}
+				10 = {	# On a close-by planet
+					modifier = {
+						factor = 2
+						exists = owner
+						owner = {
+							num_owned_planets = 1
+						}
+					}
+					random_system = {
+						limit = {
+							distance = {
+								source = prev
+								min_jumps = 0
+								max_jumps = 5
+							}
+							any_system_planet = {
+								OR = {
+									is_colonizable = yes
+									is_colony = yes
+								}
+							}
+						}
+						weights = {
+							modifier = {
+								factor = 5
+								OR = {
+									has_star_flag = neighbor_t1_first_colony
+									has_star_flag = neighbor_t2_second_colony
+								}
+							}
+						}
+						random_system_planet = {
+							limit = {
+								OR = {
+									is_colonizable = yes
+									is_colony = yes
+								}
+							}
+							weights = {
+								modifier = {
+									factor = 0.5
+									is_colony = yes
+								}
+								modifier = {
+									factor = 1.5
+									is_colonizable = yes
+								}
+							}
+							tec_generate_celestial_panspermia_blocker = yes
+						}
+					}
+				}
+				20 = {	# On a random planet in the galaxy
+					random_system = {
+						limit = {
+							distance = {
+								source = prev
+								min_jumps = 6
+								max_jumps = 25
+							}
+							any_system_planet = {
+								OR = {
+									is_colonizable = yes
+									is_colony = yes
+								}
+							}
+						}
+						random_system_planet = {
+							limit = {
+								OR = {
+									is_colonizable = yes
+									is_colony = yes
+								}
+							}
+							tec_generate_celestial_panspermia_blocker = yes
+						}
+					}
+				}
+				60 = {	# nada ;)
+				}
+			}
+		}
+	}
+	# TODO TRAIT - First event when a pod is discovered
+	#planet_event = {	# TODO TRAIT
+	#	id = tec_trait.36
+	# TODO TRAIT - Notification/toast when a pod is discovered after first event
+	#planet_event = {	# TODO TRAIT
+	#	id = tec_trait.37
+	# TODO TRAIT - Opinion debuff when the pods are broken/eaten/smashed/etc
+	#planet_event = {	# TODO TRAIT
+	#	id = tec_trait.38
+
+
 	# If the robot is mammalian, it changes to a mammalian appeal controlled via policy
 	# If the robot has a mammalian appeal, fall backs to mammalian robot if trait is out
 	# Synthetic skin/Nanite swarm appearance
