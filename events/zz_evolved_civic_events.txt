@@ -223,7 +223,7 @@ namespace = tec_trait
 			fromfrom = {
 				species = {
 					OR = {
-						has_trait = trait_tec_decomposition
+						has_trait = trait_tec_decaying_decomposition
 						has_trait = trait_tec_robot_obsolescence
 					}
 				}
@@ -337,7 +337,7 @@ namespace = tec_trait
 			fromfrom = {
 				species = {
 					OR = {
-						has_trait = trait_tec_decomposition
+						has_trait = trait_tec_decaying_decomposition
 						has_trait = trait_tec_robot_obsolescence
 					}
 				}
@@ -433,7 +433,7 @@ namespace = tec_trait
 	# Celestial Panspermia
 	 # Fired by: on_pop_grown and on_pop_assembled
 	 # NOTE: NOT ON POP ADDED to avoid the effect called several times
-	planet_event = {	# TODO TRAIT
+	planet_event = {
 		id = tec_trait.35
 		hide_window = yes
 		is_triggered_only = yes
@@ -571,6 +571,207 @@ namespace = tec_trait
 	#planet_event = {	# TODO TRAIT
 	#	id = tec_trait.38
 
+	# Predatory Evolution - Growth
+	 # Fired by: on_pop_grown and on_pop_assembled
+	 # NOTE: NOT ON POP ADDED to avoid the effect called several times
+	 # A pop has finished growing or assembling
+	 # This = Planet scope From = Country FromFrom = Pop
+	planet_event = {
+		id = tec_trait.40
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			fromfrom = {
+				species = {
+					has_trait = trait_tec_predatory_evolution
+				}
+				# Just to be safe
+				NOR = {
+					has_pop_flag = tec_invalidate_predatory_evolution
+					species = {
+						has_species_flag = tec_invalidate_predatory_evolution
+					}
+				}
+			}
+		}
+
+		immediate = {
+			owner = {	# Country
+				save_event_target_as = tec_predatory_owner
+			}
+			fromfrom = { # Devourer
+				save_event_target_as = tec_pop_that_eats
+			}
+			random = {
+				chance = value:tec_predatory_scaling|SCOPE|this|
+				random_owned_pop = {
+					limit = {
+						NOT = {
+							is_same_value = event_target:tec_pop_that_eats
+						}
+						NOR = {
+							has_modifier = tec_converged_pop
+							has_modifier = pop_modifier_trait_tec_predatory_evolution
+							has_pop_flag = tec_invalidate_decomposition
+						}
+						if = {	# Rocks eat rocks
+							limit = {
+								event_target:tec_pop_that_eats = {
+									is_lithoid = yes
+									tec_is_cyborg_species = no
+								}
+							}
+							species = {
+								is_lithoid = yes
+							}
+						}
+						if = {	# Cyborg Rocks eat rocks and machine things
+							limit = {
+								event_target:tec_pop_that_eats = {
+									is_lithoid = yes
+									tec_is_cyborg_species = yes
+								}
+							}
+							species = {
+								OR = {
+									is_lithoid = yes
+									is_robotic = yes
+									tec_is_cyborg_species = yes
+								}
+							}
+						}
+						if = {	# Not rocks don't eat robots
+							limit = {
+								event_target:tec_pop_that_eats = {
+									is_lithoid = no
+									is_robotic = no
+									tec_is_cyborg_species = no
+								}
+							}
+							species = {
+								is_lithoid = no
+								is_robotic = no
+							}
+						}
+						if = {	# ... but cyborgs can
+							limit = {
+								event_target:tec_pop_that_eats = {
+									is_lithoid = no
+									tec_is_cyborg_species = yes
+								}
+							}
+							species = {
+								is_lithoid = no
+							}
+						}
+					}
+					weights = {
+						base = 1
+						modifier = {	# Livestock is always prio
+							factor = 10
+							OR = {
+								has_job = livestock
+								#has_job = livestock_zoo_animal
+								has_job = livestock_zoo_beast
+							}
+						}
+						modifier = {	# Necrophages prio non necrophages
+							factor = 10
+							event_target:tec_pop_that_eats = {
+								has_trait = trait_necrophage
+							}
+							NOR = {
+								has_job = necro_apprentice
+								species = {
+									has_trait = trait_necrophage
+								}
+							}
+						}
+						modifier = {	# Not predatory
+							factor = 5
+							species = {
+								NOT = {
+									has_trait = trait_tec_predatory_evolution
+								}
+							}
+						}
+						modifier = {	# Weak pops are easy prey
+							factor = 5
+							species = {
+								#OR = {
+									has_trait = trait_weak
+								#}
+							}
+						}
+						modifier = {	# Is xeno
+							factor = 2
+							species = {
+								NOT = {
+									is_same_species = event_target:tec_pop_that_eats
+								}
+							}
+						}
+
+					}
+					save_event_target_as = tec_pop_to_eat
+				}
+				if = {
+					limit = {
+						exists = event_target:tec_pop_to_eat
+					}
+					# People around gets angry
+					every_country = {
+						limit = {
+							has_communications = FROM
+							NOT = { is_country = FROM }
+							NOT = { is_same_species = FROMFROM }
+							NOT = { has_ai_personality_behaviour = purger }
+							OR = {
+								tec_is_default_country = yes
+								has_ai_personality = awakened_fallen_empire_xenophile
+							}
+							has_intel_level = {
+								who = FROM
+								category = economy
+								level >= 1
+							}
+						}
+						add_opinion_modifier = { who = FROM modifier = opinion_genocidal }
+					}
+					every_country = {
+						limit = {
+							has_communications = FROM
+							NOT = { is_country = FROM }
+							is_same_species = FROMFROM
+							has_intel_level = {
+								who = FROM
+								category = economy
+								level >= 1
+							}
+						}
+						add_opinion_modifier = { who = FROM modifier = opinion_genocidal_our_species }
+					}
+					# Yummy
+					event_target:tec_pop_that_eats = {
+						add_modifier = {
+							modifier = pop_modifier_trait_tec_predatory_evolution
+							days = -1
+						}
+					}
+					# Kills the pop
+					event_target:tec_pop_to_eat = {
+						kill_pop = yes
+					}
+				}
+			}
+		}
+	}
+	# Predatory Evolution - kill
+	 # NOTE: kill_pop doesn't trigger it... its a pita so death cults and etc must be adjusted properly
+	 # Fired by: on_pop_purged on_pop_declined
+	#planet_event = {	# TODO TRAIT
+	#	id = tec_trait.41
 
 	# If the robot is mammalian, it changes to a mammalian appeal controlled via policy
 	# If the robot has a mammalian appeal, fall backs to mammalian robot if trait is out
