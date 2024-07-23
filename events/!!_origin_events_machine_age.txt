@@ -2,6 +2,183 @@
 
 namespace = machine_age
 
+#The Creeds Final Form
+situation_event = {
+	id = machine_age.1090
+	title = "machine_age.1090.name"
+	desc = {
+		trigger = {
+			owner = {
+				has_country_flag = cybernetic_creed_construction
+			}
+		}
+		text = machine_age.1090.construction
+	}
+	desc = {
+		trigger = {
+			owner = {
+				has_country_flag = cybernetic_creed_war
+			}
+		}
+		text = machine_age.1090.war
+	}
+	desc = {
+		trigger = {
+			owner = {
+				has_country_flag = cybernetic_creed_research
+			}
+		}
+		text = machine_age.1090.research
+	}
+	desc = {
+		trigger = {
+			owner = {
+				has_country_flag = cybernetic_creed_labor
+			}
+		}
+		text = machine_age.1090.labor
+	}
+	picture = GFX_evt_cybernetic_creed
+	show_sound = event_mystic_reveal
+	event_chain = cybernetic_creed_chain
+
+	is_triggered_only = yes
+
+	immediate = {
+		owner = {
+			set_country_flag = cybercreed_final_form
+			set_country_flag = cybernetics_traditions_unlocked
+			every_owned_pop = {
+				limit = {
+					has_trait = trait_cybernetic
+					has_ethic = ethic_spiritualist
+					OR = {
+						has_citizenship_type = { type = citizenship_full }
+						has_citizenship_type = { type = citizenship_limited }
+					}
+				}
+				owner = {
+					switch = {
+						trigger = has_country_flag
+						cybernetic_creed_construction = {
+							prev = {
+								inline_script = traits/cybernetic_creed_construction_traits
+							}
+						}
+						cybernetic_creed_war = {
+							prev = {
+								inline_script = traits/cybernetic_creed_war_traits
+							}
+						}
+						cybernetic_creed_research = {
+							prev = {
+								inline_script = traits/cybernetic_creed_research_traits
+							}
+						}
+						cybernetic_creed_labor = {
+							prev = {
+								inline_script = traits/cybernetic_creed_labor_traits
+							}
+						}
+						cybernetic_creed_general = {
+							prev = {
+								modify_species = {
+									species = this
+									add_trait = trait_cyborg_ritualistic_implants
+									add_traits_at_start_of_list = yes
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		# all
+		name = "machine_age.1090.a"
+		custom_tooltip = "machine_age.1090.general.tooltip"
+	}
+
+	after = {
+		owner = {
+			end_event_chain = cybernetic_creed_chain
+			set_country_flag = cyber_creed_finished_situation
+			switch = {
+				trigger = has_country_flag
+				cybernetic_creed_construction = {
+					add_modifier = {
+						modifier = cybernetic_creed_construction_robot_points_modifier
+						days = -1
+					}
+				}
+				cybernetic_creed_war = {
+					add_modifier = {
+						modifier = cybernetic_creed_war_robot_points_modifier
+						days = -1
+					}
+				}
+				cybernetic_creed_research = {
+					add_modifier = {
+						modifier = cybernetic_creed_research_robot_points_modifier
+						days = -1
+					}
+				}
+				cybernetic_creed_labor = {
+					add_modifier = {
+						modifier = cybernetic_creed_labor_robot_points_modifier
+						days = -1
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			destroy_situation = this
+		}
+	}
+}
+
+#No Creeds, No Need
+situation_event = {
+	id = machine_age.1100
+	title = "machine_age.1100.name"
+	desc = "machine_age.1100.desc"
+	picture = GFX_evt_cybernetic_creed
+	show_sound = event_mystic_reveal
+	event_chain = cybernetic_creed_chain
+
+	is_triggered_only = yes
+
+	immediate = {
+		owner = {
+			set_country_flag = cybernetics_traditions_unlocked
+		}
+	}
+
+	option = {
+		name = "machine_age.1100.a"
+		custom_tooltip = "machine_age.1100.general.tooltip"
+	}
+
+	after = {
+		owner = {
+			add_modifier = {
+				modifier = cyber_creed_no_creed_robot_points_modifier
+				days = -1
+			}
+			end_event_chain = cybernetic_creed_chain
+		}
+		hidden_effect = {
+			destroy_situation = this
+			owner = {
+				set_country_flag = can_genemod_cyborg_ritualistic_pops
+				set_country_flag = cyber_creed_finished_situation
+			}
+		}
+	}
+}
+
 country_event = {
 	id = machine_age.2235
 	is_triggered_only = yes
