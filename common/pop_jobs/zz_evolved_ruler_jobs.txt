@@ -2830,3 +2830,99 @@ tec_imperial_admin = {		#
 tec_corporate_parabellum_corp = {
 	inline_script = jobs/tec_disabled
 }
+
+tec_cyber_idol = {
+	category = ruler
+	icon = tec_technocrat
+	condition_string = RULER_JOB_TRIGGER
+	building_icon = building_corporate_forum
+	clothes_texture_index = 1
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_ruler_job
+
+	resources = {
+		category = planet_culture_workers
+		produces = {
+			unity = @tec_ruler_job_unity_low
+			influence = 0.025
+		}
+		upkeep = {
+			consumer_goods = @tec_ruler_job_upkeep
+			energy = @tec_ruler_job_upkeep
+		}
+		inline_script = jobs/resources/tec_rulers
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
+		}
+		trade_value_add = @tec_mogul_trade
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
+	}
+
+
+	triggered_planet_modifier = {
+		tec_cyborg_lifestyle_trade_value_add = 0.05
+		pop_category_cyborgs_normal_resources_consumer_goods_upkeep_add = 0.05
+	}
+
+	triggered_pop_modifier = {
+		pop_political_power = 4
+		pop_happiness = 0.5
+	}
+
+	inline_script = jobs/effects/tec_civic_tec_regular_social_prosperity
+
+	inline_script = jobs/tec_space_tag
+
+	inline_script = {
+		script = jobs/tec_eco_category_tag
+		category = planet_culture_workers
+	}
+
+	weight = {
+		# Ruler job Weight
+		weight = @ruler_job_weight
+		mult = value:job_weights_modifier|JOB|tec_cyber_idol|RESOURCE|unity|
+		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_trade_mult|
+		modifier = {
+			factor = 5
+			has_job = tec_cyber_idol
+		}
+
+		modifier = {
+			factor = 5
+			has_trait = trait_tec_cyborg_idol_implants
+		}
+
+		# Living standard weight
+		modifier = {
+			factor = 0.1
+			has_citizenship_rights = no
+			NOR = {
+				tec_has_trait_slave = yes
+			}
+		}
+
+		# crisis purge
+		modifier = {
+			factor = 0.01
+			exists = planet
+			exists = planet.controller
+			planet.controller = {
+				tec_control_crisis_country = yes
+			}
+		}
+	}
+
+	inline_script = "jobs/automodding_priority_trade"
+}
