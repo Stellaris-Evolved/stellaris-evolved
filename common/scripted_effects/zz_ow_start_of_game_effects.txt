@@ -432,48 +432,25 @@ generate_start_pops = {
 			tec_start_handle_assimilator_species = yes
 		}
 
-			#if = {
-				#	limit = {
-				#		owner = {
-				#			has_origin = origin_tec_slavetothesystem
-				#		}
-				#	}
-				#	last_created_species = {
-				#		set_species_flag = cyborg_slaves@root.owner
-				#		set_citizenship_type = {
-				#			country = root.owner
-				#			type = citizenship_slavery
-				#		}
-				#		set_living_standard = {
-				#			country = root.owner
-				#			type = living_standard_normal
-				#		}
-				#	}
-				#	while = {
-				#		count = 22
-				#		create_pop = {
-				#			species = last_created_species
-				#			ethos = random
-				#		}
-				#	}
-				#	while = {
-				#		while = {
-				#			limit = {
-				#				num_pops > 8
-				#				has_trait = trait_mechanical
-				#			}
-				#			random_owned_pop = {
-				#				limit = {
-				#					NOR = {
-				#						is_pop_category = ruler
-				#						is_pop_category = specialist
-				#					}
-				#				}
-				#				kill_pop = yes
-				#			}
-				#		}
-				#	}
-			#}
+
+		if = {
+			limit = {
+				owner = {
+					has_origin = origin_mechanists
+				}
+			}
+			tec_start_handle_mechanists = yes
+		}
+
+		if = {
+			limit = {
+				owner = {
+					has_origin = origin_tec_bioservant
+				}
+			}
+			tec_start_handle_bioservant = yes
+		}
+
 
 		while = {
 			count = owner.value:tec_start_pops_secondary_count
@@ -483,16 +460,6 @@ generate_start_pops = {
 			}
 		}
 	}
-
-	if = {
-		limit = {
-			owner = {
-				has_origin = origin_mechanists
-			}
-		}
-		tec_start_handle_mechanists = yes
-	}
-
 
 	while = {
 		limit = { num_pops < owner.value:tec_start_pops_count }
@@ -857,151 +824,47 @@ void_dweller_home_planet_setup = {	# Caelum
 				}
 			}
 		# /
-		if = {
-			limit = {
-				has_valid_civic = civic_private_healthcare_corporate
-			}
-			give_technology = { message = no tech = tech_frontier_health }
-			add_research_option = tech_subdermal_stimulation
-		}
+
+		# game_start.64 adjusted to handle this
+		# if = {
+		#	limit = {
+		#		has_valid_civic = civic_private_healthcare_corporate
+		#	}
+		#	give_technology = { message = no tech = tech_frontier_health }
+		#	add_research_option = tech_subdermal_stimulation
+		#}
 	}
-	# Distributing pops
-		# Secondary Species
-			if = {
-				limit = {
-					owner = {
-						OR = {
-							has_valid_civic = civic_machine_servitor
-							has_valid_civic = civic_machine_assimilator
-						}
-					}
-				}
-				if = {
-					limit = {
-						owner = {
-							has_valid_civic = civic_machine_servitor
-						}
-					}
-					last_created_species = {
-						modify_species = {
-							species = this
-							change_scoped_species = no
-							ideal_planet_class = pc_habitat
-							add_traits_at_start_of_list = yes
-							add_trait = trait_void_dweller_1
-							effect = {
-								set_species_flag = tec_original_biotrophy_@root.owner
-								tec_save_last_species = yes
-								set_citizenship_type = {
-									country = root.owner
-									type = citizenship_organic_trophy
-								}
-								set_living_standard = {
-									country = root.owner
-									type = living_standard_organic_trophy
-								}
-							}
-						}
-					}
-				}
-		
-				if = {
-					limit = {
-						owner = {
-							has_valid_civic = civic_machine_assimilator
-						}
-					}
-					last_created_species = {
-						modify_species = {
-							species = this
-							change_scoped_species = no
-							ideal_planet_class = pc_habitat
-							add_traits_at_start_of_list = yes
-							add_trait = trait_void_dweller_1
-							effect = {
-								set_species_flag = cyborg_assimilated@root.owner
-								tec_save_last_species = yes
-								set_citizenship_type = {
-									country = root.owner
-									type = citizenship_full_machine
-								}
-								set_living_standard = {
-									country = root.owner
-									type = living_standard_hive_mind
-								}
-							}
-						}
-					}
-				}
-			}
-
-			# Add support for other things like syncretic
-			while = {
-				count = owner.value:tec_start_pops_secondary_count
-				create_pop = {
-					species = event_target:tec_last_created_species
-					ethos = random
-				}
-			}
-		# /
-		# Main species
-			while = {
-				limit = { num_pops < owner.value:tec_start_pops_count }
-				create_pop = {
-					species = owner_main_species
-					ethos = random
-				}
-			}
-		# /
-		# Secondary species
-
-		# /
-	# /
 
 	if = {
 		limit = {
 			owner = {
-				has_valid_civic = civic_permanent_employment
+				OR = {
+					has_valid_civic = civic_machine_assimilator
+					has_valid_civic = civic_machine_servitor
+				}
 			}
 		}
-		while = {
-			count = 4
-			random_owned_pop = {
-				limit = {
+
+		if = {
+			limit = {
+				owner = {
 					OR = {
-						has_job = clerk
-						has_job = technician
-						has_job = miner
-						has_job = tec_reef_miner
-						has_job = farmer
-						has_job = angler
-						# Gestalt
-						has_job = maintenance_drone
-						has_job = technician_drone
-						has_job = mining_drone
-						has_job = tec_reef_drone
-						has_job = agri_drone
-						has_job = tec_aqua_drone
-					}
-					is_robotic_species = no
-				}
-				modify_species = {
-					species = this
-					add_trait = trait_zombie
-					add_traits_at_start_of_list = yes
-				}
-				if = {
-					limit = {
-						has_trait = trait_syncretic_proles
-					}
-					modify_species = {
-						species = this
-						remove_trait = trait_syncretic_proles
+						last_created_species = { is_lithoid = yes }
+						last_created_species = { has_trait = trait_machine_unit }
 					}
 				}
+			}
+			owner = {
+				set_country_flag = lithoid_subspecies
+			}
+		}
+		else = {
+			owner = {
+				set_country_flag = non_lithoid_subspecies
 			}
 		}
 	}
+	generate_start_pops = yes
 
 	set_planet_entity = {
 		entity = "habitat_phase_03_entity"
@@ -1019,324 +882,68 @@ void_dweller_home_planet_setup = {	# Caelum
 	add_deposit = d_tec_arcane_replicator
 	add_deposit = d_tec_minor_arcane_replicator
 
-	# Districts
-		while = {
-			count = 2
-			add_district = {
-				district_type = district_hab_housing
-				ignore_cap = yes
-			}
-		}
-		if = {
-			limit = {
-				owner = {
-					OR = {
-						is_gestalt = no
-						has_civic = civic_machine_servitor
-						has_civic = civic_machine_obsessional_directive
-						# TODO find a way to check for cg use
-					}
-				}
-			}
-			while = {
-				count = 1
-				add_district = {
-					district_type = district_hab_industrial
-					ignore_cap = yes
-				}
-			}
-			while = {
-				count = 1
-				add_district = {
-					district_type = district_tec_hab_factory
-					ignore_cap = yes
-				}
-			}
-			if = {
-				limit = {
-					owner = {
-						resource_income_compare = {
-							resource = alloys
-							value < 10
-						}
-					}
-				}
-				while = {
-					count = 1
-					add_district = {
-						district_type = district_hab_industrial
-						ignore_cap = yes
-					}
-				}
-			}
-			else = {
-				add_district = {
-					district_type = district_tec_hab_factory
-					ignore_cap = yes
-				}
-			}
-		}
-		else = {
-			while = {
-				count = 3
-				add_district = {
-					district_type = district_hab_industrial
-					ignore_cap = yes
-				}
-			}
-		}
 
-		# Always allowed to be a mining habitat
-		set_planet_flag = mining_habitat
-		change_variable = {
-			which = tec_hab_menial_districts
-			value = 1
+	# Districts
+	while = {
+		count = value:tec_value|VALUE|tec_start_city_district_count|DIVIDE|1.5|CEILING|yes|
+		add_district = {
+			district_type = district_hab_housing
+			ignore_cap = yes
 		}
-		
-		# Base
-		if = {	# Fallback
-			limit = {
-				owner = {
-					is_lithoid_empire = no
-					is_machine_empire = no
-				}
+	}
+
+	while = { # extra 1 due to alloy use
+		count = value:tec_value|VALUE|tec_start_foundry_district_count|ADD|1.5|DIVIDE|1.5|CEILING|yes|
+		add_district = {
+			district_type = district_hab_industrial
+			ignore_cap = yes
+		}
+	}
+
+	while = {
+		count = value:tec_value|VALUE|tec_start_factory_district_count|DIVIDE|1.5|CEILING|yes|
+		add_district = {
+			district_type = district_tec_hab_factory
+			ignore_cap = yes
+		}
+	}
+
+	if = {
+		limit = {
+			check_variable_arithmetic = {
+				which = value:tec_value|VALUE|tec_start_farming_district_count|DIVIDE|1.5|CEILING|yes|
+				value > 0
 			}
-			if = {
-				limit = {
-					NOT = {
-						has_planet_flag = tec_food_habitat
-					}
-				}
-				set_planet_flag = tec_food_habitat
-				change_variable = {
-					which = tec_hab_menial_districts
-					value = 1
-				}
-			}
+		}
+		set_planet_flag = tec_food_habitat
+		while = {
+			count = value:tec_value|VALUE|tec_start_farming_district_count|DIVIDE|1.5|CEILING|yes|
 			add_district = {
 				district_type = district_tec_hab_food
 				ignore_cap = yes
 			}
 		}
-		if = {	# Fallback Lithoid
-			limit = {
-				owner = {
-					is_lithoid_empire = yes
-					is_machine_empire = no
-				}
-			}
-			if = {
-				limit = {
-					NOT = {
-						has_planet_flag = mining_habitat
-					}
-				}
-				set_planet_flag = mining_habitat
-				change_variable = {
-					which = tec_hab_menial_districts
-					value = 1
-				}
-			}
-			add_district = {
-				district_type = district_hab_mining
-				ignore_cap = yes
-			}
-		}
-		if = {	# Fallback machine
-			limit = {
-				owner = {
-					is_machine_empire = yes
-				}
-			}
-			if = {
-				limit = {
-					NOT = {
-						has_planet_flag = energy_habitat
-					}
-				}
-				set_planet_flag = energy_habitat
-				change_variable = {
-					which = tec_hab_menial_districts
-					value = 1
-				}
-			}
-			add_district = {
-				district_type = district_hab_energy
-				ignore_cap = yes
-			}
-			add_district = {
-				district_type = district_hab_mining
-				ignore_cap = yes
-			}
-		}
-		if = {	# Energy
-			limit = {
-				owner = {
-					OR = {
-						tec_is_quantum_alloys_empire = yes
-					}
-				}
-			}
-			if = {
-				limit = {
-					NOT = {
-						has_planet_flag = energy_habitat
-					}
-				}
-				set_planet_flag = energy_habitat
-				change_variable = {
-					which = tec_hab_menial_districts
-					value = 1
-				}
-			}
-			while = {
-				count = 1
-				add_district = {
-					district_type = district_hab_energy
-					ignore_cap = yes
-				}
-			}
-		}
-		if = {	# Energy
-			limit = {
-				owner = {
-					OR = {
-						tec_is_cyberarch_empire = yes
-					}
-				}
-			}
-			if = {
-				limit = {
-					NOT = {
-						has_planet_flag = energy_habitat
-					}
-				}
-				set_planet_flag = energy_habitat
-				change_variable = {
-					which = tec_hab_menial_districts
-					value = 1
-				}
-			}
-			while = {
-				count = 1
-				add_district = {
-					district_type = district_hab_energy
-					ignore_cap = yes
-				}
-			}
-		}
-		if = {	# Minerals
-			limit = {
-				owner = {
-					NOR = { #Being any of these removes one mining district
-						# Energy based
-						tec_is_quantum_alloys_empire = yes
-						tec_is_cyberarch_empire = yes
-						# Food based
-						is_catalytic_empire = yes
-						tec_is_bioarch_empire = yes
-					}
-				}
-			}
-			while = {
-				count = 1
-				add_district = {
-					district_type = district_hab_mining
-					ignore_cap = yes
-				}
-			}
-		}
-		if = {	# Minerals
-			limit = {
-				owner = {
-					NOR = { #Being a full combination removes the other mining district
-						AND = {
-							tec_is_quantum_alloys_empire = yes
-							tec_is_cyberarch_empire = yes
-						}
+	}
 
-						AND = {
-							is_catalytic_empire = yes
-							tec_is_bioarch_empire = yes
-						}
+	# 4 jobs - EVOLVED NOTE - mining and swaps
+	set_planet_flag = mining_habitat
+	while = {
+		count =  value:tec_value|VALUE|tec_start_mining_district_count|DIVIDE|1.5|CEILING|yes|
+		add_district = {
+			district_type = district_hab_mining
+			ignore_cap = yes
+		}
+	}
 
-						AND = {
-							tec_is_quantum_alloys_empire = yes
-							tec_is_bioarch_empire = yes
-						}
+	set_planet_flag = energy_habitat
+	while = {
+		count =  value:tec_value|VALUE|tec_start_generator_district_count|DIVIDE|1.5|CEILING|yes|
+		add_district = {
+			district_type = district_hab_energy
+			ignore_cap = yes
+		}
+	}
 
-						AND = {
-							is_catalytic_empire = yes
-							tec_is_cyberarch_empire = yes
-						}
-					}
-				}
-			}
-			while = {
-				count = 1
-				add_district = {
-					district_type = district_hab_mining
-					ignore_cap = yes
-				}
-			}
-		}
-		if = {	# Food
-			limit = {
-				owner = {
-					OR = {
-						tec_is_bioarch_empire = yes
-					}
-				}
-			}
-			if = {
-				limit = {
-					NOT = {
-						has_planet_flag = tec_food_habitat
-					}
-				}
-				set_planet_flag = tec_food_habitat
-				change_variable = {
-					which = tec_hab_menial_districts
-					value = 1
-				}
-			}
-			while = {
-				count = 1
-				add_district = {
-					district_type = district_tec_hab_food
-					ignore_cap = yes
-				}
-			}
-		}
-		if = {	# Food
-			limit = {
-				owner = {
-					OR = {
-						is_catalytic_empire = yes
-					}
-				}
-			}
-			if = {
-				limit = {
-					NOT = {
-						has_planet_flag = tec_food_habitat
-					}
-				}
-				set_planet_flag = tec_food_habitat
-				change_variable = {
-					which = tec_hab_menial_districts
-					value = 1
-				}
-			}
-			while = {
-				count = 1
-				add_district = {
-					district_type = district_tec_hab_food
-					ignore_cap = yes
-				}
-			}
-		}
-		
 	# /
 	#buildings
 	tec_start_add_major_habitat_capital = yes
@@ -1376,7 +983,7 @@ void_dweller_home_planet_setup = {	# Caelum
 	# /
 	tec_start_add_research_building = yes
 	tec_start_add_unity_building = yes
-	#tec_start_add_amenities_building = yes
+	tec_start_add_amenities_building = yes
 	tec_start_add_assembly_building = yes
 
 	tec_start_hab_try_add_aux = yes
@@ -2677,57 +2284,6 @@ tec_start_hab_aquatic_flood_effect = {
 	}
 }
 
-tec_start_hab_pops_spawn = {
-	if = {
-		limit = {
-			owner = {
-				is_eager_explorer_empire = no
-			}
-		}
-		while = {
-			count = $count$
-			create_pop = {
-				species = owner_main_species
-			}
-		}
-	}
-	else = {
-		while = {
-			count = $eager_count$
-			create_pop = {
-				species = owner_main_species
-			}
-		}
-	}
-	if = {
-		limit = { owner = { has_valid_civic = civic_machine_assimilator } }
-		while = {
-			count = 2
-			random_owned_pop = {
-				kill_pop = yes
-			}
-		}
-		while = {
-			count = 2
-			create_pop = {
-				species = event_target:tec_last_created_species
-				ethos = random
-			}
-			last_created_pop = {
-				clear_ethos = yes
-				set_citizenship_type = {
-					country = root.owner
-					type = citizenship_full_machine
-				}
-				set_living_standard = {
-					country = root.owner
-					type = living_standard_hive_mind
-				}
-			}
-		}
-	}
-}
-
 # Pop init utils
 tec_save_last_species = {
 	save_event_target_as = last_created_species
@@ -2942,14 +2498,23 @@ tec_start_handle_mechanists = {
 		change_species_characteristics = {
 			add_trait = trait_auto_mod_robotic
 		}
-	}
-	while = {
-		count = 10
-		create_pop = {
-			species = last_created_species
-		}
+		tec_save_last_species = yes
 	}
 }
+
+tec_start_handle_bioservant = {
+	owner = {
+		tec_create_built_bioservant_species = yes
+		set_country_flag = done_tec_first_bioservant
+	}
+	last_created_species = {
+		change_species_characteristics = {
+			add_trait = trait_auto_mod_biological
+		}
+		tec_save_last_species = yes
+	}
+}
+
 
 tec_start_handle_zombies = {
 	while = {
