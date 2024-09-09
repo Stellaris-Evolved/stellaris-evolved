@@ -1066,6 +1066,37 @@ tec_hoarders_withdraw_resource = {
 	}
 }
 
+tec_hoarders_deposit_max_resource = {
+	inline_script = {
+		script = tec_type_hint
+		resource = $RESOURCE$
+	}
+	if = {
+		limit = {
+			owner = {
+				resource_income_compare = {
+					resource = $RESOURCE$
+					value >= 0
+				}
+			}
+		}
+		event_target:tec_hoarders_managed_planet = {
+			set_planet_flag = tec_vault_manage_$RESOURCE$
+			set_variable = {
+				which = tec_stockpile_change
+				value = 0
+			}
+			change_variable = {
+				which = tec_stockpile_change
+				value = value:tec_hoarders_max_that_can_be_deposited
+			}
+			tec_hoarders_manage_resource = { RESOURCE = $RESOURCE$ }
+			remove_planet_flag = tec_vault_manage_$RESOURCE$
+		}
+	}
+}
+
+
 tec_hoarders_manage_resource = {
 	inline_script = {
 		script = tec_type_hint
@@ -1852,6 +1883,7 @@ tec_country_create_aiauth_planetary_governing_node = {
 					hide_leader = no
 					immortal = yes
 					can_assign_to_council = no
+					background_planet = event_target:tec_aiauth_planetary_governing_node_planet
 					custom_description = tec_aiauth_planetary_governing_node_desc
 					randomize_traits = yes
 					background_ethic = \$ethic\$
@@ -1877,6 +1909,7 @@ tec_country_create_aiauth_planetary_governing_node = {
 		add_trait_no_notify = leader_trait_tec_aiauth_planetary_governing_node
 		set_owner = prev
 		tec_leader_add_governor_trait = yes
+
 		tec_leader_handle_starting_modifiers = {
 			from = prev
 		}
