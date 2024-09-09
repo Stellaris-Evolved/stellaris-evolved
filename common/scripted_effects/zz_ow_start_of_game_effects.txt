@@ -686,11 +686,7 @@ void_dweller_home_planet_setup = {	# Caelum
 	}
 	owner = {
 		give_starting_resources_effect = yes
-		give_technology = {
-			tech = tech_habitat_1
-			message = no
-		}
-		add_research_option = tech_habitat_2
+
 		set_variable = {
 			which = sub_habitat_amount
 			value = 0
@@ -955,40 +951,42 @@ void_dweller_home_planet_setup = {	# Caelum
 	# /
 	#buildings
 	tec_start_add_major_habitat_capital = yes
-	# Extra buildings
-		if = {	# BASE FOOD
-			limit = {
-				owner = {
-					OR = {
-						NOR = {
-							is_lithoid_empire = yes
-							is_machine_empire = yes
-						}
-						AND = {
-							is_machine_empire = yes
-							any_owned_species = {
-								NOR = {
-									is_robotic = yes
-									is_lithoid = yes
-								}
-							}
-						}
-						any_owned_species = {
-							OR = {
-								is_organic_species = yes
-							}
-						}
-					}
-				}
-			}
-			owner = {
-				give_technology = {
-					tech = tech_hydroponics
-					message = no
-				}
-			}
-		}
-	# /
+
+	# moved to tec_start_techs.3
+	# # Extra buildings
+	# 	if = {	# BASE FOOD
+	# 		limit = {
+	# 			owner = {
+	# 				OR = {
+	# 					NOR = {
+	# 						is_lithoid_empire = yes
+	# 						is_machine_empire = yes
+	# 					}
+	# 					AND = {
+	# 						is_machine_empire = yes
+	# 						any_owned_species = {
+	# 							NOR = {
+	# 								is_robotic = yes
+	# 								is_lithoid = yes
+	# 							}
+	# 						}
+	# 					}
+	# 					any_owned_species = {
+	# 						OR = {
+	# 							is_organic_species = yes
+	# 						}
+	# 					}
+	# 				}
+	# 			}
+	# 		}
+	# 		owner = {
+	# 			give_technology = {
+	# 				tech = tech_hydroponics
+	# 				message = no
+	# 			}
+	# 		}
+	# 	}
+	# # /
 	tec_start_add_research_building = yes
 	tec_start_add_unity_building = yes
 	tec_start_add_amenities_building = yes
@@ -1533,12 +1531,6 @@ tec_start_add_research_building = {
 					has_ancrel = yes
 				}
 			}
-			owner = {
-				give_technology = {
-					tech = tech_archaeostudies
-					message = no
-				}
-			}
 			add_building = building_archaeostudies_faculty
 		}
 		else_if = {
@@ -1547,16 +1539,6 @@ tec_start_add_research_building = {
 				owner = {
 					has_origin = origin_synthetic_fertility
 				}
-			}
-
-			owner = {
-				set_variable = {
-					which = num_dead_identities
-					value = 3
-				}
-				give_technology = {	tech = tech_administrative_ai message = no }
-				give_technology = {	tech = tech_self_aware_logic message = no }
-				give_technology = {	tech = tech_sapient_ai message = no }
 			}
 			add_building = building_identity_repository
 		}
@@ -1780,8 +1762,16 @@ tec_start_add_amenities_building = {
 				}
 				add_building = building_offspring_nest
 			}
-			else = {
+			else_if = {
+				limit = {
+					owner = {
+						tec_is_cyberhive = yes
+					}
+				}
 				add_building = building_tec_gestalt_parts_1
+			}
+			else = {
+				add_building = building_hive_warren
 			}
 		}
 		else_if = {
@@ -1836,6 +1826,22 @@ tec_start_add_assembly_building = {
 			}
 			add_building = building_robot_assembly_plant # will convert
 		}
+		else_if = {
+			limit = {
+				owner = {
+					has_origin = origin_tec_bioservant
+				}
+			}
+			add_building = building_tec_bioservant_plant_1 # will convert
+		}
+		else_if = {
+			limit = {
+				owner = {
+					has_origin = origin_tec_clones
+				}
+			}
+			add_building = building_clone_vats
+		}
 	}
 	else_if = {
 		limit = {
@@ -1850,6 +1856,14 @@ tec_start_add_assembly_building = {
 				}
 			}
 			add_building = building_hive_robot_assembly_plant
+		}
+		else_if = {
+			limit = {
+				owner = {
+					has_origin = origin_tec_bioservant
+				}
+			}
+			add_building = building_tec_hive_bioservant_plant_1
 		}
 		else_if = {
 			limit = {
@@ -2043,12 +2057,6 @@ tec_start_add_aux_features = {
 		limit = {
 			owner = {
 				has_valid_civic = civic_machine_tactical_algorithms
-			}
-		}
-		owner = {
-			give_technology = {
-				tech = tech_centralized_command
-				message = no
 			}
 		}
 		add_building = building_military_academy
@@ -2422,7 +2430,7 @@ tec_make_syncretic_elder_uplifted_species = {
 	modify_species = {
 		species = event_target:syncretic_species
 		remove_trait = trait_syncretic_proles
-		add_trait = @trait_tec_se_subspecies
+		has_trait = trait_tec_se_subspecies
 		change_scoped_species = yes
 		effect = {
 			set_species_flag = syncretic_species@root.owner
@@ -2527,15 +2535,32 @@ tec_start_handle_mechanists = {
 }
 
 tec_start_handle_bioservant = {
-	owner = {
-		tec_create_built_bioservant_species = yes
-		set_country_flag = done_tec_first_bioservant
-	}
 	last_created_species = {
-		change_species_characteristics = {
-			add_trait = trait_auto_mod_biological
-		}
 		tec_save_last_species = yes
+	}
+	owner = {
+		tec_make_secondary_species_bioservant_species = yes
+		set_country_flag = done_first_bioservant
+	}
+	event_target:tec_last_created_species = {
+		tec_species_swap_trait_if_exists = {
+			TRAIT = trait_tec_auto_mod_bioservant
+			WITH = trait_auto_mod_biological
+		}
+		tec_species_swap_trait_if_exists = {
+			TRAIT = trait_tec_sterile_pregame
+			WITH = trait_tec_sterile
+		}
+
+		tec_save_last_species = yes
+	}
+	owner = {
+		owner_main_species = {
+			tec_species_swap_trait_if_exists = {
+				TRAIT = trait_tec_auto_mod_bioservant
+				WITH = trait_auto_mod_biological
+			}
+		}
 	}
 }
 
