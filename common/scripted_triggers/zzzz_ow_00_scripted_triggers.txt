@@ -28,6 +28,10 @@ has_encountered_other_species = {
 can_be_leader = {
 	has_citizenship_rights = yes
 	can_think = yes
+	NOR = {
+		tec_has_stapled_trait = yes
+		tec_has_blocked_leader_trait = yes
+	}
 
 	OR = {
 		is_robot_pop = no
@@ -137,8 +141,8 @@ is_hive_empire = {
 is_autocracy = { #Power of one
 	OR = {
 		has_ethic = ethic_gestalt_consciousness
-		has_authority = auth_imperial
-		has_authority = auth_dictatorial
+		is_imperial_authority = yes
+		is_dictatorial_authority = yes
 		has_authority = auth_tec_theocracy
 		has_authority = auth_tec_patrocorporate
 		AND = {
@@ -150,7 +154,7 @@ is_autocracy = { #Power of one
 
 is_oligarchy = { #Power of few
 	OR = {
-		has_authority = auth_oligarchic
+		is_oligarchic_authority = yes
 		AND = {
 			has_authority = auth_corporate
 			is_egalitarian = no
@@ -165,7 +169,7 @@ is_oligarchy = { #Power of few
 
 is_democracy = { #Power of many
 	OR = {
-		has_authority = auth_democratic
+		is_democratic_authority = yes
 		AND = {
 			has_authority = auth_corporate
 			is_egalitarian = yes
@@ -191,6 +195,61 @@ has_corporate_government = {
 		has_civic = civic_galactic_sovereign_megacorp
 	}
 }
+# These are not overwritten as evolved new authorities are their own type
+# and will have own cyber swaps etc with tenets, essentially this might guarantee
+# SOME compatibility with other mods that add auths, potentially
+#
+# is_democratic_authority
+#
+# is_oligarchic_authority
+#
+# is_imperial_authority
+#
+# is_dictatorial_authority
+#
+# is_cyber_democracy
+#
+# is_cyber_oligarchy
+#
+# is_cyber_dictatorial
+#
+# is_cyber_imperial
+#
+# is_synth_democracy
+#
+# is_synth_oligarchy
+#
+# is_synth_dictatorial
+#
+# is_synth_imperial
+
+# Here we are in a pickle, we need to revert to auth check, or potentialy add is_corporate_authority
+# which will need extra compat for other mods to behave the same for whatever the below is used
+
+	is_corporate_authority = {
+		OR = {
+			has_authority = auth_corporate
+		}
+	}
+
+	is_cyber_corporate = {
+		is_corporate_authority = yes
+		OR = {
+			has_country_flag = cyber_individualist
+			has_country_flag = cyber_collectivist
+		}
+	}
+
+	is_synth_corporate = {
+		is_corporate_authority = yes
+		OR = {
+			has_country_flag = synth_physical
+			has_country_flag = synth_virtual
+		}
+	}
+
+# /
+
 
 tec_can_request_subsidiaries = {
 	OR = {
@@ -362,7 +421,6 @@ is_gestalt_node = {	# Paragon
 
 can_think = {
 	NOR = {
-		has_trait = trait_syncretic_proles
 		has_trait = trait_nerve_stapled
 		has_trait = trait_zombie
 		has_trait = trait_robot_suppressed
@@ -455,6 +513,10 @@ has_engineered_evolution_synergy = {
 		has_origin = origin_life_seeded
 		has_origin = origin_necrophage
 		has_origin = origin_clone_army
+		# evolved
+		has_origin = origin_tec_bioservant
+		has_origin = origin_tec_clones
+		tec_is_evolutionary_empire = yes
 	}
 }
 
@@ -467,7 +529,12 @@ has_organo_machine_interfacing_assimilator_synergy = {
 }
 
 has_synthetic_evolution_synergy = {
-	has_origin = origin_mechanists
+	OR = {
+		has_origin = origin_mechanists
+		tec_is_machine_cult = yes
+		has_civic = civic_tec_corporate_automatation
+	}
+
 }
 
 has_synthetic_evolution_anti_synergy = {
@@ -482,8 +549,17 @@ blocks_ai_synthetic_evolution = {
 		has_origin = origin_clone_army
 		has_origin = origin_overtuned
 		has_origin = origin_slavers
-		has_valid_civic = civic_idyllic_bloom
-		has_valid_civic = civic_hive_idyllic_bloom
+		tec_is_idyllic_bloom_empire = yes
+
+		# evolved
+		has_origin = origin_tec_bioservant
+		has_origin = origin_tec_clones
+		AND = {
+			has_origin = origin_syncretic_evolution
+			has_civic = civic_tec_origin_elders
+		}
+		has_civic = civic_tec_origin_neuroslug
+
 	}
 }
 
@@ -492,6 +568,8 @@ has_mind_over_matter_synergy = {
 		has_ascension_perk = ap_become_the_crisis
 		has_origin = origin_demonic_incursion
 		has_country_flag = knights_met_end_of_cycle
+		# evolved
+		tec_is_spiritual_seekers = yes
 	}
 }
 
@@ -601,3 +679,4 @@ can_obtain_rare_crystals = {
 		tec_can_produce_rare_crystals = yes
 	}
 }
+
