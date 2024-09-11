@@ -229,6 +229,149 @@ district_resort = {
 	}
 }
 
+
+district_prison = {
+	base_buildtime = 480
+	is_capped_by_modifier = no
+	exempt_from_ai_planet_specialization = yes
+	icon = district_city
+
+	show_on_uncolonized = {
+		exists = from
+		from = { is_regular_empire = yes }
+		has_modifier = penal_colony
+	}
+
+	potential = {
+		exists = owner
+		owner = { is_regular_empire = yes }
+		has_modifier = penal_colony
+	}
+
+	allow = {
+		has_modifier = penal_colony
+	}
+
+	conversion_ratio = 1
+	inline_script = districts/convert_to/tec_housing_districts
+
+	resources = {
+		category = planet_districts_cities
+		inline_script = {
+			script = districts/resources/tec_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_cost_high
+			upkeep = @tec_district_upkeep
+		}
+	}
+
+	planet_modifier = {
+		planet_housing_add = 3
+		planet_max_buildings_add = 1
+	}
+
+	# Effect Types
+		inline_script = {
+			script = districts/type/tec_housing_generic
+			scale = 1
+			secondary_scale = 2
+			trigger = ""
+		}
+		inline_script = {
+			script = districts/type/tec_housing_city
+			scale = 1
+			secondary_scale = 2
+			trigger = ""
+		}
+	# /
+
+	inline_script = {
+		script = jobs/tec_enforcer
+		count = 2
+		mult = 1
+		display = with_desc
+		trigger = ""
+		default_job = enforcer
+	}
+}
+
+
+district_slave = {
+	base_buildtime = 480
+	is_capped_by_modifier = no
+	exempt_from_ai_planet_specialization = yes
+	icon = district_city
+
+	show_on_uncolonized = {
+		exists = from
+		from = { is_regular_empire = yes }
+		has_modifier = slave_colony
+	}
+
+	potential = {
+		exists = owner
+		owner = { is_regular_empire = yes }
+		has_modifier = slave_colony
+	}
+
+	allow = {
+		has_modifier = slave_colony
+	}
+
+	conversion_ratio = 1
+	inline_script = districts/convert_to/tec_housing_districts
+
+	resources = {
+		category = planet_districts_cities
+		inline_script = {
+			script = districts/resources/tec_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_cost_high
+			upkeep = @tec_district_upkeep
+		}
+	}
+
+	planet_modifier = {
+		planet_housing_add = 10
+		planet_max_buildings_add = 1
+	}
+
+
+	# Effect Types
+		inline_script = {
+			script = districts/type/tec_housing_generic
+			scale = 1
+			secondary_scale = 2
+			trigger = ""
+		}
+		inline_script = {
+			script = districts/type/tec_housing_city
+			scale = 1
+			secondary_scale = 2
+			trigger = ""
+		}
+	# /
+
+	inline_script = {
+		script = jobs/tec_job
+		job = slave_overseer
+		count = 2
+		mult = 1
+		trigger = "
+			exists = owner
+			owner = {
+				is_gestalt = no
+				is_fallen_empire_spiritualist = no
+			}
+		"
+		display = with_desc
+	}
+}
+
 district_city = {
 	base_buildtime = 480
 	is_capped_by_modifier = no
@@ -583,6 +726,7 @@ district_industrial = {
 			tec_is_biohive = no
 		}
 		tec_has_standard_industrial_district = yes
+		tec_has_standard_industrial_district_block = no
 	}
 	
 	potential = {
@@ -591,6 +735,7 @@ district_industrial = {
 			tec_is_biohive = no
 		}
 		tec_has_standard_industrial_district = yes
+		tec_has_standard_industrial_district_block = no
 	}
 	
 	allow = {
@@ -665,6 +810,7 @@ district_tec_factory = {
 			country_uses_consumer_goods = yes
 		}
 		tec_has_standard_industrial_district = yes
+		tec_has_standard_industrial_district_block = no
 	}
 
 	potential = {
@@ -674,6 +820,7 @@ district_tec_factory = {
 			country_uses_consumer_goods = yes
 		}
 		tec_has_standard_industrial_district = yes
+		tec_has_standard_industrial_district_block = no
 	}
 
 	allow = {
@@ -728,6 +875,239 @@ district_tec_factory = {
 		display = with_desc
 		default_job = artisan
 
+	}
+}
+
+district_prison_industrial = {
+	base_buildtime = 480
+	is_capped_by_modifier = no
+	icon = district_arcology_arms_industry
+
+	prerequisites = {
+		tech_basic_industry
+	}
+
+	show_on_uncolonized = {
+		exists = owner
+		owner = { is_gestalt = no }
+		tec_has_standard_industrial_district = yes
+		has_modifier = penal_colony
+	}
+
+	potential = {
+		exists = owner
+		owner = { is_gestalt = no }
+		tec_has_standard_industrial_district = yes
+		has_modifier = penal_colony
+	}
+
+	allow = {
+		NOR = {
+			has_modifier = resort_colony
+			has_modifier = slave_colony
+		}
+	}
+
+	conversion_ratio = 1
+	inline_script = districts/convert_to/tec_industrial_districts
+	inline_script = districts/convert_to/tec_factory_districts
+
+	resources = {
+		category = planet_districts_industrial
+		inline_script = {
+			script = districts/resources/tec_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_cost_high
+			upkeep = @tec_district_upkeep_high
+		}
+
+		inline_script = districts/resources/tec_unleashed_industrialization_foundry_resources
+		inline_script = districts/resources/tec_industrial_maintenance_upkeep
+	}
+
+	triggered_planet_modifier = {
+		planet_housing_add = 2
+		mult = value:tec_regular_planet_district_scale
+	}
+	# /
+
+	inline_script = {
+		script = districts/tec_industrial_district_modifiers
+		housing_scale = 1
+		building_slot_scale = 1
+		amenities_scale = 1
+	}
+	# /
+	# Civics
+	inline_script = districts/effects/tec_unleashed_industrialization
+	# /
+	# Edicts
+	inline_script = districts/effects/tec_industrial_maintenance
+	# /
+	inline_script = {
+		script = jobs/tec_foundry
+		count = 2
+		mult = 1
+		trigger = ""
+		display = with_desc
+		default_job = foundry_prison_worker
+	}
+}
+
+district_tec_prison_factory = {
+	base_buildtime = 480
+	is_capped_by_modifier = no
+	icon = district_arcology_civilian_industry
+
+	prerequisites = {
+		tech_basic_industry
+	}
+
+	show_on_uncolonized = {
+		exists = owner
+		owner = { is_gestalt = no }
+		tec_has_standard_industrial_district = yes
+		has_modifier = penal_colony
+	}
+
+	potential = {
+		exists = owner
+		owner = { is_gestalt = no }
+		tec_has_standard_industrial_district = yes
+		has_modifier = penal_colony
+	}
+
+	allow = {
+		NOR = {
+			has_modifier = resort_colony
+			has_modifier = slave_colony
+		}
+	}
+
+	conversion_ratio = 1
+	inline_script = districts/convert_to/tec_industrial_districts
+	inline_script = districts/convert_to/tec_factory_districts
+
+	resources = {
+		category = planet_districts_industrial
+		inline_script = {
+			script = districts/resources/tec_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_cost_high
+			upkeep = @tec_district_upkeep_high
+		}
+
+		inline_script = districts/resources/tec_unleashed_industrialization_factory_resources
+		inline_script = districts/resources/tec_industrial_maintenance_upkeep
+	}
+
+	triggered_planet_modifier = {
+		planet_housing_add = 2
+		mult = value:tec_regular_planet_district_scale
+	}
+	# /
+
+	inline_script = {
+		script = districts/tec_industrial_district_modifiers
+		housing_scale = 1
+		building_slot_scale = 1
+		amenities_scale = 1
+	}
+	# /
+	# Civics
+	inline_script = districts/effects/tec_unleashed_industrialization
+	# /
+	# Edicts
+	inline_script = districts/effects/tec_industrial_maintenance
+	# /
+
+	inline_script = {
+		script = jobs/tec_artisan
+		count = 2
+		mult = 1
+		trigger = ""
+		display = with_desc
+		default_job = artisan_prison_worker
+	}
+}
+
+district_battle_thrall = {
+	base_buildtime = 480
+	is_capped_by_modifier = no
+
+	prerequisites = {
+		tech_basic_industry
+	}
+
+	show_on_uncolonized = {
+		exists = from
+		has_modifier = slave_colony
+	}
+
+	potential = {
+		exists = owner
+		has_modifier = slave_colony
+	}
+
+	allow = {
+		has_modifier = slave_colony
+	}
+
+	conversion_ratio = 1
+	inline_script = districts/convert_to/tec_industrial_districts
+	inline_script = districts/convert_to/tec_factory_districts
+
+	resources = {
+		category = planet_districts_industrial
+		inline_script = {
+			script = districts/resources/tec_district_resource_cost
+			upkeep_trigger = "
+				always = yes
+			"
+			cost = @tec_district_cost_high
+			upkeep = @tec_district_upkeep_high
+		}
+		inline_script = districts/resources/tec_unleashed_industrialization_foundry_resources
+		inline_script = districts/resources/tec_industrial_maintenance_upkeep
+	}
+
+	triggered_planet_modifier = {
+		planet_housing_add = 2
+		mult = value:tec_regular_planet_district_scale
+	}
+	# /
+
+	inline_script = {
+		script = districts/tec_industrial_district_modifiers
+		housing_scale = 1
+		building_slot_scale = 1
+		amenities_scale = 1
+	}
+	# /
+	# Civics
+	inline_script = districts/effects/tec_unleashed_industrialization
+	# /
+	# Edicts
+	inline_script = districts/effects/tec_industrial_maintenance
+	# /
+
+	inline_script = {
+		script = jobs/tec_job
+		job = battle_thrall
+		count = 2
+		mult = 1
+		trigger = "
+			exists = owner
+			owner = {
+				is_gestalt = no
+				is_fallen_empire_spiritualist = no
+			}
+		"
+		display = with_desc
 	}
 }
 
