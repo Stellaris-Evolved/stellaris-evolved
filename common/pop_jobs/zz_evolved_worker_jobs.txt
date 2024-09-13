@@ -578,32 +578,22 @@
 
 		resources = {
 			category = planet_pop_assemblers
-			upkeep = {
-				alloys = 0.5
+			inline_script = {
+				script = jobs/resources/tec_robotic_assembly_upkeep
+				base = @[tec_robot_assembly_cost / 2]
+				mult = value:tec_assembly_building_tier
+				trigger = ""
 			}
 		}
 
-		planet_modifier = {
-			planet_pop_assembly_add = 0.2
+		inline_script = {
+			script = modifiers/tec_assembly_robotic
+			trigger = ""
+			mult = 0.2
 		}
 
-		triggered_planet_modifier = {
-			potential = {
-				planet = {
-					exists = assembling_species
-					assembling_species = {
-						is_robotic_species = no
-					}
-				}
-			}
-			planet_pop_assembly_add = -0.2
-			planet_pop_assembly_organic_add = 0.2
-		}
 
 		triggered_planet_modifier = {	# Capitalized innovation
-			potential = {
-				always = yes
-			}
 			trade_value_add = 5
 			mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
 		}
@@ -679,7 +669,17 @@
 					NOT = {
 						planet = {
 							any_owned_species = {
-								is_livestock = yes
+								OR = {
+									is_livestock = yes
+									AND = {
+										has_citizenship_type = {
+											type = citizenship_robot_servitude
+											country = prev.owner
+										}
+										has_trait = trait_tec_bioservant_livestock
+									}
+								}
+
 							}
 						}
 					}
@@ -695,7 +695,17 @@
 					NOT = {
 						planet = {
 							any_owned_species = {
-								is_livestock = yes
+								OR = {
+									is_livestock = yes
+									AND = {
+										has_citizenship_type = {
+											type = citizenship_robot_servitude
+											country = prev.owner
+										}
+										has_trait = trait_tec_bioservant_livestock
+									}
+								}
+
 							}
 						}
 					}
@@ -725,7 +735,14 @@
 		weight = {
 			# Specialist weight
 			weight = @worker_job_weight
-			mult = value:job_weights_research_modifier|JOB|researcher|
+			mult = value:job_weights_research_modifier|JOB|tec_labrat|
+
+			mult = value:tec_modifier|MODIFIER|planet_livestock_minerals_produces_add|ADD|4|MULT|0.25|
+			mult = value:tec_modifier|MODIFIER|planet_livestock_food_produces_add|ADD|4|MULT|0.25|
+			mult = value:tec_modifier|MODIFIER|planet_livestock_energy_produces_add|ADD|4|MULT|0.25|
+			mult = value:tec_modifier|MODIFIER|planet_livestock_volatile_motes_produces_add|ADD|2|MULT|0.5|
+			mult = value:tec_modifier|MODIFIER|planet_livestock_exotic_gases_produces_add|ADD|2|MULT|0.5|
+			mult = value:tec_modifier|MODIFIER|planet_livestock_rare_crystals_produces_add|ADD|2|MULT|0.5|
 
 			modifier = {
 				factor = 1.5
@@ -733,26 +750,18 @@
 			}
 
 			# Living standard weight
-			modifier = {
-				factor = 2
-				has_living_standard = { type = living_standard_academic_privilege }
-			}
+			# modifier = {
+			# 	factor = 2
+			# 	has_living_standard = { type = living_standard_academic_privilege }
+			# }
 			modifier = {
 				factor = 1.5
 				is_enslaved = yes
-				has_slavery_type = { type = slavery_indentured }
-			}
-			modifier = {
-				factor = 5
-				is_enslaved = yes
-				is_livestock = no
 			}
 			modifier = {
 				factor = 0.2
 				has_citizenship_rights = no
-				NOR = {
-					tec_has_trait_slave = yes
-				}
+				tec_has_trait_slave = no
 			}
 			modifier = {
 				factor = 0.1
