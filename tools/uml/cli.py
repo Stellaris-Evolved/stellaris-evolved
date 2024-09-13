@@ -577,7 +577,7 @@ def generate_tags(config: str, local_config: str, base_mod_path: str):
                 tec_economic_category_{economic_category}_tag = {{
                     icon = mod_tec_blank
                     neutral = yes
-                    category = planet
+                    category = pop
                     percentage = no
                     localize_with_value_key = yes
                 }}
