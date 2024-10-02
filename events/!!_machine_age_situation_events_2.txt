@@ -1,0 +1,520 @@
+#################################################
+#												#
+# Machine Age DLC Digitization Situation Events	#
+#												#
+#################################################
+
+namespace = synth
+
+@synth_approach_mult = 5
+
+### DIGITIZATION SITUATION START ###
+# Fired by: tr_synthetics_adopt
+#country_event = { # Digitization - First event
+#	id = synth.1
+
+
+# Event pools gatekeeping event | Situation Random Events
+# Fired by: situation on_monthly and situation flag
+#situation_event = {
+#	id = synth.5
+
+# DIGITIZATION STAGE 1
+# Fired by: situation stage on_first_enter
+#situation_event = { # Stage 1 - Start event
+#	id = synth.100
+
+
+# Fired by: situation on_monthly
+#situation_event = { # Job strata focus
+#	id = synth.105
+
+# Fired by: on_digitization_situation_random_events_list
+#situation_event = { # Stage 1 Opportunity
+#	id = synth.120
+
+# Fired by: on_digitization_situation_random_events_list
+#situation_event = { # Stage 1 Challenge
+#	id = synth.160
+
+
+# DIGITIZATION STAGE 2
+# Fired by: situation stage on_first_enter
+#situation_event = { # Stage 2 - Start event
+#	id = synth.200
+
+# Fired by: situation on_monthly
+#situation_event = {
+#	id = synth.205
+
+# Fired by: on_digitization_situation_random_events_list
+#situation_event = { # Stage 2 Opportunity
+#	id = synth.220
+
+
+# Fired by: on_digitization_situation_random_events_list
+#situation_event = { # Stage 2 Challenge
+#	id = synth.260
+
+
+# DIGITIZATION STAGE 3
+# Fired by: situation stage on_first_enter
+#situation_event = { # Stage 3 - Start event
+#	id = synth.300
+
+
+# Fired by: situation on_monthly
+#situation_event = { # Synthetic Tourism
+#	id = synth.305
+
+
+# Fired by: situation on_monthly
+#situation_event = { # The Resistance
+#	id = synth.310
+
+# Called when a blocker is cleared from on_blocker_cleared.
+# If it's the Biological Enclaves blocker, remove the synth_resistance country flags.
+# This = Planet
+# Fired by: on_blocker_cleared
+#planet_event = {
+#	id = synth.311
+
+
+# Fired by: on_digitization_situation_random_events_list
+#situation_event = { # Stage 3 Opportunity
+#	id = synth.320
+
+# Fired by: on_digitization_situation_random_events_list
+#situation_event = { # Stage 3 Challenge
+#	id = synth.360
+
+# DIGITIZATION STAGE 4
+# Fired by: situation stage on_first_enter
+#situation_event = { # Stage 4 - Start event
+#	id = synth.400
+
+# Fired by: situation on_monthly
+#situation_event = { # Stage 4 - Mind Creation Methods
+#	id = synth.405
+
+# DIGITIZATION FINAL EVENT
+# Fired by: situation on_progress_complete
+#situation_event = { # Digitization - Final hidden event
+#	id = synth.2
+
+# Fired by: event
+#situation_event = { # Final event
+#	id = synth.4
+
+
+# Fired by: situation on_monthly and event
+situation_event = { # Event to digitize pops
+	id = synth.3
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_situation_flag = digitization_ongoing
+		if = {
+			limit = {
+				owner = {
+					NOT = { has_origin = origin_synthetic_fertility }
+				}
+			}
+			owner = {
+				check_variable_arithmetic = { which = value:num_active_buildings|BUILDING|building_identity_complex| value > 0 }
+			}
+		}
+	}
+
+	immediate = {
+		owner = { # TODO ASCENSION SYNTHETIC port changes of species traits to this
+			create_synth_species_effect = yes
+
+			if = { # Final event
+				limit = {
+					prev = {
+						has_situation_flag = digitization_final
+					}
+				}
+				every_owned_pop = {
+					limit = {
+						is_same_species = owner.species
+						NOT = {
+							has_trait = trait_mechanical
+						}
+					}
+					change_species = event_target:synthspecies@root.owner
+				}
+			}
+			else = { # Digitization ongoing
+				if = {
+					limit = {
+						owner = {
+							has_origin = origin_synthetic_fertility
+						}
+					}
+					while = {
+						limit = {
+							any_owned_pop = {
+								exists = event_target:synthspecies@root.owner
+								is_same_species = owner.species
+								NOT = {
+									has_trait = trait_mechanical
+								}
+							}
+						}
+						count = value:pop_to_digitize_per_month_synthetic_fertility
+						random_owned_pop = {
+							limit = {
+								is_same_species = owner.species
+								NOT = {
+									has_trait = trait_mechanical
+								}
+							}
+							change_species = event_target:synthspecies@root.owner
+						}
+					}
+				}
+				else = {
+					while = {
+						limit = {
+							any_owned_pop = {
+								exists = event_target:synthspecies@root.owner
+								is_same_species = owner.species
+								NOT = {
+									has_trait = trait_mechanical
+								}
+							}
+						}
+						count = value:pop_to_digitize_per_month
+						random_owned_pop = {
+							limit = {
+								is_same_species = owner.species
+								NOT = {
+									has_trait = trait_mechanical
+								}
+							}
+							change_species = event_target:synthspecies@root.owner
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					prev = {
+						OR = {
+							has_situation_flag = digitization_final
+							NOT = { has_situation_flag = synth_leaders_digitized }
+						}
+					}
+				}
+				every_owned_leader = {
+					limit = {
+						is_same_species = owner.species
+						NOT = {
+							has_trait = leader_trait_synthetic
+						}
+					}
+					change_species = event_target:synthspecies@root.owner
+					add_trait_no_notify = leader_trait_synthetic
+					remove_trait = leader_trait_brainslug
+					set_age = 1
+				}
+				every_pool_leader = {
+					limit = {
+						is_same_species = owner.species
+						NOT = {
+							has_trait = leader_trait_synthetic
+						}
+					}
+					change_species = event_target:synthspecies@root.owner
+					add_trait_no_notify = leader_trait_synthetic
+					remove_trait = leader_trait_brainslug
+					set_age = 1
+				}
+				every_envoy = {
+					limit = {
+						exists = species
+						species = {
+							is_robotic = no
+							is_livestock = no
+						}
+					}
+					change_species = event_target:synthspecies@root.owner
+					change_leader_portrait = species
+				}
+				every_controlled_ship = {
+					limit = {
+						is_ship_class = shipclass_colonizer
+						species = {
+							is_robotic = no
+							is_livestock = no
+						}
+					}
+					change_species = event_target:synthspecies@root.owner
+				}
+				every_owned_army = {
+					limit = {
+						exists = species
+						species = {
+							is_robotic = no
+							is_livestock = no
+						}
+						army_type = assault_army
+					}
+					modify_army = {
+						name = random
+						type = "robotic_army"
+						species = event_target:synthspecies@root.owner
+					}
+				}
+				every_owned_army = {
+					limit = {
+						exists = species
+						exists = planet
+						species = {
+							is_robotic = no
+							is_livestock = no
+						}
+						OR = {
+							army_type = defense_army
+							army_type = fanatic_guardian
+						}
+					}
+					modify_army = {
+						name = random
+						type = "robotic_defense_army"
+						species = event_target:synthspecies@root.owner
+					}
+				}
+				prev = {
+					set_situation_flag = synth_leaders_digitized
+				}
+			}
+		}
+		# Check if there are any pops left to digitize, otherwise remove the digitization flag to unpause the situation.
+		if = {
+			limit = {
+				NOT = {
+					owner = {
+						any_owned_pop = {
+							exists = event_target:synthspecies@root.owner
+							is_same_species = owner.species
+							NOT = {
+								has_trait = trait_mechanical
+							}
+						}
+					}
+				}
+			}
+			remove_situation_flag = digitization_ongoing
+			owner = {
+				change_dominant_species = { species = event_target:synthspecies@root.owner change_all = yes }
+			}
+		}
+	}
+}
+
+### DIGITIZATION SITUATION END ###
+
+### SOCIETAL EFFECTS EVENT CHAIN START ###
+# Fired by: tr_synthetics_finish or event
+country_event = {	# TODO ASCENSION SYNTHETICS - evolved add the special auths
+	id = synth.500
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		set_variable = {
+			which = "synth_physical_society"
+			value = 0
+		}
+		set_variable = {
+			which = "synth_virtual_society"
+			value = 0
+		}
+		if = {
+			limit = {
+				has_origin = origin_synthetic_fertility
+			}
+			if = {
+				limit = {
+					has_country_flag = synthetic_fertility_no_identity_left_behind
+				}
+				change_variable = {
+					which = "synth_physical_society"
+					value = 1
+				}
+			}
+			else = {
+				change_variable = {
+					which = "synth_virtual_society"
+					value = 1
+				}
+			}
+		}
+		switch = {
+			trigger = has_authority
+			auth_democratic = {
+				hidden_effect = {
+					country_event = { id = synth.505 }
+				}
+			}
+			auth_oligarchic = {
+				hidden_effect = {
+					country_event = { id = synth.510 }
+			 	}
+			}
+			auth_dictatorial = {
+			 	hidden_effect = {
+			 		country_event = { id = synth.515 }
+			 	}
+			}
+			auth_imperial = {
+				hidden_effect = {
+					country_event = { id = synth.520 }
+				}
+			}
+			auth_corporate = {
+				hidden_effect = {
+					country_event = { id = synth.525 }
+				}
+			}
+		}
+	}
+}
+
+# Fired by: event
+#country_event = { # Democratic
+#	id = synth.505
+
+
+# Fired by: event
+#country_event = { # Oligarchic
+#	id = synth.510
+
+
+# Fired by: event
+#country_event = { # Dictatorial
+#	id = synth.515
+
+
+# Fired by: event
+#country_event = { # Imperial
+#	id = synth.520
+
+
+# Fired by: event
+#country_event = { # Corporate
+#	id = synth.525
+
+
+### SOCIETAL EFFECTS EVENT CHAIN END ###
+
+# EVENT POOL 1: Identity
+
+# Event pool gatekeeping event
+#country_event = {
+#	id = synth.600
+
+
+# Fired by: on_synthshock_chain_identity_events_list
+#country_event = { # Synth Provenance
+#	id = synth.610
+
+
+# Fired by: on_synthshock_chain_identity_events_list
+#country_event = { # Organic Cravings
+#	id = synth.620
+
+
+# Fired by: on_synthshock_chain_identity_events_list
+#country_event = { # Home Server Architecture
+#	id = synth.630
+
+
+# EVENT POOL 2: Possibilities
+
+# Event pool gatekeeping event
+# Fired by: event
+#country_event = {
+#	id = synth.1000
+
+
+# Fired by: on_synthshock_chain_opportunity_events_list
+#country_event = { # Infinite Possibility Matrix
+#	id = synth.1010
+
+
+# Fired by: on_synthshock_chain_opportunity_events_list
+#country_event = { # Synthetic Medicine
+#	id = synth.1020
+
+
+# Fired by: on_synthshock_chain_opportunity_events_list
+#country_event = { # Respawn
+#	id = synth.1030
+
+
+# Ending
+# Fired by: event
+#country_event = {
+#	id = synth.1500
+
+
+# Democratic Final Event
+# Fired by: event
+#country_event = {
+#	id = synth.1505
+
+
+# Oligarchic Final Event
+# Fired by: event
+#country_event = {
+#	id = synth.1510
+
+
+# Dictatorial Final Event
+# Fired by: event
+#country_event = {
+#	id = synth.1515
+
+
+# Imperial Final Event
+# Fired by: event
+#country_event = {
+#	id = synth.1520
+
+
+# Corporate Final Event
+# Fired by: event
+#country_event = {
+#	id = synth.1525
+
+
+# Reassembled Armies: Upload new minds to defeated robot armies
+# An army has been killed in ground combat
+#	This = owner
+#	From = army
+#	FromFrom = opponent
+#	FromFromFrom = planet
+# Fired by: on_army_killed_in_combat
+#country_event = {
+#	id = synth.1550
+
+
+# Synth Imperial physical swap, leader dies and gives research
+# Executed as a leader has died
+#	This = Country
+#	From = Leader
+# Fired by: on_leader_death
+#country_event = {
+#	id = synth.1555
+
+
+#
+# THIS = country
+# Fired by: on_monthly_pulse_country
+#country_event = {
+#	id = cyber.1570

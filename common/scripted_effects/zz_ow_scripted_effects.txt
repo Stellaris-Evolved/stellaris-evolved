@@ -380,8 +380,6 @@ pop_diverge_ethic = {
 	}
 }
 
-
-
 # R E M I N D E R - other traits are handled by other events
 	# events = {
 	# 	utopia.2509 # New Leaders Get Erudite Trait
@@ -774,23 +772,85 @@ tec_add_leader_traits_after_modification = {
 		}
 	# /
 	# Synthetics
-	if = {	# leader_trait_synthetic - ALL
-		limit = {
-			NOT = { has_trait = leader_trait_synthetic }
-			tec_is_aiauth_node = no
-			OR = {
-				species = { has_trait = trait_mechanical }
-				AND = {
-					species = { has_trait = trait_machine_unit }
-					is_gestalt_node = no
-					owner = { has_country_flag = tec_machine_synthetic_trait }
+		if = {	# leader_trait_synthetic - ALL
+			limit = {
+				NOT = { has_trait = leader_trait_synthetic }
+				tec_is_aiauth_node = no
+				OR = {
+					species = { has_trait = trait_mechanical }
+					AND = {
+						species = { has_trait = trait_machine_unit }
+						is_gestalt_node = no
+						owner = {
+							OR = {
+								has_country_flag = tec_leaders_synthetic_trait
+								has_tradition = tr_modularity_finish
+							}
+						}
+					}
+				}
+				tec_leader_cannot_take_species_traits = no
+				owner = {
+					NOR = {
+						# Exclusivities
+						#has_country_flag = tec_leaders_synthetic_trait
+						#has_tradition = tr_modularity_finish
+						has_tradition = tr_virtuality_finish
+						has_country_flag = synth_virtual
+						# Debug
+						has_country_flag = tec_invalidates_synthetic_leader_trait
+					}
 				}
 			}
-			tec_leader_cannot_take_species_traits = no
-			owner = { NOT = { has_country_flag = tec_invalidates_synthetic_leader_trait } }
+			add_trait_no_notify = leader_trait_synthetic
+			if = {
+				limit = { # Just in case
+					has_trait = leader_trait_virtual
+				}
+				remove_trait = leader_trait_virtual
+			}
 		}
-		add_trait_no_notify = leader_trait_synthetic
-	}
+	# /
+	# Virtual
+		if = {	# leader_trait_virtual - ALL
+			limit = {
+				NOT = { has_trait = leader_trait_virtual }
+				tec_is_aiauth_node = no
+				OR = {
+					species = { has_trait = trait_mechanical }
+					AND = {
+						species = { has_trait = trait_machine_unit }
+						is_gestalt_node = no
+						owner = {
+							OR = {
+								has_tradition = tr_virtuality_finish
+								has_country_flag = synth_virtual
+							}
+						}
+					}
+				}
+				tec_leader_cannot_take_species_traits = no
+				owner = {
+					NOR = {
+						# Exclusivities
+						has_country_flag = tec_leaders_synthetic_trait
+						has_tradition = tr_modularity_finish
+						#has_tradition = tr_virtuality_finish
+						#has_country_flag = synth_virtual
+						# Debug
+						has_country_flag = tec_invalidates_synthetic_leader_trait
+					}
+				}
+			}
+			add_trait_no_notify = leader_trait_virtual
+			if = {
+				limit = { # Just in case
+					has_trait = leader_trait_synthetic
+				}
+				remove_trait = leader_trait_synthetic
+			}
+		}
+	# /
 	# Synthetics t2 (TO DO - SCRAP)
 		# if = {
 		# 	limit = {
@@ -1186,7 +1246,7 @@ remove_leader_traits_after_modification = {
 		}
 	# /
 	# Synthetics
-		if = {	# trait_tec_cyberpsionic_main - ALL
+		if = {	# leader_trait_synthetic - ALL
 			limit = {
 				has_trait = leader_trait_synthetic
 				species = {
@@ -1197,6 +1257,20 @@ remove_leader_traits_after_modification = {
 				}
 			}
 			remove_trait = leader_trait_synthetic
+		}
+	# /
+	# Virtual
+		if = {	# leader_trait_virtual - ALL
+			limit = {
+				has_trait = leader_trait_virtual
+				species = {
+					NOR = {
+						has_trait = trait_mechanical
+						has_trait = trait_machine_unit
+					}
+				}
+			}
+			remove_trait = leader_trait_virtual
 		}
 	# /
 	# Synthetics t2 (TO DO - SCRAP)
