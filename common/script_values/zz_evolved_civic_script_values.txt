@@ -115,56 +115,49 @@
 	tec_vault_scale = {
 		inline_script = {
 			script = tec_type_hint
-			variable = $VAR$
+			resource = $RESOURCE$
 		}
 
 		base = 0
 		modifier = {
-			is_variable_set = $VAR$
-			add = $VAR$
+			is_variable_set = tec_$RESOURCE$_stockpile
+			add = value:_tec_valut_scale_inner|VAR|tec_$RESOURCE$_stockpile|
+		}
+	}
+
+	_tec_valut_scale_inner = {
+		inline_script = {
+			script = tec_type_hint
+			variable = $VAR$
 		}
 		modifier = {
-			mult = 2
-			owner = {
-				tec_is_hoarder_empire = yes
-			}
+			add = owner.value:councilor_level_combo|COUNCILOR_1|councilor_civic_tec_corporate_hoarder|COUNCILOR_2|councilor_civic_tec_regular_hoarder|
+			exists = owner
 		}
+		mult = @councilor_civic_tec_corporate_hoarder_bonus
+		add = 1
+		# (1 + 0.1 * level)
+		modifier = {
+			mult = 2
+			exists = owner
+			owner = { tec_is_hoarder_empire = yes }
+		}
+		# * 2 if hoarder
+		mult = $VAR$
+		# * stockpile
 	}
 
 	# Stockpile management script values
 
 	tec_hoarder_get_vault_stockpile = {
-		modifier = {
-			has_planet_flag = tec_vault_manage_minerals
-			add = tec_minerals_stockpile
-		}
-		modifier = {
-			has_planet_flag = tec_vault_manage_food
-			add = tec_food_stockpile
-		}
-		modifier = {
-			has_planet_flag = tec_vault_manage_alloys
-			add = tec_alloys_stockpile
-		}
-		modifier = {
-			has_planet_flag = tec_vault_manage_consumer_goods
-			add = tec_consumer_goods_stockpile
-		}
-		modifier = {
-			has_planet_flag = tec_vault_manage_rare_crystals
-			add = tec_rare_crystals_stockpile
-		}
-		modifier = {
-			has_planet_flag = tec_vault_manage_exotic_gases
-			add = tec_exotic_gases_stockpile
-		}
-		modifier = {
-			has_planet_flag = tec_vault_manage_volatile_motes
-			add = tec_volatile_motes_stockpile
-		}
-		modifier = {
-			has_planet_flag = tec_vault_manage_minor_artifacts
-			add = tec_minor_artifacts_stockpile
+		inline_script = {
+			script = iterators/tec_iterate_hoarder_resource
+			code = "
+				modifier = {
+					has_planet_flag = tec_vault_manage_\$resource\$
+					add = tec_\$resource\$_stockpile
+				}
+			"
 		}
 	}
 
@@ -187,37 +180,14 @@
 
 
 	tec_hoarders_get_resource_stockpile = {
-		modifier = {
-			has_planet_flag = tec_vault_manage_minerals
-			add = value:tec_hoarders_get_resource_intermediary|RESOURCE|minerals|
-		}
-		modifier = {
-			has_planet_flag = tec_vault_manage_food
-			add = value:tec_hoarders_get_resource_intermediary|RESOURCE|food|
-		}
-		modifier = {
-			has_planet_flag = tec_vault_manage_alloys
-			add = value:tec_hoarders_get_resource_intermediary|RESOURCE|alloys|
-		}
-		modifier = {
-			has_planet_flag = tec_vault_manage_consumer_goods
-			add = value:tec_hoarders_get_resource_intermediary|RESOURCE|consumer_goods|
-		}
-		modifier = {
-			has_planet_flag = tec_vault_manage_rare_crystals
-			add = value:tec_hoarders_get_resource_intermediary|RESOURCE|rare_crystals|
-		}
-		modifier = {
-			has_planet_flag = tec_vault_manage_exotic_gases
-			add = value:tec_hoarders_get_resource_intermediary|RESOURCE|exotic_gases|
-		}
-		modifier = {
-			has_planet_flag = tec_vault_manage_volatile_motes
-			add = value:tec_hoarders_get_resource_intermediary|RESOURCE|volatile_motes|
-		}
-		modifier = {
-			has_planet_flag = tec_vault_manage_minor_artifacts
-			add = value:tec_hoarders_get_resource_intermediary|RESOURCE|minor_artifacts|
+		inline_script = {
+			script = iterators/tec_iterate_hoarder_resource
+			code = "
+				modifier = {
+					has_planet_flag = tec_vault_manage_\$resource\$
+					add = value:tec_hoarders_get_resource_intermediary|RESOURCE|\$resource\$|
+				}
+			"
 		}
 	}
 
@@ -290,24 +260,10 @@
 
 # Agendas
  # Genetic ascendancy
-	# Based on purge_traits_exp_change_total
-	agenda_tec_genetic_ascendancy_xp_change = {
-		inline_script = {
-			script = tec_type_hint
-			float = $BASE$
-			number_or_value = $MULT$
-		}
 
-		base = $BASE$
-		complex_trigger_modifier = {
-			trigger = num_leader_traits
-			parameters = {
-				negative = yes
-				count_tiers = no	# Only costs Exp per TRAIT, ignoring Tiers.
-			}
-			mode = add
-		}
-		mult = $MULT$
+	tec_epigenetic_restoration_exp_cost_per_trait = {
+		base = @tec_epigenetic_restoration_exp_cost_base
+		mult = value:tec_modifier|MODIFIER|tec_epigenetic_restoration_mult|ADD|-1|MULT|-1|
 	}
  # /
 # /

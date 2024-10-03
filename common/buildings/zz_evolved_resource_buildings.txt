@@ -4286,9 +4286,6 @@
  # /
 # /
 # ------------- HOARDERS -----------------
-	@tec_vault_scale = 0.001
-	@tec_vault_advanced = 2
-	@tec_vault_strategic = 4
 
 	# TODO: RODAH MAKE ART REEEEE
 	building_tec_vault_of_plenty = {
@@ -4314,14 +4311,12 @@
 		}
 
 		on_destroy = {
-			tec_hoarders_recover_resource = { RESOURCE = minerals }
-			tec_hoarders_recover_resource = { RESOURCE = food }
-			tec_hoarders_recover_resource = { RESOURCE = alloys }
-			tec_hoarders_recover_resource = { RESOURCE = consumer_goods }
-			tec_hoarders_recover_resource = { RESOURCE = rare_crystals }
-			tec_hoarders_recover_resource = { RESOURCE = exotic_gases }
-			tec_hoarders_recover_resource = { RESOURCE = volatile_motes }
-			tec_hoarders_recover_resource = { RESOURCE = minor_artifacts }
+			inline_script = {
+				script = iterators/tec_iterate_hoarder_resource
+				code = "
+					tec_hoarders_recover_resource = { RESOURCE = $resource$ }
+				"
+			}
 
 			remove_building = building_tec_vault_of_acquisition
 			remove_building = building_tec_vault_of_unity
@@ -4364,6 +4359,16 @@
 			}
 			country_resource_max_add = 10000
 		}
+
+		triggered_desc = {
+			trigger = {
+				owner = {
+					tec_is_hoarder_empire = no
+				}
+			}
+			text = building_tec_vault_of_plenty_no_deposit_effect_desc
+		}
+
 
 		inline_script = {
 			script = jobs/tec_bureaucrat
@@ -4409,23 +4414,11 @@
 		}
 
 		inline_script = {
-			script = buildings/effects/tec_hoarder
-			count = 2
+			script = buildings/effects/type/tec_resource_silo
+			tier = 2
 		}
 
-		triggered_desc = {
-			trigger = {
-				owner = {
-					tec_is_hoarder_empire = no
-				}
-			}
-			text = building_tec_vault_of_plenty_no_deposit_effect_desc
-		}
-
-		triggered_desc = {
-			text = building_tec_vault_of_plenty_effect_desc
-		}
-
+		custom_tooltip = building_tec_vault_of_plenty_effect_desc
 
 		inline_script = {
 			script = buildings/tec_aibait
@@ -4470,37 +4463,14 @@
 			upkeep = {
 				energy = 5
 			}
-			produces = {
-				minerals = @tec_vault_scale
-				multiplier = value:tec_vault_scale|VAR|tec_minerals_stockpile|
-			}
-			produces = {
-				food = @tec_vault_scale
-				multiplier = value:tec_vault_scale|VAR|tec_food_stockpile|
-			}
-			produces = {
-				alloys = @tec_vault_scale
-				multiplier = value:tec_vault_scale|VAR|tec_alloys_stockpile|
-			}
-			produces = {
-				consumer_goods = @tec_vault_scale
-				multiplier = value:tec_vault_scale|VAR|tec_consumer_goods_stockpile|
-			}
-			produces = {
-				rare_crystals = @tec_vault_scale
-				multiplier = value:tec_vault_scale|VAR|tec_rare_crystals_stockpile|
-			}
-			produces = {
-				exotic_gases = @tec_vault_scale
-				multiplier = value:tec_vault_scale|VAR|tec_exotic_gases_stockpile|
-			}
-			produces = {
-				volatile_motes = @tec_vault_scale
-				multiplier = value:tec_vault_scale|VAR|tec_volatile_motes_stockpile|
-			}
-			produces = {
-				minor_artifacts = @[ tec_vault_scale * 0.5]
-				multiplier = value:tec_vault_scale|VAR|tec_minor_artifacts_stockpile|
+			inline_script = {
+				script = iterators/tec_iterate_hoarder_resource
+				code = "
+					produces = {
+						$resource$ = @[tec_vault_scale * tec_vault_acquisition_$type$]
+						multiplier = value:tec_vault_scale|RESOURCE|$resource$|
+					}
+				"
 			}
 		}
 
@@ -4552,11 +4522,6 @@
 			trigger = ""
 		}
 
-		inline_script = {
-			script = buildings/effects/tec_hoarder
-			count = 1
-		}
-
 		triggered_desc = {
 			trigger = {
 				owner = {
@@ -4568,6 +4533,11 @@
 
 		triggered_desc = {
 			text = building_tec_vault_of_acquisition_effect_desc
+		}
+
+		inline_script = {
+			script = buildings/effects/type/tec_resource_silo
+			tier = 2
 		}
 
 		inline_script = {
@@ -4589,9 +4559,8 @@
 
 		category = resource
 
-		prerequisites = {
-			"tech_hypercomms_forum"
-		}
+		show_in_tech = tech_hypercomms_forum
+		show_in_tech = tech_hive_confluence
 
 		show_tech_unlock_if = {
 			tec_is_hoarder_empire = yes
@@ -4599,6 +4568,10 @@
 
 		potential = {
 			owner = {
+				OR = {
+					has_technology = tech_hypercomms_forum
+					has_technology = tech_hive_confluence
+				}
 				tec_is_hoarder_empire = yes
 			}
 			tec_planet_blocks_silo_buildings = no
@@ -4609,6 +4582,11 @@
 			tec_ai_allow_rare_dependant_building = {
 				tier = 3
 				rare = rare_crystals
+			}
+			NOT = {
+				tec_planet_has_building_or_construction = {
+					building = building_tec_vault_of_wealth
+				}
 			}
 		}
 
@@ -4631,37 +4609,14 @@
 				tier = 3
 				rare = rare_crystals
 			}
-			produces = {
-				unity = @tec_vault_scale
-				multiplier = value:tec_vault_scale|VAR|tec_minerals_stockpile|
-			}
-			produces = {
-				unity = @tec_vault_scale
-				multiplier = value:tec_vault_scale|VAR|tec_food_stockpile|
-			}
-			produces = {
-				unity = @[ tec_vault_scale * tec_vault_advanced ]
-				multiplier = value:tec_vault_scale|VAR|tec_alloys_stockpile|
-			}
-			produces = {
-				unity = @[ tec_vault_scale * tec_vault_advanced ]
-				multiplier = value:tec_vault_scale|VAR|tec_consumer_goods_stockpile|
-			}
-			produces = {
-				unity = @[ tec_vault_scale * tec_vault_strategic ]
-				multiplier = value:tec_vault_scale|VAR|tec_rare_crystals_stockpile|
-			}
-			produces = {
-				unity = @[ tec_vault_scale * tec_vault_strategic ]
-				multiplier = value:tec_vault_scale|VAR|tec_exotic_gases_stockpile|
-			}
-			produces = {
-				unity = @[ tec_vault_scale * tec_vault_strategic ]
-				multiplier = value:tec_vault_scale|VAR|tec_volatile_motes_stockpile|
-			}
-			produces = {
-				unity = @[ tec_vault_scale * tec_vault_strategic ]
-				multiplier = value:tec_vault_scale|VAR|tec_minor_artifacts_stockpile|
+			inline_script = {
+				script = iterators/tec_iterate_hoarder_resource
+				code = "
+					produces = {
+						unity = @[tec_vault_scale * tec_vault_secondary_$type$]
+						multiplier = value:tec_vault_scale|RESOURCE|$resource$|
+					}
+				"
 			}
 		}
 
@@ -4696,11 +4651,6 @@
 			trigger = ""
 		}
 
-		inline_script = {
-			script = buildings/effects/tec_hoarder
-			count = 1
-		}
-
 		triggered_desc = {
 			trigger = {
 				owner = {
@@ -4712,6 +4662,12 @@
 
 		triggered_desc = {
 			text = building_tec_vault_of_unity_effect_desc
+		}
+
+		inline_script = {
+			script = buildings/effects/type/tec_monument
+			type = all
+			tier = 2
 		}
 
 		inline_script = {
@@ -4757,6 +4713,11 @@
 				tier = 3
 				rare = rare_crystals
 			}
+			NOT = {
+				tec_planet_has_building_or_construction = {
+					building = building_tec_vault_of_unity
+				}
+			}
 		}
 
 		destroy_trigger = {
@@ -4794,44 +4755,14 @@
 			country_resource_max_add = 5000
 		}
 
-		triggered_planet_modifier = {
-			trade_value_add = @tec_vault_scale
-			mult = value:tec_vault_scale|VAR|tec_minerals_stockpile|
-		}
-
-		triggered_planet_modifier = {
-			trade_value_add = @tec_vault_scale
-			mult = value:tec_vault_scale|VAR|tec_food_stockpile|
-		}
-
-		triggered_planet_modifier = {
-			trade_value_add = @[ tec_vault_scale * tec_vault_advanced ]
-			mult = value:tec_vault_scale|VAR|tec_alloys_stockpile|
-		}
-
-		triggered_planet_modifier = {
-			trade_value_add = @[ tec_vault_scale * tec_vault_advanced ]
-			mult = value:tec_vault_scale|VAR|tec_consumer_goods_stockpile|
-		}
-
-		triggered_planet_modifier = {
-			trade_value_add = @[ tec_vault_scale * tec_vault_strategic ]
-			mult = value:tec_vault_scale|VAR|tec_rare_crystals_stockpile|
-		}
-
-		triggered_planet_modifier = {
-			trade_value_add = @[ tec_vault_scale * tec_vault_strategic ]
-			mult = value:tec_vault_scale|VAR|tec_exotic_gases_stockpile|
-		}
-
-		triggered_planet_modifier = {
-			trade_value_add = @[ tec_vault_scale * tec_vault_strategic ]
-			mult = value:tec_vault_scale|VAR|tec_volatile_motes_stockpile|
-		}
-
-		triggered_planet_modifier = {
-			trade_value_add = @[ tec_vault_scale * tec_vault_strategic ]
-			mult = value:tec_vault_scale|VAR|tec_minor_artifacts_stockpile|
+		inline_script = {
+			script = iterators/tec_iterate_hoarder_resource
+			code = "
+				triggered_planet_modifier = {
+					trade_value_add = @[tec_vault_scale * tec_vault_secondary_$type$]
+					mult = value:tec_vault_scale|RESOURCE|$resource$|
+				}
+			"
 		}
 
 		inline_script = {
@@ -4860,13 +4791,6 @@
 		}
 
 		inline_script = {
-			script = districts/effects/tec_mercantile_commercial_enterprise
-			count = 1
-			display = no_desc
-			trigger = ""
-		}
-
-		inline_script = {
 			script = jobs/tec_job
 			job = tec_trade_drone
 			count = 2
@@ -4880,11 +4804,6 @@
 			"
 		}
 
-		inline_script = {
-			script = districts/effects/tec_mercantile_commercial_enterprise_gestalt
-			count = 1
-			trigger = ""
-		}
 
 		inline_script = {
 			script = buildings/effects/tec_hoarder
@@ -4902,6 +4821,12 @@
 
 		triggered_desc = {
 			text = building_tec_vault_of_wealth_effect_desc
+		}
+
+		inline_script = {
+			script = buildings/effects/type/tec_trade
+			type = all
+			tier = 2
 		}
 
 		inline_script = {
