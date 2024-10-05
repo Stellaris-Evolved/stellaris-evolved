@@ -2375,3 +2375,94 @@ tec_country_debug_set_indentity_trait_flags = {
 		id = tec_trait.5
 	}
 }
+
+# handles terraforming to gaia and PD compat
+tec_planet_make_gaia = {
+	if = {
+		limit = { always = no }
+	}
+	inline_script = {
+		script = mod_support/tec_pd_present
+		code = "
+			else_if = {
+				limit = {
+					always = yes
+				}
+				pd_make_all_gaia_worlds_effect = yes
+			}
+		"
+	}
+	else = {
+		change_pc = pc_gaia
+	}
+}
+
+# handles terraforming to class and PD compat
+tec_planet_terraform_planet = {
+	inline_script = {
+		script = tec_type_hint
+		planet_class = $class$
+	}
+
+	change_pc = $class$
+	inline_script = {
+		script = mod_support/tec_pd_present
+		code = "
+			if = {
+				limit = {
+					exists = space_owner
+					space_owner = {
+						OR = {
+							has_policy_flag = pd_choose_every_planet_terraforming
+							has_country_flag = pd_choose_every_planet_terraforming
+						}
+					}
+					OR = {
+						is_planet_class = pc_continental
+						is_planet_class = pc_ocean
+						is_planet_class = pc_tropical
+						is_planet_class = pc_desert
+						is_planet_class = pc_arid
+						is_planet_class = pc_savannah
+						is_planet_class = pc_arctic
+						is_planet_class = pc_alpine
+						is_planet_class = pc_tundra
+					}
+				}
+				space_owner = {
+					country_event = {
+						id = pdengine.21
+						scopes = {
+							from = prev
+						}
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					exists = space_owner
+					space_owner = {
+						OR = {
+							has_policy_flag = pd_random_same_class_terraforming
+							has_country_flag = pd_random_same_class_terraforming
+						}
+					}
+					OR = {
+						is_planet_class = pc_continental
+						is_planet_class = pc_ocean
+						is_planet_class = pc_tropical
+						is_planet_class = pc_desert
+						is_planet_class = pc_arid
+						is_planet_class = pc_savannah
+						is_planet_class = pc_arctic
+						is_planet_class = pc_alpine
+						is_planet_class = pc_tundra
+					}
+				}
+				planet_event = {
+					id = pdengine.22
+				}
+			}
+		"
+	}
+}
