@@ -1387,15 +1387,22 @@ tec_has_enough_ethic_points = {
 			uses_district_set = shattered_ring_world
 			AND = {
 				uses_district_set = city_world
-				has_planet_flag = tec_remnants_decadent_ecu
+				tec_is_decadent_city_planet = yes
 			}
-			tec_is_pd_menial_uncapped = yes
+			inline_script = {
+				script = mod_support/tec_pd_ascensions_present
+				code = "
+					pd_aw_is_megaflora_planet = yes
+					pd_aw_is_wasteland_planet = yes
+					pd_aw_is_superproject_class = yes
+				"
+			}
 		}
 	}
 
 	tec_is_uncapped_planet = {
 		OR = {
-			has_modifier = pm_tec_ecoworld_planet
+			tec_is_ecoworld = yes
 			has_modifier = resort_colony
 			tec_is_modded_uncapped_planet = yes
 		}
@@ -1419,7 +1426,7 @@ tec_has_enough_ethic_points = {
 			}
 			AND = {
 				uses_district_set = city_world
-				tec_is_unspecced_ringworld = yes
+				tec_is_decadent_city_planet = yes
 			}
 			AND = {
 				tec_uses_elysium_districts = yes
@@ -1431,25 +1438,26 @@ tec_has_enough_ethic_points = {
 				tec_is_arcology_habitat = no
 			}
 			uses_district_set = hive_world
-			# PD
-			AND = { # PD
-				uses_district_set = @pdplanethab
-				OR = {
-					has_planet_flag = pd_farming_hab
-					has_modifier = hab_terraforming_candidate
-					has_modifier = hab_pdhabsubglacialocean
-				}
-				tec_is_arcology_habitat = no
+			inline_script = {
+				script = mod_support/tec_pd_present
+				code = "
+					pd_is_planet_class_hive = yes
+				"
 			}
-			uses_district_set = @pdexotic_standard
+
 			# Giga
-			giga_uses_farming_district = yes
-			uses_district_set = @giga_alderson_gaia
-			uses_district_set = @giga_birch
-			uses_district_set = @flusion_gaia_ecu
-			uses_district_set = @giga_frameworld
-			uses_district_set = @giga_orbital
-			uses_district_set = @giga_ancient_elysium
+			inline_script = {
+				script = mod_support/tec_giga_present
+				code = "
+					giga_uses_farming_district = yes
+					uses_district_set = @giga_alderson_gaia
+					uses_district_set = @giga_birch
+					uses_district_set = @flusion_gaia_ecu
+					uses_district_set = @giga_frameworld
+					uses_district_set = @giga_orbital
+					uses_district_set = @giga_ancient_elysium
+				"
+			}
 		}
 	}
 
@@ -1739,12 +1747,7 @@ tec_has_enough_ethic_points = {
 			# PD
 			inline_script = {
 				script = mod_support/tec_pd_present
-				code = "
-					uses_district_set = @pdplanethab
-					has_planet_flag = pdiceasteroidhab
-					has_planet_flag = pdcrystalasteroidhab
-					has_planet_flag = pdasteroidhab
-				"
+				code = ""
 			}
 			# gigas
 			inline_script = {
@@ -2150,7 +2153,6 @@ tec_is_aquatic_planet = {
 			script = mod_support/tec_pd_present
 			code = "
 				pd_is_planet_for_aqua_trait = yes
-				pd_is_flooded_planet = yes
 			"
 		}
 		tec_is_flooded = yes
@@ -2230,6 +2232,24 @@ tec_district_ecoworld_swap = {
 
 tec_district_organic_swap = {
 	tec_is_biomorph = yes
+}
+
+tec_has_commercial_district = {
+	OR = {
+		uses_district_set = shattered_ring_world
+	}
+}
+
+tec_has_coordination_district = {
+	OR = {
+		uses_district_set = machine_world
+		inline_script = {
+			script = mod_support/tec_pd_present
+			code = "
+				pd_is_planet_class_machine = yes
+			"
+		}
+	}
 }
 
 
@@ -2347,32 +2367,29 @@ tec_has_infinite_farming_district = {
 	}
 }
 
+tec_has_no_farming_district = {
+	OR = {
+		uses_district_set = machine_world
+		inline_script = {
+			script = mod_support/tec_pd_ascensions_present
+			code = "
+				pd_aw_is_lithoid_planet = yes
+				pd_aw_is_necro_planet = yes
+				pd_aw_is_wasteland_planet = yes
+			"
+		}
+	}
+}
+
 tec_has_standard_habitation_district = {
 	OR = {
-		uses_district_set = district_resort
 		uses_district_set = standard
 		uses_district_set = hive_world
 		uses_district_set = machine_world
 		uses_district_set = shattered_ring_world
 
-		has_planet_flag = tec_remnants_decadent_ecu
+		tec_is_decadent_city_planet = yes
 
-
-		inline_script = {
-			script = mod_support/tec_pd_present
-			code = "
-				uses_district_set = @pdnecroplanet
-				uses_district_set = @pdscrapyard
-				uses_district_set = @pdbioforge
-				uses_district_set = @pdbiofort
-				uses_district_set = @pdfloraforge
-				uses_district_set = @pdflorafort
-				AND = {
-					has_stellaris_evolved_pd = yes
-					uses_district_set = @pdexotic_standard
-				}
-			"
-		}
 		inline_script = {
 			script = mod_support/tec_giga_present
 			code = "
@@ -2841,10 +2858,7 @@ tec_is_flooded = {
 		inline_script = {
 			script = mod_support/tec_pd_present
 			code = "
-				AND = {
-					has_modifier = @hyceanfloodedhabitat
-					owner = { has_origin = @origin_pd_hycean_aquatic }
-				}
+				pd_is_flooded_planet = yes
 			"
 		}
 	}
@@ -3178,11 +3192,12 @@ tec_can_assemble_species_due_to_purity_assembly_policy = {
 
 tec_blocks_terraforming_aps = {
 	OR = {
+		always = no
 		inline_script = {
 			script = mod_support/tec_pd_present
 			code = "
 				# PD blocks hive and gaia worlds for megaflora
-				has_origin = @origin_pd_tree_of_life
+				has_origin = origin_pd_aw_tree_of_life
 			"
 		}
 	}
