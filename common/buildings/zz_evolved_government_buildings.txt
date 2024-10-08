@@ -606,16 +606,6 @@
 			has_upgraded_capital = yes
 		}
 
-		destroy_trigger = {
-			OR = {
-				tec_planet_allows_gaiaseeders = no
-				NOT = { exists = owner }
-				owner = {
-					tec_is_idyllic_bloom_empire = no
-				}
-			}
-		}
-
 		resources = {
 			category = planet_buildings
 			cost = {
@@ -692,18 +682,16 @@
 
 		upgrades = { "building_gaiaseeders_3" }
 
-		allow = {
-			can_build_gaiaseeder = yes
+		potential = {
+			exists = owner
+			owner = {
+				tec_is_idyllic_bloom_empire = yes
+			}
+			tec_planet_allows_gaiaseeders = yes
 		}
 
-		destroy_trigger = {
-			OR = {
-				tec_planet_allows_gaiaseeders = no
-				NOT = { exists = owner }
-				owner = {
-					tec_is_idyllic_bloom_empire = no
-				}
-			}
+		allow = {
+			can_build_gaiaseeder = yes
 		}
 
 		resources = {
@@ -817,18 +805,16 @@
 
 		upgrades = { "building_gaiaseeders_4" }
 
-		allow = {
-			can_build_gaiaseeder = yes
+		potential = {
+			exists = owner
+			owner = {
+				tec_is_idyllic_bloom_empire = yes
+			}
+			tec_planet_allows_gaiaseeders = yes
 		}
 
-		destroy_trigger = {
-			OR = {
-				tec_planet_allows_gaiaseeders = no
-				NOT = { exists = owner }
-				owner = {
-					tec_is_idyllic_bloom_empire = no
-				}
-			}
+		allow = {
+			can_build_gaiaseeder = yes
 		}
 
 		resources = {
@@ -934,6 +920,7 @@
 		position_priority = 10		# Important
 		ai_estimate_without_unemployment = yes
 
+		can_build = no
 		can_demolish = no
 		can_be_ruined = no
 		can_be_disabled = no
@@ -945,29 +932,10 @@
 			owner = {
 				tec_is_idyllic_bloom_empire = yes
 			}
-			OR = {
-				tec_is_gaia_world = yes
-				has_building = building_gaiaseeders_3
-			}
 		}
 
 		allow = {
 			can_build_gaiaseeder = yes
-			NOR = {
-				has_building = building_gaiaseeders_4
-				has_building_construction = building_gaiaseeders_4
-			}
-		}
-
-		destroy_trigger = {
-			OR = {
-				tec_is_gaia_world = no
-				#tec_planet_allows_gaiaseeders = no
-				NOT = { exists = owner }
-				owner = {
-					tec_is_idyllic_bloom_empire = no
-				}
-			}
 		}
 
 		resources = {
@@ -1052,7 +1020,7 @@
 			potential = {
 				exists = owner
 				owner = {
-					is_machine_empire = no
+					is_synthetic_empire = no
 				}
 			}
 			pop_growth_speed = 0.15
@@ -1063,15 +1031,10 @@
 			potential = {
 				exists = owner
 				owner = {
-					OR = {
-						is_synthetic_empire = yes
-						AND = {
-							is_machine_empire = yes
-							NOR = {
-								tec_is_organic_machine_empire = yes
-								tec_is_organic_coexist_machine = yes
-							}
-						}
+					is_synthetic_empire = yes
+					NOR = {
+						tec_is_organic_machine_empire = yes
+						tec_is_organic_coexist_machine = yes
 					}
 				}
 			}
@@ -1083,6 +1046,7 @@
 			potential = {
 				exists = owner
 				owner = {
+					is_synthetic_empire = yes
 					OR = {
 						tec_is_organic_machine_empire = yes
 						tec_is_organic_coexist_machine = yes
@@ -1092,6 +1056,163 @@
 			planet_pop_assembly_mult = 0.15
 			pop_growth_speed = 0.15
 			gaia_planet_jobs_produces_mult = 0.15
+		}
+	}
+
+	building_gaiaseeders_4_gaia_only = {
+		icon = building_gaiaseeders_4
+		base_cap_amount = 1
+		base_buildtime = @b2_time
+		position_priority = 10		# Important
+		ai_estimate_without_unemployment = yes
+
+		can_demolish = no
+		can_be_ruined = no
+		can_be_disabled = no
+
+		category = government
+
+		potential = {
+			exists = owner
+			owner = {
+				tec_is_idyllic_bloom_empire = yes
+			}
+			tec_is_gaia_world = yes
+			NOR = {
+				has_building = building_gaiaseeders_1
+				has_building = building_gaiaseeders_2
+				has_building = building_gaiaseeders_3
+				has_building = building_gaiaseeders_4
+			}
+		}
+
+		allow = {
+			can_build_gaiaseeder = yes
+		}
+
+		resources = {
+			category = planet_buildings
+			cost = {
+				energy = 1500
+				exotic_gases = @b4_rare_cost
+				multiplier = value:gaiaseeder_cost_mult
+			}
+			upkeep = {
+				energy = 20
+				exotic_gases = @b3_rare_upkeep
+				multiplier = value:gaiaseeder_upkeep
+			}
+			# Special machine costs
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes
+					}
+					is_dry = yes
+				}
+				food = 20
+				multiplier = value:gaiaseeder_upkeep
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes
+					}
+					is_wet = yes
+				}
+				minerals = 20
+				multiplier = value:gaiaseeder_upkeep
+			}
+			upkeep = {
+				trigger = {
+					exists = owner
+					owner = {
+						is_machine_empire = yes
+					}
+					is_cold = yes
+				}
+				energy = 30
+				multiplier = value:gaiaseeder_upkeep
+			}
+			# /
+		}
+
+		triggered_desc = {
+			trigger = {
+				exists = planet
+				planet = {
+					tec_is_gaia_world = no
+				}
+			}
+			text = building_gaiaseeders_4_effect_desc
+		}
+
+		# Caelum
+		# Note: this effect will be moved to the children of gaia civic
+		#triggered_desc = {
+		#	text = gaia_seeder_bloomed_pops_effect
+		#}
+
+		#triggered_desc = {
+		#	trigger = {
+		#		exists = planet
+		#		planet = {
+		#			tec_is_gaia_world = yes
+		#		}
+		#	}
+		#	text = gaia_seeder_bloom_timer_tooltip
+		#	trigger = {
+		#		has_planet_flag = gaia_seeder_bloom_timer
+		#	}
+		#}
+
+		triggered_planet_modifier = {	# Regular empires
+			potential = {
+				exists = owner
+				owner = {
+					is_synthetic_empire = no
+				}
+			}
+			pop_growth_speed = 0.15
+			planet_pop_assembly_organic_mult = 0.15
+			gaia_planet_jobs_produces_mult = 0.15
+		}
+		triggered_planet_modifier = {	# Synths
+			potential = {
+				exists = owner
+				owner = {
+					is_synthetic_empire = yes
+					NOR = {
+						tec_is_organic_machine_empire = yes
+						tec_is_organic_coexist_machine = yes
+					}
+				}
+			}
+			planet_pop_assembly_mult = 0.15
+			pop_job_amenities_mult = 0.15
+			gaia_planet_jobs_produces_mult = 0.15
+		}
+		triggered_planet_modifier = {	# Mixed machines
+			potential = {
+				exists = owner
+				owner = {
+					is_synthetic_empire = yes
+					OR = {
+						tec_is_organic_machine_empire = yes
+						tec_is_organic_coexist_machine = yes
+					}
+				}
+			}
+			planet_pop_assembly_mult = 0.15
+			pop_growth_speed = 0.15
+			gaia_planet_jobs_produces_mult = 0.15
+		}
+
+		on_built = {
+			remove_building = building_gaiaseeders_4_gaia_only
+			add_building = building_gaiaseeders_4
 		}
 	}
 
