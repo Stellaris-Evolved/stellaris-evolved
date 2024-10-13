@@ -1836,3 +1836,260 @@ building_augmentation_bazaars_branch = {
 		}
 	}
 }
+
+# Synth MegaCorp Physical Branch Office Building
+building_ai_emporium = {
+	base_buildtime = @b2_time
+	base_cap_amount = 1
+
+	owner_type = corporate
+
+	category = resource
+
+	potential = {
+		has_branch_office = yes
+		branch_office_owner = {
+			is_synth_corporate = yes
+			has_country_flag = synth_physical
+		}
+	}
+
+	allow = {
+		custom_tooltip = {
+			fail_text = building_ai_emporium_fail_tt
+			planet.owner = {
+				NOT = {
+					any_owned_planet = {
+						has_branch_office = yes
+						has_holding = {
+							holding = building_ai_emporium
+							owner = root.branch_office_owner
+						}
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = building_ai_emporium_outlawed_robots_tt
+			planet.owner = {
+				NOT = { has_policy_flag = robots_outlawed }
+			}
+		}
+	}
+
+	planet_modifier = {
+		job_roboticist_branch_office_value_mult = 0.10
+		job_identity_designer_add = 1
+	}
+
+	inline_script = {
+		script = modifiers/tec_branch_crime_syndicate
+		trade = 10
+		crime = 20
+		trigger = ""
+	}
+
+	resources = {
+		category = planet_branch_office_buildings
+		inline_script = {
+			script = buildings/resources/tec_branch_building_resource_cost
+			tier = 3
+		}
+		produces = {
+			energy = 15
+			physics_research = 10
+			multiplier = value:scripted_modifier_mult|MODIFIER|tec_branch_building_base_production_mult|
+		}
+	}
+
+	on_built = {
+		planet.owner = {
+			create_built_robot_species = yes
+		}
+	}
+
+	ai_weight = {
+		weight = 2
+
+		modifier = {
+			weight = 0.5
+			branch_office_owner = {
+				has_monthly_income = {
+					resource = energy
+					value > 50
+				}
+			}
+		}
+	}
+}
+
+# Synth MegaCorp Virtual Branch Office Building
+building_clear_thought_clinic = {
+	base_buildtime = @b2_time
+	base_cap_amount = 1
+
+	owner_type = corporate
+
+	category = resource
+
+	potential = {
+		has_branch_office = yes
+		branch_office_owner = {
+			is_synth_corporate = yes
+			has_country_flag = synth_virtual
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			OR = {
+				is_scope_valid = no
+				AND = {
+					exists = owner
+					owner = {
+						is_regular_empire = yes
+					}
+				}
+			}
+		}
+		trade_value_mult = 0.10
+		pop_happiness = -0.05
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_gestalt = yes
+			}
+		}
+		planet_amenities_mult = 0.05
+		planet_stability_add = 5
+	}
+
+	inline_script = {
+		script = jobs/tec_clerk
+		count = 2
+		secondary_count = 2
+		mult = 1
+		display = with_desc
+		trigger = ""
+		default_job = clerk
+	}
+
+	inline_script = {
+		script = jobs/tec_synapse
+		count = 1
+		mult = 1
+		display = with_desc
+		trigger = ""
+	}
+
+	resources = {
+		category = planet_branch_office_buildings
+		inline_script = {
+			script = buildings/resources/tec_branch_building_resource_cost
+			tier = 3
+		}
+		produces = {
+			energy = 10
+			society_research = 10
+			multiplier = value:scripted_modifier_mult|MODIFIER|tec_branch_building_base_production_mult|
+		}
+	}
+
+	inline_script = {
+		script = modifiers/tec_branch_crime_syndicate
+		trade = 10
+		crime = 20
+		trigger = ""
+	}
+
+	on_built = {
+		planet.owner = {
+			save_event_target_as = planet_owner
+		}
+		branch_office_owner = {
+			save_event_target_as = branch_office_owner
+			random_spynetwork = {
+				limit = {
+					owner = {
+						is_same_value = event_target:branch_office_owner
+					}
+					target = {
+						is_same_value = event_target:planet_owner
+					}
+				}
+				add_modifier = {
+					modifier = clear_thought_clinic_modifier
+					days = -1
+				}
+			}
+		}
+	}
+
+	on_destroy = {
+		planet = {
+			save_event_target_as = planet
+		}
+		planet.owner = {
+			save_event_target_as = planet_owner
+		}
+		branch_office_owner = {
+			save_event_target_as = branch_office_owner
+		}
+		if = {
+			limit = {
+				event_target:planet_owner = {
+					any_owned_planet = {
+						NOT = {
+							is_same_value = event_target:planet
+						}
+						has_branch_office = yes
+						branch_office_owner = {
+							is_same_value = event_target:branch_office_owner
+						}
+						has_holding = {
+							holding = building_clear_thought_clinic
+							owner = event_target:branch_office_owner
+						}
+					}
+				}
+			}
+			# Do nothing
+		}
+		else = {
+			event_target:branch_office_owner = {
+				random_spynetwork = {
+					limit = {
+						owner = {
+							is_same_value = event_target:branch_office_owner
+						}
+						target = {
+							is_same_value = event_target:planet_owner
+						}
+					}
+					remove_modifier = clear_thought_clinic_modifier
+				}
+			}
+		}
+	}
+
+	triggered_desc = {
+		text = clear_thought_clinic_tt
+	}
+
+	ai_weight = {
+		weight = 2
+
+		modifier = {
+			weight = 0.5
+			branch_office_owner = {
+				has_monthly_income = {
+					resource = energy
+					value > 50
+				}
+			}
+		}
+	}
+}

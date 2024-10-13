@@ -1,3 +1,173 @@
+building_akx_worm_3 = {
+	base_buildtime = 900
+	base_cap_amount = 1
+	can_demolish = no
+	can_be_ruined = no
+	can_be_disabled = no
+
+	category = research
+
+	potential = {
+		exists = planet
+		planet = { is_capital = yes }
+		NOT = { has_modifier = slave_colony }
+	}
+
+	prerequisites = {
+		"tech_akx_worm_3"
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/tec_resource_cost
+			tier = 3
+		}
+		produces = {
+			physics_research = 16
+		}
+	}
+}
+
+building_artist_patron = {
+	base_buildtime = @b2_time
+	can_demolish = yes
+	empire_limit = 1
+
+	category = unity
+
+	potential = {
+		custom_tooltip = {
+			text = EMPIRE_UNIQUE_BUILDING
+			owner = {
+				has_country_flag = artist_building_patron
+			}
+		}
+		NOT = { has_modifier = slave_colony }
+	}
+
+
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/tec_resource_cost
+			tier = 1
+		}
+	}
+
+	triggered_planet_modifier = {
+		planet_jobs_unity_produces_mult = 0.15
+	}
+
+	inline_script = {
+		script = jobs/tec_culture_worker
+		count = 3
+		mult = 1
+		display = with_desc
+		trigger = ""
+		default_job = culture_worker
+	}
+
+	inline_script = {
+		script = jobs/tec_evaluator
+		count = 3
+		mult = 1
+		display = with_desc
+		trigger = ""
+		default_job = evaluator
+	}
+
+	inline_script = {
+		script = jobs/tec_culture_worker
+		count = 1
+		mult = planet.value:tec_script_add_per_ascension|BASE|0|ASCENSION_BASE|0|ASCENSION_MULT|@tec_per_planet_ascension_mult_low|MULT|1|ROUND|yes|
+		display = no_desc
+		trigger = ""
+	}
+
+	inline_script = {
+		script = jobs/tec_evaluator
+		count = 1
+		mult = planet.value:tec_script_add_per_ascension|BASE|0|ASCENSION_BASE|0|ASCENSION_MULT|@tec_per_planet_ascension_mult_low|MULT|1|ROUND|yes|
+		display = no_desc
+		trigger = ""
+	}
+
+
+	triggered_desc = {
+		trigger = {
+			always = yes
+		}
+		text = tec_building_ascension_scaling
+	}
+
+	desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = no }
+		}
+		text = building_artist_patron_desc
+	}
+
+	desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		text = building_artist_patron_gestalt_desc
+	}
+}
+
+
+building_waste_reprocessing_center = {
+	icon = building_waste_reprocessing_center
+	base_buildtime = @b2_time
+	base_cap_amount = 1
+	can_build = yes
+	can_demolish = yes
+
+	category = resource
+
+	potential = {
+		owner = { has_country_flag = bought_waste_reprocessing_center }
+		tec_planet_blocks_menial_buildings = yes
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/tec_resource_cost
+			tier = 1_half
+		}
+		produces = {
+			minerals = 10
+			energy = 10
+		}
+	}
+
+	planet_modifier = {
+		planet_amenities_add = 5
+		job_technician_drone_add = 2
+	}
+
+	inline_script = {
+		script = jobs/tec_technician
+		regular_count = 3
+		regular_secondary_count = 3
+		hive_count = 3
+		hive_secondary_count = 3
+		machine_count = 3
+		machine_secondary_count = 3
+		mult = 1
+		secondary_mult = 1
+		display = with_desc
+		trigger = ""
+		default_job = technician
+	}
+
+}
+
 building_nuumismatic_shrine = {
 	base_buildtime = 180
 	can_demolish = yes
@@ -6,8 +176,9 @@ building_nuumismatic_shrine = {
 	category = unity
 
 	potential = {
+		exists = owner
 		owner = { has_country_flag = nuumismatic_shrine }
-		NOT = { has_modifier = slave_colony }
+		tec_planet_blocks_temple_buildings = no
 	}
 
 	destroy_trigger = {
@@ -28,11 +199,288 @@ building_nuumismatic_shrine = {
 
 	inline_script = {
 		script = jobs/tec_numistic_priest
-		job = numistic_priest
 		count = 4
 		mult = 1
 		display = with_desc
 		trigger = ""
 		default_job = numistic_priest
+	}
+}
+
+
+building_composer_sanctum = {
+	base_buildtime = @b3_time
+
+	category = government
+
+	empire_limit = {
+		base = 1
+	}
+
+	potential = {
+		host_has_dlc = "Utopia"
+		owner = { has_country_flag = composer_covenant_rank_1 }
+		NOR = {
+			has_modifier = resort_colony
+			has_modifier = slave_colony
+		}
+		tec_planet_blocks_research_buildings = no
+	}
+
+	allow = {
+		has_major_upgraded_capital = yes
+
+	}
+
+	destroy_trigger = {
+		exists = owner
+		NOT = {
+			owner = { has_country_flag = composer_covenant_rank_1 }
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/tec_resource_cost
+			tier = 3
+		}
+		inline_script = {
+			script = buildings/resources/tec_rare_resource_cost
+			tier = 3
+			rare = exotic_gases
+			trigger = ""
+		}
+	}
+
+	country_modifier = {
+		pop_environment_tolerance = 0.10
+		planet_jobs_produces_mult = 0.05
+	}
+
+	inline_script = {
+		script = jobs/tec_job
+		job = telepath
+		count = 3
+		mult = 1
+		display = with_desc
+		trigger = ""
+		default_job = telepath
+	}
+}
+
+building_eater_sanctum = {
+	base_buildtime = @b3_time
+
+	category = government
+
+	empire_limit = {
+		base = 1
+	}
+
+	potential = {
+		host_has_dlc = "Utopia"
+		owner = { has_country_flag = eater_covenant_rank_1 }
+
+		tec_planet_blocks_military_booster_buildings = no
+	}
+
+	allow = {
+		has_major_upgraded_capital = yes
+
+	}
+
+	destroy_trigger = {
+		exists = owner
+		NOT = {
+			owner = { has_country_flag = eater_covenant_rank_1 }
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/tec_resource_cost
+			tier = 3
+		}
+		inline_script = {
+			script = buildings/resources/tec_rare_resource_cost
+			tier = 3
+			rare = exotic_gases
+			trigger = ""
+		}
+	}
+
+	country_modifier = {
+		ship_weapon_range_mult = 0.1
+		ships_upkeep_mult = -0.05
+	}
+
+	inline_script = {
+		script = jobs/tec_job
+		job = telepath
+		count = 3
+		mult = 1
+		display = with_desc
+		trigger = ""
+		default_job = telepath
+	}
+}
+
+building_instrument_sanctum = {
+	base_buildtime = @b3_time
+
+	category = government
+
+	empire_limit = {
+		base = 1
+	}
+
+	potential = {
+		host_has_dlc = "Utopia"
+		owner = { has_country_flag = instrument_covenant_rank_1 }
+
+		tec_planet_blocks_amenity_buildings = no
+	}
+
+	allow = {
+		has_major_upgraded_capital = yes
+
+	}
+
+	destroy_trigger = {
+		exists = owner
+		NOT = {
+			owner = { has_country_flag = instrument_covenant_rank_1 }
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/tec_resource_cost
+			tier = 3
+		}
+		inline_script = {
+			script = buildings/resources/tec_rare_resource_cost
+			tier = 3
+			rare = exotic_gases
+			trigger = ""
+		}
+	}
+
+	country_modifier = {
+		pop_happiness = 0.05
+		trade_value_mult = 0.1
+	}
+
+	inline_script = {
+		script = jobs/tec_job
+		job = telepath
+		count = 3
+		mult = 1
+		display = with_desc
+		trigger = ""
+		default_job = telepath
+	}
+}
+
+building_whisperers_sanctum = {
+	base_buildtime = @b3_time
+
+	category = government
+
+	empire_limit = {
+		base = 1
+	}
+
+	potential = {
+		host_has_dlc = "Utopia"
+		owner = { has_country_flag = whisperers_covenant_rank_1 }
+		tec_planet_blocks_research_buildings = no
+	}
+
+	allow = {
+		has_major_upgraded_capital = yes
+	}
+
+	destroy_trigger = {
+		exists = owner
+		NOT = {
+			owner = { has_country_flag = whisperers_covenant_rank_1 }
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		inline_script = {
+			script = buildings/resources/tec_resource_cost
+			tier = 3
+		}
+		inline_script = {
+			script = buildings/resources/tec_rare_resource_cost
+			tier = 3
+			rare = exotic_gases
+			trigger = ""
+		}
+	}
+
+	country_modifier = {
+		envoys_add = 1
+		spy_network_daily_value_mult = 0.15
+	}
+
+	inline_script = {
+		script = jobs/tec_job
+		job = telepath
+		count = 3
+		mult = 1
+		display = with_desc
+		trigger = ""
+		default_job = telepath
+	}
+
+	triggered_desc = {
+		trigger = {
+			has_first_contact_dlc = yes
+		}
+		text = covenant_detection_first_contact_effect
+	}
+
+	on_built = {
+		if = {
+			limit = {
+				has_first_contact_dlc = yes
+			}
+			planet = {
+				solar_system = {
+					starbase = {
+						fleet = {
+							add_modifier = {
+								modifier = covenant_detection_first_contact
+								days = -1
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	on_destroy = {
+		if = {
+			limit = {
+				has_first_contact_dlc = yes
+			}
+			planet = {
+				solar_system = {
+					starbase = {
+						fleet = {
+							remove_modifier = covenant_detection_first_contact
+						}
+					}
+				}
+			}
+		}
 	}
 }

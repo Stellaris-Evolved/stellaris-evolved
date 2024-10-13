@@ -39,9 +39,20 @@ servant = {
 	}
 	
 	inline_script = jobs/effects/tec_pleasure_seeker_servants
+	inline_script = jobs/effects/type/tec_entertainer_effect
+
+	inline_script = jobs/tec_space_tag
+	inline_script = {
+		script = jobs/tec_effect_category_tag
+		category = entertainer
+	}
 		
 	weight = {
 		weight = @special_job_weight
+		modifier = {
+			subtract = 3
+			has_job = servant
+		}
 	}
 
 
@@ -165,7 +176,13 @@ organic_battery = {
 		}
 	}
 
+	inline_script = jobs/effects/type/tec_organic_batteries_effect
+
 	inline_script = jobs/tec_space_tag
+	inline_script = {
+		script = jobs/tec_effect_category_tag
+		category = organic_batteries
+	}
 	inline_script = {
 		script = jobs/tec_eco_category_tag
 		category = planet_organic_batteries
@@ -188,15 +205,28 @@ livestock = {
 	}
 
 	possible_pre_triggers = {
-		is_enslaved = yes
 		is_sapient = yes
 		is_robot_pop = no
 	}
 
 	possible = {
-		has_slavery_type = {
-			type = slavery_livestock
-			country = owner
+		# always = yes
+		OR = {
+			AND = {
+				is_enslaved = yes
+				has_slavery_type = {
+					type = slavery_livestock
+					country = owner
+				}
+			}
+			AND = {
+				tec_is_bioservant = yes
+				has_citizenship_type = {
+					type = citizenship_robot_servitude
+					country = owner
+				}
+				has_trait = trait_tec_bioservant_livestock
+			}
 		}
 	}
 	
@@ -229,7 +259,7 @@ livestock = {
 		}
 		inline_script = jobs/resources/tec_hive_mindflayers
 	}
-	
+
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
@@ -242,7 +272,13 @@ livestock = {
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
 	}
 
+	inline_script = jobs/effects/type/tec_livestock_effect
+
 	inline_script = jobs/tec_space_tag
+	inline_script = {
+		script = jobs/tec_effect_category_tag
+		category = livestock
+	}
 	inline_script = {
 		script = jobs/tec_eco_category_tag
 		category = planet_livestock
@@ -250,6 +286,13 @@ livestock = {
 		
 	weight = {
 		weight = @special_job_weight
+		mult = value:job_weights_multiple_resources_modifier|JOB|livestock|RESOURCE1|minerals|WEIGHT1|1|RESOURCE2|food|WEIGHT2|1|
+		mult = value:tec_modifier|MODIFIER|planet_livestock_minerals_produces_add|ADD|4|MULT|0.25|
+		mult = value:tec_modifier|MODIFIER|planet_livestock_food_produces_add|ADD|4|MULT|0.25|
+		mult = value:tec_modifier|MODIFIER|planet_livestock_energy_produces_add|ADD|4|MULT|0.25|
+		mult = value:tec_modifier|MODIFIER|planet_livestock_volatile_motes_produces_add|ADD|2|MULT|0.5|
+		mult = value:tec_modifier|MODIFIER|planet_livestock_exotic_gases_produces_add|ADD|2|MULT|0.5|
+		mult = value:tec_modifier|MODIFIER|planet_livestock_rare_crystals_produces_add|ADD|2|MULT|0.5|
 	}
 }
 
@@ -260,15 +303,24 @@ livestock_zoo_animal = {
 	clothes_texture_index = 2
 
 	possible_pre_triggers = {
-		is_enslaved = yes
 		is_sapient = yes
 		is_robot_pop = no
 	}
 
 	possible = {
-		has_slavery_type = {
-			type = slavery_livestock
-			country = owner
+		OR = {
+			has_slavery_type = {
+				type = slavery_livestock
+				country = owner
+			}
+			AND = {
+				tec_is_bioservant = yes
+				has_citizenship_type = {
+					type = citizenship_robot_servitude
+					country = owner
+				}
+				has_trait = trait_tec_bioservant_livestock
+			}
 		}
 		planet = {
 			exists = owner
@@ -335,15 +387,24 @@ livestock_zoo_beast = {
 	clothes_texture_index = 2
 
 	possible_pre_triggers = {
-		is_enslaved = yes
 		is_sapient = yes
 		is_robot_pop = no
 	}
 
 	possible = {
-		has_slavery_type = {
-			type = slavery_livestock
-			country = owner
+		OR = {
+			has_slavery_type = {
+				type = slavery_livestock
+				country = owner
+			}
+			AND = {
+				tec_is_bioservant = yes
+				has_citizenship_type = {
+					type = citizenship_robot_servitude
+					country = owner
+				}
+				has_trait = trait_tec_bioservant_livestock
+			}
 		}
 		planet = {
 			exists = owner
@@ -532,6 +593,12 @@ purge = {
 				country = owner
 			}
 			has_pop_flag = event_purge
+		}
+		NOT = {
+			has_purge_type = {
+				type = purge_clips
+				country = owner
+			}
 		}
 	}
 
@@ -845,8 +912,8 @@ assimilation = {
 				is_phototrophic = no
 				tec_is_lithotrophic = yes
 			}
-			food = @tec_lithotrophic_normal
-			minerals = @tec_lithotrophic_normal
+			food = @trait_tec_lithotrophic_rate_normal
+			minerals = @trait_tec_lithotrophic_rate_normal
 		}
 		upkeep = {
 			trigger = {
@@ -862,8 +929,8 @@ assimilation = {
 				is_phototrophic = yes
 				tec_is_lithotrophic = yes
 			}
-			food = @tec_lithotrophic_low
-			minerals = @tec_lithotrophic_low
+			food = @trait_tec_lithotrophic_rate_low
+			minerals = @trait_tec_lithotrophic_rate_low
 		}
 		upkeep = {
 			trigger = {
@@ -879,8 +946,8 @@ assimilation = {
 				is_phototrophic = no
 				tec_is_lithotrophic = yes
 			}
-			minerals = @tec_lithotrophic_normal
-			food = @tec_lithotrophic_normal
+			minerals = @trait_tec_lithotrophic_rate_normal
+			food = @trait_tec_lithotrophic_rate_normal
 		}
 		upkeep = {
 			trigger = {
@@ -896,8 +963,8 @@ assimilation = {
 				is_phototrophic = yes
 				tec_is_lithotrophic = yes
 			}
-			minerals = @tec_lithotrophic_low
-			food = @tec_lithotrophic_low
+			minerals = @trait_tec_lithotrophic_rate_low
+			food = @trait_tec_lithotrophic_rate_low
 		}
 		upkeep = {
 			trigger = {

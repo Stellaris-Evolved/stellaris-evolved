@@ -40,7 +40,7 @@ cara_generate_deal2 = {
 				set_timed_country_flag = { flag = fleet2deal2 days = @fleet2dealdecay }
 				modifier = {
 					factor = 0
-					has_ethic = ethic_gestalt_consciousness
+					is_gestalt = yes
 					NOT = { has_civic = civic_machine_servitor }
 					NOT = { has_ethic = ethic_gestalt_empathy }
 				}
@@ -56,7 +56,7 @@ cara_generate_deal2 = {
 			100 = { # Edict
 				modifier = {
 					factor = 0
-					has_ethic = ethic_gestalt_consciousness
+					is_gestalt = yes
 					NOT = { has_civic = civic_machine_servitor }
 					NOT = { has_ethic = ethic_gestalt_empathy }
 				}
@@ -83,7 +83,7 @@ cara_generate_deal2 = {
 						any_owned_leader = {
 							has_leader_flag = nuumismatic_priest
 						}
-						has_ethic = ethic_gestalt_consciousness
+						is_gestalt = yes
 					}
 				}
 				set_timed_country_flag = { flag = fleet2deal5 days = @fleet2dealdecay }
@@ -92,7 +92,7 @@ cara_generate_deal2 = {
 				set_timed_country_flag = { flag = fleet2deal6 days = @fleet2dealdecay }
 				modifier = {
 					factor = 0
-					has_ethic = ethic_gestalt_consciousness
+					is_gestalt = yes
 				}
 				modifier = {
 					factor = 0.005
@@ -109,7 +109,7 @@ cara_generate_deal2 = {
 			100 = {
 				modifier = {
 					factor = 0.1
-					NOT = { has_ethic = ethic_gestalt_consciousness }
+					is_gestalt = no
 				}
 				modifier = {
 					factor = 0.01
@@ -128,7 +128,7 @@ cara_generate_deal2 = {
 			100 = {
 				modifier = {
 					factor = 0
-					NOT = { has_authority = auth_machine_intelligence }
+					is_machine_empire = no
 				}
 				modifier = {
 					factor = 0
@@ -144,7 +144,7 @@ cara_generate_deal2 = {
 				modifier = {
 					factor = 0
 					OR = {
-						NOT = { has_authority = auth_machine_intelligence }
+						is_machine_empire = no
 						has_country_flag = divine_algorithm
 					}
 				}
@@ -216,5 +216,448 @@ cara_generate_deal2 = {
 		}
 		set_timed_planet_flag = { flag = fleet2deal9planet days = @fleet2dealdecay }
 		save_event_target_as = fleet2deal9planet
+	}
+}
+
+
+cara_generate_deal3 = {
+	if = {
+		# repeat existing deal for 1 year, otherwise refresh flag
+		limit = {
+			NOR = {
+				has_country_flag = fleet3deal1 #Selling minerals
+				has_country_flag = fleet3deal2 #Selling Racket leader
+				has_country_flag = fleet3deal3 #Selling pops
+				has_country_flag = fleet3deal4 #Selling alloy/gas/living metal
+				has_country_flag = fleet3deal5 #Selling unique building
+				has_country_flag = fleet3deal6 #Selling unique ship weapons tech
+				has_country_flag = fleet3deal7 #Selling energy mining platform "upgrade" (planetary energy deposit)
+				has_country_flag = fleet3deal8 #Selling tech drone planet mod
+				has_country_flag = fleet3deal9 #Selling Caravan destroyer
+			}
+		}
+		random_list = {
+			1 = {
+				modifier = {
+					factor = 0
+					is_machine_empire = yes
+					NOT = { has_civic = civic_machine_servitor }
+				}
+				set_timed_country_flag = { flag = fleet3deal1 days = @fleet3dealdecay }
+			}
+			1 = {
+				modifier = {
+					factor = 0
+					is_hive_empire = yes
+				}
+				set_timed_country_flag = { flag = fleet3deal2 days = @fleet3dealdecay }
+			}
+			1 = {
+				modifier = {
+					factor = 0
+					is_hive_empire = yes
+				}
+				set_timed_country_flag = { flag = fleet3deal3 days = @fleet3dealdecay }
+			}
+			1 = { set_timed_country_flag = { flag = fleet3deal4 days = @fleet3dealdecay } }
+			0 = {
+				modifier = {
+					add = 3
+					is_gestalt = yes
+				}
+				modifier = {
+					add = 2
+					is_ecologist = yes
+				}
+				modifier = {
+					factor = 0
+					OR = {
+						any_owned_planet = {
+							has_building = building_waste_reprocessing_center
+						}
+						has_country_flag = bought_waste_reprocessing_center
+					}
+				}
+				set_timed_country_flag = { flag = fleet3deal5 days = @fleet3dealdecay }
+			}
+			1 = {
+				modifier = {
+					factor = 0
+					has_technology = tech_orbital_trash_dispersal
+				}
+				set_timed_country_flag = { flag = fleet3deal6 days = @fleet3dealdecay }
+			}
+			1 = {
+				modifier = {
+					factor = 2
+					is_gestalt = yes
+				}
+				modifier = { #Low chance if you've already gotten this deal once and still have that planet
+					factor = 0.1
+					has_country_flag = got_fleet3deal7
+					any_planet_within_border = {
+						has_modifier = "racket_energy_extractor"
+					}
+				}
+				modifier = {
+					factor = 0
+					NOT = {
+						any_planet_within_border = {
+							has_mining_station = yes
+							has_resource = { type = energy amount > 0 }
+							NOT = { has_modifier = racket_energy_extractor }
+						}
+					}
+				}
+				set_timed_country_flag = { flag = fleet3deal7 days = @fleet3dealdecay }
+			}
+			2 = {
+				modifier = {
+					factor = 0
+					NOR = {
+						is_machine_empire = yes
+						is_synthetic_empire = yes
+					}
+				}
+				modifier = { #Lower chance if you've already gotten this deal once and still have that planet
+					factor = 0.1
+					has_country_flag = got_fleet3deal8
+					any_owned_planet = {
+						has_modifier = racket_generator_regulator
+					}
+				}
+				modifier = { #Do not offer if every owned habitable planet already has the mod
+					factor = 0
+					NOT = {
+						any_owned_planet = {
+							OR = {
+								is_colony = yes
+								is_capital = yes
+								is_colonizable = yes
+							}
+							NOT = { has_modifier = racket_generator_regulator }
+						}
+					}
+				}
+				set_timed_country_flag = { flag = fleet3deal8 days = @fleet3dealdecay }
+			}
+			1 = {
+				modifier = {
+					factor = 2
+					years_passed < 50
+				}
+				modifier = {
+					factor = 0
+					any_controlled_ship = {
+						is_ship_size = caravaneer_destroyer_01
+					}
+				}
+				set_timed_country_flag = { flag = fleet3deal9 days = @fleet3dealdecay }
+			}
+		}
+	}
+	#Get costs and products for Deal 1
+	if = {
+		limit = {
+			has_country_flag = fleet3deal1
+			NOR = {
+				has_country_flag = fleet3deal1cost1
+				has_country_flag = fleet3deal1cost2
+				has_country_flag = fleet3deal1cost3
+				has_country_flag = fleet3deal1product1
+				has_country_flag = fleet3deal1product2
+				has_country_flag = fleet3deal1product3
+			}
+		}
+		if = {
+			limit = { years_passed < 50 }
+			set_timed_country_flag = { flag = fleet3deal1cost1 days = @fleet3dealdecay }
+			set_timed_country_flag = { flag = fleet3deal1product1 days = @fleet3dealdecay }
+		}
+		else_if = {
+			limit = { years_passed > 49 years_passed < 150 }
+			set_timed_country_flag = { flag = fleet3deal1cost2 days = @fleet3dealdecay }
+			set_timed_country_flag = { flag = fleet3deal1product2 days = @fleet3dealdecay }
+		}
+		else_if = {
+			limit = { years_passed > 149 }
+			set_timed_country_flag = { flag = fleet3deal1cost3 days = @fleet3dealdecay }
+			set_timed_country_flag = { flag = fleet3deal1product3 days = @fleet3dealdecay }
+		}
+	}
+	#Get costs and products for Deal 2
+	if = { #Costs
+		limit = {
+			has_country_flag = fleet3deal2
+			NOR = {
+				has_country_flag = fleet3deal2cost1
+				has_country_flag = fleet3deal2cost2
+				has_country_flag = fleet3deal2cost3
+				has_country_flag = fleet3deal2product1
+				has_country_flag = fleet3deal2product2
+			}
+		}
+		random_list = {
+			1 = { set_timed_country_flag = { flag = fleet3deal2cost1 days = @fleet3dealdecay } }
+			1 = { set_timed_country_flag = { flag = fleet3deal2cost2 days = @fleet3dealdecay } }
+			1 = {
+				modifier = {
+					factor = 0
+					is_gestalt = yes
+					NOT = { has_civic = civic_machine_servitor }
+				}
+				set_timed_country_flag = { flag = fleet3deal2cost3 days = @fleet3dealdecay }
+			}
+		}
+	}
+	if = { #Products
+		limit = { has_country_flag = fleet3deal2 }
+		random_list = {
+			1 = { set_timed_country_flag = { flag = fleet3deal2product1 days = @fleet3dealdecay } }
+			1 = {
+				modifier = {
+					factor = 1.5
+					is_gestalt = yes
+				}
+				set_timed_country_flag = { flag = fleet3deal2product2 days = @fleet3dealdecay }
+			}
+		}
+	}
+	#Get tar planet for Deal 3
+	if = {
+		limit = {
+			has_country_flag = fleet3deal3
+			NOT = { exists = event_target:fleet3deal3planet }
+		}
+		if = {
+			limit = {
+				any_owned_planet = {
+					free_housing > 3
+				}
+			}
+			random_owned_planet = {
+				limit = {
+					free_housing > 3
+				}
+				set_timed_planet_flag = { flag = fleet3deal3planet days = @fleet3dealdecay }
+				save_event_target_as = fleet3deal3planet
+			}
+		}
+		else_if = {
+			limit = {
+				any_owned_planet = {
+					free_housing > 2
+				}
+			}
+			random_owned_planet = {
+				limit = {
+					free_housing > 2
+				}
+				set_timed_planet_flag = { flag = fleet3deal3planet days = @fleet3dealdecay }
+				save_event_target_as = fleet3deal3planet
+			}
+		}
+		else_if = {
+			limit = {
+				any_owned_planet = {
+					free_housing > 1
+				}
+			}
+			random_owned_planet = {
+				limit = {
+					free_housing > 1
+				}
+				set_timed_planet_flag = { flag = fleet3deal3planet days = @fleet3dealdecay }
+				save_event_target_as = fleet3deal3planet
+			}
+		}
+		else = {
+			capital_scope = {
+				set_timed_planet_flag = { flag = fleet3deal3planet days = @fleet3dealdecay }
+				save_event_target_as = fleet3deal3planet
+			}
+		}
+	}
+	#Get costs and products for Deal 4
+	if = { #Costs
+		limit = {
+			has_country_flag = fleet3deal4
+			NOR = {
+				has_country_flag = fleet3deal4cost1
+				has_country_flag = fleet3deal4cost2
+				has_country_flag = fleet3deal4cost3
+			}
+		}
+		random_list = {
+			1 = { set_timed_country_flag = { flag = fleet3deal4cost1 days = @fleet3dealdecay } }
+			1 = { set_timed_country_flag = { flag = fleet3deal4cost2 days = @fleet3dealdecay } }
+			1 = { set_timed_country_flag = { flag = fleet3deal4cost3 days = @fleet3dealdecay } }
+		}
+	}
+	if = { #Products
+		limit = {
+			has_country_flag = fleet3deal4
+			NOR = {
+				has_country_flag = fleet3deal4product1
+				has_country_flag = fleet3deal4product2
+				has_country_flag = fleet3deal4product3
+			}
+		}
+		random_list = {
+			1 = { set_timed_country_flag = { flag = fleet3deal4product1 days = @fleet3dealdecay } }
+			1 = { set_timed_country_flag = { flag = fleet3deal4product2 days = @fleet3dealdecay } }
+			1 = { set_timed_country_flag = { flag = fleet3deal4product3 days = @fleet3dealdecay } }
+		}
+	}
+	#Get costs for Deal 6
+	if = { #Costs
+		limit = {
+			has_country_flag = fleet3deal6
+			NOR = {
+				has_country_flag = fleet3deal6cost1
+				has_country_flag = fleet3deal6cost2
+				has_country_flag = fleet3deal6cost3
+			}
+		}
+		random_list = {
+			1 = { set_timed_country_flag = { flag = fleet3deal6cost1 days = @fleet3dealdecay } }
+			1 = { set_timed_country_flag = { flag = fleet3deal6cost2 days = @fleet3dealdecay } }
+			1 = { #Non-Servs will not have Consumer Goods
+				modifier = {
+					factor = 0
+					has_ethic = ethic_gestalt_consciousness
+					NOT = { has_civic = civic_machine_servitor }
+				}
+				set_timed_country_flag = { flag = fleet3deal6cost3 days = @fleet3dealdecay }
+			}
+		}
+	}
+	#Get costs for Deal 7
+	if = { #Costs
+		limit = {
+			has_country_flag = fleet3deal7
+			NOR = {
+				has_country_flag = fleet3deal7cost1
+				has_country_flag = fleet3deal7cost2
+				has_country_flag = fleet3deal7cost3
+			}
+		}
+		random_list = {
+			2 = { set_timed_country_flag = { flag = fleet3deal7cost1 days = @fleet3dealdecay } }
+			1 = { set_timed_country_flag = { flag = fleet3deal7cost2 days = @fleet3dealdecay } }
+			2 = { #Non-Servs will not have Consumer Goods
+				modifier = {
+					factor = 0
+					is_gestalt = yes
+					NOT = { has_civic = civic_machine_servitor }
+				}
+				set_timed_country_flag = { flag = fleet3deal7cost3 days = @fleet3dealdecay }
+			}
+		}
+	}
+	#Get station tar for Deal 7
+	if = {
+		limit = {
+			has_country_flag = fleet3deal7
+			NOT = { exists = event_target:fleet3deal7planet }
+		}
+		if = {
+			limit = {
+				any_planet_within_border = {
+					has_mining_station = yes
+					has_resource = { type = energy amount > 0 }
+					NOT = { has_modifier = racket_energy_extractor }
+				}
+			}
+			random_planet_within_border = {
+				limit = {
+					has_mining_station = yes
+					has_resource = { type = energy amount > 0 }
+					NOT = { has_modifier = racket_energy_extractor }
+				}
+				set_timed_planet_flag = { flag = fleet3deal7planet days = @fleet3dealdecay }
+				save_event_target_as = fleet3deal7planet
+			}
+		}
+		else = {
+			random_planet_within_border = {
+				limit = {
+					is_colonizable = no
+					has_resource = { type = energy amount > 0 }
+					NOT = { has_modifier = racket_energy_extractor }
+				}
+				set_timed_planet_flag = { flag = fleet3deal7planet days = @fleet3dealdecay }
+				save_event_target_as = fleet3deal7planet
+			}
+		}
+	}
+	#Get costs for Deal 8
+	if = {
+		limit = {
+			has_country_flag = fleet3deal8
+			NOR = {
+				has_country_flag = fleet3deal8cost1
+				has_country_flag = fleet3deal8cost2
+			}
+		}
+		random_list = {
+			1 = {
+				modifier = {
+					factor = 0
+					NOR = { #Since non-Servs can't produce Consumer Goods, an edge-case catch
+						has_civic = civic_machine_servitor
+						resource_stockpile_compare = {
+							resource = consumer_goods
+							value >= 300
+						}
+					}
+				}
+				set_timed_country_flag = { flag = fleet3deal8cost1 days = @fleet3dealdecay }
+			}
+			1 = { set_timed_country_flag = { flag = fleet3deal8cost2 days = @fleet3dealdecay } }
+		}
+	}
+	#Get planet tar for Deal 8
+	if = {
+		limit = {
+			has_country_flag = fleet3deal8
+			NOT = { exists = event_target:fleet3deal8planet }
+		}
+		if = {
+			limit = {
+				any_owned_planet = {
+					OR = {
+						has_district = district_rw_generator
+						has_district = district_generator
+					}
+				}
+			}
+			random_owned_planet = {
+				limit = {
+					OR = {
+						has_district = district_rw_generator
+						has_district = district_generator
+					}
+				}
+				weights = {
+					base = 1
+					modifier = { #Prio planets w many techies
+						factor = 100
+						num_assigned_jobs = {
+							job = technician_drone
+							value > 5
+						}
+					}
+				}
+				set_timed_planet_flag = { flag = fleet3deal8planet days = @fleet3dealdecay }
+				save_event_target_as = fleet3deal8planet
+			}
+		}
+		else = {
+			capital_scope = {
+				set_timed_planet_flag = { flag = fleet3deal8planet days = @fleet3dealdecay }
+				save_event_target_as = fleet3deal8planet
+			}
+		}
 	}
 }

@@ -6,9 +6,9 @@
 	@tec_bioware_scaling_mid_high = 0.75
 	@tec_bioware_scaling_high = 1
 
-	@tec_gene_recombinator_job_situation_score = 0.25
-	@tec_gene_recombinator_agenda_start_score = 1.5
-	@tec_gene_recombinator_agenda_finish_score = 2
+	@tec_gene_recombinator_job_situation_score = 0.15
+	@tec_gene_recombinator_agenda_start_score = 1.25
+	@tec_gene_recombinator_agenda_finish_score = 1.5
 	@tec_genetic_perfected_trait_scaling = 0.1
 
 	@tec_augmentor_job_situation_score = 0.25
@@ -73,6 +73,20 @@
 
 # Genetics
  # --------------- Recombination scaling
+	#tec_gene_malleability_scaling = {
+	#	BASE = 0
+	#	complex_trigger_modifier = {
+	#		trigger = num_trait_points
+	#		trigger_scope = from
+	#		mode = $MODE$
+	#	}
+	#	# Lets avoid partial percents
+	#	round_to = 1
+	#}
+	#
+ # / 
+
+ # --------------- Recombination scaling
 	# TODO ASCENSION
 	##mult = owner.value:tec_gene_recombinator_job_scaling
 	tec_gene_recombinator_job_scaling = {
@@ -103,6 +117,8 @@
 				has_modifier = modifier_tec_agenda_tec_genetic_recombination_finish
 			}
 		}
+		# Max contribution = 30, fast ascension scaling = 1.5 so max is 45
+		max = 30
 	}
  # /
  # --------------- Perfect trait scaling
@@ -277,7 +293,7 @@
 	}
 	# triggered_planet_growth_habitability_modifier - from = species, fromfrom = country
 	# mult = value:tec_genetic_perfected_trait_scaling|SCOPE|from|
-	# triggered_species_modifier  - this = species, from = country
+	# triggered_species_modifier - this = species, from = country
 	# mult = value:tec_genetic_perfected_trait_scaling|SCOPE|this|
 	# triggered_pop_modifier - this = pop
 	# mult = value:tec_genetic_perfected_trait_scaling|SCOPE|this|
@@ -304,6 +320,57 @@
 			set = modifier:pop_non_cyborg_happiness
 		}
 	}
+ # Cybernetic traits
+	tec_cyborg_trait_scaling = {
+		base = 1
+		mult = value:scripted_modifier_mult|MODIFIER|$MODIFIER$|
+		mult = value:tec_cyborg_trait_scaling_country|VARIABLE|$VARIABLE$|
+		## Lets make it prettier
+		#round = yes
+		#ceiling = yes
+	}
+	tec_cyborg_trait_scaling_country = {
+		base = 0
+		modifier = {
+			exists = from
+			from = { is_variable_set = $VARIABLE$ }
+			add = from.$VARIABLE$
+		}
+		mult = 0.1
+		add = 1
+		# Country has level 5 > adds 5, multiplied by 0.1 is 0.5, adds 1, mult is 1.5
+		min = 0
+	}
+	# value:tec_cyborg_trait_scaling|MODIFIER|tec_test_trait_selfbuff|VARIABLE|tec_test_trait_selfbuff_var|
+	# NOTE: triggered_species_modifier don't recognise modifiers so its a fake variable added when necessary (overclock mechanic)
+
+	#tec_cyborg_energy_upkeep_value = {
+	#	base = 0
+	#	add = modifier:tec_cyborg_energy_upkeep
+	#	mult = modifier:tec_cyborg_energy_upkeep_penalty
+	#}
+	#tec_cyborg_amenities_usage_value = {
+	#	base = 0
+	#	add = modifier:tec_cyborg_amenities_usage
+	#	mult = modifier:tec_cyborg_amenities_usage_penalty
+	#}
+
+	#tec_cyborg_cortex_bonus_value
+
+	#tec_cyborg_cortex_upkeep_value
+
+	#tec_cyborg_internal_bonus_value
+
+	#tec_cyborg_internal_upkeep_value
+
+	#tec_cyborg_external_bonus_value
+
+	#tec_cyborg_external_upkeep_value
+
+	#tec_cyborg_deck_bonus_value
+
+	#tec_cyborg_deck_upkeep_value
+ # /
 # /
 
 # Bioware
@@ -533,7 +600,7 @@
 			trigger = count_owned_pop
 			parameters = {
 				limit = { 
-					has_trait = @trait_tec_biopsionic_embroidered
+					has_trait = trait_tec_biopsionic_embroidered
 				}
 			}
 			mode = add

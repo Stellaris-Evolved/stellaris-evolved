@@ -326,6 +326,19 @@ tec_biopsionic_convergence_edict = { # Biopsionic
 	allow = {
 		any_owned_planet = {
 			has_building = building_tec_biopsionic_convergence
+			custom_tooltip = {
+				fail_text = TEC_BIOPSIONIC_CONVERGENCE_NO_RECEPIENTS
+				count_owned_pop = {
+					limit = {
+						tec_is_any_psionic_species = yes
+						NOT = {
+							has_trait = trait_tec_biopsionic_seed
+						}
+						NOT = { has_modifier = tec_converged_pop }
+					}
+					count >= 2 # we need to pops, one to kill one to get modifier
+				}
+			}
 		}
 	}
 	effect = {
@@ -370,10 +383,11 @@ tec_fix_my_game_edict = { # Debug wrong things
 		category = country		# To avoid scaling
 	}
 	potential = {
+		always = no
 		# R67I
 		# Note: Psionic issues
 		has_tradition = tr_psionics_finish
-		has_country_flag = tec_announced_psionic_traits
+		has_country_flag = tec_psionics_t1_extra_leader_traits
 		NOT = {
 			# Has no active situation
 			country_has_situation = { SITUATION = situation_tec_psionic_path_gate }
@@ -432,12 +446,24 @@ tec_fix_cache_edict = {
 	}
 
 	potential = {
-		NOT = { has_global_flag = @tec_cache_global_flag  }
+		NOT = { has_global_flag = @tec_cache_global_flag }
 	}
 
 	effect = {
 		set_global_flag = @tec_cache_global_flag
 		tec_cache_everything = yes
+		if = {
+			limit = {
+				tec_is_aiauth_empire = yes
+			}
+			every_owned_leader = {
+				limit = {
+					tec_is_aiauth_planetary_governing_node = yes
+					NOT = { exists = planet }
+				}
+				kill_leader = { show_notification = no }
+			}
+		}
 	}
 	ai_weight = {
 		weight = 99999

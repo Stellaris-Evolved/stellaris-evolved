@@ -562,11 +562,11 @@ namespace = tec_gene_path
 		# Options
 			# Regular
 			option = {
-				name = tec_gene_path.20051.confirm.regular
-				custom_tooltip = tec_gene_path.20051.confirm.regular.tooltip
+				name = tec_gene_path.20051.confirm.demogenetics.regular
+				custom_tooltip = tec_gene_path.20051.confirm.demogenetics.regular.tooltip
 				icon = {
 					icon = GFX_situation_approach_pop
-					icon_background = GFX_situation_approach_bg_green
+					icon_background = GFX_situation_approach_bg_tec_orange
 					text = tec_icon_text_outcome_good
 				}
 				trigger = {
@@ -575,6 +575,25 @@ namespace = tec_gene_path
 						owner = {
 							is_gestalt = no
 						}
+						has_situation_flag = tec_gene_path_demogenetics
+					}
+				}
+			}
+			option = {
+				name = tec_gene_path.20051.confirm.focusgenetics.regular
+				custom_tooltip = tec_gene_path.20051.confirm.focusgenetics.regular.tooltip
+				icon = {
+					icon = GFX_situation_approach_research
+					icon_background = GFX_situation_approach_bg_tec_orange
+					text = tec_icon_text_outcome_good
+				}
+				trigger = {
+					hidden_trigger = {
+						exists = owner
+						owner = {
+							is_gestalt = no
+						}
+						has_situation_flag = tec_gene_path_focusgenetics
 					}
 				}
 			}
@@ -582,7 +601,7 @@ namespace = tec_gene_path
 				name = tec_gene_path.20051.reselect.regular
 				custom_tooltip = tec_gene_path.20051.reselect.regular.tooltip
 				icon = {
-					icon = GFX_situation_approach_research
+					icon = GFX_situation_approach_shrug
 					icon_background = GFX_situation_approach_bg_yellow
 					text = tec_icon_text_outcome_good
 				}
@@ -718,19 +737,38 @@ namespace = tec_gene_path
 
 		# Options
 			option = {
-				name = tec_gene_path.20151.confirm.hive
-				custom_tooltip = tec_gene_path.20151.confirm.hive.tooltip
+				name = tec_gene_path.20151.confirm.focusgenetics.hive
+				custom_tooltip = tec_gene_path.20151.confirm.focusgenetics.hive.tooltip
+				icon = {
+					icon = GFX_situation_approach_research
+					icon_background = GFX_situation_approach_bg_tec_orange
+					text = tec_icon_text_outcome_good
+				}
+				trigger = {
+					hidden_trigger = {
+						has_situation_flag = tec_gene_path_focusgenetics
+					}
+				}
+			}
+			option = {
+				name = tec_gene_path.20151.confirm.hivegenetics.hive
+				custom_tooltip = tec_gene_path.20151.confirm.hivegenetics.hive.tooltip
 				icon = {
 					icon = GFX_situation_approach_pop
-					icon_background = GFX_situation_approach_bg_green
+					icon_background = GFX_situation_approach_bg_tec_orange
 					text = tec_icon_text_outcome_good
+				}
+				trigger = {
+					hidden_trigger = {
+						has_situation_flag = tec_gene_path_hivegenetics
+					}
 				}
 			}
 			option = {
 				name = tec_gene_path.20151.reselect.hive
 				custom_tooltip = tec_gene_path.20151.reselect.hive.tooltip
 				icon = {
-					icon = GFX_situation_approach_research
+					icon = GFX_situation_approach_shrug
 					icon_background = GFX_situation_approach_bg_yellow
 					text = tec_icon_text_outcome_good
 				}
@@ -1351,7 +1389,7 @@ namespace = tec_gene_path
 		#			random_owned_species = {
 		#				limit = {
 		#					has_species_flag = syncretic_species@prev
-		#					has_trait = @trait_tec_se_subspecies
+		#					has_trait = trait_tec_se_subspecies
 		#				}
 		#				save_event_target_as = tec_illuminated_species
 		#			}
@@ -2124,6 +2162,601 @@ namespace = tec_cybernetic_path
 		# /
 	}
   # /
+
+  # --------------- CYB T2 Util
+	# Checks species level of upgrade - tec_cybernetic_path.900xx
+	country_event = {	# From = species / this = country - on_modification_complete
+		id = tec_cybernetic_path.90001
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			from = {	# Only for cybernetic species
+				OR = {
+					tec_is_cybernetic_species = yes
+					root = {
+						has_country_flag = tec_test_cybernetic_traits_t3
+					}
+				}
+			}
+		}
+
+		immediate = {
+			if = {	# Exist species with overclock but modified hasn't inherited
+				limit = {
+					any_owned_species = {
+						OR = {
+							is_same_species = from
+							is_exact_same_species = from
+						}
+						is_variable_set = tec_overclock_level
+					}
+					from = {
+						NOT = {
+							is_variable_set = tec_overclock_level
+						}
+					}
+				}
+				if = {	# Country SHOULD have it leveled, but contingency in case it does not
+					limit = {
+						NOT = {
+							is_variable_set = tec_overclock_level_country
+						}
+					}
+					# Picks random species with overclock
+					random_owned_species = {
+						weights = {
+							base = 1
+							modifier = {	# Lets get the higher level
+								factor = tec_overclock_level
+							}
+						}
+						limit = {
+							is_variable_set = tec_overclock_level
+						}
+						save_event_target_as = tec_overclocked_species
+					}
+					set_variable = {
+						which = tec_overclock_level_country
+						value = event_target:tec_overclocked_species.tec_overclock_level
+					}
+					# And sets it to the species
+					from = {
+						set_variable = {
+							which = tec_overclock_level
+							value = root.tec_overclock_level_country
+						}
+					}
+				}
+				else = {
+					from = {
+						set_variable = {
+							which = tec_overclock_level
+							value = root.tec_overclock_level_country
+						}
+					}
+				}
+			}
+			else_if = {	# Country has higher overclock than species
+				limit = {
+					from = {
+						check_variable = {
+							which = tec_overclock_level
+							value < root.tec_overclock_level_country
+						}
+					}
+				}
+				from = {
+					set_variable = {
+						which = tec_overclock_level
+						value = root.tec_overclock_level_country
+					}
+				}
+			}
+			else_if = {	# Species has higher overclock than country
+				limit = {
+					from = {
+						check_variable = {
+							which = tec_overclock_level
+							value > root.tec_overclock_level_country
+						}
+					}
+				}
+				set_variable = {
+					which = tec_overclock_level_country
+					value = from.tec_overclock_level
+				}
+			}
+			else_if = {	# Country has overclock but species not
+				limit = {
+					is_variable_set = tec_overclock_level_country
+					from = {
+						NOT = {
+							is_variable_set = tec_overclock_level
+						}
+						OR = {
+							tec_is_cybernetic_species = yes
+							root = {
+								has_country_flag = tec_test_cybernetic_traits_t3
+							}
+						}
+					}
+				}
+				from = {
+					set_variable = {
+						which = tec_overclock_level
+						value = root.tec_overclock_level_country
+					}
+				}
+			}
+			else_if = {	# Species has overclock but country has not
+				limit = {
+					NOT = {
+						is_variable_set = tec_overclock_level_country
+					}
+					from = {
+						is_variable_set = tec_overclock_level
+					}
+				}
+				set_variable = {
+					which = tec_overclock_level_country
+					value = from.tec_overclock_level
+				}
+			}
+			# test
+			#effect = {
+			#	owner_main_species = {
+			#		set_variable = {
+			#			which = tec_overclock_level
+			#			value = 2
+			#		}
+			#	}
+			#}
+
+			#effect = {
+			#	set_variable = {
+			#		which = tec_overclock_level_country
+			#		value = 2
+			#	}
+			#}
+		}
+	}
+
+	country_event = {	# BACKUP
+		id = tec_cybernetic_path.99101
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			from = {	# Only for cybernetic species
+				OR = {
+					tec_is_cybernetic_species = yes
+					root = {
+						has_country_flag = tec_test_cybernetic_traits_t3
+					}
+				}
+			}
+			if = {	# Exist species with overclock but modified doesn't inherited
+				limit = {
+					any_owned_species = {
+						is_variable_set = tec_overclock_level
+						OR = {
+							is_same_species = from
+							is_exact_same_species = from
+						}
+					}
+				}
+				from = {
+					NOT = {
+						is_variable_set = tec_overclock_level
+					}
+					OR = {
+						tec_is_cybernetic_species = yes
+						root = {
+							has_country_flag = tec_test_cybernetic_traits_t3
+						}
+					}
+				}
+			}
+			if = {	# Country has overclock but species not
+				limit = {
+					is_variable_set = tec_overclock_level_country
+				}
+				from = {
+					NOT = {
+						is_variable_set = tec_overclock_level
+					}
+					OR = {
+						tec_is_cybernetic_species = yes
+						root = {
+							has_country_flag = tec_test_cybernetic_traits_t3
+						}
+					}
+				}
+			}
+			if = {	# Country has exported overclock
+				limit = {
+					is_variable_set = tec_overclock_level_country
+				}
+				check_variable = {
+					which = tec_overclock_level_country
+					value > 0
+				}
+				from = {
+					OR = {
+						tec_is_cybernetic_species = yes
+						root = {
+							has_country_flag = tec_test_cybernetic_traits_t3
+						}
+					}
+				}
+			}
+			else = {	# Species export overclock
+				from = {
+					if = {
+						limit = {
+							is_variable_set = tec_overclock_level
+						}
+						check_variable = {
+							which = tec_overclock_level
+							value > 0
+						}
+					}
+				}
+			}
+		}
+
+		immediate = {
+			if = {	# Exist species with overclock but modified doesn't inherited
+				limit = {
+					any_owned_species = {
+						OR = {
+							is_same_species = from
+							is_exact_same_species = from
+						}
+						is_variable_set = tec_overclock_level
+					}
+					from = {
+						NOT = {
+							is_variable_set = tec_overclock_level
+						}
+					}
+				}
+				# Country SHOULD have it leveled, but contingency in case it does not
+				if = {
+					limit = {
+						NOT = {
+							is_variable_set = tec_overclock_level_country
+						}
+					}
+					# Picks random species with overclock
+					random_owned_species = {
+						limit = {
+							is_variable_set = tec_overclock_level
+						}
+						save_event_target_as = tec_overclocked_species
+					}
+					set_variable = {
+						which = tec_overclock_level_country
+						value = event_target:tec_overclocked_species.tec_overclock_level
+					}
+					# And sets it to the species
+					from = {
+						set_variable = {
+							which = tec_overclock_level
+							value = root.tec_overclock_level_country
+						}
+					}
+				}
+				else = {
+					from = {
+						set_variable = {
+							which = tec_overclock_level
+							value = root.tec_overclock_level_country
+						}
+					}
+				}
+			}
+			else_if = {	# Country has overclock but species not
+				limit = {
+					is_variable_set = tec_overclock_level_country
+					from = {
+						NOT = {
+							is_variable_set = tec_overclock_level
+						}
+						OR = {
+							tec_is_cybernetic_species = yes
+							root = {
+								has_country_flag = tec_test_cybernetic_traits_t3
+							}
+						}
+					}
+				}
+				from = {
+					set_variable = {
+						which = tec_overclock_level
+						value = root.tec_overclock_level_country
+					}
+				}
+			}
+			else_if = {	# Species has overclock but country has not
+				limit = {
+					NOT = {
+						is_variable_set = tec_overclock_level_country
+					}
+					from = {
+						is_variable_set = tec_overclock_level
+					}
+				}
+				set_variable = {
+					which = tec_overclock_level_country
+					value = from.tec_overclock_level
+				}
+			}
+			else_if = {	# Species has higher overclock than country
+				limit = {
+					from = {
+						check_variable = {
+							which = tec_overclock_level
+							value > root.tec_overclock_level_country
+						}
+					}
+				}
+				set_variable = {
+					which = tec_overclock_level_country
+					value = from.tec_overclock_level
+				}
+			}
+			else_if = {	# Country has higher overclock than species
+				limit = {
+					from = {
+						check_variable = {
+							which = tec_overclock_level
+							value < root.tec_overclock_level_country
+						}
+					}
+				}
+				from = {
+					set_variable = {
+						which = from.tec_overclock_level
+						value = root.tec_overclock_level_country
+					}
+				}
+			}
+			# test
+			#effect = {
+			#	owner_main_species = {
+			#		set_variable = {
+			#			which = tec_overclock_level
+			#			value = 2
+			#		}
+			#	}
+			#}
+
+			#effect = {
+			#	set_variable = {
+			#		which = tec_overclock_level_country
+			#		value = 5
+			#	}
+			#}
+		}
+	}
+
+	country_event = {	# BACKUP V2
+		id = tec_cybernetic_path.99201
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			from = {	# Only for cybernetic species
+				OR = {
+					tec_is_cybernetic_species = yes
+					root = {
+						has_country_flag = tec_test_cybernetic_traits_t3
+					}
+				}
+			}
+			if = {	# Exist species with overclock but modified doesn't inherited
+				limit = {
+					any_owned_species = {
+						OR = {
+							is_same_species = from
+							is_exact_same_species = from
+						}
+						is_variable_set = tec_overclock_level
+					}
+				}
+				from = {
+					NOT = {
+						is_variable_set = tec_overclock_level
+					}
+				}
+			}
+			if = {	# Country has higher overclock than species
+				limit = {
+					is_variable_set = tec_overclock_level_country
+				}
+				from = {
+					check_variable = {
+						which = tec_overclock_level
+						value < root.tec_overclock_level_country
+					}
+				}
+			}
+			if = {	# Species has higher overclock than country
+				limit = {
+					from = {
+						is_variable_set = tec_overclock_level
+					}
+				}
+				check_variable = {
+					which = tec_overclock_level
+					value > root.tec_overclock_level_country
+				}
+			}
+			if = {	# Country has overclock but species has not
+				limit = {
+					is_variable_set = tec_overclock_level_country
+				}
+				from = {
+					NOT = {
+						is_variable_set = tec_overclock_level
+					}
+				}
+			}
+			if = {	# Species has overclock but country has not
+				limit = {
+					NOT = {
+						is_variable_set = tec_overclock_level_country
+					}
+				}
+				from = {
+					is_variable_set = tec_overclock_level
+				}
+			}
+		}
+
+		immediate = {
+			if = {	# Exist species with overclock but modified doesn't inherited
+				limit = {
+					any_owned_species = {
+						OR = {
+							is_same_species = from
+							is_exact_same_species = from
+						}
+						is_variable_set = tec_overclock_level
+					}
+					from = {
+						NOT = {
+							is_variable_set = tec_overclock_level
+						}
+					}
+				}
+				if = {	# Country SHOULD have it leveled, but contingency in case it does not
+					limit = {
+						NOT = {
+							is_variable_set = tec_overclock_level_country
+						}
+					}
+					# Picks random species with overclock
+					random_owned_species = {
+						weights = {
+							base = 1
+							modifier = {	# Lets get the higher level
+								factor = tec_overclock_level
+							}
+						}
+						limit = {
+							is_variable_set = tec_overclock_level
+						}
+						save_event_target_as = tec_overclocked_species
+					}
+					set_variable = {
+						which = tec_overclock_level_country
+						value = event_target:tec_overclocked_species.tec_overclock_level
+					}
+					# And sets it to the species
+					from = {
+						set_variable = {
+							which = tec_overclock_level
+							value = root.tec_overclock_level_country
+						}
+					}
+				}
+				else = {
+					from = {
+						set_variable = {
+							which = tec_overclock_level
+							value = root.tec_overclock_level_country
+						}
+					}
+				}
+			}
+			else_if = {	# Country has higher overclock than species
+				limit = {
+					from = {
+						check_variable = {
+							which = tec_overclock_level
+							value < root.tec_overclock_level_country
+						}
+					}
+				}
+				from = {
+					set_variable = {
+						which = from.tec_overclock_level
+						value = root.tec_overclock_level_country
+					}
+				}
+			}
+			else_if = {	# Species has higher overclock than country
+				limit = {
+					from = {
+						check_variable = {
+							which = tec_overclock_level
+							value > root.tec_overclock_level_country
+						}
+					}
+				}
+				set_variable = {
+					which = tec_overclock_level_country
+					value = from.tec_overclock_level
+				}
+			}
+			else_if = {	# Country has overclock but species not
+				limit = {
+					is_variable_set = tec_overclock_level_country
+					from = {
+						NOT = {
+							is_variable_set = tec_overclock_level
+						}
+						OR = {
+							tec_is_cybernetic_species = yes
+							root = {
+								has_country_flag = tec_test_cybernetic_traits_t3
+							}
+						}
+					}
+				}
+				from = {
+					set_variable = {
+						which = tec_overclock_level
+						value = root.tec_overclock_level_country
+					}
+				}
+			}
+			else_if = {	# Species has overclock but country has not
+				limit = {
+					NOT = {
+						is_variable_set = tec_overclock_level_country
+					}
+					from = {
+						is_variable_set = tec_overclock_level
+					}
+				}
+				set_variable = {
+					which = tec_overclock_level_country
+					value = from.tec_overclock_level
+				}
+			}
+			# test
+			#effect = {
+			#	owner_main_species = {
+			#		set_variable = {
+			#			which = tec_overclock_level
+			#			value = 2
+			#		}
+			#	}
+			#}
+
+			#effect = {
+			#	set_variable = {
+			#		which = tec_overclock_level_country
+			#		value = 5
+			#	}
+			#}
+		}
+	}
+  # /
  # /
 # /
 
@@ -2598,6 +3231,8 @@ namespace = tec_psionic_path
 		immediate = {
 			hidden_effect = {
 				set_country_flag = tec_psionics_t2_completed
+				set_country_flag = tec_psionics_t2_deluxe_shroud
+				set_country_flag = tec_psionics_t2_extra_leader_traits
 				fire_on_action = { on_action = tec_ascension_situation_finished }
 			}
 		}

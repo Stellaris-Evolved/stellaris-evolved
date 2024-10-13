@@ -2,6 +2,353 @@
 
 namespace = game_start
 
+
+country_event = {
+	id = game_start.33
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_country_type = default
+	}
+
+	immediate = {
+		if = {
+			limit = { #Make sure you are unlikely to be boxed in completely
+				OR = {
+					has_origin = origin_hegemon
+					has_origin = origin_common_ground
+				}
+				capital_scope = {
+					solar_system = {
+						NOT = {
+							any_neighbor_system = {
+								NOT = { exists = owner }
+							}
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					any_system = {
+						distance = {
+							source = root.capital_scope.solar_system
+							type = euclidean
+							min_distance >= 1
+							max_distance <= 15
+						}
+						NOT = { has_hyperlane_to = root.capital_scope.solar_system }
+						NOT = { exists = owner }
+					}
+				}
+				random_system = {
+					limit = {
+						distance = {
+							source = root.capital_scope.solar_system
+							type = euclidean
+							min_distance >= 1
+							max_distance <= 15
+						}
+						NOT = { has_hyperlane_to = root.capital_scope.solar_system }
+						NOT = { exists = owner }
+					}
+					save_event_target_as = hyperlane_system
+					add_hyperlane = {
+						from = this
+						to = root.capital_scope.solar_system
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					any_system = {
+						distance = {
+							source = root.capital_scope.solar_system
+							type = euclidean
+							min_distance >= 15
+							max_distance <= 20
+						}
+						NOT = { has_hyperlane_to = root.capital_scope.solar_system }
+						NOT = { exists = owner }
+					}
+				}
+				random_system = {
+					limit = {
+						distance = {
+							source = root.capital_scope.solar_system
+							type = euclidean
+							min_distance >= 15
+							max_distance <= 20
+						}
+						NOT = { has_hyperlane_to = root.capital_scope.solar_system }
+						NOT = { exists = owner }
+					}
+					save_event_target_as = hyperlane_system
+					add_hyperlane = {
+						from = this
+						to = root.capital_scope.solar_system
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					any_system = {
+						distance = {
+							source = root.capital_scope.solar_system
+							type = euclidean
+							min_distance >= 20
+							max_distance <= 25
+						}
+						NOT = { has_hyperlane_to = root.capital_scope.solar_system }
+						NOT = { exists = owner }
+					}
+				}
+				random_system = {
+					limit = {
+						distance = {
+							source = root.capital_scope.solar_system
+							type = euclidean
+							min_distance >= 20
+							max_distance <= 25
+						}
+						NOT = { has_hyperlane_to = root.capital_scope.solar_system }
+						NOT = { exists = owner }
+					}
+					save_event_target_as = hyperlane_system
+					add_hyperlane = {
+						from = this
+						to = root.capital_scope.solar_system
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					any_system = {
+						distance = {
+							source = root.capital_scope.solar_system
+							type = euclidean
+							min_distance >= 25
+							max_distance <= 40
+						}
+						NOT = { has_hyperlane_to = root.capital_scope.solar_system }
+						NOT = { exists = owner }
+					}
+				}
+				random_system = {
+					limit = {
+						distance = {
+							source = root.capital_scope.solar_system
+							type = euclidean
+							min_distance >= 25
+							max_distance <= 40
+						}
+						NOT = { has_hyperlane_to = root.capital_scope.solar_system }
+						NOT = { exists = owner }
+					}
+					save_event_target_as = hyperlane_system
+					add_hyperlane = {
+						from = this
+						to = root.capital_scope.solar_system
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					any_system = {
+						distance = {
+							source = root.capital_scope.solar_system
+							type = euclidean
+							min_distance >= 40
+							max_distance <= 60
+						}
+						NOT = { has_hyperlane_to = root.capital_scope.solar_system }
+						NOT = { exists = owner }
+					}
+				}
+				random_system = {
+					limit = {
+						distance = {
+							source = root.capital_scope.solar_system
+							type = euclidean
+							min_distance >= 40
+							max_distance <= 60
+						}
+						NOT = { has_hyperlane_to = root.capital_scope.solar_system }
+						NOT = { exists = owner }
+					}
+					save_event_target_as = hyperlane_system
+					add_hyperlane = {
+						from = this
+						to = root.capital_scope.solar_system
+					}
+				}
+			}
+			if = {
+				limit = {
+					exists = event_target:hyperlane_system
+					event_target:hyperlane_system = {
+						NOT = {
+							any_neighbor_system = {
+								NOT = { exists = owner }
+							}
+						}
+					}
+				}
+				event_target:hyperlane_system = {
+					random_system = {
+						limit = {
+							distance = {
+								source = prev
+								type = euclidean
+								min_distance >= 1
+								max_distance <= 25
+							}
+							NOT = { has_hyperlane_to = prev }
+							NOT = { exists = owner }
+						}
+						add_hyperlane = {
+							from = this
+							to = prev
+						}
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_origin = origin_default
+				NOT = { has_technology = tech_planetary_unification }
+			}
+			add_research_option = tech_planetary_unification
+		}
+		if = {
+			every_planet_within_border = {
+				limit = {
+					has_deposit_for = shipclass_mining_station
+					has_planet_flag = starting_mining_target
+					has_mining_station = no
+					root = {
+						is_low_tech_start = no
+					}
+				}
+				create_mining_station = {
+					owner = ROOT
+				}
+			}
+			every_planet_within_border = {
+				limit = {
+					has_deposit_for = shipclass_research_station
+					has_planet_flag = starting_research_target
+					has_research_station = no
+					root = {
+						is_low_tech_start = no
+					}
+				}
+				create_research_station = {
+					owner = ROOT
+				}
+			}
+		}
+
+		if = {
+			limit = {
+				has_origin = origin_necrophage
+				NOT = { has_civic = civic_fanatic_purifiers }
+				NOT = { has_ai_personality_behaviour = purger }
+			}
+			country_event = { id = necroids.2 days = 3420 } #tell them about the necrophage mechanic
+		}
+		if = {
+			limit = {
+				has_origin = origin_necrophage
+				is_ai = yes
+			}
+			country_event = { id = necroids.6 days = 1800 }
+			country_event = { id = necroids.6 days = 3600 }
+			country_event = { id = necroids.6 days = 5400 }
+			country_event = { id = necroids.6 days = 7200 }
+		}
+		if = {
+			limit = {
+				has_origin = origin_necrophage
+				OR = {
+					has_country_flag = necrophage_commonwealth
+					has_country_flag = necrophage_une
+				}
+			}
+			random_country = {
+				limit = {
+					OR = {
+						AND = {
+							has_country_flag = human_1
+							prev = { has_country_flag = necrophage_commonwealth }
+						}
+						AND = {
+							has_country_flag = human_2
+							prev = { has_country_flag = necrophage_une }
+						}
+					}
+				}
+				random_owned_pop = {
+					limit = {
+						NOT = { is_same_species = prev }
+					}
+					species = { save_event_target_as = correct_prepatent_species }
+				}
+			}
+			every_owned_pop = {
+				limit = {
+					NOT = { is_same_species = owner_species }
+				}
+				planet = {
+					create_pop = {
+						species = event_target:correct_prepatent_species
+					}
+				}
+				kill_pop = yes
+			}
+			remove_country_flag = necrophage_une
+			remove_country_flag = necrophage_commonwealth
+		}
+		if = {
+			limit = {
+				has_origin = origin_slavers
+			}
+			capital_scope = { generate_slaver_bonus = yes }
+		}
+		if = {
+			limit = {
+				OR = {
+					has_valid_civic = civic_hive_stargazers
+					is_hyperspace_specialty_empire = yes
+				}
+			}
+			every_system = {
+				limit = {
+					distance = {
+						source = root.capital_scope
+						use_bypasses = no
+						max_jumps = 3
+					}
+				}
+				root = { set_visited = prev }
+			}
+		}
+
+		# if = { # they start with fanatic purifiers in evolved
+		# 	limit = {
+		# 		is_ai = yes
+		# 		has_country_flag = necrophage_start_empire
+		# 		has_ethic = ethic_fanatic_xenophobe
+		# 		has_ethic = ethic_militarist
+		# 	}
+		# 	force_remove_civic = civic_cutthroat_politics
+		# 	force_add_civic = civic_fanatic_purifiers
+		# }
+	}
+}
+
 country_event = {
 	id = game_start.60
 	hide_window = yes
@@ -41,6 +388,22 @@ country_event = {
 			#}
 		}
 		add_council_agenda_progress = 6000
+	}
+}
+
+country_event = {
+	id = game_start.64
+	hide_window = yes
+	trigger = {
+		has_civic = civic_private_healthcare_corporate
+		is_country_type = default
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		give_technology = { message = no tech = tech_frontier_health }
+		add_research_option = tech_subdermal_stimulation
 	}
 }
 
@@ -218,8 +581,11 @@ country_event = {
 					}
 				}
 			}
-			unlock_council_slots = 1
-			set_council_position_to_council = councilor_defense
+			if = {
+				limit = { has_paragon_dlc = yes	}
+				unlock_council_slots = 1
+				set_council_position_to_council = councilor_defense
+			}
 			if = {
 				limit = {
 					any_owned_leader = {
@@ -267,8 +633,11 @@ country_event = {
 					}
 				}
 			}
-			unlock_council_slots = 1
-			set_council_position_to_council = councilor_research
+			if = {
+				limit = { has_paragon_dlc = yes	}
+				unlock_council_slots = 1
+				set_council_position_to_council = councilor_research
+			}
 			if = {
 				limit = {
 					any_owned_leader = {
@@ -308,7 +677,6 @@ country_event = {
 		}
 
 		# Add Minister of State Position
-		unlock_council_slots = 1
 		if = {
 			limit = {
 				blocks_minister_of_state = no
@@ -321,7 +689,11 @@ country_event = {
 						}
 					}
 				}
-				set_council_position_to_council = councilor_state
+				if = {
+					limit = { has_paragon_dlc = yes	}
+					unlock_council_slots = 1
+					set_council_position_to_council = councilor_state
+				}
 				if = {
 					limit = {
 						any_owned_leader = {
@@ -363,12 +735,14 @@ country_event = {
 		else_if = {
 			limit = {
 				has_valid_civic = civic_inwards_perfection
+				has_paragon_dlc = yes
 				NOT = {
 					has_councilor = {
 						COUNCILOR = councilor_inwards_perfection
 					}
 				}
 			}
+			unlock_council_slots = 1
 			set_council_position_to_council = councilor_inwards_perfection
 			if = {
 				limit = {
@@ -410,12 +784,14 @@ country_event = {
 		else_if = {
 			limit = {
 				has_valid_civic = civic_fanatic_purifiers
+				has_paragon_dlc = yes
 				NOT = {
 					has_councilor = {
 						COUNCILOR = councilor_fanatic_purifiers
 					}
 				}
 			}
+			unlock_council_slots = 1
 			set_council_position_to_council = councilor_fanatic_purifiers
 			if = {
 				limit = {

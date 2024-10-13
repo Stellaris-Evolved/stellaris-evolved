@@ -24,7 +24,7 @@
 		}
 
 		resources = {
-			category  = planet_tec_labour_heroes
+			category = planet_tec_labour_heroes
 			# Minerals
 			produces = {
 				trigger = {
@@ -382,7 +382,7 @@
 		}
 
 		resources = {
-			category  = planet_tec_peasants
+			category = planet_tec_peasants
 			# Minerals
 			produces = {
 				trigger = {
@@ -469,17 +469,6 @@
 			modifier = {
 				factor = 5
 				always = yes
-			}
-
-			modifier = {
-				factor = 2
-				OR = {
-					tec_is_non_sapient_robot = { cached = yes }
-					tec_is_shackled_robot = { cached = yes }
-					tec_is_non_sapient_bioservant = { cached = yes }
-					tec_is_shackled_bioservant = { cached = yes }
-				}
-				can_take_servant_job = no
 			}
 			
 			modifier = {
@@ -578,32 +567,22 @@
 
 		resources = {
 			category = planet_pop_assemblers
-			upkeep = {
-				alloys = 0.5
+			inline_script = {
+				script = jobs/resources/tec_robotic_assembly_upkeep
+				base = @[tec_robot_assembly_cost / 2]
+				mult = value:tec_assembly_building_tier
+				trigger = ""
 			}
 		}
 
-		planet_modifier = {
-			planet_pop_assembly_add = 0.2
+		inline_script = {
+			script = modifiers/tec_assembly_robotic
+			trigger = ""
+			mult = 0.2
 		}
 
-		triggered_planet_modifier = {
-			potential = {
-				planet = {
-					exists = assembling_species
-					assembling_species = {
-						is_robotic_species = no
-					}
-				}
-			}
-			planet_pop_assembly_add = -0.2
-			planet_pop_assembly_organic_add = 0.2
-		}
 
 		triggered_planet_modifier = {	# Capitalized innovation
-			potential = {
-				always = yes
-			}
 			trade_value_add = 5
 			mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
 		}
@@ -679,7 +658,17 @@
 					NOT = {
 						planet = {
 							any_owned_species = {
-								is_livestock = yes
+								OR = {
+									is_livestock = yes
+									AND = {
+										has_citizenship_type = {
+											type = citizenship_robot_servitude
+											country = prev.owner
+										}
+										has_trait = trait_tec_bioservant_livestock
+									}
+								}
+
 							}
 						}
 					}
@@ -695,7 +684,17 @@
 					NOT = {
 						planet = {
 							any_owned_species = {
-								is_livestock = yes
+								OR = {
+									is_livestock = yes
+									AND = {
+										has_citizenship_type = {
+											type = citizenship_robot_servitude
+											country = prev.owner
+										}
+										has_trait = trait_tec_bioservant_livestock
+									}
+								}
+
 							}
 						}
 					}
@@ -704,13 +703,17 @@
 			}
 		# /
 
-
 		inline_script = jobs/effects/type/tec_researcher_effect
+		inline_script = jobs/effects/type/tec_livestock_effect
 
 		inline_script = jobs/tec_space_tag
 		inline_script = {
 			script = jobs/tec_effect_category_tag
 			category = researcher
+		}
+		inline_script = {
+			script = jobs/tec_effect_category_tag
+			category = livestock
 		}
 		inline_script = {
 			script = jobs/tec_eco_category_tag
@@ -720,8 +723,15 @@
 
 		weight = {
 			# Specialist weight
-			weight = @specialist_job_weight
-			mult = value:job_weights_research_modifier|JOB|researcher|
+			weight = @worker_job_weight
+			mult = value:job_weights_research_modifier|JOB|tec_labrat|
+
+			mult = value:tec_modifier|MODIFIER|planet_livestock_minerals_produces_add|ADD|4|MULT|0.25|
+			mult = value:tec_modifier|MODIFIER|planet_livestock_food_produces_add|ADD|4|MULT|0.25|
+			mult = value:tec_modifier|MODIFIER|planet_livestock_energy_produces_add|ADD|4|MULT|0.25|
+			mult = value:tec_modifier|MODIFIER|planet_livestock_volatile_motes_produces_add|ADD|2|MULT|0.5|
+			mult = value:tec_modifier|MODIFIER|planet_livestock_exotic_gases_produces_add|ADD|2|MULT|0.5|
+			mult = value:tec_modifier|MODIFIER|planet_livestock_rare_crystals_produces_add|ADD|2|MULT|0.5|
 
 			modifier = {
 				factor = 1.5
@@ -729,26 +739,18 @@
 			}
 
 			# Living standard weight
-			modifier = {
-				factor = 2
-				has_living_standard = { type = living_standard_academic_privilege }
-			}
+			# modifier = {
+			# 	factor = 2
+			# 	has_living_standard = { type = living_standard_academic_privilege }
+			# }
 			modifier = {
 				factor = 1.5
 				is_enslaved = yes
-				has_slavery_type = { type = slavery_indentured }
-			}
-			modifier = {
-				factor = 5
-				is_enslaved = yes
-				is_livestock = no
 			}
 			modifier = {
 				factor = 0.2
 				has_citizenship_rights = no
-				NOR = {
-					tec_has_trait_slave = yes
-				}
+				tec_has_trait_slave = no
 			}
 			modifier = {
 				factor = 0.1
@@ -808,11 +810,11 @@
 			script = modifiers/tec_alternative_upkeep
 			count = 2
 			trigger = "
-			    owner = {
-			        is_catalytic_empire = no
-                    tec_is_quantum_alloys_empire = no
-                    tec_is_dystopian_empire = no
-			    }
+				owner = {
+					is_catalytic_empire = no
+					tec_is_quantum_alloys_empire = no
+					tec_is_dystopian_empire = no
+				}
 			"
 		}
 
@@ -968,14 +970,6 @@
 			modifier = {
 				factor = 1.1
 
-				OR = {
-					is_unemployed = yes
-					has_job = tec_reef_miner
-				}
-				exists = planet
-				planet = {
-					has_available_jobs = tec_reef_miner
-				}
 				owner = {
 					has_monthly_income = {
 						resource = minerals
@@ -1049,15 +1043,8 @@
 				factor = 1.5
 				has_job = tec_memorialist
 			}
-	
-			modifier = {
-				factor = 2
-				has_trait = trait_robot_propaganda_machines
-				OR = {
-					tec_is_non_sapient_robot = { cached = yes }
-					tec_is_shackled_robot = { cached = yes }
-				}
-			}
+
+
 			modifier = {
 				factor = 2
 				is_enslaved = yes
@@ -1196,10 +1183,6 @@
 			modifier = {
 				factor = 1.1
 
-				exists = planet
-				planet = {
-					has_available_jobs = "tec_hired_miner"
-				}
 				owner = {
 					has_monthly_income = {
 						resource = minerals
@@ -1331,10 +1314,6 @@
 			# low income modifier
 			modifier = {
 				factor = 1.2
-				exists = planet
-				planet = {
-					has_available_jobs = tec_hired_farmer
-				}
 				owner = {
 					has_monthly_income = {
 						resource = food
@@ -1426,7 +1405,7 @@
 		inline_script = jobs/effects/type/tec_private_effect
 
 		inline_script = jobs/tec_space_tag
-		triggered_planet_modifier = {
+		triggered_pop_modifier = {
 			tec_job_hired_tag = 1
 		}
 		inline_script = {
@@ -1453,26 +1432,6 @@
 				}
 			}
 			modifier = {
-				factor = 100
-				OR = {
-					tec_is_non_sapient_robot = { cached = yes }
-					tec_is_shackled_robot = { cached = yes }
-				}
-				can_take_servant_job = no
-				can_fill_specialist_job_trigger = no
-			}
-
-			modifier = {
-				factor = 2
-				OR = {
-					tec_is_non_sapient_robot = { cached = yes }
-					tec_is_shackled_robot = { cached = yes }
-					tec_is_non_sapient_bioservant = { cached = yes }
-					tec_is_shackled_bioservant = { cached = yes }
-				}
-				can_take_servant_job = no
-			}
-			modifier = {
 				factor = 0.25
 				can_take_servant_job = yes
 			}
@@ -1480,10 +1439,6 @@
 			# low income modifier
 			modifier = {
 				factor = 1.5
-				exists = planet
-				planet = {
-					has_available_jobs = "tec_hired_technician"
-				}
 				owner = {
 					has_monthly_income = {
 						resource = energy
@@ -1511,7 +1466,7 @@
 		}
 
 		possible = {
-			worker_job_check_trigger = yes
+			soldier_job_check_trigger = yes
 			owner = { is_gestalt = no }
 		}
 
@@ -1949,10 +1904,6 @@
 			# low income modifier
 			modifier = {
 				factor = 1.2
-				exists = planet
-				planet = {
-					has_available_jobs = "tec_hired_artisan"
-				}
 				exists = owner
 				owner = {
 					is_ai = yes
@@ -2163,15 +2114,6 @@
 				has_job = tec_hired_entertainer
 			}
 
-			# Living standard weight
-			modifier = {
-				factor = 3
-				has_trait = trait_robot_domestic_protocols
-				OR = {
-					tec_is_non_sapient_robot = { cached = yes }
-					tec_is_shackled_robot = { cached = yes }
-				}
-			}
 			modifier = {
 				factor = 0.2
 				has_citizenship_rights = no
@@ -2286,10 +2228,9 @@
 
 		weight = {
 			weight = 0.0001 # even lower than @special_job_weight
-			#weight = @special_job_weight
-			modifier = {	# This is because base job weights
-				always = yes
+			modifier = {
 				add = -3
+				has_job = tec_state_worker
 			}
 		}
 
@@ -2383,15 +2324,6 @@
 			# low income modifier
 			modifier = {
 				factor = 1.1
-
-				OR = {
-					is_unemployed = yes
-					has_job = "tec_matterminer"
-				}
-				exists = planet
-				planet = {
-					has_available_jobs = "tec_matterminer"
-				}
 				owner = {
 					has_monthly_income = {
 						resource = minerals

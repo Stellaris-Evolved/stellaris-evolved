@@ -44,7 +44,9 @@ species_can_live_on_planet = {
 	hidden_trigger = {
 		exists = root #somehow this appeared in the error log. No idea how!
 		NAND = {
-			root = { is_planet_class = pc_machine }
+			root = {
+				tec_is_machine_world = yes
+			}
 			NOR = {
 				has_trait = trait_machine_unit
 				has_trait = trait_mechanical
@@ -68,7 +70,9 @@ species_can_live_on_planet = {
 		}
 		if = {
 			limit = {
-				root = { is_planet_class = pc_hive }
+				root = {
+					tec_is_hive_world = yes
+				}
 			}
 			OR = {
 				has_trait = trait_hive_mind
@@ -155,13 +159,13 @@ can_generate_leader_from_species = {
 					has_technology = tech_tec_bioservant_3
 				}
 			}
-			has_trait = @trait_tec_bioservant
+			has_trait = trait_tec_bioservant
 		}
 		has_citizenship_type = { type = citizenship_full country = root }
 		# Evolved
 			if = {
 				limit = {
-					has_trait = @trait_tec_se_subspecies
+					has_trait = trait_tec_se_subspecies
 				}
 				OR = {
 					is_same_species = root
@@ -185,6 +189,7 @@ species_has_happiness = {
 	NOR = {
 		AND = {
 			has_trait = trait_machine_unit
+			exists = from
 			from = { is_machine_empire = yes }
 		}
 		has_trait = trait_hive_mind
@@ -200,7 +205,7 @@ species_has_happiness = {
 			}
 		}
 		AND = {
-			has_trait = @trait_tec_bioservant
+			has_trait = trait_tec_bioservant
 			OR = {
 				NOT = { exists = from }
 				from = { is_hive_empire = yes }
@@ -256,7 +261,12 @@ can_release_vassal_from_species = {
 		NOR = {
 			AND = {
 				has_trait = trait_machine_unit
-				prev.this = { is_individual_machine = no }
+				NOR = {
+					prev.this = { is_individual_machine = no }
+					prev.this = {
+						has_tradition = tr_tec_centrality_4
+					}
+				}
 			}
 			# Only progenitor hives can release vassals
 			AND = {
@@ -265,7 +275,7 @@ can_release_vassal_from_species = {
 					prev.this = { has_origin = origin_progenitor_hive }
 					# centrality
 					prev.this = {
-						has_active_tradition = tr_tec_centrality_4
+						has_tradition = tr_tec_centrality_4
 					}
 				}
 			}
@@ -279,7 +289,7 @@ can_release_vassal_from_species = {
 				NOR = {
 					prev.this = { has_ascension_perk = ap_synthetic_evolution }
 					prev.this = {
-						has_active_tradition = tr_tec_centrality_4
+						has_tradition = tr_tec_centrality_4
 					}
 				}
 			}
@@ -318,6 +328,7 @@ can_modify_species = {	# TODO MACHINE AGE UPDATE - adjust to our new techs and e
 			OR = {
 				is_archetype = BIOLOGICAL
 				is_archetype = LITHOID
+				is_archetype = REPLICANT
 			}
 		}
 		custom_tooltip = {
@@ -328,6 +339,15 @@ can_modify_species = {	# TODO MACHINE AGE UPDATE - adjust to our new techs and e
 					has_technology = tech_gene_tailoring
 					has_active_tradition = tr_cybernetics_integrated_anatomy
 					has_active_tradition = tr_cybernetics_assimilator_integrated_anatomy
+				}
+			}
+
+		}
+		custom_tooltip = {
+			fail_text = TEC_NATURAL_DESIGN_BLOCKS_GENEMODDING
+			ROOT = {
+				NOR = {
+					is_natural_design_empire = yes
 				}
 			}
 		}
@@ -353,7 +373,7 @@ can_modify_species = {	# TODO MACHINE AGE UPDATE - adjust to our new techs and e
 		# 						is_individual_machine = yes
 		# 						is_machine_empire = yes
 		# 					}
-		# 					OR  = {
+		# 					OR = {
 		# 						has_origin = origin_life_seeded
 		# 						has_origin = origin_ocean_machines
 		# 						has_origin = origin_void_machines
@@ -476,14 +496,14 @@ can_species_be_assembled = {
 				}
 				always = yes
 			}
-			else_if = {	# Cyborg	TODO MACHINE AGE UPDATE
-				limit = {
-					root.owner = {
-						tec_allows_machine_assembly_for_cyborg = yes
-					}
-				}
-				tec_is_cyborg_species = yes
-			}
+			#else_if = {	# Cyborg	TODO REMOVE
+			#	limit = {
+			#		root.owner = {
+			#			tec_allows_machine_assembly_for_cyborg = yes
+			#		}
+			#	}
+			#	tec_is_cyborg_species = yes
+			#}
 			else_if = { # Clone army thing
 				limit = {	# Made the triggers for a future clone army revamp
 					tec_is_clone_origin_species = yes
@@ -507,27 +527,27 @@ can_species_be_assembled = {
 				}
 			}
 			# PD
-				inline_script = {
-					script = mod_support/tec_pd_uniques_present
-					code = "
-						else_if = {
-							limit = {
-								has_planetary_diversity = yes
-								is_organic_fourschildren = yes
-							}
-							root = {
-								# Event 'clones.3' should cover this, but extra safety check.
-								has_building = @building_techno_04_clone_vat
-								NOT = {
-									check_variable = {
-										which = techno_pops_missing
-										value = 0
-									}
-								}
-							}
-						}
-					"
-				}
+			# 	inline_script = {
+			# 		script = mod_support/tec_pd_uniques_present
+			# 		code = "
+			# 			else_if = {
+			# 				limit = {
+			# 					has_planetary_diversity = yes
+			# 					is_organic_fourschildren = yes
+			# 				}
+			# 				root = {
+			# 					# Event 'clones.3' should cover this, but extra safety check.
+			# 					has_building = @building_techno_04_clone_vat
+			# 					NOT = {
+			# 						check_variable = {
+			# 							which = techno_pops_missing
+			# 							value = 0
+			# 						}
+			# 					}
+			# 				}
+			# 			}
+			# 		"
+			# 	}
 			# /
 			else = {	# Regular assembly
 				root = {
@@ -1254,6 +1274,7 @@ can_planet_auto_migrate = {
 	}
 	custom_tooltip = {
 		fail_text = AUTO_MIGRATE_COLONY_TOO_NEW
+		exists = this
 		OR = {
 			colony_age > 60
 			is_capital = yes # Don't break Doomsday!
@@ -1422,7 +1443,7 @@ can_dismiss_leader = {
 			tec_is_aiauth_planetary_governing_node = yes
 		}
 		custom_tooltip = {
-			always = no
+			NOT = { exists = planet }
 			fail_text = "tec_can_not_dismiss_aiauth_planetary_governing_nodes"
 		}
 	}
@@ -1460,15 +1481,15 @@ should_ai_build_stronghold_on_vulnerable_planet = {
 	#	}
 	#	AND = {
 	#		num_pops <= 10
-	#		num_buildings = { type = building_stronghold value < 2  }
+	#		num_buildings = { type = building_stronghold value < 2 }
 	#	}
 	#	AND = {
 	#		num_pops <= 15
-	#		num_buildings = { type = building_stronghold value < 3  }
+	#		num_buildings = { type = building_stronghold value < 3 }
 	#	}
 	#	AND = {
 	#		num_pops <= 25
-	#		num_buildings = { type = building_stronghold value < 4  }
+	#		num_buildings = { type = building_stronghold value < 4 }
 	#	}
 	#}
 	#
@@ -1531,4 +1552,48 @@ has_ascension_for_terraforming_candidate = {
 			has_modifier = frozen_terraforming_candidate
 		}
 	}
+}
+
+#Root = country
+#From = species
+founder_species_uses_growth_speed = {
+	OR = {
+		tec_country_uses_assembly_instead_of_growth = no
+		AND = {
+			exists = from
+			from = {
+				is_robotic_species = no
+				is_infertile = yes
+			}
+		}
+	}
+}
+
+founder_species_uses_organic_assembly = {
+	OR = {
+		tec_country_uses_assembly_instead_of_growth = yes
+		AND = {
+			exists = from
+			from = {
+				is_robotic_species = no
+				is_infertile = yes
+			}
+		}
+	}
+
+}
+
+founder_species_uses_assembly = {
+	exists = from
+	from = {
+		is_robotic_species = yes
+	}
+}
+
+# Can the country have robot pop
+# root: country
+can_have_robot_pops = {
+	exists = this
+	has_authority = auth_tec_hive_biological
+	NOT = { has_policy_flag = robots_outlawed }
 }

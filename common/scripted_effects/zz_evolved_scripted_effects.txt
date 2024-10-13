@@ -45,7 +45,7 @@ tec_cache_planet_type_triggers = {
 	optimize_memory
 	inline_script = {
 		script = tec_type_hint
-		[[force] [[force] bool = $force$ ] ]
+		[[force] bool = $force$ ]
 	}
 	[[!force]
 		if = {
@@ -98,6 +98,10 @@ tec_cache_planet_type_triggers = {
 	tec_cache = {
 		scope = planet
 		trigger = tec_has_foundry_planet_swap
+	}
+	tec_cache = {
+		scope = planet
+		trigger = tec_has_artisan_planet_swap
 	}
 
 	tec_cache = {
@@ -162,6 +166,21 @@ tec_cache_planet_type_triggers = {
 	tec_cache = {
 		scope = planet
 		trigger = tec_has_clerk_planet_swap
+	}
+
+	tec_cache = {
+		scope = planet
+		trigger = tec_has_colonist_half_planet_swap
+	}
+
+	tec_cache = {
+		scope = planet
+		trigger = tec_has_soldier_planet_swap
+	}
+
+	tec_cache = {
+		scope = planet
+		trigger = tec_has_ruler_planet_swap
 	}
 
 	inline_script = {
@@ -601,6 +620,14 @@ tec_cache_species_traits_triggers = {
 		scope = species
 		trigger = tec_has_ruler_job_invalidation_trait
 	}
+	tec_cache = {
+		scope = species
+		trigger = tec_has_specialist_job_invalidation_trait
+	}
+	tec_cache = {
+		scope = species
+		trigger = tec_has_blocked_leader_trait
+	}
 
 	tec_cache = {
 		scope = species
@@ -888,6 +915,10 @@ tec_cache_country_civic_triggers = {
 	}
 	tec_cache = {
 		scope = country
+		trigger = tec_has_colonist_half_swap
+	}
+	tec_cache = {
+		scope = country
 		trigger = tec_has_clerk_swap
 	}
 	tec_cache = {
@@ -1106,6 +1137,38 @@ tec_hoarders_withdraw_resource = {
 	}
 }
 
+tec_hoarders_deposit_max_resource = {
+	inline_script = {
+		script = tec_type_hint
+		resource = $RESOURCE$
+	}
+	if = {
+		limit = {
+			exists = owner
+			owner = {
+				resource_income_compare = {
+					resource = $RESOURCE$
+					value >= 0
+				}
+			}
+		}
+		event_target:tec_hoarders_managed_planet = {
+			set_planet_flag = tec_vault_manage_$RESOURCE$
+			set_variable = {
+				which = tec_stockpile_change
+				value = 0
+			}
+			change_variable = {
+				which = tec_stockpile_change
+				value = value:tec_hoarders_max_that_can_be_deposited
+			}
+			tec_hoarders_manage_resource = { RESOURCE = $RESOURCE$ }
+			remove_planet_flag = tec_vault_manage_$RESOURCE$
+		}
+	}
+}
+
+
 tec_hoarders_manage_resource = {
 	inline_script = {
 		script = tec_type_hint
@@ -1117,6 +1180,13 @@ tec_hoarders_manage_resource = {
 			has_planet_flag = tec_vault_manage_$RESOURCE$
 		}
 		event_target:tec_hoarders_managed_planet = {
+			if = {
+				limit = { NOT = { is_variable_set = tec_$RESOURCE$_stockpile } }
+				set_variable = {
+					which = tec_$RESOURCE$_stockpile
+					value = 0
+				}
+			}
 			change_variable = {
 				which = tec_$RESOURCE$_stockpile
 				value = tec_stockpile_change
@@ -1553,7 +1623,7 @@ tec_country_aiauth_prepare_ai_species = {
 	}
 }
 
-tec_country_create_aiauth_ruler  = {
+tec_country_create_aiauth_ruler = {
 	inline_script = {
 		script = tec_type_hint
 		[[class] leader_class = $class$ ]
@@ -1606,6 +1676,7 @@ tec_country_create_aiauth_ruler_replace = {
 	set_country_flag = tec_force_councilor_traits
 	set_country_flag = tec_no_starting_traits_modification
 	set_country_flag = tec_no_starting_skill_modification
+	set_country_flag = tec_invalidates_synthetic_leader_trait
 	tec_country_aiauth_prepare_ai_species = yes
 	$ruler$ = {
 		save_event_target_as = tec_replaced_ruler
@@ -1623,6 +1694,7 @@ tec_country_create_aiauth_ruler_replace = {
 		custom_description = councilor_tec_aiauth_ruler_desc
 		randomize_traits = no
 	}
+	remove_country_flag = tec_invalidates_synthetic_leader_trait
 	last_created_leader = {
 		save_event_target_as = tec_aiauth_ruler
 		set_leader_flag = tec_no_species_traits
@@ -1653,7 +1725,7 @@ tec_country_create_aiauth_ruler_replace = {
 	}
 }
 
-tec_country_refragment_aiauth_ruler  = {
+tec_country_refragment_aiauth_ruler = {
 	inline_script = {
 		script = tec_type_hint
 		[[ethic] ethic = $ethic$ ]
@@ -1700,6 +1772,7 @@ tec_country_create_aiauth_councilor = {
 		[[ethic] ethic = $ethic$ ]
 	}
 	set_country_flag = tec_force_councilor_traits
+	set_country_flag = tec_invalidates_synthetic_leader_trait
 	tec_country_aiauth_prepare_ai_species = yes
 	create_leader = {
 		class = $class$
@@ -1728,6 +1801,7 @@ tec_country_create_aiauth_councilor = {
 			}
 		}
 	}
+	remove_country_flag = tec_invalidates_synthetic_leader_trait
 	last_created_leader = {
 		save_event_target_as = tec_aiauth_councilor
 		set_owner = prev
@@ -1871,7 +1945,6 @@ tec_leader_aiauth_planetary_governing_node_set_trait_block_flags = {
 	set_leader_flag = block_galcom_traits
 }
 
-
 tec_country_aiauth_planetary_governing_node_set_trait_block_flags = {
 	set_country_flag = block_pilot_traits
 	set_country_flag = block_army_traits
@@ -1879,7 +1952,6 @@ tec_country_aiauth_planetary_governing_node_set_trait_block_flags = {
 	set_country_flag = block_federation_traits
 	set_country_flag = block_galcom_traits
 }
-
 
 tec_country_aiauth_planetary_governing_node_reset_trait_block_flags = {
 	remove_country_flag = block_pilot_traits
@@ -1901,6 +1973,7 @@ tec_country_create_aiauth_planetary_governing_node = {
 	tec_country_aiauth_prepare_ai_species = yes
 	tec_country_aiauth_planetary_governing_node_set_trait_block_flags = yes
 
+	set_country_flag = tec_invalidates_synthetic_leader_trait
 	inline_script = {
 		script = iterators/tec_iterate_leader_class
 		code = "
@@ -1920,6 +1993,7 @@ tec_country_create_aiauth_planetary_governing_node = {
 					hide_leader = no
 					immortal = yes
 					can_assign_to_council = no
+					background_planet = event_target:tec_aiauth_planetary_governing_node_planet
 					custom_description = tec_aiauth_planetary_governing_node_desc
 					randomize_traits = yes
 					background_ethic = \$ethic\$
@@ -1939,6 +2013,7 @@ tec_country_create_aiauth_planetary_governing_node = {
 		"
 		ethic = $ethic|ethic_gestalt_consciousness$
 	}
+	remove_country_flag = tec_invalidates_synthetic_leader_trait
 	tec_country_aiauth_planetary_governing_node_reset_trait_block_flags = yes
 
 	last_created_leader = {
@@ -1947,6 +2022,7 @@ tec_country_create_aiauth_planetary_governing_node = {
 		add_trait_no_notify = leader_trait_tec_aiauth_planetary_governing_node
 		set_owner = prev
 		tec_leader_add_governor_trait = yes
+
 		tec_leader_handle_starting_modifiers = {
 			from = prev
 		}
@@ -2228,6 +2304,16 @@ tec_set_bioservant_portrait_effect = {
 	}
 }
 
+tec_country_remove_regular_ethics = {
+	inline_script = {
+		script = iterators/tec_iterate_ethic_regular
+		code = "
+			country_remove_ethic = ethic_\$ethic\$
+			country_remove_ethic = ethic_fanatic_\$ethic\$
+		"
+	}
+}
+
 tec_country_remove_gestalt_ethics = {
 	country_remove_ethic = ethic_gestalt_consciousness
 	inline_script = {
@@ -2239,8 +2325,9 @@ tec_country_remove_gestalt_ethics = {
 }
 
 tec_country_convert_to_gestalt = {
+	optimize_memory
 	clear_ethos = yes
-	shift_ethic = ethic_gestalt_consciousness
+	country_add_ethic = ethic_gestalt_consciousness
 
 	while = {
 		count = 2
@@ -2257,11 +2344,201 @@ tec_country_convert_to_gestalt = {
 							has_ethic = ethic_\$opposing_ethic\$
 							mult = 0
 						}
-						shift_ethic = ethic_\$ethic\$
+						country_add_ethic = ethic_\$ethic\$
 					}
 				"
 			}
 		}
+	}
+}
+
+# Traits
+# ------------------------------------------------------------
+	tec_generate_celestial_panspermia_blocker = {
+		event_target:tec_celestial_owner = {
+			if = {
+				limit = {
+					is_variable_set = tec_celestial_blockers_spawned
+				}
+				change_variable = {
+					which = tec_celestial_blockers_spawned
+					value = 1
+				}
+			}
+			else = {
+				set_variable = {
+					which = tec_celestial_blockers_spawned
+					value = 1
+				}
+			}
+		}
+		if = {	# Replicant
+			limit = {
+				event_target:tec_pop_to_clone = {
+					tec_is_replicant = yes
+					is_lithoid = no
+				}
+			}
+			add_deposit = d_tec_celestial_biomechanical
+		}
+		else_if = {	# Lithoid
+			limit = {
+				event_target:tec_pop_to_clone = {
+					is_lithoid = yes
+				}
+			}
+			add_deposit = d_tec_celestial_lithoid
+		}
+		else = { # Normal
+			add_deposit = d_tec_celestial_organic
+		}
+		if = {
+			limit = {
+				is_variable_set = tec_celestial_blockers_received
+			}
+			change_variable = {
+				which = tec_celestial_blockers_received
+				value = 1
+			}
+		}
+		else = {
+			set_variable = {
+				which = tec_celestial_blockers_received
+				value = 1
+			}
+		}
+	}
+	tec_generate_celestial_pop_from_blocker = {
+		# TODO TRAIT move from the blockers
+	}
+# /
+
+tec_species_swap_trait_if_exists = {
+	inline_script = {
+		script = tec_type_hint
+		species_trait = $TRAIT$
+		species_trait = $WITH$
+	}
+	if = {
+		limit = {
+			has_trait = $TRAIT$
+		}
+		change_species_characteristics = {
+			remove_trait = $TRAIT$
+			add_trait = $WITH$
+		}
+	}
+}
+
+tec_country_identity_trait_flag = {
+	inline_script = {
+		script = tec_type_hint
+		species_trait = $trait$
+	}
+	if = {	# trait_tec_cryptobiotic
+		limit = {
+			any_owned_species = {
+				has_trait = $trait$
+			}
+		}
+		set_country_flag = tec_identity_$trait$
+	}
+}
+
+tec_country_debug_set_indentity_trait_flags = {
+	country_event = {
+		id = tec_trait.5
+	}
+}
+
+# handles terraforming to gaia and PD compat
+tec_planet_make_gaia = {
+	if = {
+		limit = { always = no }
+	}
+	inline_script = {
+		script = mod_support/tec_pd_present
+		code = "
+			else_if = {
+				limit = {
+					always = yes
+				}
+				pd_make_all_gaia_worlds_effect = yes
+			}
+		"
+	}
+	else = {
+		change_pc = pc_gaia
+	}
+}
+
+# handles terraforming to class and PD compat
+tec_planet_terraform_planet = {
+	inline_script = {
+		script = tec_type_hint
+		planet_class = $class$
+	}
+
+	change_pc = $class$
+	inline_script = {
+		script = mod_support/tec_pd_present
+		code = "
+			if = {
+				limit = {
+					exists = space_owner
+					space_owner = {
+						OR = {
+							has_policy_flag = pd_choose_every_planet_terraforming
+							has_country_flag = pd_choose_every_planet_terraforming
+						}
+					}
+					OR = {
+						is_planet_class = pc_continental
+						is_planet_class = pc_ocean
+						is_planet_class = pc_tropical
+						is_planet_class = pc_desert
+						is_planet_class = pc_arid
+						is_planet_class = pc_savannah
+						is_planet_class = pc_arctic
+						is_planet_class = pc_alpine
+						is_planet_class = pc_tundra
+					}
+				}
+				space_owner = {
+					country_event = {
+						id = pdengine.21
+						scopes = {
+							from = prev
+						}
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					exists = space_owner
+					space_owner = {
+						OR = {
+							has_policy_flag = pd_random_same_class_terraforming
+							has_country_flag = pd_random_same_class_terraforming
+						}
+					}
+					OR = {
+						is_planet_class = pc_continental
+						is_planet_class = pc_ocean
+						is_planet_class = pc_tropical
+						is_planet_class = pc_desert
+						is_planet_class = pc_arid
+						is_planet_class = pc_savannah
+						is_planet_class = pc_arctic
+						is_planet_class = pc_alpine
+						is_planet_class = pc_tundra
+					}
+				}
+				planet_event = {
+					id = pdengine.22
+				}
+			}
+		"
 	}
 }
 

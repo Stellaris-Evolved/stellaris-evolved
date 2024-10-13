@@ -105,6 +105,8 @@ class WriterSpacer:
 def create_sprites_for_cleanup(writer: Writer, missing_sprites: MissingSpritesConfig):
     writer.write("spriteTypes = {\n")
     for error in missing_sprites['errors'].split('\n'):
+        if error.strip() == '':
+            continue
         writer.write("	spriteType = {\n")
         mod_name = error.split("\"")[-2].split('/')[-1].split('.')[0]
 

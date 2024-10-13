@@ -41,6 +41,9 @@ tech_space_trading = {
 
 	ai_weight = {
 		factor = 2
+		modifier = {
+			should_ai_focus_on_trade = yes
+		}
 	}
 }
 
@@ -66,6 +69,9 @@ tech_interstellar_economics = {
 
 	ai_weight = {
 		factor = 2
+		modifier = {
+			should_ai_focus_on_trade = yes
+		}
 	}
 }
 
@@ -90,11 +96,26 @@ tech_galactic_markets = {
 		mult = value:tec_tech_cannot_produce_strategic_weight|RESOURCE|rare_crystals|
 		mult = value:tec_tech_expertise_or_curator_scientist_weight_negative|CATEGORY|statecraft|
 		mult = value:tec_tech_weight_bonus|RARE|yes|TECH|tech_galactic_markets|
+		mult = value:tec_tech_trade_weight
 
 		modifier = {
-			factor = 0.5
-			OR = {
-				has_ethic = ethic_fanatic_cooperative
+			factor = 1.1
+			any_system_within_border = {
+				has_collected_system_trade_value > 100
+			}
+		}
+
+		modifier = {
+			factor = 1.2
+			any_system_within_border = {
+				has_collected_system_trade_value > 250
+			}
+		}
+
+		modifier = {
+			factor = 1.25
+			any_system_within_border = {
+				has_collected_system_trade_value > 500
 			}
 		}
 
@@ -105,6 +126,10 @@ tech_galactic_markets = {
 	}
 
 	ai_weight = {
+		factor = 100
+		modifier = {
+			should_ai_focus_on_trade = yes
+		}
 	}
 }
 
@@ -196,12 +221,12 @@ tech_nutrient_replication = {
 
 	modifier = {
 		planet_farmers_produces_mult = 0.15
-	#	planet_districts_food_produces_mult = 0.15
+		#planet_districts_food_produces_mult = 0.15
 		starbase_constructions_food_produces_mult = 0.15
 	}
 
 	potential = {
-		NOT = { is_machine_empire = yes }
+		is_machine_empire = no
 	}
 
 	weight_modifier = {
@@ -413,6 +438,7 @@ tech_alien_life_studies = {
 				any_owned_planet = {
 					OR = {
 						has_deposit = d_alien_pets_deposit
+						has_deposit = d_avian_reserve
 						any_owned_pop = {
 							OR = {
 								is_sapient = no
@@ -1000,10 +1026,10 @@ tech_cloning = {
 	category = { biology }
 	prerequisites = { "tech_genome_mapping" }
 	weight = @tier1weight3
-
-	modifier = {
-		pop_growth_speed = 0
-	}
+	#
+	# modifier = {
+	# 	pop_growth_speed = 0
+	# }
 
 	potential = {
 		OR = {
@@ -1390,7 +1416,11 @@ tech_gene_tailoring = {
 			has_civic = civic_machine_servitor
 			has_ethic = ethic_gestalt_empathy
 		}
-		is_natural_design_empire = no
+		OR = {
+			is_natural_design_empire = no
+			tec_is_bioservant_empire = yes
+			has_origin = origin_tec_bioservant
+		}
 	}
 
 	weight_modifier = {
@@ -1731,9 +1761,7 @@ tech_selected_lineages = {
 	# Modifiers from this tech is added through a policy-option
 
 	potential = {
-		NOT = {
-			is_machine_empire = yes
-		}
+		is_machine_empire = no
 	}
 
 	weight_modifier = {
@@ -2332,6 +2360,12 @@ tech_telepathy = {
 			factor = 3
 			is_authoritarian = yes
 		}
+		modifier = {
+			factor = @tec_tech_important_ai_tech_factor
+			any_situation = {
+				is_situation_type = situation_tec_psionic_path_t1
+			}
+		}
 	}
 }
 
@@ -2366,11 +2400,7 @@ tech_precognition_interface = {
 	}
 
 	ai_weight = {
-		modifier = {
-			factor = 2
-			is_militarist = yes
-		}
-
+		mult = value:tec_tech_military_components_ai_weight
 	}
 }
 
@@ -2457,6 +2487,10 @@ tech_psi_jump_drive_1 = {
 			factor = @ap_grasp_the_void_travel_tech
 			has_country_flag = jaunted_traveler_secret_revealed
 		}
+	}
+
+	ai_weight = {
+		mult = value:tec_tech_military_components_ai_weight
 	}
 }
 
@@ -3327,7 +3361,7 @@ tech_resource_processing_algorithms = {
 	}
 
 	potential = {
-		has_authority = auth_machine_intelligence
+		is_machine_empire = yes
 	}
 
 	weight_modifier = {
@@ -3612,7 +3646,7 @@ tech_ascension_theory = {
 	}
 
 	ai_weight = {
-		factor = 5 #more ascension perks are good
+		factor = 1000 #more ascension perks are good
 
 	}
 }
@@ -3683,7 +3717,10 @@ tech_resort_colonies = {
 	}
 
 	ai_weight = {
-
+		modifier = {
+			mult = 2
+			should_ai_focus_on_trade = yes
+		}
 	}
 }
 
@@ -3702,7 +3739,7 @@ tech_slave_colonies = {
 	}
 
 	weight_modifier = {
-		factor = 0.5
+		factor = 1
 		mult = value:tec_tech_weight_bonus|TECH|tech_slave_colonies|
 		mult = value:tec_tech_expertise_or_curator_scientist_weight_negative|CATEGORY|statecraft|
 
@@ -3720,6 +3757,10 @@ tech_slave_colonies = {
 	}
 
 	ai_weight = {
+		modifier = {
+			mult = 2
+			is_slaver = yes
+		}
 
 	}
 }
@@ -3732,23 +3773,32 @@ tech_housing_agrarian_idyll = {
 	weight = @tier3weight1
 
 	potential = {
-		is_lithoid_empire = no
-		NOT = {
-			has_technology = tech_tec_housing_lithoid_idyll
-		}
+		tec_is_agrarian_idyll_empire = yes
 	}
 
 	modifier = {
 		farming_district_housing_add = 1
 	}
 
+	technology_swap = {
+		name = tech_tec_housing_lithoid_idyll
+		inherit_icon = yes
+		inherit_effects = no
+		trigger = {
+			is_lithoid_empire = yes
+		}
+		modifier = {
+			mining_district_housing_add = 1
+		}
+
+		weight = {
+			factor = 1
+		}
+	}
+
 	weight_modifier = {
 		factor = 1.5
 		mult = value:tec_tech_weight_bonus|TECH|tech_housing_agrarian_idyll|
-		modifier = {
-			factor = 0
-			tec_is_agrarian_idyll_empire = no
-		}
 	}
 
 	ai_weight = {
@@ -3894,10 +3944,14 @@ tech_capital_productivity_1 = {
 			factor = 0.25
 			NOT = { has_tradition = tr_prosperity_finish }
 		}
-
+		modifier = {
+			mult = 2
+			has_tradition = tr_tec_centrality_finish
+		}
 	}
 
 	ai_weight = {
+		mult = @capital_tech_ai_factor
 	}
 }
 
@@ -3922,10 +3976,14 @@ tech_capital_productivity_2 = {
 			factor = 0.25
 			NOT = { has_tradition = tr_prosperity_finish }
 		}
-
+		modifier = {
+			mult = 2
+			has_tradition = tr_tec_centrality_finish
+		}
 	}
 
 	ai_weight = {
+		mult = @capital_tech_ai_factor
 	}
 }
 
@@ -3950,10 +4008,14 @@ tech_capital_productivity_3 = {
 			factor = 0.25
 			NOT = { has_tradition = tr_prosperity_finish }
 		}
-
+		modifier = {
+			mult = 2
+			has_tradition = tr_tec_centrality_finish
+		}
 	}
 
 	ai_weight = {
+		mult = @capital_tech_ai_factor
 	}
 }
 
@@ -4019,6 +4081,7 @@ tech_node_reformatting_1 = {
 	}
 
 	weight_modifier = {
+		mult = value:tec_tech_weight_bonus|TECH|tech_node_reformatting_2|
 		modifier = {
 			factor = 0.5
 			any_owned_leader = {
@@ -4040,7 +4103,7 @@ tech_node_reformatting_1 = {
 			any_owned_leader = {
 				is_councilor = yes
 				is_ruler = no
-				has_skill  >= 5
+				has_skill >= 5
 			}
 		}
 		modifier = {
@@ -4048,7 +4111,7 @@ tech_node_reformatting_1 = {
 			any_owned_leader = {
 				is_councilor = yes
 				is_ruler = no
-				has_skill  >= 7
+				has_skill >= 7
 			}
 		}
 		modifier = {
@@ -4056,7 +4119,7 @@ tech_node_reformatting_1 = {
 			any_owned_leader = {
 				is_councilor = yes
 				is_ruler = no
-				has_skill  >= 9
+				has_skill >= 9
 			}
 		}
 	}
@@ -4084,6 +4147,7 @@ tech_node_reformatting_2 = {
 	}
 
 	weight_modifier = {
+		mult = value:tec_tech_weight_bonus|TECH|tech_node_reformatting_2|
 		modifier = {
 			factor = 0.5
 			any_owned_leader = {
@@ -4097,7 +4161,7 @@ tech_node_reformatting_2 = {
 			any_owned_leader = {
 				is_councilor = yes
 				is_ruler = no
-				has_skill  >= 5
+				has_skill >= 5
 			}
 		}
 		modifier = {
@@ -4105,7 +4169,7 @@ tech_node_reformatting_2 = {
 			any_owned_leader = {
 				is_councilor = yes
 				is_ruler = no
-				has_skill  >= 7
+				has_skill >= 7
 			}
 		}
 		modifier = {
@@ -4113,7 +4177,7 @@ tech_node_reformatting_2 = {
 			any_owned_leader = {
 				is_councilor = yes
 				is_ruler = no
-				has_skill  >= 9
+				has_skill >= 9
 			}
 		}
 	}
@@ -4142,6 +4206,8 @@ tech_node_reformatting_3 = {
 	}
 
 	weight_modifier = {
+		mult = value:tec_tech_weight_bonus|RARE|yes|TECH|tech_node_reformatting_3|
+		mult = value:tec_tech_expertise_or_curator_scientist_weight_negative|CATEGORY|statecraft|
 		modifier = {
 			factor = 0.5
 			any_owned_leader = {
@@ -4155,7 +4221,7 @@ tech_node_reformatting_3 = {
 			any_owned_leader = {
 				is_councilor = yes
 				is_ruler = no
-				has_skill  >= 7
+				has_skill >= 7
 			}
 		}
 		modifier = {
@@ -4163,26 +4229,7 @@ tech_node_reformatting_3 = {
 			any_owned_leader = {
 				is_councilor = yes
 				is_ruler = no
-				has_skill  >= 9
-			}
-		}
-		modifier = {
-			factor = 0.25
-			NOR = {
-				has_trait_in_council = { TRAIT = leader_trait_expertise_statecraft }
-				has_trait_in_council = { TRAIT = leader_trait_curator }
-			}
-		}
-		modifier = {
-			factor = @ap_technological_ascendancy_rare_tech
-			has_ascension_perk = ap_technological_ascendancy
-		}
-		modifier = {
-			factor = @federation_perk_factor
-			has_federation = yes
-			federation = {
-				has_federation_perk = rare_tech_boost
-				any_member = { has_technology = tech_node_reformatting_3 }
+				has_skill >= 9
 			}
 		}
 	}
@@ -4215,6 +4262,7 @@ tech_node_culling_1 = {
 	}
 
 	weight_modifier = {
+		mult = value:tec_tech_weight_bonus|TECH|tech_node_culling_1|
 		modifier = {
 			factor = 0.5
 			any_owned_leader = {
@@ -4236,7 +4284,7 @@ tech_node_culling_1 = {
 			any_owned_leader = {
 				is_councilor = yes
 				is_ruler = no
-				has_skill  >= 5
+				has_skill >= 5
 			}
 		}
 		modifier = {
@@ -4244,7 +4292,7 @@ tech_node_culling_1 = {
 			any_owned_leader = {
 				is_councilor = yes
 				is_ruler = no
-				has_skill  >= 7
+				has_skill >= 7
 			}
 		}
 		modifier = {
@@ -4252,7 +4300,7 @@ tech_node_culling_1 = {
 			any_owned_leader = {
 				is_councilor = yes
 				is_ruler = no
-				has_skill  >= 9
+				has_skill >= 9
 			}
 		}
 	}
@@ -4280,6 +4328,7 @@ tech_node_culling_2 = {
 	}
 
 	weight_modifier = {
+		mult = value:tec_tech_weight_bonus|TECH|tech_node_culling_2|
 		modifier = {
 			factor = 0.5
 			any_owned_leader = {
@@ -4293,7 +4342,7 @@ tech_node_culling_2 = {
 			any_owned_leader = {
 				is_councilor = yes
 				is_ruler = no
-				has_skill  >= 5
+				has_skill >= 5
 			}
 		}
 		modifier = {
@@ -4301,7 +4350,7 @@ tech_node_culling_2 = {
 			any_owned_leader = {
 				is_councilor = yes
 				is_ruler = no
-				has_skill  >= 7
+				has_skill >= 7
 			}
 		}
 		modifier = {
@@ -4309,7 +4358,7 @@ tech_node_culling_2 = {
 			any_owned_leader = {
 				is_councilor = yes
 				is_ruler = no
-				has_skill  >= 9
+				has_skill >= 9
 			}
 		}
 	}
@@ -4338,6 +4387,8 @@ tech_node_culling_3 = {
 	}
 
 	weight_modifier = {
+		mult = value:tec_tech_weight_bonus|RARE|yes|TECH|tech_node_culling_3|
+		mult = value:tec_tech_expertise_or_curator_scientist_weight_negative|CATEGORY|statecraft|
 		modifier = {
 			factor = 0.5
 			any_owned_leader = {
@@ -4351,7 +4402,7 @@ tech_node_culling_3 = {
 			any_owned_leader = {
 				is_councilor = yes
 				is_ruler = no
-				has_skill  >= 7
+				has_skill >= 7
 			}
 		}
 		modifier = {
@@ -4359,26 +4410,7 @@ tech_node_culling_3 = {
 			any_owned_leader = {
 				is_councilor = yes
 				is_ruler = no
-				has_skill  >= 9
-			}
-		}
-		modifier = {
-			factor = 0.25
-			NOR = {
-				has_trait_in_council = { TRAIT = leader_trait_expertise_statecraft }
-				has_trait_in_council = { TRAIT = leader_trait_curator }
-			}
-		}
-		modifier = {
-			factor = @ap_technological_ascendancy_rare_tech
-			has_ascension_perk = ap_technological_ascendancy
-		}
-		modifier = {
-			factor = @federation_perk_factor
-			has_federation = yes
-			federation = {
-				has_federation_perk = rare_tech_boost
-				any_member = { has_technology = tech_node_culling_3 }
+				has_skill >= 9
 			}
 		}
 	}

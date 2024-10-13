@@ -14,7 +14,7 @@ has_encountered_other_species = {
 		any_owned_pop = {
 			NOR = {
 				has_trait = "trait_mechanical" 
-				has_trait = @trait_tec_bioservant 
+				has_trait = trait_tec_bioservant
 			}
 			NOT = { is_same_species = prev }
 		}
@@ -28,6 +28,10 @@ has_encountered_other_species = {
 can_be_leader = {
 	has_citizenship_rights = yes
 	can_think = yes
+	NOR = {
+		tec_has_stapled_trait = yes
+		tec_has_blocked_leader_trait = yes
+	}
 
 	OR = {
 		is_robot_pop = no
@@ -54,13 +58,13 @@ can_be_leader = {
 	# Evolved
 	OR = {
 		NOT = {
-			has_trait = @trait_tec_bioservant
+			has_trait = trait_tec_bioservant
 		}
 		root = { has_technology = tech_tec_bioservant_3 }
 	}
 	if = {
 		limit = {
-			has_trait = @trait_tec_se_subspecies
+			has_trait = trait_tec_se_subspecies
 		}
 		OR = {
 			is_same_species = root
@@ -83,6 +87,7 @@ species_can_be_necrophaged = {
 		is_archetype = PRESAPIENT
 		is_same_species = prev.owner_species
 		AND = {
+			has_citizenship_type = { type = citizenship_slavery country = prev.owner }
 			has_slavery_type = { type = slavery_livestock country = prev.owner }
 			prev.owner = { is_hive_empire = no }
 		}
@@ -102,13 +107,13 @@ is_cyborg_empire = {
 			has_trait = trait_cybernetic 
 		}
 		owner_species = {
-			has_trait = @trait_tec_superior_cybernetics_main
+			has_trait = trait_tec_superior_cybernetics_main
 		}
 		owner_species = {
-			has_trait = @trait_tec_cyberpsionic_main
+			has_trait = trait_tec_cyberpsionic_main
 		}
 		#	owner_species = {
-		#		has_trait = @trait_tec_basic_cybernetics_main
+		#		has_trait = trait_tec_basic_cybernetics_main
 		#	}
 	}
 }
@@ -136,8 +141,8 @@ is_hive_empire = {
 is_autocracy = { #Power of one
 	OR = {
 		has_ethic = ethic_gestalt_consciousness
-		has_authority = auth_imperial
-		has_authority = auth_dictatorial
+        is_imperial_authority = yes
+        is_dictatorial_authority = yes
 		has_authority = auth_tec_patrocorporate
 		AND = {
 			tec_is_aiauth_empire = yes
@@ -148,7 +153,7 @@ is_autocracy = { #Power of one
 
 is_oligarchy = { #Power of few
 	OR = {
-		has_authority = auth_oligarchic
+		is_oligarchic_authority = yes
 		AND = {
 			has_authority = auth_corporate
 			is_egalitarian = no
@@ -163,7 +168,7 @@ is_oligarchy = { #Power of few
 
 is_democracy = { #Power of many
 	OR = {
-		has_authority = auth_democratic
+		is_democratic_authority = yes
 		AND = {
 			has_authority = auth_corporate
 			is_egalitarian = yes
@@ -189,6 +194,61 @@ has_corporate_government = {
 		has_civic = civic_galactic_sovereign_megacorp
 	}
 }
+# These are not overwritten as evolved new authorities are their own type
+# and will have own cyber swaps etc with tenets, essentially this might guarantee
+# SOME compatibility with other mods that add auths, potentially
+#
+# is_democratic_authority
+#
+# is_oligarchic_authority
+#
+# is_imperial_authority
+#
+# is_dictatorial_authority
+#
+# is_cyber_democracy
+#
+# is_cyber_oligarchy
+#
+# is_cyber_dictatorial
+#
+# is_cyber_imperial
+#
+# is_synth_democracy
+#
+# is_synth_oligarchy
+#
+# is_synth_dictatorial
+#
+# is_synth_imperial
+
+# Here we are in a pickle, we need to revert to auth check, or potentialy add is_corporate_authority
+# which will need extra compat for other mods to behave the same for whatever the below is used
+
+	is_corporate_authority = {
+		OR = {
+			has_authority = auth_corporate
+		}
+	}
+
+	is_cyber_corporate = {
+		is_corporate_authority = yes
+		OR = {
+			has_country_flag = cyber_individualist
+			has_country_flag = cyber_collectivist
+		}
+	}
+
+	is_synth_corporate = {
+		is_corporate_authority = yes
+		OR = {
+			has_country_flag = synth_physical
+			has_country_flag = synth_virtual
+		}
+	}
+
+# /
+
 
 tec_can_request_subsidiaries = {
 	OR = {
@@ -227,7 +287,7 @@ uses_habitat_capitals = {
 		inline_script = {
 			script = mod_support/tec_pd_present
 			code = "
-				uses_district_set = @pdplanethab
+				uses_district_set = pdplanethab
 			"
 		}
 	}
@@ -339,7 +399,7 @@ is_fanatical = {
 }
 
 # I ABSOLUTELY HATE THE NAMING INCONSISTENCIES
-# ^ me too, specially by how misleading they can be :(  (@ rodahtnov 12-03)
+# ^ me too, specially by how misleading they can be :(	(@ rodahtnov 12-03)
 has_any_industry_district = {
 	check_variable_arithmetic = {
 		which = value:industrial_districts_value
@@ -402,10 +462,9 @@ is_gestalt_node = {	# Paragon
 
 can_think = {
 	NOR = {
-		has_trait = trait_syncretic_proles
 		has_trait = trait_nerve_stapled
-		has_trait = trait_zombie
 		has_trait = trait_robot_suppressed
+		has_trait = trait_zombie
 		tec_has_stapled_trait = { cached = yes }
 	}
 }
@@ -495,6 +554,10 @@ has_engineered_evolution_synergy = {
 		has_origin = origin_life_seeded
 		has_origin = origin_necrophage
 		has_origin = origin_clone_army
+		# evolved
+		has_origin = origin_tec_bioservant
+		has_origin = origin_tec_clones
+		tec_is_evolutionary_empire = yes
 	}
 }
 
@@ -507,7 +570,12 @@ has_organo_machine_interfacing_assimilator_synergy = {
 }
 
 has_synthetic_evolution_synergy = {
-	has_origin = origin_mechanists
+	OR = {
+		has_origin = origin_mechanists
+		tec_is_machine_cult = yes
+		has_civic = civic_tec_corporate_automatation
+	}
+
 }
 
 has_synthetic_evolution_anti_synergy = {
@@ -522,8 +590,17 @@ blocks_ai_synthetic_evolution = {
 		has_origin = origin_clone_army
 		has_origin = origin_overtuned
 		has_origin = origin_slavers
-		has_valid_civic = civic_idyllic_bloom
-		has_valid_civic = civic_hive_idyllic_bloom
+		tec_is_idyllic_bloom_empire = yes
+
+		# evolved
+		has_origin = origin_tec_bioservant
+		has_origin = origin_tec_clones
+		AND = {
+			has_origin = origin_syncretic_evolution
+			has_civic = civic_tec_origin_elders
+		}
+		has_civic = civic_tec_origin_neuroslug
+
 	}
 }
 
@@ -532,6 +609,8 @@ has_mind_over_matter_synergy = {
 		has_ascension_perk = ap_become_the_crisis
 		has_origin = origin_demonic_incursion
 		has_country_flag = knights_met_end_of_cycle
+		# evolved
+		tec_is_spiritual_seekers = yes
 	}
 }
 
@@ -563,10 +642,20 @@ prefers_commander_governors = {
 # Machine Age
 has_auto_modding_trait = {
 	OR = {
+		# Vanilla
 		has_trait = trait_auto_mod_biological
 		has_trait = trait_auto_mod_cyborg
 		has_trait = trait_auto_mod_robotic
 		has_trait = trait_auto_mod_overtuned
+		# Evolved
+			# gene
+		has_trait = trait_tec_gene_automodding_t1
+		has_trait = trait_tec_gene_automodding_t2
+		has_trait = trait_tec_gene_automodding_t3
+			# cyb
+		has_trait = trait_tec_cyborg_mainframe_automodding
+		has_trait = trait_tec_cyborg_mainframe_super_automodding
+		has_trait = trait_tec_cyborg_deck_automodding
 	}
 }
 
@@ -606,3 +695,35 @@ has_auto_modding_trait = {
 is_anglers_empire = {
 	tec_is_aquatic_empire = yes
 }
+
+has_sr_deposit = {
+	OR = {
+		check_variable_arithmetic = {
+			which = modifier:building_mote_harvesters_max
+			value > 0
+		}
+		check_variable_arithmetic = {
+			which = modifier:building_gas_extractors_max
+			value > 0
+		}
+		check_variable_arithmetic = {
+			which = modifier:building_crystal_mines_max
+			value > 0
+		}
+	}
+}
+
+can_obtain_volatile_motes = {
+	custom_tooltip = {
+		fail_text = must_have_access_to_volatile_motes_tt
+		tec_can_produce_volatile_motes = yes
+	}
+}
+
+can_obtain_rare_crystals = {
+	custom_tooltip = {
+		fail_text = must_have_access_to_rare_crystals_tt
+		tec_can_produce_rare_crystals = yes
+	}
+}
+

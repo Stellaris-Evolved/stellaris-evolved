@@ -306,7 +306,7 @@ decision_boost_market_nomination = {
 					days = -1
 				}
 			}
-			if = {
+			else_if = {
 				limit = { has_modifier = market_nominee_level_2 }
 				remove_modifier = market_nominee_level_2
 				add_modifier = {
@@ -314,7 +314,7 @@ decision_boost_market_nomination = {
 					days = -1
 				}
 			}
-			if = {
+			else_if = {
 				limit = { has_modifier = market_nominee_level_3 }
 				remove_modifier = market_nominee_level_3
 				add_modifier = {
@@ -322,7 +322,7 @@ decision_boost_market_nomination = {
 					days = -1
 				}
 			}
-			if = {
+			else_if = {
 				limit = { has_modifier = market_nominee_level_4 }
 				remove_modifier = market_nominee_level_4
 				add_modifier = {
@@ -567,6 +567,184 @@ decision_museum_exhibits = {
 # 	}
 # }
 
+decision_penal_colony = {
+	owned_planets_only = yes
+
+	prerequisites = {
+		"tech_penal_colonies"
+	}
+
+	resources = {
+		category = decisions
+		cost = {
+			unity = 1000
+		}
+	}
+
+	potential = {
+		is_capital = no
+		NOR = {
+			is_artificial = yes
+			tec_is_changing_district_set_colony = yes
+			has_designation = col_nanotech_world
+			tec_is_city_world = yes
+		}
+		owner = {
+			is_regular_empire = yes
+		}
+	}
+
+	allow = {
+		planet_size >= 15
+
+		custom_tooltip = {
+			fail_text = decision_penal_colony_only_one
+			NOT = {
+				owner = {
+					any_owned_planet = {
+						has_modifier = penal_colony
+					}
+				}
+			}
+		}
+	}
+
+	effect = {
+		add_modifier = {
+			modifier = penal_colony
+			days = -1
+		}
+		hidden_effect = {
+			validate_planet_buildings_and_districts = yes
+			tec_cache_planet_type_triggers = { force = yes }
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}
+
+decision_abolish_penal_colony = {
+	owned_planets_only = yes
+	icon = decision_penal_colony
+
+	resources = {
+		category = decisions
+		cost = {
+			unity = 2500
+		}
+	}
+
+	potential = {
+		has_modifier = penal_colony
+	}
+
+	effect = {
+		remove_modifier = penal_colony
+
+		hidden_effect = {
+			validate_planet_buildings_and_districts = yes
+			tec_cache_planet_type_triggers = { force = yes }
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}
+
+# Thrall-World
+decision_slave_colony = {
+	owned_planets_only = yes
+
+	prerequisites = {
+		"tech_slave_colonies"
+	}
+
+	resources = {
+		category = decisions
+		cost = {
+			unity = 1000
+		}
+	}
+
+	potential = {
+		is_capital = no
+		NOR = {
+			is_artificial = yes
+			tec_is_changing_district_set_colony = yes
+			has_designation = col_nanotech_world
+			tec_is_city_world = yes
+		}
+
+		owner = {
+			is_regular_empire = yes
+		}
+
+	}
+
+	allow = {
+		custom_tooltip = {
+			fail_text = decision_slave_colony_must_have_slave
+			any_owned_pop = {
+				has_citizenship_type = { type = citizenship_slavery country = owner }
+			}
+		}
+		custom_tooltip = {
+			fail_text = decision_resort_colony_no_districts
+			num_districts = { type = any value < 1 }
+			num_buildings = { type = any value < 2 }
+		}
+	}
+
+	effect = {
+		custom_tooltip = decision_slave_colony_effects
+		add_modifier = {
+			modifier = slave_colony
+			days = -1
+		}
+
+		hidden_effect = {
+			validate_planet_buildings_and_districts = yes
+			tec_cache_planet_type_triggers = { force = yes }
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}
+
+decision_abolish_slave_colony = {
+	owned_planets_only = yes
+	icon = decision_slave_colony
+
+	resources = {
+		category = decisions
+		cost = {
+			unity = 2500
+		}
+	}
+
+	potential = {
+		has_modifier = slave_colony
+	}
+
+	effect = {
+		remove_modifier = slave_colony
+
+		hidden_effect = {
+			validate_planet_buildings_and_districts = yes
+			tec_cache_planet_type_triggers = { force = yes }
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}
+
 
 # Resort Colony
 decision_resort_colony = {
@@ -589,17 +767,17 @@ decision_resort_colony = {
 			is_regular_empire = yes
 		}
 		is_capital = no
-		NOR = { 
-			has_modifier = penal_colony 
-			has_modifier = slave_colony
-			has_modifier = resort_colony
+		NOR = {
+			is_artificial = yes
+			tec_is_changing_district_set_colony = yes
+			has_designation = col_nanotech_world
 			tec_is_city_world = yes
 			AND = {
-				is_planet_class = pc_nuked
+				tec_is_nuked_world = yes
 				NOR = {
 					owner = {
-						OR = {	
-							is_memorialist_empire = yes	
+						OR = {
+							is_memorialist_empire = yes
 							has_trait = trait_survivor
 							has_trait = trait_robot_survivor
 
@@ -622,8 +800,6 @@ decision_resort_colony = {
 				}
 			}
 		}
-		is_artificial = no
-		NOT = { has_designation = col_nanotech_world }
 	}
 
 	allow = {
@@ -660,37 +836,8 @@ decision_resort_colony = {
 			days = -1
 		}
 		hidden_effect = {
-			# TO DO alt capitals
-			if = {
-				limit = {
-					OR = {
-						has_building = building_colony_shelter
-						has_building = building_capital
-					}
-				}
-				remove_building = building_colony_shelter
-				remove_building = building_capital
-				add_building = building_resort_capital
-			}
-			if = {
-				limit = {
-					OR = {
-						has_building = building_major_capital
-						has_building = building_system_capital
-						# Evolved
-						has_building = building_galactic_capital
-					}
-				}
-				remove_building = building_major_capital
-				remove_building = building_system_capital
-				# Evolved
-				remove_building = building_galactic_capital
-				# /
-				add_building = building_resort_major_capital
-			}
-		}
-		hidden_effect = {
 			validate_planet_buildings_and_districts = yes
+			tec_cache_planet_type_triggers = { force = yes }
 		}
 	}
 
@@ -699,6 +846,117 @@ decision_resort_colony = {
 	}
 }
 
+decision_abolish_resort_colony = {
+	owned_planets_only = yes
+	icon = decision_resort_colony
+
+	resources = {
+		category = decisions
+		cost = {
+			unity = 2500
+		}
+	}
+
+	potential = {
+		has_modifier = resort_colony
+	}
+
+	effect = {
+		remove_modifier = resort_colony
+
+		hidden_effect = {
+			validate_planet_buildings_and_districts = yes
+			tec_cache_planet_type_triggers = { force = yes }
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}
+
+# Crucible Colony
+decision_gestation_colony = {
+	owned_planets_only = yes
+
+	resources = {
+		category = decisions
+		cost = {
+			unity = 1000
+		}
+	}
+
+	potential = {
+		is_capital = no
+		NOR = {
+			is_artificial = yes
+			tec_is_changing_district_set_colony = yes
+			has_designation = col_nanotech_world
+			tec_is_city_world = yes
+			tec_is_machine_world = yes
+		}
+		owner = {
+			has_tradition = tr_cybernetics_assimilator_gestation
+		}
+	}
+
+	allow = {
+		planet_size >= 15
+		custom_tooltip = {
+			fail_text = decision_gestation_colony_only_one
+			NOT = {
+				owner = {
+					any_owned_planet = { has_modifier = gestation_colony }
+				}
+			}
+		}
+	}
+
+	effect = {
+		add_modifier = {
+			modifier = gestation_colony
+			days = -1
+		}
+
+		hidden_effect = {
+			validate_planet_buildings_and_districts = yes
+			tec_cache_planet_type_triggers = yes
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}
+
+decision_abolish_gestation_colony = {
+	owned_planets_only = yes
+	icon = decision_gestation_colony
+
+	resources = {
+		category = decisions
+		cost = {
+			unity = 2500
+		}
+	}
+
+	potential = {
+		has_modifier = gestation_colony
+	}
+
+	effect = {
+		remove_modifier = gestation_colony
+
+		hidden_effect = {
+			validate_planet_buildings_and_districts = yes
+			tec_cache_planet_type_triggers = yes
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}
 
 # - - - - - - - - - - - - - - - - - - - - - 
 # O V E R W R I T E	08_paragon_decisions.txt

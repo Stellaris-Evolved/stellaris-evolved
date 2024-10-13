@@ -1,6 +1,8 @@
 # - Assembly -
- 
-tec_create_built_bioservant_species = {
+
+tec_create_global_parent_bioservant_species = {
+	optimize_memory
+
 	create_species = {
 		name = "NAME_bioservant"
 		plural = "NAME_bioservants"
@@ -8,51 +10,61 @@ tec_create_built_bioservant_species = {
 		namelist = this
 		portrait = "pre_mol3"
 		traits = {
-			trait = @trait_tec_bioservant
+			trait = trait_tec_bioservant
+			trait = "trait_tec_sterile"
+		}
+
+		effect = {
+			save_global_event_target_as = tec_global_bioservant_parent_species
+		}
+	}
+}
+
+tec_create_built_bioservant_species = {
+	if = {
+		limit = {
+			NOT = {
+				exists = event_target:tec_global_bioservant_parent_species
+			}
+		}
+		tec_create_global_parent_bioservant_species = yes
+	}
+	create_species = {
+		name = "NAME_bioservant"
+		plural = "NAME_bioservants"
+		class = BIOSERVANT
+		namelist = this
+		portrait = "pre_mol3"
+		traits = {
+			trait = trait_tec_bioservant
 			trait = "trait_tec_sterile"
 		}
 		
 		effect = {
+			tec_set_bioservant_portrait_effect = yes
+			set_species_identity = event_target:tec_global_bioservant_parent_species
 			set_species_flag = bioservant_species@prev
 		}
 	}
-	last_created_species = {
-		tec_set_bioservant_portrait_effect = yes
-	}
 }
-	
-tec_create_built_robot_species = {
+
+# depends on last
+tec_make_secondary_species_bioservant_species = {
+	last_created_species = {
+		save_event_target_as = tec_species_temp
+	}
 	if = {
 		limit = {
 			NOT = {
-				exists = event_target:global_robot_parent_species
+				exists = event_target:tec_global_bioservant_parent_species
 			}
 		}
-		create_global_robot_parent_species = yes
+		tec_create_global_parent_bioservant_species = yes
 	}
-
-	create_species = {
-		name = "NAME_Robot"
-		plural = "NAME_Robot_plural"
-		class = ROBOT
-		namelist = this
-		portrait = "default_robot"
-		traits = {
-			trait = "trait_mechanical"
-		}
-
-		effect = {
-			set_species_identity = event_target:global_robot_parent_species
-			set_species_flag = mechanical_species@prev
-			save_event_target_as = mechanical_species_checker@prev
-		}
+	event_target:tec_species_temp = {
+		set_species_identity = event_target:tec_global_bioservant_parent_species
+		set_species_flag = bioservant_species@prev
 	}
-
-	last_created_species = {
-		set_synth_or_robot_portrait_effect = yes
-	}
-
-	set_built_species = last_created_species
 }
 
 tec_create_fake_robot_species = {
@@ -88,6 +100,26 @@ tec_create_fake_robot_species = {
 
 	# This species should be never assembled
 	#set_built_species = last_created_species
+}
+
+# depends on last
+tec_make_secondary_species_robot_species = {
+	optimize_memory
+	last_created_species = {
+		save_event_target_as = tec_species_temp
+	}
+	if = {
+		limit = {
+			NOT = {
+				exists = event_target:global_robot_parent_species
+			}
+		}
+		create_global_robot_parent_species = yes
+	}
+	event_target:tec_species_temp = {
+		set_species_identity = event_target:global_robot_parent_species
+		set_species_flag = mechanical_species@prev
+	}
 }
 
 # Debug scope printing

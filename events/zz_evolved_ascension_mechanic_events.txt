@@ -4,8 +4,15 @@
 # Biological A Genetic
 # ------------------------------------------------------------ tec_gene_path.5xx +
 namespace = tec_gene_path
- # --------------- GENE T2 POSTMECHANIC
-	country_event = { # Decision picked - Genetic Recombination
+ # --------------- GENE T2 POSTMECHANIC ANNOUNCEMENT
+	#country_event = { # Tease - Requires to build a building - adds an alert
+	#	id = tec_gene_path.250
+
+	#country_event = { # Tease - Building built - continues triggering the tec_gene_path.500 event
+	#	id = tec_gene_path.25001
+ # /
+ # --------------- GENE T2 POSTMECHANIC - GENETIC RECOMBINATION
+	country_event = { # Situation Started - Genetic Recombination
 		id = tec_gene_path.500
 		title = "tec_gene_path.500.name"
 		# Descs
@@ -14,6 +21,16 @@ namespace = tec_gene_path
 				text = "tec_gene_path.500.desc.regular"
 				trigger = {
 					is_gestalt = no
+					NOT = {
+						has_country_flag = tec_gene_recombination_tutorial
+					}
+				}
+			}
+			desc = {
+				text = "tec_gene_path.500.desc.regular.repeatable"
+				trigger = {
+					is_gestalt = no
+					has_country_flag = tec_gene_recombination_tutorial
 				}
 			}
 			# Gestalt
@@ -21,6 +38,15 @@ namespace = tec_gene_path
 				text = "tec_gene_path.500.desc.hive"
 				trigger = {
 					is_gestalt = yes
+				}
+			}
+			desc = {
+				text = "tec_gene_path.500.desc.hive.repeatable"
+				trigger = {
+					is_gestalt = yes
+					NOT = {
+						has_country_flag = tec_gene_recombination_tutorial
+					}
 				}
 			}
 			# Fallback
@@ -46,6 +72,12 @@ namespace = tec_gene_path
 						set_situation_locked = yes
 					}
 				}
+			}
+		}
+
+		after = {
+			hidden_effect = {
+				set_country_flag = tec_gene_recombination_tutorial
 			}
 		}
 
@@ -138,7 +170,11 @@ namespace = tec_gene_path
 						fail_text = tec_gene_path.50010.recombine.upgrade.nope
 						hidden_trigger = {
 							owner = {
-								tec_has_all_genetic_perfection_upgraded_trait_flags = no
+								OR = {
+									tec_has_all_genetic_perfection_main_trait_flags = no
+									tec_has_all_genetic_perfection_advanced_trait_flags = no
+									tec_has_all_genetic_perfection_normal_trait_flags = no
+								}
 							}
 						}
 					}
@@ -158,7 +194,7 @@ namespace = tec_gene_path
 				hidden_effect = {
 					set_situation_flag = tec_gene_recombination_lotto
 				}
-				allow = {
+				allow = {	# TODO ASCENSION GENETIC T2
 					always = no
 				}
 			}
@@ -235,57 +271,45 @@ namespace = tec_gene_path
 				}
 				allow = {
 					custom_tooltip = {
-						fail_text = tec_gene_path.50125.already.unlocked.all
+						fail_text = tec_gene_path.50125.already.unlocked.all.traits.main
 						hidden_trigger = {
 							exists = owner
 							owner = {
-								tec_has_all_genetic_perfection_advanced_trait_flags = no
+								tec_has_all_genetic_perfection_main_trait_flags = no
 							}
 						}
 					}
-					custom_tooltip = {
-						fail_text = tec_gene_path.50125.already.unlocked.all.main
-						hidden_trigger = {
-							exists = owner
-							owner = {
-								NAND = {
-									has_country_flag = unlocked_trait_tec_gene_main_t2
-									has_country_flag = unlocked_trait_tec_gene_main_t3
-								}
-							}
-						}
-					}
-					#custom_tooltip = {
-					#	fail_text = tec_gene_path.50125.require.previous.t2.knowledge
-					#	# Requires at least 5 discovered t2 traits
-					#	hidden_trigger = {
-					#		exists = owner
-					#		owner = {
-					#			NOT = {
-					#				has_country_flag = unlocked_trait_tec_gene_main_t2
-					#			}
-					#			calc_true_if = {
-					#				amount > 5
-					#				has_country_flag = unlocked_trait_tec_gene_automodding_t2
-					#				has_country_flag = unlocked_trait_tec_gene_genius_t2
-					#				has_country_flag = unlocked_trait_tec_gene_will_t2
-					#				has_country_flag = unlocked_trait_tec_gene_fertile_t2
-					#				has_country_flag = unlocked_trait_tec_gene_robust_t2
-					#				has_country_flag = unlocked_trait_tec_gene_audacious_t2
-					#				has_country_flag = unlocked_trait_tec_gene_lifespan_t2
-					#				has_country_flag = unlocked_trait_tec_gene_metabolic_t2
-					#				# Basic
-					#				has_country_flag = unlocked_trait_tec_gene_energy_t2
-					#				has_country_flag = unlocked_trait_tec_gene_mining_t2
-					#				has_country_flag = unlocked_trait_tec_gene_farming_t2
-					#				has_country_flag = unlocked_trait_tec_gene_research_t2
-					#				has_country_flag = unlocked_trait_tec_gene_unity_t2
-					#				has_country_flag = unlocked_trait_tec_gene_industry_t2
-					#				has_country_flag = unlocked_trait_tec_gene_amenities_t2
-					#				has_country_flag = unlocked_trait_tec_gene_trade_t2
-					#			}
-					#		}
-					#	}
+					#custom_tooltip = {	# TODO ASCENSION GENETIC T2
+						#fail_text = tec_gene_path.50125.require.previous.t2.knowledge
+						## Requires at least 5 discovered t2 traits
+						#hidden_trigger = {
+							#exists = owner
+							#owner = {
+							#	NOT = {
+							#		has_country_flag = unlocked_trait_tec_gene_main_t2
+							#	}
+							#	calc_true_if = {
+							#		amount > 5
+							#		has_country_flag = unlocked_trait_tec_gene_automodding_t2
+							#		has_country_flag = unlocked_trait_tec_gene_genius_t2
+							#		has_country_flag = unlocked_trait_tec_gene_will_t2
+							#		has_country_flag = unlocked_trait_tec_gene_fertile_t2
+							#		has_country_flag = unlocked_trait_tec_gene_robust_t2
+							#		has_country_flag = unlocked_trait_tec_gene_audacious_t2
+							#		has_country_flag = unlocked_trait_tec_gene_lifespan_t2
+							#		has_country_flag = unlocked_trait_tec_gene_metabolic_t2
+							#		# Basic
+							#		has_country_flag = unlocked_trait_tec_gene_energy_t2
+							#		has_country_flag = unlocked_trait_tec_gene_mining_t2
+							#		has_country_flag = unlocked_trait_tec_gene_farming_t2
+							#		has_country_flag = unlocked_trait_tec_gene_research_t2
+							#		has_country_flag = unlocked_trait_tec_gene_unity_t2
+							#		has_country_flag = unlocked_trait_tec_gene_industry_t2
+							#		has_country_flag = unlocked_trait_tec_gene_amenities_t2
+							#		has_country_flag = unlocked_trait_tec_gene_trade_t2
+							#	}
+							#}
+						#}
 					#}
 				}
 				hidden_effect = {
@@ -302,7 +326,7 @@ namespace = tec_gene_path
 				}
 				allow = {
 					custom_tooltip = {
-						fail_text = tec_gene_path.50125.already.unlocked.all
+						fail_text = tec_gene_path.50125.already.unlocked.all.traits.advanced
 						hidden_trigger = {
 							exists = owner
 							owner = {
@@ -310,13 +334,13 @@ namespace = tec_gene_path
 							}
 						}
 					}
-					custom_tooltip = {
-						fail_text = tec_gene_path.50125.require.previous.upgrade
-						hidden_trigger = {
-							exists = owner
-							# TODO ASCENSION
-						}
-					}
+					#custom_tooltip = {	# TODO ASCENSION GENETIC T2
+						#fail_text = tec_gene_path.50125.require.main.upgrade
+						#hidden_trigger = {
+						#	exists = owner
+						#	# TODO ASCENSION
+						#}
+					#}
 				}
 				hidden_effect = {
 					set_situation_flag = tec_gene_recombination_advanced_trait
@@ -332,38 +356,45 @@ namespace = tec_gene_path
 				}
 				allow = {
 					custom_tooltip = {
-						fail_text = tec_gene_path.50125.already.unlocked.all
+						fail_text = tec_gene_path.50125.already.unlocked.all.traits.normal
 						hidden_trigger = {
 							exists = owner
 							owner = {
-								tec_has_all_genetic_perfection_advanced_trait_flags = no
+								tec_has_all_genetic_perfection_normal_trait_flags = no
 							}
 						}
 					}
+					#custom_tooltip = {	# TODO ASCENSION GENETIC T2
+						#fail_text = tec_gene_path.50125.require.main.upgrade
+						#hidden_trigger = {
+						#	exists = owner
+						#	# TODO ASCENSION
+						#}
+					#}
 				}
 				hidden_effect = {
 					set_situation_flag = tec_gene_recombination_normal_trait
 				}
 			}
 			#option = {	# Rare trait - moved to trait point lotto
-			#	name = tec_gene_path.50125.recombine.rare
-			#	custom_tooltip = tec_gene_path.50125.recombine.rare.tooltip
-			#	icon = {
-			#		icon = GFX_situation_approach_genetics
-			#		icon_background = GFX_situation_approach_bg_tec_orange
-			#		text = tec_icon_text_outcome_neutral
-			#	}
-			#	allow = {
-			#		custom_tooltip = {
-			#			fail_text = tec_gene_path.50125.already.unlocked.all
-			#			hidden_trigger = {
-			#				tec_has_all_genetic_perfection_recombined_trait_flags = no
-			#			}
-			#		}
-			#	}
-			#	hidden_effect = {
-			#		set_situation_flag = tec_gene_recombination_main_trait
-			#	}
+				#name = tec_gene_path.50125.recombine.rare
+				#custom_tooltip = tec_gene_path.50125.recombine.rare.tooltip
+				#icon = {
+				#	icon = GFX_situation_approach_genetics
+				#	icon_background = GFX_situation_approach_bg_tec_orange
+				#	text = tec_icon_text_outcome_neutral
+				#}
+				#allow = {
+				#	custom_tooltip = {
+				#		fail_text = tec_gene_path.50125.already.unlocked.all
+				#		hidden_trigger = {
+				#			tec_has_all_genetic_perfection_recombined_trait_flags = no
+				#		}
+				#	}
+				#}
+				#hidden_effect = {
+				#	set_situation_flag = tec_gene_recombination_main_trait
+				#}
 			#}
 		# /
 	}
@@ -515,7 +546,7 @@ namespace = tec_gene_path
 		}
 
 		# Options
-			option = {	# Main trait
+			option = {	# Main Standard trait
 				name = tec_gene_path.50150.recombine.main.t2
 				custom_tooltip = tec_gene_path.50150.recombine.main.t2.tooltip
 				icon = {
@@ -538,7 +569,7 @@ namespace = tec_gene_path
 					}
 				}
 			}
-			option = {	# Main trait
+			option = {	# Main Standard trait t3
 				name = tec_gene_path.50150.recombine.main.t3
 				custom_tooltip = tec_gene_path.50150.recombine.main.t3.tooltip
 				icon = {
@@ -1815,6 +1846,14 @@ namespace = tec_gene_path
 				# Main
 				remove_country_flag = tec_improve_trait_tec_gene_main_t1
 				remove_country_flag = tec_improve_trait_tec_gene_main_t2
+				#remove_country_flag = tec_improve_trait_tec_gene_main_cloning_t1
+				#remove_country_flag = tec_improve_trait_tec_gene_main_cloning_t2
+				#remove_country_flag = tec_improve_trait_tec_gene_main_adaptation_t1
+				#remove_country_flag = tec_improve_trait_tec_gene_main_adaptation_t2
+				#remove_country_flag = tec_improve_trait_tec_gene_main_necrophage_t1
+				#remove_country_flag = tec_improve_trait_tec_gene_main_necrophage_t2
+				#remove_country_flag = tec_improve_trait_tec_gene_main_sylvan_t1
+				#remove_country_flag = tec_improve_trait_tec_gene_main_sylvan_t2
 				# Advanced
 				remove_country_flag = tec_improve_trait_tec_gene_automodding_t1
 				remove_country_flag = tec_improve_trait_tec_gene_automodding_t2
@@ -2344,9 +2383,36 @@ namespace = tec_gene_path
 # ------------------------------------------------------------ tec_biogenic_path.2xx +
 namespace = tec_biogenic_path
 
- # --------------- BIOGENIC T2 POSTMECHANIC
-  # ---------- TO DO
-  # /
+ # --------------- BIOGENIC T2 POSTMECHANIC ANNOUNCEMENT
+	#country_event = { # Tease - TODO ASCENSION
+	#	id = tec_biogenic_path.250
+
+	#country_event = { # Tease - TODO ASCENSION
+	#	id = tec_biogenic_path.25001
+ # /
+ # --------------- BIOGENIC T2 POSTMECHANIC - MUTATIVE BIOAMALGAMATION
+	#country_event = { # Situation Started - Bioamalgamation
+	#	id = tec_biogenic_path.500
+
+	#situation_event = { # Bioamalgamation - XX% - TODO ASCENSION
+	#	id = tec_biogenic_path.500XX
+
+	#situation_event = { # Bioamalgamation - XX% - TODO ASCENSION
+	#	id = tec_biogenic_path.500XX
+
+	#situation_event = { # Bioamalgamation - XX% - TODO ASCENSION
+	#	id = tec_biogenic_path.500XX
+
+	#situation_event = { # Bioamalgamation - XX% - TODO ASCENSION
+	#	id = tec_biogenic_path.505
+
+	#country_event = { # Bioamalgamation - 100A% - TODO ASCENSION
+	#	id = tec_biogenic_path.50501
+
+	#country_event = { # Bioamalgamation - 100A% - TODO
+	#	id = tec_biogenic_path.50502
+
+ # /
  # /
 # /
 
@@ -2354,17 +2420,399 @@ namespace = tec_biogenic_path
 # ------------------------------------------------------------ tec_cybernetic_path.2xx +
 namespace = tec_cybernetic_path
 
- # --------------- CYB T2 POSTMECHANIC
+ # --------------- CYB T2 POSTMECHANIC ANNOUNCEMENT
+	#country_event = { # Tease - Requires to build a building - adds an alert
+	#	id = tec_cybernetic_path.250
 
+	#country_event = { # Tease - Building built - continues triggering the tec_cybernetic_path.500 event
+	#	id = tec_cybernetic_path.25001
+ # /
+ # --------------- CYB T2 POSTMECHANIC - AUGMENTATION OVERCLOCK
+	country_event = { # Situation Started - Augmentation Overclock
+		id = tec_cybernetic_path.500
+		title = "tec_cybernetic_path.500.name"
+		# Descs
+			# Regular
+			desc = {
+				text = "tec_cybernetic_path.500.desc.regular"
+				trigger = {
+					is_gestalt = no
+					NOT = {
+						has_country_flag = tec_cybernetic_augmentation_tutorial
+					}
+				}
+			}
+			desc = {
+				text = "tec_cybernetic_path.500.desc.regular.repeatable"
+				trigger = {
+					is_gestalt = no
+					has_country_flag = tec_cybernetic_augmentation_tutorial
+				}
+			}
+			# Gestalt
+			desc = {
+				text = "tec_cybernetic_path.500.desc.gestalt"
+				trigger = {
+					is_gestalt = yes
+				}
+			}
+			desc = {
+				text = "tec_cybernetic_path.500.desc.gestalt.repeatable"
+				trigger = {
+					is_gestalt = yes
+					NOT = {
+						has_country_flag = tec_cybernetic_augmentation_tutorial
+					}
+				}
+			}
+		# /
+		picture = GFX_evt_synth_situation
+		show_sound = event_the_flesh_is_weak
+		trackable = yes
+
+		is_triggered_only = yes
+
+		immediate = {
+			owner_main_species = {
+				save_event_target_as = tec_target_species
+			}
+			save_event_target_as = tec_temp_country
+			event_target:tec_temp_country = {
+				start_situation = {
+					type = situation_tec_ascension_cybernetic_overclock
+					target = event_target:tec_temp_country.capital_scope
+					effect = {
+						save_event_target_as = new_situation
+						set_situation_locked = yes
+					}
+				}
+			}
+		}
+
+		after = {
+			hidden_effect = {
+				set_country_flag = tec_cybernetic_augmentation_tutorial
+			}
+		}
+
+		# Options
+			option = {
+				name = "tec_cybernetic_path.500.slow"
+				custom_tooltip = "tec_cybernetic_path.500.slow.tooltip"
+				icon = {
+					icon = GFX_situation_approach_tec_cybernetics
+					icon_background = GFX_situation_approach_bg_tec_blue
+					text = set_situation_approach_icon_text
+				}
+				hidden_effect = {
+					event_target:new_situation = {
+						set_situation_approach = situation_tec_ascension_cybernetic_overclock_approach_slow
+						set_situation_locked = no
+					}
+				}
+			}
+			option = {
+				name = "tec_cybernetic_path.500.standard"
+				custom_tooltip = "tec_cybernetic_path.500.standard.tooltip"
+				icon = {
+					icon = GFX_situation_approach_tec_cybernetics
+					icon_background = GFX_situation_approach_bg_yellow
+					text = set_situation_approach_icon_text
+				}
+				hidden_effect = {
+					event_target:new_situation = {
+						set_situation_approach = situation_tec_ascension_cybernetic_overclock_approach_standard
+						set_situation_locked = no
+					}
+				}
+			}
+			option = {
+				name = "tec_cybernetic_path.500.fast"
+				custom_tooltip = "tec_cybernetic_path.500.fast.tooltip"
+				icon = {
+					icon = GFX_situation_approach_tec_cybernetics
+					icon_background = GFX_situation_approach_bg_red
+					text = set_situation_approach_icon_text
+				}
+				hidden_effect = {
+					event_target:new_situation = {
+						set_situation_approach = situation_tec_ascension_cybernetic_overclock_approach_fast
+						set_situation_locked = no
+					}
+				}
+			}
+		# /
+	}
+	situation_event = { # Overclock - 5% - Select the focus
+		id = tec_cybernetic_path.50005
+		title = "tec_cybernetic_path.50005.name"
+		# Descs
+			desc = {	# Fallback
+				text = "tec_cybernetic_path.50005.desc.regular"
+				trigger = { always = yes }
+			}
+		# /
+		picture = GFX_evt_hive_cyberization
+		#show_sound = event_evolution_mastery
+		is_triggered_only = yes
+		situation = this
+		location = target
+
+		immediate = {
+			hidden_effect = {
+				set_situation_locked = yes
+			}
+		}
+
+		after = {
+			hidden_effect = {
+				set_situation_locked = no
+			}
+		}
+
+		# Options
+			option = {	# Standard
+				name = tec_cybernetic_path.50005.upgrade.cortex
+				custom_tooltip = tec_cybernetic_path.50005.upgrade.cortex.tooltip
+				icon = {
+					icon = GFX_situation_approach_tec_ai
+					icon_background = GFX_situation_approach_bg_tec_blue
+					text = situation_monthly_change_tooltip_approaches_dependent
+				}
+				trigger = {
+					owner = {
+						NOT = {
+							has_country_flag = tec_cybernetic_augmentation_cortex_repeatable
+						}
+					}
+				}
+				hidden_effect = {
+					set_situation_flag = tec_cybernetic_augmentation_cortex
+				}
+			}
+			option = {	# Repeatable
+				name = tec_cybernetic_path.50005.upgrade.cortex.repeatable
+				custom_tooltip = tec_cybernetic_path.50005.upgrade.cortex.repeatable.tooltip
+				icon = {
+					icon = GFX_situation_approach_tec_ai
+					icon_background = GFX_situation_approach_bg_tec_blue
+					text = situation_monthly_change_tooltip_approaches_dependent
+				}
+				trigger = {
+					owner = {
+						has_country_flag = tec_cybernetic_augmentation_cortex_repeatable
+					}
+				}
+				hidden_effect = {
+					set_situation_flag = tec_cybernetic_augmentation_cortex
+				}
+			}
+			option = {	# Standard
+				name = tec_cybernetic_path.50005.upgrade.material
+				custom_tooltip = tec_gene_path.50010.upgrade.material.tooltip
+				icon = {
+					icon = GFX_situation_approach_amenities
+					icon_background = GFX_situation_approach_bg_tec_blue
+					text = situation_monthly_change_tooltip_approaches_dependent
+				}
+				trigger = {
+					owner = {
+						NOT = {
+							has_country_flag = tec_cybernetic_augmentation_material_repeatable
+						}
+					}
+				}
+				hidden_effect = {
+					set_situation_flag = tec_cybernetic_augmentation_material
+				}
+			}
+			option = {	# Repeatable
+				name = tec_cybernetic_path.50005.upgrade.material.repeatable
+				custom_tooltip = tec_gene_path.50010.upgrade.material.repeatable.tooltip
+				icon = {
+					icon = GFX_situation_approach_amenities
+					icon_background = GFX_situation_approach_bg_tec_blue
+					text = situation_monthly_change_tooltip_approaches_dependent
+				}
+				trigger = {
+					owner = {
+						has_country_flag = tec_cybernetic_augmentation_material_repeatable
+					}
+				}
+				hidden_effect = {
+					set_situation_flag = tec_cybernetic_augmentation_material
+				}
+			}
+			option = {	# Cyberpsychosis - mitigate
+				name = tec_cybernetic_path.50005.cyberpsychosis.mitigate
+				custom_tooltip = tec_gene_path.50010.cyberpsychosis.mitigate.tooltip
+				icon = {
+					icon = GFX_situation_approach_tec_cybernetics
+					icon_background = GFX_situation_approach_bg_yellow
+					text = situation_monthly_change_tooltip_approaches_dependent
+				}
+				trigger = {
+					owner = {
+						has_country_flag = tec_cyberpsychosis_triggered
+					}
+				}
+				hidden_effect = {
+					set_situation_flag = tec_cybernetic_augmentation_mitigate_cyberpsychosis
+				}
+			}
+			option = {	# Cyberpsychosis - benefit
+				name = tec_cybernetic_path.50005.cyberpsychosis.benefit
+				custom_tooltip = tec_gene_path.50010.cyberpsychosis.benefit.tooltip
+				icon = {
+					icon = GFX_situation_approach_tec_cybernetics
+					icon_background = GFX_situation_approach_bg_red
+					text = situation_monthly_change_tooltip_approaches_dependent
+				}
+				trigger = {
+					owner = {
+						has_country_flag = tec_cyberpsychosis_triggered
+					}
+				}
+				hidden_effect = {
+					set_situation_flag = tec_cybernetic_augmentation_benefit_cyberpsychosis
+				}
+			}
+		# /
+	}
+	situation_event = { # Overclock - 20% - SORTER
+		id = tec_cybernetic_path.50020
+		hide_window = yes
+		is_triggered_only = yes
+		situation = this
+		location = target
+
+		immediate = {
+			hidden_effect = {
+				if = {	# Module Upgrade - Cor/OS
+					limit = {
+						has_situation_flag = tec_cybernetic_augmentation_cortex
+					}
+					situation_event = {
+						id = tec_cybernetic_path.50120
+					}
+				}
+				else_if = {	# Module Upgrade - Int/ex
+					limit = {
+						has_situation_flag = tec_cybernetic_augmentation_material
+					}
+					situation_event = {
+						id = tec_cybernetic_path.50220
+					}
+				}
+				#else_if = {	# Cyberpsycho mitigation	TODO ASCENSION
+				#	limit = {
+				#		has_situation_flag = tec_cybernetic_augmentation_mitigate_cyberpsychosis
+				#	}
+				#	situation_event = {
+				#		id = tec_cybernetic_path.50320
+				#	}
+				#}
+				#else_if = {	# Cyberpsycho Benefit	TODO ASCENSION
+				#	limit = {
+				#		has_situation_flag = tec_cybernetic_augmentation_benefit_cyberpsychosis
+				#	}
+				#	situation_event = {
+				#		id = tec_cybernetic_path.50420
+				#	}
+				#}
+				else = {	# Fallback to cor/os
+					situation_event = {
+						id = tec_cybernetic_path.50120
+					}
+				}
+			}
+		}
+	}
+	situation_event = { # Overclock - 20A% - Buff cortex/OS
+		id = tec_cybernetic_path.50120
+		hide_window = yes
+		is_triggered_only = yes
+		situation = this
+		location = target
+
+		immediate = {
+			# TODO ASCENSION CYBERNETIC T2
+		}
+	}
+
+	situation_event = { # Overclock - 20B% - Buff int/ex
+		id = tec_cybernetic_path.50220
+		hide_window = yes
+		is_triggered_only = yes
+		situation = this
+		location = target
+
+		immediate = {
+			# TODO ASCENSION CYBERNETIC T2
+		}
+	}
+
+	#situation_event = { # Overclock - 20C% - Cure cyberpsychosis
+	#	id = tec_cybernetic_path.50220
+
+	#situation_event = { # Overclock - 20C% - Benefit of cyberpsychosis
+	#	id = tec_cybernetic_path.50320
+
+	#situation_event = { # Overclock - 75% - Select the way of buffing it
+	#	id = tec_cybernetic_path.50075
+
+	#situation_event = { # Overclock - 100% - SORTER
+	#	id = tec_cybernetic_path.505
+
+	#country_event = { # Overclock - 100A% - Cortex/Cyberdeck Upgrade
+	#	id = tec_cybernetic_path.50501
+
+	#country_event = { # Overclock - 100B% - Inter/External Upgrade
+	#	id = tec_cybernetic_path.50502
+
+	#country_event = { # Overclock - 100C% - Cyberpsychosis mitigation
+	#	id = tec_cybernetic_path.50503
+
+	#country_event = { # Overclock - 100C% - Cyberpsychosis benefit
+	#	id = tec_cybernetic_path.50504
  # /
 # /
 
 # Bioware Path
-# ------------------------------------------------------------ tec_synth_path.2xx +
+# ------------------------------------------------------------ tec_bioware_path.2xx +
 namespace = tec_bioware_path
 
- # --------------- BIOWARE T2 POSTMECHANIC
+ # --------------- BIOWARE T2 POSTMECHANIC ANNOUNCEMENT
+	#country_event = { # Tease - TODO ASCENSION
+	#	id = tec_bioware_path.250
 
+	#country_event = { # Tease - TODO ASCENSION
+	#	id = tec_bioware_path.25001
+ # /
+ # --------------- BIOWARE T2 POSTMECHANIC - TECHNOORGANIC SYNCHRONIZATION
+	#country_event = { # Situation Started - Technoorganic Synchronization
+	#	id = tec_bioware_path.500
+
+	#situation_event = { # Synchronization - XX% - TODO ASCENSION
+	#	id = tec_bioware_path.500XX
+
+	#situation_event = { # Synchronization - XX% - TODO ASCENSION
+	#	id = tec_bioware_path.500XX
+
+	#situation_event = { # Synchronization - XX% - TODO ASCENSION
+	#	id = tec_bioware_path.500XX
+
+	#situation_event = { # Synchronization - XX% - TODO ASCENSION
+	#	id = tec_bioware_path.505
+
+	#country_event = { # Synchronization - 100A% - TODO ASCENSION
+	#	id = tec_bioware_path.50501
+
+	#country_event = { # Synchronization - 100B% - TODO ASCENSION
+	#	id = tec_bioware_path.50502
+
+	#country_event = { # Synchronization - 100C% - TODO ASCENSION
+	#	id = tec_bioware_path.50503
  # /
 # /
 
@@ -2387,6 +2835,7 @@ namespace = tec_digital_path
 # ------------------------------------------------------------ tec_psionic_path.2xx +
 namespace = tec_psionic_path
 
+ # Mechanic is shroud premium
  # --------------- PSIONIC T2 POSTMECHANIC
   # ---------- Ascension mechanic
 	# Ascension controller
@@ -2623,7 +3072,8 @@ namespace = tec_psionic_path
 		is_triggered_only = yes
 
 		trigger = {
-			has_country_flag = tec_announced_psionic_traits
+			always = no
+			has_country_flag = tec_psionics_t1_extra_leader_traits
 			NOT = {
 				has_country_flag = tec_recently_received_psionic_trait
 			}
@@ -3145,8 +3595,37 @@ namespace = tec_psionic_path
 # ------------------------------------------------------------ tec_psychic_path.2xx +
 namespace = tec_psychic_path
 
- # --------------- PSYCHIC T2 POSTMECHANIC
+ # --------------- PSYCHIC T2 POSTMECHANIC ANNOUNCEMENT
+	#country_event = { # Tease - TODO ASCENSION
+	#	id = tec_bioware_path.250
 
+	#country_event = { # Tease - TODO ASCENSION
+	#	id = tec_bioware_path.25001
+ # /
+ # --------------- PSYCHIC T2 POSTMECHANIC - PSYCHOGENIC MANIFESTATION
+	#country_event = { # Situation Started - Psychogenic Manifestation
+	#	id = tec_bioware_path.500
+
+	#situation_event = { # Manifestation - XX% - TODO ASCENSION
+	#	id = tec_bioware_path.500XX
+
+	#situation_event = { # Manifestation - XX% - TODO ASCENSION
+	#	id = tec_bioware_path.500XX
+
+	#situation_event = { # Manifestation - XX% - TODO ASCENSION
+	#	id = tec_bioware_path.500XX
+
+	#situation_event = { # Manifestation - XX% - TODO ASCENSION
+	#	id = tec_bioware_path.505
+
+	#country_event = { # Manifestation - 100A% - TODO ASCENSION
+	#	id = tec_bioware_path.50501
+
+	#country_event = { # Manifestation - 100B% - TODO ASCENSION
+	#	id = tec_bioware_path.50502
+
+	#country_event = { # Manifestation - 100C% - TODO ASCENSION
+	#	id = tec_bioware_path.50503
  # /
 # /
 
@@ -3155,8 +3634,37 @@ namespace = tec_psychic_path
 # ------------------------------------------------------------ tec_replicant_path.xxx
 namespace = tec_replicant_path
 
- # --------------- REPLICANT T2 POSTMECHANIC
+ # --------------- REPLICANT T2 POSTMECHANIC ANNOUNCEMENT
+	#country_event = { # Tease - TODO ASCENSION
+	#	id = tec_replicant_path.250
 
+	#country_event = { # Tease - TODO ASCENSION
+	#	id = tec_replicant_path.25001
+ # /
+ # --------------- REPLICANT T2 POSTMECHANIC - BIOMECHANICAL REMODELING
+	#country_event = { # Situation Started - Biomechanical Remodeling
+	#	id = tec_replicant_path.500
+
+	#situation_event = { # Remodel - XX% - Select the focus
+	#	id = tec_replicant_path.500XX
+
+	#situation_event = { # Remodel - XX% - TODO ASCENSION
+	#	id = tec_replicant_path.500XX
+
+	#situation_event = { # Remodel - XX% - TODO ASCENSION
+	#	id = tec_replicant_path.500XX
+
+	#situation_event = { # Remodel - 100% - SORTER
+	#	id = tec_replicant_path.505
+
+	#country_event = { # Remodel - 100A% - TODO ASCENSION
+	#	id = tec_replicant_path.50501
+
+	#country_event = { # Remodel - 100B% - TODO ASCENSION
+	#	id = tec_replicant_path.50502
+
+	#country_event = { # Remodel - 100C% - TODO ASCENSION
+	#	id = tec_replicant_path.50503
  # /
 # /
 
@@ -3164,6 +3672,38 @@ namespace = tec_replicant_path
 # ------------------------------------------------------------ tec_cyberpsionic_path.xxx
 namespace = tec_cyberpsionic_path
 
+ # --------------- CYBERPSIONIC T2 POSTMECHANIC ANNOUNCEMENT
+	#country_event = { # Tease - TODO ASCENSION
+	#	id = tec_cyberpsionic_path.250
+
+	#country_event = { # Tease - TODO ASCENSION
+	#	id = tec_cyberpsionic_path.25001
+ # /
+ # --------------- CYBERPSIONIC T2 POSTMECHANIC - ENTROPIC INFUSION
+	#country_event = { # Situation Started - Entropic Infusion
+	#	id = tec_cyberpsionic_path.500
+
+	#situation_event = { # Infusion - XX% - Select the focus
+	#	id = tec_cyberpsionic_path.500XX
+
+	#situation_event = { # Infusion - XX% - TODO ASCENSION
+	#	id = tec_cyberpsionic_path.500XX
+
+	#situation_event = { # Infusion - XX% - TODO ASCENSION
+	#	id = tec_cyberpsionic_path.500XX
+
+	#situation_event = { # Infusion - 100% - SORTER
+	#	id = tec_cyberpsionic_path.505
+
+	#country_event = { # Infusion - 100A% - TODO ASCENSION
+	#	id = tec_cyberpsionic_path.50501
+
+	#country_event = { # Infusion - 100B% - TODO ASCENSION
+	#	id = tec_cyberpsionic_path.50502
+
+	#country_event = { # Infusion - 100C% - TODO ASCENSION
+	#	id = tec_cyberpsionic_path.50503
+ # /
  # Review
 	# ==============================================
 	# ==============================================
@@ -3540,7 +4080,17 @@ namespace = tec_cyberpsionic_path
 # ------------------------------------------------------------ tec_biopsionic_path.xxx
 namespace = tec_biopsionic_path
 
-  # ---------------  BIOPSI T2 POSTMECHANIC
+ # --------------- BIOPSIONIC T2 POSTMECHANIC ANNOUNCEMENT
+	#country_event = { # Tease - Indicate zro/building requirements
+	#	id = tec_biopsionic_path.250
+
+	#country_event = { # Tease - Investigated Zro
+	#	id = tec_biopsionic_path.25001
+
+	#country_event = { # Tease - Built the first convergence building
+	#	id = tec_biopsionic_path.25002
+ # /
+  # ---------------  BIOPSI T2 POSTMECHANIC - CONVERGENCE
 	# TODO ASCENSION - RENAME ID
 	country_event = { # Pops get merged
 		id = tec_biopsionic_path.350
@@ -3693,6 +4243,18 @@ namespace = tec_biopsionic_path
 					# /
 					while = {
 						count = tec_biopsi
+						limit = {
+							count_owned_pop = {
+								limit = {
+									tec_is_any_psionic_species = yes
+									NOT = {
+										has_trait = trait_tec_biopsionic_seed
+									}
+									NOT = { has_modifier = tec_converged_pop }
+								}
+								count >= 2 # we need to pops, one to kill one to get modifier
+							}
+						}
 						if = { # Prio seeded pops
 							limit = {
 								any_owned_species = {
@@ -3800,7 +4362,7 @@ namespace = tec_biopsionic_path
 		trigger = {
 			from = {
 				species = {
-					has_trait = @trait_tec_biopsionic_brain
+					has_trait = trait_tec_biopsionic_brain
 				}
 			}
 			NOT = {
@@ -3908,16 +4470,81 @@ namespace = tec_biopsionic_path
 # ------------------------------------------------------------ tec_biopsychic_path.xxx
 namespace = tec_biopsychic_path
 
+ # --------------- BIOPSYCHIC T2 POSTMECHANIC ANNOUNCEMENT
+	#country_event = { # Tease - TODO ASCENSION
+	#	id = tec_biopsychic_path.250
+
+	#country_event = { # Tease - TODO ASCENSION
+	#	id = tec_biopsychic_path.25001
+ # /
+ # --------------- BIOPSYCHIC T2 POSTMECHANIC - ASCENDANT EMULSION
+	#country_event = { # Situation Started - Ascendant Emulsion
+	#	id = tec_biopsychic_path.500
+
+	#situation_event = { # Emulsion - XX% - Select the focus
+	#	id = tec_biopsychic_path.500XX
+
+	#situation_event = { # Emulsion - XX% - TODO ASCENSION
+	#	id = tec_biopsychic_path.500XX
+
+	#situation_event = { # Emulsion - XX% - TODO ASCENSION
+	#	id = tec_biopsychic_path.500XX
+
+	#situation_event = { # Emulsion - 100% - SORTER
+	#	id = tec_biopsychic_path.505
+
+	#country_event = { # Emulsion - 100A% - TODO ASCENSION
+	#	id = tec_biopsychic_path.50501
+
+	#country_event = { # Emulsion - 100B% - TODO ASCENSION
+	#	id = tec_biopsychic_path.50502
+
+	#country_event = { # Emulsion - 100C% - TODO ASCENSION
+	#	id = tec_biopsychic_path.50503
+ # /
 # /
 
 # Cyber-Psy: Biotic Mastery
 # ------------------------------------------------------------ tec_cyberpsychic_path.xxx
 namespace = tec_cyberpsychic_path
 
+ # --------------- BIOPSYCHIC T2 POSTMECHANIC ANNOUNCEMENT
+	#country_event = { # Tease - TODO ASCENSION
+	#	id = tec_biopsychic_path.250
+
+	#country_event = { # Tease - TODO ASCENSION
+	#	id = tec_biopsychic_path.25001
+ # /
+ # --------------- BIOPSYCHIC T2 POSTMECHANIC - BIONIC ENTANGLEMENT
+	#country_event = { # Situation Started - Ascendant Emulsion
+	#	id = tec_biopsychic_path.500
+
+	#situation_event = { # Entanglement - XX% - Select the focus
+	#	id = tec_biopsychic_path.500XX
+
+	#situation_event = { # Entanglement - XX% - TODO ASCENSION
+	#	id = tec_biopsychic_path.500XX
+
+	#situation_event = { # Entanglement - XX% - TODO ASCENSION
+	#	id = tec_biopsychic_path.500XX
+
+	#situation_event = { # Entanglement - 100% - SORTER
+	#	id = tec_biopsychic_path.505
+
+	#country_event = { # Entanglement - 100A% - TODO ASCENSION
+	#	id = tec_biopsychic_path.50501
+
+	#country_event = { # Entanglement - 100B% - TODO ASCENSION
+	#	id = tec_biopsychic_path.50502
+
+	#country_event = { # Entanglement - 100C% - TODO ASCENSION
+	#	id = tec_biopsychic_path.50503
+ # /
 # /
 
 # Bioware-Psy: TO DO
 # ------------------------------------------------------------ tec_biowarepsychic_path.xxx
 namespace = tec_biowarepsychic_path
 
+	# TODO/TO DISCARD
 # /

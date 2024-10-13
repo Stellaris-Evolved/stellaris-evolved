@@ -161,13 +161,6 @@ tec_is_pd_ecu_with_trade = {
 	}
 }
 
-tec_is_pd_menial_uncapped = {
-	OR = {
-		uses_district_set = @pdnecroplanet
-		is_pd_wasteland = yes
-		is_pd_planetary_megaproject = yes
-	}
-}
 
 tec_is_pd_exotic_planets = {
 	#INSERT
@@ -179,76 +172,20 @@ tec_is_pd_exotic_planets = {
 tec_is_pd_perfect_planets = {
 	# for planetary perfect planets
 	OR = {
-		is_pd_unique = yes
-		is_pd_shroud_world = yes
-		is_pd_gaia = yes
+		pd_unique_modifier = yes
+		pd_aw_is_shroud_planet = yes
+		pd_is_planet_class_pd_gaia = yes
+		pd_is_planet_class_gaia = yes
 	}
 }
 
 
 # New arcologies
-tec_pd_arcology_housing_trigger = {
-	OR = {
-		uses_district_set = @pdecocity
-		uses_district_set = @pdmilarc
-		uses_district_set = @pdcorpoarc
-		uses_district_set = @pdtechnoarch
-	}
-}
 
-tec_pd_arcology_arms_trigger = {
-	uses_district_set = @pdmilarc
-}
-
-tec_pd_arcology_leisure_trigger = {
-	OR = {
-		uses_district_set = @pdecocity
-		uses_district_set = @pdmilarc
-		uses_district_set = @pdcorpoarc
-		uses_district_set = @pdtechnoarch
-
-		AND = {
-			has_stellaris_evolved_pd = yes
-			OR = {
-				# maintenance
-				uses_district_set = @pdbiofort
-				uses_district_set = @pdbioforge
-				uses_district_set = @pdflorafort
-				uses_district_set = @pdfloraforge
-
-				uses_district_set = @pdmachinefactory
-				uses_district_set = @pdmachinefort
-				uses_district_set = @pdmachinecapital
-			}
-		}
-	}
-}
-
-tec_pd_arcology_trade_trigger = {
-	AND = {
-		has_stellaris_evolved_pd = yes
-		
-		OR = {
-			uses_district_set = @pdecocity
-			uses_district_set = @pdcorpoarc
-		}
-	}
-}
-
-tec_pd_arcology_organic_housing_trigger = {
-	OR = {
-		uses_district_set = @pdecocity
-		uses_district_set = @pdmilarc
-		uses_district_set = @pdcorpoarc
-	}
-}
-
-tec_pd_arcology_administrative_trigger = {
-	OR = {
-		uses_district_set = @pdecocity
-		uses_district_set = @pdcorpoarc
-		uses_district_set = @pdmilarc
-		uses_district_set = @pdtechnoarch
+tec_has_pd_arcologies = {
+	check_variable_arithmetic = {
+		which = @has_planetary_diversity_more_arcologies
+		value = 1
 	}
 }
 
@@ -256,26 +193,134 @@ tec_pd_arcology_administrative_trigger = {
 
 tec_has_pd_biosynth_ascension_path = {
 	OR = {
-		tec_has_pd_biosynth_ascension_origin = yes
+		always = no
+		# tec_has_pd_biosynth_ascension_origin = yes
 	}
 }
 
 tec_has_pd_biosynth_ascension_origin = {
 	OR = {
-		has_origin = @origin_techno_world
+		always = no
+		# has_origin = @origin_techno_world
 	}
 }
 
 tec_has_pd_biosynth_ascension_finished = {
 	OR = {
+		always = no
 		# Might include hybrid paths
-		has_tradition = @pd_tr_biosynth_finish 
+		# has_tradition = @pd_tr_biosynth_finish
 	}
 }
 
 
 tec_has_pd_biosynth_assembly_buildings = {
 	OR = {
-		has_building = @building_techno_04_clone_vat
+		always = no
+		# has_building = @building_techno_04_clone_vat
 	}
+}
+
+
+# Forced overwrite
+pd_aw_is_superproject_class = {
+	always = no
+}
+
+pd_is_necro_empire = {
+	OR = {
+		has_ascension_perk = ap_mechromancy
+		has_origin = origin_necrophage
+		tec_is_memorialist_empire = yes
+		tec_is_death_cult = yes
+		tec_is_zombie_empire = yes
+		tec_is_reanimator_empire = yes
+		has_civic = civic_hive_cordyceptic_drones
+		has_civic = civic_tec_hive_necrophage
+		owner_main_species = {
+			has_trait = trait_tec_zombification
+		}
+	}
+}
+
+pd_is_valid_capital_arcology_regular = {
+	OR = {
+		tec_is_city_world = yes
+		tec_is_ringworld = yes
+		tec_is_ecoworld = yes
+		tec_is_elysium = yes
+		AND = {
+			tec_is_habitat = yes
+			tec_is_arcology_habitat = yes
+		}
+	}
+}
+
+pd_is_valid_capital_arcology_hive = {
+	OR = {
+		tec_is_hive_world = yes
+		pd_is_valid_capital_arcology_regular = yes
+		is_pd_uncommon_hive = yes
+		is_pd_uncommon_hive_arc = yes
+	}
+}
+
+pd_is_valid_capital_arcology_machine = {
+	OR = {
+		tec_is_machine_world = yes
+		pd_is_valid_capital_arcology_regular = yes
+		is_pd_uncommon_machine = yes
+		is_pd_uncommon_machine_arc = yes
+	}
+}
+
+pd_is_valid_for_senate_capital_arcology = {
+	OR = {
+		is_democratic_authority = yes
+		is_oligarchic_authority = yes
+		AND = {
+			has_authority = auth_tec_ai
+			is_authoritarian = no
+		}
+	}
+}
+pd_is_valid_for_palace_capital_arcology = {
+	OR = {
+		has_authority = auth_tec_theocracy
+		is_dictatorial_authority = yes
+		is_imperial_authority = yes
+		# has_authority = auth_tec_patrocorporate # they get corp one
+
+		AND = {
+			has_authority = auth_tec_ai
+			is_authoritarian = yes
+		}
+	}
+}
+pd_is_valid_for_headquarters_capital_arcology = {
+	OR = {
+		is_megacorp = yes
+	}
+}
+pd_is_valid_for_spire_capital_arcology = {
+	OR = {
+		is_hive_empire = yes
+	}
+}
+pd_is_valid_for_cpu_capital_arcology = {
+	OR = {
+		is_machine_empire = yes
+	}
+}
+
+pd_can_take_ap_pd_wasteland_worlds  = {
+	OR = {
+		is_relentless_industrialist_empire = yes
+		tec_has_toxic_baths = yes
+		tec_can_enact_overstrip = yes
+		has_valid_civic = civic_tec_regular_computerized_extraction
+		has_valid_civic = civic_tec_regular_unleashed_industrialization
+		has_origin = origin_overtuned
+	}
+	NOT = { has_ethic = ethic_fanatic_ecologist }
 }
