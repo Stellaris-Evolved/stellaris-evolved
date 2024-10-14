@@ -4705,6 +4705,126 @@ namespace = tec_imperial_cult
 # ------------------------------------------------------------
 # HIVE
 # ------------------------------------------------------------
+namespace = tec_hive_brood
+ # Growth - Eusociality (11XX)
+
+ # /
+ # Growth - Splicer queens (12XX)
+
+ # /
+ # Output - Overminds (21XX)
+
+ # /
+ # Output - Cerebrates (22XX)
+
+ # /
+ # Protean (31XX)
+
+ # /
+ # Mutagenic (32XX)
+	# Mutagenic game start - mutates 1/3 of the population
+
+	# Predatory Consumption - Growth
+	# Fired by: on_colony_yearly_pulse
+	# This = Planet
+	planet_event = {	# TODO CIVIC
+		id = tec_hive_brood.3205
+		hide_window = yes
+		is_triggered_only = yes
+
+		trigger = {
+			exists = owner
+			owner = {
+				has_valid_civic = civic_tec_hive_brood_mutagenic
+			}
+			# Lets ensure it has broodtwister jobs
+			num_assigned_jobs = {
+				job = tec_broodtwister_drone
+				value > 0
+			}
+		}
+
+		immediate = {
+			export_trigger_value_to_variable = {
+				trigger = num_assigned_jobs
+				parameters = {
+					job = tec_broodtwister_drone
+				}
+				variable = tec_num_broodtwisters
+			}
+			# Number of pops to mutate
+			while = {
+				count = value:tec_num_broodtwisters_scaling
+				random_owned_pop = {
+					limit = {
+						exists = this
+						is_hive_species = yes
+					}
+					if = {	# Has modifier
+						limit = {
+							OR = {
+								has_modifier = pop_modifier_tec_broodtwisted_stage_bad
+								has_modifier = pop_modifier_tec_broodtwisted_stage_1
+								has_modifier = pop_modifier_tec_broodtwisted_stage_2
+								has_modifier = pop_modifier_tec_broodtwisted_stage_3
+							}
+						}
+						random_list = {
+							1 = {	# Upgrades the modifier
+								modifier = {
+									factor = value:tec_broodtwister_mutation_chance_scaling|GOOD|yes|REPEATABLE|yes|
+									always = yes
+								}
+								add_modifier = {
+									modifier = pop_modifier_tec_broodtwisted_stage_1
+								}
+							}
+							1 = {	# Reduces the modifier
+								modifier = {
+									factor = value:tec_broodtwister_mutation_chance_scaling|BAD|yes|REPEATABLE|yes|
+									always = yes
+								}
+								add_modifier = {
+									modifier = pop_modifier_tec_broodtwisted_stage_bad
+								}
+							}
+						}
+					}
+					else = {	# Does not have modifier
+						random_list = {
+							1 = {	# Gain a positive modifier
+								modifier = {
+									factor = value:tec_broodtwister_mutation_chance_scaling|GOOD|yes|
+									always = yes
+								}
+								add_modifier = {
+									modifier = pop_modifier_tec_broodtwisted_stage_1
+								}
+							}
+							1 = {	# Gain a negative modifier
+								modifier = {
+									factor = value:tec_broodtwister_mutation_chance_scaling|BAD|yes|
+									always = yes
+								}
+								add_modifier = {
+									modifier = pop_modifier_tec_broodtwisted_stage_bad
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+ # /
+ # Cluster
+
+ # /
+ # Bioshaper
+
+ # /
+# /
+
 # ------------------------------------------------- Percussive Hiveminds
 namespace = tec_percuhive
 
