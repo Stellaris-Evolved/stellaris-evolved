@@ -832,7 +832,7 @@ tec_has_any_gestalt_ethics = {
 			# Evolved
 			has_origin = origin_tec_psionicspecies			# Origin
 			# PD
-			has_origin = @origin_pd_shroud
+
 			# Origins Expanded
 			has_origin = @origin_psionic_abilities
 			# Origins Extended
@@ -1306,7 +1306,7 @@ tec_has_any_gestalt_ethics = {
 			tec_has_psychic_ascension_path = yes
 			tec_has_digital_ascension_path = yes
 			# PD
-			tec_has_pd_biosynth_ascension_path = yes
+			# tec_has_pd_biosynth_ascension_path = yes
 		}
 	}
 
@@ -1317,7 +1317,7 @@ tec_has_any_gestalt_ethics = {
 			tec_has_cybernetic_ascension_finished = yes
 			tec_has_synthetic_ascension_finished = yes
 			# PD
-			tec_has_pd_biosynth_ascension_finished = yes
+			# tec_has_pd_biosynth_ascension_finished = yes
 		}
 	}
 
@@ -1556,10 +1556,15 @@ tec_has_any_gestalt_ethics = {
 				script = mod_support/tec_pd_present
 				code = "
 					pd_unique_modifier = yes
+					pd_is_domed_colony_class = yes
+			    "
+			}
+			inline_script = {
+				script = mod_support/tec_pd_ascensions_present
+				code = "
 					pd_aw_is_wasteland_planet = yes
 					pd_aw_is_superproject_class = yes
 					pd_aw_is_lithoid_planet = yes
-					pd_is_domed_colony_class = yes
 			    "
 			}
 
@@ -1585,9 +1590,14 @@ tec_has_any_gestalt_ethics = {
 			inline_script = {
 			    script = mod_support/tec_pd_present
 			    code = "
+					pd_is_domed_colony_class = yes
+			    "
+			}
+			inline_script = {
+				script = mod_support/tec_pd_ascensions_present
+				code = "
 					pd_aw_is_superproject_class = yes
 					pd_aw_is_wasteland_planet = yes
-					pd_is_domed_colony_class = yes
 			    "
 			}
 		} 
@@ -1708,13 +1718,6 @@ tec_has_any_gestalt_ethics = {
 			# Generic
 			uses_district_set = standard
 			# PD
-
-			inline_script = {
-				script = mod_support/tec_pd_present
-				code = "
-					is_pd_regular = yes
-				"
-			}
 
 			inline_script = {
 				script = mod_support/tec_trigger_include
@@ -1937,10 +1940,9 @@ tec_has_any_gestalt_ethics = {
 			tec_is_gaia_world = yes
 			tec_is_ecoworld = yes
 			inline_script = {
-				script = mod_support/tec_pd_present
+				script = mod_support/tec_pd_uniques_present
 				code = "
 					pd_unique_modifier = yes
-					pd_aw_is_shroud_planet = yes
 				"
 			}
 		}
@@ -1958,10 +1960,21 @@ tec_is_perfect_planet = {
 	OR = {
 		tec_is_gaia_world = yes
 		inline_script = {
+			script = mod_support/tec_pd_uniques_present
+			code = "
+				pd_unique_modifier = yes
+		    "
+		}
+		inline_script = {
 			script = mod_support/tec_pd_present
 			code = "
-				tec_is_pd_perfect_planets = yes
-			"
+				pd_is_planet_class_pd_gaia = yes
+				pd_is_planet_class_gaia = yes
+		    "
+		}
+		inline_script = { 
+		    script = mod_support/tec_trigger_include
+		    trigger = tec_is_perfect_planet
 		}
 	}
 	]
@@ -1978,6 +1991,10 @@ tec_is_neutral_planet = {
 		tec_is_elysium = yes
 		tec_is_ringworld = yes
 		tec_is_modded_space_arcology = yes
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_is_neutral_planet
+		}
 	}
 	]
 }
@@ -1992,22 +2009,11 @@ tec_is_wet_planet_exceptions = {	# Outside is_wet trigger
 	OR = {
 		tec_is_gaia_world = yes
 		tec_is_flooded = yes
+
 		tec_is_wet_planet_origin_exceptions = {
 			owner = $owner$
 		}
-		tec_is_wet_modded_planet_exceptions = {
-			owner = $owner$
-		}
-	}
-}
 
-tec_is_wet_modded_planet_exceptions = {
-	optimize_memory
-	inline_script = {
-		script = tec_type_hint
-		country_scope = $owner$
-	}
-	OR = {
 		inline_script = {
 			script = mod_support/tec_giga_present
 			code = "
@@ -2034,8 +2040,7 @@ tec_is_wet_modded_planet_exceptions = {
 
 		inline_script = {
 			script = mod_support/tec_trigger_include
-			trigger = tec_is_wet_modded_planet_exceptions
-			owner = $owner$
+			trigger = tec_is_wet_planet_exceptions
 		}
 	}
 }
@@ -2068,7 +2073,11 @@ tec_is_wet_planet_origin_exceptions = {
 			}
 			tec_is_machine_world = yes
 		}
-		# 
+		#
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_is_wet_planet_origin_exceptions
+		}
 	}
 }
 
@@ -2077,13 +2086,6 @@ tec_is_ecoworld = {
 }
 
 
-tec_is_modded_habitat_exception = {
-	OR = {
-		giga_uses_habitat_capitals = yes
-		has_planet_flag = giga_habitat_capital_compat
-	}
-}
-
 tec_is_upgraded_habitat = {
 	optimize_memory
 	OR = {
@@ -2091,6 +2093,14 @@ tec_is_upgraded_habitat = {
 		tec_has_t4_capital = { cached = yes }
 		tec_has_t5_capital = { cached = yes }
 		tec_has_imperial_capital = { cached = yes }
+		inline_script = {
+			script = mod_support/tec_acot_present
+			code = "
+				has_enigmatic_capital = yes
+				has_ascended_capital = yes
+				has_phanon_capital = yes
+			"
+		}
 	}
 }
 
@@ -2100,6 +2110,14 @@ tec_is_fully_upgraded_habitat = {
 		tec_has_t4_capital = { cached = yes }
 		tec_has_t5_capital = { cached = yes }
 		tec_has_imperial_capital = { cached = yes }
+		inline_script = {
+			script = mod_support/tec_acot_present
+			code = "
+				has_enigmatic_capital = yes
+				has_ascended_capital = yes
+				has_phanon_capital = yes
+			"
+		}
 	}
 }
 
@@ -2131,6 +2149,10 @@ tec_is_hive_world = {
 				pd_is_pd_hive_world = yes
 			"
 		}
+		inline_script = {
+		    script = mod_support/tec_trigger_include
+		    trigger = tec_is_hive_world
+		}
 	}
 }
 
@@ -2149,6 +2171,10 @@ tec_is_machine_world = {
 				pd_is_pd_machine_arc = yes
 			"
 		}
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_is_machine_world
+		}
 	}
 }
 
@@ -2160,6 +2186,10 @@ tec_is_nuked_world = {
 			code = "
 				pd_is_planet_class_nuked = yes
 			"
+		}
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_is_nuked_world
 		}
 	}
 }
@@ -2173,6 +2203,10 @@ tec_is_relic_world = {
 				is_pd_relic = yes
 			"
 		}
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_is_relic_world
+		}
 	}
 }
 
@@ -2184,6 +2218,10 @@ tec_is_gaia_world = {
 			code = "
 				pd_is_planet_class_gaia = yes
 			"
+		}
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_is_gaia_world
 		}
 	}
 }
@@ -2198,6 +2236,10 @@ tec_is_aquatic_planet = {
 			"
 		}
 		tec_is_flooded = yes
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_is_aquatic_planet
+		}
 	}
 }
 
@@ -2215,6 +2257,11 @@ tec_has_nuked_world_origin = {
 		has_origin = @originsextended_starless
 		has_origin = @originsextended_magnetica
 		has_origin = @originsextended_graveyard
+
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_nuked_world_origin
+		}
 	}
 }
 
@@ -2229,6 +2276,11 @@ tec_has_hive_world_origin = {
 		}
 		has_origin = @origin_hive
 		has_origin = @originsextended_infest
+
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_hive_world_origin
+		}
 	}
 }
 
@@ -2236,6 +2288,11 @@ tec_has_machine_world_origin = {
 	OR = {
 		has_origin = origin_machine
 		has_origin = @originsextended_core
+
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_machine_world_origin
+		}
 	}
 }
 
@@ -2245,7 +2302,11 @@ tec_has_relic_world_origin = {
 		has_origin = @origin_reliquary
 		has_origin = @origin_mem_from_the_ashes
 		has_origin = @origin_mem_ceaseless_gaze
-		# has_origin = @origin_pd_scrapyard_world # Commented cause not relic planet type but similar enough
+
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_relic_world_origin
+		}
 	}
 }
 
@@ -2254,6 +2315,11 @@ tec_has_gaia_world_origin = {
 		has_origin = origin_life_seeded
 		has_origin = @originsextended_gaia
 		has_origin = @origin_resort_world
+
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_gaia_world_origin
+		}
 	}
 }
 
@@ -2268,6 +2334,11 @@ tec_district_organic_swap = {
 tec_has_commercial_district = {
 	OR = {
 		uses_district_set = shattered_ring_world
+
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_commercial_district
+		}
 	}
 }
 
@@ -2280,6 +2351,10 @@ tec_has_coordination_district = {
 				pd_is_planet_class_machine = yes
 			"
 		}
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_coordination_district
+		}
 	}
 }
 
@@ -2291,6 +2366,10 @@ tec_has_synaptic_district = {
 			code = "
 				pd_is_planet_class_hive = yes
 			"
+		}
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_synaptic_district
 		}
 	}
 }
@@ -2324,6 +2403,11 @@ tec_has_infinite_generator_district = {
 		prev = {
 			tec_has_infinite_menial_districts = yes
 		}
+
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_infinite_generator_district
+		}
 	}
 	# Exceptions
 	if = {
@@ -2333,6 +2417,27 @@ tec_has_infinite_generator_district = {
 		OR = {
 			is_gestalt = yes
 			is_fallen_empire = yes
+		}
+	}
+}
+
+# scope: owner
+# prev: planet
+tec_has_no_generator_district = {
+	OR = {
+		if = {
+			limit = {
+				prev = { uses_district_set = shattered_ring_world }
+			}
+			OR = {
+				is_gestalt = yes
+				is_fallen_empire = yes
+			}
+		}
+
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_no_generator_district
 		}
 	}
 }
@@ -2367,8 +2472,23 @@ tec_has_infinite_mining_district = {
 			tec_has_infinite_menial_districts = yes
 		}
 		is_subterranean_empire = yes
+
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_infinite_mining_district
+		}
 	}
-	# Exceptions
+}
+
+# scope: owner prev: planet
+tec_has_no_mining_district = {
+	OR = {
+		always = no
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_no_mining_district
+		}
+	}
 }
 
 # scope: country
@@ -2402,25 +2522,36 @@ tec_has_infinite_farming_district = {
 		prev = {
 			tec_has_infinite_menial_districts = yes
 		}
-	}
-	# Exceptions
-	prev = {
-		NOT = {
-			uses_district_set = machine_world
+
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_infinite_farming_district
 		}
 	}
 }
 
+# scope: owner prev: planet
 tec_has_no_farming_district = {
 	OR = {
-		uses_district_set = machine_world
+		prev = {
+			uses_district_set = machine_world
+		}
 		inline_script = {
 			script = mod_support/tec_pd_ascensions_present
 			code = "
-				pd_aw_is_lithoid_planet = yes
-				pd_aw_is_necro_planet = yes
-				pd_aw_is_wasteland_planet = yes
+				prev = {
+					OR = {
+						pd_aw_is_lithoid_planet = yes
+						pd_aw_is_necro_planet = yes
+						pd_aw_is_wasteland_planet = yes
+					}
+				}
 			"
+		}
+
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_no_farming_district
 		}
 	}
 }
@@ -2728,6 +2859,7 @@ tec_can_destroy_planet_with_PLANET_KILLER_TEC_DEVOLVERAY = {
 	custom_tooltip = { # Replicants assimilate EVERYTHING
 		fail_text = no_assimilatable_pops
 		any_owned_pop = {
+			exists = this
 			is_valid_pop_for_PLANET_KILLER_NANOBOTS = yes
 		}
 	}
@@ -2788,6 +2920,7 @@ tec_can_destroy_planet_with_PLANET_KILLER_TEC_REPLICANTRAY = {
 	#custom_tooltip = { # Replicants assimilate EVERYTHING
 	#	fail_text = no_assimilatable_pops
 	#	any_owned_pop = {
+	# 		exists = this
 	#		is_valid_pop_for_PLANET_KILLER_NANOBOTS = yes
 	#	}
 	#}
@@ -2804,7 +2937,12 @@ tec_is_unspecced_city_planet = {
 		has_planet_flag = tec_ecumenopolis_spec_science
 		has_planet_flag = tec_ecumenopolis_spec_admin
 		has_planet_flag = tec_ecumenopolis_spec_precursor
-		pd_is_pd_arcology = yes
+		inline_script = {
+			script = mod_support/tec_pd_arcologies_present
+			code = "
+				pd_is_pd_arcology = yes
+			"
+		}
 	}
 }
 
@@ -2826,6 +2964,162 @@ tec_is_science_city_planet = {
 
 tec_is_decadent_city_planet = {
 	has_planet_flag = tec_remnants_decadent_ecu
+}
+
+tec_has_alloy_district_city_planet = {
+	OR = {
+		tec_is_military_city_planet = yes
+		tec_is_unspecced_city_planet = yes
+
+		inline_script = {
+			script = mod_support/tec_pd_arcologies_present
+			code = "
+				is_pd_fortress_arcology = yes
+				is_pd_commerical_arcology = yes
+			"
+		}
+
+		inline_script = {
+		    script = mod_support/tec_trigger_include
+		    trigger = tec_has_alloy_district_city_planet
+		}
+	}
+}
+
+tec_has_alloy_district_good_city_planet = {
+	OR = {
+		tec_is_military_city_planet = yes
+
+		inline_script = {
+			script = mod_support/tec_pd_arcologies_present
+			code = "
+				is_pd_fortress_arcology = yes
+				is_pd_commerical_arcology = yes
+			"
+		}
+
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_alloy_district_good_city_planet
+		}
+	}
+}
+
+tec_has_cg_district_city_planet = {
+	OR = {
+		tec_is_admin_city_planet = yes
+		tec_is_unspecced_city_planet = yes
+
+		inline_script = {
+			script = mod_support/tec_pd_arcologies_present
+			code = "
+				is_pd_garden_arcology = yes
+				is_pd_commerical_arcology = yes
+			"
+		}
+
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_cg_district_city_planet
+		}
+	}
+}
+
+tec_has_cg_district_good_city_planet = {
+	OR = {
+		tec_is_admin_city_planet = yes
+
+		inline_script = {
+			script = mod_support/tec_pd_arcologies_present
+			code = "
+				is_pd_garden_arcology = yes
+				is_pd_commerical_arcology = yes
+			"
+		}
+
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_cg_district_good_city_planet
+		}
+	}
+}
+
+tec_has_trade_district_city_planet = {
+	OR = {
+		tec_is_unspecced_city_planet = no
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_trade_district_city_planet
+		}
+	}
+	inline_script = {
+		script = mod_support/tec_pd_arcologies_present
+		code = "
+			is_pd_garden_arcology = no
+			is_pd_fortress_arcology = no
+		"
+	}
+}
+
+tec_has_research_district_city_planet = {
+	OR = {
+		tec_is_science_city_planet = yes
+		inline_script = {
+			script = mod_support/tec_pd_arcologies_present
+			code = "
+				is_pd_garden_arcology = yes
+			"
+		}
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_research_district_city_planet
+		}
+	}
+}
+
+tec_has_refinery_district_city_planet = {
+	OR = {
+		tec_is_science_city_planet = yes
+
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_refinery_district_city_planet
+		}
+	}
+}
+
+tec_has_unity_district_city_planet = {
+	OR = {
+		tec_is_admin_city_planet = yes
+		inline_script = {
+			script = mod_support/tec_pd_arcologies_present
+			code = "
+					is_pd_garden_arcology = yes
+				"
+		}
+
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_unity_district_city_planet
+		}
+	}
+}
+
+tec_has_military_district_city_planet = {
+	OR = {
+		tec_is_military_city_planet = yes
+		inline_script = {
+			script = mod_support/tec_pd_arcologies_present
+			code = "
+				is_pd_fortress_arcology = yes
+			"
+		}
+
+		inline_script = {
+			script = mod_support/tec_trigger_include
+			trigger = tec_has_military_district_city_planet
+		}
+	}
 }
 
 tec_is_specced_ringworld = {
@@ -2886,6 +3180,12 @@ tec_is_flooded = {
 				pd_is_flooded_planet = yes
 			"
 		}
+		inline_script = {
+			script = mod_support/tec_pd_ascensions_present
+			code = "
+				pd_is_flooded_planet = yes
+			"
+		}
 	}
 }
 
@@ -2930,19 +3230,6 @@ tec_arcology_project_potential = {
 
 tec_arcology_project_relic_potential = {
 	optimize_memory
-	[[!milarc]
-		is_planet_class = pc_relic
-	]
-	inline_script = {
-		script = mod_support/tec_pd_present
-		code = "
-			# PD compat
-			[[milarc]
-				is_pd_milarc_relic = yes
-			]
-		"
-	}
-	
 	tec_invalidates_arcology_project_comp = no
 	habitable_structure = no
 	tec_is_arcology = no
@@ -2974,18 +3261,6 @@ tec_arcology_project_allow = {
 	if = {
 		limit = { owner = { is_ai = no } }
 		custom_tooltip = {
-			# PD compat
-			[[!eco]
-				fail_text = decision_arcology_project_requirements
-			]
-			inline_script = {
-				script = mod_support/tec_pd_present
-				code = "
-					[[eco]
-						fail_text = decision_eco_arcology_project_requirements
-					]
-				"
-			}
 			if = {
 				limit = {
 					owner = {
@@ -2994,15 +3269,6 @@ tec_arcology_project_allow = {
 				}
 				free_district_slots < 1
 
-				# PD compat
-				inline_script = {
-					script = mod_support/tec_pd_present
-					code = "
-						[[eco]
-							num_districts = { type = district_industrial value < 1 }
-						]
-					"
-				}
 				check_variable_arithmetic = {
 					which = value:farming_districts_value
 					value = 0
@@ -3036,15 +3302,6 @@ tec_arcology_project_allow = {
 			}
 			free_district_slots < 4
 
-			# PD compat
-			inline_script = {
-				script = mod_support/tec_pd_present
-				code = "
-					[[eco]
-						num_districts = { type = district_industrial value < 3 }
-					]
-				"
-			}
 			check_variable_arithmetic = {
 				which = value:farming_districts_value
 				value < 4
@@ -3219,7 +3476,7 @@ tec_blocks_terraforming_aps = {
 	OR = {
 		always = no
 		inline_script = {
-			script = mod_support/tec_pd_present
+			script = mod_support/tec_pd_ascensions_present
 			code = "
 				# PD blocks hive and gaia worlds for megaflora
 				has_origin = origin_pd_aw_tree_of_life
@@ -4608,6 +4865,7 @@ tec_leader_already_exists_destiny_in_empire = {
 		}
 		owner = {
 			any_owned_leader = {
+				exists = this
 				has_trait = $trait$
 			}
 		}
@@ -4625,6 +4883,7 @@ tec_leader_trait_already_exists_in_empire = {
 
 	owner = {
 		any_owned_leader = {
+			exists = this
 			_tec_leader_trait_already_exists_in_empire = {
 				trait = $trait$
 				tiers$tiers$ = yes
@@ -4641,8 +4900,10 @@ _tec_leader_trait_already_exists_in_empire = {
 		bool = $tiers2$
 		bool = $tiers3$
 	}
+	exists = owner
 	owner = {
 		any_owned_leader = {
+			exists = this
 			[[tiers1]
 				has_trait = $trait$
 			]
@@ -4732,6 +4993,7 @@ tec_country_composer_aps_like = {
 tec_country_composer_other_like = {
 	NOT = {
 		any_owned_planet = {
+			exists = this
 			tec_has_clinic_buildings = yes
 		}
 	}
@@ -4882,10 +5144,14 @@ tec_country_instrument_aps_like = {
 tec_country_instrument_other_like = {
 	OR = {
 		is_at_war = no
-		ruler = {
-			has_trait_tier1or2 = { TRAIT = leader_trait_substance_abuser }
+		AND = {
+			exists = ruler
+			ruler = {
+				has_trait_tier1or2 = { TRAIT = leader_trait_substance_abuser }
+			}
 		}
 		any_owned_planet = {
+			exists = this
 			is_colony = yes
 			has_designation = col_resort
 		}
@@ -5139,6 +5405,7 @@ tec_planet_selective_kinship_likes = {
 	]
 	[[!cached]
 		any_owned_pop = {
+			exists = this
 			NOT = { is_same_species = owner }
 			is_same_species_class = owner
 		}
@@ -5151,6 +5418,7 @@ tec_planet_selective_kinship_hates = {
 	]
 	[[!cached]
 		any_owned_pop = {
+			exists = this
 			NOT = { is_same_species_class = owner }
 		}
 	]
@@ -5190,12 +5458,6 @@ tec_blocks_urban_designations = {
 		uses_district_set = city_world
 		tec_uses_ringworld_districts = yes
 		uses_district_set = habitat
-		inline_script = {
-			script = mod_support/tec_pd_present
-			code = "
-				tec_is_pd_nonconventional_world = yes
-			"
-		}
 
 		inline_script = {
 			script = mod_support/tec_trigger_include
@@ -5209,12 +5471,6 @@ tec_blocks_rural_designations = {
 		uses_district_set = city_world
 		tec_uses_ringworld_districts = yes
 		uses_district_set = habitat
-		inline_script = {
-			script = mod_support/tec_pd_present
-			code = "
-				tec_is_pd_nonconventional_world = yes
-			"
-		}
 
 		inline_script = {
 			script = mod_support/tec_trigger_include
@@ -5229,12 +5485,6 @@ tec_blocks_industrial_designations = {
 		uses_district_set = machine_world
 		uses_district_set = hive_world
 		uses_district_set = habitat
-		inline_script = {
-			script = mod_support/tec_pd_present
-			code = "
-				tec_is_pd_nonconventional_world = yes
-			"
-		}
 
 		inline_script = {
 			script = mod_support/tec_trigger_include
@@ -5292,6 +5542,7 @@ tec_species_in_country_other_are_free_xenos = {
 	[[!cached]
 		$country$ = {
 			any_owned_pop = {
+				exists = this
 				not = { is_same_species = prevprev }
 				is_enslaved = no
 				is_being_purged = no
