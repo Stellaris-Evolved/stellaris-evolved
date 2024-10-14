@@ -4723,8 +4723,6 @@ namespace = tec_hive_brood
  # /
  # Brood Evolution - Broodtwisters (32XX)
 	# Mutagenic game start - mutates 1/3 of the population
-
-	# Predatory Consumption - Growth
 	# Fired by: on_colony_yearly_pulse
 	# This = Planet
 	planet_event = {	# TODO CIVIC
@@ -4735,12 +4733,11 @@ namespace = tec_hive_brood
 		trigger = {
 			exists = owner
 			owner = {
-				has_valid_civic = civic_tec_hive_brood_mutagenic
+				has_valid_civic = civic_tec_hive_brood_twisters
 			}
 			# Lets ensure it has broodtwister jobs
 			num_assigned_jobs = {
-				#job = tec_brood_twister_drone
-				job = tec_brood_queen_drone
+				job = tec_brood_twister_drone
 				value > 0
 			}
 		}
@@ -4749,8 +4746,7 @@ namespace = tec_hive_brood
 			export_trigger_value_to_variable = {
 				trigger = num_assigned_jobs
 				parameters = {
-					#job = tec_brood_twister_drone
-					job = tec_brood_queen_drone
+					job = tec_brood_twister_drone
 				}
 				variable = tec_num_brood_twisters
 			}
@@ -4776,7 +4772,7 @@ namespace = tec_hive_brood
 						random_list = {
 							1 = {	# Upgrades the modifier
 								modifier = {
-									factor = value:tec_brood_twister_mutation_chance_scaling|SCOPE|root|GOOD|yes|REPEATABLE|yes|
+									factor = value:tec_brood_twister_mutation_chance_scaling|SCOPE|root|GOOD|yes|
 									always = yes
 								}
 								switch = {
@@ -4800,10 +4796,16 @@ namespace = tec_hive_brood
 										}
 									}
 								}
+								root.owner = {
+									change_variable = {
+										which = tec_brood_twisted_pops_good
+										value = 1
+									}
+								}
 							}
 							1 = {	# Reduces the modifier
 								modifier = {
-									factor = value:tec_brood_twister_mutation_chance_scaling|SCOPE|root|BAD|yes|REPEATABLE|yes|
+									factor = value:tec_brood_twister_mutation_chance_scaling|SCOPE|root|BAD|yes|
 									always = yes
 								}
 								switch = {
@@ -4830,6 +4832,12 @@ namespace = tec_hive_brood
 										}
 									}
 								}
+								root.owner = {
+									change_variable = {
+										which = tec_brood_twisted_pops_bad
+										value = 1
+									}
+								}
 							}
 						}
 					}
@@ -4843,6 +4851,12 @@ namespace = tec_hive_brood
 								add_modifier = {
 									modifier = pop_modifier_tec_broodtwisted_stage_1
 								}
+								root.owner = {
+									change_variable = {
+										which = tec_brood_twisted_pops_good
+										value = 1
+									}
+								}
 							}
 							1 = {	# Gain a negative modifier
 								modifier = {
@@ -4852,11 +4866,97 @@ namespace = tec_hive_brood
 								add_modifier = {
 									modifier = pop_modifier_tec_broodtwisted_stage_bad
 								}
+								root.owner = {
+									change_variable = {
+										which = tec_brood_twisted_pops_bad
+										value = 1
+									}
+								}
 							}
 						}
 					}
 				}
 			}
+			# Just in case
+			clear_variable = tec_num_brood_twisters
+		}
+
+		after = {
+			# event for notification
+			owner = {
+				if = {
+					limit = {
+						NOT = {
+							has_country_flag = tec_brood_twisted_announcement
+						}
+						OR = {
+							check_variable = {
+								which = tec_brood_twisted_pops_good
+								value > 1
+							}
+							check_variable = {
+								which = tec_brood_twisted_pops_bad
+								value > 1
+							}
+						}
+					}
+					set_country_flag = tec_brood_twisted_announcement
+					country_event = {
+						id = tec_hive_brood.3210
+						days = 10
+					}
+				}
+			}
+		}
+	}
+
+	country_event = {
+		id = tec_hive_brood.3210
+		is_triggered_only = yes
+		hide_window = yes
+
+		trigger = {
+			has_valid_civic = civic_tec_hive_brood_twisters
+			has_country_flag = tec_brood_twisted_announcement
+			OR = {
+				check_variable = {
+					which = tec_brood_twisted_pops_good
+					value > 1
+				}
+				check_variable = {
+					which = tec_brood_twisted_pops_bad
+					value > 1
+				}
+			}
+		}
+
+		immediate = {
+			create_message = {
+				type = TOAST_TEC_BROOD_TWIST_OUTCOME
+				#TOAST_TRUCE_IS_OVER
+				localization = TOAST_TEC_BROOD_TWIST_OUTCOME_DESC
+				days = @toast_important_message_days
+				target = root
+				variable = {
+					type = variable
+					varname = tec_brood_twisted_pops_good
+					localization = tec_brood_twisted_pops_good
+					scope = this
+				}
+				variable = {
+					type = variable
+					varname = tec_brood_twisted_pops_bad
+					localization = tec_brood_twisted_pops_bad
+					scope = this
+				}
+			}
+		}
+
+		after = {
+			clear_variable = tec_brood_twisted_pops_good
+			clear_variable = tec_brood_twisted_pops_bad
+			remove_country_flag = tec_brood_twisted_announcement
+			
 		}
 	}
  # /
