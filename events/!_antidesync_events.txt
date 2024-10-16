@@ -21,11 +21,13 @@ country_event = {
 	trigger = {
 		# is_multiplayer = yes
 		from = {
+			NOT = { has_leader_flag = tec_evolved_regenerated_leader }
 			tec_has_any_gestalt_ethics = no
 		}
 	}
 
 	immediate = {
+		save_event_target_as = tec_temp_owner
 		from = {
 			save_event_target_as = tec_temp_leader
 			# We sample from the population of the species and apply an ethic
@@ -36,6 +38,18 @@ country_event = {
 						is_exact_same_species = event_target:tec_temp_leader
 						tec_has_any_regular_ethics = yes
 						can_be_leader = yes
+						is_unemployed = no
+					}
+					weights = {
+						base = 1
+						modifier = {
+							mult = 25
+							tec_is_ruler_pop_category = yes
+						}
+						modifier = {
+							mult = 10
+							tec_is_specialist_pop_category = yes
+						}
 					}
 					save_event_target_as = tec_temp_selected_pop
 				}
@@ -45,34 +59,21 @@ country_event = {
 				}
 			}
 			set_leader_flag = tec_no_starting_actions
-			switch = {
-				trigger = leader_class
-				inline_script = {
-					script = iterators/tec_iterate_leader_class
-					code = "
-						$leader_class$ = {
-							set_random_$leader_class$_background_effect = yes
-						}
-					"
-				}
-			}
 		}
-		set_country_flag = tec_no_starting_actions
-		if = {
-			limit = {
-				exists = event_target:tec_temp_selected_pop
-			}
-			event_target:tec_temp_selected_pop = {
-				switch = {
-					trigger = has_ethic
-					inline_script = {
-						script = iterators/tec_iterate_ethic_regular
-						code = "
+		event_target:tec_temp_owner = {
+			set_country_flag = tec_no_starting_actions
+			if = {
+				limit = {
+					exists = event_target:tec_temp_selected_pop
+				}
+				event_target:tec_temp_selected_pop = {
+					switch = {
+						trigger = has_ethic
+						inline_script = {
+							script = iterators/tec_iterate_ethic_regular
+							code = "
 							ethic_$ethic$ = {
-								event_target:tec_temp_leader = {
-									change_background_ethic = ethic_$ethic$
-								}
-								root = {
+								event_target:tec_temp_owner = {
 									clone_leader = {
 										target = event_target:tec_temp_leader
 										background_planet = event_target:tec_temp_selected_pop.planet
@@ -87,81 +88,311 @@ country_event = {
 
 							}
 						"
+						}
 					}
 				}
-			}
-		} else = {
-			random_list = {
-				inline_script = {
-					script = iterators/tec_iterate_ethic_regular
-					code = "
-						1 = {
-							clone_leader = {
-								target = event_target:tec_temp_leader
-								background_planet = event_target:tec_temp_selected_planet
-								background_ethic = ethic_$random$
-								skip_background_generation = yes
-								effect = {
-									copy_flags_and_variables_from = event_target:tec_temp_leader
-									save_event_target_as = tec_temp_new_leader
+			} else = {
+				random_list = {
+					inline_script = {
+						script = iterators/tec_iterate_ethic_regular
+						code = "
+							1 = {
+								clone_leader = {
+									target = event_target:tec_temp_leader
+									background_planet = event_target:tec_temp_selected_planet
+									background_ethic = ethic_$ethic$
+									skip_background_generation = yes
+									effect = {
+										copy_flags_and_variables_from = event_target:tec_temp_leader
+										save_event_target_as = tec_temp_new_leader
+									}
 								}
 							}
-						}
-					"
+						"
+					}
+					0 = {}
 				}
-				0 = {}
 			}
+			remove_country_flag = tec_no_starting_actions
 		}
-		remove_country_flag = tec_no_starting_actions
 
 		event_target:tec_temp_new_leader = {
 			remove_leader_flag = tec_no_starting_actions
+			set_leader_flag = tec_evolved_regenerated_leader
+			if = {
+				limit = {
+					exists = event_target:tec_temp_selected_pop
+				}
+				event_target:tec_temp_selected_pop = {
+					switch = {
+						trigger = has_job
+						politician = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = politician
+							}
+						}
+						executive = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = executive
+							}
+						}
+						tec_ai_computator = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = tec_ai_computator
+							}
+						}
+						tec_ai_high_ordinator = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = tec_ai_high_ordinator
+							}
+						}
+						head_researcher = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = head_researcher
+							}
+						}
+						high_priest = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = high_priest
+							}
+						}
+						technophant = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = technophant
+							}
+						}
+						noble = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = noble
+							}
+						}
+						merchant = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = merchant
+							}
+						}
+						tec_commander = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = tec_commander
+							}
+						}
+						tec_mogul = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = tec_mogul
+							}
+						}
+						tec_technocrat = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = tec_technocrat
+							}
+						}
+						tec_grand_occultist = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = tec_grand_occultist
+							}
+						}
+						tec_grand_archivist = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = tec_grand_archivist
+							}
+						}
+						tec_supervisor_bureaucrat = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = tec_supervisor_bureaucrat
+							}
+						}
+						tec_master_tinker = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = tec_master_tinker
+							}
+						}
+						tec_corpo_consultant = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = tec_corpo_consultant
+							}
+						}
+						tec_corpo_bank_director = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = tec_corpo_bank_director
+							}
+						}
+						tec_corpo_prospector = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = tec_corpo_prospector
+							}
+						}
+						tec_corpo_tinker = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = tec_corpo_tinker
+							}
+						}
+						tec_corpo_ecoprospector = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = tec_corpo_ecoprospector
+							}
+						}
+						researcher = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = researcher
+							}
+						}
+						bureaucrat = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = bureaucrat
+							}
+						}
+						manager = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = manager
+							}
+						}
+						steward = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = steward
+							}
+						}
+						tec_ai_operator = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = tec_ai_operator
+							}
+						}
+						tec_ai_ordinator = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = tec_ai_ordinator
+							}
+						}
+						priest = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = priest
+							}
+						}
+						haruspex = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = haruspex
+							}
+						}
+						death_priest = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = death_priest
+							}
+						}
+						tec_mecha_priest = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = tec_mecha_priest
+							}
+						}
+						foundry = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = foundry
+							}
+						}
+						catalytic_technician = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = catalytic_technician
+							}
+						}
+						artisan = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = artisan
+							}
+						}
+						artificer = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = artificer
+							}
+						}
+						culture_worker = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = culture_worker
+							}
+						}
+						entertainer = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = entertainer
+							}
+						}
+						enforcer = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = enforcer
+							}
+						}
+						clerk = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = clerk
+							}
+						}
+						farmer = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = farmer
+							}
+						}
+						angler = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = angler
+							}
+						}
+						miner = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = miner
+							}
+						}
+						tec_reef_miner = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = tec_reef_miner
+							}
+						}
+						technician = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = technician
+							}
+						}
+						soldier = {
+							event_target:tec_temp_new_leader = {
+								change_background_job = soldier
+							}
+						}
+
+						default = {
+							event_target:tec_temp_new_leader = {
+								switch = {
+									trigger = leader_class
+									inline_script = {
+										script = iterators/tec_iterate_leader_class
+										code = "
+											$leader_class$ = {
+												set_random_$leader_class$_background_effect = yes
+											}
+										"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			else = {
+				switch = {
+					trigger = leader_class
+					inline_script = {
+						script = iterators/tec_iterate_leader_class
+						code = "
+						$leader_class$ = {
+							set_random_$leader_class$_background_effect = yes
+						}
+					"
+					}
+				}
+			}
+			recruitable = no
+			recruitable = yes
 		}
 
 		event_target:tec_temp_leader = {
-			if = {
-				limit = {
-					exists = planet
-				}
-				planet = {
-					assign_leader = event_target:tec_temp_new_leader
-				}
-			} else_if = {
-				limit = {
-					exists = fleet
-				}
-				fleet = {
-					assign_leader = event_target:tec_temp_new_leader
-				}
-			} else_if = {
-				limit = {
-					root = {
-						any_owned_army = {
-							exists = leader
-							leader = {
-								is_same_value = event_target:tec_temp_leader
-							}
-						}
-					}
-				}
-				root = {
-					random_owned_army = {
-						limit = {
-							exists = leader
-							leader = {
-								is_same_value = event_target:tec_temp_leader
-							}
-						}
-						assign_leader = event_target:tec_temp_new_leader
-					}
-				}
-			}
-			kill_leader = {
-				show_notification = no
-			}
+			kill_leader = { show_notification = no }
 		}
 	}
 }
+
 country_event = { # Leader level handler
 	id = antidesync_evolved.1002
 	hide_window = yes
