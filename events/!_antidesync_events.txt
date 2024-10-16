@@ -19,140 +19,146 @@ country_event = {
 	hide_window = yes
 
 	trigger = {
-		always = yes
+		# is_multiplayer = yes
+		from = {
+			tec_has_any_gestalt_ethics = no
+		}
 	}
 
 	immediate = {
 		from = {
 			save_event_target_as = tec_temp_leader
-			# Changes ethic to gestalt to normalize
-			change_background_ethic = ethic_gestalt_consciousness
 			# We sample from the population of the species and apply an ethic
 			creator = {
 				random_owned_pop = {
 					limit = {
 						exists = this
 						is_exact_same_species = event_target:tec_temp_leader
-						NOR = {
-							has_trait = trait_mechanical
-							has_trait = trait_tec_bioservant
-							has_trait = trait_zombie
-							has_trait = trait_nerve_stapled
-							has_trait = trait_presapient_proles
-							has_trait = trait_syncretic_proles
-						}
+						tec_has_any_regular_ethics = yes
+						can_be_leader = yes
 					}
-					switch = {
-						trigger = has_ethic
-						# Vanilla
-						ethic_authoritarian = {
-							event_target:tec_temp_leader = {
-								change_background_ethic = ethic_authoritarian
-							}
+					save_event_target_as = tec_temp_selected_pop
+				}
+				random_owned_planet = {
+
+					save_event_target_as = tec_temp_selected_planet
+				}
+			}
+			set_leader_flag = tec_no_starting_actions
+			switch = {
+				trigger = leader_class
+				inline_script = {
+					script = iterators/tec_iterate_leader_class
+					code = "
+						$leader_class$ = {
+							set_random_$leader_class$_background_effect = yes
 						}
-						ethic_egalitarian = {
-							event_target:tec_temp_leader = {
-								change_background_ethic = ethic_egalitarian
+					"
+				}
+			}
+		}
+		set_country_flag = tec_no_starting_actions
+		if = {
+			limit = {
+				exists = event_target:tec_temp_selected_pop
+			}
+			event_target:tec_temp_selected_pop = {
+				switch = {
+					trigger = has_ethic
+					inline_script = {
+						script = iterators/tec_iterate_ethic_regular
+						code = "
+							ethic_$ethic$ = {
+								event_target:tec_temp_leader = {
+									change_background_ethic = ethic_$ethic$
+								}
+								root = {
+									clone_leader = {
+										target = event_target:tec_temp_leader
+										background_planet = event_target:tec_temp_selected_pop.planet
+										background_ethic = ethic_$ethic$
+										skip_background_generation = yes
+										effect = {
+											copy_flags_and_variables_from = event_target:tec_temp_leader
+											save_event_target_as = tec_temp_new_leader
+										}
+									}
+								}
+
 							}
-						}
-						ethic_xenophobe = {
-							event_target:tec_temp_leader = {
-								change_background_ethic = ethic_xenophobe
-							}
-						}
-						ethic_xenophile = {
-							event_target:tec_temp_leader = {
-								change_background_ethic = ethic_xenophile
-							}
-						}
-						ethic_militarist = {
-							event_target:tec_temp_leader = {
-								change_background_ethic = ethic_militarist
-							}
-						}
-						ethic_pacifist = {
-							event_target:tec_temp_leader = {
-								change_background_ethic = ethic_pacifist
-							}
-						}
-						ethic_spiritualist = {
-							event_target:tec_temp_leader = {
-								change_background_ethic = ethic_spiritualist
-							}
-						}
-						ethic_materialist = {
-							event_target:tec_temp_leader = {
-								change_background_ethic = ethic_materialist
-							}
-						}
-						# Evolved
-						ethic_cooperative = {
-							event_target:tec_temp_leader = {
-								change_background_ethic = ethic_cooperative
-							}
-						}
-						ethic_competitive = {
-							event_target:tec_temp_leader = {
-								change_background_ethic = ethic_competitive
-							}
-						}
-						ethic_ecologist = {
-							event_target:tec_temp_leader = {
-								change_background_ethic = ethic_ecologist
-							}
-						}
-						ethic_industrialist = {
-							event_target:tec_temp_leader = {
-								change_background_ethic = ethic_industrialist
-							}
-						}
-						ethic_elitist = {
-							event_target:tec_temp_leader = {
-								change_background_ethic = ethic_elitist
-							}
-						}
-						ethic_pluralist = {
-							event_target:tec_temp_leader = {
-								change_background_ethic = ethic_pluralist
-							}
-						}
-						# Gestalt
-						ethic_gestalt_consciousness = {
-							event_target:tec_temp_leader = {
-								change_background_ethic = ethic_gestalt_consciousness
-							}
-						}
+						"
 					}
 				}
 			}
-			# Now that ethics have been changed...
-			# Technically this event should trigger before extra traits
-			# So lets nuke it
-			remove_all_traits = yes
-			set_variable = {
-				which = var_level
-				value = trigger:has_skill
+		} else = {
+			random_list = {
+				inline_script = {
+					script = iterators/tec_iterate_ethic_regular
+					code = "
+						1 = {
+							clone_leader = {
+								target = event_target:tec_temp_leader
+								background_planet = event_target:tec_temp_selected_planet
+								background_ethic = ethic_$random$
+								skip_background_generation = yes
+								effect = {
+									copy_flags_and_variables_from = event_target:tec_temp_leader
+									save_event_target_as = tec_temp_new_leader
+								}
+							}
+						}
+					"
+				}
+				0 = {}
 			}
-			change_variable = {
-				which = var_level
-				value = -1
-			}
-			set_skill = 1
-			# Adds a new starting trait
-			# (now weighted properly by non ghost ethics)
-			add_trait_no_notify = "random_common"
-			# Increases the skills equal to the level -1
+		}
+		remove_country_flag = tec_no_starting_actions
+
+		event_target:tec_temp_new_leader = {
+			remove_leader_flag = tec_no_starting_actions
+		}
+
+		event_target:tec_temp_leader = {
 			if = {
 				limit = {
-					check_variable = {
-						which = var_level
-						value > 0
+					exists = planet
+				}
+				planet = {
+					assign_leader = event_target:tec_temp_new_leader
+				}
+			} else_if = {
+				limit = {
+					exists = fleet
+				}
+				fleet = {
+					assign_leader = event_target:tec_temp_new_leader
+				}
+			} else_if = {
+				limit = {
+					root = {
+						any_owned_army = {
+							exists = leader
+							leader = {
+								is_same_value = event_target:tec_temp_leader
+							}
+						}
 					}
 				}
-				add_skill_without_trait_selection = var_level
+				root = {
+					random_owned_army = {
+						limit = {
+							exists = leader
+							leader = {
+								is_same_value = event_target:tec_temp_leader
+							}
+						}
+						assign_leader = event_target:tec_temp_new_leader
+					}
+				}
 			}
-			# Lets clean it
-			clear_variable = var_level
+			kill_leader = {
+				show_notification = no
+			}
 		}
 	}
 }
@@ -163,7 +169,7 @@ country_event = { # Leader level handler
 	is_triggered_only = yes
 
 	trigger = {
-		always = yes
+		is_multiplayer = yes
 	}
 
 	immediate = {
@@ -175,6 +181,27 @@ country_event = { # Leader level handler
 		#}
 	}
 }
+
+country_event = { # ROADD attempts electric bugalooo
+	id = antidesync_evolved.1002
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_multiplayer = yes
+	}
+
+	immediate = {
+		from = {
+			set_skill = trigger:has_skill
+		}
+		#every_owned_leader = {
+		#	set_skill = trigger:has_skill
+		#}
+	}
+}
+
 
 
 
