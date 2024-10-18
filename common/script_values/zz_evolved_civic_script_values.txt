@@ -162,6 +162,23 @@
 		}
 	}
 
+	tec_hoarder_get_vault_stockpile_V2 = {
+		inline_script = {
+			script = tec_type_hint
+			resource = $RESOURCE$
+			[[MULT] float = $MULT$ ]
+		}
+		base = 0
+		modifier = {
+			is_variable_set = tec_$RESOURCE$_stockpile
+			add = tec_$RESOURCE$_stockpile
+		}
+		[[MULT]
+			mult = $MULT$
+		]
+	}
+
+
 	tec_hoarders_get_resource_intermediary = {
 		inline_script = {
 			script = tec_type_hint
@@ -192,6 +209,15 @@
 		}
 	}
 
+	tec_hoarders_get_resource_stockpile_V2 = {
+		inline_script = {
+			script = tec_type_hint
+			resource = $RESOURCE$
+		}
+		add = value:tec_hoarders_get_resource_intermediary|RESOURCE|$RESOURCE$|
+	}
+
+
 
 	tec_hoarders_after_withdraw_balance = {
 		inline_script = {
@@ -203,6 +229,18 @@
 		add = value:tec_hoarder_get_vault_stockpile
 		subtract = $WITHDRAW$
 		add = tec_stockpile_change
+	}
+
+	tec_hoarders_after_withdraw_balance_V2 = {
+		inline_script = {
+			script = tec_type_hint
+			float = $WITHDRAW$
+			resource = $RESOURCE$
+		}
+
+		base = 0
+		add = value:tec_hoarder_get_vault_stockpile_V2|RESOURCE|$RESOURCE$|
+		subtract = $WITHDRAW$
 	}
 
 
@@ -221,6 +259,19 @@
 		}
 	}
 
+	tec_hoarders_after_deposit_balance_V2 = {
+		inline_script = {
+			script = tec_type_hint
+			float = $WITHDRAW$
+			resource = $RESOURCE$
+		}
+
+		base = 0
+		add = value:tec_hoarders_get_resource_stockpile_V2|RESOURCE|$RESOURCE$|
+		subtract = $DEPOSIT$
+	}
+
+
 	tec_hoarders_after_deposit_remaining_capacity = {
 		inline_script = {
 			script = tec_type_hint
@@ -237,13 +288,38 @@
 		subtract = $DEPOSIT$
 	}
 
+	tec_hoarders_after_deposit_remaining_capacity_V2 = {
+		inline_script = {
+			script = tec_type_hint
+			float = $WITHDRAW$
+			resource = $RESOURCE$
+		}
+		base = 0
+		add = owner.modifier:country_resource_max_add
+		subtract = value:tec_hoarder_get_vault_stockpile_V2|RESOURCE|$RESOURCE$|
+		subtract = $DEPOSIT$
+	}
+
+
 	tec_hoarders_max_that_can_be_deposited = {
 		add = 0
 		min = value:tec_hoarders_after_deposit_balance|DEPOSIT|0|
 		max = value:tec_hoarders_after_deposit_remaining_capacity|DEPOSIT|0|
 		min = 0
 	}
+
+	tec_hoarders_max_that_can_be_deposited_V2 = {
+		inline_script = {
+			script = tec_type_hint
+			resource = $RESOURCE$
+		}
+		add = 0
+		min = value:tec_hoarders_after_deposit_balance_V2|RESOURCE|$RESOURCE$|DEPOSIT|0|
+		max = value:tec_hoarders_after_deposit_remaining_capacity_V2|RESOURCE|$RESOURCE$|DEPOSIT|0|
+		min = 0
+	}
  # /
+
  # Netrunners
 	tec_netrunner_efficiency = {
 		inline_script = {

@@ -26,6 +26,7 @@ SCRIPTED_TRIGGERS = div_str("common/scripted_triggers")
 SCRIPTED_EFFECTS = div_str("common/scripted_effects")
 SCRIPTED_VARIABLES = div_str("common/scripted_variables")
 SCRIPT_VALUES = div_str("common/script_values")
+HOARDER_BUTTONS_TEMPLATE = INLINE_FOLDER / div_str("cui/hoarder/tec_hoarder_resource_buttons.txt")
 SUFFIX_PLACEHOLDER = "\\<suffix\\>"
 
 def load_config(path: str) -> Config:
