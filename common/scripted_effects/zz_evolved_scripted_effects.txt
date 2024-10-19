@@ -1077,23 +1077,35 @@ tec_hoarders_recover_resource = {
 	}
 }
 
+tec_hoarders_initialzie_vault = {
+	inline_script = {
+		script = iterators/tec_iterate_hoarder_resource
+		code = "
+			create_variable_if_not_exists = { VARIABLE = tec_$resource$_stockpile VALUE_IF_CREATED = 0 }
+		"
+	}
+}
+
 tec_hoarders_withdraw_resource = {
 	inline_script = {
 		script = tec_type_hint
-		resource = $RESOURCE$
+		resource = $resource$
 	}
 
 	if = {
 		limit = {
-			is_variable_set = tec_$RESOURCE$_stockpile
+			is_variable_set = tec_$resource$_stockpile
 		}
 		owner = {
 			add_resource = {
-				$RESOURCE$ = 1
-				mult = prev.tec_$RESOURCE$_stockpile
+				$resource$ = 1
+				mult = prev.tec_$resource$_stockpile
 			}
 		}
-		clear_variable = tec_$RESOURCE$_stockpile
+		set_variable = {
+			which = tec_$resource$_stockpile
+			value = 0
+		}
 	}
 }
 
@@ -1124,6 +1136,28 @@ tec_hoarders_deposit_max_resource = {
 			}
 			tec_hoarders_manage_resource = { RESOURCE = $RESOURCE$ }
 			remove_planet_flag = tec_vault_manage_$RESOURCE$
+		}
+	}
+}
+
+tec_hoarders_deposit_max_resource_V2 = {
+	inline_script = {
+		script = tec_type_hint
+		resource = $resource$
+	}
+	if = {
+		limit = {
+			exists = owner
+			owner = {
+				resource_income_compare = {
+					resource = $resource$
+					value >= 0
+				}
+			}
+		}
+		tec_hoarders_manage_resource_V2 = {
+			RESOURCE = $resource$
+			COUNT = value:tec_hoarder_get_vault_stockpile_V2|RESOURCE|$resource$|MULT|-1|
 		}
 	}
 }
@@ -1165,7 +1199,7 @@ tec_hoarders_manage_resource_V2 = {
 	inline_script = {
 		script = tec_type_hint
 		resource = $RESOURCE$
-		float = $COUNT$
+		number_or_value = $COUNT$
 	}
 
 	if = {
@@ -1186,7 +1220,7 @@ tec_hoarders_manage_resource_V2 = {
 	owner = {
 		add_resource = {
 			$RESOURCE$ = -1
-			mult = tec_temp_manage
+			mult = prev.tec_temp_manage
 		}
 	}
 }
